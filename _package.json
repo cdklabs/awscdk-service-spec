@@ -1,0 +1,40 @@
+{
+  "name": "awscdk-service-spec",
+  "description": "Monorepo for the AWS CDK's service spec",
+  "private": true,
+  "version": "0.0.0",
+  "devDependencies": {
+    "yarn": "^1.22.19",
+    "@apidevtools/json-schema-ref-parser": "^10.0.1",
+    "@types/fs-extra": "^8.1.2",
+    "@types/jest": "^27.5.2",
+    "@types/json-schema": "^7.0.11",
+    "@types/md5": "^2.3.2",
+    "jest": "^27.5.1",
+    "json-diff": "^0.10.0",
+    "json-schema-to-typescript": "^11.0.3",
+    "sort-json": "^2.0.1"
+  },
+  "dependencies": {
+    "fs-extra": "^9.1.0",
+    "md5": "^2.3.0"
+  },
+  "repository": {
+    "url": "git+https://github.com/aws/aws-cdk.git",
+    "type": "git",
+    "directory": "packages/@aws-cdk/cfnspec"
+  },
+  "license": "Apache-2.0",
+  "author": "Amazon Web Services (https://aws.amazon.com)",
+  "keywords": [
+    "aws",
+    "cdk"
+  ],
+  "homepage": "https://github.com/aws/aws-cdk",
+  "bugs": {
+    "url": "https://github.com/aws/aws-cdk/issues"
+  },
+  "directories": {
+    "test": "test"
+  }
+}
