@@ -1,5 +1,5 @@
-var path = require("path");
-var fs = require("fs");
+var path = require('path');
+var fs = require('fs');
 var contents = fs.readFileSync('.eslintrc.json', { encoding: 'utf-8' });
 // Strip comments, JSON.parse() doesn't like those
 contents = contents.replace(/^\/\/.*$/m, '');

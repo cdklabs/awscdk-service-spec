@@ -16,7 +16,7 @@ const repo = new MonorepoRoot({
       trailingComma: pj.javascript.TrailingComma.ALL,
     },
   },
-  release: true,
+  release: false,
 
   githubOptions: {
     mergify: false,
