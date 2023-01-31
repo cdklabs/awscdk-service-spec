@@ -31,15 +31,13 @@ export class MonorepoRoot extends pj.typescript.TypeScriptProject {
 
   private finalEscapeHatches() {
     // Get the ObjectFile
-    const packageJson = this.tryFindObjectFile('package.json');
-    packageJson?.addOverride('private', true);
-    packageJson?.addOverride('workspaces', {
+    this.package.addField('private', true);
+    this.package.addField('workspaces', {
       packages: this.projects.map((p) => `packages/${p.name}`),
     });
 
-    const tsConfig = this.tryFindObjectFile('tsconfig.json');
-    tsConfig?.addOverride('include', []);
-    tsConfig?.addOverride(
+    this.tsconfig?.file.addOverride('include', []);
+    this.tsconfig?.file.addOverride(
       'references',
       this.projects.map((p) => ({ path: `packages/${p.name}` })),
     );
@@ -59,6 +57,8 @@ export interface MonorepoTypeScriptProjectOptions
     | 'outdir'
   > {
   readonly parent: MonorepoRoot;
+
+  readonly private?: boolean;
 }
 
 export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
@@ -81,6 +81,10 @@ export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
 
     // Suppress installing dependencies
     (this.package as any).installDependencies = () => {};
+
+    if (props.private) {
+      this.package.addField('private', true);
+    }
 
     props.parent.register(this);
   }
