@@ -1,7 +1,0 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const index_1 = require("../lib/index");
-test('namespaces() includes some namespaces', () => {
-    expect(index_1.namespaces().length).toBeGreaterThan(10);
-});
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibmFtZXNwYWNlcy50ZXN0LmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsibmFtZXNwYWNlcy50ZXN0LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7O0FBQUEsd0NBQTBDO0FBRTFDLElBQUksQ0FBQyx1Q0FBdUMsRUFBRSxHQUFHLEVBQUU7SUFDakQsTUFBTSxDQUFDLGtCQUFVLEVBQUUsQ0FBQyxNQUFNLENBQUMsQ0FBQyxlQUFlLENBQUMsRUFBRSxDQUFDLENBQUM7QUFDbEQsQ0FBQyxDQUFDLENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBuYW1lc3BhY2VzIH0gZnJvbSAnLi4vbGliL2luZGV4JztcblxudGVzdCgnbmFtZXNwYWNlcygpIGluY2x1ZGVzIHNvbWUgbmFtZXNwYWNlcycsICgpID0+IHtcbiAgZXhwZWN0KG5hbWVzcGFjZXMoKS5sZW5ndGgpLnRvQmVHcmVhdGVyVGhhbigxMCk7XG59KTtcbiJdfQ==

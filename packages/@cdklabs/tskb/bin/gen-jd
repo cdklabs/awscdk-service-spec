@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require('./gen-jd.js');
+require('../lib/cli/gen-jd.js');

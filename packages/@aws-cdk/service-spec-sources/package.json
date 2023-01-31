@@ -19,6 +19,7 @@
     "projen": "npx projen"
   },
   "devDependencies": {
+    "@cdklabs/tskb": "*",
     "@types/jest": "^29.2.6",
     "@types/node": "^14",
     "@typescript-eslint/eslint-plugin": "^5",

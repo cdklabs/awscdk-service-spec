@@ -1,6 +1,9 @@
 {
   "name": "@cdklabs/tskb",
   "description": "Using TypeScript as a knowledge base",
+  "bin": {
+    "gen-jd": "bin/gen-jd"
+  },
   "scripts": {
     "build": "npx projen build",
     "clobber": "npx projen clobber",
