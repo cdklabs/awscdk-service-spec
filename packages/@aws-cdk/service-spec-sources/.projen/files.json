@@ -1,5 +1,6 @@
 {
   "files": [
+    ".eslintrc.js",
     ".eslintrc.json",
     ".gitattributes",
     ".gitignore",

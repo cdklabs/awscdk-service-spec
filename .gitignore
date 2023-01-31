@@ -45,5 +45,4 @@ jspm_packages/
 !/src/
 /lib
 /dist/
-!/.eslintrc.json
 .DS_Store

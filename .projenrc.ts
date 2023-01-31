@@ -34,25 +34,27 @@ const serviceSpecSources = new MonorepoTypeScriptProject({
   parent: repo,
   name: '@aws-cdk/service-spec-sources',
   description: 'Sources for the service spec',
-  devDeps: ['@cdklabs/tskb'],
+  devDeps: [tsKb],
   private: true,
 });
 serviceSpecSources.compileTask.prependExec('gen-jd'); // Comes from tskb
 serviceSpecSources.synth();
 
-const serviceSpecBuild = new MonorepoTypeScriptProject({
-  parent: repo,
-  name: '@aws-cdk/service-spec-build',
-  description: 'Build the service spec from service-spec-sources to service-spec',
-  private: true,
-});
-serviceSpecBuild.synth();
-
 const serviceSpec = new MonorepoTypeScriptProject({
   parent: repo,
   name: '@aws-cdk/service-spec',
   description: 'AWS CDK Service spec',
+  deps: [tsKb],
 });
 serviceSpec.synth();
+
+const serviceSpecBuild = new MonorepoTypeScriptProject({
+  parent: repo,
+  name: '@aws-cdk/service-spec-build',
+  description: 'Build the service spec from service-spec-sources to service-spec',
+  deps: [tsKb, serviceSpecSources, serviceSpec],
+  private: true,
+});
+serviceSpecBuild.synth();
 
 repo.synth();
