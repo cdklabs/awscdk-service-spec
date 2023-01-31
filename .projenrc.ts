@@ -1,8 +1,7 @@
-import * as pj from 'projen';
 import { TrailingComma } from 'projen/lib/javascript';
-import { MonorepoTypeScriptProject } from './projenrc/mono-repo-typescript-project';
+import { MonorepoRoot, MonorepoTypeScriptProject } from './projenrc/monorepo';
 
-const repo = new pj.typescript.TypeScriptProject({
+const repo = new MonorepoRoot({
   defaultReleaseBranch: 'main',
   name: 'awscdk-service-spec',
   description: "Monorepo for the AWS CDK's service spec",
@@ -22,32 +21,11 @@ const repo = new pj.typescript.TypeScriptProject({
     mergify: false,
   },
 });
-repo.gitignore.addPatterns('.DS_Store');
-
-// Get the ObjectFile
-const packageJson = repo.tryFindObjectFile('package.json');
-packageJson?.addOverride('private', true);
-packageJson?.addOverride('workspaces', {
-  packages: ['packages/*'],
-});
-
-const tsConfig = repo.tryFindObjectFile('tsconfig.json');
-tsConfig?.addOverride('include', []);
-tsConfig?.addOverride('references', [
-  { path: 'packages/@cdklabs/tskb' },
-  { path: 'packages/@aws-cdk/service-spec-sources' },
-  { path: 'packages/@aws-cdk/service-spec-build' },
-  { path: 'packages/@aws-cdk/service-spec' },
-]);
 
 const tsKb = new MonorepoTypeScriptProject({
   parent: repo,
   name: '@cdklabs/tskb',
   description: 'Using TypeScript as a knowledge base',
-
-  bin: {
-    'gen-jd': 'bin/gen-jd',
-  },
 });
 tsKb.synth();
 
@@ -57,7 +35,7 @@ const serviceSpecSources = new MonorepoTypeScriptProject({
   description: 'Sources for the service spec',
   devDeps: ['@cdklabs/tskb'],
 });
-serviceSpecSources.preCompileTask.prependExec('gen-jd'); // Comes from tskb
+serviceSpecSources.compileTask.prependExec('gen-jd'); // Comes from tskb
 serviceSpecSources.synth();
 
 const serviceSpecBuild = new MonorepoTypeScriptProject({

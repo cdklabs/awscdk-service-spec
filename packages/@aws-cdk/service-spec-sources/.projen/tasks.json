@@ -58,6 +58,9 @@
       "description": "Only compile",
       "steps": [
         {
+          "exec": "gen-jd"
+        },
+        {
           "exec": "tsc --build"
         }
       ]
@@ -114,12 +117,7 @@
     },
     "pre-compile": {
       "name": "pre-compile",
-      "description": "Prepare the project for compilation",
-      "steps": [
-        {
-          "exec": "gen-jd"
-        }
-      ]
+      "description": "Prepare the project for compilation"
     },
     "test": {
       "name": "test",
