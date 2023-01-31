@@ -1,4 +1,4 @@
-import { TrailingComma } from 'projen/lib/javascript';
+import * as pj from 'projen';
 import { MonorepoRoot, MonorepoTypeScriptProject } from './projenrc/monorepo';
 
 const repo = new MonorepoRoot({
@@ -11,8 +11,9 @@ const repo = new MonorepoRoot({
   prettier: true,
   prettierOptions: {
     settings: {
+      printWidth: 120,
       singleQuote: true,
-      trailingComma: TrailingComma.ALL,
+      trailingComma: pj.javascript.TrailingComma.ALL,
     },
   },
   release: true,

@@ -3,10 +3,7 @@ import * as pj from 'projen';
 //////////////////////////////////////////////////////////////////////
 
 export interface MonorepoRootOptions
-  extends Omit<
-    pj.typescript.TypeScriptProjectOptions,
-    'sampleCode' | 'jest' | 'jestOptions'
-  > {}
+  extends Omit<pj.typescript.TypeScriptProjectOptions, 'sampleCode' | 'jest' | 'jestOptions'> {}
 
 export class MonorepoRoot extends pj.typescript.TypeScriptProject {
   private projects = new Array<MonorepoTypeScriptProject>();
@@ -49,12 +46,7 @@ export class MonorepoRoot extends pj.typescript.TypeScriptProject {
 export interface MonorepoTypeScriptProjectOptions
   extends Omit<
     pj.typescript.TypeScriptProjectOptions,
-    | 'parent'
-    | 'defaultReleaseBranch'
-    | 'release'
-    | 'repositoryDirectory'
-    | 'autoDetectBin'
-    | 'outdir'
+    'parent' | 'defaultReleaseBranch' | 'release' | 'repositoryDirectory' | 'autoDetectBin' | 'outdir'
   > {
   readonly parent: MonorepoRoot;
 
@@ -90,10 +82,7 @@ export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
   }
 }
 
-function without<A extends object, K extends keyof A>(
-  x: A,
-  ...ks: K[]
-): Omit<A, K> {
+function without<A extends object, K extends keyof A>(x: A, ...ks: K[]): Omit<A, K> {
   const ret = { ...x };
   for (const k of ks) {
     delete ret[k];
