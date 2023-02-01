@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as pj from 'projen';
 
 //////////////////////////////////////////////////////////////////////
@@ -35,14 +36,16 @@ export class MonorepoRoot extends pj.typescript.TypeScriptProject {
     });
 
     this.tsconfig?.file.addOverride('include', []);
-    this.tsconfig?.file.addOverride(
-      'references',
-      this.projects.map((p) => ({ path: `packages/${p.name}` })),
-    );
-    this.tsconfigDev?.file.addOverride(
-      'references',
-      this.projects.map((p) => ({ path: `packages/${p.name}` })),
-    );
+    this.tsconfigDev?.file.addOverride('include', [
+      '.projenrc.ts',
+      'projenrc/**/*.ts',
+    ]);
+    for (const tsconfig of [this.tsconfig, this.tsconfigDev]) {
+      tsconfig?.file.addOverride(
+        'references',
+        this.projects.map((p) => ({ path: `packages/${p.name}` })),
+      );
+    };
   }
 }
 
@@ -90,9 +93,18 @@ export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
 
       ...remainder,
     });
-    // Composite project
-    (this.tsconfig?.compilerOptions as any).composite = true;
-    (this.tsconfigDev?.compilerOptions as any).composite = true;
+
+    // Composite project and references
+    const allDeps = [...props.deps ?? [], ...props.peerDeps ?? [], ...props.devDeps ?? []];
+
+    for (const tsconfig of [this.tsconfig, this.tsconfigDev]) {
+      tsconfig?.file.addOverride('composite', true);
+      tsconfig?.file.addOverride(
+        'references',
+        allDeps.filter(isMonorepoTypeScriptProject).
+          map((p) => ({ path: path.relative(this.outdir, p.outdir) }),
+      ));
+    }
 
     // Suppress installing dependencies
     (this.package as any).installDependencies = () => {};
@@ -133,4 +145,9 @@ function without<A extends object, K extends keyof A>(x: A, ...ks: K[]): Omit<A,
     delete ret[k];
   }
   return ret;
+}
+
+
+function isMonorepoTypeScriptProject(x: unknown): x is MonorepoTypeScriptProject {
+  return typeof x === 'object' && !!x && x instanceof MonorepoTypeScriptProject;
 }
