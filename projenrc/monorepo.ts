@@ -98,7 +98,7 @@ export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
     const allDeps = [...props.deps ?? [], ...props.peerDeps ?? [], ...props.devDeps ?? []];
 
     for (const tsconfig of [this.tsconfig, this.tsconfigDev]) {
-      tsconfig?.file.addOverride('composite', true);
+      tsconfig?.file.addOverride('compilerOptions.composite', true);
       tsconfig?.file.addOverride(
         'references',
         allDeps.filter(isMonorepoTypeScriptProject).

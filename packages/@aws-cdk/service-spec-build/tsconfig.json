@@ -24,13 +24,13 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "stripInternal": true,
-    "target": "ES2019"
+    "target": "ES2019",
+    "composite": true
   },
   "include": [
     "src/**/*.ts"
   ],
   "exclude": [],
-  "composite": true,
   "references": [
     {
       "path": "../../@cdklabs/tskb"
