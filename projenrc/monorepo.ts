@@ -106,6 +106,10 @@ export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
       ));
     }
 
+    // FIXME: I don't know why `tsconfig.dev.json` doesn't have an outdir, or where it's used,
+    // but it's causing in-place `.js` files to appear.
+    this.tsconfigDev.file.addOverride('compilerOptions.outDir', 'lib');
+
     // Suppress installing dependencies
     (this.package as any).installDependencies = () => {};
 

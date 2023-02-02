@@ -23,7 +23,8 @@
     "strictPropertyInitialization": true,
     "stripInternal": true,
     "target": "ES2019",
-    "composite": true
+    "composite": true,
+    "outDir": "lib"
   },
   "include": [
     ".projenrc.js",
