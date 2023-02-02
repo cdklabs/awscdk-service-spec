@@ -1,4 +1,5 @@
 import * as pj from 'projen';
+import { JsonFile } from 'projen';
 import { MonorepoRoot, MonorepoTypeScriptProject } from './projenrc/monorepo';
 
 const repo = new MonorepoRoot({
@@ -37,6 +38,9 @@ const serviceSpecSources = new MonorepoTypeScriptProject({
   devDeps: [tsKb],
   private: true,
 });
+for (const tsconfig of [serviceSpecSources.tsconfig, serviceSpecSources.tsconfigDev]) {
+  tsconfig?.addInclude('src/**/*.json');
+}
 serviceSpecSources.compileTask.prependExec('gen-jd'); // Comes from tskb
 serviceSpecSources.synth();
 
@@ -57,4 +61,26 @@ const serviceSpecBuild = new MonorepoTypeScriptProject({
 });
 serviceSpecBuild.synth();
 
+// Hide most of the generated files from VS Code
+new JsonFile(repo, '.vscode/settings.json', {
+  obj: {
+    'files.exclude': {
+      '**/.projen': true,
+      '**/.eslintrc.js': true,
+      '**/.eslintrc.json': true,
+      '**/.gitattributes': true,
+      '**/.gitignore': true,
+      '**/.npmignore': true,
+      '**/*.tsbuildinfo': true,
+      'packages/**/node_modules': true,
+      'packages/**/lib': true,
+      '.prettierignore': true,
+      '.prettierrc.json': true,
+      '**/tsconfig.json': true,
+      '**/tsconfig.dev.json': true,
+    },
+  },
+});
+
 repo.synth();
+

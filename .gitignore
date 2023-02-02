@@ -43,3 +43,4 @@ jspm_packages/
 /lib
 /dist/
 .DS_Store
+!/.vscode/settings.json
