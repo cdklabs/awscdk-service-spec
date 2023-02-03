@@ -35,13 +35,25 @@ const serviceSpecSources = new MonorepoTypeScriptProject({
   parent: repo,
   name: '@aws-cdk/service-spec-sources',
   description: 'Sources for the service spec',
-  devDeps: [tsKb],
+  devDeps: [
+    tsKb,
+    'typescript-json-schema'
+  ],
   private: true,
 });
 for (const tsconfig of [serviceSpecSources.tsconfig, serviceSpecSources.tsconfigDev]) {
   tsconfig?.addInclude('src/**/*.json');
 }
+
+const serviceSpecSchemaTask = serviceSpecSources.addTask('gen-schemas', {
+  steps: [
+    // 'CloudFormationRegistryResource'
+  ].map((schema: string) => ({
+    exec: `typescript-json-schema ./src/types/index.ts ${schema} > schemas/${schema}.json`
+  }))
+});
 serviceSpecSources.compileTask.prependExec('gen-jd'); // Comes from tskb
+serviceSpecSources.compileTask.spawn(serviceSpecSchemaTask);
 serviceSpecSources.synth();
 
 const serviceSpec = new MonorepoTypeScriptProject({
