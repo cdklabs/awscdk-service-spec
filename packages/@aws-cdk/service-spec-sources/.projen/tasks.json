@@ -62,6 +62,9 @@
         },
         {
           "exec": "tsc --build"
+        },
+        {
+          "spawn": "gen-schemas"
         }
       ]
     },
@@ -92,6 +95,14 @@
       "steps": [
         {
           "exec": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern src test build-tools .projenrc.js"
+        }
+      ]
+    },
+    "gen-schemas": {
+      "name": "gen-schemas",
+      "steps": [
+        {
+          "exec": "typescript-json-schema ./src/types/index.ts CloudFormationRegistryResource > schemas/CloudFormationRegistryResource.json"
         }
       ]
     },

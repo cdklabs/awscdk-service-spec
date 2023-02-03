@@ -1,13 +1,21 @@
-import { Database, emptyCollection, emptyRelationship } from '@cdklabs/tskb';
-import { DatabaseSchema } from '@aws-cdk/service-spec';
+import { emptyDatabase } from '@aws-cdk/service-spec';
+import * as sources from '@aws-cdk/service-spec-sources';
+import { loadCloudFormationRegistryResource } from './cloudformation-registry';
 
 export function buildDatabase() {
-  const db = new Database<DatabaseSchema>({
-    resource: emptyCollection(),
-    service: emptyCollection(),
-    hasResource: emptyRelationship('service', 'resource'),
-  });
+  const db = emptyDatabase();
 
+  for (const [key, resources] of Object.entries(sources.CloudFormationSchema)) {
+    const regionName = key.replace(/_/g, '-'); // us_east_1 -> us-east-1
+
+    const region = db.allocate('region', {
+      name: regionName,
+    });
+
+    for (const resource of Object.values(resources)) {
+      loadCloudFormationRegistryResource(db, region, resource);
+    }
+  }
 
   const svc = db.allocate('service', {
     name: '',
@@ -16,12 +24,9 @@ export function buildDatabase() {
   const res = db.allocate('resource', {
     attributes: {},
     cloudFormationType: '',
-    documentation: '',
     name: '',
     properties: {},
   });
-
-  db.all('resource')[0].documentation;
 
   const xs = db.follow('hasResource', svc);
   console.log(xs[0]);

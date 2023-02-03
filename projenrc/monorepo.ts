@@ -111,6 +111,7 @@ export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
     this.tsconfigDev.file.addOverride('compilerOptions.outDir', 'lib');
 
     // Suppress installing dependencies
+    // FIXME: need to bubble up and run yarn at the root level when deps change
     (this.package as any).installDependencies = () => {};
 
     if (props.private) {
