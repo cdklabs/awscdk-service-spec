@@ -1,6 +1,8 @@
 import * as path from 'path';
 import * as pj from 'projen';
 
+
+
 //////////////////////////////////////////////////////////////////////
 
 export interface MonorepoRootOptions
@@ -8,6 +10,7 @@ export interface MonorepoRootOptions
 
 export class MonorepoRoot extends pj.typescript.TypeScriptProject {
   private projects = new Array<MonorepoTypeScriptProject>();
+  private postInstallDependencies = new Array<() => boolean>;
 
   constructor(options: MonorepoRootOptions) {
     super({
@@ -28,6 +31,16 @@ export class MonorepoRoot extends pj.typescript.TypeScriptProject {
     super.synth();
   }
 
+  /**
+   * Allows a sub project to request installation of dependency at the Monorepo root
+   * They must provide a function that is executed after dependencies have been installed
+   * If this function returns true, the install command is run for a second time after all sub project requests have run.
+   * This is used to resolve dependency versions from `*` to a concrete version constraint.
+   */
+  public requestInstallDependencies(request: () => boolean) {
+    this.postInstallDependencies.push(request);
+  }
+
   private finalEscapeHatches() {
     // Get the ObjectFile
     this.package.addField('private', true);
@@ -46,6 +59,20 @@ export class MonorepoRoot extends pj.typescript.TypeScriptProject {
         this.projects.map((p) => ({ path: `packages/${p.name}` })),
       );
     };
+  }
+
+  public postSynthesize() {
+    if (this.postInstallDependencies.length) {
+      const nodePkg: any = this.package;
+      nodePkg.installDependencies();
+
+      const completedRequests = this.postInstallDependencies.map(request => request());
+      if (completedRequests.some(Boolean)) {
+        nodePkg.installDependencies();
+      }
+
+      this.postInstallDependencies = [];     
+    }
   }
 }
 
@@ -74,6 +101,8 @@ export interface MonorepoTypeScriptProjectOptions
 }
 
 export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
+  public readonly parent: MonorepoRoot;
+
   constructor(props: MonorepoTypeScriptProjectOptions) {
     const remainder = without(props, 'parent', 'name', 'description', 'deps', 'peerDeps', 'devDeps');
 
@@ -86,6 +115,7 @@ export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
       defaultReleaseBranch: 'REQUIRED-BUT-SHOULDNT-BE',
       release: false,
       eslint: true,
+      sampleCode: false,
 
       deps: packageNames(props.deps),
       peerDeps: packageNames(props.peerDeps),
@@ -93,6 +123,8 @@ export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
 
       ...remainder,
     });
+
+    this.parent = props.parent;
 
     // Composite project and references
     const allDeps = [...props.deps ?? [], ...props.peerDeps ?? [], ...props.devDeps ?? []];
@@ -110,8 +142,10 @@ export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
     // but it's causing in-place `.js` files to appear.
     this.tsconfigDev.file.addOverride('compilerOptions.outDir', 'lib');
 
-    // Suppress installing dependencies
-    (this.package as any).installDependencies = () => {};
+    // Install dependencies via the parent project
+    (this.package as any).installDependencies = () => {
+      this.parent.requestInstallDependencies(() => (this.package as any).resolveDepsAndWritePackageJson())
+    };
 
     if (props.private) {
       this.package.addField('private', true);
