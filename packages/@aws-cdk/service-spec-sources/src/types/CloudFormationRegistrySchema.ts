@@ -1,4 +1,4 @@
-import { ArbitraryMap, jsonschema } from "./JsonSchema";
+import { jsonschema } from "./JsonSchema";
 
 export interface CloudFormationRegistryResource extends ImplicitJsonSchemaObject {
   readonly $schema?: string;
@@ -16,7 +16,7 @@ export interface CloudFormationRegistryResource extends ImplicitJsonSchemaObject
   readonly readOnlyProperties?: string[];
   readonly writeOnlyProperties?: string[];
   readonly primaryIdentifier?: string[];
-  readonly definitions?: ArbitraryMap<jsonschema.Schema>;
+  readonly definitions?: Record<string, jsonschema.Schema>;
   readonly handlers?: Handlers;
   readonly tagging?: ResourceTagging;
   readonly taggable?: boolean;

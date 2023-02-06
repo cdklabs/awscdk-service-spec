@@ -2,23 +2,12 @@
   "$ref": "#/definitions/CloudFormationRegistryResource",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "ArbitraryMap<Schema>": {
-      "additionalProperties": {
-        "$ref": "#/definitions/jsonschema.Schema"
-      },
-      "description": "A map with an annotation so that `typescript-json-schema` will allow arbitrary properties",
-      "type": "object"
-    },
-    "ArbitraryMap<jsonschema.Schema>": {
-      "additionalProperties": {
-        "$ref": "#/definitions/jsonschema.Schema"
-      },
-      "description": "A map with an annotation so that `typescript-json-schema` will allow arbitrary properties",
-      "type": "object"
-    },
     "CloudFormationRegistryResource": {
       "additionalProperties": false,
       "properties": {
+        "$comment": {
+          "type": "string"
+        },
         "$schema": {
           "type": "string"
         },
@@ -57,7 +46,10 @@
           "type": "array"
         },
         "definitions": {
-          "$ref": "#/definitions/ArbitraryMap%3Cjsonschema.Schema%3E"
+          "additionalProperties": {
+            "$ref": "#/definitions/jsonschema.Schema"
+          },
+          "type": "object"
         },
         "deprecatedProperties": {
           "items": {
@@ -75,7 +67,10 @@
           "$ref": "#/definitions/Handlers"
         },
         "patternProperties": {
-          "$ref": "#/definitions/ArbitraryMap%3Cjsonschema.Schema%3E"
+          "additionalProperties": {
+            "$ref": "#/definitions/jsonschema.Schema"
+          },
+          "type": "object"
         },
         "primaryIdentifier": {
           "items": {
@@ -274,7 +269,10 @@
           "type": "string"
         },
         "patternProperties": {
-          "$ref": "#/definitions/ArbitraryMap%3CSchema%3E"
+          "additionalProperties": {
+            "$ref": "#/definitions/jsonschema.Schema"
+          },
+          "type": "object"
         },
         "properties": {
           "$ref": "#/definitions/jsonschema.ObjectProperties"
@@ -297,7 +295,10 @@
       "type": "object"
     },
     "jsonschema.ObjectProperties": {
-      "$ref": "#/definitions/ArbitraryMap%3CSchema%3E"
+      "additionalProperties": {
+        "$ref": "#/definitions/jsonschema.Schema"
+      },
+      "type": "object"
     },
     "jsonschema.Reference": {
       "additionalProperties": false,
