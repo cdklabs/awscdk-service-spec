@@ -44,8 +44,13 @@ const serviceSpecSources = new MonorepoTypeScriptProject({
 for (const tsconfig of [serviceSpecSources.tsconfig, serviceSpecSources.tsconfigDev]) {
   tsconfig?.addInclude('src/**/*.json');
 }
+
 const serviceSpecSchemaTask = serviceSpecSources.addTask('gen-schemas', {
-  exec: 'typescript-json-schema ./src/types/index.ts CloudFormationRegistryResource > schemas/CloudFormationRegistryResource.json'
+  steps: [
+    'CloudFormationRegistryResource'
+  ].map((schema: string) => ({
+    exec: `typescript-json-schema ./src/types/index.ts ${schema} > schemas/${schema}.json`
+  }))
 });
 serviceSpecSources.compileTask.prependExec('gen-jd'); // Comes from tskb
 serviceSpecSources.compileTask.spawn(serviceSpecSchemaTask);

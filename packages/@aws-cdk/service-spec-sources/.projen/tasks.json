@@ -99,12 +99,7 @@
       ]
     },
     "gen-schemas": {
-      "name": "gen-schemas",
-      "steps": [
-        {
-          "exec": "typescript-json-schema ./src/types/index.ts CloudFormationRegistryResource > schemas/CloudFormationRegistryResource.json"
-        }
-      ]
+      "name": "gen-schemas"
     },
     "package": {
       "name": "package",
