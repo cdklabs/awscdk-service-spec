@@ -28,6 +28,10 @@
       "type": "build"
     },
     {
+      "name": "ajv-cli",
+      "type": "build"
+    },
+    {
       "name": "eslint-import-resolver-node",
       "type": "build"
     },

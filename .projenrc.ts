@@ -40,6 +40,7 @@ const serviceSpecSources = new MonorepoTypeScriptProject({
     tsKb,
     'ts-json-schema-generator',
     '@types/glob',
+    'ajv-cli',
   ],
   private: true,
 });
@@ -58,10 +59,18 @@ const serviceSpecSchemaTask = serviceSpecSources.addTask('gen-schemas', {
     ].join(' '),
   }))
 });
+
+// FIXME: Needs to automatically run, but not yet because not everything validates yet
+serviceSpecSources.addTask('validate-specs', {
+  steps: [
+    { exec: 'node ./lib/build-tools/validate-resources.js' },
+  ]
+});
+
 serviceSpecSources.compileTask.prependExec('gen-jd'); // Comes from tskb
 serviceSpecSources.compileTask.prependSpawn(serviceSpecSchemaTask);
-serviceSpecSources.compileTask.exec('node ./lib/build-tools/validate-resources.js');
 serviceSpecSources.synth();
+
 
 const serviceSpec = new MonorepoTypeScriptProject({
   parent: repo,

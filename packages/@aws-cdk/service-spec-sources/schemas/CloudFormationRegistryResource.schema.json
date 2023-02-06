@@ -47,7 +47,7 @@
         },
         "definitions": {
           "additionalProperties": {
-            "$ref": "#/definitions/jsonschema.Schema"
+            "$ref": "#/definitions/jsonschema.ConcreteSchema"
           },
           "type": "object"
         },
@@ -220,11 +220,11 @@
     "jsonschema.Boolean": {
       "additionalProperties": false,
       "properties": {
-        "description": {
+        "$comment": {
           "type": "string"
         },
-        "items": {
-          "$ref": "#/definitions/jsonschema.Schema"
+        "description": {
+          "type": "string"
         },
         "type": {
           "const": "boolean",
@@ -232,8 +232,7 @@
         }
       },
       "required": [
-        "type",
-        "items"
+        "type"
       ],
       "type": "object"
     },
@@ -245,15 +244,60 @@
         {
           "$ref": "#/definitions/jsonschema.String"
         },
-        {},
+        {
+          "$ref": "#/definitions/jsonschema.SchemaArray"
+        },
         {
           "$ref": "#/definitions/jsonschema.Boolean"
+        },
+        {
+          "$ref": "#/definitions/jsonschema.Number"
         }
       ]
+    },
+    "jsonschema.Number": {
+      "additionalProperties": false,
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "default": {
+          "type": "number"
+        },
+        "description": {
+          "type": "string"
+        },
+        "enum": {
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        "maximum": {
+          "type": "number"
+        },
+        "minimum": {
+          "type": "number"
+        },
+        "type": {
+          "enum": [
+            "number",
+            "integer"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
     },
     "jsonschema.Object": {
       "additionalProperties": false,
       "properties": {
+        "$comment": {
+          "type": "string"
+        },
         "additionalProperties": {
           "anyOf": [
             {
@@ -322,9 +366,47 @@
         }
       ]
     },
+    "jsonschema.SchemaArray": {
+      "additionalProperties": false,
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "insertionOrder": {
+          "type": "boolean"
+        },
+        "items": {
+          "$ref": "#/definitions/jsonschema.Schema"
+        },
+        "maxLength": {
+          "type": "number"
+        },
+        "minLength": {
+          "type": "number"
+        },
+        "type": {
+          "const": "array",
+          "type": "string"
+        },
+        "uniqueItems": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "type",
+        "items"
+      ],
+      "type": "object"
+    },
     "jsonschema.String": {
       "additionalProperties": false,
       "properties": {
+        "$comment": {
+          "type": "string"
+        },
         "default": {
           "type": "string"
         },
@@ -332,7 +414,10 @@
           "type": "string"
         },
         "enum": {
-          "type": "string"
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         },
         "format": {
           "const": "date-time",

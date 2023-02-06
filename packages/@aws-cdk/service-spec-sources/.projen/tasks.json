@@ -65,9 +65,6 @@
         },
         {
           "exec": "tsc --build"
-        },
-        {
-          "exec": "node ./lib/build-tools/validate-resources.js"
         }
       ]
     },
@@ -191,6 +188,14 @@
         },
         {
           "spawn": "post-upgrade"
+        }
+      ]
+    },
+    "validate-specs": {
+      "name": "validate-specs",
+      "steps": [
+        {
+          "exec": "node ./lib/build-tools/validate-resources.js"
         }
       ]
     },

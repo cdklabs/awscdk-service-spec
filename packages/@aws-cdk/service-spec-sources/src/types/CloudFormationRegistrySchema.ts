@@ -16,7 +16,7 @@ export interface CloudFormationRegistryResource extends ImplicitJsonSchemaObject
   readonly readOnlyProperties?: string[];
   readonly writeOnlyProperties?: string[];
   readonly primaryIdentifier?: string[];
-  readonly definitions?: Record<string, jsonschema.Schema>;
+  readonly definitions?: Record<string, jsonschema.ConcreteSchema>;
   readonly handlers?: Handlers;
   readonly tagging?: ResourceTagging;
   readonly taggable?: boolean;

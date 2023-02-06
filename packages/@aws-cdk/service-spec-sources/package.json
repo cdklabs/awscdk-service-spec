@@ -16,6 +16,7 @@
     "test": "npx projen test",
     "test:watch": "npx projen test:watch",
     "upgrade": "npx projen upgrade",
+    "validate-specs": "npx projen validate-specs",
     "watch": "npx projen watch",
     "projen": "npx projen"
   },
@@ -26,6 +27,7 @@
     "@types/node": "^14",
     "@typescript-eslint/eslint-plugin": "^5",
     "@typescript-eslint/parser": "^5",
+    "ajv-cli": "^5.0.0",
     "eslint": "^8",
     "eslint-import-resolver-node": "^0.3.7",
     "eslint-import-resolver-typescript": "^3.5.3",
