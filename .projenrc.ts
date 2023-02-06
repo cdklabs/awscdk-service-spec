@@ -19,7 +19,11 @@ const repo = new MonorepoRoot({
     },
   },
   release: false,
-
+  autoApproveUpgrades: true,
+  autoApproveOptions: {
+    allowedUsernames: ['github-bot', 'cdklabs-automation'],
+    secret: 'GITHUB_TOKEN',
+  },
   githubOptions: {
     mergify: false,
   },
