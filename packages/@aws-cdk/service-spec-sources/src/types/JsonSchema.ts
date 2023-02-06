@@ -8,7 +8,7 @@ export namespace jsonschema {
     readonly '$ref': string;
   }
 
-  export type ObjectProperties = Record<string, Schema>;
+  export type ObjectProperties = ArbitraryMap<Schema>;
 
   export interface Object {
     readonly type: 'object';
@@ -16,7 +16,7 @@ export namespace jsonschema {
     readonly properties: ObjectProperties;
     readonly required?: string[];
     readonly additionalProperties?: false | Schema;
-    readonly patternProperties?: Record<string, Schema>;
+    readonly patternProperties?: ArbitraryMap<Schema>;
   }
 
   export interface String {
@@ -80,3 +80,8 @@ export namespace jsonschema {
     return '$ref' in x;
   }
 }
+
+/**
+ * A map with an annotation so that `typescript-json-schema` will allow arbitrary properties
+ */
+export type ArbitraryMap<A> = Record<string, A>;

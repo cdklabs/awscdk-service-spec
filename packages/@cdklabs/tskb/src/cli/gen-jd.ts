@@ -35,7 +35,7 @@ async function walk(dir: string) {
 
 // Then, use it with a simple async for loop
 async function main() {
-  walk('.');
+  walk('src');
 }
 
 main().catch(e => {

@@ -35,9 +35,11 @@ const serviceSpecSources = new MonorepoTypeScriptProject({
   parent: repo,
   name: '@aws-cdk/service-spec-sources',
   description: 'Sources for the service spec',
+  deps: ['ajv', 'glob'],
   devDeps: [
     tsKb,
-    'typescript-json-schema'
+    'ts-json-schema-generator',
+    '@types/glob',
   ],
   private: true,
 });
@@ -48,12 +50,17 @@ for (const tsconfig of [serviceSpecSources.tsconfig, serviceSpecSources.tsconfig
 const serviceSpecSchemaTask = serviceSpecSources.addTask('gen-schemas', {
   steps: [
     'CloudFormationRegistryResource'
-  ].map((schema: string) => ({
-    exec: `typescript-json-schema ./src/types/index.ts ${schema} > schemas/${schema}.json`
+  ].map((typeName: string) => ({
+    exec: ['ts-json-schema-generator',
+      '--path', './src/types/index.ts',
+      '--type', typeName,
+      '--out', `schemas/${typeName}.schema.json`
+    ].join(' '),
   }))
 });
 serviceSpecSources.compileTask.prependExec('gen-jd'); // Comes from tskb
-serviceSpecSources.compileTask.spawn(serviceSpecSchemaTask);
+serviceSpecSources.compileTask.prependSpawn(serviceSpecSchemaTask);
+serviceSpecSources.compileTask.exec('node ./lib/build-tools/validate-resources.js');
 serviceSpecSources.synth();
 
 const serviceSpec = new MonorepoTypeScriptProject({

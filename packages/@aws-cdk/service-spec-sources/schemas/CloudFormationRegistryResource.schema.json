@@ -1,0 +1,360 @@
+{
+  "$ref": "#/definitions/CloudFormationRegistryResource",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "ArbitraryMap<Schema>": {
+      "additionalProperties": {
+        "$ref": "#/definitions/jsonschema.Schema"
+      },
+      "description": "A map with an annotation so that `typescript-json-schema` will allow arbitrary properties",
+      "type": "object"
+    },
+    "ArbitraryMap<jsonschema.Schema>": {
+      "additionalProperties": {
+        "$ref": "#/definitions/jsonschema.Schema"
+      },
+      "description": "A map with an annotation so that `typescript-json-schema` will allow arbitrary properties",
+      "type": "object"
+    },
+    "CloudFormationRegistryResource": {
+      "additionalProperties": false,
+      "properties": {
+        "$schema": {
+          "type": "string"
+        },
+        "additionalIdentifiers": {
+          "description": "Not sure what this is",
+          "items": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "type": "array"
+        },
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "const": false,
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/definitions/jsonschema.Schema"
+            }
+          ]
+        },
+        "conditionalCreateOnlyProperties": {
+          "description": "FIXME: wut?",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "createOnlyProperties": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "definitions": {
+          "$ref": "#/definitions/ArbitraryMap%3Cjsonschema.Schema%3E"
+        },
+        "deprecatedProperties": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "description": {
+          "type": "string"
+        },
+        "documentationUrl": {
+          "type": "string"
+        },
+        "handlers": {
+          "$ref": "#/definitions/Handlers"
+        },
+        "patternProperties": {
+          "$ref": "#/definitions/ArbitraryMap%3Cjsonschema.Schema%3E"
+        },
+        "primaryIdentifier": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "properties": {
+          "$ref": "#/definitions/jsonschema.ObjectProperties"
+        },
+        "propertyTransform": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Functions to apply to properties\n\nExample:\n\n``` \"propertyTransform\" : {   \"/properties/DBClusterIdentifier\" : \"$lowercase(DBClusterIdentifier)\",   \"/properties/DBClusterSnapshotIdentifier\" : \"$lowercase(DBClusterSnapshotIdentifier)\",   \"/properties/MasterUserSecret/KmsKeyId\" : \"$join([\\\"arn:(aws)[-]{0,1}[a-z]{0,2}[-]{0,1}[a-z]{0,3}:kms:[a-z]{2}[-]{1}[a-z]{3,10}[-]{0,1}[a-z]{0,10}[-]{1}[1-3]{1}:[0-9]{12}[:]{1}key\\\\/\\\", KmsKeyId])\",   \"/properties/KmsKeyId\" : \"$join([\\\"arn:(aws)[-]{0,1}[a-z]{0,2}[-]{0,1}[a-z]{0,3}:kms:[a-z]{2}[-]{1}[a-z]{3,10}[-]{0,1}[a-z]{0,10}[-]{1}[1-3]{1}:[0-9]{12}[:]{1}key\\\\/\\\", KmsKeyId])\",   \"/properties/PerformanceInsightsKMSKeyId\" : \"$join([\\\"arn:(aws)[-]{0,1}[a-z]{0,2}[-]{0,1}[a-z]{0,3}:kms:[a-z]{2}[-]{1}[a-z]{3,10}[-]{0,1}[a-z]{0,10}[-]{1}[1-3]{1}:[0-9]{12}[:]{1}key\\\\/\\\", PerformanceInsightsKMSKeyId])\" }, ```",
+          "type": "object"
+        },
+        "readOnlyProperties": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "replacementStrategy": {
+          "$ref": "#/definitions/ReplacementStrategy"
+        },
+        "required": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "resourceLink": {
+          "$ref": "#/definitions/ResourceLink",
+          "description": "How to construct a console link for a resource"
+        },
+        "sourceUrl": {
+          "type": "string"
+        },
+        "taggable": {
+          "type": "boolean"
+        },
+        "tagging": {
+          "$ref": "#/definitions/ResourceTagging"
+        },
+        "typeName": {
+          "type": "string"
+        },
+        "writeOnlyProperties": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "description",
+        "properties",
+        "typeName"
+      ],
+      "type": "object"
+    },
+    "Handler": {
+      "additionalProperties": false,
+      "properties": {
+        "permissions": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "timeoutInMinutes": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "permissions"
+      ],
+      "type": "object"
+    },
+    "Handlers": {
+      "additionalProperties": false,
+      "properties": {
+        "create": {
+          "$ref": "#/definitions/Handler"
+        },
+        "delete": {
+          "$ref": "#/definitions/Handler"
+        },
+        "list": {
+          "$ref": "#/definitions/Handler"
+        },
+        "read": {
+          "$ref": "#/definitions/Handler"
+        },
+        "update": {
+          "$ref": "#/definitions/Handler"
+        }
+      },
+      "type": "object"
+    },
+    "ReplacementStrategy": {
+      "const": "delete_then_create",
+      "type": "string"
+    },
+    "ResourceLink": {
+      "additionalProperties": false,
+      "properties": {
+        "mappings": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Example:\n\n`{ MetricName: '/MetricName', 'LogGroupName': '/LogGroupName' }`",
+          "type": "object"
+        },
+        "templateUri": {
+          "description": "Example:\n\n``` /cloudwatch/home?region=${awsRegion}#logsV2:log-groups/log-group/${LogGroupName}/edit-metric-filter/${MetricName} ```",
+          "type": "string"
+        }
+      },
+      "required": [
+        "templateUri"
+      ],
+      "type": "object"
+    },
+    "ResourceTagging": {
+      "additionalProperties": false,
+      "properties": {
+        "cloudFormationSystemTags": {
+          "type": "boolean"
+        },
+        "tagOnCreate": {
+          "type": "boolean"
+        },
+        "tagProperty": {
+          "type": "string"
+        },
+        "tagUpdatable": {
+          "type": "boolean"
+        },
+        "taggable": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "jsonschema.Boolean": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "items": {
+          "$ref": "#/definitions/jsonschema.Schema"
+        },
+        "type": {
+          "const": "boolean",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "items"
+      ],
+      "type": "object"
+    },
+    "jsonschema.ConcreteSchema": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/jsonschema.Object"
+        },
+        {
+          "$ref": "#/definitions/jsonschema.String"
+        },
+        {},
+        {
+          "$ref": "#/definitions/jsonschema.Boolean"
+        }
+      ]
+    },
+    "jsonschema.Object": {
+      "additionalProperties": false,
+      "properties": {
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "const": false,
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/definitions/jsonschema.Schema"
+            }
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "patternProperties": {
+          "$ref": "#/definitions/ArbitraryMap%3CSchema%3E"
+        },
+        "properties": {
+          "$ref": "#/definitions/jsonschema.ObjectProperties"
+        },
+        "required": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "type": {
+          "const": "object",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "properties"
+      ],
+      "type": "object"
+    },
+    "jsonschema.ObjectProperties": {
+      "$ref": "#/definitions/ArbitraryMap%3CSchema%3E"
+    },
+    "jsonschema.Reference": {
+      "additionalProperties": false,
+      "properties": {
+        "$ref": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "$ref"
+      ],
+      "type": "object"
+    },
+    "jsonschema.Schema": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/jsonschema.Reference"
+        },
+        {
+          "$ref": "#/definitions/jsonschema.ConcreteSchema"
+        }
+      ]
+    },
+    "jsonschema.String": {
+      "additionalProperties": false,
+      "properties": {
+        "default": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "enum": {
+          "type": "string"
+        },
+        "format": {
+          "const": "date-time",
+          "type": "string"
+        },
+        "maxLength": {
+          "type": "number"
+        },
+        "minLength": {
+          "type": "number"
+        },
+        "pattern": {
+          "type": "string"
+        },
+        "type": {
+          "const": "string",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    }
+  }
+}
