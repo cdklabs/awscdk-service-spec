@@ -1,12 +1,14 @@
 import { Database, emptyCollection, emptyRelationship, EntityCollection, RelationshipCollection } from '@cdklabs/tskb';
-import { Resource, Service, HasResource, Region, RegionHasResource } from './resource';
+import { Resource, Service, HasResource, Region, RegionHasResource, TypeDefinition, UsesType } from './resource';
 
 export interface DatabaseSchema {
   readonly service: EntityCollection<Service>;
   readonly region: EntityCollection<Region>;
   readonly resource: EntityCollection<Resource>;
+  readonly typeDefinition: EntityCollection<TypeDefinition>;
   readonly hasResource: RelationshipCollection<HasResource, DatabaseSchema, 'service', 'resource'>;
   readonly regionHasResource: RelationshipCollection<RegionHasResource, DatabaseSchema, 'region', 'resource'>;
+  readonly usesType: RelationshipCollection<UsesType, DatabaseSchema, 'resource', 'typeDefinition'>;
 }
 
 export function emptyDatabase() {
@@ -14,8 +16,11 @@ export function emptyDatabase() {
     resource: emptyCollection(),
     region: emptyCollection(),
     service: emptyCollection(),
+    typeDefinition: emptyCollection(),
+
     hasResource: emptyRelationship('service', 'resource'),
     regionHasResource: emptyRelationship('region', 'resource'),
+    usesType: emptyRelationship('resource', 'typeDefinition'),
   });
 }
 

@@ -5,6 +5,8 @@ export type EvolutionInvariantPred<A> = (previous: A, current: A) => boolean;
 
 export function evolutionInvariant<A>(description: string, pred: EvolutionInvariantPred<A>): Invariant {
   // TODO: Find a way
+  Array.isArray(description);
+  Array.isArray(pred);
 }
 
 export function implies(x: boolean, y: boolean) {

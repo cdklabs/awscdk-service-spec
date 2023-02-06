@@ -38,6 +38,7 @@ export type ResourceProperties = Record<string, Property>;
 export interface TypeDefinition extends Entity {
   readonly name: string;
   readonly documentation?: string;
+  readonly properties: ResourceProperties;
 }
 
 export interface Property {
@@ -86,6 +87,8 @@ export type ResourceDoc = Relationship<Resource, Documentation>;
 
 export type ServiceInRegion = Relationship<Region, Service>;
 export type ResourceInRegion = Relationship<Region, Resource>;
+
+export type UsesType = Relationship<Resource, TypeDefinition>;
 
 
 export interface ResourceIdentifier extends Entity {
