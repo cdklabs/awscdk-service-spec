@@ -1,6 +1,7 @@
 import * as pj from 'projen';
 import { JsonFile } from 'projen';
 import { MonorepoRoot, MonorepoTypeScriptProject } from './projenrc/monorepo';
+import { AutoMergeUpgrade, MergeMethod } from './projenrc/auto-merge-upgrade';
 
 const repo = new MonorepoRoot({
   defaultReleaseBranch: 'main',
@@ -18,11 +19,16 @@ const repo = new MonorepoRoot({
     },
   },
   release: false,
-
+  autoApproveUpgrades: true,
+  autoApproveOptions: {
+    allowedUsernames: ['github-bot', 'cdklabs-automation'],
+    secret: 'GITHUB_TOKEN',
+  },
   githubOptions: {
     mergify: false,
   },
 });
+new AutoMergeUpgrade(repo.upgradeWorkflow, { mergeMethod: MergeMethod.SQUASH });
 
 const tsKb = new MonorepoTypeScriptProject({
   parent: repo,
