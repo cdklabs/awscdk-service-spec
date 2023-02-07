@@ -71,7 +71,7 @@ export class MonorepoRoot extends pj.typescript.TypeScriptProject {
         nodePkg.installDependencies();
       }
 
-      this.postInstallDependencies = [];     
+      this.postInstallDependencies = [];
     }
   }
 }

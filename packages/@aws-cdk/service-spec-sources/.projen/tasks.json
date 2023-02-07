@@ -58,13 +58,13 @@
       "description": "Only compile",
       "steps": [
         {
+          "spawn": "gen-schemas"
+        },
+        {
           "exec": "gen-jd"
         },
         {
           "exec": "tsc --build"
-        },
-        {
-          "spawn": "gen-schemas"
         }
       ]
     },
@@ -99,7 +99,12 @@
       ]
     },
     "gen-schemas": {
-      "name": "gen-schemas"
+      "name": "gen-schemas",
+      "steps": [
+        {
+          "exec": "ts-json-schema-generator --path ./src/types/index.ts --type CloudFormationRegistryResource --out schemas/CloudFormationRegistryResource.schema.json"
+        }
+      ]
     },
     "package": {
       "name": "package",
@@ -183,6 +188,14 @@
         },
         {
           "spawn": "post-upgrade"
+        }
+      ]
+    },
+    "validate-specs": {
+      "name": "validate-specs",
+      "steps": [
+        {
+          "exec": "node ./lib/build-tools/validate-resources.js"
         }
       ]
     },
