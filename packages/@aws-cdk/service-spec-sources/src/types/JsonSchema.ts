@@ -21,6 +21,10 @@ export namespace jsonschema {
     readonly required?: string[];
     readonly additionalProperties?: false | Schema;
     readonly patternProperties?: Record<string, Schema>;
+    readonly title?: string;
+    readonly anyOf?: Array<Partial<Object>>;
+    readonly allOf?: Array<Partial<Object>>;
+    readonly oneOf?: Array<Partial<Object>>;
   }
 
   export interface String extends Annotatable {
@@ -30,7 +34,8 @@ export namespace jsonschema {
     readonly maxLength?: number;
     readonly pattern?: string;
     readonly enum?: string[];
-    readonly format?: 'date-time';
+    readonly format?: 'date-time' | 'timestamp' | 'int64' | 'double' | 'uri' | '(^arn:[a-z\\d-]+:rekognition:[a-z\\d-]+:\\d{12}:collection\\/([a-zA-Z0-9_.\\-]+){1,255})';
+    readonly anyOf?: Array<Partial<String>>;
   }
 
   export interface Number extends Annotatable {
