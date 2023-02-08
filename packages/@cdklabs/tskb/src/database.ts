@@ -1,5 +1,5 @@
-import { Entity, EntityCollection, Plain } from "./entity";
-import { AnyRelationshipCollection, RelationshipCollection, RelAttr, RelFrom, RelTo } from "./relationship";
+import { dehydrateEntityCollection, Entity, EntityCollection, hydrateEntityCollection, isDehydratedEntityCollection, isEntityCollection, Plain } from "./entity";
+import { AnyRelationshipCollection, dehydrateRelationshipCollection, hydrateRelationshipCollection, isDehydratedRelationshipCollection, isRelationshipCollection, RelationshipCollection, RelAttr, RelFrom, RelTo } from "./relationship";
 
 export class Database<S extends object> {
   private readonly schema: S;
@@ -93,6 +93,58 @@ export class Database<S extends object> {
       ...entity,
     } as any;
   }
+
+  /**
+   * Turn the current database collection into something that can be stored.
+   */
+  public save(): DehydratedDatabase {
+    return {
+      idCtr: this.idCtr,
+      schema: dehydrate(this.schema),
+    };
+
+    function dehydrate(x: unknown): any {
+      if (isEntityCollection(x)) {
+        return dehydrateEntityCollection(x);
+      }
+      if (isRelationshipCollection(x)) {
+        return dehydrateRelationshipCollection(x);
+      }
+      if (Array.isArray(x)) {
+        return x.map(dehydrate);
+      }
+      if (!!x && typeof x === 'object') {
+        return Object.fromEntries(Object.entries(x).map(([k, v]) => [k, dehydrate(v)]));
+      }
+      return x;
+    }
+  }
+
+  public load(x: DehydratedDatabase) {
+    this.idCtr = x.idCtr;
+    Object.assign(this.schema, hydrate(x.schema, this.schema));
+
+    function hydrate(x: unknown, proto: any): any {
+      if (isDehydratedEntityCollection(x)) {
+        return hydrateEntityCollection(x);
+      }
+      if (isDehydratedRelationshipCollection(x)) {
+        return hydrateRelationshipCollection(x, proto);
+      }
+      if (Array.isArray(x)) {
+        return x.map(hydrate);
+      }
+      if (!!x && typeof x === 'object') {
+        return Object.fromEntries(Object.entries(x).map(([k, v]) => [k, hydrate(v, proto[k])]));
+      }
+      return x;
+    }
+  }
+}
+
+interface DehydratedDatabase {
+  readonly idCtr: number;
+  readonly schema: any;
 }
 
 function removeId<A extends object>(x: A): Omit<A, '$id'> {

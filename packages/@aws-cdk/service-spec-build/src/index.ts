@@ -1,9 +1,11 @@
 import { emptyDatabase } from '@aws-cdk/service-spec';
 import * as sources from '@aws-cdk/service-spec-sources';
 import { loadCloudFormationRegistryResource } from './cloudformation-registry';
+import { Failures } from './result';
 
 export function buildDatabase() {
   const db = emptyDatabase();
+  const fails: Failures = [];
 
   for (const [key, resources] of Object.entries(sources.CloudFormationSchema)) {
     const regionName = key.replace(/_/g, '-'); // us_east_1 -> us-east-1
@@ -13,27 +15,10 @@ export function buildDatabase() {
     });
 
     for (const resource of Object.values(resources)) {
-      loadCloudFormationRegistryResource(db, region, resource);
+      console.log(resource.typeName);
+      loadCloudFormationRegistryResource(db, region, resource, fails);
     }
   }
 
-  const svc = db.allocate('service', {
-    name: '',
-    shortName: '',
-  });
-  const res = db.allocate('resource', {
-    attributes: {},
-    cloudFormationType: '',
-    name: '',
-    properties: {},
-  });
-
-  const xs = db.follow('hasResource', svc);
-  console.log(xs[0]);
-  const ys = db.incoming('hasResource', res);
-  console.log(ys[0]);
-
-  return db;
+  return { db, fails };
 }
-
-buildDatabase();

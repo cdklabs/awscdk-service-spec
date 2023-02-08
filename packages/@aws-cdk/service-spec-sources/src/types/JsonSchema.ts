@@ -75,7 +75,7 @@ export namespace jsonschema {
         throw new Error(`Can only resolve references inside the same file, got '${path}'`);
       }
 
-      const parts = path.split('/');
+      const parts = path.substring(2).split('/');
       let current = root;
       while (true) {
         const name = parts.shift();

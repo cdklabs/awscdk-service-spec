@@ -93,6 +93,7 @@ const serviceSpecBuild = new MonorepoTypeScriptProject({
   deps: [tsKb, serviceSpecSources, serviceSpec],
   private: true,
 });
+serviceSpecBuild.gitignore.addPatterns('db.json');
 serviceSpecBuild.synth();
 
 // Hide most of the generated files from VS Code
