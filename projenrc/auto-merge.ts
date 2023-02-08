@@ -74,6 +74,7 @@ export class AutoMerge extends Component {
       runsOn: options.runsOn ?? ['ubuntu-latest'],
       permissions: {
         pullRequests: gh.workflows.JobPermission.WRITE,
+        contents: gh.workflows.JobPermission.WRITE,
       },
       if: conditions.length ? conditions.join(' && ') : undefined,
       steps: [
