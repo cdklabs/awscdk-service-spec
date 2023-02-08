@@ -41,3 +41,4 @@ junit.xml
 /dist/
 !/.eslintrc.json
 !/.eslintrc.js
+db.json
