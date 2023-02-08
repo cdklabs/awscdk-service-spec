@@ -44,4 +44,5 @@ jspm_packages/
 /lib
 /dist/
 .DS_Store
+!/.github/workflows/auto-merge.yml
 !/.vscode/settings.json
