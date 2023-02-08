@@ -28,9 +28,7 @@ export class MergeQueue extends Component {
     const autoMerge = options.autoMerge ?? true;
 
     project.github?.tryFindWorkflow("build")?.on({
-      'merge_group': {
-        types: ['checks_requested']
-      }
+      'merge_group': {}
     } as any);
 
     if (autoMerge && project.github) {
