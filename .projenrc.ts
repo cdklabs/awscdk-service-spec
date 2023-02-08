@@ -1,7 +1,7 @@
 import * as pj from 'projen';
 import { JsonFile } from 'projen';
 import { MonorepoRoot, MonorepoTypeScriptProject } from './projenrc/monorepo';
-import { AutoMergeUpgrade, MergeMethod } from './projenrc/auto-merge-upgrade';
+import { MergeQueue } from './projenrc/merge-queue';
 
 const repo = new MonorepoRoot({
   defaultReleaseBranch: 'main',
@@ -28,7 +28,7 @@ const repo = new MonorepoRoot({
     mergify: false,
   },
 });
-new AutoMergeUpgrade(repo.upgradeWorkflow, { mergeMethod: MergeMethod.SQUASH });
+new MergeQueue(repo)
 
 const tsKb = new MonorepoTypeScriptProject({
   parent: repo,
