@@ -70,6 +70,7 @@ export class AutoMerge extends Component {
     const mergeMethod = options.mergeMethod ?? MergeMethod.SQUASH;
 
     const autoMergeJob: gh.workflows.Job = {
+      name: "Set AutoMerge on PR #${{ github.event.number }}",
       runsOn: options.runsOn ?? ['ubuntu-latest'],
       permissions: {
         pullRequests: gh.workflows.JobPermission.WRITE,
@@ -80,7 +81,7 @@ export class AutoMerge extends Component {
           uses: 'peter-evans/enable-pull-request-automerge@v2',
           with: {
             'token': `\${{ secrets.${secret} }}`,
-            'pull-request-number': '${{ github.event.pull_request.number }}',
+            'pull-request-number': '${{ github.event.number }}',
             'merge-method': mergeMethod,
           },
         },
