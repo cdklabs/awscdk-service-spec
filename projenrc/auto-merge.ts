@@ -3,7 +3,7 @@ import { github as gh, Component } from 'projen';
 export enum MergeMethod {
   SQUASH = 'squash',
   MERGE = 'merge',
-  REBASE = 'rebase'
+  REBASE = 'rebase',
 }
 
 /**
@@ -37,7 +37,7 @@ export interface AutoMergeOptions {
    * Any branch protection rules must allow this merge method.
    * @default MergeMethod.SQUASH
    */
-  readonly mergeMethod?: MergeMethod;  
+  readonly mergeMethod?: MergeMethod;
 
   /**
    * Github Runner selection labels
@@ -70,7 +70,7 @@ export class AutoMerge extends Component {
     const mergeMethod = options.mergeMethod ?? MergeMethod.SQUASH;
 
     const autoMergeJob: gh.workflows.Job = {
-      name: "Set AutoMerge on PR #${{ github.event.number }}",
+      name: 'Set AutoMerge on PR #${{ github.event.number }}',
       runsOn: options.runsOn ?? ['ubuntu-latest'],
       permissions: {
         pullRequests: gh.workflows.JobPermission.WRITE,
@@ -81,7 +81,7 @@ export class AutoMerge extends Component {
         {
           uses: 'peter-evans/enable-pull-request-automerge@v2',
           with: {
-            'token': `\${{ secrets.${secret} }}`,
+            token: `\${{ secrets.${secret} }}`,
             'pull-request-number': '${{ github.event.number }}',
             'merge-method': mergeMethod,
           },
