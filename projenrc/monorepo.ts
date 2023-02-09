@@ -120,6 +120,7 @@ export interface MonorepoTypeScriptProjectOptions
     | 'deps'
     | 'devDeps'
     | 'peerDeps'
+    | 'depsUpgradeOptions'
   > {
   readonly parent: MonorepoRoot;
 
@@ -128,13 +129,14 @@ export interface MonorepoTypeScriptProjectOptions
   readonly deps?: Array<string | MonorepoTypeScriptProject>;
   readonly devDeps?: Array<string | MonorepoTypeScriptProject>;
   readonly peerDeps?: Array<string | MonorepoTypeScriptProject>;
+  readonly excludeDepsFromUpgrade?: Array<string>;
 }
 
 export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
   public readonly parent: MonorepoRoot;
 
   constructor(props: MonorepoTypeScriptProjectOptions) {
-    const remainder = without(props, 'parent', 'name', 'description', 'deps', 'peerDeps', 'devDeps');
+    const remainder = without(props, 'parent', 'name', 'description', 'deps', 'peerDeps', 'devDeps', 'excludeDepsFromUpgrade');
 
     super({
       parent: props.parent,
@@ -150,6 +152,15 @@ export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
       deps: packageNames(props.deps),
       peerDeps: packageNames(props.peerDeps),
       devDeps: packageNames(props.devDeps),
+
+      depsUpgradeOptions: {
+        exclude: [
+          ...(props.excludeDepsFromUpgrade ?? []),
+          ...packageNames(props.deps?.filter(isMonorepoTypeScriptProject)) ?? [],
+          ...packageNames(props.peerDeps?.filter(isMonorepoTypeScriptProject)) ?? [],
+          ...packageNames(props.devDeps?.filter(isMonorepoTypeScriptProject)) ?? [],
+        ]
+      },
 
       ...remainder,
     });
