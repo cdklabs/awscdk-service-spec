@@ -1,6 +1,6 @@
 import { jsonschema } from "./JsonSchema";
 
-export interface CloudFormationRegistryResource extends ImplicitJsonSchemaObject {
+export interface CloudFormationRegistryResource extends ImplicitJsonSchemaRecord {
   readonly $schema?: string;
   readonly $comment?: string;
 
@@ -67,7 +67,7 @@ export interface Handler {
   readonly timeoutInMinutes?: number;
 }
 
-export type ImplicitJsonSchemaObject = Omit<jsonschema.Object, 'type'>;
+export type ImplicitJsonSchemaRecord = Omit<jsonschema.RecordLikeObject, 'type'>;
 
 export interface ResourceTagging {
   readonly taggable?: boolean;

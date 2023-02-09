@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import { buildDatabase } from '../index';
-import { errorMessage } from '../result';
+import { errorMessage } from '@cdklabs/tskb';
 
 async function main() {
   console.log('Building...');
