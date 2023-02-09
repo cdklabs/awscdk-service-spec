@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 async function walk(dir: string) {
-  const entries = []
+  const entries = [];
   for await (const ent of await fs.promises.opendir(dir)) {
     entries.push(ent);
   }
@@ -29,13 +29,13 @@ async function walk(dir: string) {
 
   for (const d of entries) {
     const entry = path.join(dir, d.name);
-    if (d.isDirectory()) walk(entry);
+    if (d.isDirectory()) await walk(entry);
   }
 }
 
 // Then, use it with a simple async for loop
 async function main() {
-  walk('src');
+  await walk('src');
 }
 
 main().catch(e => {

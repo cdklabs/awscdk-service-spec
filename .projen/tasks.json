@@ -2,25 +2,12 @@
   "tasks": {
     "build": {
       "name": "build",
-      "description": "Full release build",
       "steps": [
         {
           "spawn": "default"
         },
         {
-          "spawn": "pre-compile"
-        },
-        {
-          "spawn": "compile"
-        },
-        {
-          "spawn": "post-compile"
-        },
-        {
-          "spawn": "test"
-        },
-        {
-          "spawn": "package"
+          "exec": "yarn workspaces run build"
         }
       ]
     },
@@ -61,7 +48,7 @@
       "description": "Only compile",
       "steps": [
         {
-          "exec": "tsc --build"
+          "exec": "yarn workspaces run compile"
         }
       ]
     },
@@ -74,45 +61,32 @@
         }
       ]
     },
-    "eject": {
-      "name": "eject",
-      "description": "Remove projen from the project",
-      "env": {
-        "PROJEN_EJECTING": "true"
-      },
-      "steps": [
-        {
-          "spawn": "default"
-        }
-      ]
-    },
     "package": {
       "name": "package",
       "description": "Creates the distribution package",
       "steps": [
         {
-          "exec": "mkdir -p dist/js"
-        },
-        {
-          "exec": "mv $(npm pack) dist/js/"
+          "exec": "yarn workspaces run package"
         }
       ]
     },
-    "post-compile": {
-      "name": "post-compile",
-      "description": "Runs after successful compilation"
-    },
-    "post-upgrade": {
-      "name": "post-upgrade",
-      "description": "Runs after upgrading dependencies"
-    },
-    "pre-compile": {
-      "name": "pre-compile",
-      "description": "Prepare the project for compilation"
+    "run": {
+      "name": "run",
+      "steps": [
+        {
+          "exec": "yarn workspaces run",
+          "receiveArgs": true
+        }
+      ]
     },
     "test": {
       "name": "test",
-      "description": "Run tests"
+      "description": "Run tests",
+      "steps": [
+        {
+          "exec": "yarn workspaces run test"
+        }
+      ]
     },
     "upgrade": {
       "name": "upgrade",
@@ -150,15 +124,6 @@
         },
         {
           "spawn": "post-upgrade"
-        }
-      ]
-    },
-    "watch": {
-      "name": "watch",
-      "description": "Watch & compile in the background",
-      "steps": [
-        {
-          "exec": "tsc --build -w"
         }
       ]
     }

@@ -6,14 +6,10 @@
     "clobber": "npx projen clobber",
     "compile": "npx projen compile",
     "default": "npx projen default",
-    "eject": "npx projen eject",
     "package": "npx projen package",
-    "post-compile": "npx projen post-compile",
-    "post-upgrade": "npx projen post-upgrade",
-    "pre-compile": "npx projen pre-compile",
+    "run": "npx projen run",
     "test": "npx projen test",
     "upgrade": "npx projen upgrade",
-    "watch": "npx projen watch",
     "projen": "npx projen"
   },
   "devDependencies": {

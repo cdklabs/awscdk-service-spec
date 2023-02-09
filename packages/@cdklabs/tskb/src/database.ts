@@ -1,5 +1,5 @@
-import { dehydrateEntityCollection, Entity, EntityCollection, hydrateEntityCollection, isDehydratedEntityCollection, isEntityCollection, Plain } from "./entity";
-import { AnyRelationshipCollection, dehydrateRelationshipCollection, hydrateRelationshipCollection, isDehydratedRelationshipCollection, isRelationshipCollection, RelationshipCollection, RelAttr, RelFrom, RelTo } from "./relationship";
+import { dehydrateEntityCollection, Entity, EntityCollection, hydrateEntityCollection, isDehydratedEntityCollection, isEntityCollection, Plain } from './entity';
+import { AnyRelationshipCollection, dehydrateRelationshipCollection, hydrateRelationshipCollection, isDehydratedRelationshipCollection, isRelationshipCollection, RelationshipCollection, RelAttr, RelFrom, RelTo } from './relationship';
 
 export class Database<S extends object> {
   private readonly schema: S;
@@ -89,7 +89,7 @@ export class Database<S extends object> {
 
   public e<E extends Entity>(entity: Plain<E>): E {
     return {
-      '$id': this.id(),
+      $id: this.id(),
       ...entity,
     } as any;
   }
@@ -120,9 +120,9 @@ export class Database<S extends object> {
     }
   }
 
-  public load(x: DehydratedDatabase) {
-    this.idCtr = x.idCtr;
-    Object.assign(this.schema, hydrate(x.schema, this.schema));
+  public load(db: DehydratedDatabase) {
+    this.idCtr = db.idCtr;
+    Object.assign(this.schema, hydrate(db.schema, this.schema));
 
     function hydrate(x: unknown, proto: any): any {
       if (isDehydratedEntityCollection(x)) {
