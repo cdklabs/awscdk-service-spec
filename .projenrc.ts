@@ -28,7 +28,11 @@ const repo = new MonorepoRoot({
     mergify: false,
   },
 });
-new MergeQueue(repo)
+new MergeQueue(repo, {
+  autoMergeOptions: {
+    secret: 'PROJEN_GITHUB_TOKEN'
+  }
+})
 
 const tsKb = new MonorepoTypeScriptProject({
   parent: repo,
