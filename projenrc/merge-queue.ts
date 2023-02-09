@@ -1,4 +1,4 @@
-import { javascript, Component} from 'projen';
+import { javascript, Component } from 'projen';
 import { AutoMerge, AutoMergeOptions } from './auto-merge';
 
 /**
@@ -27,16 +27,14 @@ export class MergeQueue extends Component {
 
     const autoMerge = options.autoMerge ?? true;
 
-    project.github?.tryFindWorkflow("build")?.on({
-      'push': {
-        branches: [
-          "gh-readonly-queue/main/*"
-        ]
-      }
+    project.github?.tryFindWorkflow('build')?.on({
+      push: {
+        branches: ['gh-readonly-queue/main/*'],
+      },
     } as any);
 
     if (autoMerge && project.github) {
-      new AutoMerge(project.github, options.autoMergeOptions)
+      new AutoMerge(project.github, options.autoMergeOptions);
     }
   }
 }

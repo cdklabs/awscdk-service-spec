@@ -6,6 +6,7 @@
     "clobber": "npx projen clobber",
     "compile": "npx projen compile",
     "default": "npx projen default",
+    "fmt": "npx projen fmt",
     "package": "npx projen package",
     "post-upgrade": "npx projen post-upgrade",
     "run": "npx projen run",
@@ -15,6 +16,8 @@
   },
   "devDependencies": {
     "@types/node": "^14",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "npm-check-updates": "^16",
     "prettier": "^2.8.4",
     "projen": "^0.67.42",

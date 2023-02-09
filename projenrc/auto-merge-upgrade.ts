@@ -3,7 +3,7 @@ import { javascript, JsonPatch } from 'projen';
 export enum MergeMethod {
   SQUASH = 'squash',
   MERGE = 'merge',
-  REBASE = 'rebase'
+  REBASE = 'rebase',
 }
 
 export interface AutoMergeUpgradeOptions {
@@ -20,7 +20,6 @@ export interface AutoMergeUpgradeOptions {
   mergeMethod?: MergeMethod;
 }
 
-
 export class AutoMergeUpgrade {
   constructor(upgradeDeps?: javascript.UpgradeDependencies, options: AutoMergeUpgradeOptions = {}) {
     if (!upgradeDeps) {
@@ -29,15 +28,17 @@ export class AutoMergeUpgrade {
 
     const { branches = ['main'], mergeMethod = MergeMethod.SQUASH } = options;
 
-    this.getWorkflows(upgradeDeps, branches).forEach(workflow => {
-      workflow.file?.patch(JsonPatch.add('/jobs/pr/steps/-', {
-        uses: 'peter-evans/enable-pull-request-automerge@v2',
-        with: {
-          'token': '${{ secrets.PROJEN_GITHUB_TOKEN }}',
-          'pull-request-number': '${{ steps.create-pr.outputs.pull-request-number }}',
-          'merge-method': mergeMethod,
-        },
-      }));
+    this.getWorkflows(upgradeDeps, branches).forEach((workflow) => {
+      workflow.file?.patch(
+        JsonPatch.add('/jobs/pr/steps/-', {
+          uses: 'peter-evans/enable-pull-request-automerge@v2',
+          with: {
+            token: '${{ secrets.PROJEN_GITHUB_TOKEN }}',
+            'pull-request-number': '${{ steps.create-pr.outputs.pull-request-number }}',
+            'merge-method': mergeMethod,
+          },
+        }),
+      );
     });
   }
 
@@ -46,8 +47,8 @@ export class AutoMergeUpgrade {
       return upgradeDeps.workflows;
     }
 
-    const workflowNames = branches.map(b => `${upgradeDeps.upgradeTask.name}-${b}`);
+    const workflowNames = branches.map((b) => `${upgradeDeps.upgradeTask.name}-${b}`);
 
-    return upgradeDeps.workflows.filter(wf => workflowNames.includes(wf.name));
+    return upgradeDeps.workflows.filter((wf) => workflowNames.includes(wf.name));
   }
 }
