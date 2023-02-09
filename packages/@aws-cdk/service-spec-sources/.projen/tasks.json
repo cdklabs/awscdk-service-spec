@@ -21,6 +21,29 @@
         }
       ]
     },
+    "check-for-updates": {
+      "name": "check-for-updates",
+      "env": {
+        "CI": "0"
+      },
+      "steps": [
+        {
+          "exec": "npm-check-updates --dep dev --upgrade --target=minor"
+        },
+        {
+          "exec": "npm-check-updates --dep optional --upgrade --target=minor"
+        },
+        {
+          "exec": "npm-check-updates --dep peer --upgrade --target=minor"
+        },
+        {
+          "exec": "npm-check-updates --dep prod --upgrade --target=minor"
+        },
+        {
+          "exec": "npm-check-updates --dep bundle --upgrade --target=minor"
+        }
+      ]
+    },
     "compile": {
       "name": "compile",
       "description": "Only compile",

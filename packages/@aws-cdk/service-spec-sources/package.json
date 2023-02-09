@@ -3,6 +3,7 @@
   "description": "Sources for the service spec",
   "scripts": {
     "build": "npx projen build",
+    "check-for-updates": "npx projen check-for-updates",
     "compile": "npx projen compile",
     "default": "npx projen default",
     "eslint": "npx projen eslint",

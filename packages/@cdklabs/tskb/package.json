@@ -6,6 +6,7 @@
   },
   "scripts": {
     "build": "npx projen build",
+    "check-for-updates": "npx projen check-for-updates",
     "compile": "npx projen compile",
     "default": "npx projen default",
     "eslint": "npx projen eslint",
