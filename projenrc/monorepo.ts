@@ -1,8 +1,6 @@
 import * as path from 'path';
 import * as pj from 'projen';
 
-
-
 //////////////////////////////////////////////////////////////////////
 
 export interface MonorepoRootOptions
@@ -10,7 +8,7 @@ export interface MonorepoRootOptions
 
 export class MonorepoRoot extends pj.typescript.TypeScriptProject {
   private projects = new Array<MonorepoTypeScriptProject>();
-  private postInstallDependencies = new Array<() => boolean>;
+  private postInstallDependencies = new Array<() => boolean>();
 
   constructor(options: MonorepoRootOptions) {
     super({
@@ -20,6 +18,41 @@ export class MonorepoRoot extends pj.typescript.TypeScriptProject {
       eslint: false,
     });
     this.gitignore.addPatterns('.DS_Store');
+
+    // Tasks
+    // Forward to workspaces
+    this.tasks.removeTask('build');
+    this.tasks.addTask('build', {
+      steps: [{ spawn: 'default' }, { exec: 'yarn workspaces run build' }],
+    });
+
+    this.tasks.tryFind('compile')?.reset('yarn workspaces run compile');
+    this.tasks.tryFind('package')?.reset('yarn workspaces run package');
+    this.tasks.tryFind('test')?.reset('yarn workspaces run test');
+    this.addTask('run', {
+      exec: 'yarn workspaces run',
+      receiveArgs: true,
+    });
+
+    this.tasks.removeTask('upgrade');
+    this.tasks.addTask('upgrade', {
+      env: { CI: '0' },
+      description: 'Upgrade dependencies in all workspaces',
+      steps: [
+        { exec: 'yarn upgrade npm-check-updates' },
+        { exec: 'yarn workspaces run check-for-updates' },
+        { exec: 'yarn install --check-files' },
+        { exec: 'yarn upgrade' },
+        { spawn: 'default' },
+        { spawn: 'post-upgrade' },
+      ],
+    });
+
+    // Not needed at top-level
+    this.tasks.removeTask('eject');
+    this.tasks.removeTask('watch');
+    this.tasks.removeTask('pre-compile');
+    this.tasks.removeTask('post-compile');
   }
 
   public register(project: MonorepoTypeScriptProject) {
@@ -49,16 +82,13 @@ export class MonorepoRoot extends pj.typescript.TypeScriptProject {
     });
 
     this.tsconfig?.file.addOverride('include', []);
-    this.tsconfigDev?.file.addOverride('include', [
-      '.projenrc.ts',
-      'projenrc/**/*.ts',
-    ]);
+    this.tsconfigDev?.file.addOverride('include', ['.projenrc.ts', 'projenrc/**/*.ts']);
     for (const tsconfig of [this.tsconfig, this.tsconfigDev]) {
       tsconfig?.file.addOverride(
         'references',
         this.projects.map((p) => ({ path: `packages/${p.name}` })),
       );
-    };
+    }
   }
 
   public postSynthesize() {
@@ -66,7 +96,7 @@ export class MonorepoRoot extends pj.typescript.TypeScriptProject {
       const nodePkg: any = this.package;
       nodePkg.installDependencies();
 
-      const completedRequests = this.postInstallDependencies.map(request => request());
+      const completedRequests = this.postInstallDependencies.map((request) => request());
       if (completedRequests.some(Boolean)) {
         nodePkg.installDependencies();
       }
@@ -90,6 +120,7 @@ export interface MonorepoTypeScriptProjectOptions
     | 'deps'
     | 'devDeps'
     | 'peerDeps'
+    | 'depsUpgradeOptions'
   > {
   readonly parent: MonorepoRoot;
 
@@ -98,13 +129,14 @@ export interface MonorepoTypeScriptProjectOptions
   readonly deps?: Array<string | MonorepoTypeScriptProject>;
   readonly devDeps?: Array<string | MonorepoTypeScriptProject>;
   readonly peerDeps?: Array<string | MonorepoTypeScriptProject>;
+  readonly excludeDepsFromUpgrade?: Array<string>;
 }
 
 export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
   public readonly parent: MonorepoRoot;
 
   constructor(props: MonorepoTypeScriptProjectOptions) {
-    const remainder = without(props, 'parent', 'name', 'description', 'deps', 'peerDeps', 'devDeps');
+    const remainder = without(props, 'parent', 'name', 'description', 'deps', 'peerDeps', 'devDeps', 'excludeDepsFromUpgrade');
 
     super({
       parent: props.parent,
@@ -121,21 +153,51 @@ export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
       peerDeps: packageNames(props.peerDeps),
       devDeps: packageNames(props.devDeps),
 
+      depsUpgradeOptions: {
+        exclude: [
+          ...(props.excludeDepsFromUpgrade ?? []),
+          ...packageNames(props.deps?.filter(isMonorepoTypeScriptProject)) ?? [],
+          ...packageNames(props.peerDeps?.filter(isMonorepoTypeScriptProject)) ?? [],
+          ...packageNames(props.devDeps?.filter(isMonorepoTypeScriptProject)) ?? [],
+        ]
+      },
+
       ...remainder,
     });
 
     this.parent = props.parent;
 
+    // Tasks
+    this.tasks.tryFind('default')?.reset('(cd `git rev-parse --show-toplevel`; npx projen default)');
+    this.tasks.removeTask('clobber');
+    this.tasks.removeTask('eject');
+
+    const upgrades: any = this.components.find(
+      (c: pj.Component): c is pj.javascript.UpgradeDependencies => c instanceof pj.javascript.UpgradeDependencies,
+    );
+    this.tasks.removeTask('upgrade');
+    this.tasks.removeTask('post-upgrade');
+    this.tasks.addTask('check-for-updates', {
+      env: { CI: '0' },
+      steps: {
+        toJSON: () => {
+          const steps = upgrades.renderTaskSteps() as pj.TaskStep[];
+          return steps.filter(
+            (step) => step.exec && typeof step.exec === 'string' && step.exec?.startsWith('npm-check-updates'),
+          );
+        },
+      } as any,
+    });
+
     // Composite project and references
-    const allDeps = [...props.deps ?? [], ...props.peerDeps ?? [], ...props.devDeps ?? []];
+    const allDeps = [...(props.deps ?? []), ...(props.peerDeps ?? []), ...(props.devDeps ?? [])];
 
     for (const tsconfig of [this.tsconfig, this.tsconfigDev]) {
       tsconfig?.file.addOverride('compilerOptions.composite', true);
       tsconfig?.file.addOverride(
         'references',
-        allDeps.filter(isMonorepoTypeScriptProject).
-          map((p) => ({ path: path.relative(this.outdir, p.outdir) }),
-      ));
+        allDeps.filter(isMonorepoTypeScriptProject).map((p) => ({ path: path.relative(this.outdir, p.outdir) })),
+      );
     }
 
     // FIXME: I don't know why `tsconfig.dev.json` doesn't have an outdir, or where it's used,
@@ -144,7 +206,7 @@ export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
 
     // Install dependencies via the parent project
     (this.package as any).installDependencies = () => {
-      this.parent.requestInstallDependencies(() => (this.package as any).resolveDepsAndWritePackageJson())
+      this.parent.requestInstallDependencies(() => (this.package as any).resolveDepsAndWritePackageJson());
     };
 
     if (props.private) {
@@ -184,7 +246,6 @@ function without<A extends object, K extends keyof A>(x: A, ...ks: K[]): Omit<A,
   }
   return ret;
 }
-
 
 function isMonorepoTypeScriptProject(x: unknown): x is MonorepoTypeScriptProject {
   return typeof x === 'object' && !!x && x instanceof MonorepoTypeScriptProject;

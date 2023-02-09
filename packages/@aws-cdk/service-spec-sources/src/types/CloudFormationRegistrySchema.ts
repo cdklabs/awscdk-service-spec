@@ -1,4 +1,4 @@
-import { jsonschema } from "./JsonSchema";
+import { jsonschema } from './JsonSchema';
 
 export interface CloudFormationRegistryResource extends ImplicitJsonSchemaRecord {
   readonly $schema?: string;

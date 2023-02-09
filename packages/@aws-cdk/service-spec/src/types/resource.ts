@@ -57,7 +57,7 @@ export interface Attribute {
 
 Invariants.push(evolutionInvariant<Property>(
   'wasOnceJson may never be switched off',
-  (prev, cur) => impliesU(prev.wasOnceJson, cur.wasOnceJson)
+  (prev, cur) => impliesU(prev.wasOnceJson, cur.wasOnceJson),
 ));
 
 
