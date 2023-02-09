@@ -70,6 +70,10 @@
         }
       ]
     },
+    "post-upgrade": {
+      "name": "post-upgrade",
+      "description": "Runs after upgrading dependencies"
+    },
     "run": {
       "name": "run",
       "steps": [
@@ -90,7 +94,7 @@
     },
     "upgrade": {
       "name": "upgrade",
-      "description": "upgrade dependencies",
+      "description": "Upgrade dependencies in all workspaces",
       "env": {
         "CI": "0"
       },
@@ -99,19 +103,7 @@
           "exec": "yarn upgrade npm-check-updates"
         },
         {
-          "exec": "npm-check-updates --dep dev --upgrade --target=minor"
-        },
-        {
-          "exec": "npm-check-updates --dep optional --upgrade --target=minor"
-        },
-        {
-          "exec": "npm-check-updates --dep peer --upgrade --target=minor"
-        },
-        {
-          "exec": "npm-check-updates --dep prod --upgrade --target=minor"
-        },
-        {
-          "exec": "npm-check-updates --dep bundle --upgrade --target=minor"
+          "exec": "yarn workspaces run check-for-updates"
         },
         {
           "exec": "yarn install --check-files"
@@ -120,7 +112,7 @@
           "exec": "yarn upgrade"
         },
         {
-          "exec": "npx projen"
+          "spawn": "default"
         },
         {
           "spawn": "post-upgrade"

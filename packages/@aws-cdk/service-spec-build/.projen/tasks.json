@@ -21,6 +21,29 @@
         }
       ]
     },
+    "check-for-updates": {
+      "name": "check-for-updates",
+      "env": {
+        "CI": "0"
+      },
+      "steps": [
+        {
+          "exec": "npm-check-updates --dep dev --upgrade --target=minor --reject='@cdklabs/tskb,@aws-cdk/service-spec-sources,@aws-cdk/service-spec'"
+        },
+        {
+          "exec": "npm-check-updates --dep optional --upgrade --target=minor --reject='@cdklabs/tskb,@aws-cdk/service-spec-sources,@aws-cdk/service-spec'"
+        },
+        {
+          "exec": "npm-check-updates --dep peer --upgrade --target=minor --reject='@cdklabs/tskb,@aws-cdk/service-spec-sources,@aws-cdk/service-spec'"
+        },
+        {
+          "exec": "npm-check-updates --dep prod --upgrade --target=minor --reject='@cdklabs/tskb,@aws-cdk/service-spec-sources,@aws-cdk/service-spec'"
+        },
+        {
+          "exec": "npm-check-updates --dep bundle --upgrade --target=minor --reject='@cdklabs/tskb,@aws-cdk/service-spec-sources,@aws-cdk/service-spec'"
+        }
+      ]
+    },
     "compile": {
       "name": "compile",
       "description": "Only compile",
