@@ -4,11 +4,9 @@ name: build
 on:
   pull_request: {}
   workflow_dispatch: {}
-  merge_group:
+  push:
     branches:
-      - main
-    types:
-      - checks_requested
+      - gh-readonly-queue/main/*
 jobs:
   build:
     runs-on: ubuntu-latest

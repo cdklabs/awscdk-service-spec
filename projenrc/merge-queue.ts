@@ -28,9 +28,10 @@ export class MergeQueue extends Component {
     const autoMerge = options.autoMerge ?? true;
 
     project.github?.tryFindWorkflow("build")?.on({
-      'merge_group': {
-        branches: [ 'main' ],
-        types: ['checks_requested']
+      'push': {
+        branches: [
+          "gh-readonly-queue/main/*"
+        ]
       }
     } as any);
 
