@@ -30,9 +30,9 @@ const repo = new MonorepoRoot({
 });
 new MergeQueue(repo, {
   autoMergeOptions: {
-    secret: 'PROJEN_GITHUB_TOKEN'
-  }
-})
+    secret: 'PROJEN_GITHUB_TOKEN',
+  },
+});
 
 const tsKb = new MonorepoTypeScriptProject({
   parent: repo,
@@ -46,12 +46,7 @@ const serviceSpecSources = new MonorepoTypeScriptProject({
   name: '@aws-cdk/service-spec-sources',
   description: 'Sources for the service spec',
   deps: ['ajv', 'glob'],
-  devDeps: [
-    tsKb,
-    'ts-json-schema-generator',
-    '@types/glob',
-    'ajv-cli',
-  ],
+  devDeps: [tsKb, 'ts-json-schema-generator', '@types/glob', 'ajv-cli'],
   private: true,
 });
 for (const tsconfig of [serviceSpecSources.tsconfig, serviceSpecSources.tsconfigDev]) {
@@ -59,28 +54,27 @@ for (const tsconfig of [serviceSpecSources.tsconfig, serviceSpecSources.tsconfig
 }
 
 const serviceSpecSchemaTask = serviceSpecSources.addTask('gen-schemas', {
-  steps: [
-    'CloudFormationRegistryResource'
-  ].map((typeName: string) => ({
-    exec: ['ts-json-schema-generator',
-      '--path', './src/types/index.ts',
-      '--type', typeName,
-      '--out', `schemas/${typeName}.schema.json`
+  steps: ['CloudFormationRegistryResource'].map((typeName: string) => ({
+    exec: [
+      'ts-json-schema-generator',
+      '--path',
+      './src/types/index.ts',
+      '--type',
+      typeName,
+      '--out',
+      `schemas/${typeName}.schema.json`,
     ].join(' '),
-  }))
+  })),
 });
 
 // FIXME: Needs to automatically run, but not yet because not everything validates yet
 serviceSpecSources.addTask('validate-specs', {
-  steps: [
-    { exec: 'node ./lib/build-tools/validate-resources.js' },
-  ]
+  steps: [{ exec: 'node ./lib/build-tools/validate-resources.js' }],
 });
 
 serviceSpecSources.compileTask.prependExec('gen-jd'); // Comes from tskb
 serviceSpecSources.compileTask.prependSpawn(serviceSpecSchemaTask);
 serviceSpecSources.synth();
-
 
 const serviceSpec = new MonorepoTypeScriptProject({
   parent: repo,
@@ -122,4 +116,3 @@ new JsonFile(repo, '.vscode/settings.json', {
 });
 
 repo.synth();
-
