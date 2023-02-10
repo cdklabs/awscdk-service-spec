@@ -19,13 +19,34 @@ export class MonorepoRoot extends pj.typescript.TypeScriptProject {
     });
     this.gitignore.addPatterns('.DS_Store');
 
-    // Tasks
-    // Forward to workspaces
+    /**
+     * Formatting
+     */
+    this.addDevDeps('eslint-config-prettier', 'eslint-plugin-prettier');
+    new pj.JsonFile(this, '.eslintrc.json', {
+      allowComments: true,
+      obj: {
+        plugins: ['@typescript-eslint', 'prettier'],
+        parser: '@typescript-eslint/parser',
+        parserOptions: {
+          ecmaVersion: 2018,
+          sourceType: 'module',
+          project: './tsconfig.dev.json',
+        },
+        ignorePatterns: ['!.projenrc.ts'],
+        extends: ['plugin:prettier/recommended'],
+      },
+    });
+    this.tasks.addTask('fmt', { exec: 'eslint --ext .ts --fix projenrc .projenrc.ts' });
+
+    /**
+     * Tasks
+     */
+    // Tasks that should be applied in all workspaces
     this.tasks.removeTask('build');
     this.tasks.addTask('build', {
-      steps: [{ spawn: 'default' }, { exec: 'yarn workspaces run build' }],
+      steps: [{ spawn: 'default' }, { spawn: 'fmt' }, { exec: 'yarn workspaces run build' }],
     });
-
     this.tasks.tryFind('compile')?.reset('yarn workspaces run compile');
     this.tasks.tryFind('package')?.reset('yarn workspaces run package');
     this.tasks.tryFind('test')?.reset('yarn workspaces run test');
@@ -34,6 +55,7 @@ export class MonorepoRoot extends pj.typescript.TypeScriptProject {
       receiveArgs: true,
     });
 
+    // Upgrade task
     this.tasks.removeTask('upgrade');
     this.tasks.addTask('upgrade', {
       env: { CI: '0' },
@@ -48,7 +70,7 @@ export class MonorepoRoot extends pj.typescript.TypeScriptProject {
       ],
     });
 
-    // Not needed at top-level
+    // Clean up tasks not required at top-level
     this.tasks.removeTask('eject');
     this.tasks.removeTask('watch');
     this.tasks.removeTask('pre-compile');
@@ -136,7 +158,16 @@ export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
   public readonly parent: MonorepoRoot;
 
   constructor(props: MonorepoTypeScriptProjectOptions) {
-    const remainder = without(props, 'parent', 'name', 'description', 'deps', 'peerDeps', 'devDeps', 'excludeDepsFromUpgrade');
+    const remainder = without(
+      props,
+      'parent',
+      'name',
+      'description',
+      'deps',
+      'peerDeps',
+      'devDeps',
+      'excludeDepsFromUpgrade',
+    );
 
     super({
       parent: props.parent,
@@ -156,10 +187,10 @@ export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
       depsUpgradeOptions: {
         exclude: [
           ...(props.excludeDepsFromUpgrade ?? []),
-          ...packageNames(props.deps?.filter(isMonorepoTypeScriptProject)) ?? [],
-          ...packageNames(props.peerDeps?.filter(isMonorepoTypeScriptProject)) ?? [],
-          ...packageNames(props.devDeps?.filter(isMonorepoTypeScriptProject)) ?? [],
-        ]
+          ...(packageNames(props.deps?.filter(isMonorepoTypeScriptProject)) ?? []),
+          ...(packageNames(props.peerDeps?.filter(isMonorepoTypeScriptProject)) ?? []),
+          ...(packageNames(props.devDeps?.filter(isMonorepoTypeScriptProject)) ?? []),
+        ],
       },
 
       ...remainder,

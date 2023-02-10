@@ -1,7 +1,5 @@
 import * as pj from 'projen';
-import { JsonFile } from 'projen';
-import { MonorepoRoot, MonorepoTypeScriptProject } from './projenrc/monorepo';
-import { MergeQueue } from './projenrc/merge-queue';
+import { MergeQueue, MonorepoRoot, MonorepoTypeScriptProject } from './projenrc';
 
 const repo = new MonorepoRoot({
   defaultReleaseBranch: 'main',
@@ -95,24 +93,32 @@ serviceSpecBuild.gitignore.addPatterns('db.json');
 serviceSpecBuild.synth();
 
 // Hide most of the generated files from VS Code
-new JsonFile(repo, '.vscode/settings.json', {
-  obj: {
-    'files.exclude': {
-      '**/.projen': true,
-      '**/.eslintrc.js': true,
-      '**/.eslintrc.json': true,
-      '**/.gitattributes': true,
-      '**/.gitignore': true,
-      '**/.npmignore': true,
-      '**/*.tsbuildinfo': true,
-      'packages/**/node_modules': true,
-      'packages/**/lib': true,
-      '.prettierignore': true,
-      '.prettierrc.json': true,
-      '**/tsconfig.json': true,
-      '**/tsconfig.dev.json': true,
-    },
+repo.vscode?.settings.addSettings({
+  'files.exclude': {
+    '**/.projen': true,
+    '**/.eslintrc.js': true,
+    '**/.eslintrc.json': true,
+    '**/.gitattributes': true,
+    '**/.gitignore': true,
+    '**/.npmignore': true,
+    '**/*.tsbuildinfo': true,
+    'packages/**/node_modules': true,
+    'packages/**/lib': true,
+    '.prettierignore': true,
+    '.prettierrc.json': true,
+    '**/tsconfig.json': true,
+    '**/tsconfig.dev.json': true,
   },
+  'eslint.format.enable': true,
 });
+
+// Formatting
+repo.vscode?.extensions.addRecommendations('esbenp.prettier-vscode', 'dbaeumer.vscode-eslint');
+repo.vscode?.settings.addSetting('editor.defaultFormatter', 'esbenp.prettier-vscode');
+repo.vscode?.settings.addSetting('eslint.format.enable', true);
+repo.vscode?.settings.addSettings({ 'editor.defaultFormatter': 'dbaeumer.vscode-eslint' }, [
+  'javascript',
+  'typescript',
+]);
 
 repo.synth();

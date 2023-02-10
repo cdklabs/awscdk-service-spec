@@ -1,5 +1,6 @@
 {
   "files": [
+    ".eslintrc.json",
     ".gitattributes",
     ".github/pull_request_template.md",
     ".github/workflows/auto-approve.yml",
@@ -14,6 +15,7 @@
     ".projen/deps.json",
     ".projen/files.json",
     ".projen/tasks.json",
+    ".vscode/extensions.json",
     ".vscode/settings.json",
     "LICENSE",
     "tsconfig.dev.json",
