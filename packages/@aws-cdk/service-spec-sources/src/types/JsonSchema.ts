@@ -13,9 +13,24 @@ export namespace jsonschema {
     readonly description?: string;
   }
 
+  export type Object = MapLikeObject | RecordLikeObject;
+
+  export interface MapLikeObject extends Annotatable {
+    readonly type: 'object';
+    /**
+     * Simplification:
+     *
+     * { additionalProperties: X }
+     *       <===>
+     * { patternProperties: { ".*": X }}
+     */
+    readonly additionalProperties?: false | Schema;
+    readonly patternProperties?: Record<string, Schema>;
+  }
+
   export type ObjectProperties = Record<string, Schema>;
 
-  export interface Object extends Annotatable {
+  export interface RecordLikeObject extends Annotatable {
     readonly type: 'object';
     readonly properties: ObjectProperties;
     readonly required?: string[];
@@ -25,6 +40,21 @@ export namespace jsonschema {
     readonly anyOf?: Array<Partial<Object>>;
     readonly allOf?: Array<Partial<Object>>;
     readonly oneOf?: Array<Partial<Object>>;
+  }
+
+  export function isRecordLikeObject(x: Object): x is RecordLikeObject {
+    const ret = !!(x as RecordLikeObject).properties;
+
+    // Do a sanity check of our understanding
+    if (ret && (x as MapLikeObject).additionalProperties || (x as MapLikeObject).patternProperties) {
+      throw new Error(`object with properties should not have additionalProperties or patternProperties: ${JSON.stringify(x)}`);
+    }
+
+    return ret;
+  }
+
+  export function isMapLikeObject(x: Object): x is MapLikeObject {
+    return !(x as RecordLikeObject).properties;
   }
 
   export interface String extends Annotatable {
@@ -71,6 +101,9 @@ export namespace jsonschema {
     readonly referenceName?: string;
   }
 
+  /**
+   * Make a resolver function that will resolve `$ref` entries with respect to the given document root.
+   */
   export function resolveReference(root: any) {
     return (ref: Schema): ResolvedSchema => {
       if (!isReference(ref)) { return { schema: ref }; }
@@ -80,7 +113,7 @@ export namespace jsonschema {
         throw new Error(`Can only resolve references inside the same file, got '${path}'`);
       }
 
-      const parts = path.split('/');
+      const parts = path.substring(2).split('/');
       let current = root;
       while (true) {
         const name = parts.shift();
@@ -91,7 +124,13 @@ export namespace jsonschema {
     };
   }
 
-  function isReference(x: Schema): x is Reference {
+  /**
+   * The type of a resolver function
+   */
+  export type Resolver = ReturnType<typeof resolveReference>;
+
+  export function isReference(x: Schema): x is Reference {
     return '$ref' in x;
   }
+
 }

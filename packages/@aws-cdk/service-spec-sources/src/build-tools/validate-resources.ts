@@ -1,8 +1,8 @@
 // A build tool to validate that our type definitions cover all resources
 //
 // Not a lot of thought given to where this needs to live yet.
-import Ajv from 'ajv';
 import { promises as fs } from 'fs';
+import Ajv from 'ajv';
 import * as glob from 'glob';
 
 async function main() {

@@ -1,12 +1,13 @@
-import { PropertyType, Region, ResourceProperties, SpecDatabase, TypeDefinition } from "@aws-cdk/service-spec";
-import { CloudFormationRegistryResource, ImplicitJsonSchemaObject, jsonschema } from "@aws-cdk/service-spec-sources";
-import { ref } from "@cdklabs/tskb";
+import { PropertyType, Region, ResourceProperties, SpecDatabase, TypeDefinition } from '@aws-cdk/service-spec';
+import { CloudFormationRegistryResource, ImplicitJsonSchemaRecord, jsonschema, unifyAllSchemas } from '@aws-cdk/service-spec-sources';
+import { Fail, failure, Failures, isFailure, Result, tryCatch, using, ref } from '@cdklabs/tskb';
 
-export function loadCloudFormationRegistryResource(db: SpecDatabase, region: Region, resource: CloudFormationRegistryResource) {
+export function loadCloudFormationRegistryResource(db: SpecDatabase, region: Region, resource: CloudFormationRegistryResource, fails: Failures) {
   const typeDefinitions = new Map<jsonschema.Object, TypeDefinition>();
 
-
   const resolve = jsonschema.resolveReference(resource);
+
+  // FIXME: Resource may already exist, in which case we should look it up.
 
   const res = db.allocate('resource', {
     cloudFormationType: resource.typeName,
@@ -16,82 +17,96 @@ export function loadCloudFormationRegistryResource(db: SpecDatabase, region: Reg
     properties: {},
   });
 
-  recurseProperties(resource, res.properties);
+  recurseProperties(resource, res.properties, failure.in(resource.typeName));
 
   db.link('regionHasResource', region, res);
 
-  function recurseProperties(source: ImplicitJsonSchemaObject, target: ResourceProperties) {
-    if (source.additionalProperties || source.patternProperties) {
-      throw new Error(`recurseProperties: expecting a fixed record type, without additionalProperties(${source.additionalProperties}) or patternProperties (${source.patternProperties})`);
+  function recurseProperties(source: ImplicitJsonSchemaRecord, target: ResourceProperties, fail: Fail) {
+    if (!source.properties) {
+      throw new Error(`Not an object type with properties: ${JSON.stringify(source)}`);
     }
 
     for (const [name, property] of Object.entries(source.properties)) {
       const resolved = resolve(property);
-      target[name] = {
-        type: schemaTypeToModelType(name, resolved),
-        documentation: resolved.schema.description,
-        required: ifTrue((source.required ?? []).includes(name)),
-      };
+      const type = schemaTypeToModelType(name, resolved, fail.in(`property ${name}`));
+
+      if (isFailure(type)) {
+        fails.push(type);
+      } else {
+        target[name] = {
+          type,
+          documentation: resolved.schema.description,
+          required: ifTrue((source.required ?? []).includes(name)),
+        };
+      }
     }
   }
 
-  function schemaTypeToModelType(propertyName: string, resolved: jsonschema.ResolvedSchema): PropertyType {
-    const nameHint = resolved.referenceName ?? propertyName;
+  function schemaTypeToModelType(propertyName: string, resolved: jsonschema.ResolvedSchema, fail: Fail): Result<PropertyType> {
+    return tryCatch(fail, (): Result<PropertyType> => {
+      const nameHint = resolved.referenceName ?? propertyName;
 
-    switch (resolved.schema.type) {
-      case 'string':
-        return 'string';
-      case 'array':
-        // FIXME: insertionOrder, uniqueItems
-        return {
-          type: 'array',
-          element: schemaTypeToModelType(nameHint, resolve(resolved.schema.items)),
-        };
-      case 'boolean':
-        return 'boolean';
-      case 'object':
-        if (resolved.schema.additionalProperties || resolved.schema.patternProperties) {
-          // Map type
-          if (!isEmpty(resolved.schema.properties)) {
-            throw new Error('Map types should not have properties');
-          }
-          if (resolved.schema.additionalProperties && resolved.schema.patternProperties) {
-            throw new Error('Map types should have only additionalProperties or patternProperties');
-          }
-          if (resolved.schema.additionalProperties) {
-            return {
-              type: 'map',
-              element: schemaTypeToModelType(nameHint, resolve(resolved.schema.additionalProperties)),
-            };
-          } else if (resolved.schema.patternProperties) {
-            const types = Object.values(resolved.schema.patternProperties);
-            if (types.length !== 1) {
-              throw new Error('Map types should have exactly 1 patternProperties');
-            }
-            return {
-              type: 'map',
-              element: schemaTypeToModelType(nameHint, resolve(types[0])),
-            };
-          }
-        } else {
-          // Object type
-          let typeDef = typeDefinitions.get(resolved.schema)
-          if (!typeDef) {
-            typeDef = db.allocate('typeDefinition', {
-              name: nameHint,
-              documentation: resolved.schema.description,
-              properties: {},
-            });
-            db.link('usesType', res, typeDef);
+      switch (resolved.schema.type) {
+        case 'string':
+          return 'string';
 
-            recurseProperties(resolved.schema, typeDef.properties);
-          }
+        case 'array':
+          // FIXME: insertionOrder, uniqueItems
+          return using(
+            schemaTypeToModelType(nameHint, resolve(resolved.schema.items), fail),
+            element => ({ type: 'array', element }));
 
-          return { type: 'ref', reference: ref(typeDef) };
-        }
+        case 'boolean':
+          return 'boolean';
+
+        case 'object':
+          return schemaObjectToModelType(nameHint, resolved.schema, fail);
+
+        case 'number':
+        case 'integer':
+          return 'number';
+      }
+    });
+  }
+
+  function schemaObjectToModelType(nameHint: string, schema: jsonschema.Object, fail: Fail): Result<PropertyType> {
+    if (jsonschema.isMapLikeObject(schema)) {
+      // Map type
+      if (schema.additionalProperties && schema.patternProperties) {
+        throw new Error('Map types should have only additionalProperties or patternProperties');
+      }
+      if (schema.additionalProperties) {
+        return using(
+          schemaTypeToModelType(nameHint, resolve(schema.additionalProperties), fail),
+          element => ({ type: 'map', element }));
+      } else if (schema.patternProperties) {
+        return using(
+          unifyAllSchemas(Object.values(schema.patternProperties)),
+          unifiedType => using(
+            schemaTypeToModelType(nameHint, resolve(unifiedType), fail),
+            element => ({ type: 'map', element })));
+      } else {
+        // Fully untyped map
+        // FIXME: is 'json' really a primitive type, or do we mean `Map<unknown>` ?
+        return 'json';
+      }
     }
 
-    throw new Error('TypeScript should have checked exhaustiveness here');
+    // Object type
+    let typeDef = typeDefinitions.get(schema);
+    if (!typeDef) {
+      typeDef = db.allocate('typeDefinition', {
+        name: nameHint,
+        documentation: schema.description,
+        properties: {},
+      });
+      db.link('usesType', res, typeDef);
+      typeDefinitions.set(schema, typeDef);
+
+      recurseProperties(schema, typeDef.properties, fail.in(`typedef ${nameHint}`));
+    }
+
+    return { type: 'ref', reference: ref(typeDef) };
   }
 }
 
@@ -102,8 +117,4 @@ function last<A>(xs: A[]): A {
 
 function ifTrue(x: boolean | undefined) {
   return x ? x : undefined;
-}
-
-function isEmpty<A>(x: Record<string, A>) {
-  return Object.keys(x).length === 0;
 }

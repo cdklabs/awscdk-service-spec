@@ -1,7 +1,5 @@
 import * as pj from 'projen';
-import { JsonFile } from 'projen';
-import { MonorepoRoot, MonorepoTypeScriptProject } from './projenrc/monorepo';
-import { AutoMergeUpgrade, MergeMethod } from './projenrc/auto-merge-upgrade';
+import { MergeQueue, MonorepoRoot, MonorepoTypeScriptProject } from './projenrc';
 
 const repo = new MonorepoRoot({
   defaultReleaseBranch: 'main',
@@ -28,7 +26,11 @@ const repo = new MonorepoRoot({
     mergify: false,
   },
 });
-new AutoMergeUpgrade(repo.upgradeWorkflow, { mergeMethod: MergeMethod.SQUASH });
+new MergeQueue(repo, {
+  autoMergeOptions: {
+    secret: 'PROJEN_GITHUB_TOKEN',
+  },
+});
 
 const tsKb = new MonorepoTypeScriptProject({
   parent: repo,
@@ -41,13 +43,8 @@ const serviceSpecSources = new MonorepoTypeScriptProject({
   parent: repo,
   name: '@aws-cdk/service-spec-sources',
   description: 'Sources for the service spec',
-  deps: ['ajv', 'glob'],
-  devDeps: [
-    tsKb,
-    'ts-json-schema-generator',
-    '@types/glob',
-    'ajv-cli',
-  ],
+  deps: ['ajv', 'glob', tsKb],
+  devDeps: ['ts-json-schema-generator', '@types/glob', 'ajv-cli'],
   private: true,
 });
 for (const tsconfig of [serviceSpecSources.tsconfig, serviceSpecSources.tsconfigDev]) {
@@ -55,28 +52,27 @@ for (const tsconfig of [serviceSpecSources.tsconfig, serviceSpecSources.tsconfig
 }
 
 const serviceSpecSchemaTask = serviceSpecSources.addTask('gen-schemas', {
-  steps: [
-    'CloudFormationRegistryResource'
-  ].map((typeName: string) => ({
-    exec: ['ts-json-schema-generator',
-      '--path', './src/types/index.ts',
-      '--type', typeName,
-      '--out', `schemas/${typeName}.schema.json`
+  steps: ['CloudFormationRegistryResource'].map((typeName: string) => ({
+    exec: [
+      'ts-json-schema-generator',
+      '--tsconfig',
+      'tsconfig.json',
+      '--type',
+      typeName,
+      '--out',
+      `schemas/${typeName}.schema.json`,
     ].join(' '),
-  }))
+  })),
 });
 
 // FIXME: Needs to automatically run, but not yet because not everything validates yet
 serviceSpecSources.addTask('validate-specs', {
-  steps: [
-    { exec: 'node ./lib/build-tools/validate-resources.js' },
-  ]
+  steps: [{ exec: 'node ./lib/build-tools/validate-resources.js' }],
 });
 
 serviceSpecSources.compileTask.prependExec('gen-jd'); // Comes from tskb
 serviceSpecSources.compileTask.prependSpawn(serviceSpecSchemaTask);
 serviceSpecSources.synth();
-
 
 const serviceSpec = new MonorepoTypeScriptProject({
   parent: repo,
@@ -93,28 +89,36 @@ const serviceSpecBuild = new MonorepoTypeScriptProject({
   deps: [tsKb, serviceSpecSources, serviceSpec],
   private: true,
 });
+serviceSpecBuild.gitignore.addPatterns('db.json');
 serviceSpecBuild.synth();
 
 // Hide most of the generated files from VS Code
-new JsonFile(repo, '.vscode/settings.json', {
-  obj: {
-    'files.exclude': {
-      '**/.projen': true,
-      '**/.eslintrc.js': true,
-      '**/.eslintrc.json': true,
-      '**/.gitattributes': true,
-      '**/.gitignore': true,
-      '**/.npmignore': true,
-      '**/*.tsbuildinfo': true,
-      'packages/**/node_modules': true,
-      'packages/**/lib': true,
-      '.prettierignore': true,
-      '.prettierrc.json': true,
-      '**/tsconfig.json': true,
-      '**/tsconfig.dev.json': true,
-    },
+repo.vscode?.settings.addSettings({
+  'files.exclude': {
+    '**/.projen': true,
+    '**/.eslintrc.js': true,
+    '**/.eslintrc.json': true,
+    '**/.gitattributes': true,
+    '**/.gitignore': true,
+    '**/.npmignore': true,
+    '**/*.tsbuildinfo': true,
+    'packages/**/node_modules': true,
+    'packages/**/lib': true,
+    '.prettierignore': true,
+    '.prettierrc.json': true,
+    '**/tsconfig.json': true,
+    '**/tsconfig.dev.json': true,
   },
+  'eslint.format.enable': true,
 });
 
-repo.synth();
+// Formatting
+repo.vscode?.extensions.addRecommendations('esbenp.prettier-vscode', 'dbaeumer.vscode-eslint');
+repo.vscode?.settings.addSetting('editor.defaultFormatter', 'esbenp.prettier-vscode');
+repo.vscode?.settings.addSetting('eslint.format.enable', true);
+repo.vscode?.settings.addSettings({ 'editor.defaultFormatter': 'dbaeumer.vscode-eslint' }, [
+  'javascript',
+  'typescript',
+]);
 
+repo.synth();
