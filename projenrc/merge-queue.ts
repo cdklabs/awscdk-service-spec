@@ -42,6 +42,6 @@ export class MergeQueue extends Component {
     // Do not require PR validation on merge queue
     project.github
       ?.tryFindWorkflow('pull-request-lint')
-      ?.file?.addOverride('jobs.validate.if', '${{ github.event_name == "pull_request" }} ');
+      ?.file?.addOverride('jobs.validate.if', '${{ github.event_name == "pull_request" }}');
   }
 }
