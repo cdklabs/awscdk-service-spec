@@ -1,10 +1,6 @@
 {
   "dependencies": [
     {
-      "name": "@cdklabs/tskb",
-      "type": "build"
-    },
-    {
       "name": "@types/glob",
       "type": "build"
     },
@@ -77,6 +73,10 @@
     {
       "name": "typescript",
       "type": "build"
+    },
+    {
+      "name": "@cdklabs/tskb",
+      "type": "runtime"
     },
     {
       "name": "ajv",

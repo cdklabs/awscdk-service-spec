@@ -21,17 +21,6 @@
           },
           "type": "array"
         },
-        "additionalProperties": {
-          "anyOf": [
-            {
-              "const": false,
-              "type": "boolean"
-            },
-            {
-              "$ref": "#/definitions/jsonschema.Schema"
-            }
-          ]
-        },
         "conditionalCreateOnlyProperties": {
           "description": "FIXME: wut?",
           "items": {
@@ -65,12 +54,6 @@
         },
         "handlers": {
           "$ref": "#/definitions/Handlers"
-        },
-        "patternProperties": {
-          "additionalProperties": {
-            "$ref": "#/definitions/jsonschema.Schema"
-          },
-          "type": "object"
         },
         "primaryIdentifier": {
           "items": {
@@ -255,6 +238,43 @@
         }
       ]
     },
+    "jsonschema.MapLikeObject": {
+      "additionalProperties": false,
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "const": false,
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/definitions/jsonschema.Schema"
+            }
+          ],
+          "description": "Simplification:\n\n{ additionalProperties: X }       <===> { patternProperties: { \".*\": X }}"
+        },
+        "description": {
+          "type": "string"
+        },
+        "patternProperties": {
+          "additionalProperties": {
+            "$ref": "#/definitions/jsonschema.Schema"
+          },
+          "type": "object"
+        },
+        "type": {
+          "const": "object",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
     "jsonschema.Number": {
       "additionalProperties": false,
       "properties": {
@@ -293,30 +313,29 @@
       "type": "object"
     },
     "jsonschema.Object": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/jsonschema.MapLikeObject"
+        },
+        {
+          "$ref": "#/definitions/jsonschema.RecordLikeObject"
+        }
+      ]
+    },
+    "jsonschema.ObjectProperties": {
+      "additionalProperties": {
+        "$ref": "#/definitions/jsonschema.Schema"
+      },
+      "type": "object"
+    },
+    "jsonschema.RecordLikeObject": {
       "additionalProperties": false,
       "properties": {
         "$comment": {
           "type": "string"
         },
-        "additionalProperties": {
-          "anyOf": [
-            {
-              "const": false,
-              "type": "boolean"
-            },
-            {
-              "$ref": "#/definitions/jsonschema.Schema"
-            }
-          ]
-        },
         "description": {
           "type": "string"
-        },
-        "patternProperties": {
-          "additionalProperties": {
-            "$ref": "#/definitions/jsonschema.Schema"
-          },
-          "type": "object"
         },
         "properties": {
           "$ref": "#/definitions/jsonschema.ObjectProperties"
@@ -336,12 +355,6 @@
         "type",
         "properties"
       ],
-      "type": "object"
-    },
-    "jsonschema.ObjectProperties": {
-      "additionalProperties": {
-        "$ref": "#/definitions/jsonschema.Schema"
-      },
       "type": "object"
     },
     "jsonschema.Reference": {

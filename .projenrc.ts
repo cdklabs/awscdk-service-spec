@@ -43,8 +43,8 @@ const serviceSpecSources = new MonorepoTypeScriptProject({
   parent: repo,
   name: '@aws-cdk/service-spec-sources',
   description: 'Sources for the service spec',
-  deps: ['ajv', 'glob'],
-  devDeps: [tsKb, 'ts-json-schema-generator', '@types/glob', 'ajv-cli'],
+  deps: ['ajv', 'glob', tsKb],
+  devDeps: ['ts-json-schema-generator', '@types/glob', 'ajv-cli'],
   private: true,
 });
 for (const tsconfig of [serviceSpecSources.tsconfig, serviceSpecSources.tsconfigDev]) {
@@ -55,8 +55,8 @@ const serviceSpecSchemaTask = serviceSpecSources.addTask('gen-schemas', {
   steps: ['CloudFormationRegistryResource'].map((typeName: string) => ({
     exec: [
       'ts-json-schema-generator',
-      '--path',
-      './src/types/index.ts',
+      '--tsconfig',
+      'tsconfig.json',
       '--type',
       typeName,
       '--out',
