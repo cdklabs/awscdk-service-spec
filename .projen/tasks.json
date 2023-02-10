@@ -7,6 +7,9 @@
           "spawn": "default"
         },
         {
+          "spawn": "fmt"
+        },
+        {
           "exec": "yarn workspaces run build"
         }
       ]
@@ -58,6 +61,14 @@
       "steps": [
         {
           "exec": "ts-node --project tsconfig.dev.json .projenrc.ts"
+        }
+      ]
+    },
+    "fmt": {
+      "name": "fmt",
+      "steps": [
+        {
+          "exec": "eslint --ext .ts --fix projenrc .projenrc.ts"
         }
       ]
     },

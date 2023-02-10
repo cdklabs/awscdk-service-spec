@@ -6,6 +6,14 @@
       "type": "build"
     },
     {
+      "name": "eslint-config-prettier",
+      "type": "build"
+    },
+    {
+      "name": "eslint-plugin-prettier",
+      "type": "build"
+    },
+    {
       "name": "npm-check-updates",
       "version": "^16",
       "type": "build"
