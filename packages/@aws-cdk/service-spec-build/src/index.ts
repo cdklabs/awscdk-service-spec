@@ -1,7 +1,7 @@
 import { emptyDatabase } from '@aws-cdk/service-spec';
 import * as sources from '@aws-cdk/service-spec-sources';
+import { Failures } from '@cdklabs/tskb';
 import { loadCloudFormationRegistryResource } from './cloudformation-registry';
-import { Failures } from './result';
 
 export function buildDatabase(sourcesRoot: string) {
   const db = emptyDatabase();
@@ -15,7 +15,6 @@ export function buildDatabase(sourcesRoot: string) {
     });
 
     for (const resource of Object.values(resources)) {
-      console.log(resource.typeName);
       loadCloudFormationRegistryResource(db, region, resource, fails);
     }
   }
