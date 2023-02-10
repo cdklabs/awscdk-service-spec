@@ -43,8 +43,8 @@ const serviceSpecSources = new MonorepoTypeScriptProject({
   parent: repo,
   name: '@aws-cdk/service-spec-sources',
   description: 'Sources for the service spec',
-  deps: ['ajv', 'glob'],
-  devDeps: [tsKb, 'ts-json-schema-generator', '@types/glob', 'ajv-cli'],
+  deps: ['ajv', 'glob', tsKb],
+  devDeps: ['ts-json-schema-generator', '@types/glob', 'ajv-cli'],
   private: true,
 });
 for (const tsconfig of [serviceSpecSources.tsconfig, serviceSpecSources.tsconfigDev]) {
