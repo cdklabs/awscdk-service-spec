@@ -70,7 +70,6 @@ serviceSpecSources.addTask('validate-specs', {
   steps: [{ exec: 'node ./lib/build-tools/validate-resources.js' }],
 });
 
-serviceSpecSources.compileTask.prependExec('gen-jd'); // Comes from tskb
 serviceSpecSources.compileTask.prependSpawn(serviceSpecSchemaTask);
 serviceSpecSources.synth();
 
