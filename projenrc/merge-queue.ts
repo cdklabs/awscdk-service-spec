@@ -34,8 +34,8 @@ export class MergeQueue extends Component {
     buildWorkflow?.file?.patch(JsonPatch.remove('/on/pull_request'));
     buildWorkflow?.on({
       pullRequestTarget: {},
-      push: {
-        branches: ['gh-readonly-queue/main/*'],
+      mergeGroup: {
+        branches: ['main'],
       },
     });
 
