@@ -3,7 +3,7 @@ import * as sources from '@aws-cdk/service-spec-sources';
 import { loadCloudFormationRegistryResource } from './cloudformation-registry';
 import { Failures } from './result';
 
-export function buildDatabase() {
+export function buildDatabase(sourcesRoot: string) {
   const db = emptyDatabase();
   const fails: Failures = [];
 

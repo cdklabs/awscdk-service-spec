@@ -4,6 +4,7 @@
 import { promises as fs } from 'fs';
 import Ajv from 'ajv';
 import * as glob from 'glob';
+import * as path from 'path';
 
 async function main() {
   const ajv = new Ajv();
@@ -14,7 +15,7 @@ async function main() {
   console.log(process.cwd());
 
   let errors = 0;
-  for (const fileName of glob.sync('./src/sources/CloudFormationSchema.jd/*/*.json')) {
+  for (const fileName of glob.sync(path.join(__dirname, '../../../sources/CloudFormationSchema/*/*.json'))) {
     const file = JSON.parse(await fs.readFile(fileName, { encoding: 'utf-8' }));
     const valid = await validateCfnResource(file);
     if (!valid) {
