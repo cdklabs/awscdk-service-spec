@@ -4,7 +4,7 @@ import { buildDatabase } from '../index';
 
 async function main() {
   console.log('Building...');
-  const { db, fails } = buildDatabase();
+  const { db, fails } = await buildDatabase();
   console.log('Saving db.json');
   await fs.writeFile('db.json', JSON.stringify(db.save(), undefined, 1), { encoding: 'utf-8' });
 

@@ -7,7 +7,7 @@ import * as _glob from 'glob';
 import * as path from 'path';
 import * as util from 'util';
 import { CloudFormationRegistryResource } from '../types';
-import { Result } from '@cdklabs/tskb';
+import { Failure, failure, isFailure, isSuccess, Result } from '@cdklabs/tskb';
 
 const glob = util.promisify(_glob.glob);
 
@@ -16,46 +16,40 @@ export async function loadCloudFormationRegistryDirectory(directory: string): Pr
   const cfnSchemaJson = JSON.parse(await fs.readFile(path.join(__dirname, '../../schemas/CloudFormationRegistryResource.schema.json'), { encoding: 'utf-8' }));
   const validateCfnResource = ajv.compile(cfnSchemaJson);
 
+  const ret = [];
   for (const fileName of await glob(path.join(directory, '*.json'))) {
     const file = JSON.parse(await fs.readFile(fileName, { encoding: 'utf-8' }));
     const valid = await validateCfnResource(file);
-    if (!valid) {
-      console.log(fileName);
-      console.log('='.repeat(60));
-      console.log(validateCfnResource.errors);
-      console.log('');
 
-      errors += validateCfnResource.errors?.length ?? 0;
-      process.exitCode = 1;
-    }
+    ret.push(valid ? file : failure(formatErrors(fileName, validateCfnResource.errors)));
+  }
+  return ret;
+
+  function formatErrors(fileName: string, errors: Ajv.ErrorObject[] | null | undefined) {
+    return [
+      fileName,
+      '='.repeat(60),
+      ...util.inspect(errors),
+    ].join('\n');
   }
 }
 
-async function main() {
-
-  console.log(process.cwd());
-
-  let errors = 0;
-  for (const fileName of glob.sync(path.join(__dirname, '../../../sources/CloudFormationSchema/*/*.json'))) {
-    const file = JSON.parse(await fs.readFile(fileName, { encoding: 'utf-8' }));
-    const valid = await validateCfnResource(file);
-    if (!valid) {
-      console.log(fileName);
-      console.log('='.repeat(60));
-      console.log(validateCfnResource.errors);
-      console.log('');
-
-      errors += validateCfnResource.errors?.length ?? 0;
-      process.exitCode = 1;
-    }
-  }
-
-  if (errors > 0) {
-    console.log(`${errors} validation errors`);
-  }
+export interface CloudFormationRegistryResources {
+  readonly regionName: string;
+  readonly resources: Array<CloudFormationRegistryResource>;
+  readonly failures: Failure[];
 }
 
-main().catch(e => {
-  console.error(e);
-  process.exitCode = 1;
-});
+export async function loadDefaultCloudFormationRegistryResources(): Promise<CloudFormationRegistryResources[]> {
+  return await Promise.all((await glob(path.join(__dirname, '../../../sources/*'))).map(async (directoryName) => {
+    const regionName = path.basename(directoryName);
+    const resources = await loadCloudFormationRegistryDirectory(directoryName);
+
+    const ret: CloudFormationRegistryResources = {
+      regionName,
+      resources: resources.filter(isSuccess),
+      failures: resources.filter(isFailure),
+    };
+    return ret;
+  }));
+}
