@@ -81,7 +81,7 @@
       "name": "gen-schemas",
       "steps": [
         {
-          "exec": "ts-json-schema-generator --path ./src/types/index.ts --type CloudFormationRegistryResource --out schemas/CloudFormationRegistryResource.schema.json"
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudFormationRegistryResource --out schemas/CloudFormationRegistryResource.schema.json"
         }
       ]
     },

@@ -63,7 +63,7 @@ const serviceSpecSchemaTask = serviceSpecSources.addTask('gen-schemas', {
     'CloudFormationRegistryResource'
   ].map((typeName: string) => ({
     exec: ['ts-json-schema-generator',
-      '--path', './src/types/index.ts',
+      '--tsconfig', 'tsconfig.json',
       '--type', typeName,
       '--out', `schemas/${typeName}.schema.json`
     ].join(' '),

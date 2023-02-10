@@ -1,4 +1,4 @@
-import { jsonschema } from "./JsonSchema";
+import { jsonschema } from "../types/JsonSchema";
 import { failure, isFailure, liftResult, locateFailure, Result, using } from '@cdklabs/tskb';
 
 /**
