@@ -1,5 +1,5 @@
-import { jsonschema } from "../types/JsonSchema";
 import { failure, isFailure, liftResult, locateFailure, Result, using } from '@cdklabs/tskb';
+import { jsonschema } from '../types/JsonSchema';
 
 /**
  * Merge two schemas, returning a new schema that will satisfy both input schemas
@@ -129,9 +129,9 @@ function unifyRecordTypes(meta: any, a: jsonschema.RecordLikeObject, b: jsonsche
 
   const keys = union(Object.keys(a.properties), Object.keys(b.properties));
   const properties = locateFailure('object.properties')
-    (liftResult(Object.fromEntries(keys.map(key =>
-      [key, locateFailure(`[${key}]`)
-        (unifySchemas(a.properties[key], b.properties[key]))]))));
+  (liftResult(Object.fromEntries(keys.map(key =>
+    [key, locateFailure(`[${key}]`)
+    (unifySchemas(a.properties[key], b.properties[key]))]))));
 
   if (isFailure(properties)) {
     return properties;
