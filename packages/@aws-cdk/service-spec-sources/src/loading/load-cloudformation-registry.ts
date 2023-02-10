@@ -29,7 +29,7 @@ export async function loadCloudFormationRegistryDirectory(directory: string): Pr
     return [
       fileName,
       '='.repeat(60),
-      ...util.inspect(errors),
+      util.inspect(errors),
     ].join('\n');
   }
 }
@@ -41,7 +41,7 @@ export interface CloudFormationRegistryResources {
 }
 
 export async function loadDefaultCloudFormationRegistryResources(): Promise<CloudFormationRegistryResources[]> {
-  return Promise.all((await glob(path.join(__dirname, '../../../sources/*'))).map(async (directoryName) => {
+  return Promise.all((await glob(path.join(__dirname, '../../../../../sources/CloudFormationSchema/*'))).map(async (directoryName) => {
     const regionName = path.basename(directoryName);
     const resources = await loadCloudFormationRegistryDirectory(directoryName);
 
