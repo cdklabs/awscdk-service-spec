@@ -2,12 +2,12 @@
 //
 // Not a lot of thought given to where this needs to live yet.
 import { promises as fs } from 'fs';
-import Ajv from 'ajv';
-import * as _glob from 'glob';
 import * as path from 'path';
 import * as util from 'util';
-import { CloudFormationRegistryResource } from '../types';
 import { Failure, failure, isFailure, isSuccess, Result } from '@cdklabs/tskb';
+import Ajv from 'ajv';
+import * as _glob from 'glob';
+import { CloudFormationRegistryResource } from '../types';
 
 const glob = util.promisify(_glob.glob);
 
@@ -41,7 +41,7 @@ export interface CloudFormationRegistryResources {
 }
 
 export async function loadDefaultCloudFormationRegistryResources(): Promise<CloudFormationRegistryResources[]> {
-  return await Promise.all((await glob(path.join(__dirname, '../../../sources/*'))).map(async (directoryName) => {
+  return Promise.all((await glob(path.join(__dirname, '../../../sources/*'))).map(async (directoryName) => {
     const regionName = path.basename(directoryName);
     const resources = await loadCloudFormationRegistryDirectory(directoryName);
 

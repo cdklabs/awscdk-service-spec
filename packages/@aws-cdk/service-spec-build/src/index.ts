@@ -7,7 +7,7 @@ export async function buildDatabase() {
   const db = emptyDatabase();
   const fails: Failures = [];
 
-  for (const  resources of await sources.loadDefaultCloudFormationRegistryResources()) {
+  for (const resources of await sources.loadDefaultCloudFormationRegistryResources()) {
     const region = db.allocate('region', {
       name: resources.regionName,
     });
