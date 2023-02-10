@@ -26,4 +26,4 @@ jobs:
             fix
             chore
           requireScope: false
-    if: '${{ github.event_name == "pull_request" }} '
+    if: ${{ github.event_name == "pull_request" }}
