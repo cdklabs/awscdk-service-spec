@@ -86,8 +86,13 @@ const serviceSpecBuild = new MonorepoTypeScriptProject({
   name: '@aws-cdk/service-spec-build',
   description: 'Build the service spec from service-spec-sources to service-spec',
   deps: [tsKb, serviceSpecSources, serviceSpec],
+  devDeps: ['source-map-support'],
   private: true,
 });
+const buildDb = serviceSpecBuild.tasks.addTask('build:db', {
+  exec: 'node -r source-map-support/register lib/cli/build',
+});
+serviceSpecBuild.postCompileTask.spawn(buildDb);
 serviceSpecBuild.gitignore.addPatterns('db.json');
 serviceSpecBuild.synth();
 

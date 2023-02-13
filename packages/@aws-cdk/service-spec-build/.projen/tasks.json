@@ -21,6 +21,14 @@
         }
       ]
     },
+    "build:db": {
+      "name": "build:db",
+      "steps": [
+        {
+          "exec": "node -r source-map-support/register lib/cli/build"
+        }
+      ]
+    },
     "check-for-updates": {
       "name": "check-for-updates",
       "env": {
@@ -77,7 +85,12 @@
     },
     "post-compile": {
       "name": "post-compile",
-      "description": "Runs after successful compilation"
+      "description": "Runs after successful compilation",
+      "steps": [
+        {
+          "spawn": "build:db"
+        }
+      ]
     },
     "pre-compile": {
       "name": "pre-compile",
