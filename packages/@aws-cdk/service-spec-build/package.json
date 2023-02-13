@@ -3,6 +3,7 @@
   "description": "Build the service spec from service-spec-sources to service-spec",
   "scripts": {
     "build": "npx projen build",
+    "build:db": "npx projen build:db",
     "check-for-updates": "npx projen check-for-updates",
     "compile": "npx projen compile",
     "default": "npx projen default",
@@ -28,6 +29,7 @@
     "jest-junit": "^13",
     "npm-check-updates": "^16",
     "projen": "^0.67.50",
+    "source-map-support": "^0.5.21",
     "ts-jest": "^29.0.5",
     "typescript": "^4.9.5"
   },
