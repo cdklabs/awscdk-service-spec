@@ -13,6 +13,10 @@ export async function buildDatabase() {
     });
 
     for (const resource of Object.values(resources)) {
+      if (typeof resource !== 'object' || Array.isArray(resource)) {
+        continue;
+      }
+
       loadCloudFormationRegistryResource(db, region, resource, fails);
     }
   }
