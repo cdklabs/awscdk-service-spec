@@ -32,14 +32,14 @@ We will design the AST to be jsii compatible.
 
 ## Consequences
 
-Using AST will make it possible to implement features that require knowledge of the complete tree.
+Using an AST will make it possible to implement features that require knowledge of the complete tree.
 
-Designing a generic AST could potentially have a very large scope.
+Designing a generic AST could have a very large scope.
 We intend to implement this on an as-needed basis, while keeping extensibility in mind.
 
-A jsii compatible AST limits is not general purpose in regards to other TypeScript applications.
-It will however make it easier to compose ASTs as concerns of jsii compatibility are abstracted away from the user.
-This also enables a future extension of direct code generation to other jsii languages.
+A jsii compatible AST is not general purpose in regards to other TypeScript applications.
+It will however make it easier to compose ASTs, as concerns of jsii compatibility are abstracted away from the user.
+This also enables a possible extension to direct code generation to other jsii languages.
 
 [^code-block-writer]: https://github.com/dsherret/code-block-writer
 [^codemaker]: https://github.com/aws/jsii/tree/main/packages/codemaker
