@@ -11,7 +11,16 @@ import { CloudFormationRegistryResource } from '../types';
 
 const glob = util.promisify(_glob.glob);
 
-export async function loadCloudFormationRegistryDirectory(directory: string): Promise<Array<Result<CloudFormationRegistryResource>>> {
+export enum SchemaValidation {
+  NONE,
+  WARN,
+  FAIL,
+}
+
+export async function loadCloudFormationRegistryDirectory(
+  directory: string,
+  validate=SchemaValidation.FAIL,
+): Promise<Array<Result<CloudFormationRegistryResource>>> {
   const ajv = new Ajv();
   const cfnSchemaJson = JSON.parse(await fs.readFile(path.join(__dirname, '../../schemas/CloudFormationRegistryResource.schema.json'), { encoding: 'utf-8' }));
   const validateCfnResource = ajv.compile(cfnSchemaJson);
@@ -21,7 +30,13 @@ export async function loadCloudFormationRegistryDirectory(directory: string): Pr
     const file = JSON.parse(await fs.readFile(fileName, { encoding: 'utf-8' }));
     const valid = await validateCfnResource(file);
 
-    ret.push(valid ? file : failure(formatErrors(fileName, validateCfnResource.errors)));
+    if (validate !== SchemaValidation.NONE && !valid) {
+      ret.push(failure(formatErrors(fileName, validateCfnResource.errors)));
+    }
+
+    if (validate !== SchemaValidation.FAIL || valid) {
+      ret.push(file);
+    }
   }
   return ret;
 
@@ -40,10 +55,10 @@ export interface CloudFormationRegistryResources {
   readonly failures: Failure[];
 }
 
-export async function loadDefaultCloudFormationRegistryResources(): Promise<CloudFormationRegistryResources[]> {
-  return Promise.all((await glob(path.join(__dirname, '../../../../../sources/CloudFormationSchema/*/'))).map(async (directoryName) => {
+export async function loadDefaultCloudFormationRegistryResources(validate=SchemaValidation.FAIL): Promise<CloudFormationRegistryResources[]> {
+  return Promise.all((await glob(path.join(__dirname, '../../../../../sources/CloudFormationSchema/*'))).map(async (directoryName) => {
     const regionName = path.basename(directoryName);
-    const resources = await loadCloudFormationRegistryDirectory(directoryName);
+    const resources = await loadCloudFormationRegistryDirectory(directoryName, validate);
 
     const ret: CloudFormationRegistryResources = {
       regionName,
