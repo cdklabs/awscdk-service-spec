@@ -1,35 +1,24 @@
 // A build tool to validate that our type definitions cover all resources
 //
 // Not a lot of thought given to where this needs to live yet.
-import { promises as fs } from 'fs';
-import Ajv from 'ajv';
-import * as glob from 'glob';
+import { errorMessage } from '@cdklabs/tskb';
+import { loadDefaultCloudFormationRegistryResources } from '../loading/load-cloudformation-registry';
 
 async function main() {
-  const ajv = new Ajv();
-
-  const cfnSchemaJson = JSON.parse(await fs.readFile('schemas/CloudFormationRegistryResource.schema.json', { encoding: 'utf-8' }));
-  const validateCfnResource = ajv.compile(cfnSchemaJson);
-
-  console.log(process.cwd());
+  const regions = await loadDefaultCloudFormationRegistryResources();
 
   let errors = 0;
-  for (const fileName of glob.sync('./src/sources/CloudFormationSchema.jd/*/*.json')) {
-    const file = JSON.parse(await fs.readFile(fileName, { encoding: 'utf-8' }));
-    const valid = await validateCfnResource(file);
-    if (!valid) {
-      console.log(fileName);
-      console.log('='.repeat(60));
-      console.log(validateCfnResource.errors);
-      console.log('');
+  for (const region of regions) {
+    for (const fail of region.failures) {
+      console.log(errorMessage(fail));
 
-      errors += validateCfnResource.errors?.length ?? 0;
+      errors += 1;
       process.exitCode = 1;
     }
   }
 
   if (errors > 0) {
-    console.log(`${errors} validation errors`);
+    console.log(`${errors} schema files have errors`);
   }
 }
 

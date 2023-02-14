@@ -26,6 +26,10 @@ export function isFailure<A>(x: Result<A>): x is Failure {
   return !!x && typeof x === 'object' && (x as any)[errorSym];
 }
 
+export function isSuccess<A>(x: Result<A>): x is A {
+  return !isFailure(x);
+}
+
 export function unpack<A>(x: Result<A>): A {
   if (isFailure(x)) {
     throw new Error(`unpack: ${x[errorSym]}`);

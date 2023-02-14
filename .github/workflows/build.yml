@@ -2,11 +2,11 @@
 
 name: build
 on:
-  pull_request: {}
   workflow_dispatch: {}
-  push:
+  pull_request_target: {}
+  merge_group:
     branches:
-      - gh-readonly-queue/main/*
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest

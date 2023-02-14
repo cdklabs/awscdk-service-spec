@@ -1,20 +1,25 @@
 import { emptyDatabase } from '@aws-cdk/service-spec';
 import * as sources from '@aws-cdk/service-spec-sources';
+import { SchemaValidation } from '@aws-cdk/service-spec-sources';
 import { Failures } from '@cdklabs/tskb';
 import { loadCloudFormationRegistryResource } from './cloudformation-registry';
 
-export function buildDatabase() {
+export interface BuildDatabaseOptions {
+  readonly validateJsonSchema?: SchemaValidation;
+}
+
+export async function buildDatabase(options: BuildDatabaseOptions = {}) {
   const db = emptyDatabase();
   const fails: Failures = [];
 
-  for (const [key, resources] of Object.entries(sources.CloudFormationSchema)) {
-    const regionName = key.replace(/_/g, '-'); // us_east_1 -> us-east-1
+  for (const resources of await sources.loadDefaultCloudFormationRegistryResources(options.validateJsonSchema)) {
+    fails.push(...resources.failures);
 
     const region = db.allocate('region', {
-      name: regionName,
+      name: resources.regionName,
     });
 
-    for (const resource of Object.values(resources)) {
+    for (const resource of resources.resources) {
       loadCloudFormationRegistryResource(db, region, resource, fails);
     }
   }
