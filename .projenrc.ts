@@ -49,6 +49,13 @@ const tsKb = new MonorepoTypeScriptProject({
 });
 tsKb.synth();
 
+const typewriter = new MonorepoTypeScriptProject({
+  parent: repo,
+  name: '@cdklabs/typewriter',
+  description: 'Write typed code for jsii',
+});
+typewriter.synth();
+
 const serviceSpecSources = new MonorepoTypeScriptProject({
   parent: repo,
   name: '@aws-cdk/service-spec-sources',
@@ -106,25 +113,13 @@ serviceSpecBuild.postCompileTask.spawn(buildDb);
 serviceSpecBuild.gitignore.addPatterns('db.json');
 serviceSpecBuild.synth();
 
-// Hide most of the generated files from VS Code
-repo.vscode?.settings.addSettings({
-  'files.exclude': {
-    '**/.projen': true,
-    '**/.eslintrc.js': true,
-    '**/.eslintrc.json': true,
-    '**/.gitattributes': true,
-    '**/.gitignore': true,
-    '**/.npmignore': true,
-    '**/*.tsbuildinfo': true,
-    'packages/**/node_modules': true,
-    'packages/**/lib': true,
-    '.prettierignore': true,
-    '.prettierrc.json': true,
-    '**/tsconfig.json': true,
-    '**/tsconfig.dev.json': true,
-  },
-  'eslint.format.enable': true,
+const cfnResources = new MonorepoTypeScriptProject({
+  parent: repo,
+  name: '@aws-cdk/cfn-resources',
+  description: 'L1 constructs for all CloudFormation Resources',
+  devDeps: [typewriter, serviceSpecBuild],
 });
+cfnResources.synth();
 
 // Formatting
 repo.vscode?.extensions.addRecommendations('esbenp.prettier-vscode', 'dbaeumer.vscode-eslint');

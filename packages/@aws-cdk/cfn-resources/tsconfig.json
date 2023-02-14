@@ -25,28 +25,19 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "stripInternal": true,
-    "target": "ES2019"
+    "target": "ES2019",
+    "composite": true
   },
-  "include": [],
+  "include": [
+    "src/**/*.ts"
+  ],
   "exclude": [],
   "references": [
     {
-      "path": "packages/@cdklabs/tskb"
+      "path": "../../@cdklabs/typewriter"
     },
     {
-      "path": "packages/@cdklabs/typewriter"
-    },
-    {
-      "path": "packages/@aws-cdk/service-spec-sources"
-    },
-    {
-      "path": "packages/@aws-cdk/service-spec"
-    },
-    {
-      "path": "packages/@aws-cdk/service-spec-build"
-    },
-    {
-      "path": "packages/@aws-cdk/cfn-resources"
+      "path": "../service-spec-build"
     }
   ]
 }
