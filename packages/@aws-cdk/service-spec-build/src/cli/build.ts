@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
+import { SchemaValidation } from '@aws-cdk/service-spec-sources';
 import { errorMessage } from '@cdklabs/tskb';
 import { buildDatabase } from '../index';
-import { SchemaValidation } from '@aws-cdk/service-spec-sources';
 
 async function main() {
   // FIXME: Switch this to 'FAIL' at some point
