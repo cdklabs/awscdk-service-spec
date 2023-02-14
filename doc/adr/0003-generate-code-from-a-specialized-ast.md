@@ -12,8 +12,8 @@ A goal of the `awscdk-service-spec` project is to generate code from the service
 that will allow consumers to describe model resources in any jsii language.
 The generated code must be well-typed, jsii compatible and human readable.
 
-Writing formatted code blocks is a solved problem. [^code-block-writer] [^codemaker] [^json2jsii]\
-Existing code generation projects within the AWS CDK context mix specification parsing and analysis with code writing and do not generally distinguish between the two.
+Emitting formatted code blocks is a solved problem. [^code-block-writer] [^codemaker] [^json2jsii]\
+Existing code generation projects within the AWS CDK context handle model interpretation and code emitting in the same step.
 This design has proven itself challenging in regards of extensibility.
  [^cdk-cloudformation] [^cfn2ts]
 
