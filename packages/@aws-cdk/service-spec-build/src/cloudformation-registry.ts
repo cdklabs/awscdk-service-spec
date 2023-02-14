@@ -1,4 +1,4 @@
-import { PropertyType, Region, ResourceProperties, SpecDatabase, TypeDefinition } from '@aws-cdk/service-spec';
+import { PropertyType, Region, Resource, ResourceProperties, SpecDatabase, TypeDefinition } from '@aws-cdk/service-spec';
 import { CloudFormationRegistryResource, ImplicitJsonSchemaRecord, jsonschema, unifyAllSchemas } from '@aws-cdk/service-spec-sources';
 import { Fail, failure, Failures, isFailure, Result, tryCatch, using, ref } from '@cdklabs/tskb';
 
@@ -8,16 +8,23 @@ export function loadCloudFormationRegistryResource(db: SpecDatabase, region: Reg
   const resolve = jsonschema.resolveReference(resource);
 
   // FIXME: Resource may already exist, in which case we should look it up.
+  const existing = db.lookup('resource', 'cloudFormationType', 'equals', resource.typeName);
 
-  const res = db.allocate('resource', {
-    cloudFormationType: resource.typeName,
-    documentation: resource.description,
-    name: last(resource.typeName.split('::')),
-    attributes: {},
-    properties: {},
-  });
+  let res: Resource;
+  if (existing.length === 0) {
+    res = db.allocate('resource', {
+      cloudFormationType: resource.typeName,
+      documentation: resource.description,
+      name: last(resource.typeName.split('::')),
+      attributes: {},
+      properties: {},
+    });
 
-  recurseProperties(resource, res.properties, failure.in(resource.typeName));
+    recurseProperties(resource, res.properties, failure.in(resource.typeName));
+  } else {
+    // FIXME: Probably recurse into the properties to see if they are different...
+    res = existing[0];
+  }
 
   db.link('regionHasResource', region, res);
 
