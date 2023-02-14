@@ -17,7 +17,10 @@ export enum SchemaValidation {
   FAIL,
 }
 
-export async function loadCloudFormationRegistryDirectory(directory: string, validate=SchemaValidation.FAIL): Promise<Array<Result<CloudFormationRegistryResource>>> {
+export async function loadCloudFormationRegistryDirectory(
+  directory: string,
+  validate=SchemaValidation.FAIL,
+): Promise<Array<Result<CloudFormationRegistryResource>>> {
   const ajv = new Ajv();
   const cfnSchemaJson = JSON.parse(await fs.readFile(path.join(__dirname, '../../schemas/CloudFormationRegistryResource.schema.json'), { encoding: 'utf-8' }));
   const validateCfnResource = ajv.compile(cfnSchemaJson);
