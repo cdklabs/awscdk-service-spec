@@ -1,5 +1,5 @@
-import { dehydrateEntityCollection, Entity, EntityCollection, hydrateEntityCollection, isDehydratedEntityCollection, isEntityCollection, Plain } from './entity';
-import { AnyRelationshipCollection, dehydrateRelationshipCollection, hydrateRelationshipCollection, isDehydratedRelationshipCollection, isRelationshipCollection, RelationshipCollection, RelAttr, RelFrom, RelTo } from './relationship';
+import { Entity, EntityCollection, isEntityCollection, Plain } from './entity';
+import { AnyRelationshipCollection, isRelationshipCollection, RelationshipCollection, RelAttr, RelFrom, RelTo } from './relationship';
 
 export class Database<S extends object> {
   private readonly schema: S;
@@ -25,13 +25,16 @@ export class Database<S extends object> {
    */
   public store<K extends EntityKeys<S>>(key: K, entity: EntityType<S[K]>): EntityType<S[K]> {
     const coll: EntityCollection<any> = this.schema[key] as any;
-    coll.entities[(entity as any).$id] = entity;
+    coll.add(entity);
     return entity as any;
   }
 
+  /**
+   * Get an entity by key
+   */
   public get<K extends EntityKeys<S>>(key: K, id: string): EntityType<S[K]> {
     const coll: EntityCollection<any> = this.schema[key] as any;
-    const ret = coll.entities[id];
+    const ret = coll.entities.get(id);
     if (!ret) {
       throw new Error(`No such ${String(key)}: ${id}`);
     }
@@ -43,7 +46,17 @@ export class Database<S extends object> {
    */
   public all<K extends EntityKeys<S>>(key: K): Array<EntityType<S[K]>> {
     const coll: EntityCollection<any> = this.schema[key] as any;
-    return Object.values(coll.entities);
+    return Array.from(coll.entities.values());
+  }
+
+  /**
+   * Lookup an entity by index
+   */
+  public lookup<K extends EntityKeys<S>, I extends keyof EntityType<S[K]> & IndexesOf<S[K]>>
+  (key: K, index: I, lookup: LookupsOf<S[K], I>, value: EntityType<S[K]>[I]): EntityType<S[K]>[] {
+    const coll: EntityCollection<any> = this.schema[key] as any;
+    const ids = (coll.indexes as any)[index].lookups[lookup](value);
+    return ids.map((id: string) => coll.entities.get(id));
   }
 
   /**
@@ -55,18 +68,7 @@ export class Database<S extends object> {
   public link<K extends RelWoAttrs<S>>(key: K, from: RelFrom<RelType<S[K]>>, to: RelTo<RelType<S[K]>>): void;
   public link<K extends RelKeys<S>>(key: K, from: RelFrom<RelType<S[K]>>, to: RelTo<RelType<S[K]>>, attributes?: RelAttr<RelType<S[K]>>) {
     const col: AnyRelationshipCollection = this.schema[key] as any;
-
-    let forward = col.forward[from.$id];
-    if (!forward) {
-      forward = col.forward[from.$id] = [];
-    }
-    let backward = col.backward[to.$id];
-    if (!backward) {
-      backward = col.backward[to.$id] = [];
-    }
-
-    forward.push({ $id: to.$id, ...attributes });
-    backward.push({ $id: from.$id, ...attributes });
+    col.add(from, to, attributes);
   }
 
   /**
@@ -74,8 +76,8 @@ export class Database<S extends object> {
    */
   public follow<K extends RelKeys<S>>(key: K, from: RelFrom<RelType<S[K]>>): Array<ToLink<RelTo<RelType<S[K]>>, RelAttr<RelType<S[K]>>>> {
     const col: AnyRelationshipCollection = this.schema[key] as any;
-    const toLinks = col.forward[from.$id] ?? [];
-    return toLinks.map(i => ({ to: this.get(col.to, i.$id), ...removeId(i) })) as any;
+    const toLinks = col.forward.get(from.$id) ?? [];
+    return toLinks.map(i => ({ to: this.get(col.toColl, i.$id), ...removeId(i) })) as any;
   }
 
   /**
@@ -83,8 +85,8 @@ export class Database<S extends object> {
    */
   public incoming<K extends RelKeys<S>>(key: K, to: RelTo<RelType<S[K]>>): Array<FromLink<RelFrom<RelType<S[K]>>, RelAttr<RelType<S[K]>>>> {
     const col: AnyRelationshipCollection = this.schema[key] as any;
-    const fromIds = col.backward[to.$id] ?? [];
-    return fromIds.map(i => ({ from: this.get(col.from, i.$id), ...removeId(i) })) as any;
+    const fromIds = col.backward.get(to.$id) ?? [];
+    return fromIds.map(i => ({ from: this.get(col.fromColl, i.$id), ...removeId(i) })) as any;
   }
 
   public e<E extends Entity>(entity: Plain<E>): E {
@@ -105,10 +107,10 @@ export class Database<S extends object> {
 
     function dehydrate(x: unknown): any {
       if (isEntityCollection(x)) {
-        return dehydrateEntityCollection(x);
+        return x.dehydrate();
       }
       if (isRelationshipCollection(x)) {
-        return dehydrateRelationshipCollection(x);
+        return x.dehydrate();
       }
       if (Array.isArray(x)) {
         return x.map(dehydrate);
@@ -122,22 +124,23 @@ export class Database<S extends object> {
 
   public load(db: DehydratedDatabase) {
     this.idCtr = db.idCtr;
-    Object.assign(this.schema, hydrate(db.schema, this.schema));
+    hydrate(this.schema, db.schema);
 
-    function hydrate(x: unknown, proto: any): any {
-      if (isDehydratedEntityCollection(x)) {
-        return hydrateEntityCollection(x);
+    function hydrate(proto: unknown, x: unknown): void {
+      if (isEntityCollection(proto)) {
+        proto.hydrateFrom(x);
       }
-      if (isDehydratedRelationshipCollection(x)) {
-        return hydrateRelationshipCollection(x, proto);
+      if (isRelationshipCollection(proto)) {
+        proto.hydrateFrom(x);
       }
       if (Array.isArray(x)) {
-        return x.map(hydrate);
+        x.forEach(hydrate);
       }
-      if (!!x && typeof x === 'object') {
-        return Object.fromEntries(Object.entries(x).map(([k, v]) => [k, hydrate(v, proto[k])]));
+      if (!!proto && typeof proto === 'object' && !!x && typeof x === 'object') {
+        for (const [k, v] of Object.entries(proto)) {
+          hydrate(v, (x as any)[k]);
+        }
       }
-      return x;
     }
   }
 }
@@ -164,3 +167,7 @@ type RelWoAttrs<S> = { [K in RelKeys<S>]: {} extends RelAttr<RelType<S[K]>> ? K 
 type EntityType<A> = A extends EntityCollection<infer B> ? B : never;
 
 type RelType<A> = A extends RelationshipCollection<infer B, any, any, any> ? B : never;
+
+type IndexesOf<A> = A extends EntityCollection<any, any> ? keyof A['indexes'] : never;
+
+type LookupsOf<A, I extends IndexesOf<A>> = A extends EntityCollection<any, any> ? keyof A['indexes'][I]['lookups'] : never;
