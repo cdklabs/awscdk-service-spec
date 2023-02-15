@@ -19,6 +19,21 @@ export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result
     return a;
   }
 
+  if (jsonschema.isOneOf(a) || jsonschema.isOneOf(b)) {
+    // FIXME: not implemented yet
+    return a;
+  }
+
+  if (jsonschema.isAnyOf(a) || jsonschema.isAnyOf(b)) {
+    // FIXME: not implemented yet
+    return a;
+  }
+
+  if (jsonschema.isUnionType(a) || jsonschema.isUnionType(b)) {
+    // FIXME: not implemented yet
+    return a as jsonschema.UnionType;
+  }
+
   if (jsonschema.isReference(a) || jsonschema.isReference(b)) {
     return jsonschema.isReference(a) && jsonschema.isReference(b) && a.$ref === b.$ref ? a : failure(`${JSON.stringify(a)} != ${JSON.stringify(b)}`);
   }
@@ -56,8 +71,8 @@ export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result
           type: 'array',
           ...meta,
           items,
-          minLength: combine(a.minLength, b.minLength, (x, y) => Math.min(x, y)),
-          maxLength: combine(a.maxLength, b.maxLength, (x, y) => Math.max(x, y)),
+          minLength: combine(a.minItems, b.minItems, (x, y) => Math.min(x, y)),
+          maxLength: combine(a.maxItems, b.maxItems, (x, y) => Math.max(x, y)),
           uniqueItems: combine(a.uniqueItems, b.uniqueItems, (x, y) => x && y),
           // FIXME: insertionOrder ??
         }));
@@ -101,6 +116,9 @@ export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result
         return unifyRecordTypes(meta, a, b);
       }
       return unifyMapTypes(meta, a, b);
+    default: 
+      // FIXME: union type not implemented
+      return a;
   };
 }
 

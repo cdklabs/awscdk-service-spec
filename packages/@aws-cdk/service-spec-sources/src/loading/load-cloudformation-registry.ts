@@ -8,18 +8,20 @@ import { Failure, failure, isFailure, isSuccess, Result } from '@cdklabs/tskb';
 import Ajv from 'ajv';
 import * as _glob from 'glob';
 import { CloudFormationRegistryResource } from '../types';
+import { lintSchema } from './lint-schema';
 
 const glob = util.promisify(_glob.glob);
 
 export async function loadCloudFormationRegistryDirectory(directory: string): Promise<Array<Result<CloudFormationRegistryResource>>> {
-  const ajv = new Ajv();
+  const ajv = new Ajv({ verbose: true });
   const cfnSchemaJson = JSON.parse(await fs.readFile(path.join(__dirname, '../../schemas/CloudFormationRegistryResource.schema.json'), { encoding: 'utf-8' }));
   const validateCfnResource = ajv.compile(cfnSchemaJson);
 
   const ret = [];
   for (const fileName of await glob(path.join(directory, '*.json'))) {
     const file = JSON.parse(await fs.readFile(fileName, { encoding: 'utf-8' }));
-    const valid = await validateCfnResource(file);
+    if (file.typeName === 'AWS::SES::ConfigurationSet') { console.log('awef') }
+    const valid = await validateCfnResource(lintSchema(file));
 
     ret.push(valid ? file : failure(formatErrors(fileName, validateCfnResource.errors)));
   }
@@ -29,7 +31,7 @@ export async function loadCloudFormationRegistryDirectory(directory: string): Pr
     return [
       fileName,
       '='.repeat(60),
-      util.inspect(errors),
+      util.inspect(errors, { depth: 3 }),
     ].join('\n');
   }
 }

@@ -2,18 +2,35 @@ export namespace jsonschema {
 
   export type Schema = Reference | ConcreteSchema;
 
-  export type ConcreteSchema = Object | String | SchemaArray | Boolean | Number;
-
-  export interface Reference {
-    readonly '$ref': string;
-  }
-
+  export type ConcreteSchema = Object | UnionType | OneOf | AnyOf | String | SchemaArray | Boolean | Number;
   export interface Annotatable {
     readonly $comment?: string;
     readonly description?: string;
   }
 
+  export interface Reference extends Annotatable {
+    readonly '$ref': string;
+    readonly [other: string]: unknown;
+  }
+
   export type Object = MapLikeObject | RecordLikeObject;
+
+  export interface AnyOf extends Annotatable {
+    readonly anyOf: Array<Schema>;
+    readonly additionalProperties?: false;
+  }
+
+  export function isAnyOf(x: Schema): x is AnyOf {
+    return 'anyOf' in x;
+  }
+  export interface OneOf extends Annotatable {
+    readonly oneOf: Array<Schema>;
+    readonly additionalProperties?: false;
+  }
+
+  export function isOneOf(x: Schema): x is OneOf {
+    return 'oneOf' in x;
+  }
 
   export interface MapLikeObject extends Annotatable {
     readonly type: 'object';
@@ -26,6 +43,8 @@ export namespace jsonschema {
      */
     readonly additionalProperties?: false | Schema;
     readonly patternProperties?: Record<string, Schema>;
+    readonly minProperties?: number;
+    readonly maxProperties?: number;
   }
 
   export type ObjectProperties = Record<string, Schema>;
@@ -34,6 +53,12 @@ export namespace jsonschema {
     readonly type: 'object';
     readonly properties: ObjectProperties;
     readonly required?: string[];
+    /**
+     * FIXME: should be required but some service teams have omitted it.
+     */
+    readonly additionalProperties?: false;
+    readonly oneOf?: Array<{ required?: string[], type?: string }>;
+    readonly anyOf?: Array<{ required?: string[], type?: string }>;
   }
 
   export function isRecordLikeObject(x: Object): x is RecordLikeObject {
@@ -59,6 +84,7 @@ export namespace jsonschema {
     readonly pattern?: string;
     readonly enum?: string[];
     readonly format?: 'date-time';
+    readonly examples?: string[];
   }
 
   export interface Number extends Annotatable {
@@ -74,12 +100,31 @@ export namespace jsonschema {
     readonly items: Schema;
     readonly uniqueItems?: boolean;
     readonly insertionOrder?: boolean;
-    readonly minLength?: number;
-    readonly maxLength?: number;
+    readonly maxItems?: number;
+    readonly minItems?: number;
+    // /**
+    //  * FIXME: exists but is not valid json schema.
+    //  */
+    // readonly maxLength?: number;
+    // /**
+    //  * FIXME: exists but is not valid json schema.
+    //  */
+    // readonly minLength?: number;
+    readonly default?: any[];
+    readonly examples?: any[];
   }
 
   export interface Boolean extends Annotatable {
     readonly type: 'boolean';
+    readonly default?: boolean;
+  }
+
+  export interface UnionType extends Annotatable {
+    readonly type: string[];
+  }
+
+  export function isUnionType(x: Schema): boolean {
+    return typeof (x as unknown as UnionType).type !== 'string';
   }
 
   export interface ResolvedSchema {

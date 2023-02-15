@@ -21,6 +21,29 @@
           },
           "type": "array"
         },
+        "additionalProperties": {
+          "const": false,
+          "description": "FIXME: should be required but some service teams have omitted it.",
+          "type": "boolean"
+        },
+        "anyOf": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "required": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "type": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
         "conditionalCreateOnlyProperties": {
           "description": "FIXME: wut?",
           "items": {
@@ -54,6 +77,24 @@
         },
         "handlers": {
           "$ref": "#/definitions/Handlers"
+        },
+        "oneOf": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "required": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "type": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
         },
         "primaryIdentifier": {
           "items": {
@@ -200,11 +241,39 @@
       },
       "type": "object"
     },
+    "jsonschema.AnyOf": {
+      "additionalProperties": false,
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "additionalProperties": {
+          "const": false,
+          "type": "boolean"
+        },
+        "anyOf": {
+          "items": {
+            "$ref": "#/definitions/jsonschema.Schema"
+          },
+          "type": "array"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "anyOf"
+      ],
+      "type": "object"
+    },
     "jsonschema.Boolean": {
       "additionalProperties": false,
       "properties": {
         "$comment": {
           "type": "string"
+        },
+        "default": {
+          "type": "boolean"
         },
         "description": {
           "type": "string"
@@ -223,6 +292,15 @@
       "anyOf": [
         {
           "$ref": "#/definitions/jsonschema.Object"
+        },
+        {
+          "$ref": "#/definitions/jsonschema.UnionType"
+        },
+        {
+          "$ref": "#/definitions/jsonschema.OneOf"
+        },
+        {
+          "$ref": "#/definitions/jsonschema.AnyOf"
         },
         {
           "$ref": "#/definitions/jsonschema.String"
@@ -258,6 +336,12 @@
         },
         "description": {
           "type": "string"
+        },
+        "maxProperties": {
+          "type": "number"
+        },
+        "minProperties": {
+          "type": "number"
         },
         "patternProperties": {
           "additionalProperties": {
@@ -328,14 +412,80 @@
       },
       "type": "object"
     },
+    "jsonschema.OneOf": {
+      "additionalProperties": false,
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "additionalProperties": {
+          "const": false,
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        },
+        "oneOf": {
+          "items": {
+            "$ref": "#/definitions/jsonschema.Schema"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "oneOf"
+      ],
+      "type": "object"
+    },
     "jsonschema.RecordLikeObject": {
       "additionalProperties": false,
       "properties": {
         "$comment": {
           "type": "string"
         },
+        "additionalProperties": {
+          "const": false,
+          "description": "FIXME: should be required but some service teams have omitted it.",
+          "type": "boolean"
+        },
+        "anyOf": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "required": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "type": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
         "description": {
           "type": "string"
+        },
+        "oneOf": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "required": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "type": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
         },
         "properties": {
           "$ref": "#/definitions/jsonschema.ObjectProperties"
@@ -358,9 +508,15 @@
       "type": "object"
     },
     "jsonschema.Reference": {
-      "additionalProperties": false,
+      "additionalProperties": {},
       "properties": {
+        "$comment": {
+          "type": "string"
+        },
         "$ref": {
+          "type": "string"
+        },
+        "description": {
           "type": "string"
         }
       },
@@ -385,8 +541,16 @@
         "$comment": {
           "type": "string"
         },
+        "default": {
+          "items": {},
+          "type": "array"
+        },
         "description": {
           "type": "string"
+        },
+        "examples": {
+          "items": {},
+          "type": "array"
         },
         "insertionOrder": {
           "type": "boolean"
@@ -394,10 +558,10 @@
         "items": {
           "$ref": "#/definitions/jsonschema.Schema"
         },
-        "maxLength": {
+        "maxItems": {
           "type": "number"
         },
-        "minLength": {
+        "minItems": {
           "type": "number"
         },
         "type": {
@@ -432,6 +596,12 @@
           },
           "type": "array"
         },
+        "examples": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
         "format": {
           "const": "date-time",
           "type": "string"
@@ -448,6 +618,27 @@
         "type": {
           "const": "string",
           "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "jsonschema.UnionType": {
+      "additionalProperties": false,
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         }
       },
       "required": [
