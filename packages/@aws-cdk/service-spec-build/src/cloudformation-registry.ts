@@ -1,5 +1,5 @@
 import { PropertyType, Region, Resource, ResourceProperties, SpecDatabase, TypeDefinition } from '@aws-cdk/service-spec';
-import { CloudFormationRegistryResource, ImplicitJsonSchemaRecord, jsonschema, unifyAllSchemas } from '@aws-cdk/service-spec-sources';
+import { CloudFormationRegistryResource, ImplicitJsonSchemaRecord, jsonschema, simplePropNameFromJsonPtr, unifyAllSchemas } from '@aws-cdk/service-spec-sources';
 import { Fail, failure, Failures, isFailure, Result, tryCatch, using, ref } from '@cdklabs/tskb';
 
 export function loadCloudFormationRegistryResource(db: SpecDatabase, region: Region, resource: CloudFormationRegistryResource, fails: Failures) {
@@ -20,7 +20,13 @@ export function loadCloudFormationRegistryResource(db: SpecDatabase, region: Reg
       properties: {},
     });
 
-    recurseProperties(resource, res.properties, failure.in(resource.typeName));
+    recurseProperties(resource, res.properties, failure.in(`${resource.typeName} properties`));
+    // Every property that's a "readonly" property, remove it again from the `properties` collection.
+    for (const propPtr of resource.readOnlyProperties ?? []) {
+      const propName = simplePropNameFromJsonPtr(propPtr);
+      delete res.properties[propName];
+    }
+
   } else {
     // FIXME: Probably recurse into the properties to see if they are different...
     res = existing[0];
