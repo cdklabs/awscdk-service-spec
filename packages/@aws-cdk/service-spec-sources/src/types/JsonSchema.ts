@@ -73,7 +73,17 @@ export namespace jsonschema {
     readonly type: 'array';
     readonly items: Schema;
     readonly uniqueItems?: boolean;
+
+    /**
+     * Whether to treat the order as significant
+     *
+     * In other words, does this array model a "sequence" or a "set".
+     *
+     * - `true` (default): order is significant, the array is a sequence.
+     * - `false`: order is insignificant, the array is a set.
+     */
     readonly insertionOrder?: boolean;
+
     readonly minLength?: number;
     readonly maxLength?: number;
   }
