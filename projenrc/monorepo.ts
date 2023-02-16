@@ -177,6 +177,7 @@ export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
       outdir: `packages/${props.name}`,
       defaultReleaseBranch: 'REQUIRED-BUT-SHOULDNT-BE',
       release: false,
+      package: !props.private,
       eslint: true,
       sampleCode: false,
 

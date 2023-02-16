@@ -1,5 +1,10 @@
 import { jsonschema } from './JsonSchema';
 
+/**
+ * Root class of a CloudFormation Resource Registry Schema
+ *
+ * @see https://docs.aws.amazon.com/cloudformation-cli/latest/userguide/resource-type-schema.html
+ */
 export interface CloudFormationRegistryResource extends ImplicitJsonSchemaRecord {
   readonly $schema?: string;
   readonly $comment?: string;
@@ -8,14 +13,42 @@ export interface CloudFormationRegistryResource extends ImplicitJsonSchemaRecord
   readonly sourceUrl?: string;
   readonly documentationUrl?: string;
   readonly description: string;
-  readonly createOnlyProperties?: string[];
+
   /**
-   * FIXME: wut?
+   * JSON pointers for properties that will cause a resource replacement if they are changed
+   */
+  readonly createOnlyProperties?: string[];
+
+  /**
+   * JSON pointers for properties that *may* cause a resource replacement if they are changed
    */
   readonly conditionalCreateOnlyProperties?: string[];
+
+  /**
+   * JSON pointers for properties that can only be read, not updated.
+   *
+   * This is typically used for generated identifiers and such.
+   */
   readonly readOnlyProperties?: string[];
+
+  /**
+   * JSON pointers for properties that can only be written, never read.
+   *
+   * This is typically used for secrets.
+   */
   readonly writeOnlyProperties?: string[];
+
+  /**
+   * The properties that make up the primary identifier of the resource.
+   *
+   * This is the value that is returned by `{ Ref }`. If there is more than one property
+   * they are joined using the symbol `"|"`.
+   */
   readonly primaryIdentifier?: string[];
+
+  /**
+   * Reusable schema type definitions used in this schema.
+   */
   readonly definitions?: Record<string, jsonschema.ConcreteSchema>;
   readonly handlers?: Handlers;
   readonly tagging?: ResourceTagging;
@@ -94,4 +127,17 @@ export interface ResourceLink {
    * `{ MetricName: '/MetricName', 'LogGroupName': '/LogGroupName' }`
    */
   readonly mappings?: Record<string, string>;
+}
+
+/**
+ * Turn a JSON pointer into a property name
+ *
+ * Turns `"/properties/hello"`, which the CloudFormation Registry Schema uses -> `"hello"`.
+ */
+export function simplePropNameFromJsonPtr(propRef: string) {
+  const prefix = '/properties/';
+  if (!propRef.startsWith(prefix)) {
+    throw new Error(`'${propRef}' should start with '${prefix}'`);
+  }
+  return propRef.substring(prefix.length);
 }

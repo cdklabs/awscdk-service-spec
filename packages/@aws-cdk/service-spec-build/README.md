@@ -6,8 +6,13 @@ Not sure about the long-term organization of this code, but this will do for now
 
 ## How to exercise
 
-```
-$ npx tsc -b
-$ node -r source-map-support/register lib/cli/build
+```console
+npx projen build
 ```
 
+Or individually:
+
+```console
+npx projen compile
+npx projen build:db
+```

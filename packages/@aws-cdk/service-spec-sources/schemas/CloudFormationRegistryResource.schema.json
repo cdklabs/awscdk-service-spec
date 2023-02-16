@@ -4,6 +4,7 @@
   "definitions": {
     "CloudFormationRegistryResource": {
       "additionalProperties": false,
+      "description": "Root class of a CloudFormation Resource Registry Schema",
       "properties": {
         "$comment": {
           "type": "string"
@@ -45,13 +46,14 @@
           "type": "array"
         },
         "conditionalCreateOnlyProperties": {
-          "description": "FIXME: wut?",
+          "description": "JSON pointers for properties that *may* cause a resource replacement if they are changed",
           "items": {
             "type": "string"
           },
           "type": "array"
         },
         "createOnlyProperties": {
+          "description": "JSON pointers for properties that will cause a resource replacement if they are changed",
           "items": {
             "type": "string"
           },
@@ -61,6 +63,7 @@
           "additionalProperties": {
             "$ref": "#/definitions/jsonschema.ConcreteSchema"
           },
+          "description": "Reusable schema type definitions used in this schema.",
           "type": "object"
         },
         "deprecatedProperties": {
@@ -97,6 +100,7 @@
           "type": "array"
         },
         "primaryIdentifier": {
+          "description": "The properties that make up the primary identifier of the resource.\n\nThis is the value that is returned by `{ Ref }`. If there is more than one property they are joined using the symbol `\"|\"`.",
           "items": {
             "type": "string"
           },
@@ -113,6 +117,7 @@
           "type": "object"
         },
         "readOnlyProperties": {
+          "description": "JSON pointers for properties that can only be read, not updated.\n\nThis is typically used for generated identifiers and such.",
           "items": {
             "type": "string"
           },
@@ -144,6 +149,7 @@
           "type": "string"
         },
         "writeOnlyProperties": {
+          "description": "JSON pointers for properties that can only be written, never read.\n\nThis is typically used for secrets.",
           "items": {
             "type": "string"
           },
@@ -553,6 +559,7 @@
           "type": "array"
         },
         "insertionOrder": {
+          "description": "Whether to treat the order as significant\n\nIn other words, does this array model a \"sequence\" or a \"set\".\n\n- `true` (default): order is significant, the array is a sequence.\n- `false`: order is insignificant, the array is a set.",
           "type": "boolean"
         },
         "items": {

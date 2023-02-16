@@ -55,6 +55,10 @@
       "type": "build"
     },
     {
+      "name": "source-map-support",
+      "type": "build"
+    },
+    {
       "name": "ts-jest",
       "type": "build"
     },
