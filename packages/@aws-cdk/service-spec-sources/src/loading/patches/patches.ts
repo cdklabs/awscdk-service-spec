@@ -4,12 +4,21 @@ import { SchemaLens } from './json-patcher';
 
 type Patcher = (lens: JsonLens) => void;
 
+/**
+ * The property 'additionalProperties' should only exist on object types.
+ * This function removes any instances of 'additionalProperties' on non-objects.
+ */
 export function removeAdditionalProperties(lens: JsonLens) {
   if (lens.isObject() && lens.value.type !== 'object' && lens.value.additionalProperties !== undefined) {
     lens.removeProperty('additionalProperties may only exist on object types', 'additionalProperties');
   }
 }
 
+/**
+ * Arrays use 'minItems' and 'maxItems' to delineate boundaries.
+ * Some specs erroneously use 'minLength' and 'maxLength'. This
+ * function renames those values.
+ */
 export function replaceArrayLengthProps(lens: JsonLens) {
   if (!lens.isObject() || lens.value.type !== 'array') { return; }
 
@@ -22,6 +31,10 @@ export function replaceArrayLengthProps(lens: JsonLens) {
   }
 }
 
+/**
+ * Although allowed, including `pattern: 'true|false'` on boolean
+ * properties is redundant. This function removes those instances.
+ */
 export function removeBooleanPatterns(lens: JsonLens) {
   if (lens.isObject() && lens.value.type === 'boolean' && lens.value.pattern !== undefined) {
     lens.removeProperty('pattern is redundant on boolean property', 'pattern');
