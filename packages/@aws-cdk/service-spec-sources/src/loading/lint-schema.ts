@@ -32,7 +32,6 @@ function canonicalizeOneOf(schema: any): void {
         delete v[prop];
       }
       v.oneOf = combinedOneOfProp;
-      return [k, v];
     }
     return [k, v];
   });
