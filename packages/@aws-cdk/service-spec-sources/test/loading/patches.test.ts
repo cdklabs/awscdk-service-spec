@@ -1,7 +1,7 @@
-import { recurseAndPatch, removeAdditionalProperties } from '../../src/loading/json-patcher';
+import { recurseAndPatch, removeAdditionalProperties, replaceArrayLengthProps } from '../../src/loading/patches/patches';
 
 describe('patches', () => {
-  describe('removeAdditionalProperties', () => {
+  describe(removeAdditionalProperties, () => {
     test('works in the base case', () => {
       const obj = {
         type: 'string',
@@ -46,6 +46,50 @@ describe('patches', () => {
           Prop: {
             type: 'array',
             minItems: 1,
+          },
+        },
+      });
+    });
+  });
+
+  describe(replaceArrayLengthProps, () => {
+    test('works in the base case', () => {
+      const obj = {
+        type: 'array',
+        minLength: 1,
+        maxLength: 2,
+      };
+
+      const patchedObj = recurseAndPatch(obj, replaceArrayLengthProps);
+
+      expect(patchedObj).toEqual({
+        type: 'array',
+        minItems: 1,
+        maxItems: 2,
+      });
+    });
+
+    test('works in embedded object', () => {
+      const obj = {
+        type: 'object',
+        properties: {
+          Prop: {
+            type: 'array',
+            minLength: 1,
+            maxLength: 2,
+          },
+        },
+      };
+
+      const patchedObj = recurseAndPatch(obj, replaceArrayLengthProps);
+
+      expect(patchedObj).toEqual({
+        type: 'object',
+        properties: {
+          Prop: {
+            type: 'array',
+            minItems: 1,
+            maxItems: 2,
           },
         },
       });

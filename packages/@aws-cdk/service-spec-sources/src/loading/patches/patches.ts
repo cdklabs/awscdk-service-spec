@@ -1,6 +1,6 @@
-import { JsonLens } from "./json-lens";
-import { JsonPatch } from "./json-patch";
-import { SchemaLens } from "./json-patcher";
+import { JsonLens } from './json-lens';
+import { JsonPatch } from './json-patch';
+import { SchemaLens } from './json-patcher';
 
 type Patcher = (lens: JsonLens) => void;
 
@@ -8,6 +8,18 @@ export function removeAdditionalProperties(lens: JsonLens) {
   console.log(lens.isObject());
   if (lens.isObject() && lens.value.type !== 'object' && lens.value.additionalProperties !== undefined) {
     lens.removeProperty('additionalProperties may only exist on object types', 'additionalProperties');
+  }
+}
+
+export function replaceArrayLengthProps(lens: JsonLens) {
+  if (!lens.isObject() || lens.value.type !== 'array') { return; }
+
+  if (lens.value.minLength !== undefined) {
+    lens.renameProperty('array lengths are specified using minItems, not minLength', 'minLength', 'minItems');
+  }
+
+  if (lens.value.maxLength !== undefined) {
+    lens.renameProperty('array lengths are specified using maxItens, not maxLength', 'maxLength', 'maxItems');
   }
 }
 
