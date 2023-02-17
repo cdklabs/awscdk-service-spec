@@ -7,8 +7,8 @@ import * as util from 'util';
 import { Failure, failure, isFailure, isSuccess, Result } from '@cdklabs/tskb';
 import Ajv from 'ajv';
 import * as _glob from 'glob';
-import { CloudFormationRegistryResource } from '../types';
 import { lintSchema } from './lint-schema';
+import { CloudFormationRegistryResource } from '../types';
 
 const glob = util.promisify(_glob.glob);
 
@@ -29,7 +29,7 @@ export async function loadCloudFormationRegistryDirectory(
   const ret = [];
   for (const fileName of await glob(path.join(directory, '*.json'))) {
     const file = JSON.parse(await fs.readFile(fileName, { encoding: 'utf-8' }));
-    if (file.typeName === 'AWS::SES::ConfigurationSet') { console.log('awef') }
+    if (file.typeName === 'AWS::SES::ConfigurationSet') { console.log('awef'); }
     const valid = await validateCfnResource(lintSchema(file));
 
     if (validate !== SchemaValidation.NONE && !valid) {

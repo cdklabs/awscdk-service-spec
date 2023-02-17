@@ -253,10 +253,6 @@
         "$comment": {
           "type": "string"
         },
-        "additionalProperties": {
-          "const": false,
-          "type": "boolean"
-        },
         "anyOf": {
           "items": {
             "$ref": "#/definitions/jsonschema.Schema"
@@ -298,9 +294,6 @@
       "anyOf": [
         {
           "$ref": "#/definitions/jsonschema.Object"
-        },
-        {
-          "$ref": "#/definitions/jsonschema.UnionType"
         },
         {
           "$ref": "#/definitions/jsonschema.OneOf"
@@ -423,10 +416,6 @@
       "properties": {
         "$comment": {
           "type": "string"
-        },
-        "additionalProperties": {
-          "const": false,
-          "type": "boolean"
         },
         "description": {
           "type": "string"
@@ -625,27 +614,6 @@
         "type": {
           "const": "string",
           "type": "string"
-        }
-      },
-      "required": [
-        "type"
-      ],
-      "type": "object"
-    },
-    "jsonschema.UnionType": {
-      "additionalProperties": false,
-      "properties": {
-        "$comment": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "type": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
         }
       },
       "required": [

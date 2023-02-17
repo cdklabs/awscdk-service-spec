@@ -29,10 +29,10 @@ export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result
     return a;
   }
 
-  if (jsonschema.isUnionType(a) || jsonschema.isUnionType(b)) {
-    // FIXME: not implemented yet
-    return a as jsonschema.UnionType;
-  }
+  // if (jsonschema.isUnionType(a) || jsonschema.isUnionType(b)) {
+  //   // FIXME: not implemented yet
+  //   return a as jsonschema.UnionType;
+  // }
 
   if (jsonschema.isReference(a) || jsonschema.isReference(b)) {
     return jsonschema.isReference(a) && jsonschema.isReference(b) && a.$ref === b.$ref ? a : failure(`${JSON.stringify(a)} != ${JSON.stringify(b)}`);
@@ -116,7 +116,7 @@ export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result
         return unifyRecordTypes(meta, a, b);
       }
       return unifyMapTypes(meta, a, b);
-    default: 
+    default:
       // FIXME: union type not implemented
       return a;
   };

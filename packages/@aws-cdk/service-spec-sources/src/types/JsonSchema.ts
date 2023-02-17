@@ -2,7 +2,7 @@ export namespace jsonschema {
 
   export type Schema = Reference | ConcreteSchema;
 
-  export type ConcreteSchema = Object | UnionType | OneOf | AnyOf | String | SchemaArray | Boolean | Number;
+  export type ConcreteSchema = Object | OneOf | AnyOf | String | SchemaArray | Boolean | Number;
   export interface Annotatable {
     readonly $comment?: string;
     readonly description?: string;
@@ -17,7 +17,6 @@ export namespace jsonschema {
 
   export interface AnyOf extends Annotatable {
     readonly anyOf: Array<Schema>;
-    readonly additionalProperties?: false;
   }
 
   export function isAnyOf(x: Schema): x is AnyOf {
@@ -25,7 +24,6 @@ export namespace jsonschema {
   }
   export interface OneOf extends Annotatable {
     readonly oneOf: Array<Schema>;
-    readonly additionalProperties?: false;
   }
 
   export function isOneOf(x: Schema): x is OneOf {
@@ -57,8 +55,8 @@ export namespace jsonschema {
      * FIXME: should be required but some service teams have omitted it.
      */
     readonly additionalProperties?: false;
-    readonly oneOf?: Array<{ required?: string[], type?: string }>;
-    readonly anyOf?: Array<{ required?: string[], type?: string }>;
+    readonly oneOf?: Array<{ required?: string[]; type?: string }>;
+    readonly anyOf?: Array<{ required?: string[]; type?: string }>;
   }
 
   export function isRecordLikeObject(x: Object): x is RecordLikeObject {
@@ -126,14 +124,6 @@ export namespace jsonschema {
   export interface Boolean extends Annotatable {
     readonly type: 'boolean';
     readonly default?: boolean;
-  }
-
-  export interface UnionType extends Annotatable {
-    readonly type: string[];
-  }
-
-  export function isUnionType(x: Schema): boolean {
-    return typeof (x as unknown as UnionType).type !== 'string';
   }
 
   export interface ResolvedSchema {

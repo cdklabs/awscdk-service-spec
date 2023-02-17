@@ -1,4 +1,4 @@
-import { Report } from "./schema";
+import { Report } from './schema';
 
 export function lintSchema(schema: any): any {
   let report: Report[] = [];
