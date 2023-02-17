@@ -1,5 +1,5 @@
 import * as pj from 'projen';
-import { MergeQueue, MonorepoRoot, MonorepoTypeScriptProject } from './projenrc';
+import { GitLfs, MergeQueue, MonorepoRoot, MonorepoTypeScriptProject } from './projenrc';
 
 const repo = new MonorepoRoot({
   defaultReleaseBranch: 'main',
@@ -30,6 +30,11 @@ new MergeQueue(repo, {
   autoMergeOptions: {
     secret: 'PROJEN_GITHUB_TOKEN',
   },
+});
+new GitLfs(repo, {
+  patterns: [
+    'sources/**/*.json',
+  ],
 });
 
 const tsKb = new MonorepoTypeScriptProject({

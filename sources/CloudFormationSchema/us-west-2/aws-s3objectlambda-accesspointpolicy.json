@@ -1,36 +1,3 @@
-{
-  "typeName" : "AWS::S3ObjectLambda::AccessPointPolicy",
-  "description" : "AWS::S3ObjectLambda::AccessPointPolicy resource is an Amazon S3ObjectLambda policy type that you can use to control permissions for your S3ObjectLambda",
-  "sourceUrl" : "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git",
-  "additionalProperties" : false,
-  "properties" : {
-    "ObjectLambdaAccessPoint" : {
-      "description" : "The name of the Amazon S3 ObjectLambdaAccessPoint to which the policy applies.",
-      "type" : "string",
-      "pattern" : "^[a-z0-9]([a-z0-9\\-]*[a-z0-9])?$",
-      "minLength" : 3,
-      "maxLength" : 45
-    },
-    "PolicyDocument" : {
-      "description" : "A policy document containing permissions to add to the specified ObjectLambdaAccessPoint. For more information, see Access Policy Language Overview (https://docs.aws.amazon.com/AmazonS3/latest/dev/access-policy-language-overview.html) in the Amazon Simple Storage Service Developer Guide. ",
-      "type" : "object"
-    }
-  },
-  "required" : [ "ObjectLambdaAccessPoint", "PolicyDocument" ],
-  "createOnlyProperties" : [ "/properties/ObjectLambdaAccessPoint" ],
-  "primaryIdentifier" : [ "/properties/ObjectLambdaAccessPoint" ],
-  "handlers" : {
-    "create" : {
-      "permissions" : [ "s3:PutAccessPointPolicyForObjectLambda", "s3:GetAccessPointPolicyForObjectLambda" ]
-    },
-    "read" : {
-      "permissions" : [ "s3:GetAccessPointPolicyForObjectLambda" ]
-    },
-    "update" : {
-      "permissions" : [ "s3:PutAccessPointPolicyForObjectLambda", "s3:GetAccessPointPolicyForObjectLambda" ]
-    },
-    "delete" : {
-      "permissions" : [ "s3:DeleteAccessPointPolicyForObjectLambda", "s3:GetAccessPointPolicyForObjectLambda" ]
-    }
-  }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:49743e077b924ea7cdaedec74f3fd522e139b388a281177fd249c1a77161b229
+size 1729

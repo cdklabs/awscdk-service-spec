@@ -1,22 +1,3 @@
-{
-  "typeName" : "AWS::DAX::ParameterGroup",
-  "description" : "Resource Type definition for AWS::DAX::ParameterGroup",
-  "additionalProperties" : false,
-  "properties" : {
-    "ParameterNameValues" : {
-      "type" : "object"
-    },
-    "Description" : {
-      "type" : "string"
-    },
-    "Id" : {
-      "type" : "string"
-    },
-    "ParameterGroupName" : {
-      "type" : "string"
-    }
-  },
-  "createOnlyProperties" : [ "/properties/ParameterGroupName" ],
-  "primaryIdentifier" : [ "/properties/Id" ],
-  "readOnlyProperties" : [ "/properties/Id" ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:46e4a14bd69a12e8d1362256508a534a61d33896c04e6f9e95d3112d5d39d399
+size 553
