@@ -5,7 +5,6 @@ import { SchemaLens } from './json-patcher';
 type Patcher = (lens: JsonLens) => void;
 
 export function removeAdditionalProperties(lens: JsonLens) {
-  console.log(lens.isObject());
   if (lens.isObject() && lens.value.type !== 'object' && lens.value.additionalProperties !== undefined) {
     lens.removeProperty('additionalProperties may only exist on object types', 'additionalProperties');
   }
@@ -23,10 +22,15 @@ export function replaceArrayLengthProps(lens: JsonLens) {
   }
 }
 
+export function removeBooleanPatterns(lens: JsonLens) {
+  if (lens.isObject() && lens.value.type === 'boolean' && lens.value.pattern !== undefined) {
+    lens.removeProperty('pattern is redundant on boolean property', 'pattern');
+  }
+}
+
 export function recurseAndPatch(root: any, patcher: Patcher) {
   const schema = new SchemaLens(root, { fileName: '' });
   recurse(schema);
-  console.log(schema.patches);
   const patchedSchema = applyPatches(schema.patches);
   return patchedSchema;
 

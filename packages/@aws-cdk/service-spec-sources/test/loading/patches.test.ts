@@ -1,4 +1,4 @@
-import { recurseAndPatch, removeAdditionalProperties, replaceArrayLengthProps } from '../../src/loading/patches/patches';
+import { recurseAndPatch, removeAdditionalProperties, removeBooleanPatterns, replaceArrayLengthProps } from '../../src/loading/patches/patches';
 
 describe('patches', () => {
   describe(removeAdditionalProperties, () => {
@@ -92,6 +92,21 @@ describe('patches', () => {
             maxItems: 2,
           },
         },
+      });
+    });
+  });
+
+  describe(removeBooleanPatterns, () => {
+    test('aworks in the base case', () => {
+      const obj = {
+        type: 'boolean',
+        pattern: 'true|false',
+      };
+
+      const patchedObj = recurseAndPatch(obj, removeBooleanPatterns);
+
+      expect(patchedObj).toEqual({
+        type: 'boolean',
       });
     });
   });
