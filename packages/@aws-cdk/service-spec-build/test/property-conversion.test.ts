@@ -1,27 +1,72 @@
-import { emptyDatabase, Region } from '@aws-cdk/service-spec';
+import { emptyDatabase } from '@aws-cdk/service-spec';
 import { Failures } from '@cdklabs/tskb';
 import { loadCloudFormationRegistryResource } from '../src/cloudformation-registry';
 
 let db: ReturnType<typeof emptyDatabase>;
-let region: Region;
 let fails: Failures;
 beforeEach(() => {
   db = emptyDatabase();
-  region = db.allocate('region', { name: 'us-somewhere' });
   fails = [];
 });
 
 test('exclude readOnlyProperties from properties', () => {
-  loadCloudFormationRegistryResource(db, region, {
-    description: 'Test resource',
-    typeName: 'AWS::Some::Type',
-    properties: {
-      Property: { type: 'string' },
-      Id: { type: 'string' },
+  loadCloudFormationRegistryResource({
+    db,
+    fails,
+    resource: {
+      description: 'Test resource',
+      typeName: 'AWS::Some::Type',
+      properties: {
+        Property: { type: 'string' },
+        Id: { type: 'string' },
+      },
+      readOnlyProperties: ['/properties/Id'],
     },
-    readOnlyProperties: ['/properties/Id'],
-  }, fails);
+  });
 
   const propNames = Object.keys(db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.properties);
   expect(propNames).toEqual(['Property']);
+});
+
+test('include readOnlyProperties in attributes', () => {
+  loadCloudFormationRegistryResource({
+    db,
+    fails,
+    resource: {
+      description: 'Test resource',
+      typeName: 'AWS::Some::Type',
+      properties: {
+        Property: { type: 'string' },
+        Id: { type: 'string' },
+      },
+      readOnlyProperties: ['/properties/Id'],
+    },
+  });
+
+  const attrNames = Object.keys(db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.attributes);
+  expect(attrNames).toEqual(['Id']);
+});
+
+test('include legacy attributes in attributes', () => {
+  loadCloudFormationRegistryResource({
+    db,
+    fails,
+    resource: {
+      description: 'Test resource',
+      typeName: 'AWS::Some::Type',
+      properties: {
+        Property: { type: 'string' },
+        Id: { type: 'string' },
+      },
+      readOnlyProperties: ['/properties/Id'],
+    },
+    specResource: {
+      Attributes: {
+        Property: { PrimitiveType: 'String', UpdateType: 'Mutable' },
+      },
+    },
+  });
+
+  const attrNames = Object.keys(db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.attributes);
+  expect(attrNames.sort()).toEqual(['Id', 'Property']);
 });

@@ -41,6 +41,18 @@ export function errorMessage(x: Failure): string {
   return x[errorSym];
 }
 
+export function errorFrom(x: Failure): Error {
+  return new Error(errorMessage(x));
+}
+
+export function assertSuccess<A>(x: Result<A>): asserts x is A;
+export function assertSuccess(x: Failure): never;
+export function assertSuccess(x: Failure): void {
+  if (isFailure(x)) {
+    throw errorFrom(x);
+  }
+}
+
 export function tryCatch<A>(block: () => A): Result<A>;
 export function tryCatch<A>(failFn: Fail, block: () => A): Result<A>;
 export function tryCatch<A>(failOrBlock: Fail | (() => A), maybeBlock?: () => A): Result<A> {
