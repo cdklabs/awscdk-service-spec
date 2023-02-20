@@ -37,7 +37,7 @@ export class SchemaLens implements JsonLens, JsonObjectLens {
 
   /** Type test for whether the current lens points to an object. */
   isObject(): this is JsonObjectLens {
-    return typeof this.value === 'object' && 'type' in this.value;
+    return typeof this.value === 'object' && this.value && this.value.type === 'object';
   };
 
   wasRemoved(key: any) {
@@ -87,7 +87,7 @@ export class SchemaLens implements JsonLens, JsonObjectLens {
   }
 
   /** Recurse through the array. */
-  descendArrayItems(index: number): SchemaLens {
+  descendArrayElement(index: number): SchemaLens {
     const newSchema = new SchemaLens(this.value[index], {
       fileName: this.fileName,
       jsonPath: `${this.jsonPath}/${index}`,

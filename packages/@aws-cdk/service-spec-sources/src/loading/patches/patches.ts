@@ -52,7 +52,7 @@ export function recurseAndPatch(root: any, patcher: Patcher) {
 
     if (Array.isArray(lens.value)) {
       lens.value.forEach((_, i) => {
-        const nextLens = lens.descendArrayItems(i);
+        const nextLens = lens.descendArrayElement(i);
         recurse(nextLens);
         lens.reports.push(...nextLens.reports);
         lens.patches.push(...nextLens.patches);
