@@ -1,4 +1,4 @@
-import { recurseAndPatch, removeAdditionalProperties, removeBooleanPatterns, replaceArrayLengthProps } from '../../src/loading/patches/patches';
+import { canonicalizeOneOf, canonicalizeUnionType, recurseAndPatch, removeAdditionalProperties, removeBooleanPatterns, replaceArrayLengthProps } from '../../src/loading/patches/patches';
 
 describe('patches', () => {
   describe(removeAdditionalProperties, () => {
@@ -97,7 +97,7 @@ describe('patches', () => {
   });
 
   describe(removeBooleanPatterns, () => {
-    test('aworks in the base case', () => {
+    test('works in the base case', () => {
       const obj = {
         type: 'boolean',
         pattern: 'true|false',
@@ -107,6 +107,112 @@ describe('patches', () => {
 
       expect(patchedObj).toEqual({
         type: 'boolean',
+      });
+    });
+  });
+
+  describe(canonicalizeUnionType, () => {
+    test('works in the base case', () => {
+      const obj = {
+        type: ['string', 'object'],
+      };
+
+      const patchedObj = recurseAndPatch(obj, canonicalizeUnionType);
+
+      expect(patchedObj).toEqual({
+        oneOf: [{
+          type: 'string',
+        }, {
+          type: 'object',
+        }],
+      });
+    });
+
+    test('works when object has other properties', () => {
+      const obj = {
+        type: ['string', 'object'],
+        additionalProperties: false,
+        minLength: 0,
+      };
+
+      const patchedObj = recurseAndPatch(obj, canonicalizeUnionType);
+
+      expect(patchedObj).toEqual({
+        oneOf: [{
+          type: 'string',
+          additionalProperties: false,
+          minLength: 0,
+        }, {
+          type: 'object',
+          additionalProperties: false,
+          minLength: 0,
+        }],
+      });
+    });
+  });
+
+  describe(canonicalizeOneOf, () => {
+    test('works in base case', () => {
+      const obj = {
+        Prop: {
+          description: 'my description',
+          type: 'object',
+          properties: {
+            Name: {
+              type: 'string',
+            },
+            Attribute: {
+              type: 'string',
+            },
+            RequiredAttribute: {
+              type: 'string',
+            },
+          },
+          required: ['RequiredAttribute'],
+          oneOf: [{
+            required: ['Name'],
+          }, {
+            required: ['Attribute'],
+          }],
+        },
+      };
+
+      const patchedObj = recurseAndPatch(obj, canonicalizeOneOf);
+
+      expect(patchedObj).toEqual({
+        Prop: {
+          oneOf: [{
+            description: 'my description',
+            type: 'object',
+            properties: {
+              Name: {
+                type: 'string',
+              },
+              Attribute: {
+                type: 'string',
+              },
+              RequiredAttribute: {
+                type: 'string',
+              },
+            },
+            required: ['RequiredAttribute', 'Name'],
+          }, {
+            description: 'my description',
+            type: 'object',
+            properties: {
+              Name: {
+                type: 'string',
+              },
+              Attribute: {
+                type: 'string',
+              },
+              RequiredAttribute: {
+                type: 'string',
+              },
+            },
+            required: ['RequiredAttribute', 'Attribute'],
+          }],
+        },
       });
     });
   });

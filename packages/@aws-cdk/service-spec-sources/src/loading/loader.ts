@@ -7,11 +7,12 @@ import * as util from 'util';
 import { errorMessage, Failure, failure, Result } from '@cdklabs/tskb';
 import Ajv from 'ajv';
 import * as _glob from 'glob';
+import { recurseAndPatch, allPatchers } from './patches/patches';
 
 
 export class Loader<A> {
   public static async fromSchemaFile<A>(fileName: string, validation=SchemaValidation.FAIL): Promise<Loader<A>> {
-    const ajv = new Ajv();
+    const ajv = new Ajv({ verbose: true });
     const cfnSchemaJson = JSON.parse(await fs.readFile(path.join(__dirname, `../../schemas/${fileName}`), { encoding: 'utf-8' }));
     const validator = ajv.compile(cfnSchemaJson);
     return new Loader(validator, validation);
@@ -23,7 +24,8 @@ export class Loader<A> {
   }
 
   public async load(obj: unknown): Promise<Result<A>> {
-    const valid = await this.validator(obj);
+    const patchedObj = recurseAndPatch(obj, allPatchers);
+    const valid = await this.validator(patchedObj);
 
     const failures = [];
 
