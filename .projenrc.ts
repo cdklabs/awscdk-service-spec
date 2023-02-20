@@ -53,6 +53,7 @@ const typewriter = new MonorepoTypeScriptProject({
   parent: repo,
   name: '@cdklabs/typewriter',
   description: 'Write typed code for jsii',
+  deps: ['@jsii/spec'],
 });
 typewriter.synth();
 
@@ -117,8 +118,23 @@ const cfnResources = new MonorepoTypeScriptProject({
   parent: repo,
   name: '@aws-cdk/cfn-resources',
   description: 'L1 constructs for all CloudFormation Resources',
-  devDeps: [typewriter, serviceSpecBuild],
+  devDeps: [
+    typewriter,
+    serviceSpecBuild,
+    serviceSpecSources,
+    'ts-node',
+    '@jsii/spec',
+    'fs-extra',
+    '@types/fs-extra@ts3.9',
+  ],
 });
+cfnResources.addGitIgnore('src/services/**');
+cfnResources.preCompileTask.spawn(
+  cfnResources.tasks.addTask('generate', {
+    exec: 'ts-node src/cli/generate.ts',
+    receiveArgs: true,
+  }),
+);
 cfnResources.synth();
 
 // Formatting

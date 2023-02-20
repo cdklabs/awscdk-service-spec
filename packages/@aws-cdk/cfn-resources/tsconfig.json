@@ -38,6 +38,9 @@
     },
     {
       "path": "../service-spec-build"
+    },
+    {
+      "path": "../service-spec-sources"
     }
   ]
 }

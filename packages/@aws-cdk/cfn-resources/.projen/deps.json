@@ -5,7 +5,20 @@
       "type": "build"
     },
     {
+      "name": "@aws-cdk/service-spec-sources",
+      "type": "build"
+    },
+    {
       "name": "@cdklabs/typewriter",
+      "type": "build"
+    },
+    {
+      "name": "@jsii/spec",
+      "type": "build"
+    },
+    {
+      "name": "@types/fs-extra",
+      "version": "ts3.9",
       "type": "build"
     },
     {
@@ -45,6 +58,10 @@
       "type": "build"
     },
     {
+      "name": "fs-extra",
+      "type": "build"
+    },
+    {
       "name": "jest",
       "type": "build"
     },
@@ -64,6 +81,10 @@
     },
     {
       "name": "ts-jest",
+      "type": "build"
+    },
+    {
+      "name": "ts-node",
       "type": "build"
     },
     {

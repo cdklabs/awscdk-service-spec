@@ -28,19 +28,19 @@
       },
       "steps": [
         {
-          "exec": "npm-check-updates --dep dev --upgrade --target=minor --reject='@cdklabs/typewriter,@aws-cdk/service-spec-build'"
+          "exec": "npm-check-updates --dep dev --upgrade --target=minor --reject='@types/fs-extra,@cdklabs/typewriter,@aws-cdk/service-spec-build,@aws-cdk/service-spec-sources'"
         },
         {
-          "exec": "npm-check-updates --dep optional --upgrade --target=minor --reject='@cdklabs/typewriter,@aws-cdk/service-spec-build'"
+          "exec": "npm-check-updates --dep optional --upgrade --target=minor --reject='@types/fs-extra,@cdklabs/typewriter,@aws-cdk/service-spec-build,@aws-cdk/service-spec-sources'"
         },
         {
-          "exec": "npm-check-updates --dep peer --upgrade --target=minor --reject='@cdklabs/typewriter,@aws-cdk/service-spec-build'"
+          "exec": "npm-check-updates --dep peer --upgrade --target=minor --reject='@types/fs-extra,@cdklabs/typewriter,@aws-cdk/service-spec-build,@aws-cdk/service-spec-sources'"
         },
         {
-          "exec": "npm-check-updates --dep prod --upgrade --target=minor --reject='@cdklabs/typewriter,@aws-cdk/service-spec-build'"
+          "exec": "npm-check-updates --dep prod --upgrade --target=minor --reject='@types/fs-extra,@cdklabs/typewriter,@aws-cdk/service-spec-build,@aws-cdk/service-spec-sources'"
         },
         {
-          "exec": "npm-check-updates --dep bundle --upgrade --target=minor --reject='@cdklabs/typewriter,@aws-cdk/service-spec-build'"
+          "exec": "npm-check-updates --dep bundle --upgrade --target=minor --reject='@types/fs-extra,@cdklabs/typewriter,@aws-cdk/service-spec-build,@aws-cdk/service-spec-sources'"
         }
       ]
     },
@@ -71,6 +71,15 @@
         }
       ]
     },
+    "generate": {
+      "name": "generate",
+      "steps": [
+        {
+          "exec": "ts-node src/cli/generate.ts",
+          "receiveArgs": true
+        }
+      ]
+    },
     "package": {
       "name": "package",
       "description": "Creates the distribution package",
@@ -89,7 +98,12 @@
     },
     "pre-compile": {
       "name": "pre-compile",
-      "description": "Prepare the project for compilation"
+      "description": "Prepare the project for compilation",
+      "steps": [
+        {
+          "spawn": "generate"
+        }
+      ]
     },
     "test": {
       "name": "test",
