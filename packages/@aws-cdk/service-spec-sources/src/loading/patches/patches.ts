@@ -9,7 +9,7 @@ type Patcher = (lens: JsonLens) => void;
  * This function removes any instances of 'additionalProperties' on non-objects.
  */
 export function removeAdditionalProperties(lens: JsonLens) {
-  if (lens.isObject() && lens.value.type !== 'object' && lens.value.additionalProperties !== undefined) {
+  if (lens.isJsonObject() && lens.value.type !== 'object' && lens.value.additionalProperties !== undefined) {
     lens.removeProperty('additionalProperties may only exist on object types', 'additionalProperties');
   }
 }
@@ -20,7 +20,7 @@ export function removeAdditionalProperties(lens: JsonLens) {
  * function renames those values.
  */
 export function replaceArrayLengthProps(lens: JsonLens) {
-  if (!lens.isObject() || lens.value.type !== 'array') { return; }
+  if (!lens.isJsonObject() || lens.value.type !== 'array') { return; }
 
   if (lens.value.minLength !== undefined) {
     lens.renameProperty('array lengths are specified using minItems, not minLength', 'minLength', 'minItems');
@@ -36,7 +36,7 @@ export function replaceArrayLengthProps(lens: JsonLens) {
  * properties is redundant. This function removes those instances.
  */
 export function removeBooleanPatterns(lens: JsonLens) {
-  if (lens.isObject() && lens.value.type === 'boolean' && lens.value.pattern !== undefined) {
+  if (lens.isJsonObject() && lens.value.type === 'boolean' && lens.value.pattern !== undefined) {
     lens.removeProperty('pattern is redundant on boolean property', 'pattern');
   }
 }

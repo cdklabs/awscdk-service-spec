@@ -12,7 +12,7 @@ export interface JsonLens {
   readonly value: unknown;
 
   /** Type test for whether the current lens points to an object. */
-  isObject(): this is JsonObjectLens;
+  isJsonObject(): this is JsonObjectLens;
 
   /** Fully replace the current value with a different one. */
   replaceValue(reason: string, newValue: any): void;

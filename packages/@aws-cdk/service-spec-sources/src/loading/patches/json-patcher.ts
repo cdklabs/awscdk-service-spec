@@ -35,9 +35,9 @@ export class SchemaLens implements JsonLens, JsonObjectLens {
     this.rootPath.push(this);
   }
 
-  /** Type test for whether the current lens points to an object. */
-  isObject(): this is JsonObjectLens {
-    return typeof this.value === 'object' && this.value && this.value.type === 'object';
+  /** Type test for whether the current lens points to a json object. */
+  isJsonObject(): this is JsonObjectLens {
+    return typeof this.value === 'object' && this.value && this.value.type !== undefined;
   };
 
   wasRemoved(key: any) {
@@ -52,7 +52,7 @@ export class SchemaLens implements JsonLens, JsonObjectLens {
 
   /** Remove the property with the given name on the current object. The property will not be recursed into. */
   removeProperty(reason: string, name: string): void {
-    if (this.isObject()) {
+    if (this.isJsonObject()) {
       this.reports.push(reason);
       this.removedKeys.push(name);
       this.patches.push(JsonPatch.remove(`${this.jsonPath}/${name}`));
@@ -61,7 +61,7 @@ export class SchemaLens implements JsonLens, JsonObjectLens {
 
   /** Rename a property, optionally transforming its value. */
   renameProperty(reason: string, oldName: string, newName: string, fx: (x: any) => any = (x) => x): void {
-    if (this.isObject()) {
+    if (this.isJsonObject()) {
       this.reports.push(reason);
       this.patches.push(JsonPatch.add(`${this.jsonPath}/${newName}`, fx(this.value[oldName])));
       this.patches.push(JsonPatch.remove(`${this.jsonPath}/${oldName}`));
@@ -70,7 +70,7 @@ export class SchemaLens implements JsonLens, JsonObjectLens {
 
   /** Add a property */
   addProperty(reason: string, name: string, value: any): void {
-    if (this.isObject()) {
+    if (this.isJsonObject()) {
       this.reports.push(reason);
       this.patches.push(JsonPatch.add(`${this.jsonPath}/${name}`, value));
     }
