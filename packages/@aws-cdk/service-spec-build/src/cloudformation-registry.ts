@@ -139,6 +139,10 @@ export function loadCloudFormationRegistryResource(options: LoadCloudFormationRe
     ]));
 
     for (const name of attributeNames) {
+      if (!source.properties[name]) {
+        fails.push(fail(`no property definition for: ${name}`));
+        continue;
+      }
       const resolved = resolve(source.properties[name]);
 
       withResult(

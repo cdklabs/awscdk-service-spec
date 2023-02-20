@@ -62,7 +62,7 @@ test('include legacy attributes in attributes', () => {
     },
     specResource: {
       Attributes: {
-        Property: { PrimitiveType: 'String', UpdateType: 'Mutable' },
+        Property: { PrimitiveType: 'String' },
       },
     },
   });

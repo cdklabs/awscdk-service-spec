@@ -4,7 +4,7 @@
 import { promises as fs } from 'fs';
 import * as path from 'path';
 import * as util from 'util';
-import { Failure, failure, Result } from '@cdklabs/tskb';
+import { errorMessage, Failure, failure, Result } from '@cdklabs/tskb';
 import Ajv from 'ajv';
 import * as _glob from 'glob';
 
@@ -25,15 +25,18 @@ export class Loader<A> {
   public async load(obj: unknown): Promise<Result<A>> {
     const valid = await this.validator(obj);
 
+    const failures = [];
+
     if (this.validation !== SchemaValidation.NONE && !valid) {
-      this.failures.push(...wrapErrors(this.validator.errors));
+      failures.push(...wrapErrors(this.validator.errors));
     }
+    this.failures.push(...failures);
 
     if (this.validation !== SchemaValidation.FAIL || valid) {
       return obj as A;
     }
 
-    return failure(`${this.validator.errors?.length} validation errors`);
+    return failure(`${failures.length} validation errors:\n${failures.map(x => `- ${errorMessage(x)}`).join('\n')}`);
   }
 
   public async loadFile(fileName: string): Promise<Result<A>> {

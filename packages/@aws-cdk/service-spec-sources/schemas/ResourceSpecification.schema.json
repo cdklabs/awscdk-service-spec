@@ -7,8 +7,16 @@
       "properties": {
         "PropertyTypes": {
           "additionalProperties": {
-            "$ref": "#/definitions/resourcespec.PropertyType"
+            "anyOf": [
+              {
+                "$ref": "#/definitions/resourcespec.PropertyType"
+              },
+              {
+                "$ref": "#/definitions/resourcespec.Property"
+              }
+            ]
           },
+          "description": "Not really valid for this to be a plain property, but it happens in practice anyway",
           "type": "object"
         },
         "ResourceSpecificationVersion": {
@@ -26,6 +34,33 @@
         "ResourceTypes",
         "PropertyTypes"
       ],
+      "type": "object"
+    },
+    "resourcespec.Attribute": {
+      "additionalProperties": false,
+      "properties": {
+        "Documentation": {
+          "type": "string"
+        },
+        "DuplicatesAllowed": {
+          "type": "boolean"
+        },
+        "ItemType": {
+          "type": "string"
+        },
+        "PrimitiveItemType": {
+          "type": "string"
+        },
+        "PrimitiveType": {
+          "type": "string"
+        },
+        "Required": {
+          "type": "boolean"
+        },
+        "Type": {
+          "type": "string"
+        }
+      },
       "type": "object"
     },
     "resourcespec.Property": {
@@ -55,7 +90,8 @@
         "UpdateType": {
           "enum": [
             "Mutable",
-            "Immutable"
+            "Immutable",
+            "Conditional"
           ],
           "type": "string"
         }
@@ -68,9 +104,27 @@
     "resourcespec.PropertyType": {
       "additionalProperties": false,
       "properties": {
-        "Attributes": {
+        "Documentation": {
+          "type": "string"
+        },
+        "Properties": {
           "additionalProperties": {
             "$ref": "#/definitions/resourcespec.Property"
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "resourcespec.ResourceType": {
+      "additionalProperties": false,
+      "properties": {
+        "AdditionalProperties": {
+          "type": "boolean"
+        },
+        "Attributes": {
+          "additionalProperties": {
+            "$ref": "#/definitions/resourcespec.Attribute"
           },
           "type": "object"
         },
@@ -82,19 +136,6 @@
             "$ref": "#/definitions/resourcespec.Property"
           },
           "type": "object"
-        }
-      },
-      "required": [
-        "Properties",
-        "Attributes"
-      ],
-      "type": "object"
-    },
-    "resourcespec.ResourceType": {
-      "additionalProperties": false,
-      "properties": {
-        "Documentation": {
-          "type": "string"
         }
       },
       "type": "object"

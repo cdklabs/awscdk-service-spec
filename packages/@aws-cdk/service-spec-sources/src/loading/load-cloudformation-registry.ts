@@ -1,10 +1,10 @@
 import * as path from 'path';
-import { Failure, isFailure, isSuccess, Result } from "@cdklabs/tskb";
-import { CloudFormationRegistryResource } from '../types';
-import { Loader, SchemaValidation } from "./loader";
-
 import * as util from 'util';
+import { Failure, isFailure, isSuccess, Result } from '@cdklabs/tskb';
 import * as _glob from 'glob';
+import { Loader, SchemaValidation } from './loader';
+import { CloudFormationRegistryResource } from '../types';
+
 
 const glob = util.promisify(_glob.glob);
 
