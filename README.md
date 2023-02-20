@@ -8,6 +8,6 @@ This repository uses [Git LFS](https://git-lfs.com/). Before you clone this repo
 *once*:
 
 ```sh
-$ brew install git-lfs   # Or equivalent, see the website above
-$ git lfs install        # Only need to run this once
+brew install git-lfs   # Or equivalent, see the website above
+git lfs install        # Only need to run this once
 ```
