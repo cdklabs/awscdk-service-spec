@@ -61,7 +61,7 @@ export function loadCloudFormationRegistryResource(db: SpecDatabase, region: Reg
 
       switch (resolved.schema.type) {
         case 'string':
-          return 'string';
+          return { type: 'string' };
 
         case 'array':
           // FIXME: insertionOrder, uniqueItems
@@ -70,14 +70,14 @@ export function loadCloudFormationRegistryResource(db: SpecDatabase, region: Reg
             element => ({ type: 'array', element }));
 
         case 'boolean':
-          return 'boolean';
+          return { type: 'boolean' };
 
         case 'object':
           return schemaObjectToModelType(nameHint, resolved.schema, fail);
 
         case 'number':
         case 'integer':
-          return 'number';
+          return { type: 'number' };
       }
     });
   }
@@ -101,7 +101,7 @@ export function loadCloudFormationRegistryResource(db: SpecDatabase, region: Reg
       } else {
         // Fully untyped map
         // FIXME: is 'json' really a primitive type, or do we mean `Map<unknown>` ?
-        return 'json';
+        return { type: 'json' };
       }
     }
 

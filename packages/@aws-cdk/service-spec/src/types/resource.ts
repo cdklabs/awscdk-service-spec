@@ -63,7 +63,22 @@ Invariants.push(evolutionInvariant<Property>(
 
 export type PropertyType = PrimitiveType | DefinitionReference | ArrayType<PropertyType> | MapType<PropertyType>;
 
-export type PrimitiveType = 'string' | 'number' | 'boolean' | 'json';
+export type PrimitiveType = StringType | NumberType | BooleanType | JsonType;
+
+export interface StringType {
+  readonly type: 'string';
+}
+
+export interface NumberType {
+  readonly type: 'number';
+}
+
+export interface BooleanType {
+  readonly type: 'boolean';
+}
+export interface JsonType {
+  readonly type: 'json';
+}
 
 export interface DefinitionReference {
   readonly type: 'ref';
