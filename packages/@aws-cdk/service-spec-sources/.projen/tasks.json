@@ -79,6 +79,9 @@
       "steps": [
         {
           "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudFormationRegistryResource --out schemas/CloudFormationRegistryResource.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type ResourceSpecification --out schemas/ResourceSpecification.schema.json"
         }
       ]
     },
