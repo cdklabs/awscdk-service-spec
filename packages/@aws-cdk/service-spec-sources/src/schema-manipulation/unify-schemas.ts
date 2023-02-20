@@ -1,5 +1,5 @@
 import { failure, isFailure, liftResult, locateFailure, Result, using } from '@cdklabs/tskb';
-import { jsonschema } from '../types/JsonSchema';
+import { jsonschema } from '../types';
 
 /**
  * Merge two schemas, returning a new schema that will satisfy both input schemas
