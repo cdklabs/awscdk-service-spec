@@ -1,32 +1,39 @@
 export namespace jsonschema {
+  export type Schema = Reference | OneOf<Schema> | AnyOf<Schema> | ConcreteSchema;
 
-  export type Schema = Reference | ConcreteSchema;
+  export type ConcreteSchema =
+    | Object
+    | OneOf<ConcreteSchema>
+    | AnyOf<ConcreteSchema>
+    | String
+    | SchemaArray
+    | Boolean
+    | Number;
 
-  export type ConcreteSchema = Object | OneOf | AnyOf | String | SchemaArray | Boolean | Number;
   export interface Annotatable {
     readonly $comment?: string;
     readonly description?: string;
   }
 
   export interface Reference extends Annotatable {
-    readonly '$ref': string;
+    readonly $ref: string;
     readonly [other: string]: unknown;
   }
 
   export type Object = MapLikeObject | RecordLikeObject;
 
-  export interface AnyOf extends Annotatable {
-    readonly anyOf: Array<Schema>;
+  export interface AnyOf<S> extends Annotatable {
+    readonly anyOf: Array<S>;
   }
 
-  export function isAnyOf(x: Schema): x is AnyOf {
+  export function isAnyOf(x: Schema): x is AnyOf<any> {
     return 'anyOf' in x;
   }
-  export interface OneOf extends Annotatable {
-    readonly oneOf: Array<Schema>;
+  export interface OneOf<S> extends Annotatable {
+    readonly oneOf: Array<S>;
   }
 
-  export function isOneOf(x: Schema): x is OneOf {
+  export function isOneOf(x: Schema): x is OneOf<any> {
     return 'oneOf' in x;
   }
 
@@ -63,8 +70,10 @@ export namespace jsonschema {
     const ret = !!(x as RecordLikeObject).properties;
 
     // Do a sanity check of our understanding
-    if (ret && (x as MapLikeObject).additionalProperties || (x as MapLikeObject).patternProperties) {
-      throw new Error(`object with properties should not have additionalProperties or patternProperties: ${JSON.stringify(x)}`);
+    if ((ret && (x as MapLikeObject).additionalProperties) || (x as MapLikeObject).patternProperties) {
+      throw new Error(
+        `object with properties should not have additionalProperties or patternProperties: ${JSON.stringify(x)}`,
+      );
     }
 
     return ret;
@@ -142,8 +151,25 @@ export namespace jsonschema {
    * Make a resolver function that will resolve `$ref` entries with respect to the given document root.
    */
   export function resolveReference(root: any) {
-    return (ref: Schema): ResolvedSchema => {
-      if (!isReference(ref)) { return { schema: ref }; }
+    const resolve = (ref: Schema): ResolvedSchema => {
+      if (!isReference(ref)) {
+        // If this is a oneOf or anyOf, make sure the types inside the oneOf or anyOf get resolved
+        if (isOneOf(ref)) {
+          return {
+            schema: {
+              oneOf: ref.oneOf.map((x) => resolve(x).schema),
+            },
+          };
+        } else if (isAnyOf(ref)) {
+          return {
+            schema: {
+              anyOf: ref.anyOf.map((x) => resolve(x).schema),
+            },
+          };
+        } else {
+          return { schema: ref };
+        }
+      }
 
       const path = ref.$ref;
       if (!path.startsWith('#/')) {
@@ -154,11 +180,14 @@ export namespace jsonschema {
       let current = root;
       while (true) {
         const name = parts.shift();
-        if (!name) { break; }
+        if (!name) {
+          break;
+        }
         current = current[name];
       }
       return { schema: current, referenceName: parts[parts.length - 1] };
     };
+    return resolve;
   }
 
   /**
@@ -169,5 +198,4 @@ export namespace jsonschema {
   export function isReference(x: Schema): x is Reference {
     return '$ref' in x;
   }
-
 }

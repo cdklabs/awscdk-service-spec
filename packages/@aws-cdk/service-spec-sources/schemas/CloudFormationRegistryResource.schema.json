@@ -247,7 +247,28 @@
       },
       "type": "object"
     },
-    "jsonschema.AnyOf": {
+    "jsonschema.AnyOf<ConcreteSchema>": {
+      "additionalProperties": false,
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "anyOf": {
+          "items": {
+            "$ref": "#/definitions/jsonschema.ConcreteSchema"
+          },
+          "type": "array"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "anyOf"
+      ],
+      "type": "object"
+    },
+    "jsonschema.AnyOf<Schema>": {
       "additionalProperties": false,
       "properties": {
         "$comment": {
@@ -296,10 +317,10 @@
           "$ref": "#/definitions/jsonschema.Object"
         },
         {
-          "$ref": "#/definitions/jsonschema.OneOf"
+          "$ref": "#/definitions/jsonschema.OneOf%3CConcreteSchema%3E"
         },
         {
-          "$ref": "#/definitions/jsonschema.AnyOf"
+          "$ref": "#/definitions/jsonschema.AnyOf%3CConcreteSchema%3E"
         },
         {
           "$ref": "#/definitions/jsonschema.String"
@@ -411,7 +432,28 @@
       },
       "type": "object"
     },
-    "jsonschema.OneOf": {
+    "jsonschema.OneOf<ConcreteSchema>": {
+      "additionalProperties": false,
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "oneOf": {
+          "items": {
+            "$ref": "#/definitions/jsonschema.ConcreteSchema"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "oneOf"
+      ],
+      "type": "object"
+    },
+    "jsonschema.OneOf<Schema>": {
       "additionalProperties": false,
       "properties": {
         "$comment": {
@@ -524,6 +566,12 @@
       "anyOf": [
         {
           "$ref": "#/definitions/jsonschema.Reference"
+        },
+        {
+          "$ref": "#/definitions/jsonschema.OneOf%3CSchema%3E"
+        },
+        {
+          "$ref": "#/definitions/jsonschema.AnyOf%3CSchema%3E"
         },
         {
           "$ref": "#/definitions/jsonschema.ConcreteSchema"
