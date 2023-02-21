@@ -1,13 +1,21 @@
-import { PropertyType, Region, Resource, ResourceProperties, SpecDatabase, TypeDefinition } from '@aws-cdk/service-spec';
-import { CloudFormationRegistryResource, ImplicitJsonSchemaRecord, jsonschema, simplePropNameFromJsonPtr, unifyAllSchemas } from '@aws-cdk/service-spec-sources';
+import { PropertyType, Resource, ResourceProperties, SpecDatabase, TypeDefinition } from '@aws-cdk/service-spec';
+import { CloudFormationRegistryResource, ImplicitJsonSchemaRecord, jsonschema, simplePropNameFromJsonPtr, resourcespec, unifyAllSchemas } from '@aws-cdk/service-spec-sources';
 import { Fail, failure, Failures, isFailure, Result, tryCatch, using, ref } from '@cdklabs/tskb';
 
-export function loadCloudFormationRegistryResource(db: SpecDatabase, region: Region, resource: CloudFormationRegistryResource, fails: Failures) {
+export interface LoadCloudFormationRegistryResourceOptions {
+  readonly db: SpecDatabase;
+  readonly resource: CloudFormationRegistryResource;
+  readonly fails: Failures;
+  readonly specResource?: resourcespec.ResourceType;
+}
+
+export function loadCloudFormationRegistryResource(options: LoadCloudFormationRegistryResourceOptions) {
+  const { db, resource, fails } = options;
+
   const typeDefinitions = new Map<jsonschema.Object, TypeDefinition>();
 
   const resolve = jsonschema.resolveReference(resource);
 
-  // FIXME: Resource may already exist, in which case we should look it up.
   const existing = db.lookup('resource', 'cloudFormationType', 'equals', resource.typeName);
 
   let res: Resource;
@@ -20,19 +28,20 @@ export function loadCloudFormationRegistryResource(db: SpecDatabase, region: Reg
       properties: {},
     });
 
-    recurseProperties(resource, res.properties, failure.in(`${resource.typeName} properties`));
+    recurseProperties(resource, res.properties, failure.in(resource.typeName));
     // Every property that's a "readonly" property, remove it again from the `properties` collection.
     for (const propPtr of resource.readOnlyProperties ?? []) {
       const propName = simplePropNameFromJsonPtr(propPtr);
       delete res.properties[propName];
     }
 
+    copyAttributes(resource, res.attributes, failure.in(resource.typeName));
   } else {
     // FIXME: Probably recurse into the properties to see if they are different...
     res = existing[0];
   }
 
-  db.link('regionHasResource', region, res);
+  return res;
 
   function recurseProperties(source: ImplicitJsonSchemaRecord, target: ResourceProperties, fail: Fail) {
     if (!source.properties) {
@@ -41,17 +50,16 @@ export function loadCloudFormationRegistryResource(db: SpecDatabase, region: Reg
 
     for (const [name, property] of Object.entries(source.properties)) {
       const resolved = resolve(property);
-      const type = schemaTypeToModelType(name, resolved, fail.in(`property ${name}`));
 
-      if (isFailure(type)) {
-        fails.push(type);
-      } else {
-        target[name] = {
-          type,
-          documentation: resolved.schema.description,
-          required: ifTrue((source.required ?? []).includes(name)),
-        };
-      }
+      withResult(
+        schemaTypeToModelType(name, resolved, fail.in(`property ${name}`)),
+        type => {
+          target[name] = {
+            type,
+            documentation: resolved.schema.description,
+            required: ifTrue((source.required ?? []).includes(name)),
+          };
+        });
     }
   }
 
@@ -61,7 +69,7 @@ export function loadCloudFormationRegistryResource(db: SpecDatabase, region: Reg
 
       switch (resolved.schema.type) {
         case 'string':
-          return 'string';
+          return { type: 'string' };
 
         case 'array':
           // FIXME: insertionOrder, uniqueItems
@@ -70,14 +78,14 @@ export function loadCloudFormationRegistryResource(db: SpecDatabase, region: Reg
             element => ({ type: 'array', element }));
 
         case 'boolean':
-          return 'boolean';
+          return { type: 'boolean' };
 
         case 'object':
           return schemaObjectToModelType(nameHint, resolved.schema, fail);
 
         case 'number':
         case 'integer':
-          return 'number';
+          return { type: 'number' };
       }
     });
   }
@@ -101,7 +109,7 @@ export function loadCloudFormationRegistryResource(db: SpecDatabase, region: Reg
       } else {
         // Fully untyped map
         // FIXME: is 'json' really a primitive type, or do we mean `Map<unknown>` ?
-        return 'json';
+        return { type: 'json' };
       }
     }
 
@@ -120,6 +128,41 @@ export function loadCloudFormationRegistryResource(db: SpecDatabase, region: Reg
     }
 
     return { type: 'ref', reference: ref(typeDef) };
+  }
+
+  function copyAttributes(source: CloudFormationRegistryResource, target: ResourceProperties, fail: Fail) {
+    // The attributes are (currently) in `readOnlyResources`. Because of a representation issue, this doesn't cover
+    // everything, so also look for the legacy spec.
+    const attributeNames = Array.from(new Set([
+      ...(source.readOnlyProperties ?? []).map(simplePropNameFromJsonPtr),
+      ...Object.keys(options.specResource?.Attributes ?? {}),
+    ]));
+
+    for (const name of attributeNames) {
+      if (!source.properties[name]) {
+        fails.push(fail(`no property definition for: ${name}`));
+        continue;
+      }
+      const resolved = resolve(source.properties[name]);
+
+      withResult(
+        schemaTypeToModelType(name, resolved, fail.in(`attribute ${name}`)),
+        type => {
+          target[name] = {
+            type,
+            documentation: resolved.schema.description,
+            required: ifTrue((source.required ?? []).includes(name)),
+          };
+        });
+    }
+  }
+
+  function withResult<A>(x: Result<A>, cb: (x: A) => void): void {
+    if (isFailure(x)) {
+      fails.push(x);
+    } else {
+      cb(x);
+    }
   }
 }
 
