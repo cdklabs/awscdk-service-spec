@@ -1,0 +1,30 @@
+{
+  "$ref": "#/definitions/StatefulResources",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "StatefulResources": {
+      "additionalProperties": false,
+      "properties": {
+        "ResourceTypes": {
+          "additionalProperties": {
+            "$ref": "#/definitions/stateful.StatefulResourceAttributes"
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "ResourceTypes"
+      ],
+      "type": "object"
+    },
+    "stateful.StatefulResourceAttributes": {
+      "additionalProperties": false,
+      "properties": {
+        "DeleteRequiresEmptyResource": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    }
+  }
+}

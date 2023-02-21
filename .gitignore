@@ -45,6 +45,7 @@ jspm_packages/
 /dist/
 .DS_Store
 !/.eslintrc.json
+!/awscdk-service-spec.code-workspace
 !/.github/workflows/auto-merge.yml
-!/.vscode/settings.json
 !/.vscode/extensions.json
+!/.vscode/settings.json

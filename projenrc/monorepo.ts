@@ -4,11 +4,19 @@ import * as pj from 'projen';
 //////////////////////////////////////////////////////////////////////
 
 export interface MonorepoRootOptions
-  extends Omit<pj.typescript.TypeScriptProjectOptions, 'sampleCode' | 'jest' | 'jestOptions'> {}
+  extends Omit<pj.typescript.TypeScriptProjectOptions, 'sampleCode' | 'jest' | 'jestOptions'> {
+  /**
+   * Create a VSCode multi-root workspace file for all monorepo workspaces
+   *
+   * @default true
+   */
+  vscodeWorkspace?: boolean;
+}
 
 export class MonorepoRoot extends pj.typescript.TypeScriptProject {
   private projects = new Array<MonorepoTypeScriptProject>();
   private postInstallDependencies = new Array<() => boolean>();
+  private vscodeHiddenFilesPatterns = new Array<string>();
 
   constructor(options: MonorepoRootOptions) {
     super({
@@ -38,6 +46,43 @@ export class MonorepoRoot extends pj.typescript.TypeScriptProject {
       },
     });
     this.tasks.addTask('fmt', { exec: 'eslint --ext .ts --fix projenrc .projenrc.ts' });
+
+    /**
+     * VSCode
+     */
+    this.vscodeHiddenFilesPatterns.push(
+      '**/.projen',
+      '**/.eslintrc.js',
+      '**/.eslintrc.json',
+      '**/.gitattributes',
+      '**/.gitignore',
+      '**/.npmignore',
+      '**/*.tsbuildinfo',
+      '**/node_modules',
+      '**/coverage',
+      '**/dist',
+      '**/lib',
+      '**/test-reports',
+      '.prettierignore',
+      '.prettierrc.json',
+      '**/tsconfig.json',
+      '**/tsconfig.dev.json',
+    );
+
+    if (options.vscodeWorkspace ?? true) {
+      const workspaceFile = `${this.name}.code-workspace`;
+      this.vscodeHiddenFilesPatterns.push(workspaceFile);
+      new pj.JsonFile(this, workspaceFile, {
+        allowComments: true,
+        obj: () => ({
+          folders: this.projects
+            .sort((p1, p2) => p1.name.localeCompare(p2.name))
+            .map((p) => ({ path: `packages/${p.name}` })),
+          settings: () => getObjFromFile(this, '.vscode/settings.json'),
+          extensions: () => getObjFromFile(this, '.vscode/extensions.json'),
+        }),
+      });
+    }
 
     /**
      * Tasks
@@ -111,6 +156,10 @@ export class MonorepoRoot extends pj.typescript.TypeScriptProject {
         this.projects.map((p) => ({ path: `packages/${p.name}` })),
       );
     }
+
+    this.vscode?.settings.addSettings({
+      'files.exclude': Object.fromEntries(this.vscodeHiddenFilesPatterns.map((p) => [p, true])),
+    });
   }
 
   public postSynthesize() {
@@ -281,4 +330,8 @@ function without<A extends object, K extends keyof A>(x: A, ...ks: K[]): Omit<A,
 
 function isMonorepoTypeScriptProject(x: unknown): x is MonorepoTypeScriptProject {
   return typeof x === 'object' && !!x && x instanceof MonorepoTypeScriptProject;
+}
+
+function getObjFromFile(project: pj.Project, file: string): object {
+  return (project.tryFindObjectFile(file) as any).obj;
 }
