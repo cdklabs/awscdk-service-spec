@@ -20,6 +20,13 @@ export const allPatchers = makeCompositePatcher(
   canonicalizeOneOf,
   // canonicalizeAnyOf,
   minMaxImpliesInteger,
+  erroneousInsertionOrderOnObject,
+  extraneousPropsOnReferences,
+  patchConstOnString,
+  canonicalizeDefaultOnBoolean,
+  patchMaxItemsOnString,
+  patchMinLengthOnInteger,
+  canonicalizeRegexInFormat,
 );
 
 /**
@@ -38,7 +45,9 @@ export function removeAdditionalProperties(lens: JsonLens) {
  * function renames those values.
  */
 export function replaceArrayLengthProps(lens: JsonLens) {
-  if (!lens.isJsonObject() || lens.value.type !== 'array') { return; }
+  if (!lens.isJsonObject() || lens.value.type !== 'array') {
+    return;
+  }
 
   if (lens.value.minLength !== undefined) {
     lens.renameProperty('array lengths are specified using minItems, not minLength', 'minLength', 'minItems');
@@ -74,16 +83,18 @@ export function canonicalizeUnionType(lens: JsonLens) {
 export function canonicalizeOneOf(lens: JsonLens) {
   if (lens.isJsonObject() && Array.isArray(lens.value.oneOf)) {
     lens.replaceValue('no-mistake', {
-      oneOf: lens.value.oneOf.map(branch => {
+      oneOf: lens.value.oneOf.map((branch) => {
         return {
           ...restOfObjectWithout(lens.value, ['oneOf']),
           ...branch,
-          ...(Array.isArray(lens.value.required) || Array.isArray(branch.required) ? {
-            required: [
-              ...Array.isArray(lens.value.required) ? lens.value.required : [],
-              ...Array.isArray(branch.required) ? branch.required : [],
-            ],
-          } : undefined),
+          ...(Array.isArray(lens.value.required) || Array.isArray(branch.required)
+            ? {
+                required: [
+                  ...(Array.isArray(lens.value.required) ? lens.value.required : []),
+                  ...(Array.isArray(branch.required) ? branch.required : []),
+                ],
+              }
+            : undefined),
         };
       }),
     });
@@ -93,16 +104,18 @@ export function canonicalizeOneOf(lens: JsonLens) {
 export function canonicalizeAnyOf(lens: JsonLens) {
   if (lens.isJsonObject() && Array.isArray(lens.value.anyOf)) {
     lens.replaceValue('no-mistake', {
-      anyOf: lens.value.anyOf.map(branch => {
+      anyOf: lens.value.anyOf.map((branch) => {
         return {
           ...restOfObjectWithout(lens.value, ['anyOf']),
           ...branch,
-          ...(Array.isArray(lens.value.required) || Array.isArray(branch.required) ? {
-            required: [
-              ...Array.isArray(lens.value.required) ? lens.value.required : [],
-              ...Array.isArray(branch.required) ? branch.required : [],
-            ],
-          } : undefined),
+          ...(Array.isArray(lens.value.required) || Array.isArray(branch.required)
+            ? {
+                required: [
+                  ...(Array.isArray(lens.value.required) ? lens.value.required : []),
+                  ...(Array.isArray(branch.required) ? branch.required : []),
+                ],
+              }
+            : undefined),
         };
       }),
     });
@@ -114,6 +127,75 @@ export function minMaxImpliesInteger(lens: JsonLens) {
     if (lens.value.maximum || lens.value.minimum) {
       lens.removeProperty('string type has max/min so it was meant to be an integer type', 'type');
       lens.addProperty('string type has max/min so it was meant to be an integer type', 'type', 'integer');
+    }
+  }
+}
+
+export function erroneousInsertionOrderOnObject(lens: JsonLens) {
+  if (lens.isJsonObject() && lens.value.type === 'object') {
+    if (lens.value.insertionOrder !== undefined) {
+      lens.removeProperty('object does not have insertionOrder prop', 'insertionOrder');
+    }
+  }
+}
+
+export function extraneousPropsOnReferences(lens: JsonLens) {
+  if (lens.isReference()) {
+    const { $ref, description, $comment, ...reduced } = lens.value as any;
+    if (Object.keys(reduced).length > 0) {
+      lens.replaceValue('extraneous values on reference prop', {
+        $ref,
+        description,
+        $comment,
+      });
+    }
+  }
+}
+
+export function patchConstOnString(lens: JsonLens) {
+  if (lens.isJsonObject() && lens.value.type === 'string' && lens.value.const !== undefined) {
+    lens.addProperty('const is not a property on a string', 'pattern', lens.value.const);
+    lens.removeProperty('const is not a property on a string', 'const');
+  }
+}
+
+/** TODO: this one is just flat out wrong and we should remove when the service team fixes their spec */
+export function patchMaxItemsOnString(lens: JsonLens) {
+  if (lens.isJsonObject() && lens.value.type === 'string' && lens.value.maxItems !== undefined) {
+    lens.removeProperty(
+      "strings do not have maxItems, and it's likely an error rather than a typo for maxLength so we are removing the property",
+      'maxItems',
+    );
+  }
+}
+
+export function patchMinLengthOnInteger(lens: JsonLens) {
+  if (
+    lens.isJsonObject() &&
+    (lens.value.type === 'integer' || lens.value.type === 'number') &&
+    lens.value.minLength !== undefined
+  ) {
+    lens.removeProperty('integers do not have minLength', 'minLength');
+  }
+}
+
+export function canonicalizeDefaultOnBoolean(lens: JsonLens) {
+  if (lens.isJsonObject() && lens.value.type === 'boolean' && typeof lens.value.default === 'string') {
+    lens.renameProperty('canonicalize default type', 'default', 'default', (d) => d === 'true');
+  }
+}
+
+export function canonicalizeRegexInFormat(lens: JsonLens) {
+  if (
+    lens.isJsonObject() &&
+    lens.value.type === 'string' &&
+    lens.value.format !== undefined &&
+    lens.value.pattern === undefined &&
+    typeof lens.value.format === 'string'
+  ) {
+    if (!['uri', 'timestamp', 'date-time'].includes(lens.value.format)) {
+      lens.addProperty('canonicalize regexes in format', 'pattern', lens.value.format);
+      lens.removeProperty('canonicalize regexes in format', 'format');
     }
   }
 }

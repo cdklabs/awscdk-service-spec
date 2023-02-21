@@ -13,11 +13,11 @@ export namespace jsonschema {
   export interface Annotatable {
     readonly $comment?: string;
     readonly description?: string;
+    readonly title?: string;
   }
 
   export interface Reference extends Annotatable {
     readonly $ref: string;
-    readonly [other: string]: unknown;
   }
 
   export type Object = MapLikeObject | RecordLikeObject;
@@ -90,7 +90,7 @@ export namespace jsonschema {
     readonly maxLength?: number;
     readonly pattern?: string;
     readonly enum?: string[];
-    readonly format?: 'date-time';
+    readonly format?: 'date-time' | 'uri' | 'timestamp';
     readonly examples?: string[];
   }
 
@@ -100,6 +100,7 @@ export namespace jsonschema {
     readonly enum?: number[];
     readonly minimum?: number;
     readonly maximum?: number;
+    readonly format?: 'int64' | 'double';
   }
 
   export interface SchemaArray extends Annotatable {

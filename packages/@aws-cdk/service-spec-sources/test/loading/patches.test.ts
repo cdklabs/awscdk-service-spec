@@ -1,4 +1,12 @@
-import { canonicalizeOneOf, canonicalizeUnionType, recurseAndPatch, removeAdditionalProperties, removeBooleanPatterns, replaceArrayLengthProps } from '../../src/loading/patches/patches';
+import {
+  canonicalizeOneOf,
+  canonicalizeUnionType,
+  recurseAndPatch,
+  removeAdditionalProperties,
+  removeBooleanPatterns,
+  replaceArrayLengthProps,
+  extraneousPropsOnReferences,
+} from '../../src/loading/patches/patches';
 
 describe('patches', () => {
   describe(removeAdditionalProperties, () => {
@@ -120,11 +128,14 @@ describe('patches', () => {
       const patchedObj = recurseAndPatch(obj, canonicalizeUnionType);
 
       expect(patchedObj).toEqual({
-        oneOf: [{
-          type: 'string',
-        }, {
-          type: 'object',
-        }],
+        oneOf: [
+          {
+            type: 'string',
+          },
+          {
+            type: 'object',
+          },
+        ],
       });
     });
 
@@ -138,15 +149,18 @@ describe('patches', () => {
       const patchedObj = recurseAndPatch(obj, canonicalizeUnionType);
 
       expect(patchedObj).toEqual({
-        oneOf: [{
-          type: 'string',
-          additionalProperties: false,
-          minLength: 0,
-        }, {
-          type: 'object',
-          additionalProperties: false,
-          minLength: 0,
-        }],
+        oneOf: [
+          {
+            type: 'string',
+            additionalProperties: false,
+            minLength: 0,
+          },
+          {
+            type: 'object',
+            additionalProperties: false,
+            minLength: 0,
+          },
+        ],
       });
     });
   });
@@ -169,11 +183,14 @@ describe('patches', () => {
             },
           },
           required: ['RequiredAttribute'],
-          oneOf: [{
-            required: ['Name'],
-          }, {
-            required: ['Attribute'],
-          }],
+          oneOf: [
+            {
+              required: ['Name'],
+            },
+            {
+              required: ['Attribute'],
+            },
+          ],
         },
       };
 
@@ -181,38 +198,71 @@ describe('patches', () => {
 
       expect(patchedObj).toEqual({
         Prop: {
-          oneOf: [{
-            description: 'my description',
-            type: 'object',
-            properties: {
-              Name: {
-                type: 'string',
+          oneOf: [
+            {
+              description: 'my description',
+              type: 'object',
+              properties: {
+                Name: {
+                  type: 'string',
+                },
+                Attribute: {
+                  type: 'string',
+                },
+                RequiredAttribute: {
+                  type: 'string',
+                },
               },
-              Attribute: {
-                type: 'string',
-              },
-              RequiredAttribute: {
-                type: 'string',
-              },
+              required: ['RequiredAttribute', 'Name'],
             },
-            required: ['RequiredAttribute', 'Name'],
-          }, {
-            description: 'my description',
-            type: 'object',
-            properties: {
-              Name: {
-                type: 'string',
+            {
+              description: 'my description',
+              type: 'object',
+              properties: {
+                Name: {
+                  type: 'string',
+                },
+                Attribute: {
+                  type: 'string',
+                },
+                RequiredAttribute: {
+                  type: 'string',
+                },
               },
-              Attribute: {
-                type: 'string',
-              },
-              RequiredAttribute: {
-                type: 'string',
-              },
+              required: ['RequiredAttribute', 'Attribute'],
             },
-            required: ['RequiredAttribute', 'Attribute'],
-          }],
+          ],
         },
+      });
+    });
+  });
+
+  describe(extraneousPropsOnReferences, () => {
+    test('works in base case', () => {
+      const obj = {
+        $ref: 'reference',
+        additionalProperties: false,
+      };
+
+      const patchedObj = recurseAndPatch(obj, extraneousPropsOnReferences);
+
+      expect(patchedObj).toEqual({ $ref: 'reference' });
+    });
+
+    test('description and comments are kept', () => {
+      const obj = {
+        $ref: 'reference',
+        additionalProperties: false,
+        description: 'reference',
+        $comment: 'some comment',
+      };
+
+      const patchedObj = recurseAndPatch(obj, extraneousPropsOnReferences);
+
+      expect(patchedObj).toEqual({
+        $ref: 'reference',
+        description: 'reference',
+        $comment: 'some comment',
       });
     });
   });

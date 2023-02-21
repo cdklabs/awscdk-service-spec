@@ -61,7 +61,7 @@
         },
         "definitions": {
           "additionalProperties": {
-            "$ref": "#/definitions/jsonschema.ConcreteSchema"
+            "$ref": "#/definitions/jsonschema.Schema"
           },
           "description": "Reusable schema type definitions used in this schema.",
           "type": "object"
@@ -144,6 +144,9 @@
         },
         "tagging": {
           "$ref": "#/definitions/ResourceTagging"
+        },
+        "title": {
+          "type": "string"
         },
         "typeName": {
           "type": "string"
@@ -261,6 +264,9 @@
         },
         "description": {
           "type": "string"
+        },
+        "title": {
+          "type": "string"
         }
       },
       "required": [
@@ -282,6 +288,9 @@
         },
         "description": {
           "type": "string"
+        },
+        "title": {
+          "type": "string"
         }
       },
       "required": [
@@ -299,6 +308,9 @@
           "type": "boolean"
         },
         "description": {
+          "type": "string"
+        },
+        "title": {
           "type": "string"
         },
         "type": {
@@ -369,6 +381,9 @@
           },
           "type": "object"
         },
+        "title": {
+          "type": "string"
+        },
         "type": {
           "const": "object",
           "type": "string"
@@ -397,11 +412,21 @@
           },
           "type": "array"
         },
+        "format": {
+          "enum": [
+            "int64",
+            "double"
+          ],
+          "type": "string"
+        },
         "maximum": {
           "type": "number"
         },
         "minimum": {
           "type": "number"
+        },
+        "title": {
+          "type": "string"
         },
         "type": {
           "enum": [
@@ -446,6 +471,9 @@
             "$ref": "#/definitions/jsonschema.ConcreteSchema"
           },
           "type": "array"
+        },
+        "title": {
+          "type": "string"
         }
       },
       "required": [
@@ -467,6 +495,9 @@
             "$ref": "#/definitions/jsonschema.Schema"
           },
           "type": "array"
+        },
+        "title": {
+          "type": "string"
         }
       },
       "required": [
@@ -533,6 +564,9 @@
           },
           "type": "array"
         },
+        "title": {
+          "type": "string"
+        },
         "type": {
           "const": "object",
           "type": "string"
@@ -545,7 +579,7 @@
       "type": "object"
     },
     "jsonschema.Reference": {
-      "additionalProperties": {},
+      "additionalProperties": false,
       "properties": {
         "$comment": {
           "type": "string"
@@ -554,6 +588,9 @@
           "type": "string"
         },
         "description": {
+          "type": "string"
+        },
+        "title": {
           "type": "string"
         }
       },
@@ -608,6 +645,9 @@
         "minItems": {
           "type": "number"
         },
+        "title": {
+          "type": "string"
+        },
         "type": {
           "const": "array",
           "type": "string"
@@ -647,7 +687,11 @@
           "type": "array"
         },
         "format": {
-          "const": "date-time",
+          "enum": [
+            "date-time",
+            "uri",
+            "timestamp"
+          ],
           "type": "string"
         },
         "maxLength": {
@@ -657,6 +701,9 @@
           "type": "number"
         },
         "pattern": {
+          "type": "string"
+        },
+        "title": {
           "type": "string"
         },
         "type": {

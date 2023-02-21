@@ -49,7 +49,7 @@ export interface CloudFormationRegistryResource extends ImplicitJsonSchemaRecord
   /**
    * Reusable schema type definitions used in this schema.
    */
-  readonly definitions?: Record<string, jsonschema.ConcreteSchema>;
+  readonly definitions?: Record<string, jsonschema.Schema>; // FIXME: Kaizen changed this from ConcreteSchema to fix 1 isue.
   readonly handlers?: Handlers;
   readonly tagging?: ResourceTagging;
   readonly taggable?: boolean;

@@ -16,7 +16,7 @@ export async function loadCloudFormationRegistryDirectory(
   );
 
   const files = await glob(path.join(directory, '*.json'));
-  return await loader.loadFiles(files);
+  return loader.loadFiles(files);
 }
 
 export interface CloudFormationRegistryResources {

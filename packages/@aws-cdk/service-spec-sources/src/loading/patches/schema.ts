@@ -3,8 +3,7 @@ import { JsonPatch } from './json-patch';
 export class Schema {
   private readonly _reports: Report[] = [];
   private readonly _patches: JsonPatch[] = [];
-  public constructor(public readonly schema: any) {
-  }
+  public constructor(public readonly schema: any) {}
 
   public applyPatches() {
     JsonPatch.apply(this.schema, ...this._patches);

@@ -14,6 +14,9 @@ export interface JsonLens {
   /** Type test for whether the current lens points to an object. */
   isJsonObject(): this is JsonObjectLens;
 
+  /** Test for whether the current lens points to a reference. */
+  isReference(): boolean;
+
   /** Fully replace the current value with a different one. */
   replaceValue(reason: string, newValue: any): void;
 }

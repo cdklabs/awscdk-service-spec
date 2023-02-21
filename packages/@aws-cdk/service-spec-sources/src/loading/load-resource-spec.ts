@@ -3,7 +3,9 @@ import { assertSuccess } from '@cdklabs/tskb';
 import { Loader, LoadResult } from './loader';
 import { ResourceSpecification } from '../types';
 
-export async function loadDefaultResourceSpecification(mustValidate = true): Promise<LoadResult<ResourceSpecification>> {
+export async function loadDefaultResourceSpecification(
+  mustValidate = true,
+): Promise<LoadResult<ResourceSpecification>> {
   const loader = await Loader.fromSchemaFile<ResourceSpecification>('ResourceSpecification.schema.json', mustValidate);
 
   const result = await loader.loadFile(

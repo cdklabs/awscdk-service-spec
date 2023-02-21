@@ -38,7 +38,11 @@ export class SchemaLens implements JsonLens, JsonObjectLens {
   /** Type test for whether the current lens points to a json object. */
   isJsonObject(): this is JsonObjectLens {
     return typeof this.value === 'object' && this.value && this.value.type !== undefined;
-  };
+  }
+
+  isReference(): boolean {
+    return this.value && this.value.$ref !== undefined;
+  }
 
   wasRemoved(key: any) {
     return this.removedKeys.includes(key);
