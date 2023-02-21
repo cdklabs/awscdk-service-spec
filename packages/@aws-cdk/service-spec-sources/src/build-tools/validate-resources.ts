@@ -5,16 +5,14 @@ import { errorMessage } from '@cdklabs/tskb';
 import { loadDefaultCloudFormationRegistryResources } from '../loading/load-cloudformation-registry';
 
 async function main() {
-  const regions = await loadDefaultCloudFormationRegistryResources();
+  const allResources = await loadDefaultCloudFormationRegistryResources();
 
   let errors = 0;
-  for (const region of regions) {
-    for (const fail of region.failures) {
-      console.log(errorMessage(fail));
+  for (const fail of allResources.warnings) {
+    console.log(errorMessage(fail));
 
-      errors += 1;
-      process.exitCode = 1;
-    }
+    errors += 1;
+    process.exitCode = 1;
   }
 
   if (errors > 0) {
@@ -22,7 +20,7 @@ async function main() {
   }
 }
 
-main().catch(e => {
+main().catch((e) => {
   console.error(e);
   process.exitCode = 1;
 });
