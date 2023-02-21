@@ -30,7 +30,7 @@ export interface Resource extends Entity {
   readonly attributes: Record<string, Attribute>;
   readonly validations?: unknown;
   readonly identifier?: ResourceIdentifier;
-  readonly isStateful?: boolean;
+  isStateful?: boolean;
 }
 
 export type ResourceProperties = Record<string, Property>;

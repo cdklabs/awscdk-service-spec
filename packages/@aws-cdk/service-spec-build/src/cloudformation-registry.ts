@@ -1,5 +1,12 @@
 import { PropertyType, Resource, ResourceProperties, SpecDatabase, TypeDefinition } from '@aws-cdk/service-spec';
-import { CloudFormationRegistryResource, ImplicitJsonSchemaRecord, jsonschema, simplePropNameFromJsonPtr, resourcespec, unifyAllSchemas } from '@aws-cdk/service-spec-sources';
+import {
+  CloudFormationRegistryResource,
+  ImplicitJsonSchemaRecord,
+  jsonschema,
+  simplePropNameFromJsonPtr,
+  resourcespec,
+  unifyAllSchemas,
+} from '@aws-cdk/service-spec-sources';
 import { Fail, failure, Failures, isFailure, Result, tryCatch, using, ref } from '@cdklabs/tskb';
 
 export interface LoadCloudFormationRegistryResourceOptions {
@@ -51,19 +58,21 @@ export function loadCloudFormationRegistryResource(options: LoadCloudFormationRe
     for (const [name, property] of Object.entries(source.properties)) {
       const resolved = resolve(property);
 
-      withResult(
-        schemaTypeToModelType(name, resolved, fail.in(`property ${name}`)),
-        type => {
-          target[name] = {
-            type,
-            documentation: resolved.schema.description,
-            required: ifTrue((source.required ?? []).includes(name)),
-          };
-        });
+      withResult(schemaTypeToModelType(name, resolved, fail.in(`property ${name}`)), (type) => {
+        target[name] = {
+          type,
+          documentation: resolved.schema.description,
+          required: ifTrue((source.required ?? []).includes(name)),
+        };
+      });
     }
   }
 
-  function schemaTypeToModelType(propertyName: string, resolved: jsonschema.ResolvedSchema, fail: Fail): Result<PropertyType> {
+  function schemaTypeToModelType(
+    propertyName: string,
+    resolved: jsonschema.ResolvedSchema,
+    fail: Fail,
+  ): Result<PropertyType> {
     return tryCatch(fail, (): Result<PropertyType> => {
       const nameHint = resolved.referenceName ?? propertyName;
 
@@ -73,9 +82,10 @@ export function loadCloudFormationRegistryResource(options: LoadCloudFormationRe
 
         case 'array':
           // FIXME: insertionOrder, uniqueItems
-          return using(
-            schemaTypeToModelType(nameHint, resolve(resolved.schema.items), fail),
-            element => ({ type: 'array', element }));
+          return using(schemaTypeToModelType(nameHint, resolve(resolved.schema.items), fail), (element) => ({
+            type: 'array',
+            element,
+          }));
 
         case 'boolean':
           return { type: 'boolean' };
@@ -97,15 +107,14 @@ export function loadCloudFormationRegistryResource(options: LoadCloudFormationRe
         throw new Error('Map types should have only additionalProperties or patternProperties');
       }
       if (schema.additionalProperties) {
-        return using(
-          schemaTypeToModelType(nameHint, resolve(schema.additionalProperties), fail),
-          element => ({ type: 'map', element }));
+        return using(schemaTypeToModelType(nameHint, resolve(schema.additionalProperties), fail), (element) => ({
+          type: 'map',
+          element,
+        }));
       } else if (schema.patternProperties) {
-        return using(
-          unifyAllSchemas(Object.values(schema.patternProperties)),
-          unifiedType => using(
-            schemaTypeToModelType(nameHint, resolve(unifiedType), fail),
-            element => ({ type: 'map', element })));
+        return using(unifyAllSchemas(Object.values(schema.patternProperties)), (unifiedType) =>
+          using(schemaTypeToModelType(nameHint, resolve(unifiedType), fail), (element) => ({ type: 'map', element })),
+        );
       } else {
         // Fully untyped map
         // FIXME: is 'json' really a primitive type, or do we mean `Map<unknown>` ?
@@ -133,10 +142,12 @@ export function loadCloudFormationRegistryResource(options: LoadCloudFormationRe
   function copyAttributes(source: CloudFormationRegistryResource, target: ResourceProperties, fail: Fail) {
     // The attributes are (currently) in `readOnlyResources`. Because of a representation issue, this doesn't cover
     // everything, so also look for the legacy spec.
-    const attributeNames = Array.from(new Set([
-      ...(source.readOnlyProperties ?? []).map(simplePropNameFromJsonPtr),
-      ...Object.keys(options.specResource?.Attributes ?? {}),
-    ]));
+    const attributeNames = Array.from(
+      new Set([
+        ...(source.readOnlyProperties ?? []).map(simplePropNameFromJsonPtr),
+        ...Object.keys(options.specResource?.Attributes ?? {}),
+      ]),
+    );
 
     for (const name of attributeNames) {
       if (!source.properties[name]) {
@@ -145,15 +156,13 @@ export function loadCloudFormationRegistryResource(options: LoadCloudFormationRe
       }
       const resolved = resolve(source.properties[name]);
 
-      withResult(
-        schemaTypeToModelType(name, resolved, fail.in(`attribute ${name}`)),
-        type => {
-          target[name] = {
-            type,
-            documentation: resolved.schema.description,
-            required: ifTrue((source.required ?? []).includes(name)),
-          };
-        });
+      withResult(schemaTypeToModelType(name, resolved, fail.in(`attribute ${name}`)), (type) => {
+        target[name] = {
+          type,
+          documentation: resolved.schema.description,
+          required: ifTrue((source.required ?? []).includes(name)),
+        };
+      });
     }
   }
 
@@ -165,7 +174,6 @@ export function loadCloudFormationRegistryResource(options: LoadCloudFormationRe
     }
   }
 }
-
 
 function last<A>(xs: A[]): A {
   return xs[xs.length - 1];
