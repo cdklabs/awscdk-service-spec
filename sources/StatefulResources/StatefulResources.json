@@ -1,33 +1,3 @@
-{
-  "ResourceTypes": {
-    "AWS::CloudFormation::Stack" : {},
-    "AWS::Backup::BackupVault" : {},
-    "AWS::Cognito::UserPool" : {},
-    "AWS::DocDB::DBCluster" : {},
-    "AWS::DocDB::DBInstance" : {},
-    "AWS::DynamoDB::GlobalTable" : {},
-    "AWS::DynamoDB::Table" : {},
-    "AWS::EC2::Volume" : {},
-    "AWS::EFS::FileSystem" : {},
-    "AWS::EMR::Cluster" : {},
-    "AWS::ElastiCache::CacheCluster" : {},
-    "AWS::ElastiCache::ReplicationGroup" : {},
-    "AWS::Elasticsearch::Domain" : {},
-    "AWS::FSx::FileSystem" : {},
-    "AWS::Logs::LogGroup" : {},
-    "AWS::Neptune::DBCluster" : {},
-    "AWS::Neptune::DBInstance" : {},
-    "AWS::OpenSearchService::Domain" : {},
-    "AWS::Organizations::Account" : {},
-    "AWS::QLDB::Ledger" : {},
-    "AWS::RDS::DBCluster" : {},
-    "AWS::RDS::DBInstance" : {},
-    "AWS::Redshift::Cluster" : {},
-    "AWS::SDB::Domain" : {},
-    "AWS::SQS::Queue" : {},
-    "AWS::S3::Bucket" : {
-      "DeleteRequiresEmptyResource": true
-    },
-    "AWS::SecretsManager::Secret" : {}
-  }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:afb1acce27ee07c0cf3b8e461e853dc2ce2ab7961c3a23a3a0d67f179c157763
+size 1023
