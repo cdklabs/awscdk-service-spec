@@ -1,26 +1,3 @@
-{
-  "typeName" : "AWS::AppStream::StackUserAssociation",
-  "description" : "Resource Type definition for AWS::AppStream::StackUserAssociation",
-  "additionalProperties" : false,
-  "properties" : {
-    "Id" : {
-      "type" : "string"
-    },
-    "SendEmailNotification" : {
-      "type" : "boolean"
-    },
-    "UserName" : {
-      "type" : "string"
-    },
-    "StackName" : {
-      "type" : "string"
-    },
-    "AuthenticationType" : {
-      "type" : "string"
-    }
-  },
-  "required" : [ "StackName", "UserName", "AuthenticationType" ],
-  "createOnlyProperties" : [ "/properties/StackName", "/properties/AuthenticationType", "/properties/SendEmailNotification", "/properties/UserName" ],
-  "primaryIdentifier" : [ "/properties/Id" ],
-  "readOnlyProperties" : [ "/properties/Id" ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:0c0c639443dbb6e08ab942af4c5087cfd1091feeba36b5aadcbda262d0d04ca3
+size 780

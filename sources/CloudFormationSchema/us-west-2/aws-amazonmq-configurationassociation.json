@@ -1,35 +1,3 @@
-{
-  "typeName" : "AWS::AmazonMQ::ConfigurationAssociation",
-  "description" : "Resource Type definition for AWS::AmazonMQ::ConfigurationAssociation",
-  "additionalProperties" : false,
-  "properties" : {
-    "Id" : {
-      "type" : "string"
-    },
-    "Broker" : {
-      "type" : "string"
-    },
-    "Configuration" : {
-      "$ref" : "#/definitions/ConfigurationId"
-    }
-  },
-  "definitions" : {
-    "ConfigurationId" : {
-      "type" : "object",
-      "additionalProperties" : false,
-      "properties" : {
-        "Revision" : {
-          "type" : "integer"
-        },
-        "Id" : {
-          "type" : "string"
-        }
-      },
-      "required" : [ "Revision", "Id" ]
-    }
-  },
-  "required" : [ "Configuration", "Broker" ],
-  "createOnlyProperties" : [ "/properties/Broker" ],
-  "primaryIdentifier" : [ "/properties/Id" ],
-  "readOnlyProperties" : [ "/properties/Id" ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:985edff0a6b4c8a422916eb9317ed84eea60e3e2c65298cf3070c6f36ee7d7f9
+size 879

@@ -1,26 +1,3 @@
-{
-  "typeName" : "AWS::ServiceCatalog::PortfolioPrincipalAssociation",
-  "description" : "Resource Type definition for AWS::ServiceCatalog::PortfolioPrincipalAssociation",
-  "additionalProperties" : false,
-  "properties" : {
-    "Id" : {
-      "type" : "string"
-    },
-    "PrincipalARN" : {
-      "type" : "string"
-    },
-    "AcceptLanguage" : {
-      "type" : "string"
-    },
-    "PortfolioId" : {
-      "type" : "string"
-    },
-    "PrincipalType" : {
-      "type" : "string"
-    }
-  },
-  "required" : [ "PortfolioId", "PrincipalType", "PrincipalARN" ],
-  "createOnlyProperties" : [ "/properties/PortfolioId", "/properties/AcceptLanguage", "/properties/PrincipalARN", "/properties/PrincipalType" ],
-  "primaryIdentifier" : [ "/properties/Id" ],
-  "readOnlyProperties" : [ "/properties/Id" ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:c08014f5b71a22679bcd816d3a7092280ce029223d3900868cfffe8722335b71
+size 796
