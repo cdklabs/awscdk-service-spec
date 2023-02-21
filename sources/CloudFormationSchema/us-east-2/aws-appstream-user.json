@@ -1,29 +1,3 @@
-{
-  "typeName" : "AWS::AppStream::User",
-  "description" : "Resource Type definition for AWS::AppStream::User",
-  "additionalProperties" : false,
-  "properties" : {
-    "UserName" : {
-      "type" : "string"
-    },
-    "LastName" : {
-      "type" : "string"
-    },
-    "Id" : {
-      "type" : "string"
-    },
-    "FirstName" : {
-      "type" : "string"
-    },
-    "MessageAction" : {
-      "type" : "string"
-    },
-    "AuthenticationType" : {
-      "type" : "string"
-    }
-  },
-  "required" : [ "UserName", "AuthenticationType" ],
-  "createOnlyProperties" : [ "/properties/FirstName", "/properties/AuthenticationType", "/properties/MessageAction", "/properties/LastName", "/properties/UserName" ],
-  "primaryIdentifier" : [ "/properties/Id" ],
-  "readOnlyProperties" : [ "/properties/Id" ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:6e1147e128d51e5fd8e4b2ec541ae2803e7eb3dc888a6ef191dd80b2e88678bb
+size 792

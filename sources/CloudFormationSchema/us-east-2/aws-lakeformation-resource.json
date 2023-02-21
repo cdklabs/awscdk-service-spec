@@ -1,22 +1,3 @@
-{
-  "typeName" : "AWS::LakeFormation::Resource",
-  "description" : "Resource Type definition for AWS::LakeFormation::Resource",
-  "additionalProperties" : false,
-  "properties" : {
-    "Id" : {
-      "type" : "string"
-    },
-    "ResourceArn" : {
-      "type" : "string"
-    },
-    "UseServiceLinkedRole" : {
-      "type" : "boolean"
-    },
-    "RoleArn" : {
-      "type" : "string"
-    }
-  },
-  "required" : [ "ResourceArn", "UseServiceLinkedRole" ],
-  "primaryIdentifier" : [ "/properties/Id" ],
-  "readOnlyProperties" : [ "/properties/Id" ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:4a70bfe4972813bb6809a9d0c69cce521c23011f31f73b1de42bdb29cf8431db
+size 545

@@ -1,35 +1,3 @@
-{
-  "typeName" : "AWS::EMR::SecurityConfiguration",
-  "description" : "Use a SecurityConfiguration resource to configure data encryption, Kerberos authentication, and Amazon S3 authorization for EMRFS.",
-  "tagging" : {
-    "taggable" : false
-  },
-  "properties" : {
-    "Name" : {
-      "description" : "The name of the security configuration.",
-      "type" : "string"
-    },
-    "SecurityConfiguration" : {
-      "description" : "The security configuration details in JSON format.",
-      "type" : [ "object", "string" ]
-    }
-  },
-  "additionalProperties" : false,
-  "required" : [ "SecurityConfiguration" ],
-  "createOnlyProperties" : [ "/properties/Name", "/properties/SecurityConfiguration" ],
-  "primaryIdentifier" : [ "/properties/Name" ],
-  "handlers" : {
-    "create" : {
-      "permissions" : [ "elasticmapreduce:CreateSecurityConfiguration", "elasticmapreduce:DescribeSecurityConfiguration" ]
-    },
-    "read" : {
-      "permissions" : [ "elasticmapreduce:DescribeSecurityConfiguration" ]
-    },
-    "delete" : {
-      "permissions" : [ "elasticmapreduce:DeleteSecurityConfiguration" ]
-    },
-    "list" : {
-      "permissions" : [ "elasticmapreduce:ListSecurityConfigurations" ]
-    }
-  }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:73c8f1a4b3a13da07085c2fa462fc8ecb611bbb094ba88b6731b2e21c3b7ca34
+size 1205
