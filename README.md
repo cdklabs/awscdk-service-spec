@@ -1,14 +1,13 @@
-# AWS CDK CloudFormation Tools
+# AWS CDK Service Specification
 
-To update the CloudFormation spec, you can run `bump-cfnspec.sh` from a clean repo, as so -
+Source of truth for CDK code generation.
 
-```console
-./scripts/bump-cfnspec.sh
-```
+## Contributing
 
-If you wish to only update the CFN spec, make sure to install all dependencies and build the `cfnspec` module,
-and then you can just run:
+This repository uses [Git LFS](https://git-lfs.com/). Before you clone this repository, run the following commands
+*once*:
 
-```console
-yarn update
+```sh
+brew install git-lfs   # Or equivalent, see the website above
+git lfs install        # Only need to run this once
 ```

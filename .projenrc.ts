@@ -1,6 +1,8 @@
 import * as pj from 'projen';
 import { MergeQueue, MonorepoRoot, MonorepoTypeScriptProject } from './projenrc';
 
+const lfsPatterns = ['sources/**/*.json'];
+
 const repo = new MonorepoRoot({
   defaultReleaseBranch: 'main',
   name: 'awscdk-service-spec',
@@ -25,12 +27,20 @@ const repo = new MonorepoRoot({
   githubOptions: {
     mergify: false,
   },
+  gitOptions: {
+    lfsPatterns,
+  },
 });
 new MergeQueue(repo, {
   autoMergeOptions: {
     secret: 'PROJEN_GITHUB_TOKEN',
   },
 });
+
+// Tell GitHub to hide these files from diffs and not count the lines by default
+for (const lfsPattern of lfsPatterns) {
+  repo.gitattributes.addAttributes(lfsPattern, 'linguist-generated=true');
+}
 
 const tsKb = new MonorepoTypeScriptProject({
   parent: repo,

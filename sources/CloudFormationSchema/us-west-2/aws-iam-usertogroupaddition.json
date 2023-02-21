@@ -1,23 +1,3 @@
-{
-  "typeName" : "AWS::IAM::UserToGroupAddition",
-  "description" : "Resource Type definition for AWS::IAM::UserToGroupAddition",
-  "additionalProperties" : false,
-  "properties" : {
-    "Id" : {
-      "type" : "string"
-    },
-    "GroupName" : {
-      "type" : "string"
-    },
-    "Users" : {
-      "type" : "array",
-      "uniqueItems" : false,
-      "items" : {
-        "type" : "string"
-      }
-    }
-  },
-  "required" : [ "GroupName", "Users" ],
-  "primaryIdentifier" : [ "/properties/Id" ],
-  "readOnlyProperties" : [ "/properties/Id" ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:bd7426a918867eaf2c33f4e2da4088a95e7cbf5c2c46956bf390278e31b4b590
+size 544

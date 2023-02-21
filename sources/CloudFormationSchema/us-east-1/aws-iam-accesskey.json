@@ -1,26 +1,3 @@
-{
-  "typeName" : "AWS::IAM::AccessKey",
-  "description" : "Resource Type definition for AWS::IAM::AccessKey",
-  "additionalProperties" : false,
-  "properties" : {
-    "Id" : {
-      "type" : "string"
-    },
-    "SecretAccessKey" : {
-      "type" : "string"
-    },
-    "Serial" : {
-      "type" : "integer"
-    },
-    "Status" : {
-      "type" : "string"
-    },
-    "UserName" : {
-      "type" : "string"
-    }
-  },
-  "required" : [ "UserName" ],
-  "readOnlyProperties" : [ "/properties/SecretAccessKey", "/properties/Id" ],
-  "createOnlyProperties" : [ "/properties/UserName", "/properties/Serial" ],
-  "primaryIdentifier" : [ "/properties/Id" ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:b1f36ca9cad383e463115003fbc6ad85be054f18ae72685a5fdf3c86ae4001c9
+size 647

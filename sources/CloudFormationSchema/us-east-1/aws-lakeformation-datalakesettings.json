@@ -1,28 +1,3 @@
-{
-  "typeName" : "AWS::LakeFormation::DataLakeSettings",
-  "description" : "Resource Type definition for AWS::LakeFormation::DataLakeSettings",
-  "additionalProperties" : false,
-  "properties" : {
-    "Admins" : {
-      "$ref" : "#/definitions/Admins"
-    },
-    "TrustedResourceOwners" : {
-      "type" : "array",
-      "uniqueItems" : false,
-      "items" : {
-        "type" : "string"
-      }
-    },
-    "Id" : {
-      "type" : "string"
-    }
-  },
-  "definitions" : {
-    "Admins" : {
-      "type" : "object",
-      "additionalProperties" : false
-    }
-  },
-  "primaryIdentifier" : [ "/properties/Id" ],
-  "readOnlyProperties" : [ "/properties/Id" ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:bd8313ffd3c995f29b7e91ea1ff78b1b915fa0bb456df38c7184259ae813c738
+size 654
