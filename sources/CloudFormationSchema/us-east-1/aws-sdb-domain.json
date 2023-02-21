@@ -1,15 +1,3 @@
-{
-  "typeName" : "AWS::SDB::Domain",
-  "description" : "Resource Type definition for AWS::SDB::Domain",
-  "additionalProperties" : false,
-  "properties" : {
-    "Id" : {
-      "type" : "string"
-    },
-    "Description" : {
-      "type" : "string"
-    }
-  },
-  "primaryIdentifier" : [ "/properties/Id" ],
-  "readOnlyProperties" : [ "/properties/Id" ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:3595d062ccc714f5b820f240c2ddddbd5845c9a4ee38b5dbc895f1570db90145
+size 351

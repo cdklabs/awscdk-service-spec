@@ -4223,10 +4223,31 @@ progress@^2.0.3:
   resolved "https://registry.yarnpkg.com/progress/-/progress-2.0.3.tgz#7e8cf8d8f5b8f239c1bc68beb4eb78567d572ef8"
   integrity sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==
 
-projen@^0.67.42, projen@^0.67.60:
+projen@^0.67.60:
   version "0.67.60"
   resolved "https://registry.yarnpkg.com/projen/-/projen-0.67.60.tgz#b9c1a98aed6769f04c7ba1af9069cdccc0ecf2ed"
   integrity sha512-4S9Dl9qT6tc16Fjbkw+AQeaoxOkT+55rwin9oIk6sZTZD/EjP+pr/auswZHGOqH+notUmhhVOzBRBrz6pMx/Jw==
+  dependencies:
+    "@iarna/toml" "^2.2.5"
+    case "^1.6.3"
+    chalk "^4.1.2"
+    comment-json "4.2.2"
+    conventional-changelog-config-spec "^2.1.0"
+    fast-json-patch "^3.1.1"
+    fs-extra "^9.1.0"
+    glob "^8"
+    ini "^2.0.0"
+    semver "^7.3.8"
+    shx "^0.3.4"
+    xmlbuilder2 "^2.4.1"
+    yaml "2.0.0"
+    yargs "^16.2.0"
+    zlib "^1.0.5"
+
+projen@^0.67.62:
+  version "0.67.62"
+  resolved "https://registry.yarnpkg.com/projen/-/projen-0.67.62.tgz#51d5baab0da9b2dd295070b6d7d2984046b88dce"
+  integrity sha512-EPIjOSgEMGBw5dizr0VdPJzZj/d9lKs2jpY/L0qehujRwVHrhiB/S4RT6wJkr0ULSuhb1AqhRxxBPmlGN3zYrw==
   dependencies:
     "@iarna/toml" "^2.2.5"
     case "^1.6.3"

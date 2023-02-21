@@ -1,4 +1,4 @@
-import { javascript, Component, JsonPatch } from 'projen';
+import { javascript, Component } from 'projen';
 import { AutoMerge, AutoMergeOptions } from './auto-merge';
 
 /**
@@ -31,9 +31,7 @@ export class MergeQueue extends Component {
     }
 
     const buildWorkflow = project.github?.tryFindWorkflow('build');
-    buildWorkflow?.file?.patch(JsonPatch.remove('/on/pull_request'));
     buildWorkflow?.on({
-      pullRequestTarget: {},
       mergeGroup: {
         branches: ['main'],
       },

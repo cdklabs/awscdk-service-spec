@@ -1,20 +1,3 @@
-{
-  "typeName" : "AWS::Pinpoint::VoiceChannel",
-  "description" : "Resource Type definition for AWS::Pinpoint::VoiceChannel",
-  "additionalProperties" : false,
-  "properties" : {
-    "Id" : {
-      "type" : "string"
-    },
-    "Enabled" : {
-      "type" : "boolean"
-    },
-    "ApplicationId" : {
-      "type" : "string"
-    }
-  },
-  "required" : [ "ApplicationId" ],
-  "createOnlyProperties" : [ "/properties/ApplicationId" ],
-  "primaryIdentifier" : [ "/properties/Id" ],
-  "readOnlyProperties" : [ "/properties/Id" ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:70bda4173756033bf77e362b3a089a4b1c5e7d4316778faa0bd8185df17bb222
+size 521
