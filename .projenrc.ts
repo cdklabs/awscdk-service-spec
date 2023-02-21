@@ -52,17 +52,19 @@ for (const tsconfig of [serviceSpecSources.tsconfig, serviceSpecSources.tsconfig
 }
 
 const serviceSpecSchemaTask = serviceSpecSources.addTask('gen-schemas', {
-  steps: ['CloudFormationRegistryResource', 'ResourceSpecification', 'CloudFormationDocumentation'].map((typeName: string) => ({
-    exec: [
-      'ts-json-schema-generator',
-      '--tsconfig',
-      'tsconfig.json',
-      '--type',
-      typeName,
-      '--out',
-      `schemas/${typeName}.schema.json`,
-    ].join(' '),
-  })),
+  steps: ['CloudFormationRegistryResource', 'ResourceSpecification', 'CloudFormationDocumentation'].map(
+    (typeName: string) => ({
+      exec: [
+        'ts-json-schema-generator',
+        '--tsconfig',
+        'tsconfig.json',
+        '--type',
+        typeName,
+        '--out',
+        `schemas/${typeName}.schema.json`,
+      ].join(' '),
+    }),
+  ),
 });
 
 // FIXME: Needs to automatically run, but not yet because not everything validates yet
