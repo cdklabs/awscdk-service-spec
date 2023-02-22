@@ -281,6 +281,19 @@ export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
 
     this.parent = props.parent;
 
+    // jest config
+    if (this.jest?.config && this.jest.config.preset === 'ts-jest') {
+      delete this.jest.config.globals?.['ts-jest'];
+      this.jest.config.transform = {
+        '^.+\\.tsx?$': [
+          'ts-jest',
+          {
+            tsconfig: this.tsconfigDev.fileName,
+          },
+        ],
+      };
+    }
+
     // Tasks
     this.tasks.tryFind('default')?.reset('(cd `git rev-parse --show-toplevel`; npx projen default)');
     this.tasks.removeTask('clobber');
