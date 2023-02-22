@@ -1,5 +1,13 @@
 import canonicalize from 'canonicalize';
-import { TypeKeyWitness, STRING_KEY_WITNESS, OBJECT_KEY_WITNESS, ARRAY_KEY_WITNESS } from './field-witnesses';
+import {
+  TypeKeyWitness,
+  STRING_KEY_WITNESS,
+  OBJECT_KEY_WITNESS,
+  ARRAY_KEY_WITNESS,
+  BOOLEAN_KEY_WITNESS,
+  NUMBER_KEY_WITNESS,
+  retainRelevantKeywords,
+} from './field-witnesses';
 import { JsonLens, JsonObjectLens, NO_MISTAKE } from './json-lens';
 import { JsonPatch } from './json-patch';
 import { PatchReport, SchemaLens } from './json-patcher';
@@ -27,7 +35,7 @@ export const allPatchers = onlyObjects(
     removeAdditionalProperties,
     replaceArrayLengthProps,
     removeBooleanPatterns,
-    canonicalizeUnionType,
+    explodeTypeArray,
     canonicalizeTypeOperators('oneOf'),
     canonicalizeTypeOperators('anyOf'),
     canonicalizeTypeOperators('allOf'),
@@ -42,6 +50,9 @@ export const allPatchers = onlyObjects(
     makeKeywordDropper('string', STRING_KEY_WITNESS),
     makeKeywordDropper('object', OBJECT_KEY_WITNESS),
     makeKeywordDropper('array', ARRAY_KEY_WITNESS),
+    makeKeywordDropper('boolean', BOOLEAN_KEY_WITNESS),
+    makeKeywordDropper('integer', NUMBER_KEY_WITNESS),
+    makeKeywordDropper('number', NUMBER_KEY_WITNESS),
   ),
 );
 
@@ -84,15 +95,26 @@ export function removeBooleanPatterns(lens: JsonObjectLens) {
   }
 }
 
-export function canonicalizeUnionType(lens: JsonObjectLens) {
+/**
+ * If `type` is an array, either type is fine, and whatever keywords are on the type
+ * that apply to any of the types in the array apply to that type.
+ */
+export function explodeTypeArray(lens: JsonObjectLens) {
   if (Array.isArray(lens.value.type)) {
     const oneOf = lens.value.type.map((v) => {
       return {
         type: v,
-        ...restOfObjectWithout(lens.value, ['type']),
+        ...retainRelevantKeywords(lens.value, witnessForType(v)),
       };
     });
-    lens.replaceValue('type should not be an array', { oneOf: oneOf });
+
+    // Get a list of keys that were in the original but aren't in any of the more specific types
+    const allKeys = new Set(Object.keys(lens.value));
+    for (const usedKey of oneOf.flatMap((x) => Object.keys(x))) {
+      allKeys.delete(usedKey);
+    }
+
+    lens.replaceValue(NO_MISTAKE, { oneOf });
   }
 }
 
@@ -400,4 +422,22 @@ function makeKeywordDropper(typeName: string, witness: TypeKeyWitness<any>) {
       dropIrrelevantKeywords(lens, `type=${typeName}`, witness);
     }
   };
+}
+
+function witnessForType(type: string): TypeKeyWitness<any> {
+  switch (type) {
+    case 'string':
+      return STRING_KEY_WITNESS;
+    case 'object':
+      return OBJECT_KEY_WITNESS;
+    case 'number':
+    case 'integer':
+      return NUMBER_KEY_WITNESS;
+    case 'array':
+      return ARRAY_KEY_WITNESS;
+
+    default:
+      throw new Error(`Don't recognize type: ${type}`);
+  }
+
 }

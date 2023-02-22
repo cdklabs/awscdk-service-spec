@@ -22,6 +22,19 @@ export const STRING_KEY_WITNESS: TypeKeyWitness<jsonschema.String> = {
   title: true,
 };
 
+export const NUMBER_KEY_WITNESS: TypeKeyWitness<jsonschema.Number> = {
+  type: true,
+  $comment: true,
+  default: true,
+  description: true,
+  enum: true,
+  format: true,
+  maximum: true,
+  minimum: true,
+  multipleOf: true,
+  title: true,
+};
+
 export const OBJECT_KEY_WITNESS: TypeKeyWitness<jsonschema.Object> = {
   type: true,
   $comment: true,
@@ -48,3 +61,15 @@ export const ARRAY_KEY_WITNESS: TypeKeyWitness<jsonschema.SchemaArray> = {
   title: true,
   uniqueItems: true,
 };
+
+export const BOOLEAN_KEY_WITNESS: TypeKeyWitness<jsonschema.Boolean> = {
+  type: true,
+  $comment: true,
+  description: true,
+  default: true,
+  title: true,
+};
+
+export function retainRelevantKeywords<A extends object>(x: object, witness: TypeKeyWitness<A>): A {
+  return Object.fromEntries(Object.keys(witness).map((k) => [k, (x as any)[k]])) as any;
+}
