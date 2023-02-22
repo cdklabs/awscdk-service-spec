@@ -19,6 +19,7 @@
   "devDependencies": {
     "@aws-cdk/service-spec-build": "^0.0.0",
     "@aws-cdk/service-spec-sources": "^0.0.0",
+    "@cdklabs/tskb": "^0.0.0",
     "@cdklabs/typewriter": "^0.0.0",
     "@jsii/spec": "^1.75.0",
     "@types/fs-extra": "ts3.9",

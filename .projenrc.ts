@@ -126,16 +126,23 @@ const cfnResources = new MonorepoTypeScriptProject({
     typewriter,
     serviceSpecBuild,
     serviceSpecSources,
+    tsKb,
     'ts-node',
     '@jsii/spec',
     'fs-extra',
     '@types/fs-extra@ts3.9',
   ],
 });
+cfnResources.eslint?.addOverride({
+  files: ['src/cli/**/*.ts', 'test/**/*.ts'],
+  rules: {
+    'import/no-extraneous-dependencies': 'off',
+  },
+});
 cfnResources.addGitIgnore('src/services/**');
 cfnResources.preCompileTask.spawn(
   cfnResources.tasks.addTask('generate', {
-    exec: 'ts-node src/cli/generate.ts',
+    exec: 'ts-node src/cli/main.ts',
     receiveArgs: true,
   }),
 );

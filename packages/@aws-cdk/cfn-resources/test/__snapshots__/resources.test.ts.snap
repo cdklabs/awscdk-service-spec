@@ -1,0 +1,203 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AWS::ApiGateway::RestApi 1`] = `
+"export interface CfnRestApiProps {
+  readonly apiKeySourceType: string;
+
+  readonly binaryMediaTypes: Array<string>;
+
+  readonly body: any;
+
+  readonly bodyS3Location: any;
+
+  readonly cloneFrom: string;
+
+  readonly endpointConfiguration: any;
+
+  readonly description: string;
+
+  readonly disableExecuteApiEndpoint: boolean;
+
+  readonly failOnWarnings: boolean;
+
+  readonly name: string;
+
+  readonly minimumCompressionSize: number;
+
+  readonly mode: string;
+
+  readonly policy: any;
+
+  readonly parameters: any;
+
+  readonly tags: Array<any>;
+}
+"
+`;
+
+exports[`AWS::IAM::Role 1`] = `
+"export interface CfnRoleProps {
+  readonly assumeRolePolicyDocument: any;
+
+  readonly description: string;
+
+  readonly managedPolicyArns: Array<string>;
+
+  readonly maxSessionDuration: number;
+
+  readonly path: string;
+
+  readonly permissionsBoundary: string;
+
+  readonly policies: Array<any>;
+
+  readonly roleName: string;
+
+  readonly tags: Array<any>;
+}
+"
+`;
+
+exports[`AWS::Lambda::Function 1`] = `
+"export interface CfnFunctionProps {
+  readonly description: string;
+
+  readonly tracingConfig: any;
+
+  readonly vpcConfig: any;
+
+  readonly reservedConcurrentExecutions: number;
+
+  readonly snapStart: any;
+
+  readonly fileSystemConfigs: Array<any>;
+
+  readonly functionName: string;
+
+  readonly runtime: string;
+
+  readonly kmsKeyArn: string;
+
+  readonly packageType: string;
+
+  readonly codeSigningConfigArn: string;
+
+  readonly layers: Array<string>;
+
+  readonly tags: Array<any>;
+
+  readonly imageConfig: any;
+
+  readonly memorySize: number;
+
+  readonly deadLetterConfig: any;
+
+  readonly timeout: number;
+
+  readonly handler: string;
+
+  readonly code: any;
+
+  readonly role: string;
+
+  readonly environment: any;
+
+  readonly ephemeralStorage: any;
+
+  readonly architectures: Array<string>;
+}
+"
+`;
+
+exports[`AWS::S3::Bucket 1`] = `
+"export interface CfnBucketProps {
+  readonly accelerateConfiguration: any;
+
+  readonly accessControl: string;
+
+  readonly analyticsConfigurations: Array<any>;
+
+  readonly bucketEncryption: any;
+
+  readonly bucketName: string;
+
+  readonly corsConfiguration: any;
+
+  readonly intelligentTieringConfigurations: Array<any>;
+
+  readonly inventoryConfigurations: Array<any>;
+
+  readonly lifecycleConfiguration: any;
+
+  readonly loggingConfiguration: any;
+
+  readonly metricsConfigurations: Array<any>;
+
+  readonly notificationConfiguration: any;
+
+  readonly objectLockConfiguration: any;
+
+  readonly objectLockEnabled: boolean;
+
+  readonly ownershipControls: any;
+
+  readonly publicAccessBlockConfiguration: any;
+
+  readonly replicationConfiguration: any;
+
+  readonly tags: Array<any>;
+
+  readonly versioningConfiguration: any;
+
+  readonly websiteConfiguration: any;
+}
+"
+`;
+
+exports[`AWS::SQS::Queue 1`] = `
+"export interface CfnQueueProps {
+  readonly contentBasedDeduplication: boolean;
+
+  readonly deduplicationScope: string;
+
+  readonly delaySeconds: number;
+
+  readonly fifoQueue: boolean;
+
+  readonly fifoThroughputLimit: string;
+
+  readonly kmsDataKeyReusePeriodSeconds: number;
+
+  readonly kmsMasterKeyId: string;
+
+  readonly sqsManagedSseEnabled: boolean;
+
+  readonly maximumMessageSize: number;
+
+  readonly messageRetentionPeriod: number;
+
+  readonly queueName: string;
+
+  readonly receiveMessageWaitTimeSeconds: number;
+
+  readonly redriveAllowPolicy: any;
+
+  readonly redrivePolicy: any;
+
+  readonly tags: Array<any>;
+
+  readonly visibilityTimeout: number;
+}
+"
+`;
+
+exports[`Alexa::ASK::Skill 1`] = `
+"export interface CfnSkillProps {
+  readonly authenticationConfiguration: any;
+
+  readonly vendorId: string;
+
+  readonly skillPackage: any;
+}
+"
+`;
