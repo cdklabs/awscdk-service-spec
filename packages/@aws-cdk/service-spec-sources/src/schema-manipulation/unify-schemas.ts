@@ -111,6 +111,10 @@ export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result
         return unifyRecordTypes(meta, a, b);
       }
       return unifyMapTypes(meta, a, b);
+
+    case 'null':
+      // Optionality will be recorded somewhere else
+      return b;
   };
 }
 

@@ -70,6 +70,13 @@ export const BOOLEAN_KEY_WITNESS: TypeKeyWitness<jsonschema.Boolean> = {
   title: true,
 };
 
+export const NULL_KEY_WITNESS: TypeKeyWitness<jsonschema.Null> = {
+  type: true,
+  $comment: true,
+  description: true,
+  title: true,
+};
+
 export function retainRelevantKeywords<A extends object>(x: object, witness: TypeKeyWitness<A>): A {
-  return Object.fromEntries(Object.keys(witness).map((k) => [k, (x as any)[k]])) as any;
+  return Object.fromEntries(Object.entries(x).flatMap(([k, v]) => ((witness as any)[k] ? [[k, v]] : []))) as any;
 }

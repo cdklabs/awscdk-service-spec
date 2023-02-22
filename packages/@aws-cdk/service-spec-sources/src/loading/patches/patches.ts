@@ -7,6 +7,7 @@ import {
   BOOLEAN_KEY_WITNESS,
   NUMBER_KEY_WITNESS,
   retainRelevantKeywords,
+  NULL_KEY_WITNESS,
 } from './field-witnesses';
 import { JsonLens, JsonObjectLens, NO_MISTAKE } from './json-lens';
 import { JsonPatch } from './json-patch';
@@ -53,6 +54,7 @@ export const allPatchers = onlyObjects(
     makeKeywordDropper('boolean', BOOLEAN_KEY_WITNESS),
     makeKeywordDropper('integer', NUMBER_KEY_WITNESS),
     makeKeywordDropper('number', NUMBER_KEY_WITNESS),
+    makeKeywordDropper('null', NULL_KEY_WITNESS),
   ),
 );
 
@@ -103,8 +105,8 @@ export function explodeTypeArray(lens: JsonObjectLens) {
   if (Array.isArray(lens.value.type)) {
     const oneOf = lens.value.type.map((v) => {
       return {
-        type: v,
         ...retainRelevantKeywords(lens.value, witnessForType(v)),
+        type: v,
       };
     });
 
@@ -112,6 +114,10 @@ export function explodeTypeArray(lens: JsonObjectLens) {
     const allKeys = new Set(Object.keys(lens.value));
     for (const usedKey of oneOf.flatMap((x) => Object.keys(x))) {
       allKeys.delete(usedKey);
+    }
+
+    for (const unusedKey of allKeys) {
+      lens.removeProperty(`'${unusedKey}' not applicable to any of ${JSON.stringify(lens.value.type)}`, unusedKey);
     }
 
     lens.replaceValue(NO_MISTAKE, { oneOf });
@@ -430,14 +436,17 @@ function witnessForType(type: string): TypeKeyWitness<any> {
       return STRING_KEY_WITNESS;
     case 'object':
       return OBJECT_KEY_WITNESS;
+    case 'boolean':
+      return BOOLEAN_KEY_WITNESS;
     case 'number':
     case 'integer':
       return NUMBER_KEY_WITNESS;
     case 'array':
       return ARRAY_KEY_WITNESS;
+    case 'null':
+      return NULL_KEY_WITNESS;
 
     default:
       throw new Error(`Don't recognize type: ${type}`);
   }
-
 }

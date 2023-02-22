@@ -9,7 +9,8 @@ export namespace jsonschema {
     | String
     | SchemaArray
     | Boolean
-    | Number;
+    | Number
+    | Null;
 
   export interface Annotatable {
     readonly $comment?: string;
@@ -62,6 +63,10 @@ export namespace jsonschema {
     readonly patternProperties?: Record<string, Schema>;
     readonly minProperties?: number;
     readonly maxProperties?: number;
+  }
+
+  export interface Null extends Annotatable {
+    readonly type: 'null';
   }
 
   export type ObjectProperties = Record<string, Schema>;
