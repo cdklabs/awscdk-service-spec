@@ -4,6 +4,7 @@ import { SchemaValidation } from '@aws-cdk/service-spec-sources';
 import { Failures } from '@cdklabs/tskb';
 import { readCloudFormationDocumentation } from './cloudformation-docs';
 import { readCloudFormationRegistryResource } from './cloudformation-registry';
+import { readStatefulResources } from './stateful-resources';
 
 export interface BuildDatabaseOptions {
   readonly validateJsonSchema?: SchemaValidation;
@@ -35,6 +36,8 @@ export async function buildDatabase(options: BuildDatabaseOptions = {}) {
 
   const docs = await sources.loadDefaultCloudFormationDocs();
   readCloudFormationDocumentation(db, docs, fails);
+
+  readStatefulResources(db, await sources.loadDefaultStatefulResources(), fails);
 
   return { db, fails };
 }

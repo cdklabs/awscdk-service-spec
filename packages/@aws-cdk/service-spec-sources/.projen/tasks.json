@@ -85,6 +85,9 @@
         },
         {
           "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudFormationDocumentation --out schemas/CloudFormationDocumentation.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type StatefulResources --out schemas/StatefulResources.schema.json"
         }
       ]
     },
