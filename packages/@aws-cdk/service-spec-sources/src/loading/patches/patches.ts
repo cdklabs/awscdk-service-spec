@@ -242,11 +242,15 @@ export function canonicalizeRegexInFormat(lens: JsonObjectLens) {
   if (
     lens.value.type === 'string' &&
     lens.value.format !== undefined &&
-    lens.value.pattern === undefined &&
-    typeof lens.value.format === 'string'
+    typeof lens.value.format === 'string' &&
+    !['uri', 'timestamp', 'date-time'].includes(lens.value.format)
   ) {
-    if (!['uri', 'timestamp', 'date-time'].includes(lens.value.format)) {
-      lens.replaceProperty('canonicalize regexes in format', 'pattern', lens.value.format);
+    // Format as a regex, store it in 'pattern' instead
+
+    if (lens.value.pattern === undefined) {
+      lens.renameProperty('prefer regexes in pattern', 'format', 'pattern');
+    } else {
+      lens.removeProperty('redundant regex in format', 'format');
     }
   }
 }
