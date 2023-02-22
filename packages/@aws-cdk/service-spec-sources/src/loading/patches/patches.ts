@@ -255,8 +255,8 @@ export function removeEmptyRequiredArray(lens: JsonObjectLens) {
  * We're seeing `type: string` with `default: <boolean>`.
  */
 export function noBooleanDefaultForStringType(lens: JsonObjectLens) {
-  if (lens.value.type === 'string' && typeof lens.value.default === 'boolean') {
-    lens.removeProperty('default value for a string type cannot be a boolean', 'default');
+  if (lens.value.type === 'string' && lens.value.default !== undefined && typeof lens.value.default !== 'string') {
+    lens.removeProperty(`default value for a string type cannot be a ${typeof lens.value.default}`, 'default');
   }
 }
 
