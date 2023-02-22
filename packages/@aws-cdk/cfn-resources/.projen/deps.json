@@ -9,6 +9,10 @@
       "type": "build"
     },
     {
+      "name": "@cdklabs/tskb",
+      "type": "build"
+    },
+    {
       "name": "@cdklabs/typewriter",
       "type": "build"
     },

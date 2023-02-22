@@ -1,7 +1,22 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import { PropertyType } from '@aws-cdk/service-spec';
-import { TypeReferenceSpec } from '@cdklabs/typewriter';
+import { PropertyType, Resource } from '@aws-cdk/service-spec';
+import { Case, InterfaceSpec, MemberKind, TypeReferenceSpec } from '@cdklabs/typewriter';
 import * as jsii from '@jsii/spec';
+
+export function resourcePropsSpec(r: Resource): InterfaceSpec {
+  const propsInterface = `Cfn${r.name}Props`;
+
+  return {
+    export: true,
+    name: propsInterface,
+    kind: jsii.TypeKind.Interface,
+    properties: Object.entries(r.properties).map(([name, p]) => ({
+      kind: MemberKind.Property,
+      name: Case.firstCharToLower(name),
+      type: propertyTypeToTypeReferenceSpec(p.type),
+      immutable: true,
+    })),
+  };
+}
 
 export function propertyTypeToTypeReferenceSpec(type: PropertyType): TypeReferenceSpec {
   switch (type?.type) {
