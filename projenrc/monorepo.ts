@@ -170,6 +170,10 @@ export class MonorepoRoot extends pj.typescript.TypeScriptProject {
     this.vscode?.settings.addSettings({
       'files.exclude': Object.fromEntries(this.vscodeHiddenFilesPatterns.map((p) => [p, true])),
     });
+
+    this.package.addField('jest', {
+      projects: this.projects.map((p) => `<rootDir>/packages/${p.name}`),
+    });
   }
 
   public postSynthesize() {
