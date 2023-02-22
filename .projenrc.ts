@@ -9,7 +9,6 @@ const repo = new MonorepoRoot({
   description: "Monorepo for the AWS CDK's service spec",
   projenrcTs: true,
 
-  eslint: true,
   prettier: true,
   prettierOptions: {
     settings: {
@@ -141,14 +140,5 @@ cfnResources.preCompileTask.spawn(
   }),
 );
 cfnResources.synth();
-
-// Formatting
-repo.vscode?.extensions.addRecommendations('esbenp.prettier-vscode', 'dbaeumer.vscode-eslint');
-repo.vscode?.settings.addSetting('editor.defaultFormatter', 'esbenp.prettier-vscode');
-repo.vscode?.settings.addSetting('eslint.format.enable', true);
-repo.vscode?.settings.addSettings({ 'editor.defaultFormatter': 'dbaeumer.vscode-eslint' }, [
-  'javascript',
-  'typescript',
-]);
 
 repo.synth();

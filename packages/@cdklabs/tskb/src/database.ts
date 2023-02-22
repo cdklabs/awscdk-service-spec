@@ -1,5 +1,12 @@
 import { Entity, EntityCollection, isEntityCollection, Plain } from './entity';
-import { AnyRelationshipCollection, isRelationshipCollection, RelationshipCollection, RelAttr, RelFrom, RelTo } from './relationship';
+import {
+  AnyRelationshipCollection,
+  isRelationshipCollection,
+  RelationshipCollection,
+  RelAttr,
+  RelFrom,
+  RelTo,
+} from './relationship';
 
 export class Database<S extends object> {
   private readonly schema: S;
@@ -52,8 +59,12 @@ export class Database<S extends object> {
   /**
    * Lookup an entity by index
    */
-  public lookup<K extends EntityKeys<S>, I extends keyof EntityType<S[K]> & IndexesOf<S[K]>>
-  (key: K, index: I, lookup: LookupsOf<S[K], I>, value: EntityType<S[K]>[I]): EntityType<S[K]>[] {
+  public lookup<K extends EntityKeys<S>, I extends keyof EntityType<S[K]> & IndexesOf<S[K]>>(
+    key: K,
+    index: I,
+    lookup: LookupsOf<S[K], I>,
+    value: EntityType<S[K]>[I],
+  ): EntityType<S[K]>[] {
     const coll: EntityCollection<any> = this.schema[key] as any;
     const ids = (coll.indexes as any)[index].lookups[lookup](value);
     return ids.map((id: string) => coll.entities.get(id));
@@ -64,9 +75,19 @@ export class Database<S extends object> {
    *
    * Overload to account for whether we have attributes or not.
    */
-  public link<K extends RelWAttrs<S>>(key: K, from: RelFrom<RelType<S[K]>>, to: RelTo<RelType<S[K]>>, attributes: RelAttr<RelType<S[K]>>): void;
+  public link<K extends RelWAttrs<S>>(
+    key: K,
+    from: RelFrom<RelType<S[K]>>,
+    to: RelTo<RelType<S[K]>>,
+    attributes: RelAttr<RelType<S[K]>>,
+  ): void;
   public link<K extends RelWoAttrs<S>>(key: K, from: RelFrom<RelType<S[K]>>, to: RelTo<RelType<S[K]>>): void;
-  public link<K extends RelKeys<S>>(key: K, from: RelFrom<RelType<S[K]>>, to: RelTo<RelType<S[K]>>, attributes?: RelAttr<RelType<S[K]>>) {
+  public link<K extends RelKeys<S>>(
+    key: K,
+    from: RelFrom<RelType<S[K]>>,
+    to: RelTo<RelType<S[K]>>,
+    attributes?: RelAttr<RelType<S[K]>>,
+  ) {
     const col: AnyRelationshipCollection = this.schema[key] as any;
     col.add(from, to, attributes);
   }
@@ -74,19 +95,25 @@ export class Database<S extends object> {
   /**
    * Follow a link
    */
-  public follow<K extends RelKeys<S>>(key: K, from: RelFrom<RelType<S[K]>>): Array<ToLink<RelTo<RelType<S[K]>>, RelAttr<RelType<S[K]>>>> {
+  public follow<K extends RelKeys<S>>(
+    key: K,
+    from: RelFrom<RelType<S[K]>>,
+  ): Array<ToLink<RelTo<RelType<S[K]>>, RelAttr<RelType<S[K]>>>> {
     const col: AnyRelationshipCollection = this.schema[key] as any;
     const toLinks = col.forward.get(from.$id) ?? [];
-    return toLinks.map(i => ({ to: this.get(col.toColl, i.$id), ...removeId(i) })) as any;
+    return toLinks.map((i) => ({ to: this.get(col.toColl, i.$id), ...removeId(i) })) as any;
   }
 
   /**
    * Follow incoming links backwards
    */
-  public incoming<K extends RelKeys<S>>(key: K, to: RelTo<RelType<S[K]>>): Array<FromLink<RelFrom<RelType<S[K]>>, RelAttr<RelType<S[K]>>>> {
+  public incoming<K extends RelKeys<S>>(
+    key: K,
+    to: RelTo<RelType<S[K]>>,
+  ): Array<FromLink<RelFrom<RelType<S[K]>>, RelAttr<RelType<S[K]>>>> {
     const col: AnyRelationshipCollection = this.schema[key] as any;
     const fromIds = col.backward.get(to.$id) ?? [];
-    return fromIds.map(i => ({ from: this.get(col.fromColl, i.$id), ...removeId(i) })) as any;
+    return fromIds.map((i) => ({ from: this.get(col.fromColl, i.$id), ...removeId(i) })) as any;
   }
 
   public e<E extends Entity>(entity: Plain<E>): E {
@@ -170,4 +197,6 @@ type RelType<A> = A extends RelationshipCollection<infer B, any, any, any> ? B :
 
 type IndexesOf<A> = A extends EntityCollection<any, any> ? keyof A['indexes'] : never;
 
-type LookupsOf<A, I extends IndexesOf<A>> = A extends EntityCollection<any, any> ? keyof A['indexes'][I]['lookups'] : never;
+type LookupsOf<A, I extends IndexesOf<A>> = A extends EntityCollection<any, any>
+  ? keyof A['indexes'][I]['lookups']
+  : never;

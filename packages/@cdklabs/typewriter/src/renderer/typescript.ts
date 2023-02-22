@@ -13,17 +13,18 @@ export class TypeScriptRenderer extends Renderer {
 
     return [
       this.indent(`${modifiers}interface ${interfaceType.name} {`, indentationLevel),
-      Array.from(interfaceType.properties.values()).map(p => this.renderProperty(p, indentationLevel+1)).join('\n\n'),
+      Array.from(interfaceType.properties.values())
+        .map((p) => this.renderProperty(p, indentationLevel + 1))
+        .join('\n\n'),
       this.indent('}\n', indentationLevel),
     ].join('\n');
   }
 
   protected renderProperty(property: Property, level = 0): string {
     return this.indent(`${property.spec.immutable ? 'readonly ' : ''}${property.name}: ${property.type};`, level);
-  };
+  }
 
   // renderRef(_renderer: Renderer, _indentationLevel: number): string {
   //   return this.toString();
   // }
-
 }

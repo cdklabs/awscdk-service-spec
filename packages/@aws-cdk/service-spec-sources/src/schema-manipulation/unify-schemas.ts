@@ -20,7 +20,9 @@ export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result
   }
 
   if (jsonschema.isReference(a) || jsonschema.isReference(b)) {
-    return jsonschema.isReference(a) && jsonschema.isReference(b) && a.$ref === b.$ref ? a : failure(`${JSON.stringify(a)} != ${JSON.stringify(b)}`);
+    return jsonschema.isReference(a) && jsonschema.isReference(b) && a.$ref === b.$ref
+      ? a
+      : failure(`${JSON.stringify(a)} != ${JSON.stringify(b)}`);
   }
 
   const meta = {
@@ -50,17 +52,15 @@ export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result
         return failure(`${a.type} != ${b.type}`);
       }
 
-      return using(
-        locateFailure('array.items')(unifySchemas(a.items, b.items)),
-        items => ({
-          type: 'array',
-          ...meta,
-          items,
-          minLength: combine(a.minLength, b.minLength, (x, y) => Math.min(x, y)),
-          maxLength: combine(a.maxLength, b.maxLength, (x, y) => Math.max(x, y)),
-          uniqueItems: combine(a.uniqueItems, b.uniqueItems, (x, y) => x && y),
-          // FIXME: insertionOrder ??
-        }));
+      return using(locateFailure('array.items')(unifySchemas(a.items, b.items)), (items) => ({
+        type: 'array',
+        ...meta,
+        items,
+        minLength: combine(a.minLength, b.minLength, (x, y) => Math.min(x, y)),
+        maxLength: combine(a.maxLength, b.maxLength, (x, y) => Math.max(x, y)),
+        uniqueItems: combine(a.uniqueItems, b.uniqueItems, (x, y) => x && y),
+        // FIXME: insertionOrder ??
+      }));
 
     case 'boolean':
       if (b.type !== 'boolean') {
@@ -101,7 +101,7 @@ export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result
         return unifyRecordTypes(meta, a, b);
       }
       return unifyMapTypes(meta, a, b);
-  };
+  }
 }
 
 /**
@@ -117,21 +117,30 @@ export function unifyAllSchemas(xs: jsonschema.Schema[]): Result<jsonschema.Sche
   const schemas = [...xs];
   while (schemas.length > 1) {
     const uni = unifySchemas(schemas[0], schemas[1]);
-    if (isFailure(uni)) { return uni; }
+    if (isFailure(uni)) {
+      return uni;
+    }
     schemas.splice(0, 2, uni);
   }
   return schemas[0];
 }
 
-function unifyRecordTypes(meta: any, a: jsonschema.RecordLikeObject, b: jsonschema.RecordLikeObject): Result<jsonschema.RecordLikeObject> {
+function unifyRecordTypes(
+  meta: any,
+  a: jsonschema.RecordLikeObject,
+  b: jsonschema.RecordLikeObject,
+): Result<jsonschema.RecordLikeObject> {
   // Most difficult decisions are here -- what do we do with mismatching properties?
   // Fail unification or just fail the single property?
 
   const keys = union(Object.keys(a.properties), Object.keys(b.properties));
-  const properties = locateFailure('object.properties')
-  (liftResult(Object.fromEntries(keys.map(key =>
-    [key, locateFailure(`[${key}]`)
-    (unifySchemas(a.properties[key], b.properties[key]))]))));
+  const properties = locateFailure('object.properties')(
+    liftResult(
+      Object.fromEntries(
+        keys.map((key) => [key, locateFailure(`[${key}]`)(unifySchemas(a.properties[key], b.properties[key]))]),
+      ),
+    ),
+  );
 
   if (isFailure(properties)) {
     return properties;
@@ -145,15 +154,19 @@ function unifyRecordTypes(meta: any, a: jsonschema.RecordLikeObject, b: jsonsche
   };
 }
 
-function unifyMapTypes(meta: any, a: jsonschema.MapLikeObject, b: jsonschema.MapLikeObject): Result<jsonschema.MapLikeObject> {
+function unifyMapTypes(
+  meta: any,
+  a: jsonschema.MapLikeObject,
+  b: jsonschema.MapLikeObject,
+): Result<jsonschema.MapLikeObject> {
   // Most difficult decisions are here
   const aPats = { ...a.patternProperties };
   const bPats = { ...b.patternProperties };
 
   if (a.additionalProperties || b.additionalProperties) {
     const unified = unifyAllSchemas([
-      ...a.additionalProperties ? [a.additionalProperties] : [],
-      ...b.additionalProperties ? [b.additionalProperties] : [],
+      ...(a.additionalProperties ? [a.additionalProperties] : []),
+      ...(b.additionalProperties ? [b.additionalProperties] : []),
       ...Object.values(aPats),
       ...Object.values(bPats),
     ]);
@@ -204,5 +217,5 @@ function union<A>(xs: Iterable<A>, ys: Iterable<A>): A[] {
 
 function intersect<A>(xs: A[], ys: A[]): A[] {
   const xss = new Set(xs);
-  return ys.filter(y => xss.has(y));
+  return ys.filter((y) => xss.has(y));
 }

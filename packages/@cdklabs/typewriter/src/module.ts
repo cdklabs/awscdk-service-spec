@@ -6,7 +6,7 @@ import { Type } from './type';
  * A module
  */
 export class Module extends Scope {
-  protected readonly typeMap: Map<string, Type> = new Map<string, Type>;
+  protected readonly typeMap: Map<string, Type> = new Map<string, Type>();
 
   public get name(): string {
     return this.fqn;
@@ -27,9 +27,7 @@ export class Module extends Scope {
    * All interfaces in this module/namespace (not submodules)
    */
   public get interfaces(): readonly InterfaceType[] {
-    return this.types
-      .filter((t) => t instanceof InterfaceType)
-      .map((t) => t as InterfaceType);
+    return this.types.filter((t) => t instanceof InterfaceType).map((t) => t as InterfaceType);
   }
 
   public addType(type: Type): void {

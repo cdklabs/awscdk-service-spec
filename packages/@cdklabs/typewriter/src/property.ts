@@ -29,11 +29,7 @@ export class Property extends TypeMember {
     return new TypeReference(this.scope.scope, this.spec.type);
   }
 
-  public constructor(
-    public readonly scope: InterfaceType,
-    public readonly spec: PropertySpec,
-  ) {
-
+  public constructor(public readonly scope: InterfaceType, public readonly spec: PropertySpec) {
     super(scope, spec);
   }
 }

@@ -28,10 +28,7 @@ export abstract class Type {
     return this.spec.kind;
   }
 
-  public constructor(
-    public readonly scope: Scope,
-    public readonly spec: TypeSpec,
-  ) {
+  public constructor(public readonly scope: Scope, public readonly spec: TypeSpec) {
     scope.addType(this);
   }
 

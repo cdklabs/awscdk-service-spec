@@ -110,7 +110,6 @@ export interface ResourceTagging {
   readonly tagProperty?: string;
 }
 
-
 export interface ResourceLink {
   /**
    * Example:

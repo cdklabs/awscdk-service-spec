@@ -8,19 +8,22 @@ import { errorMessage, Failure, failure, Result } from '@cdklabs/tskb';
 import Ajv from 'ajv';
 import * as _glob from 'glob';
 
-
 export class Loader<A> {
-  public static async fromSchemaFile<A>(fileName: string, validation=SchemaValidation.FAIL): Promise<Loader<A>> {
+  public static async fromSchemaFile<A>(fileName: string, validation = SchemaValidation.FAIL): Promise<Loader<A>> {
     const ajv = new Ajv();
-    const cfnSchemaJson = JSON.parse(await fs.readFile(path.join(__dirname, `../../schemas/${fileName}`), { encoding: 'utf-8' }));
+    const cfnSchemaJson = JSON.parse(
+      await fs.readFile(path.join(__dirname, `../../schemas/${fileName}`), { encoding: 'utf-8' }),
+    );
     const validator = ajv.compile(cfnSchemaJson);
     return new Loader(validator, validation);
   }
 
   public readonly failures: Failure[] = [];
 
-  private constructor(private readonly validator: Ajv.ValidateFunction, private readonly validation: SchemaValidation) {
-  }
+  private constructor(
+    private readonly validator: Ajv.ValidateFunction,
+    private readonly validation: SchemaValidation,
+  ) {}
 
   public async load(obj: unknown): Promise<Result<A>> {
     const valid = await this.validator(obj);
@@ -36,7 +39,7 @@ export class Loader<A> {
       return obj as A;
     }
 
-    return failure(`${failures.length} validation errors:\n${failures.map(x => `- ${errorMessage(x)}`).join('\n')}`);
+    return failure(`${failures.length} validation errors:\n${failures.map((x) => `- ${errorMessage(x)}`).join('\n')}`);
   }
 
   public async loadFile(fileName: string): Promise<Result<A>> {
@@ -59,5 +62,5 @@ export enum SchemaValidation {
 }
 
 function wrapErrors(errors: Ajv.ErrorObject[] | null | undefined) {
-  return errors?.map(x => failure(util.inspect(x, { depth: 3 }))) ?? [];
+  return errors?.map((x) => failure(util.inspect(x, { depth: 3 }))) ?? [];
 }
