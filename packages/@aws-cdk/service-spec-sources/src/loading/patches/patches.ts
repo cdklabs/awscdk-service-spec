@@ -177,11 +177,14 @@ export function canonicalizeTypeOperators(op: 'oneOf' | 'anyOf' | 'allOf') {
       }),
     );
 
-    // Nothing happened
-    if (deepEqual(branches, newBranches)) {
-      return;
+    const replacement = { [op]: newBranches };
+    // Prevent infinite recursion that would be a no-op
+    if (!deepEqual(lens.value, replacement)) {
+      lens.replaceValue(NO_MISTAKE, replacement);
     }
 
+    // Let's not try to be too clever for now
+    /*
     switch (newBranches.length) {
       case 0:
         lens.removeProperty(`empty ${op}`, op);
@@ -190,9 +193,13 @@ export function canonicalizeTypeOperators(op: 'oneOf' | 'anyOf' | 'allOf') {
         lens.replaceProperty(`unnecessary ${op}`, op, newBranches[0]);
         break;
       default:
-        lens.replaceValue(NO_MISTAKE, { [op]: newBranches });
+        const replacement = { [op]: newBranches };
+        if (!deepEqual(lens.value, replacement)) {
+          lens.replaceValue(NO_MISTAKE, replacement);
+        }
         break;
     }
+    */
   };
 }
 
