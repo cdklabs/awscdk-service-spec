@@ -142,7 +142,7 @@ cfnResources.eslint?.addOverride({
 cfnResources.addGitIgnore('src/services/**');
 cfnResources.preCompileTask.spawn(
   cfnResources.tasks.addTask('generate', {
-    exec: 'ts-node src/cli/main.ts',
+    exec: 'ts-node --project tsconfig.dev.json src/cli/main.ts',
     receiveArgs: true,
   }),
 );
