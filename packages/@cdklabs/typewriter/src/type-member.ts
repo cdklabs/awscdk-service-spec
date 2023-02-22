@@ -34,11 +34,7 @@ export abstract class TypeMember {
     return `${this.scope.fqn}#${this.name}`;
   }
 
-  public constructor(
-    public readonly scope: InterfaceType,
-    public readonly spec: TypeMemberSpec,
-  ) {
-  }
+  public constructor(public readonly scope: InterfaceType, public readonly spec: TypeMemberSpec) {}
 
   /**
    * Simple Human readable string representation of the property.

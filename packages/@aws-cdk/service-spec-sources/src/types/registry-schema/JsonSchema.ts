@@ -1,11 +1,10 @@
 export namespace jsonschema {
-
   export type Schema = Reference | ConcreteSchema;
 
   export type ConcreteSchema = Object | String | SchemaArray | Boolean | Number;
 
   export interface Reference {
-    readonly '$ref': string;
+    readonly $ref: string;
   }
 
   export interface Annotatable {
@@ -40,8 +39,10 @@ export namespace jsonschema {
     const ret = !!(x as RecordLikeObject).properties;
 
     // Do a sanity check of our understanding
-    if (ret && (x as MapLikeObject).additionalProperties || (x as MapLikeObject).patternProperties) {
-      throw new Error(`object with properties should not have additionalProperties or patternProperties: ${JSON.stringify(x)}`);
+    if ((ret && (x as MapLikeObject).additionalProperties) || (x as MapLikeObject).patternProperties) {
+      throw new Error(
+        `object with properties should not have additionalProperties or patternProperties: ${JSON.stringify(x)}`,
+      );
     }
 
     return ret;
@@ -109,7 +110,9 @@ export namespace jsonschema {
    */
   export function resolveReference(root: any) {
     return (ref: Schema): ResolvedSchema => {
-      if (!isReference(ref)) { return { schema: ref }; }
+      if (!isReference(ref)) {
+        return { schema: ref };
+      }
 
       const path = ref.$ref;
       if (!path.startsWith('#/')) {
@@ -120,7 +123,9 @@ export namespace jsonschema {
       let current = root;
       while (true) {
         const name = parts.shift();
-        if (!name) { break; }
+        if (!name) {
+          break;
+        }
         current = current[name];
       }
       return { schema: current, referenceName: parts[parts.length - 1] };
@@ -135,5 +140,4 @@ export namespace jsonschema {
   export function isReference(x: Schema): x is Reference {
     return '$ref' in x;
   }
-
 }

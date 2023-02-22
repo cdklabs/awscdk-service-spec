@@ -24,7 +24,9 @@ test('exclude readOnlyProperties from properties', () => {
     },
   });
 
-  const propNames = Object.keys(db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.properties);
+  const propNames = Object.keys(
+    db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.properties,
+  );
   expect(propNames).toEqual(['Property']);
 });
 
@@ -43,7 +45,9 @@ test('include readOnlyProperties in attributes', () => {
     },
   });
 
-  const attrNames = Object.keys(db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.attributes);
+  const attrNames = Object.keys(
+    db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.attributes,
+  );
   expect(attrNames).toEqual(['Id']);
 });
 
@@ -67,6 +71,8 @@ test('include legacy attributes in attributes', () => {
     },
   });
 
-  const attrNames = Object.keys(db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.attributes);
+  const attrNames = Object.keys(
+    db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.attributes,
+  );
   expect(attrNames.sort()).toEqual(['Id', 'Property']);
 });

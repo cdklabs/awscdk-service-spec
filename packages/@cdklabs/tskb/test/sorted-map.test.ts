@@ -1,6 +1,5 @@
 import { sortedMap, SortedMultiMap } from '../src/sorted-map';
 
-
 function buildTwoArrays(): [SortedMultiMap<string, string>, Array<string>] {
   const smap: SortedMultiMap<string, string> = [];
   const sortedArray = new Array<string>();

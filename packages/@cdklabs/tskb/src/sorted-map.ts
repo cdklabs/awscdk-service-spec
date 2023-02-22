@@ -1,4 +1,3 @@
-
 export type SortedMultiMap<A, B> = Array<[A, B]>;
 
 export namespace sortedMap {
@@ -11,7 +10,9 @@ export namespace sortedMap {
 
   export function find<A, B>(map: SortedMultiMap<A, B>, cmp: Comparator<A>, key: A): B | undefined {
     const i = firstNotBefore(map, cmp, key);
-    if (i === map.length) { return undefined; }
+    if (i === map.length) {
+      return undefined;
+    }
 
     const [foundKey, value] = map[i];
     return cmp(foundKey, key) === 0 ? value : undefined;

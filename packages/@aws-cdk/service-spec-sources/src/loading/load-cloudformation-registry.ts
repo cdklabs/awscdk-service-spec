@@ -5,22 +5,21 @@ import * as _glob from 'glob';
 import { Loader, SchemaValidation } from './loader';
 import { CloudFormationRegistryResource } from '../types';
 
-
 const glob = util.promisify(_glob.glob);
 
 export async function loadCloudFormationRegistryDirectory(
   directory: string,
-  validate=SchemaValidation.FAIL,
+  validate = SchemaValidation.FAIL,
 ): Promise<Array<Result<CloudFormationRegistryResource>>> {
-  const loader = await Loader.fromSchemaFile<CloudFormationRegistryResource>('CloudFormationRegistryResource.schema.json', validate);
+  const loader = await Loader.fromSchemaFile<CloudFormationRegistryResource>(
+    'CloudFormationRegistryResource.schema.json',
+    validate,
+  );
 
   const files = await glob(path.join(directory, '*.json'));
   const results = await loader.loadFiles(files);
 
-  return [
-    ...results.filter(isSuccess),
-    ...loader.failures,
-  ];
+  return [...results.filter(isSuccess), ...loader.failures];
 }
 
 export interface CloudFormationRegistryResources {
@@ -29,16 +28,20 @@ export interface CloudFormationRegistryResources {
   readonly failures: Failure[];
 }
 
-export async function loadDefaultCloudFormationRegistryResources(validate=SchemaValidation.FAIL): Promise<CloudFormationRegistryResources[]> {
-  return Promise.all((await glob(path.join(__dirname, '../../../../../sources/CloudFormationSchema/*'))).map(async (directoryName) => {
-    const regionName = path.basename(directoryName);
-    const resources = await loadCloudFormationRegistryDirectory(directoryName, validate);
+export async function loadDefaultCloudFormationRegistryResources(
+  validate = SchemaValidation.FAIL,
+): Promise<CloudFormationRegistryResources[]> {
+  return Promise.all(
+    (await glob(path.join(__dirname, '../../../../../sources/CloudFormationSchema/*'))).map(async (directoryName) => {
+      const regionName = path.basename(directoryName);
+      const resources = await loadCloudFormationRegistryDirectory(directoryName, validate);
 
-    const ret: CloudFormationRegistryResources = {
-      regionName,
-      resources: resources.filter(isSuccess),
-      failures: resources.filter(isFailure),
-    };
-    return ret;
-  }));
+      const ret: CloudFormationRegistryResources = {
+        regionName,
+        resources: resources.filter(isSuccess),
+        failures: resources.filter(isFailure),
+      };
+      return ret;
+    }),
+  );
 }

@@ -1,15 +1,15 @@
 import { sortedMap, SortedMultiMap } from './sorted-map';
 
 export interface Entity {
-  readonly '$id': string;
+  readonly $id: string;
 }
 
 export type Plain<E extends Entity> = Omit<E, '$id'>;
 
-export interface EntityCollection<A extends Entity, Indexes extends keyof A=never> {
+export interface EntityCollection<A extends Entity, Indexes extends keyof A = never> {
   readonly type: 'entities';
   readonly entities: Map<string, A>;
-  readonly indexes: {[K in Indexes]: EntityIndex<A, K>};
+  readonly indexes: { [K in Indexes]: EntityIndex<A, K> };
 
   add(x: A): void;
   dehydrate(): any;
@@ -30,8 +30,12 @@ export interface StringIndexLookups {
 }
 
 export function emptyCollection<A extends Entity, I extends keyof A>(): EntityCollection<A, never>;
-export function emptyCollection<A extends Entity, I extends keyof A, Ix extends {[K in I]: EntityIndex<A, K>}>(indexes: Ix): EntityCollection<A, I>;
-export function emptyCollection<A extends Entity, I extends keyof A, Ix extends {[K in I]: EntityIndex<A, K>}>(ixes?: Ix): EntityCollection<A, I> {
+export function emptyCollection<A extends Entity, I extends keyof A, Ix extends { [K in I]: EntityIndex<A, K> }>(
+  indexes: Ix,
+): EntityCollection<A, I>;
+export function emptyCollection<A extends Entity, I extends keyof A, Ix extends { [K in I]: EntityIndex<A, K> }>(
+  ixes?: Ix,
+): EntityCollection<A, I> {
   const entities = new Map<string, A>();
   const indexes = ixes ?? {};
 
@@ -61,7 +65,10 @@ export function emptyCollection<A extends Entity, I extends keyof A, Ix extends 
   };
 }
 
-export function emptyIndex<A extends Entity, P extends keyof A>(propName: P, comparator: sortedMap.Comparator<A[P]>): EntityIndex<A, P> {
+export function emptyIndex<A extends Entity, P extends keyof A>(
+  propName: P,
+  comparator: sortedMap.Comparator<A[P]>,
+): EntityIndex<A, P> {
   const index: SortedMultiMap<A[P], string> = [];
   return {
     add: (x) => sortedMap.add(index, comparator, x[propName], x.$id),

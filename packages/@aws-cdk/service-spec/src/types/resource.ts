@@ -55,11 +55,11 @@ export interface Attribute {
 
 // FIXME: Should properties & attributes be entities or not?
 
-Invariants.push(evolutionInvariant<Property>(
-  'wasOnceJson may never be switched off',
-  (prev, cur) => impliesU(prev.wasOnceJson, cur.wasOnceJson),
-));
-
+Invariants.push(
+  evolutionInvariant<Property>('wasOnceJson may never be switched off', (prev, cur) =>
+    impliesU(prev.wasOnceJson, cur.wasOnceJson),
+  ),
+);
 
 export type PropertyType = PrimitiveType | DefinitionReference | ArrayType<PropertyType> | MapType<PropertyType>;
 
@@ -95,7 +95,6 @@ export interface MapType<E> {
   readonly element: E;
 }
 
-
 export type HasResource = Relationship<Service, Resource>;
 export type RegionHasResource = Relationship<Region, Resource>;
 export type ResourceDoc = Relationship<Resource, Documentation>;
@@ -104,7 +103,6 @@ export type ServiceInRegion = Relationship<Region, Service>;
 export type ResourceInRegion = Relationship<Region, Resource>;
 
 export type UsesType = Relationship<Resource, TypeDefinition>;
-
 
 export interface ResourceIdentifier extends Entity {
   readonly arnTemplate?: string;

@@ -2,7 +2,7 @@ import * as jsii from '@jsii/spec';
 import { Scope } from './scope';
 import { Type } from './type';
 
-export type TypeReferenceSpec = jsii.TypeReference
+export type TypeReferenceSpec = jsii.TypeReference;
 
 /**
  * A reference to an existing type in the given scope
@@ -12,11 +12,7 @@ export class TypeReference {
     return jsii.isNamedTypeReference(this.spec) ? this.spec.fqn : undefined;
   }
 
-  public constructor(
-    public readonly scope: Scope,
-    public readonly spec: TypeReferenceSpec,
-  ) {
-  }
+  public constructor(public readonly scope: Scope, public readonly spec: TypeReferenceSpec) {}
 
   public toString(): string {
     if (this.void) {
