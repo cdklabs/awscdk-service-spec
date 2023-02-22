@@ -1,10 +1,11 @@
-import { JsonLens } from './json-lens';
+import canonicalize from 'canonicalize';
+import { JsonLens, JsonObjectLens, NO_MISTAKE } from './json-lens';
 import { JsonPatch } from './json-patch';
-import { SchemaLens } from './json-patcher';
+import { PatchReport, SchemaLens } from './json-patcher';
 
-type Patcher = (lens: JsonLens) => void;
+type Patcher<L extends JsonLens> = (lens: L) => void;
 
-function makeCompositePatcher(...patchers: Patcher[]): Patcher {
+function makeCompositePatcher<L extends JsonLens>(...patchers: Patcher<L>[]): Patcher<L> {
   return (lens) => {
     for (const patcher of patchers) {
       patcher(lens);
@@ -12,29 +13,44 @@ function makeCompositePatcher(...patchers: Patcher[]): Patcher {
   };
 }
 
-export const allPatchers = makeCompositePatcher(
-  removeAdditionalProperties,
-  replaceArrayLengthProps,
-  removeBooleanPatterns,
-  canonicalizeUnionType,
-  canonicalizeOneOf,
-  // canonicalizeAnyOf,
-  minMaxImpliesInteger,
-  erroneousInsertionOrderOnObject,
-  extraneousPropsOnReferences,
-  patchConstOnString,
-  canonicalizeDefaultOnBoolean,
-  patchMaxItemsOnString,
-  patchMinLengthOnInteger,
-  canonicalizeRegexInFormat,
+function onlyObjects(patcher: Patcher<JsonObjectLens>): Patcher<JsonLens> {
+  return (lens) => {
+    if (lens.isJsonObject()) {
+      patcher(lens);
+    }
+  };
+}
+
+export const allPatchers = onlyObjects(
+  makeCompositePatcher(
+    removeAdditionalProperties,
+    replaceArrayLengthProps,
+    removeBooleanPatterns,
+    canonicalizeUnionType,
+    canonicalizeTypeOperators('oneOf'),
+    canonicalizeTypeOperators('anyOf'),
+    canonicalizeTypeOperators('allOf'),
+    minMaxImpliesInteger,
+    erroneousInsertionOrderOnObject,
+    patchConstOnString,
+    canonicalizeDefaultOnBoolean,
+    patchMaxItemsOnString,
+    patchMinLengthOnInteger,
+    canonicalizeRegexInFormat,
+    noMatchPropertiesOnString,
+    removeEmptyRequiredArray,
+    noBooleanDefaultForStringType,
+    removeMinMaxLengthOnObject,
+    missingTypeField,
+  ),
 );
 
 /**
  * The property 'additionalProperties' should only exist on object types.
  * This function removes any instances of 'additionalProperties' on non-objects.
  */
-export function removeAdditionalProperties(lens: JsonLens) {
-  if (lens.isJsonObject() && lens.value.type !== 'object' && lens.value.additionalProperties !== undefined) {
+export function removeAdditionalProperties(lens: JsonObjectLens) {
+  if (lens.value.type !== 'object' && lens.value.additionalProperties !== undefined) {
     lens.removeProperty('additionalProperties may only exist on object types', 'additionalProperties');
   }
 }
@@ -44,8 +60,8 @@ export function removeAdditionalProperties(lens: JsonLens) {
  * Some specs erroneously use 'minLength' and 'maxLength'. This
  * function renames those values.
  */
-export function replaceArrayLengthProps(lens: JsonLens) {
-  if (!lens.isJsonObject() || lens.value.type !== 'array') {
+export function replaceArrayLengthProps(lens: JsonObjectLens) {
+  if (lens.value.type !== 'array') {
     return;
   }
 
@@ -62,106 +78,138 @@ export function replaceArrayLengthProps(lens: JsonLens) {
  * Although allowed, including `pattern: 'true|false'` on boolean
  * properties is redundant. This function removes those instances.
  */
-export function removeBooleanPatterns(lens: JsonLens) {
-  if (lens.isJsonObject() && lens.value.type === 'boolean' && lens.value.pattern !== undefined) {
+export function removeBooleanPatterns(lens: JsonObjectLens) {
+  if (lens.value.type === 'boolean' && lens.value.pattern !== undefined) {
     lens.removeProperty('pattern is redundant on boolean property', 'pattern');
   }
 }
 
-export function canonicalizeUnionType(lens: JsonLens) {
-  if (lens.isJsonObject() && Array.isArray(lens.value.type)) {
+export function canonicalizeUnionType(lens: JsonObjectLens) {
+  if (Array.isArray(lens.value.type)) {
     const oneOf = lens.value.type.map((v) => {
       return {
         type: v,
         ...restOfObjectWithout(lens.value, ['type']),
       };
     });
-    lens.replaceValue('canonicalize union type into oneOf', { oneOf: oneOf });
+    lens.replaceValue('type should not be an array', { oneOf: oneOf });
   }
 }
 
-export function canonicalizeOneOf(lens: JsonLens) {
-  if (lens.isJsonObject() && Array.isArray(lens.value.oneOf)) {
-    lens.replaceValue('no-mistake', {
-      oneOf: lens.value.oneOf.map((branch) => {
+/**
+ * Some type operators (oneOf/anyOf) are embedded in type objects.
+ *
+ * We lift them out to make the schema more regular to work with.
+ *
+ * Example:
+ *
+ * ```
+ * {
+ *   type: 'object',
+ *   properties: { ... },
+ *   oneOf: [
+ *     { required: ['a'] },
+ *     { required: ['b'] },
+ *   ]
+ * }
+ * ```
+ *
+ * Turns into:
+ *
+ * ```
+ * {
+ *   oneOf: [
+ *     { type: 'object', properties: { ... }, required: ['a'] },
+ *     { type: 'object', properties: { ... }, required: ['b'] },
+ *   ]
+ * }
+ * ```
+ *
+ */
+export function canonicalizeTypeOperators(op: 'oneOf' | 'anyOf' | 'allOf') {
+  return (lens: JsonObjectLens) => {
+    // Only normalize 'oneOf' if we're not at the root. We make an exception for these t
+    // Don't do anything if 'oneOf' appears in the position of a property name, that's valid without
+    // invoking its special powers.
+    if (isRoot(lens) || !isInSchemaPosition(lens)) {
+      return;
+    }
+
+    const branches = lens.value[op];
+    if (!Array.isArray(branches)) {
+      return;
+    }
+
+    const newBranches = deepDedupe(
+      branches.map((branch) => {
         return {
-          ...restOfObjectWithout(lens.value, ['oneOf']),
+          ...restOfObjectWithout(lens.value, [op]),
           ...branch,
-          ...(Array.isArray(lens.value.required) || Array.isArray(branch.required)
-            ? {
-                required: [
-                  ...(Array.isArray(lens.value.required) ? lens.value.required : []),
-                  ...(Array.isArray(branch.required) ? branch.required : []),
-                ],
-              }
-            : undefined),
         };
       }),
-    });
-  }
+    );
+
+    // Nothing happened
+    if (deepEqual(branches, newBranches)) {
+      return;
+    }
+
+    switch (newBranches.length) {
+      case 0:
+        lens.removeProperty(`empty ${op}`, op);
+        break;
+      case 1:
+        lens.replaceProperty(`unnecessary ${op}`, op, newBranches[0]);
+        break;
+      default:
+        lens.replaceValue(NO_MISTAKE, { [op]: newBranches });
+        break;
+    }
+  };
 }
 
-export function canonicalizeAnyOf(lens: JsonLens) {
-  if (lens.isJsonObject() && Array.isArray(lens.value.anyOf)) {
-    lens.replaceValue('no-mistake', {
-      anyOf: lens.value.anyOf.map((branch) => {
-        return {
-          ...restOfObjectWithout(lens.value, ['anyOf']),
-          ...branch,
-          ...(Array.isArray(lens.value.required) || Array.isArray(branch.required)
-            ? {
-                required: [
-                  ...(Array.isArray(lens.value.required) ? lens.value.required : []),
-                  ...(Array.isArray(branch.required) ? branch.required : []),
-                ],
-              }
-            : undefined),
-        };
-      }),
-    });
-  }
-}
-
-export function minMaxImpliesInteger(lens: JsonLens) {
-  if (lens.isJsonObject() && lens.value.type === 'string') {
-    if (lens.value.maximum || lens.value.minimum) {
-      lens.removeProperty('string type has max/min so it was meant to be an integer type', 'type');
-      lens.addProperty('string type has max/min so it was meant to be an integer type', 'type', 'integer');
+/**
+ * Remove additionalProperties/patternProperties on type: string
+ *
+ * These may accidentally be copied when we turn a `type: ['object', 'string']`
+ * into a `oneOf`.
+ */
+export function noMatchPropertiesOnString(lens: JsonObjectLens) {
+  if (lens.value.type === 'string') {
+    if (lens.value.additionalProperties !== undefined) {
+      lens.removeProperty('type=string should not have additionalProperties', 'additionalProperties');
+    }
+    if (lens.value.patternProperties !== undefined) {
+      lens.removeProperty('type=string should not have patternProperties', 'patternProperties');
     }
   }
 }
 
-export function erroneousInsertionOrderOnObject(lens: JsonLens) {
-  if (lens.isJsonObject() && lens.value.type === 'object') {
+export function minMaxImpliesInteger(lens: JsonObjectLens) {
+  if (lens.value.type === 'string') {
+    if (lens.value.maximum || lens.value.minimum) {
+      lens.replaceProperty('string type has max/min so it was meant to be an integer type', 'type', 'integer');
+    }
+  }
+}
+
+export function erroneousInsertionOrderOnObject(lens: JsonObjectLens) {
+  if (lens.value.type === 'object') {
     if (lens.value.insertionOrder !== undefined) {
       lens.removeProperty('object does not have insertionOrder prop', 'insertionOrder');
     }
   }
 }
 
-export function extraneousPropsOnReferences(lens: JsonLens) {
-  if (lens.isReference()) {
-    const { $ref, description, $comment, ...reduced } = lens.value as any;
-    if (Object.keys(reduced).length > 0) {
-      lens.replaceValue('extraneous values on reference prop', {
-        $ref,
-        description,
-        $comment,
-      });
-    }
-  }
-}
-
-export function patchConstOnString(lens: JsonLens) {
-  if (lens.isJsonObject() && lens.value.type === 'string' && lens.value.const !== undefined) {
-    lens.addProperty('const is not a property on a string', 'pattern', lens.value.const);
-    lens.removeProperty('const is not a property on a string', 'const');
+export function patchConstOnString(lens: JsonObjectLens) {
+  if (lens.value.type === 'string' && lens.value.const !== undefined) {
+    lens.renameProperty('const is not a property on a string', 'const', 'pattern');
   }
 }
 
 /** TODO: this one is just flat out wrong and we should remove when the service team fixes their spec */
-export function patchMaxItemsOnString(lens: JsonLens) {
-  if (lens.isJsonObject() && lens.value.type === 'string' && lens.value.maxItems !== undefined) {
+export function patchMaxItemsOnString(lens: JsonObjectLens) {
+  if (lens.value.type === 'string' && lens.value.maxItems !== undefined) {
     lens.removeProperty(
       "strings do not have maxItems, and it's likely an error rather than a typo for maxLength so we are removing the property",
       'maxItems',
@@ -169,62 +217,123 @@ export function patchMaxItemsOnString(lens: JsonLens) {
   }
 }
 
-export function patchMinLengthOnInteger(lens: JsonLens) {
-  if (
-    lens.isJsonObject() &&
-    (lens.value.type === 'integer' || lens.value.type === 'number') &&
-    lens.value.minLength !== undefined
-  ) {
+export function patchMinLengthOnInteger(lens: JsonObjectLens) {
+  if ((lens.value.type === 'integer' || lens.value.type === 'number') && lens.value.minLength !== undefined) {
     lens.removeProperty('integers do not have minLength', 'minLength');
   }
 }
 
-export function canonicalizeDefaultOnBoolean(lens: JsonLens) {
-  if (lens.isJsonObject() && lens.value.type === 'boolean' && typeof lens.value.default === 'string') {
+export function canonicalizeDefaultOnBoolean(lens: JsonObjectLens) {
+  if (lens.value.type === 'boolean' && typeof lens.value.default === 'string') {
     lens.renameProperty('canonicalize default type', 'default', 'default', (d) => d === 'true');
   }
 }
 
-export function canonicalizeRegexInFormat(lens: JsonLens) {
+export function canonicalizeRegexInFormat(lens: JsonObjectLens) {
   if (
-    lens.isJsonObject() &&
     lens.value.type === 'string' &&
     lens.value.format !== undefined &&
     lens.value.pattern === undefined &&
     typeof lens.value.format === 'string'
   ) {
     if (!['uri', 'timestamp', 'date-time'].includes(lens.value.format)) {
-      lens.addProperty('canonicalize regexes in format', 'pattern', lens.value.format);
-      lens.removeProperty('canonicalize regexes in format', 'format');
+      lens.replaceProperty('canonicalize regexes in format', 'pattern', lens.value.format);
     }
   }
 }
 
-export function recurseAndPatch(root: any, patcher: Patcher) {
-  const schema = new SchemaLens(root, { fileName: '' });
-  recurse(schema);
-  const patchedSchema = applyPatches(schema.patches);
-  return patchedSchema;
+/**
+ * Some map objects have `required: []`. It's not wrong, but our types don't enjoy it, so remove 'em.
+ */
+export function removeEmptyRequiredArray(lens: JsonObjectLens) {
+  if (lens.value.type === 'object' && Array.isArray(lens.value.required) && lens.value.required.length === 0) {
+    lens.removeProperty('no-mistake', 'required');
+  }
+}
+
+/**
+ * We're seeing `type: string` with `default: <boolean>`.
+ */
+export function noBooleanDefaultForStringType(lens: JsonObjectLens) {
+  if (lens.value.type === 'string' && typeof lens.value.default === 'boolean') {
+    lens.removeProperty('default value for a string type cannot be a boolean', 'default');
+  }
+}
+
+/**
+ * We're seeing `type: object` with `minLength/maxLength`.
+ *
+ * I think people intend for this to represent the maximum string length of
+ * the JSONification of this object, but it's not valid JSON Schema.
+ */
+export function removeMinMaxLengthOnObject(lens: JsonObjectLens) {
+  if (lens.value.type === 'object') {
+    if (lens.value.minLength) {
+      lens.removeProperty('minLength does not make sense on an object type', 'minLength');
+    }
+    if (lens.value.maxLength) {
+      lens.removeProperty('maxLength does not make sense on an object type', 'maxLength');
+    }
+  }
+}
+
+/**
+ * If it looks like we're trying to validate an object or a map but we forgot the 'type' keyword...
+ */
+export function missingTypeField(lens: JsonObjectLens) {
+  if (!isRoot(lens) && isInSchemaPosition(lens) && lens.value.type === undefined) {
+    if (
+      lens.value.properties !== undefined ||
+      lens.value.additionalProperties !== undefined ||
+      lens.value.patternProperties !== undefined
+    ) {
+      lens.addProperty('forgot type: object', 'type', 'object');
+    }
+  }
+}
+
+export function recurseAndPatch(root: any, patcher: Patcher<JsonLens>) {
+  // Do multiple iterations to find a fixpoint for the patching
+  const patchSets = new Array<PatchReport[]>();
+  let maxIterations = 10;
+  while (maxIterations) {
+    const schema = new SchemaLens(root, { fileName: '' });
+    recurse(schema);
+    if (!schema.hasPatches) {
+      break;
+    }
+    patchSets.push(schema.reports);
+
+    if (--maxIterations === 0) {
+      throw new Error(
+        [
+          'Patching JSON failed to stabilize. Infinite recursion? Most recent patchsets:',
+          JSON.stringify(patchSets.slice(-2), undefined, 2),
+        ].join('\n'),
+      );
+    }
+    try {
+      root = applyPatches(schema.patches);
+    } catch (e) {
+      // We may have produced patches that no longer cleanly apply depending on what other patches have done.
+      // Catch those occurrences and give it another go on the next round.
+    }
+  }
+  return root;
 
   function recurse(lens: SchemaLens) {
     patcher(lens);
 
     if (Array.isArray(lens.value)) {
       lens.value.forEach((_, i) => {
-        const nextLens = lens.descendArrayElement(i);
-        recurse(nextLens);
-        lens.reports.push(...nextLens.reports);
-        lens.patches.push(...nextLens.patches);
+        recurse(lens.descendArrayElement(i));
       });
     }
 
-    if (lens.value && typeof lens.value === 'object') {
+    if (lens.isJsonObject()) {
       for (const k of Object.keys(lens.value)) {
         if (!lens.wasRemoved(k)) {
-          const nextSchema = lens.descendObjectField(k);
-          recurse(nextSchema);
-          lens.reports.push(...nextSchema.reports);
-          lens.patches.push(...nextSchema.patches);
+          recurse(lens.descendObjectField(k));
         }
       }
     }
@@ -236,9 +345,43 @@ export function recurseAndPatch(root: any, patcher: Patcher) {
 }
 
 function restOfObjectWithout(obj: any, values: string[]) {
-  const returnObj = JSON.parse(JSON.stringify(obj));
+  const returnObj = { ...obj };
   for (const val of values) {
     delete returnObj[val];
   }
   return returnObj;
+}
+
+/**
+ * Do a deep dedupe of the given objects
+ */
+function deepDedupe<A>(xs: A[]): A[] {
+  const ret = new Array<A>();
+  const seen = new Set<string>();
+  for (const x of xs) {
+    const json = canonicalize(x);
+    if (!seen.has(json)) {
+      ret.push(x);
+      seen.add(json);
+    }
+  }
+  return ret;
+}
+
+function deepEqual(x: any, y: any) {
+  return canonicalize(x) === canonicalize(y);
+}
+
+/**
+ * Whether the current object is in a position where a schema is expected
+ *
+ * This is usually true, UNLESS we're in the 'properties' array, in which case
+ * all names are literal.
+ */
+function isInSchemaPosition(lens: JsonLens) {
+  return !lens.jsonPath.endsWith('/properties');
+}
+
+function isRoot(lens: JsonLens) {
+  return lens.rootPath.length === 1;
 }

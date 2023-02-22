@@ -83,6 +83,27 @@ export interface CloudFormationRegistryResource extends ImplicitJsonSchemaRecord
    * ```
    */
   readonly propertyTransform?: Record<string, string>;
+
+  /**
+   * Technically this should have been canonicalized out, but that will complicate a lot of the rest of the code.
+   *
+   * So we allow embedded oneOfs/anyOfs, only at the top level.
+   */
+  readonly oneOf?: CommonTypeCombinatorFields[];
+  readonly anyOf?: CommonTypeCombinatorFields[];
+}
+
+/**
+ * Type combinator fields we commonly see at the resource level
+ *
+ * (They can be nested)
+ */
+interface CommonTypeCombinatorFields {
+  readonly required?: string[];
+  readonly type?: string;
+  readonly oneOf?: CommonTypeCombinatorFields[];
+  readonly anyOf?: CommonTypeCombinatorFields[];
+  readonly allOf?: CommonTypeCombinatorFields[];
 }
 
 export type ReplacementStrategy = 'delete_then_create';

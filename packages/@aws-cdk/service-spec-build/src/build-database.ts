@@ -3,7 +3,6 @@ import * as sources from '@aws-cdk/service-spec-sources';
 import { LoadResult } from '@aws-cdk/service-spec-sources';
 import { assertSuccess, Failures, Result } from '@cdklabs/tskb';
 import { loadCloudFormationRegistryResource } from './cloudformation-registry';
-import { readStatefulResources } from './stateful-resources';
 
 export interface BuildDatabaseOptions {
   readonly mustValidate?: boolean;

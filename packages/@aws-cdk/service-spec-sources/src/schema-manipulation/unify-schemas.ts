@@ -19,12 +19,12 @@ export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result
     return a;
   }
 
-  if (jsonschema.isOneOf(a) || jsonschema.isOneOf(b)) {
+  if (jsonschema.isOneOf(a) || jsonschema.isAnyOf(a) || jsonschema.isAllOf(a)) {
     // FIXME: not implemented yet
     return a;
   }
 
-  if (jsonschema.isAnyOf(a) || jsonschema.isAnyOf(b)) {
+  if (jsonschema.isOneOf(b) || jsonschema.isAnyOf(b) || jsonschema.isAllOf(b)) {
     // FIXME: not implemented yet
     return a;
   }

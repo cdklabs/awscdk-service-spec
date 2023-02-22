@@ -7,20 +7,22 @@ import { loadDefaultCloudFormationRegistryResources } from '../loading/load-clou
 async function main() {
   const allResources = await loadDefaultCloudFormationRegistryResources();
 
-  let errors = 0;
+  if (allResources.warnings.length > 0) {
+    console.log(`${allResources.warnings.length} schema files have errors`);
+  }
+
   for (const fail of allResources.warnings) {
     console.log(errorMessage(fail));
 
-    errors += 1;
     process.exitCode = 1;
   }
 
-  if (errors > 0) {
-    console.log(`${errors} schema files have errors`);
+  if (allResources.warnings.length > 0) {
+    console.log(`${allResources.warnings.length} schema files have errors`);
   }
 }
 
 main().catch((e) => {
-  console.error(e);
+  console.log(e);
   process.exitCode = 1;
 });

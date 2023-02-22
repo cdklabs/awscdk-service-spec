@@ -1,10 +1,11 @@
 export namespace jsonschema {
-  export type Schema = Reference | OneOf<Schema> | AnyOf<Schema> | ConcreteSchema;
+  export type Schema = Reference | OneOf<Schema> | AnyOf<Schema> | AllOf<Schema> | ConcreteSchema;
 
   export type ConcreteSchema =
     | Object
     | OneOf<ConcreteSchema>
     | AnyOf<ConcreteSchema>
+    | AllOf<ConcreteSchema>
     | String
     | SchemaArray
     | Boolean
@@ -18,6 +19,8 @@ export namespace jsonschema {
 
   export interface Reference extends Annotatable {
     readonly $ref: string;
+    // A ref may have any number of other fields (I think they are supposed to combine with the referencee)
+    [k: string]: unknown;
   }
 
   export type Object = MapLikeObject | RecordLikeObject;
@@ -29,12 +32,21 @@ export namespace jsonschema {
   export function isAnyOf(x: Schema): x is AnyOf<any> {
     return 'anyOf' in x;
   }
+
   export interface OneOf<S> extends Annotatable {
     readonly oneOf: Array<S>;
   }
 
   export function isOneOf(x: Schema): x is OneOf<any> {
     return 'oneOf' in x;
+  }
+
+  export interface AllOf<S> extends Annotatable {
+    readonly allOf: Array<S>;
+  }
+
+  export function isAllOf(x: Schema): x is AllOf<any> {
+    return 'allOf' in x;
   }
 
   export interface MapLikeObject extends Annotatable {
@@ -62,8 +74,6 @@ export namespace jsonschema {
      * FIXME: should be required but some service teams have omitted it.
      */
     readonly additionalProperties?: false;
-    readonly oneOf?: Array<{ required?: string[]; type?: string }>;
-    readonly anyOf?: Array<{ required?: string[]; type?: string }>;
   }
 
   export function isRecordLikeObject(x: Object): x is RecordLikeObject {
@@ -101,6 +111,7 @@ export namespace jsonschema {
     readonly minimum?: number;
     readonly maximum?: number;
     readonly format?: 'int64' | 'double';
+    readonly multipleOf?: number;
   }
 
   export interface SchemaArray extends Annotatable {
@@ -165,6 +176,12 @@ export namespace jsonschema {
           return {
             schema: {
               anyOf: ref.anyOf.map((x) => resolve(x).schema),
+            },
+          };
+        } else if (isAllOf(ref)) {
+          return {
+            schema: {
+              allOf: ref.allOf.map((x) => resolve(x).schema),
             },
           };
         } else {

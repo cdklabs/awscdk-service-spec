@@ -1,5 +1,6 @@
 import * as pj from 'projen';
 import { MergeQueue, MonorepoRoot, MonorepoTypeScriptProject } from './projenrc';
+import * as canonicalize from 'canonicalize';
 
 const lfsPatterns = ['sources/**/*.json'];
 
@@ -61,7 +62,7 @@ const serviceSpecSources = new MonorepoTypeScriptProject({
   parent: repo,
   name: '@aws-cdk/service-spec-sources',
   description: 'Sources for the service spec',
-  deps: ['ajv', 'glob', tsKb, 'fast-json-patch'],
+  deps: ['ajv', 'glob', tsKb, 'fast-json-patch', 'canonicalize'],
   devDeps: ['ts-json-schema-generator', '@types/glob', 'ajv-cli'],
   private: true,
 });

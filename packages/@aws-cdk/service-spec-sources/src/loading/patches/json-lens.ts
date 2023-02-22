@@ -1,3 +1,5 @@
+export const NO_MISTAKE = 'no-mistake';
+
 export interface JsonLens {
   /** Filename of the file */
   readonly fileName: string;
@@ -14,9 +16,6 @@ export interface JsonLens {
   /** Type test for whether the current lens points to an object. */
   isJsonObject(): this is JsonObjectLens;
 
-  /** Test for whether the current lens points to a reference. */
-  isReference(): boolean;
-
   /** Fully replace the current value with a different one. */
   replaceValue(reason: string, newValue: any): void;
 }
@@ -32,6 +31,9 @@ export interface JsonObjectLens extends JsonLens {
 
   /** Add a property */
   addProperty(reason: string, name: string, value: any): void;
+
+  /** Replace a property */
+  replaceProperty(reason: string, name: string, value: any): void;
 
   /** Recurse through the object field. */
   descendObjectField(key: string, value: any): void;

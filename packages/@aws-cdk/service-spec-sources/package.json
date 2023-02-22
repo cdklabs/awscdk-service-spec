@@ -39,6 +39,7 @@
   "dependencies": {
     "@cdklabs/tskb": "^0.0.0",
     "ajv": "^6.12.6",
+    "canonicalize": "^1.0.8",
     "fast-json-patch": "^3.1.1",
     "glob": "^7.2.3"
   },
