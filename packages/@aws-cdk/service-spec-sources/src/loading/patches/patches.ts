@@ -1,4 +1,5 @@
 import canonicalize from 'canonicalize';
+import { TypeKeyWitness, STRING_KEY_WITNESS, OBJECT_KEY_WITNESS, ARRAY_KEY_WITNESS } from './field-witnesses';
 import { JsonLens, JsonObjectLens, NO_MISTAKE } from './json-lens';
 import { JsonPatch } from './json-patch';
 import { PatchReport, SchemaLens } from './json-patcher';
@@ -30,18 +31,17 @@ export const allPatchers = onlyObjects(
     canonicalizeTypeOperators('oneOf'),
     canonicalizeTypeOperators('anyOf'),
     canonicalizeTypeOperators('allOf'),
-    minMaxImpliesInteger,
-    erroneousInsertionOrderOnObject,
-    patchConstOnString,
     canonicalizeDefaultOnBoolean,
-    patchMaxItemsOnString,
     patchMinLengthOnInteger,
     canonicalizeRegexInFormat,
-    noMatchPropertiesOnString,
     removeEmptyRequiredArray,
-    noBooleanDefaultForStringType,
+    noIncorrectDefaultType,
     removeMinMaxLengthOnObject,
     missingTypeField,
+    minMaxItemsOnObject,
+    makeKeywordDropper('string', STRING_KEY_WITNESS),
+    makeKeywordDropper('object', OBJECT_KEY_WITNESS),
+    makeKeywordDropper('array', ARRAY_KEY_WITNESS),
   ),
 );
 
@@ -168,52 +168,11 @@ export function canonicalizeTypeOperators(op: 'oneOf' | 'anyOf' | 'allOf') {
   };
 }
 
-/**
- * Remove additionalProperties/patternProperties on type: string
- *
- * These may accidentally be copied when we turn a `type: ['object', 'string']`
- * into a `oneOf`.
- */
-export function noMatchPropertiesOnString(lens: JsonObjectLens) {
-  if (lens.value.type === 'string') {
-    if (lens.value.additionalProperties !== undefined) {
-      lens.removeProperty('type=string should not have additionalProperties', 'additionalProperties');
-    }
-    if (lens.value.patternProperties !== undefined) {
-      lens.removeProperty('type=string should not have patternProperties', 'patternProperties');
-    }
-  }
-}
-
-export function minMaxImpliesInteger(lens: JsonObjectLens) {
-  if (lens.value.type === 'string') {
-    if (lens.value.maximum || lens.value.minimum) {
-      lens.replaceProperty('string type has max/min so it was meant to be an integer type', 'type', 'integer');
-    }
-  }
-}
-
 export function erroneousInsertionOrderOnObject(lens: JsonObjectLens) {
   if (lens.value.type === 'object') {
     if (lens.value.insertionOrder !== undefined) {
       lens.removeProperty('object does not have insertionOrder prop', 'insertionOrder');
     }
-  }
-}
-
-export function patchConstOnString(lens: JsonObjectLens) {
-  if (lens.value.type === 'string' && lens.value.const !== undefined) {
-    lens.renameProperty('const is not a property on a string', 'const', 'pattern');
-  }
-}
-
-/** TODO: this one is just flat out wrong and we should remove when the service team fixes their spec */
-export function patchMaxItemsOnString(lens: JsonObjectLens) {
-  if (lens.value.type === 'string' && lens.value.maxItems !== undefined) {
-    lens.removeProperty(
-      "strings do not have maxItems, and it's likely an error rather than a typo for maxLength so we are removing the property",
-      'maxItems',
-    );
   }
 }
 
@@ -254,9 +213,13 @@ export function removeEmptyRequiredArray(lens: JsonObjectLens) {
 /**
  * We're seeing `type: string` with `default: <boolean>`.
  */
-export function noBooleanDefaultForStringType(lens: JsonObjectLens) {
-  if (lens.value.type === 'string' && lens.value.default !== undefined && typeof lens.value.default !== 'string') {
-    lens.removeProperty(`default value for a string type cannot be a ${typeof lens.value.default}`, 'default');
+export function noIncorrectDefaultType(lens: JsonObjectLens) {
+  if (
+    typeof lens.value.type === 'string' &&
+    lens.value.default !== undefined &&
+    typeof lens.value.default !== lens.value.type
+  ) {
+    lens.removeProperty(`default value for a ${lens.value.type} cannot be a ${typeof lens.value.default}`, 'default');
   }
 }
 
@@ -273,6 +236,31 @@ export function removeMinMaxLengthOnObject(lens: JsonObjectLens) {
     }
     if (lens.value.maxLength) {
       lens.removeProperty('maxLength does not make sense on an object type', 'maxLength');
+    }
+  }
+}
+
+/**
+ * We're seeing `type: object` with `minItems/maxItems`.
+ *
+ * I think people intend for this to represent the amount of elements in a map.
+ */
+export function minMaxItemsOnObject(lens: JsonObjectLens) {
+  if (lens.value.type === 'object') {
+    if (lens.value.additionalProperties || lens.value.patternProperties) {
+      if (lens.value.minItems !== undefined) {
+        lens.renameProperty('should use minProperties on an object type', 'minItems', 'minProperties');
+      }
+      if (lens.value.maxItems !== undefined) {
+        lens.renameProperty('should use maxProperties on an ojbect type', 'maxItems', 'maxProperties');
+      }
+    } else {
+      if (lens.value.minItems !== undefined) {
+        lens.removeProperty('minItems/minProperties does not make sense on fixed size object', 'minItems');
+      }
+      if (lens.value.maxItems !== undefined) {
+        lens.removeProperty('maxItems/maxProperties does not make sense on fixed size object', 'maxItems');
+      }
     }
   }
 }
@@ -384,4 +372,32 @@ function isInSchemaPosition(lens: JsonLens) {
 
 function isRoot(lens: JsonLens) {
   return lens.rootPath.length === 1;
+}
+
+/**
+ * Drop keywords that aren't in a field witness
+ *
+ * Ignore allOf/anyOf etc, those will be normalized out later.
+ */
+function dropIrrelevantKeywords(lens: JsonObjectLens, typeDescription: string, witness: TypeKeyWitness<any>) {
+  // The root is special
+  if (isRoot(lens)) {
+    return;
+  }
+
+  const protectedKeys = ['anyOf', 'oneOf', 'allOf'];
+
+  for (const key of Object.keys(lens.value)) {
+    if (!witness[key] && !protectedKeys.includes(key)) {
+      lens.removeProperty(`${key} does not apply to ${typeDescription}`, key);
+    }
+  }
+}
+
+function makeKeywordDropper(typeName: string, witness: TypeKeyWitness<any>) {
+  return (lens: JsonObjectLens) => {
+    if (lens.value.type === typeName) {
+      dropIrrelevantKeywords(lens, `type=${typeName}`, witness);
+    }
+  };
 }

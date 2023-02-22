@@ -100,6 +100,13 @@
         "handlers": {
           "$ref": "#/definitions/Handlers"
         },
+        "maxProperties": {
+          "type": "number"
+        },
+        "minProperties": {
+          "description": "FIXME: these are weird but oh hey?",
+          "type": "number"
+        },
         "oneOf": {
           "description": "Technically this should have been canonicalized out, but that will complicate a lot of the rest of the code.\n\nSo we allow embedded oneOfs/anyOfs, only at the top level.",
           "items": {
@@ -645,6 +652,13 @@
         },
         "description": {
           "type": "string"
+        },
+        "maxProperties": {
+          "type": "number"
+        },
+        "minProperties": {
+          "description": "FIXME: these are weird but oh hey?",
+          "type": "number"
         },
         "properties": {
           "$ref": "#/definitions/jsonschema.ObjectProperties"

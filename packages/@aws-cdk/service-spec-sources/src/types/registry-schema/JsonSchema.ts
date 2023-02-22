@@ -74,6 +74,12 @@ export namespace jsonschema {
      * FIXME: should be required but some service teams have omitted it.
      */
     readonly additionalProperties?: false;
+
+    /**
+     * FIXME: these are weird but oh hey?
+     */
+    readonly minProperties?: number;
+    readonly maxProperties?: number;
   }
 
   export function isRecordLikeObject(x: Object): x is RecordLikeObject {
