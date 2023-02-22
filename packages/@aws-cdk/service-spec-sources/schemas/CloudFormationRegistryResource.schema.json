@@ -476,6 +476,9 @@
         },
         {
           "$ref": "#/definitions/jsonschema.Number"
+        },
+        {
+          "$ref": "#/definitions/jsonschema.Null"
         }
       ]
     },
@@ -517,6 +520,28 @@
         },
         "type": {
           "const": "object",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "jsonschema.Null": {
+      "additionalProperties": false,
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "const": "null",
           "type": "string"
         }
       },

@@ -46,6 +46,7 @@ export const allPatchers = onlyObjects(
     removeEmptyRequiredArray,
     noIncorrectDefaultType,
     removeMinMaxLengthOnObject,
+    removeSuspiciousPatterns,
     missingTypeField,
     minMaxItemsOnObject,
     makeKeywordDropper('string', STRING_KEY_WITNESS),
@@ -94,6 +95,20 @@ export function replaceArrayLengthProps(lens: JsonObjectLens) {
 export function removeBooleanPatterns(lens: JsonObjectLens) {
   if (lens.value.type === 'boolean' && lens.value.pattern !== undefined) {
     lens.removeProperty('pattern is redundant on boolean property', 'pattern');
+  }
+}
+
+/**
+ * format: 'string' and pattern: 'string' are probably not intended.
+ *
+ * Do we really mean the literal text `s t r i n g` ?
+ */
+export function removeSuspiciousPatterns(lens: JsonObjectLens) {
+  if (lens.value?.format === 'string') {
+    lens.removeProperty('you probably did not mean the literal string "string"', 'format');
+  }
+  if (lens.value?.pattern === 'string') {
+    lens.removeProperty('you probably did not mean the literal string "string"', 'pattern');
   }
 }
 
