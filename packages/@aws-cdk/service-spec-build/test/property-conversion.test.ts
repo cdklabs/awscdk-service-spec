@@ -1,6 +1,6 @@
 import { emptyDatabase } from '@aws-cdk/service-spec';
 import { Failures } from '@cdklabs/tskb';
-import { loadCloudFormationRegistryResource } from '../src/cloudformation-registry';
+import { readCloudFormationRegistryResource } from '../src/cloudformation-registry';
 
 let db: ReturnType<typeof emptyDatabase>;
 let fails: Failures;
@@ -10,7 +10,7 @@ beforeEach(() => {
 });
 
 test('exclude readOnlyProperties from properties', () => {
-  loadCloudFormationRegistryResource({
+  readCloudFormationRegistryResource({
     db,
     fails,
     resource: {
@@ -29,7 +29,7 @@ test('exclude readOnlyProperties from properties', () => {
 });
 
 test('include readOnlyProperties in attributes', () => {
-  loadCloudFormationRegistryResource({
+  readCloudFormationRegistryResource({
     db,
     fails,
     resource: {
@@ -48,7 +48,7 @@ test('include readOnlyProperties in attributes', () => {
 });
 
 test('include legacy attributes in attributes', () => {
-  loadCloudFormationRegistryResource({
+  readCloudFormationRegistryResource({
     db,
     fails,
     resource: {

@@ -70,7 +70,12 @@ for (const tsconfig of [serviceSpecSources.tsconfig, serviceSpecSources.tsconfig
 }
 
 const serviceSpecSchemaTask = serviceSpecSources.addTask('gen-schemas', {
-  steps: ['CloudFormationRegistryResource', 'ResourceSpecification', 'StatefulResources'].map((typeName: string) => ({
+  steps: [
+    'CloudFormationRegistryResource',
+    'ResourceSpecification',
+    'CloudFormationDocumentation',
+    'StatefulResources',
+  ].map((typeName: string) => ({
     exec: [
       'ts-json-schema-generator',
       '--tsconfig',
