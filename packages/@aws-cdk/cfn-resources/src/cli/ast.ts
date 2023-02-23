@@ -64,6 +64,8 @@ export class AstBuilder<T extends Module> {
         try {
           return this.scope.findType(ref.name);
         } catch {
+          // We need to first create the Interface without properties, in case of a recursive type.
+          // This way when a property is added that recursively uses the type, it already exists (albeit without properties) and can be referenced
           const theType = new InterfaceType(this.scope, {
             export: true,
             name: ref.name,
