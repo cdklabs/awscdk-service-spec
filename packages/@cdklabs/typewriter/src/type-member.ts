@@ -12,6 +12,12 @@ export enum MemberKind {
   Property = 'property',
 }
 
+export enum MemberVisibility {
+  Public = 'public',
+  Protected = 'protected',
+  Private = 'Private',
+}
+
 export abstract class TypeMember {
   /**
    * The simple name of the type (MyClass).
@@ -33,6 +39,8 @@ export abstract class TypeMember {
   public get fqn(): string {
     return `${this.scope.fqn}#${this.name}`;
   }
+
+  public abstract visibility: MemberVisibility;
 
   public constructor(public readonly scope: InterfaceType, public readonly spec: TypeMemberSpec) {}
 

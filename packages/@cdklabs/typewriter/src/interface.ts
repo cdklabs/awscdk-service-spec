@@ -22,17 +22,29 @@ export class InterfaceType extends Type {
     return result;
   }
 
+  /**
+   * List the modifiers of the interface
+   */
   public get modifiers(): Array<string> {
     const modifiers = [];
 
     if (this.spec.export) {
       modifiers.push('export');
     }
-
     return modifiers;
   }
 
   public constructor(public scope: Scope, public readonly spec: InterfaceSpec) {
     super(scope, spec);
+  }
+
+  /**
+   * Adds a property to the interface
+   */
+  public addProperty(spec: PropertySpec) {
+    if (!this.spec.properties) {
+      this.spec.properties = [];
+    }
+    this.spec.properties.push(spec);
   }
 }

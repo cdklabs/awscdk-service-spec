@@ -1,18 +1,43 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`AWS::ApiGateway::RestApi 1`] = `
-"export interface CfnRestApiProps {
+"export interface BodyS3Location {
+  readonly bucket: string;
+
+  readonly eTag: string;
+
+  readonly version: string;
+
+  readonly key: string;
+}
+
+
+export interface EndpointConfiguration {
+  readonly types: Array<string>;
+
+  readonly vpcEndpointIds: Array<string>;
+}
+
+
+export interface Tags {
+  readonly key: string;
+
+  readonly value: string;
+}
+
+
+export interface CfnRestApiProps {
   readonly apiKeySourceType: string;
 
   readonly binaryMediaTypes: Array<string>;
 
   readonly body: any;
 
-  readonly bodyS3Location: any;
+  readonly bodyS3Location: BodyS3Location;
 
   readonly cloneFrom: string;
 
-  readonly endpointConfiguration: any;
+  readonly endpointConfiguration: EndpointConfiguration;
 
   readonly description: string;
 
@@ -30,13 +55,27 @@ exports[`AWS::ApiGateway::RestApi 1`] = `
 
   readonly parameters: any;
 
-  readonly tags: Array<any>;
+  readonly tags: Array<Tags>;
 }
 "
 `;
 
 exports[`AWS::IAM::Role 1`] = `
-"export interface CfnRoleProps {
+"export interface Policies {
+  readonly policyDocument: any;
+
+  readonly policyName: string;
+}
+
+
+export interface Tags {
+  readonly key: string;
+
+  readonly value: string;
+}
+
+
+export interface CfnRoleProps {
   readonly assumeRolePolicyDocument: any;
 
   readonly description: string;
@@ -49,28 +88,96 @@ exports[`AWS::IAM::Role 1`] = `
 
   readonly permissionsBoundary: string;
 
-  readonly policies: Array<any>;
+  readonly policies: Array<Policies>;
 
   readonly roleName: string;
 
-  readonly tags: Array<any>;
+  readonly tags: Array<Tags>;
 }
 "
 `;
 
 exports[`AWS::Lambda::Function 1`] = `
-"export interface CfnFunctionProps {
+"export interface TracingConfig {
+  readonly mode: string;
+}
+
+
+export interface VpcConfig {
+  readonly securityGroupIds: Array<string>;
+
+  readonly subnetIds: Array<string>;
+}
+
+
+export interface SnapStart {
+  readonly applyOn: string;
+}
+
+
+export interface FileSystemConfigs {
+  readonly arn: string;
+
+  readonly localMountPath: string;
+}
+
+
+export interface Tags {
+  readonly value: string;
+
+  readonly key: string;
+}
+
+
+export interface ImageConfig {
+  readonly workingDirectory: string;
+
+  readonly command: Array<string>;
+
+  readonly entryPoint: Array<string>;
+}
+
+
+export interface DeadLetterConfig {
+  readonly targetArn: string;
+}
+
+
+export interface Code {
+  readonly s3ObjectVersion: string;
+
+  readonly s3Bucket: string;
+
+  readonly zipFile: string;
+
+  readonly s3Key: string;
+
+  readonly imageUri: string;
+}
+
+
+export interface Environment {
+  readonly variables: Map<string, string>;
+}
+
+
+export interface EphemeralStorage {
+  readonly size: number;
+}
+
+
+export interface CfnFunctionProps {
   readonly description: string;
 
-  readonly tracingConfig: any;
+  readonly tracingConfig: TracingConfig;
 
-  readonly vpcConfig: any;
+  readonly vpcConfig: VpcConfig;
 
   readonly reservedConcurrentExecutions: number;
 
-  readonly snapStart: any;
+  readonly snapStart: SnapStart;
 
-  readonly fileSystemConfigs: Array<any>;
+  readonly fileSystemConfigs: Array<FileSystemConfigs>;
 
   readonly functionName: string;
 
@@ -84,25 +191,25 @@ exports[`AWS::Lambda::Function 1`] = `
 
   readonly layers: Array<string>;
 
-  readonly tags: Array<any>;
+  readonly tags: Array<Tags>;
 
-  readonly imageConfig: any;
+  readonly imageConfig: ImageConfig;
 
   readonly memorySize: number;
 
-  readonly deadLetterConfig: any;
+  readonly deadLetterConfig: DeadLetterConfig;
 
   readonly timeout: number;
 
   readonly handler: string;
 
-  readonly code: any;
+  readonly code: Code;
 
   readonly role: string;
 
-  readonly environment: any;
+  readonly environment: Environment;
 
-  readonly ephemeralStorage: any;
+  readonly ephemeralStorage: EphemeralStorage;
 
   readonly architectures: Array<string>;
 }
@@ -110,52 +217,423 @@ exports[`AWS::Lambda::Function 1`] = `
 `;
 
 exports[`AWS::S3::Bucket 1`] = `
-"export interface CfnBucketProps {
-  readonly accelerateConfiguration: any;
+"export interface AccelerateConfiguration {
+  readonly accelerationStatus: string;
+}
+
+
+export interface AnalyticsConfigurations {
+  readonly tagFilters: Array<TagFilters>;
+
+  readonly storageClassAnalysis: StorageClassAnalysis;
+
+  readonly id: string;
+
+  readonly prefix: string;
+}
+
+
+export interface TagFilters {
+  readonly value: string;
+
+  readonly key: string;
+}
+
+
+export interface StorageClassAnalysis {
+  readonly dataExport: DataExport;
+}
+
+
+export interface DataExport {
+  readonly destination: Destination;
+
+  readonly outputSchemaVersion: string;
+}
+
+
+export interface Destination {
+  readonly bucketArn: string;
+
+  readonly bucketAccountId: string;
+
+  readonly format: string;
+
+  readonly prefix: string;
+}
+
+
+export interface BucketEncryption {
+  readonly serverSideEncryptionConfiguration: Array<ServerSideEncryptionConfiguration>;
+}
+
+
+export interface ServerSideEncryptionConfiguration {
+  readonly bucketKeyEnabled: boolean;
+
+  readonly serverSideEncryptionByDefault: ServerSideEncryptionByDefault;
+}
+
+
+export interface ServerSideEncryptionByDefault {
+  readonly kMSMasterKeyID: string;
+
+  readonly sSEAlgorithm: string;
+}
+
+
+export interface CorsConfiguration {
+  readonly corsRules: Array<CorsRules>;
+}
+
+
+export interface CorsRules {
+  readonly allowedHeaders: Array<string>;
+
+  readonly allowedMethods: Array<string>;
+
+  readonly allowedOrigins: Array<string>;
+
+  readonly exposedHeaders: Array<string>;
+
+  readonly id: string;
+
+  readonly maxAge: number;
+}
+
+
+export interface IntelligentTieringConfigurations {
+  readonly id: string;
+
+  readonly prefix: string;
+
+  readonly status: string;
+
+  readonly tagFilters: Array<TagFilters>;
+
+  readonly tierings: Array<Tierings>;
+}
+
+
+export interface Tierings {
+  readonly accessTier: string;
+
+  readonly days: number;
+}
+
+
+export interface InventoryConfigurations {
+  readonly destination: Destination;
+
+  readonly enabled: boolean;
+
+  readonly id: string;
+
+  readonly includedObjectVersions: string;
+
+  readonly optionalFields: Array<string>;
+
+  readonly prefix: string;
+
+  readonly scheduleFrequency: string;
+}
+
+
+export interface LifecycleConfiguration {
+  readonly rules: Array<Rules>;
+}
+
+
+export interface Rules {
+  readonly abortIncompleteMultipartUpload: AbortIncompleteMultipartUpload;
+
+  readonly expirationDate: string;
+
+  readonly expirationInDays: number;
+
+  readonly expiredObjectDeleteMarker: boolean;
+
+  readonly id: string;
+
+  readonly noncurrentVersionExpirationInDays: number;
+
+  readonly noncurrentVersionExpiration: NoncurrentVersionExpiration;
+
+  readonly noncurrentVersionTransition: NoncurrentVersionTransition;
+
+  readonly noncurrentVersionTransitions: Array<NoncurrentVersionTransition>;
+
+  readonly prefix: string;
+
+  readonly status: string;
+
+  readonly tagFilters: Array<TagFilters>;
+
+  readonly objectSizeGreaterThan: string;
+
+  readonly objectSizeLessThan: string;
+
+  readonly transition: Transition;
+
+  readonly transitions: Array<Transition>;
+}
+
+
+export interface AbortIncompleteMultipartUpload {
+  readonly daysAfterInitiation: number;
+}
+
+
+export interface NoncurrentVersionExpiration {
+  readonly noncurrentDays: number;
+
+  readonly newerNoncurrentVersions: number;
+}
+
+
+export interface NoncurrentVersionTransition {
+  readonly storageClass: string;
+
+  readonly transitionInDays: number;
+
+  readonly newerNoncurrentVersions: number;
+}
+
+
+export interface Transition {
+  readonly storageClass: string;
+
+  readonly transitionDate: string;
+
+  readonly transitionInDays: number;
+}
+
+
+export interface LoggingConfiguration {
+  readonly destinationBucketName: string;
+
+  readonly logFilePrefix: string;
+}
+
+
+export interface MetricsConfigurations {
+  readonly accessPointArn: string;
+
+  readonly id: string;
+
+  readonly prefix: string;
+
+  readonly tagFilters: Array<TagFilters>;
+}
+
+
+export interface NotificationConfiguration {
+  readonly eventBridgeConfiguration: EventBridgeConfiguration;
+
+  readonly lambdaConfigurations: Array<LambdaConfigurations>;
+
+  readonly queueConfigurations: Array<QueueConfigurations>;
+
+  readonly topicConfigurations: Array<TopicConfigurations>;
+}
+
+
+export interface EventBridgeConfiguration {
+  readonly eventBridgeEnabled: boolean;
+}
+
+
+export interface LambdaConfigurations {
+  readonly event: string;
+
+  readonly filter: Filter;
+
+  readonly function: string;
+}
+
+
+export interface Filter {
+  readonly s3Key: S3Key;
+}
+
+
+export interface S3Key {
+  readonly rules: Array<Rules>;
+}
+
+
+export interface QueueConfigurations {
+  readonly event: string;
+
+  readonly filter: Filter;
+
+  readonly queue: string;
+}
+
+
+export interface TopicConfigurations {
+  readonly event: string;
+
+  readonly filter: Filter;
+
+  readonly topic: string;
+}
+
+
+export interface ObjectLockConfiguration {
+  readonly objectLockEnabled: string;
+
+  readonly rule: Rule;
+}
+
+
+export interface Rule {
+  readonly defaultRetention: DefaultRetention;
+}
+
+
+export interface DefaultRetention {
+  readonly years: number;
+
+  readonly days: number;
+
+  readonly mode: string;
+}
+
+
+export interface OwnershipControls {
+  readonly rules: Array<Rules>;
+}
+
+
+export interface PublicAccessBlockConfiguration {
+  readonly blockPublicAcls: boolean;
+
+  readonly blockPublicPolicy: boolean;
+
+  readonly ignorePublicAcls: boolean;
+
+  readonly restrictPublicBuckets: boolean;
+}
+
+
+export interface ReplicationConfiguration {
+  readonly role: string;
+
+  readonly rules: Array<Rules>;
+}
+
+
+export interface Tags {
+  readonly key: string;
+
+  readonly value: string;
+}
+
+
+export interface VersioningConfiguration {
+  readonly status: string;
+}
+
+
+export interface WebsiteConfiguration {
+  readonly errorDocument: string;
+
+  readonly indexDocument: string;
+
+  readonly routingRules: Array<RoutingRules>;
+
+  readonly redirectAllRequestsTo: RedirectAllRequestsTo;
+}
+
+
+export interface RoutingRules {
+  readonly redirectRule: RedirectRule;
+
+  readonly routingRuleCondition: RoutingRuleCondition;
+}
+
+
+export interface RedirectRule {
+  readonly hostName: string;
+
+  readonly httpRedirectCode: string;
+
+  readonly protocol: string;
+
+  readonly replaceKeyPrefixWith: string;
+
+  readonly replaceKeyWith: string;
+}
+
+
+export interface RoutingRuleCondition {
+  readonly keyPrefixEquals: string;
+
+  readonly httpErrorCodeReturnedEquals: string;
+}
+
+
+export interface RedirectAllRequestsTo {
+  readonly hostName: string;
+
+  readonly protocol: string;
+}
+
+
+export interface CfnBucketProps {
+  readonly accelerateConfiguration: AccelerateConfiguration;
 
   readonly accessControl: string;
 
-  readonly analyticsConfigurations: Array<any>;
+  readonly analyticsConfigurations: Array<AnalyticsConfigurations>;
 
-  readonly bucketEncryption: any;
+  readonly bucketEncryption: BucketEncryption;
 
   readonly bucketName: string;
 
-  readonly corsConfiguration: any;
+  readonly corsConfiguration: CorsConfiguration;
 
-  readonly intelligentTieringConfigurations: Array<any>;
+  readonly intelligentTieringConfigurations: Array<IntelligentTieringConfigurations>;
 
-  readonly inventoryConfigurations: Array<any>;
+  readonly inventoryConfigurations: Array<InventoryConfigurations>;
 
-  readonly lifecycleConfiguration: any;
+  readonly lifecycleConfiguration: LifecycleConfiguration;
 
-  readonly loggingConfiguration: any;
+  readonly loggingConfiguration: LoggingConfiguration;
 
-  readonly metricsConfigurations: Array<any>;
+  readonly metricsConfigurations: Array<MetricsConfigurations>;
 
-  readonly notificationConfiguration: any;
+  readonly notificationConfiguration: NotificationConfiguration;
 
-  readonly objectLockConfiguration: any;
+  readonly objectLockConfiguration: ObjectLockConfiguration;
 
   readonly objectLockEnabled: boolean;
 
-  readonly ownershipControls: any;
+  readonly ownershipControls: OwnershipControls;
 
-  readonly publicAccessBlockConfiguration: any;
+  readonly publicAccessBlockConfiguration: PublicAccessBlockConfiguration;
 
-  readonly replicationConfiguration: any;
+  readonly replicationConfiguration: ReplicationConfiguration;
 
-  readonly tags: Array<any>;
+  readonly tags: Array<Tags>;
 
-  readonly versioningConfiguration: any;
+  readonly versioningConfiguration: VersioningConfiguration;
 
-  readonly websiteConfiguration: any;
+  readonly websiteConfiguration: WebsiteConfiguration;
 }
 "
 `;
 
 exports[`AWS::SQS::Queue 1`] = `
-"export interface CfnQueueProps {
+"export interface Tags {
+  readonly key: string;
+
+  readonly value: string;
+}
+
+
+export interface CfnQueueProps {
   readonly contentBasedDeduplication: boolean;
 
   readonly deduplicationScope: string;
@@ -184,7 +662,7 @@ exports[`AWS::SQS::Queue 1`] = `
 
   readonly redrivePolicy: any;
 
-  readonly tags: Array<any>;
+  readonly tags: Array<Tags>;
 
   readonly visibilityTimeout: number;
 }
@@ -192,12 +670,39 @@ exports[`AWS::SQS::Queue 1`] = `
 `;
 
 exports[`Alexa::ASK::Skill 1`] = `
-"export interface CfnSkillProps {
-  readonly authenticationConfiguration: any;
+"export interface AuthenticationConfiguration {
+  readonly clientId: string;
+
+  readonly refreshToken: string;
+
+  readonly clientSecret: string;
+}
+
+
+export interface SkillPackage {
+  readonly s3BucketRole: string;
+
+  readonly overrides: Overrides;
+
+  readonly s3ObjectVersion: string;
+
+  readonly s3Bucket: string;
+
+  readonly s3Key: string;
+}
+
+
+export interface Overrides {
+  readonly manifest: any;
+}
+
+
+export interface CfnSkillProps {
+  readonly authenticationConfiguration: AuthenticationConfiguration;
 
   readonly vendorId: string;
 
-  readonly skillPackage: any;
+  readonly skillPackage: SkillPackage;
 }
 "
 `;

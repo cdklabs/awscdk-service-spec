@@ -1,8 +1,8 @@
 import { DatabaseSchema } from '@aws-cdk/service-spec';
 import { Database } from '@cdklabs/tskb';
 import { TypeScriptRenderer } from '@cdklabs/typewriter';
+import { AstBuilder } from '../src/cli/ast';
 import { loadDatabase } from '../src/cli/db';
-import { moduleFromResource } from '../src/cli/service';
 
 const renderer = new TypeScriptRenderer();
 let db: Database<DatabaseSchema>;
@@ -20,6 +20,9 @@ test.each([
   'AWS::SQS::Queue',
 ])('%s', (cloudFormationType) => {
   const resource = db.lookup('resource', 'cloudFormationType', 'equals', cloudFormationType)[0];
-  const mod = moduleFromResource(resource);
-  expect(renderer.render(mod)).toMatchSnapshot();
+
+  const ast = AstBuilder.forResource(resource.cloudFormationType, db);
+  ast.addResource(resource);
+
+  expect(renderer.render(ast.scope)).toMatchSnapshot();
 });
