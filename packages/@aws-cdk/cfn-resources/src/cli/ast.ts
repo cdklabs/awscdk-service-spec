@@ -18,7 +18,6 @@ export class AstBuilder<T extends Module> {
   protected constructor(public readonly scope: T, public readonly db: Database<DatabaseSchema>) {}
 
   public addResource(r: Resource) {
-    this.db.follow('usesType', r);
     new InterfaceType(this.scope, this.resourcePropsSpec(r));
   }
 
