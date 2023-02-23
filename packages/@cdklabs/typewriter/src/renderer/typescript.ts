@@ -2,8 +2,8 @@ import { Renderer } from './base';
 import { InterfaceType } from '../interface';
 import { Module } from '../module';
 import { Property } from '../property';
-import { TypeReference } from '../type-ref';
 import { MemberVisibility } from '../type-member';
+import { TypeReference } from '../type-ref';
 
 export class TypeScriptRenderer extends Renderer {
   protected renderModule(mod: Module, indentationLevel: number): string {
