@@ -1,6 +1,6 @@
 import * as jsii from '@jsii/spec';
 import { InterfaceType } from './interface';
-import { MemberKind, TypeMember } from './type-member';
+import { MemberKind, MemberVisibility, TypeMember } from './type-member';
 import { TypeReference } from './type-ref';
 
 export interface PropertySpec extends Omit<jsii.Property, 'assembly' | 'fqn'> {
@@ -20,6 +20,16 @@ export class Property extends TypeMember {
    */
   public get optional(): boolean {
     return !!this.spec?.optional;
+  }
+
+  /**
+   * The visibility of the member.
+   */
+  public get visibility(): MemberVisibility {
+    if (this.spec?.protected) {
+      return MemberVisibility.Protected;
+    }
+    return MemberVisibility.Public;
   }
 
   /**

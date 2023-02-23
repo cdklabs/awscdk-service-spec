@@ -21,14 +21,14 @@ export abstract class Scope {
   public abstract addType(type: Type): void;
 
   /**
-   * Find type by FQN
+   * Find type by FQN or Name
    */
-  public findType(fqn: string): Type {
-    const ownType = this.typeMap.get(fqn);
+  public findType(fqnOrName: string): Type {
+    const ownType = this.typeMap.get(fqnOrName) || this.typeMap.get(`${this.fqn}.${fqnOrName}`);
     if (ownType !== undefined) {
       return ownType;
     }
 
-    throw new Error(`Type '${fqn}' not found in assembly ${this.name}`);
+    throw new Error(`Type '${fqnOrName}' not found in assembly ${this.name}`);
   }
 }

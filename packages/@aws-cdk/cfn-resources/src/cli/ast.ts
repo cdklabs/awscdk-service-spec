@@ -18,6 +18,7 @@ export class AstBuilder<T extends Module> {
   protected constructor(public readonly scope: T, public readonly db: Database<DatabaseSchema>) {}
 
   public addResource(r: Resource) {
+    this.db.follow('usesType', r);
     new InterfaceType(this.scope, this.resourcePropsSpec(r));
   }
 
@@ -59,6 +60,26 @@ export class AstBuilder<T extends Module> {
             elementtype: this.propertyTypeToTypeReferenceSpec(type.element) as any,
           },
         };
+      case 'ref':
+        const ref = this.db.get('typeDefinition', type.reference.$ref);
+        try {
+          return this.scope.findType(ref.name);
+        } catch {
+          const theType = new InterfaceType(this.scope, {
+            export: true,
+            name: ref.name,
+            kind: jsii.TypeKind.Interface,
+          });
+          Object.entries(ref.properties).forEach(([name, p]) =>
+            theType.addProperty({
+              kind: MemberKind.Property,
+              name: Case.firstCharToLower(name),
+              type: this.propertyTypeToTypeReferenceSpec(p.type),
+              immutable: true,
+            }),
+          );
+          return theType;
+        }
       case 'json':
       default:
         return {
