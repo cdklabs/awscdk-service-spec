@@ -48,5 +48,8 @@
     {
       "path": "../../@cdklabs/tskb"
     }
-  ]
+  ],
+  "ts-node": {
+    "swc": true
+  }
 }
