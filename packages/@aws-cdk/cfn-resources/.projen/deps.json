@@ -21,8 +21,12 @@
       "type": "build"
     },
     {
+      "name": "@swc/core",
+      "type": "build"
+    },
+    {
       "name": "@types/fs-extra",
-      "version": "ts3.9",
+      "version": "ts4.9",
       "type": "build"
     },
     {

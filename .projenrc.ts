@@ -130,7 +130,8 @@ const cfnResources = new MonorepoTypeScriptProject({
     'ts-node',
     '@jsii/spec',
     'fs-extra',
-    '@types/fs-extra@ts3.9',
+    '@types/fs-extra@ts4.9',
+    '@swc/core',
   ],
 });
 cfnResources.eslint?.addOverride({
@@ -140,6 +141,7 @@ cfnResources.eslint?.addOverride({
   },
 });
 cfnResources.addGitIgnore('src/services/**');
+cfnResources.tsconfigDev.file.addOverride('ts-node.swc', true);
 cfnResources.preCompileTask.spawn(
   cfnResources.tasks.addTask('generate', {
     exec: 'ts-node --project tsconfig.dev.json src/cli/main.ts',
