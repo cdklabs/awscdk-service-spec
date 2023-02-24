@@ -1,10 +1,11 @@
-import { buildDatabase } from '@aws-cdk/service-spec-build';
-import { SchemaValidation } from '@aws-cdk/service-spec-sources';
+import fs from 'fs-extra';
+import { emptyDatabase } from '@aws-cdk/service-spec';
+
+const pathToDb = require.resolve('@aws-cdk/service-spec-build/db.json');
 
 export async function loadDatabase() {
-  const { db } = await buildDatabase({
-    validateJsonSchema: SchemaValidation.NONE,
-  });
-
+  const spec = fs.readJson(pathToDb);
+  const db = emptyDatabase();
+  db.load(await spec);
   return db;
 }
