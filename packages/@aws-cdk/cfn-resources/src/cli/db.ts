@@ -1,5 +1,5 @@
-import fs from 'fs-extra';
 import { emptyDatabase } from '@aws-cdk/service-spec';
+import fs from 'fs-extra';
 
 const pathToDb = require.resolve('@aws-cdk/service-spec-build/db.json');
 
