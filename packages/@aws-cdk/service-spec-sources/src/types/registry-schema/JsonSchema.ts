@@ -120,15 +120,10 @@ export namespace jsonschema {
       }
 
       const parts = path.substring(2).split('/');
-      let current = root;
-      while (true) {
-        const name = parts.shift();
-        if (!name) {
-          break;
-        }
-        current = current[name];
-      }
-      return { schema: current, referenceName: parts[parts.length - 1] };
+      const referenceName = parts[parts.length - 1];
+      const schema = parts.reduce((current, next) => current[next], root);
+
+      return { schema, referenceName };
     };
   }
 

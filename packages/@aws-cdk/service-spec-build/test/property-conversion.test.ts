@@ -76,3 +76,45 @@ test('include legacy attributes in attributes', () => {
   );
   expect(attrNames.sort()).toEqual(['Id', 'Property']);
 });
+
+test('reference types are correctly named', () => {
+  readCloudFormationRegistryResource({
+    db,
+    fails,
+    resource: {
+      description: 'Test resource',
+      typeName: 'AWS::Some::Type',
+      definitions: {
+        Property: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            Name: {
+              type: 'string',
+            },
+          },
+          required: ['Name'],
+        },
+      },
+      properties: {
+        PropertyList: {
+          type: 'array',
+          items: {
+            $ref: '#/definitions/Property',
+          },
+        },
+        PropertySingular: {
+          $ref: '#/definitions/Property',
+        },
+        Id: { type: 'string' },
+      },
+      readOnlyProperties: ['/properties/Id'],
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0];
+  const types = db.follow('usesType', resource);
+
+  expect(types.length).toBe(1);
+  expect(types[0].to.name).toBe('Property');
+});
