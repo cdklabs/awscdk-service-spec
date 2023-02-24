@@ -130,7 +130,7 @@ const cfnResources = new MonorepoTypeScriptProject({
     'ts-node',
     '@jsii/spec',
     'fs-extra',
-    '@types/fs-extra@ts4.9',
+    '@types/fs-extra@^9',
     '@swc/core',
   ],
 });

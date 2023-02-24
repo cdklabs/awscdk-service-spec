@@ -26,7 +26,7 @@
     },
     {
       "name": "@types/fs-extra",
-      "version": "ts4.9",
+      "version": "^9",
       "type": "build"
     },
     {
