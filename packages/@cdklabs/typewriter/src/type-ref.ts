@@ -12,7 +12,7 @@ export class TypeReference {
     return jsii.isNamedTypeReference(this.spec) ? this.spec.fqn : undefined;
   }
 
-  public constructor(public readonly scope: Scope, public readonly spec: TypeReferenceSpec) {}
+  public constructor(public readonly scope: Scope, public readonly spec?: TypeReferenceSpec) {}
 
   public toString(): string {
     if (this.void) {

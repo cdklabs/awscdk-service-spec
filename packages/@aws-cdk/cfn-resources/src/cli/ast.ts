@@ -79,6 +79,23 @@ export class AstBuilder<T extends Module> {
               immutable: true,
             }),
           );
+
+          // new (this.scope, {
+          //   name: `cfnSkillOverridesPropertyToCloudFormation`,
+          //   parameters: [
+          //     {
+          //       name: 'properties',
+          //       type: {
+          //         primitive: 'any',
+          //       },
+          //     },
+          //   ],
+          //   returnType: {
+          //     primitive: 'any',
+          //   },
+          //   body: [],
+          // });
+
           return theType;
         }
       case 'json':

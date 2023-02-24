@@ -2,6 +2,14 @@ import { Renderer } from './base';
 import { InterfaceType } from '../interface';
 import { Module } from '../module';
 import { Property } from '../property';
+import {
+  Callable,
+  ObjectAccessStatement,
+  ObjectLiteral,
+  ReturnStatement as ReturnExpression,
+  Statement,
+  Symbol,
+} from '../statements';
 import { MemberVisibility } from '../type-member';
 import { TypeReference } from '../type-ref';
 
@@ -52,5 +60,56 @@ export class TypeScriptRenderer extends Renderer {
     }
 
     return 'any';
+  }
+
+  renderFunction(func: Callable, indentationLevel: number): string {
+    const params = func.parameters.map((p) => `${p.name}: ${this.renderTypeRef(p.type)}`).join(', ');
+    const returnType = func.returnType ? `: ${this.renderTypeRef(func.returnType)}` : '';
+    return [
+      this.indent(`function ${func.name}(${params})${returnType} {`, indentationLevel),
+      ...func.body.map((s) => this.renderStatement(s, indentationLevel + 1)),
+      this.indent('}\n', indentationLevel),
+    ].join('\n');
+  }
+
+  renderStatement(stmnt: Statement, lvl: number): string {
+    if (stmnt instanceof ReturnExpression) {
+      return this.renderReturnStatement(stmnt, lvl);
+    } else if (stmnt instanceof ObjectLiteral) {
+      return this.renderObjectLiteral(stmnt, lvl);
+    } else if (stmnt instanceof ObjectAccessStatement) {
+      return this.renderObjectAccessStatement(stmnt, lvl);
+    }
+
+    return '/* todo */';
+  }
+
+  renderObjectLiteral(obj: ObjectLiteral, lvl: number) {
+    return [
+      this.indent('{', lvl),
+      obj.entries
+        .map(([key, val]) => this.indent(`${JSON.stringify(key)}: ${this.renderStatement(val, lvl + 1)},`, lvl + 1))
+        .join('\n'),
+      this.indent('}', lvl),
+    ].join('\n');
+  }
+
+  renderObjectAccessStatement({ object, property }: ObjectAccessStatement, lvl: number) {
+    if (object instanceof ObjectLiteral) {
+      return this.indent(`(${this.renderObjectLiteral(object, lvl)}).${property}`, lvl);
+    }
+    return this.indent(`${this.renderSymbol(object)}.${property}`, lvl);
+  }
+
+  renderSymbol(symbol: Symbol): string {
+    return symbol.name;
+  }
+
+  renderReturnStatement(ret: ReturnExpression, lvl: number) {
+    if (!ret.statement) {
+      return this.indent('return;', lvl);
+    }
+
+    return this.indent(`return ${this.renderStatement(ret.statement, lvl).trim()};`, lvl);
   }
 }
