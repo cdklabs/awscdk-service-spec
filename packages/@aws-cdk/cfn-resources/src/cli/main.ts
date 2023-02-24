@@ -16,21 +16,21 @@ async function main() {
 
   db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::S3::Bucket')[0].validations;
 
-  const services = db.all('resource').map((r) => {
+  const resources = db.all('resource').map((r) => {
     debug(r.cloudFormationType, 'ast');
     const ast = AstBuilder.forResource(r.cloudFormationType, db);
     ast.addResource(r);
     return ast.scope;
   });
 
-  console.log('Generating %i Resources for %i Services', db.all('resource').length, services.length);
+  console.log('Generating %i Resources for %i Services', db.all('resource').length, resources.length);
 
   const outputPath = path.join(__dirname, '../services/');
   fs.removeSync(outputPath);
-  for (const service of services) {
-    debug(service.service.toUpperCase(), 'render');
-    const filePath = path.join(outputPath, `${service.service.toLowerCase()}.ts`);
-    fs.outputFileSync(filePath, renderer.render(service));
+  for (const res of resources) {
+    debug(`${res.service}::${res.resource}`, 'render');
+    const filePath = path.join(outputPath, `${res.service}-${res.resource}.ts`.toLowerCase());
+    fs.outputFileSync(filePath, renderer.render(res));
   }
 }
 

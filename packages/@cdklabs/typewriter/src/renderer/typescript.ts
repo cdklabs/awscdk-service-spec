@@ -1,33 +1,40 @@
 import { Renderer } from './base';
+import { Callable } from '../callable';
 import { InterfaceType } from '../interface';
 import { Module } from '../module';
 import { Property } from '../property';
 import {
-  Callable,
-  ObjectAccessStatement,
+  ObjectPropertyAccess,
   ObjectLiteral,
   ReturnStatement as ReturnExpression,
   Statement,
-  Symbol,
+  LocalSymbol,
+  InvokeCallable,
+  ObjectMethodInvoke,
+  ObjectReference,
 } from '../statements';
 import { MemberVisibility } from '../type-member';
 import { TypeReference } from '../type-ref';
 
 export class TypeScriptRenderer extends Renderer {
-  protected renderModule(mod: Module, indentationLevel: number): string {
-    return this.renderModuleTypes(mod, indentationLevel).join('\n\n');
+  protected renderModule(mod: Module, lvl: number): string {
+    return [this.renderImports(mod), this.renderModuleTypes(mod, lvl).join('\n\n')].join('\n\n');
   }
 
-  protected renderInterface(interfaceType: InterfaceType, indentationLevel: number): string {
+  protected renderImports(mod: Module): string {
+    return mod.imports.map(([name, scope]) => `import * as ${name} from "${scope.fqn}";`).join('\n');
+  }
+
+  protected renderInterface(interfaceType: InterfaceType, lvl: number): string {
     const modifiers = interfaceType.modifiers.length ? interfaceType.modifiers.join(' ') + ' ' : '';
 
     return [
-      this.indent(`${modifiers}interface ${interfaceType.name} {`, indentationLevel),
+      this.indent(`${modifiers}interface ${interfaceType.name} {`, lvl),
       Array.from(interfaceType.properties.values())
         .filter((p) => p.visibility === MemberVisibility.Public)
-        .map((p) => this.renderProperty(p, indentationLevel + 1))
+        .map((p) => this.renderProperty(p, lvl + 1))
         .join('\n\n'),
-      this.indent('}\n', indentationLevel),
+      this.indent('}\n', lvl),
     ].join('\n');
   }
 
@@ -62,50 +69,62 @@ export class TypeScriptRenderer extends Renderer {
     return 'any';
   }
 
-  renderFunction(func: Callable, indentationLevel: number): string {
+  protected renderCallable(func: Callable, lvl: number): string {
     const params = func.parameters.map((p) => `${p.name}: ${this.renderTypeRef(p.type)}`).join(', ');
     const returnType = func.returnType ? `: ${this.renderTypeRef(func.returnType)}` : '';
     return [
-      this.indent(`function ${func.name}(${params})${returnType} {`, indentationLevel),
-      ...func.body.map((s) => this.renderStatement(s, indentationLevel + 1)),
-      this.indent('}\n', indentationLevel),
+      this.indent(`// @ts-ignore TS6133`, lvl),
+      this.indent(`function ${func.name}(${params})${returnType} {`, lvl),
+      ...func.body.map((s) => this.renderStatement(s, lvl + 1)),
+      this.indent('}\n', lvl),
     ].join('\n');
   }
 
-  renderStatement(stmnt: Statement, lvl: number): string {
+  protected renderStatement(stmnt: Statement, lvl: number): string {
     if (stmnt instanceof ReturnExpression) {
       return this.renderReturnStatement(stmnt, lvl);
     } else if (stmnt instanceof ObjectLiteral) {
       return this.renderObjectLiteral(stmnt, lvl);
-    } else if (stmnt instanceof ObjectAccessStatement) {
-      return this.renderObjectAccessStatement(stmnt, lvl);
+    } else if (stmnt instanceof ObjectPropertyAccess) {
+      return this.renderObjectAccess(stmnt.obj, stmnt.property, lvl);
+    } else if (stmnt instanceof ObjectMethodInvoke) {
+      return this.renderInvokeCallable(`${this.renderObjectAccess(stmnt.obj, stmnt.method, lvl)}`, stmnt.args, lvl);
+    } else if (stmnt instanceof InvokeCallable) {
+      return this.renderInvokeCallable(stmnt.callable.name, stmnt.args, lvl);
     }
 
-    return '/* todo */';
+    return `/* @todo ${stmnt.constructor.name} */`;
   }
 
-  renderObjectLiteral(obj: ObjectLiteral, lvl: number) {
+  protected renderInvokeCallable(name: string, args: Statement[], lvl: number): string {
+    const argList = args.map((arg) => this.renderStatement(arg, lvl));
+    return this.indent(`${name}(${argList.join(', ').trim()})`, lvl);
+  }
+
+  protected renderObjectLiteral(obj: ObjectLiteral, lvl: number) {
     return [
       this.indent('{', lvl),
       obj.entries
-        .map(([key, val]) => this.indent(`${JSON.stringify(key)}: ${this.renderStatement(val, lvl + 1)},`, lvl + 1))
+        .map(([key, val]) =>
+          this.indent(`${JSON.stringify(key)}: ${this.renderStatement(val, lvl + 1).trim()},`, lvl + 1),
+        )
         .join('\n'),
       this.indent('}', lvl),
     ].join('\n');
   }
 
-  renderObjectAccessStatement({ object, property }: ObjectAccessStatement, lvl: number) {
-    if (object instanceof ObjectLiteral) {
-      return this.indent(`(${this.renderObjectLiteral(object, lvl)}).${property}`, lvl);
+  protected renderObjectAccess(obj: ObjectLiteral | ObjectReference, member: string, lvl: number): string {
+    if (obj instanceof ObjectLiteral) {
+      return this.indent(`(${this.renderObjectLiteral(obj, lvl)}).${member}`, lvl);
     }
-    return this.indent(`${this.renderSymbol(object)}.${property}`, lvl);
+    return this.indent(`${this.renderSymbol(obj.symbol)}.${member}`, lvl);
   }
 
-  renderSymbol(symbol: Symbol): string {
+  protected renderSymbol(symbol: LocalSymbol): string {
     return symbol.name;
   }
 
-  renderReturnStatement(ret: ReturnExpression, lvl: number) {
+  protected renderReturnStatement(ret: ReturnExpression, lvl: number) {
     if (!ret.statement) {
       return this.indent('return;', lvl);
     }

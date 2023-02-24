@@ -21,6 +21,11 @@ export abstract class Scope {
   public abstract addType(type: Type): void;
 
   /**
+   * Register a import to the scope
+   */
+  public abstract addImport(scope: Scope, name: string): void;
+
+  /**
    * Find type by FQN or Name
    */
   public findType(fqnOrName: string): Type {

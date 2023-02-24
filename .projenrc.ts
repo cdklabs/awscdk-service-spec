@@ -122,6 +122,8 @@ const cfnResources = new MonorepoTypeScriptProject({
   parent: repo,
   name: '@aws-cdk/cfn-resources',
   description: 'L1 constructs for all CloudFormation Resources',
+  deps: ['aws-cdk-lib@^2'],
+  peerDeps: ['constructs@^10.0.0'],
   devDeps: [typewriter, serviceSpecBuild, tsKb, 'ts-node', '@jsii/spec', 'fs-extra', '@types/fs-extra@^9', '@swc/core'],
 });
 cfnResources.eslint?.addOverride({
