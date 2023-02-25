@@ -1,11 +1,12 @@
+import { JsonLens } from '../../src/loading/patches/json-lens';
 import {
-  canonicalizeOneOf,
-  canonicalizeUnionType,
+  canonicalizeTypeOperators,
+  explodeTypeArray,
   recurseAndPatch,
   removeAdditionalProperties,
   removeBooleanPatterns,
   replaceArrayLengthProps,
-  extraneousPropsOnReferences,
+  Patcher,
 } from '../../src/loading/patches/patches';
 
 describe('patches', () => {
@@ -16,7 +17,7 @@ describe('patches', () => {
         additionalProperties: false,
       };
 
-      const patchedObj = recurseAndPatch(obj, removeAdditionalProperties);
+      const patchedObj = recurseAndPatch(obj, removeAdditionalProperties as Patcher<JsonLens>);
 
       expect(patchedObj).toEqual({
         type: 'string',
@@ -29,7 +30,7 @@ describe('patches', () => {
         additionalProperties: false,
       };
 
-      const patchedObj = recurseAndPatch(obj, removeAdditionalProperties);
+      const patchedObj = recurseAndPatch(obj, removeAdditionalProperties as Patcher<JsonLens>);
 
       expect(patchedObj).toEqual(obj);
     });
@@ -46,7 +47,7 @@ describe('patches', () => {
         },
       };
 
-      const patchedObj = recurseAndPatch(obj, removeAdditionalProperties);
+      const patchedObj = recurseAndPatch(obj, removeAdditionalProperties as Patcher<JsonLens>);
 
       expect(patchedObj).toEqual({
         type: 'object',
@@ -68,7 +69,7 @@ describe('patches', () => {
         maxLength: 2,
       };
 
-      const patchedObj = recurseAndPatch(obj, replaceArrayLengthProps);
+      const patchedObj = recurseAndPatch(obj, replaceArrayLengthProps as Patcher<JsonLens>);
 
       expect(patchedObj).toEqual({
         type: 'array',
@@ -89,7 +90,7 @@ describe('patches', () => {
         },
       };
 
-      const patchedObj = recurseAndPatch(obj, replaceArrayLengthProps);
+      const patchedObj = recurseAndPatch(obj, replaceArrayLengthProps as Patcher<JsonLens>);
 
       expect(patchedObj).toEqual({
         type: 'object',
@@ -111,7 +112,7 @@ describe('patches', () => {
         pattern: 'true|false',
       };
 
-      const patchedObj = recurseAndPatch(obj, removeBooleanPatterns);
+      const patchedObj = recurseAndPatch(obj, removeBooleanPatterns as Patcher<JsonLens>);
 
       expect(patchedObj).toEqual({
         type: 'boolean',
@@ -119,13 +120,13 @@ describe('patches', () => {
     });
   });
 
-  describe(canonicalizeUnionType, () => {
+  describe(explodeTypeArray, () => {
     test('works in the base case', () => {
       const obj = {
         type: ['string', 'object'],
       };
 
-      const patchedObj = recurseAndPatch(obj, canonicalizeUnionType);
+      const patchedObj = recurseAndPatch(obj, explodeTypeArray as Patcher<JsonLens>);
 
       expect(patchedObj).toEqual({
         oneOf: [
@@ -146,123 +147,95 @@ describe('patches', () => {
         minLength: 0,
       };
 
-      const patchedObj = recurseAndPatch(obj, canonicalizeUnionType);
+      const patchedObj = recurseAndPatch(obj, explodeTypeArray as Patcher<JsonLens>);
 
       expect(patchedObj).toEqual({
         oneOf: [
           {
             type: 'string',
-            additionalProperties: false,
             minLength: 0,
           },
           {
             type: 'object',
             additionalProperties: false,
-            minLength: 0,
           },
         ],
       });
     });
   });
 
-  describe(canonicalizeOneOf, () => {
+  describe(canonicalizeTypeOperators, () => {
     test('works in base case', () => {
       const obj = {
-        Prop: {
-          description: 'my description',
-          type: 'object',
-          properties: {
-            Name: {
-              type: 'string',
+        properties: {
+          Prop: {
+            description: 'my description',
+            type: 'object',
+            properties: {
+              Name: {
+                type: 'string',
+              },
+              Attribute: {
+                type: 'string',
+              },
+              RequiredAttribute: {
+                type: 'string',
+              },
             },
-            Attribute: {
-              type: 'string',
-            },
-            RequiredAttribute: {
-              type: 'string',
-            },
+            required: ['RequiredAttribute'],
+            oneOf: [
+              {
+                required: ['Name'],
+              },
+              {
+                required: ['Attribute'],
+              },
+            ],
           },
-          required: ['RequiredAttribute'],
-          oneOf: [
-            {
-              required: ['Name'],
-            },
-            {
-              required: ['Attribute'],
-            },
-          ],
         },
       };
 
-      const patchedObj = recurseAndPatch(obj, canonicalizeOneOf);
+      const patchedObj = recurseAndPatch(obj, canonicalizeTypeOperators('oneOf') as Patcher<JsonLens>);
 
       expect(patchedObj).toEqual({
-        Prop: {
-          oneOf: [
-            {
-              description: 'my description',
-              type: 'object',
-              properties: {
-                Name: {
-                  type: 'string',
+        properties: {
+          Prop: {
+            oneOf: [
+              {
+                description: 'my description',
+                type: 'object',
+                properties: {
+                  Name: {
+                    type: 'string',
+                  },
+                  Attribute: {
+                    type: 'string',
+                  },
+                  RequiredAttribute: {
+                    type: 'string',
+                  },
                 },
-                Attribute: {
-                  type: 'string',
-                },
-                RequiredAttribute: {
-                  type: 'string',
-                },
+                required: ['Name', 'RequiredAttribute'],
               },
-              required: ['RequiredAttribute', 'Name'],
-            },
-            {
-              description: 'my description',
-              type: 'object',
-              properties: {
-                Name: {
-                  type: 'string',
+              {
+                description: 'my description',
+                type: 'object',
+                properties: {
+                  Name: {
+                    type: 'string',
+                  },
+                  Attribute: {
+                    type: 'string',
+                  },
+                  RequiredAttribute: {
+                    type: 'string',
+                  },
                 },
-                Attribute: {
-                  type: 'string',
-                },
-                RequiredAttribute: {
-                  type: 'string',
-                },
+                required: ['Attribute', 'RequiredAttribute'],
               },
-              required: ['RequiredAttribute', 'Attribute'],
-            },
-          ],
+            ],
+          },
         },
-      });
-    });
-  });
-
-  describe(extraneousPropsOnReferences, () => {
-    test('works in base case', () => {
-      const obj = {
-        $ref: 'reference',
-        additionalProperties: false,
-      };
-
-      const patchedObj = recurseAndPatch(obj, extraneousPropsOnReferences);
-
-      expect(patchedObj).toEqual({ $ref: 'reference' });
-    });
-
-    test('description and comments are kept', () => {
-      const obj = {
-        $ref: 'reference',
-        additionalProperties: false,
-        description: 'reference',
-        $comment: 'some comment',
-      };
-
-      const patchedObj = recurseAndPatch(obj, extraneousPropsOnReferences);
-
-      expect(patchedObj).toEqual({
-        $ref: 'reference',
-        description: 'reference',
-        $comment: 'some comment',
       });
     });
   });

@@ -13,7 +13,7 @@ import { JsonLens, JsonObjectLens, NO_MISTAKE } from './json-lens';
 import { JsonPatch } from './json-patch';
 import { PatchReport, SchemaLens } from './json-patcher';
 
-type Patcher<L extends JsonLens> = (lens: L) => void;
+export type Patcher<L extends JsonLens> = (lens: L) => void;
 
 function makeCompositePatcher<L extends JsonLens>(...patchers: Patcher<L>[]): Patcher<L> {
   return (lens) => {
@@ -171,10 +171,10 @@ export function explodeTypeArray(lens: JsonObjectLens) {
  */
 export function canonicalizeTypeOperators(op: 'oneOf' | 'anyOf' | 'allOf') {
   return (lens: JsonObjectLens) => {
-    // Only normalize 'oneOf' if we're not at the root. We make an exception for these t
+    // Only normalize 'oneOf' if we're not at the root. We make an exception for these.
     // Don't do anything if 'oneOf' appears in the position of a property name, that's valid without
     // invoking its special powers.
-    if (isRoot(lens) || !isInSchemaPosition(lens)) {
+    if (isRoot(lens) || !isInSchemaPosition(lens) || (isInPropPosition(lens) && onlyTypeOperator(op, lens))) {
       return;
     }
 
@@ -186,8 +186,9 @@ export function canonicalizeTypeOperators(op: 'oneOf' | 'anyOf' | 'allOf') {
     const newBranches = deepDedupe(
       branches.map((branch) => {
         return {
-          ...restOfObjectWithout(lens.value, [op]),
           ...branch,
+          ...restOfObjectWithout(lens.value, [op]),
+          required: [...branch.required, ...restOfObjectWithout(lens.value, [op]).required],
         };
       }),
     );
@@ -341,6 +342,7 @@ export function recurseAndPatch(root: any, patcher: Patcher<JsonLens>) {
   while (maxIterations) {
     const schema = new SchemaLens(root, { fileName: '' });
     recurse(schema);
+    console.log(JSON.stringify(schema.value, undefined, 2));
     if (!schema.hasPatches) {
       break;
     }
@@ -356,6 +358,7 @@ export function recurseAndPatch(root: any, patcher: Patcher<JsonLens>) {
     }
     try {
       root = applyPatches(schema.patches);
+      console.log('root', root);
     } catch (e) {
       // We may have produced patches that no longer cleanly apply depending on what other patches have done.
       // Catch those occurrences and give it another go on the next round.
@@ -410,6 +413,19 @@ function deepDedupe<A>(xs: A[]): A[] {
   return ret;
 }
 
+// FIXME: I literally can't get this to work.
+// function deepMerge(x: any, y: any): any {
+//   const returnObj = JSON.parse(JSON.stringify(x));
+//   for (const [k, v] of Object.entries(y)) {
+//     if (Array.isArray(v) && Array.isArray(returnObj[k])) {
+//       returnObj[k].push(...v);
+//     } else if (typeof v === 'object' && typeof returnObj[k] === 'object') {
+//       deepMerge(returnObj[k], v);
+//     }
+//   }
+//   return returnObj;
+// }
+
 function deepEqual(x: any, y: any) {
   return canonicalize(x) === canonicalize(y);
 }
@@ -422,6 +438,16 @@ function deepEqual(x: any, y: any) {
  */
 function isInSchemaPosition(lens: JsonLens) {
   return !lens.jsonPath.endsWith('/properties');
+}
+
+function isInPropPosition(lens: JsonLens) {
+  const paths = lens.jsonPath.split('/');
+  return paths[paths.length - 2] === 'properties';
+}
+
+function onlyTypeOperator(op: 'oneOf' | 'anyOf' | 'allOf', lens: JsonLens) {
+  const keys = Object.keys(lens.value as any);
+  return keys.length === 1 && keys[0] === op;
 }
 
 function isRoot(lens: JsonLens) {
