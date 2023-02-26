@@ -165,7 +165,7 @@ describe('patches', () => {
   });
 
   describe(canonicalizeTypeOperators, () => {
-    test('works in base case', () => {
+    test('type operator is expanded to include all community properties - oneOf', () => {
       const obj = {
         properties: {
           Prop: {
@@ -238,5 +238,74 @@ describe('patches', () => {
         },
       });
     });
+
+    test('type operator expanded to include all community properties - anyOf', () => {
+      const obj = {
+        properties: {
+          CreationDate: {
+            description: 'my description',
+            type: 'string',
+            anyOf: [
+              {
+                format: 'date-time',
+              },
+              {
+                format: 'timestamp',
+              },
+            ],
+          },
+        },
+      };
+
+      const patchedObj = recurseAndPatch(obj, canonicalizeTypeOperators('anyOf') as Patcher<JsonLens>);
+
+      expect(patchedObj).toEqual({
+        properties: {
+          CreationDate: {
+            anyOf: [
+              {
+                description: 'my description',
+                type: 'string',
+                format: 'date-time',
+              },
+              {
+                description: 'my description',
+                type: 'string',
+                format: 'timestamp',
+              },
+            ],
+          },
+        },
+      });
+    });
+
+    test('type operators are unchanged when in canonical format', () => {
+      const obj = {
+        properties: {
+          CreationDate: {
+            anyOf: [
+              {
+                description: 'my description',
+                type: 'string',
+                format: 'date-time',
+              },
+              {
+                description: 'my description',
+                type: 'string',
+                format: 'timestamp',
+              },
+            ],
+          },
+        },
+      };
+
+      const patchedObj = recurseAndPatch(obj, canonicalizeTypeOperators('anyOf') as Patcher<JsonLens>);
+
+      expect(patchedObj).toEqual(obj);
+    });
   });
+
+  // describe('minimizeTypeOperators', () => {
+  //   test('removes type operators with 1 element', () => {});
+  // });
 });
