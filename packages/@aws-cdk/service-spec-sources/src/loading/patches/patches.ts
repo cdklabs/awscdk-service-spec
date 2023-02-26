@@ -174,7 +174,7 @@ export function canonicalizeTypeOperators(op: 'oneOf' | 'anyOf' | 'allOf') {
     // Only normalize 'oneOf' if we're not at the root. We make an exception for these.
     // Don't do anything if 'oneOf' appears in the position of a property name, that's valid without
     // invoking its special powers.
-    if (isRoot(lens) || !isInSchemaPosition(lens) || (isInPropPosition(lens) && onlyTypeOperator(op, lens))) {
+    if (isRoot(lens) || !isInSchemaPosition(lens) || (isPropertyOrDefinition(lens) && onlyTypeOperator(op, lens))) {
       return;
     }
 
@@ -213,6 +213,29 @@ export function canonicalizeTypeOperators(op: 'oneOf' | 'anyOf' | 'allOf') {
     }
     */
   };
+}
+
+export function minimizeTypeOperators(lens: JsonObjectLens) {
+  for (const type of ['oneOf', 'anyOf', 'allOf']) {
+    const val = lens.value[type];
+    if (Array.isArray(val) && val.length === 1) {
+      const onlyOption = val[0];
+      lens.removeProperty(`redundant type operator ${type}`, type);
+      lens.replaceValue(`redundant type operator ${type}`, {
+        ...restOfObjectWithout(lens.value, [type]),
+        ...onlyOption,
+      });
+      return;
+    }
+
+    // This may cause duplicates in parent type operators.
+    // We'll handle them on the next pass if necessary.
+    if (Array.isArray(val) && Object.keys(val).length !== Object.keys(deepDedupe(val)).length) {
+      lens.replaceValue(NO_MISTAKE, {
+        [type]: deepDedupe(val),
+      });
+    }
+  }
 }
 
 export function erroneousInsertionOrderOnObject(lens: JsonObjectLens) {
@@ -338,7 +361,6 @@ export function recurseAndPatch(root: any, patcher: Patcher<JsonLens>) {
   while (maxIterations) {
     const schema = new SchemaLens(root, { fileName: '' });
     recurse(schema);
-    console.log(JSON.stringify(schema.value, undefined, 2));
     if (!schema.hasPatches) {
       break;
     }
@@ -354,7 +376,6 @@ export function recurseAndPatch(root: any, patcher: Patcher<JsonLens>) {
     }
     try {
       root = applyPatches(schema.patches);
-      console.log('root', root);
     } catch (e) {
       // We may have produced patches that no longer cleanly apply depending on what other patches have done.
       // Catch those occurrences and give it another go on the next round.
@@ -437,9 +458,9 @@ function isInSchemaPosition(lens: JsonLens) {
   return !lens.jsonPath.endsWith('/properties');
 }
 
-function isInPropPosition(lens: JsonLens) {
+function isPropertyOrDefinition(lens: JsonLens) {
   const paths = lens.jsonPath.split('/');
-  return paths[paths.length - 2] === 'properties';
+  return ['properties', 'definitions'].includes(paths[paths.length - 2]);
 }
 
 function onlyTypeOperator(op: 'oneOf' | 'anyOf' | 'allOf', lens: JsonLens) {

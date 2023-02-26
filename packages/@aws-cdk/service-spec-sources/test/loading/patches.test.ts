@@ -1,6 +1,7 @@
 import { JsonLens } from '../../src/loading/patches/json-lens';
 import {
   canonicalizeTypeOperators,
+  minimizeTypeOperators,
   explodeTypeArray,
   recurseAndPatch,
   removeAdditionalProperties,
@@ -305,7 +306,52 @@ describe('patches', () => {
     });
   });
 
-  // describe('minimizeTypeOperators', () => {
-  //   test('removes type operators with 1 element', () => {});
-  // });
+  describe(minimizeTypeOperators, () => {
+    test('removes type operators with 1 element', () => {
+      const obj = {
+        anyOf: [
+          {
+            required: ['FirehoseArn', 'RoleArn', 'OutputFormat'],
+          },
+          {
+            allOf: [
+              {
+                required: ['FirehoseArn', 'RoleArn', 'OutputFormat'],
+              },
+            ],
+          },
+          {
+            oneOf: [
+              {
+                required: ['IncludeFilters'],
+              },
+              {
+                required: ['ExcludeFilters'],
+              },
+            ],
+          },
+        ],
+      };
+
+      const patchedObj = recurseAndPatch(obj, minimizeTypeOperators as Patcher<JsonLens>);
+
+      expect(patchedObj).toEqual({
+        anyOf: [
+          {
+            required: ['FirehoseArn', 'RoleArn', 'OutputFormat'],
+          },
+          {
+            oneOf: [
+              {
+                required: ['IncludeFilters'],
+              },
+              {
+                required: ['ExcludeFilters'],
+              },
+            ],
+          },
+        ],
+      });
+    });
+  });
 });
