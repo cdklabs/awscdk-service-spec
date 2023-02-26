@@ -185,11 +185,7 @@ export function canonicalizeTypeOperators(op: 'oneOf' | 'anyOf' | 'allOf') {
 
     const newBranches = deepDedupe(
       branches.map((branch) => {
-        return {
-          ...branch,
-          ...restOfObjectWithout(lens.value, [op]),
-          required: [...branch.required, ...restOfObjectWithout(lens.value, [op]).required],
-        };
+        return deepMerge(branch, restOfObjectWithout(lens.value, [op]));
       }),
     );
 
@@ -413,18 +409,19 @@ function deepDedupe<A>(xs: A[]): A[] {
   return ret;
 }
 
-// FIXME: I literally can't get this to work.
-// function deepMerge(x: any, y: any): any {
-//   const returnObj = JSON.parse(JSON.stringify(x));
-//   for (const [k, v] of Object.entries(y)) {
-//     if (Array.isArray(v) && Array.isArray(returnObj[k])) {
-//       returnObj[k].push(...v);
-//     } else if (typeof v === 'object' && typeof returnObj[k] === 'object') {
-//       deepMerge(returnObj[k], v);
-//     }
-//   }
-//   return returnObj;
-// }
+function deepMerge(x: any, y: any): any {
+  const returnObj = JSON.parse(JSON.stringify(x));
+  for (const [k, v] of Object.entries(y)) {
+    if (Array.isArray(v) && Array.isArray(returnObj[k])) {
+      returnObj[k].push(...v);
+    } else if (typeof v === 'object' && typeof returnObj[k] === 'object') {
+      deepMerge(returnObj[k], v);
+    } else {
+      returnObj[k] = v;
+    }
+  }
+  return returnObj;
+}
 
 function deepEqual(x: any, y: any) {
   return canonicalize(x) === canonicalize(y);
