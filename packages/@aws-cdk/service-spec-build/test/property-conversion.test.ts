@@ -1,6 +1,6 @@
 import { emptyDatabase } from '@aws-cdk/service-spec';
 import { Failures } from '@cdklabs/tskb';
-import { loadCloudFormationRegistryResource } from '../src/cloudformation-registry';
+import { readCloudFormationRegistryResource } from '../src/cloudformation-registry';
 
 let db: ReturnType<typeof emptyDatabase>;
 let fails: Failures;
@@ -10,7 +10,7 @@ beforeEach(() => {
 });
 
 test('exclude readOnlyProperties from properties', () => {
-  loadCloudFormationRegistryResource({
+  readCloudFormationRegistryResource({
     db,
     fails,
     resource: {
@@ -24,12 +24,14 @@ test('exclude readOnlyProperties from properties', () => {
     },
   });
 
-  const propNames = Object.keys(db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.properties);
+  const propNames = Object.keys(
+    db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.properties,
+  );
   expect(propNames).toEqual(['Property']);
 });
 
 test('include readOnlyProperties in attributes', () => {
-  loadCloudFormationRegistryResource({
+  readCloudFormationRegistryResource({
     db,
     fails,
     resource: {
@@ -43,12 +45,14 @@ test('include readOnlyProperties in attributes', () => {
     },
   });
 
-  const attrNames = Object.keys(db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.attributes);
+  const attrNames = Object.keys(
+    db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.attributes,
+  );
   expect(attrNames).toEqual(['Id']);
 });
 
 test('include legacy attributes in attributes', () => {
-  loadCloudFormationRegistryResource({
+  readCloudFormationRegistryResource({
     db,
     fails,
     resource: {
@@ -67,6 +71,50 @@ test('include legacy attributes in attributes', () => {
     },
   });
 
-  const attrNames = Object.keys(db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.attributes);
+  const attrNames = Object.keys(
+    db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.attributes,
+  );
   expect(attrNames.sort()).toEqual(['Id', 'Property']);
+});
+
+test('reference types are correctly named', () => {
+  readCloudFormationRegistryResource({
+    db,
+    fails,
+    resource: {
+      description: 'Test resource',
+      typeName: 'AWS::Some::Type',
+      definitions: {
+        Property: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            Name: {
+              type: 'string',
+            },
+          },
+          required: ['Name'],
+        },
+      },
+      properties: {
+        PropertyList: {
+          type: 'array',
+          items: {
+            $ref: '#/definitions/Property',
+          },
+        },
+        PropertySingular: {
+          $ref: '#/definitions/Property',
+        },
+        Id: { type: 'string' },
+      },
+      readOnlyProperties: ['/properties/Id'],
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0];
+  const types = db.follow('usesType', resource);
+
+  expect(types.length).toBe(1);
+  expect(types[0].to.name).toBe('Property');
 });

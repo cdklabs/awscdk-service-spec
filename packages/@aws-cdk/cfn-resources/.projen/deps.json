@@ -5,7 +5,7 @@
       "type": "build"
     },
     {
-      "name": "@aws-cdk/service-spec-sources",
+      "name": "@cdklabs/tskb",
       "type": "build"
     },
     {
@@ -17,8 +17,12 @@
       "type": "build"
     },
     {
+      "name": "@swc/core",
+      "type": "build"
+    },
+    {
       "name": "@types/fs-extra",
-      "version": "ts3.9",
+      "version": "^9",
       "type": "build"
     },
     {
@@ -41,6 +45,10 @@
       "type": "build"
     },
     {
+      "name": "eslint-config-prettier",
+      "type": "build"
+    },
+    {
       "name": "eslint-import-resolver-node",
       "type": "build"
     },
@@ -50,6 +58,10 @@
     },
     {
       "name": "eslint-plugin-import",
+      "type": "build"
+    },
+    {
+      "name": "eslint-plugin-prettier",
       "type": "build"
     },
     {
@@ -73,6 +85,10 @@
     {
       "name": "npm-check-updates",
       "version": "^16",
+      "type": "build"
+    },
+    {
+      "name": "prettier",
       "type": "build"
     },
     {

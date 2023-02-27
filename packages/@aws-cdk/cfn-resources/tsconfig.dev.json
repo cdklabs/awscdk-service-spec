@@ -43,7 +43,10 @@
       "path": "../service-spec-build"
     },
     {
-      "path": "../service-spec-sources"
+      "path": "../../@cdklabs/tskb"
     }
-  ]
+  ],
+  "ts-node": {
+    "swc": true
+  }
 }

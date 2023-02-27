@@ -21,7 +21,6 @@ beforeEach(() => {
   db = emptyDatabase();
 });
 
-
 describe.each([false, true])('database is filled with one item (saveAndLoad: %p)', (saveAndLoad) => {
   beforeEach(() => {
     db.allocate('thing', {
@@ -39,18 +38,22 @@ describe.each([false, true])('database is filled with one item (saveAndLoad: %p)
 
   test('it can be looked up', () => {
     // THEN
-    expect(db.all('thing')).toContainEqual(expect.objectContaining({
-      name: 'A',
-      value: 'A',
-    }));
+    expect(db.all('thing')).toContainEqual(
+      expect.objectContaining({
+        name: 'A',
+        value: 'A',
+      }),
+    );
   });
 
   test('can lookup by index', () => {
     const found = db.lookup('thing', 'name', 'equals', 'A');
 
-    expect(found).toContainEqual(expect.objectContaining({
-      name: 'A',
-      value: 'A',
-    }));
+    expect(found).toContainEqual(
+      expect.objectContaining({
+        name: 'A',
+        value: 'A',
+      }),
+    );
   });
 });

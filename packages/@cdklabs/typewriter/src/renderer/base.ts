@@ -29,7 +29,7 @@ export abstract class Renderer {
    * Render types of a module.
    */
   protected renderModuleTypes(mod: Module, indentationLevel: number): string[] {
-    return mod.types.map(t => {
+    return mod.types.map((t) => {
       switch (t.kind) {
         case jsii.TypeKind.Interface:
           return this.renderInterface(t as InterfaceType, indentationLevel);
@@ -50,7 +50,6 @@ export abstract class Renderer {
   public indent(text: string, level: number): string {
     return this.getIndentation(level) + text;
   }
-
 
   protected setIndentationSymbol(symbol: number | string = 2): string {
     if (typeof symbol === 'number') {
