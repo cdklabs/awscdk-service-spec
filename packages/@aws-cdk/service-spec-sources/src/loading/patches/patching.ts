@@ -86,7 +86,7 @@ export class SchemaLens implements JsonLens, JsonObjectLens, JsonArrayLens {
         this.recordPatch(reason, JsonPatch.add(`${this.jsonPath}/${newName}`, fx(this.value[oldName])));
         this.recordPatch(reason, JsonPatch.remove(`${this.jsonPath}/${oldName}`));
       } else {
-        this.recordPatch(reason, JsonPatch.move(`${this.jsonPath}/${oldName}`, `${this.jsonPath}/newName`));
+        this.recordPatch(reason, JsonPatch.move(`${this.jsonPath}/${oldName}`, `${this.jsonPath}/${newName}`));
       }
     }
   }
