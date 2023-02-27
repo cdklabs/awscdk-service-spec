@@ -80,10 +80,14 @@ export class SchemaLens implements JsonLens, JsonObjectLens, JsonArrayLens {
   }
 
   /** Rename a property, optionally transforming its value. */
-  renameProperty(reason: string, oldName: string, newName: string, fx: (x: any) => any = (x) => x): void {
+  renameProperty(reason: string, oldName: string, newName: string, fx?: (x: any) => any): void {
     if (this.isJsonObject()) {
-      this.recordPatch(reason, JsonPatch.add(`${this.jsonPath}/${newName}`, fx(this.value[oldName])));
-      this.recordPatch(reason, JsonPatch.remove(`${this.jsonPath}/${oldName}`));
+      if (fx) {
+        this.recordPatch(reason, JsonPatch.add(`${this.jsonPath}/${newName}`, fx(this.value[oldName])));
+        this.recordPatch(reason, JsonPatch.remove(`${this.jsonPath}/${oldName}`));
+      } else {
+        this.recordPatch(reason, JsonPatch.move(`${this.jsonPath}/${oldName}`, `${this.jsonPath}/newName`));
+      }
     }
   }
 
@@ -97,8 +101,7 @@ export class SchemaLens implements JsonLens, JsonObjectLens, JsonArrayLens {
   /** Replace a property */
   replaceProperty(reason: string, name: string, value: any): void {
     if (this.isJsonObject()) {
-      this.recordPatch(reason, JsonPatch.remove(`${this.jsonPath}/${name}`));
-      this.recordPatch(reason, JsonPatch.add(`${this.jsonPath}/${name}`, value));
+      this.recordPatch(reason, JsonPatch.replace(`${this.jsonPath}/${name}`, value));
     }
   }
 
