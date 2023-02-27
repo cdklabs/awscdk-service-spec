@@ -266,7 +266,10 @@ export function noIncorrectDefaultType(lens: JsonObjectLens) {
     lens.value.default !== undefined &&
     typeof lens.value.default !== lens.value.type
   ) {
-    lens.removeProperty(`default value for a ${lens.value.type} cannot be a ${typeof lens.value.default}`, 'default');
+    lens.removeProperty(
+      `default value for type='${lens.value.type}' cannot be '${typeof lens.value.default}'`,
+      'default',
+    );
   }
 }
 
