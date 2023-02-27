@@ -1,5 +1,5 @@
-import canonicalize from 'canonicalize';
-import { JsonLens } from '../../src/loading/patches/json-lens';
+import { STRING_KEY_WITNESS } from '../../src/loading/patches/field-witnesses';
+import { JsonLens, JsonObjectLens } from '../../src/loading/patches/json-lens';
 import { applyPatcher, Patcher } from '../../src/loading/patches/patching';
 import {
   canonicalizeDefaultOnBoolean,
@@ -28,7 +28,7 @@ describe('patches', () => {
         maxLength: 2,
       };
 
-      const { root: patchedObj } = applyPatcher(obj, replaceArrayLengthProps as Patcher<JsonLens>);
+      const patchedObj = patchObject(obj, replaceArrayLengthProps);
 
       expect(patchedObj).toEqual({
         type: 'array',
@@ -49,7 +49,7 @@ describe('patches', () => {
         },
       };
 
-      const { root: patchedObj } = applyPatcher(obj, replaceArrayLengthProps as Patcher<JsonLens>);
+      const patchedObj = patchObject(obj, replaceArrayLengthProps);
 
       expect(patchedObj).toEqual({
         type: 'object',
@@ -71,7 +71,7 @@ describe('patches', () => {
         pattern: 'true|false',
       };
 
-      const { root: patchedObj } = applyPatcher(obj, removeBooleanPatterns as Patcher<JsonLens>);
+      const patchedObj = patchObject(obj, removeBooleanPatterns);
 
       expect(patchedObj).toEqual({
         type: 'boolean',
@@ -85,7 +85,7 @@ describe('patches', () => {
         type: ['string', 'object'],
       };
 
-      const { root: patchedObj } = applyPatcher(obj, explodeTypeArray as Patcher<JsonLens>);
+      const patchedObj = patchObject(obj, explodeTypeArray);
 
       expect(patchedObj).toEqual({
         oneOf: [
@@ -106,7 +106,7 @@ describe('patches', () => {
         minLength: 0,
       };
 
-      const { root: patchedObj } = applyPatcher(obj, explodeTypeArray as Patcher<JsonLens>);
+      const patchedObj = patchObject(obj, explodeTypeArray);
 
       expect(patchedObj).toEqual({
         oneOf: [
@@ -154,7 +154,7 @@ describe('patches', () => {
         },
       };
 
-      const { root: patchedObj } = applyPatcher(obj, canonicalizeTypeOperators('oneOf') as Patcher<JsonLens>);
+      const patchedObj = patchObject(obj, canonicalizeTypeOperators('oneOf'));
 
       expect(patchedObj).toEqual({
         properties: {
@@ -216,7 +216,7 @@ describe('patches', () => {
         },
       };
 
-      const { root: patchedObj } = applyPatcher(obj, canonicalizeTypeOperators('anyOf') as Patcher<JsonLens>);
+      const patchedObj = patchObject(obj, canonicalizeTypeOperators('anyOf'));
 
       expect(patchedObj).toEqual({
         properties: {
@@ -258,7 +258,7 @@ describe('patches', () => {
         },
       };
 
-      const { root: patchedObj } = applyPatcher(obj, canonicalizeTypeOperators('anyOf') as Patcher<JsonLens>);
+      const patchedObj = patchObject(obj, canonicalizeTypeOperators('anyOf'));
 
       expect(patchedObj).toEqual(obj);
     });
@@ -271,7 +271,7 @@ describe('patches', () => {
         default: false,
       };
 
-      const { root: patchedObj } = applyPatcher(obj, canonicalizeDefaultOnBoolean as Patcher<JsonLens>);
+      const patchedObj = patchObject(obj, canonicalizeDefaultOnBoolean);
 
       expect(patchedObj).toEqual(obj);
     });
@@ -282,43 +282,144 @@ describe('patches', () => {
         default: 'true',
       };
 
-      const { root: patchedObj } = applyPatcher(obj, canonicalizeDefaultOnBoolean as Patcher<JsonLens>);
+      const patchedObj = patchObject(obj, canonicalizeDefaultOnBoolean);
 
-      expect(canonicalize(patchedObj)).toEqual(
-        canonicalize({
-          type: 'boolean',
-          default: true,
-        }),
-      );
+      expect(patchedObj).toEqual({
+        type: 'boolean',
+        default: true,
+      });
     });
   });
 
   describe(patchMinLengthOnInteger, () => {
-    test('base case', () => {});
+    test('removes minlength on integer', () => {
+      const obj = {
+        type: 'integer',
+        minLength: 5,
+      };
+
+      const patchedObj = patchObject(obj, patchMinLengthOnInteger);
+
+      expect(patchedObj).toEqual({ type: 'integer' });
+    });
+
+    test('removes minlength on number', () => {
+      const obj = {
+        type: 'number',
+        minLength: 5,
+      };
+
+      const patchedObj = patchObject(obj, patchMinLengthOnInteger);
+
+      expect(patchedObj).toEqual({ type: 'number' });
+    });
   });
 
   describe(canonicalizeRegexInFormat, () => {
-    test('base case', () => {});
+    test('regexes in format become patterns', () => {
+      const obj = {
+        type: 'string',
+        format: 'regex',
+      };
+
+      const patchedObj = patchObject(obj, canonicalizeRegexInFormat);
+
+      expect(patchedObj).toEqual({
+        type: 'string',
+        pattern: 'regex',
+      });
+    });
   });
 
   describe(removeEmptyRequiredArray, () => {
-    test('base case', () => {});
+    test('removes empty required', () => {
+      const obj = {
+        type: 'object',
+        required: [],
+      };
+
+      const patchedObj = patchObject(obj, removeEmptyRequiredArray);
+
+      expect(patchedObj).toEqual({ type: 'object' });
+    });
   });
 
   describe(noIncorrectDefaultType, () => {
-    test('base case', () => {});
+    test('removes incorrect default types', () => {
+      const obj = {
+        type: 'string',
+        default: true,
+      };
+
+      const patchedObj = patchObject(obj, noIncorrectDefaultType);
+
+      expect(patchedObj).toEqual({ type: 'string' });
+    });
   });
 
   describe(removeMinMaxLengthOnObject, () => {
-    test('base case', () => {});
+    test('removes min/maxLength on objects', () => {
+      const obj = {
+        type: 'object',
+        minLength: 1,
+        maxLength: 5,
+      };
+
+      const patchedObj = patchObject(obj, removeMinMaxLengthOnObject);
+
+      expect(patchedObj).toEqual({ type: 'object' });
+    });
   });
 
   describe(removeSuspiciousPatterns, () => {
-    test('base case', () => {});
+    test('remove format literal string', () => {
+      const obj = {
+        type: 'string',
+        format: 'string',
+      };
+
+      const patchedObj = patchObject(obj, removeSuspiciousPatterns);
+
+      expect(patchedObj).toEqual({ type: 'string' });
+    });
+
+    test('remove pattern literal string', () => {
+      const obj = {
+        type: 'string',
+        pattern: 'string',
+      };
+
+      const patchedObj = patchObject(obj, removeSuspiciousPatterns);
+
+      expect(patchedObj).toEqual({ type: 'string' });
+    });
   });
 
   describe(missingTypeField, () => {
-    test('base case', () => {});
+    test('if properties are defined without type, add type object', () => {
+      const obj = {
+        root: {
+          properties: {
+            Prop: {
+              val: 'val',
+            },
+          },
+        },
+      };
+
+      const patchedObj = patchObject(obj, missingTypeField);
+
+      expect(patchedObj).toEqual({
+        root: {
+          type: 'object',
+          properties: {
+            Prop: {
+              val: 'val',
+            },
+          },
+        },
+      });
+    });
   });
 
   describe(dropRedundantTypeOperatorsInMetricStream, () => {
@@ -349,17 +450,97 @@ describe('patches', () => {
         ],
       };
 
-      const { root: patchedObj } = applyPatcher(obj, dropRedundantTypeOperatorsInMetricStream as Patcher<JsonLens>);
+      const patchedObj = patchObject(obj, dropRedundantTypeOperatorsInMetricStream);
 
       expect(patchedObj).toEqual({ typeName: 'AWS::CloudWatch::MetricStream' });
     });
   });
 
   describe(minMaxItemsOnObject, () => {
-    test('base case', () => {});
+    test('removed on properties', () => {
+      const obj = {
+        type: 'object',
+        properties: {
+          Prop: {
+            val: 'val',
+          },
+        },
+        minItems: 1,
+        maxItems: 1,
+      };
+
+      const patchedObj = patchObject(obj, minMaxItemsOnObject);
+
+      expect(patchedObj).toEqual({
+        type: 'object',
+        properties: {
+          Prop: {
+            val: 'val',
+          },
+        },
+      });
+    });
+
+    test('replaced with min/maxProperties on additionalProperties', () => {
+      const obj = {
+        type: 'object',
+        properties: {
+          Prop: {
+            val: 'val',
+          },
+        },
+        additionalProperties: {
+          AnotherProp: {
+            val: 'val',
+          },
+        },
+        minItems: 1,
+        maxItems: 1,
+      };
+
+      const patchedObj = patchObject(obj, minMaxItemsOnObject);
+
+      expect(patchedObj).toEqual({
+        type: 'object',
+        properties: {
+          Prop: {
+            val: 'val',
+          },
+        },
+        additionalProperties: {
+          AnotherProp: {
+            val: 'val',
+          },
+        },
+        minProperties: 1,
+        maxProperties: 1,
+      });
+    });
   });
 
   describe(makeKeywordDropper, () => {
-    test('base case', () => {});
+    test('strings', () => {
+      const obj = {
+        root: {
+          type: 'string',
+          weirdThing: 'blah',
+          description: 'this is allowed',
+        },
+      };
+
+      const patchedObj = patchObject(obj, makeKeywordDropper('string', STRING_KEY_WITNESS));
+
+      expect(patchedObj).toEqual({
+        root: {
+          type: 'string',
+          description: 'this is allowed',
+        },
+      });
+    });
   });
 });
+
+function patchObject(obj: any, fn: Patcher<JsonObjectLens>): any {
+  const { root: patchedObj } = applyPatcher(obj, fn as Patcher<JsonLens>);
+  return patchedObj;
+}
