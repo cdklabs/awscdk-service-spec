@@ -2,7 +2,9 @@ import { emptyDatabase } from '@aws-cdk/service-spec';
 import * as sources from '@aws-cdk/service-spec-sources';
 import { LoadResult } from '@aws-cdk/service-spec-sources';
 import { assertSuccess, Failures, Result } from '@cdklabs/tskb';
-import { loadCloudFormationRegistryResource } from './cloudformation-registry';
+import { readCloudFormationDocumentation } from './cloudformation-docs';
+import { readCloudFormationRegistryResource } from './cloudformation-registry';
+import { readStatefulResources } from './stateful-resources';
 
 export interface BuildDatabaseOptions {
   readonly mustValidate?: boolean;
@@ -20,7 +22,7 @@ export async function buildDatabase(options: BuildDatabaseOptions = {}) {
     });
 
     for (const resource of resources.resources) {
-      const res = loadCloudFormationRegistryResource({
+      const res = readCloudFormationRegistryResource({
         db,
         resource,
         fails: warnings,
@@ -29,6 +31,12 @@ export async function buildDatabase(options: BuildDatabaseOptions = {}) {
       db.link('regionHasResource', region, res);
     }
   }
+
+  const docs = loadResult(await sources.loadDefaultCloudFormationDocs());
+  readCloudFormationDocumentation(db, docs, warnings);
+
+  const stateful = loadResult(await sources.loadDefaultStatefulResources());
+  readStatefulResources(db, stateful, warnings);
 
   return { db, warnings };
 

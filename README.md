@@ -9,5 +9,13 @@ This repository uses [Git LFS](https://git-lfs.com/). Before you clone this repo
 
 ```sh
 brew install git-lfs   # Or equivalent, see the website above
-git lfs install        # Only need to run this once
+git lfs install        # Need to run this once per repo
+```
+
+If you end up with the files not being downloaded from LFS
+(these are called [LFS pointer files](https://github.com/git-lfs/git-lfs/wiki/Tutorial#lfs-pointer-files-advanced)),
+the following command will download them for you:
+
+```sh
+git lfs pull
 ```

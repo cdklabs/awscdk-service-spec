@@ -1,67 +1,14 @@
 import { JsonLens } from '../../src/loading/patches/json-lens';
+import { applyPatcher, Patcher } from '../../src/loading/patches/patching';
 import {
   canonicalizeTypeOperators,
   minimizeTypeOperators,
   explodeTypeArray,
-  recurseAndPatch,
-  removeAdditionalProperties,
   removeBooleanPatterns,
   replaceArrayLengthProps,
-  Patcher,
-} from '../../src/loading/patches/patches';
+} from '../../src/loading/patches/registry-patches';
 
 describe('patches', () => {
-  describe(removeAdditionalProperties, () => {
-    test('works in the base case', () => {
-      const obj = {
-        type: 'string',
-        additionalProperties: false,
-      };
-
-      const patchedObj = recurseAndPatch(obj, removeAdditionalProperties as Patcher<JsonLens>);
-
-      expect(patchedObj).toEqual({
-        type: 'string',
-      });
-    });
-
-    test('does not remove from objects', () => {
-      const obj = {
-        type: 'object',
-        additionalProperties: false,
-      };
-
-      const patchedObj = recurseAndPatch(obj, removeAdditionalProperties as Patcher<JsonLens>);
-
-      expect(patchedObj).toEqual(obj);
-    });
-
-    test('works in embedded properties', () => {
-      const obj = {
-        type: 'object',
-        properties: {
-          Prop: {
-            type: 'array',
-            minItems: 1,
-            additionalProperties: false,
-          },
-        },
-      };
-
-      const patchedObj = recurseAndPatch(obj, removeAdditionalProperties as Patcher<JsonLens>);
-
-      expect(patchedObj).toEqual({
-        type: 'object',
-        properties: {
-          Prop: {
-            type: 'array',
-            minItems: 1,
-          },
-        },
-      });
-    });
-  });
-
   describe(replaceArrayLengthProps, () => {
     test('works in the base case', () => {
       const obj = {
@@ -70,7 +17,7 @@ describe('patches', () => {
         maxLength: 2,
       };
 
-      const patchedObj = recurseAndPatch(obj, replaceArrayLengthProps as Patcher<JsonLens>);
+      const { root: patchedObj } = applyPatcher(obj, replaceArrayLengthProps as Patcher<JsonLens>);
 
       expect(patchedObj).toEqual({
         type: 'array',
@@ -91,7 +38,7 @@ describe('patches', () => {
         },
       };
 
-      const patchedObj = recurseAndPatch(obj, replaceArrayLengthProps as Patcher<JsonLens>);
+      const { root: patchedObj } = applyPatcher(obj, replaceArrayLengthProps as Patcher<JsonLens>);
 
       expect(patchedObj).toEqual({
         type: 'object',
@@ -113,7 +60,7 @@ describe('patches', () => {
         pattern: 'true|false',
       };
 
-      const patchedObj = recurseAndPatch(obj, removeBooleanPatterns as Patcher<JsonLens>);
+      const { root: patchedObj } = applyPatcher(obj, removeBooleanPatterns as Patcher<JsonLens>);
 
       expect(patchedObj).toEqual({
         type: 'boolean',
@@ -127,7 +74,7 @@ describe('patches', () => {
         type: ['string', 'object'],
       };
 
-      const patchedObj = recurseAndPatch(obj, explodeTypeArray as Patcher<JsonLens>);
+      const { root: patchedObj } = applyPatcher(obj, explodeTypeArray as Patcher<JsonLens>);
 
       expect(patchedObj).toEqual({
         oneOf: [
@@ -148,7 +95,7 @@ describe('patches', () => {
         minLength: 0,
       };
 
-      const patchedObj = recurseAndPatch(obj, explodeTypeArray as Patcher<JsonLens>);
+      const { root: patchedObj } = applyPatcher(obj, explodeTypeArray as Patcher<JsonLens>);
 
       expect(patchedObj).toEqual({
         oneOf: [
@@ -196,7 +143,7 @@ describe('patches', () => {
         },
       };
 
-      const patchedObj = recurseAndPatch(obj, canonicalizeTypeOperators('oneOf') as Patcher<JsonLens>);
+      const { root: patchedObj } = applyPatcher(obj, canonicalizeTypeOperators('oneOf') as Patcher<JsonLens>);
 
       expect(patchedObj).toEqual({
         properties: {
@@ -258,7 +205,7 @@ describe('patches', () => {
         },
       };
 
-      const patchedObj = recurseAndPatch(obj, canonicalizeTypeOperators('anyOf') as Patcher<JsonLens>);
+      const { root: patchedObj } = applyPatcher(obj, canonicalizeTypeOperators('anyOf') as Patcher<JsonLens>);
 
       expect(patchedObj).toEqual({
         properties: {
@@ -300,7 +247,7 @@ describe('patches', () => {
         },
       };
 
-      const patchedObj = recurseAndPatch(obj, canonicalizeTypeOperators('anyOf') as Patcher<JsonLens>);
+      const { root: patchedObj } = applyPatcher(obj, canonicalizeTypeOperators('anyOf') as Patcher<JsonLens>);
 
       expect(patchedObj).toEqual(obj);
     });
@@ -333,7 +280,7 @@ describe('patches', () => {
         ],
       };
 
-      const patchedObj = recurseAndPatch(obj, minimizeTypeOperators as Patcher<JsonLens>);
+      const { root: patchedObj } = applyPatcher(obj, minimizeTypeOperators as Patcher<JsonLens>);
 
       expect(patchedObj).toEqual({
         anyOf: [

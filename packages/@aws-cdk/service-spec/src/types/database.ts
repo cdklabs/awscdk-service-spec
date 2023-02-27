@@ -1,4 +1,12 @@
-import { Database, emptyCollection, emptyIndex, emptyRelationship, EntityCollection, RelationshipCollection, stringCmp } from '@cdklabs/tskb';
+import {
+  Database,
+  emptyCollection,
+  emptyIndex,
+  emptyRelationship,
+  EntityCollection,
+  RelationshipCollection,
+  stringCmp,
+} from '@cdklabs/tskb';
 import { Resource, Service, HasResource, Region, RegionHasResource, TypeDefinition, UsesType } from './resource';
 
 export interface DatabaseSchema {

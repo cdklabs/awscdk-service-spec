@@ -1,7 +1,19 @@
 import * as jsii from '@jsii/spec';
 import { Scope } from './scope';
 
-export interface TypeSpec extends Omit<jsii.TypeBase, 'assembly' | 'fqn'> {}
+/**
+ * Kinds of types.
+ */
+export enum TypeKind {
+  Class = 'class',
+  Enum = 'enum',
+  Interface = 'interface',
+  Function = 'function',
+}
+
+export interface TypeSpec extends Omit<jsii.TypeBase, 'assembly' | 'fqn' | 'kind'> {
+  kind: TypeKind;
+}
 
 /**
  * An abstract jsii type
@@ -24,14 +36,11 @@ export abstract class Type {
   /**
    * The kind of the type.
    */
-  public get kind(): jsii.TypeKind {
+  public get kind(): TypeKind {
     return this.spec.kind;
   }
 
-  public constructor(
-    public readonly scope: Scope,
-    public readonly spec: TypeSpec,
-  ) {
+  public constructor(public readonly scope: Scope, public readonly spec: TypeSpec) {
     scope.addType(this);
   }
 

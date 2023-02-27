@@ -16,7 +16,7 @@ export interface LoadCloudFormationRegistryResourceOptions {
   readonly specResource?: resourcespec.ResourceType;
 }
 
-export function loadCloudFormationRegistryResource(options: LoadCloudFormationRegistryResourceOptions) {
+export function readCloudFormationRegistryResource(options: LoadCloudFormationRegistryResourceOptions) {
   const { db, resource, fails } = options;
 
   const typeDefinitions = new Map<jsonschema.Object, TypeDefinition>();

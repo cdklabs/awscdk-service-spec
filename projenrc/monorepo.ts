@@ -4,7 +4,7 @@ import * as pj from 'projen';
 //////////////////////////////////////////////////////////////////////
 
 export interface MonorepoRootOptions
-  extends Omit<pj.typescript.TypeScriptProjectOptions, 'sampleCode' | 'jest' | 'jestOptions'> {
+  extends Omit<pj.typescript.TypeScriptProjectOptions, 'sampleCode' | 'jest' | 'jestOptions' | 'eslint'> {
   /**
    * Create a VSCode multi-root workspace file for all monorepo workspaces
    *
@@ -30,22 +30,32 @@ export class MonorepoRoot extends pj.typescript.TypeScriptProject {
     /**
      * Formatting
      */
-    this.addDevDeps('eslint-config-prettier', 'eslint-plugin-prettier');
-    new pj.JsonFile(this, '.eslintrc.json', {
-      allowComments: true,
-      obj: {
-        plugins: ['@typescript-eslint', 'prettier'],
-        parser: '@typescript-eslint/parser',
-        parserOptions: {
-          ecmaVersion: 2018,
-          sourceType: 'module',
-          project: './tsconfig.dev.json',
+    if (options.prettier) {
+      this.addDevDeps('eslint-config-prettier', 'eslint-plugin-prettier');
+      new pj.JsonFile(this, '.eslintrc.json', {
+        allowComments: true,
+        obj: {
+          plugins: ['@typescript-eslint', 'prettier'],
+          parser: '@typescript-eslint/parser',
+          parserOptions: {
+            ecmaVersion: 2018,
+            sourceType: 'module',
+            project: './tsconfig.dev.json',
+          },
+          ignorePatterns: ['!.projenrc.ts'],
+          extends: ['plugin:prettier/recommended'],
         },
-        ignorePatterns: ['!.projenrc.ts'],
-        extends: ['plugin:prettier/recommended'],
-      },
-    });
-    this.tasks.addTask('fmt', { exec: 'eslint --ext .ts --fix projenrc .projenrc.ts' });
+      });
+      this.tasks.addTask('fmt', { exec: 'eslint --ext .ts --fix projenrc .projenrc.ts' });
+
+      this.vscode?.extensions.addRecommendations('esbenp.prettier-vscode', 'dbaeumer.vscode-eslint');
+      this.vscode?.settings.addSetting('editor.defaultFormatter', 'esbenp.prettier-vscode');
+      this.vscode?.settings.addSetting('eslint.format.enable', true);
+      this.vscode?.settings.addSettings({ 'editor.defaultFormatter': 'dbaeumer.vscode-eslint' }, [
+        'javascript',
+        'typescript',
+      ]);
+    }
 
     /**
      * VSCode
@@ -160,6 +170,10 @@ export class MonorepoRoot extends pj.typescript.TypeScriptProject {
     this.vscode?.settings.addSettings({
       'files.exclude': Object.fromEntries(this.vscodeHiddenFilesPatterns.map((p) => [p, true])),
     });
+
+    this.package.addField('jest', {
+      projects: this.projects.map((p) => `<rootDir>/packages/${p.name}`),
+    });
   }
 
   public postSynthesize() {
@@ -218,6 +232,9 @@ export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
       'excludeDepsFromUpgrade',
     );
 
+    const useEslint = remainder.eslint ?? true;
+    const usePrettier = remainder.prettier ?? true;
+
     super({
       parent: props.parent,
       name: props.name,
@@ -227,7 +244,23 @@ export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
       defaultReleaseBranch: 'REQUIRED-BUT-SHOULDNT-BE',
       release: false,
       package: !props.private,
-      eslint: true,
+      eslint: useEslint,
+      prettier: usePrettier,
+      prettierOptions: usePrettier
+        ? {
+            overrides: props.parent.prettier?.overrides,
+            settings: props.parent.prettier?.settings,
+            ...remainder.prettierOptions,
+          }
+        : undefined,
+      eslintOptions: useEslint
+        ? {
+            dirs: [remainder.srcdir ?? 'src'],
+            devdirs: [remainder.testdir ?? 'test', 'build-tools'],
+            ...remainder.eslintOptions,
+            prettier: usePrettier,
+          }
+        : undefined,
       sampleCode: false,
 
       deps: packageNames(props.deps),
@@ -247,6 +280,19 @@ export class MonorepoTypeScriptProject extends pj.typescript.TypeScriptProject {
     });
 
     this.parent = props.parent;
+
+    // jest config
+    if (this.jest?.config && this.jest.config.preset === 'ts-jest') {
+      delete this.jest.config.globals?.['ts-jest'];
+      this.jest.config.transform = {
+        '^.+\\.tsx?$': [
+          'ts-jest',
+          {
+            tsconfig: this.tsconfigDev.fileName,
+          },
+        ],
+      };
+    }
 
     // Tasks
     this.tasks.tryFind('default')?.reset('(cd `git rev-parse --show-toplevel`; npx projen default)');

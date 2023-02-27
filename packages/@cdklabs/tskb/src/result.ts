@@ -2,7 +2,9 @@
 const errorSym = Symbol('error');
 
 export type Result<A> = A | Failure;
-export interface Failure { readonly [errorSym]: string };
+export interface Failure {
+  readonly [errorSym]: string;
+}
 
 export interface Fail {
   (error: string): Failure;
@@ -67,7 +69,9 @@ export function tryCatch<A>(failOrBlock: Fail | (() => A), maybeBlock?: () => A)
 }
 
 export function using<A, B>(value: Result<A>, block: (x: A) => Result<B>): Result<B> {
-  if (isFailure(value)) { return value; }
+  if (isFailure(value)) {
+    return value;
+  }
   return block(value);
 }
 
@@ -81,17 +85,17 @@ export function using<A, B>(value: Result<A>, block: (x: A) => Result<B>): Resul
  * to build the error message as the call stack deepens.
  */
 export function locateFailure(prefix: string) {
-  return <A>(x: Result<A>): Result<A> => isFailure(x) ? failure(`${prefix}: ${x[errorSym]}`) : x;
+  return <A>(x: Result<A>): Result<A> => (isFailure(x) ? failure(`${prefix}: ${x[errorSym]}`) : x);
 }
 
 export type Failures = Array<Failure>;
 
 export function liftResult<A>(xs: Record<string, Result<A>>): Result<Record<string, A>>;
 export function liftResult<A>(xs: Array<Result<A>>): Result<Array<A>>;
-export function liftResult<A>(xs: Record<string, Result<A>> | Array<Result<A>>): Result<Record<string, A>> | Result<Array<A>> {
-  const failures = Array.isArray(xs)
-    ? xs.filter(isFailure)
-    : Object.values(xs).filter(isFailure);
+export function liftResult<A>(
+  xs: Record<string, Result<A>> | Array<Result<A>>,
+): Result<Record<string, A>> | Result<Array<A>> {
+  const failures = Array.isArray(xs) ? xs.filter(isFailure) : Object.values(xs).filter(isFailure);
   if (failures.length > 0) {
     return failure(failures.map(errorMessage).join(', '));
   }

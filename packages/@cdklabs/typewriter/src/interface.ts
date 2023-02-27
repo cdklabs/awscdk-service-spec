@@ -1,9 +1,10 @@
 import * as jsii from '@jsii/spec';
 import { Property, PropertySpec } from './property';
 import { Scope } from './scope';
-import { Type } from './type';
+import { Type, TypeKind } from './type';
 
-export interface InterfaceSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn'> {
+export interface InterfaceSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' | 'kind'> {
+  kind: TypeKind.Interface;
   export?: boolean;
   properties?: PropertySpec[];
 }
@@ -16,29 +17,35 @@ export class InterfaceType extends Type {
     const result = new Map<string, Property>();
 
     for (const p of this.spec.properties ?? []) {
-      result.set(
-        p.name,
-        new Property(this, p),
-      );
+      result.set(p.name, new Property(this, p));
     }
 
     return result;
   }
 
+  /**
+   * List the modifiers of the interface
+   */
   public get modifiers(): Array<string> {
     const modifiers = [];
 
-    if ( this.spec.export) {
+    if (this.spec.export) {
       modifiers.push('export');
     }
-
     return modifiers;
   }
 
-  public constructor(
-    public scope: Scope,
-    public readonly spec: InterfaceSpec,
-  ) {
+  public constructor(public scope: Scope, public readonly spec: InterfaceSpec) {
     super(scope, spec);
+  }
+
+  /**
+   * Adds a property to the interface
+   */
+  public addProperty(spec: PropertySpec) {
+    if (!this.spec.properties) {
+      this.spec.properties = [];
+    }
+    this.spec.properties.push(spec);
   }
 }

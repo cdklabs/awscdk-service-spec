@@ -7,19 +7,33 @@ import * as util from 'util';
 import { failure, Failure, isFailure, isSuccess, locateFailure, Result } from '@cdklabs/tskb';
 import Ajv from 'ajv';
 import * as _glob from 'glob';
-import { recurseAndPatch, allPatchers } from './patches/patches';
+import { applyPatcher, JsonLensPatcher, PatchReport } from './patches/patching';
+
+export interface LoadOptions {
+  /**
+   * Fail if we detect schema validations with the data source
+   *
+   * @default true
+   */
+  readonly mustValidate?: boolean;
+
+  /**
+   * Patches to apply to the data before it is validated
+   */
+  readonly patcher?: JsonLensPatcher;
+}
 
 export class Loader<A> {
-  public static async fromSchemaFile<A>(fileName: string, mustValidate: boolean): Promise<Loader<A>> {
+  public static async fromSchemaFile<A>(fileName: string, options: LoadOptions): Promise<Loader<A>> {
     const ajv = new Ajv({ verbose: true });
     const cfnSchemaJson = JSON.parse(
       await fs.readFile(path.join(__dirname, `../../schemas/${fileName}`), { encoding: 'utf-8' }),
     );
     const validator = ajv.compile(cfnSchemaJson);
-    return new Loader(validator, mustValidate);
+    return new Loader(validator, options);
   }
 
-  private constructor(private readonly validator: Ajv.ValidateFunction, private readonly mustValidate: boolean) {}
+  private constructor(private readonly validator: Ajv.ValidateFunction, private readonly options: LoadOptions) {}
 
   /**
    * Validate the given object
@@ -28,15 +42,22 @@ export class Loader<A> {
    * - Adds warnings to the Loader object if validation is WARNING.
    */
   public async load(obj: unknown): Promise<Result<LoadResult<A>>> {
-    const patchedObj = recurseAndPatch(obj, allPatchers);
-    const valid = await this.validator(patchedObj);
+    const patchesApplied = new Array<PatchReport>();
 
-    if (this.mustValidate && !valid) {
+    if (this.options.patcher) {
+      const patchResult = applyPatcher(obj, this.options.patcher);
+      obj = patchResult.root;
+      patchesApplied.push(...patchResult.patches);
+    }
+    const valid = await this.validator(obj);
+
+    if ((this.options.mustValidate ?? true) && !valid) {
       return failureFromErrors(this.validator.errors);
     }
 
     return {
       value: obj as any,
+      patchesApplied,
       warnings: failuresFromErrors(this.validator.errors),
     };
   }
@@ -48,7 +69,10 @@ export class Loader<A> {
    * - Adds warnings to the Loader object if validation is WARNING.
    */
   public async loadFile(fileName: string): Promise<Result<LoadResult<A>>> {
-    return prefixResult(fileName, await this.load(JSON.parse(await fs.readFile(fileName, { encoding: 'utf-8' }))));
+    return annotateWithFilename(
+      fileName,
+      await this.load(JSON.parse(await fs.readFile(fileName, { encoding: 'utf-8' }))),
+    );
   }
 
   /**
@@ -83,28 +107,42 @@ async function seqMap<A, B>(xs: A[], fn: (x: A) => Promise<B>): Promise<B[]> {
 }
 
 export interface LoadResult<A> {
+  /**
+   * The value that was loaded
+   */
   readonly value: A;
+
+  /**
+   * Schema errors reported by the schema checker
+   */
   readonly warnings: Failure[];
+
+  /**
+   * Patches that were applied by the patcher (if any)
+   */
+  readonly patchesApplied: PatchReport[];
 }
 
-function prefixResult<A>(prefix: string, x: Result<LoadResult<A>>): Result<LoadResult<A>> {
+function annotateWithFilename<A>(fileName: string, x: Result<LoadResult<A>>): Result<LoadResult<A>> {
   if (isFailure(x)) {
-    return locateFailure(prefix)(x);
+    return locateFailure(fileName)(x);
   }
 
   return {
     value: x.value,
-    warnings: x.warnings.map(locateFailure(prefix)),
+    patchesApplied: x.patchesApplied.map((p) => ({ ...p, fileName })),
+    warnings: x.warnings.map(locateFailure(fileName)),
   };
 }
 
 export function combineLoadResults<A>(xs: Result<LoadResult<A>>[]): LoadResult<A[]> {
-  const ret: LoadResult<A[]> = { value: [], warnings: [] };
+  const ret: LoadResult<A[]> = { value: [], warnings: [], patchesApplied: [] };
 
   return xs.reduce((rs, r) => {
     if (isSuccess(r)) {
       rs.value.push(r.value);
       rs.warnings.push(...r.warnings);
+      rs.patchesApplied.push(...r.patchesApplied);
     } else {
       rs.warnings.push(r);
     }

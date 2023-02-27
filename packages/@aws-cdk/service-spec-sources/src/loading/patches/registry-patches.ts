@@ -10,30 +10,13 @@ import {
   NULL_KEY_WITNESS,
 } from './field-witnesses';
 import { JsonLens, JsonObjectLens, NO_MISTAKE } from './json-lens';
-import { JsonPatch } from './json-patch';
-import { PatchReport, SchemaLens } from './json-patcher';
+import { makeCompositePatcher, onlyObjects } from './patching';
 
-export type Patcher<L extends JsonLens> = (lens: L) => void;
-
-function makeCompositePatcher<L extends JsonLens>(...patchers: Patcher<L>[]): Patcher<L> {
-  return (lens) => {
-    for (const patcher of patchers) {
-      patcher(lens);
-    }
-  };
-}
-
-function onlyObjects(patcher: Patcher<JsonObjectLens>): Patcher<JsonLens> {
-  return (lens) => {
-    if (lens.isJsonObject()) {
-      patcher(lens);
-    }
-  };
-}
-
-export const allPatchers = onlyObjects(
+/**
+ * Patchers that apply to the CloudFormation Registry source files
+ */
+export const patchCloudFormationRegistry = onlyObjects(
   makeCompositePatcher(
-    removeAdditionalProperties,
     replaceArrayLengthProps,
     removeBooleanPatterns,
     explodeTypeArray,
@@ -59,16 +42,6 @@ export const allPatchers = onlyObjects(
     makeKeywordDropper('null', NULL_KEY_WITNESS),
   ),
 );
-
-/**
- * The property 'additionalProperties' should only exist on object types.
- * This function removes any instances of 'additionalProperties' on non-objects.
- */
-export function removeAdditionalProperties(lens: JsonObjectLens) {
-  if (lens.value.type !== 'object' && lens.value.additionalProperties !== undefined) {
-    lens.removeProperty('additionalProperties may only exist on object types', 'additionalProperties');
-  }
-}
 
 /**
  * Arrays use 'minItems' and 'maxItems' to delineate boundaries.
@@ -294,7 +267,10 @@ export function noIncorrectDefaultType(lens: JsonObjectLens) {
     lens.value.default !== undefined &&
     typeof lens.value.default !== lens.value.type
   ) {
-    lens.removeProperty(`default value for a ${lens.value.type} cannot be a ${typeof lens.value.default}`, 'default');
+    lens.removeProperty(
+      `default value for type='${lens.value.type}' cannot be '${typeof lens.value.default}'`,
+      'default',
+    );
   }
 }
 
@@ -352,58 +328,6 @@ export function missingTypeField(lens: JsonObjectLens) {
     ) {
       lens.addProperty('forgot type: object', 'type', 'object');
     }
-  }
-}
-
-export function recurseAndPatch(root: any, patcher: Patcher<JsonLens>) {
-  // Do multiple iterations to find a fixpoint for the patching
-  const patchSets = new Array<PatchReport[]>();
-  let maxIterations = 10;
-  while (maxIterations) {
-    const schema = new SchemaLens(root, { fileName: '' });
-    recurse(schema);
-    if (!schema.hasPatches) {
-      break;
-    }
-    patchSets.push(schema.reports);
-
-    if (--maxIterations === 0) {
-      throw new Error(
-        [
-          'Patching JSON failed to stabilize. Infinite recursion? Most recent patchsets:',
-          JSON.stringify(patchSets.slice(-2), undefined, 2),
-        ].join('\n'),
-      );
-    }
-    try {
-      root = applyPatches(schema.patches);
-    } catch (e) {
-      // We may have produced patches that no longer cleanly apply depending on what other patches have done.
-      // Catch those occurrences and give it another go on the next round.
-    }
-  }
-  return root;
-
-  function recurse(lens: SchemaLens) {
-    patcher(lens);
-
-    if (Array.isArray(lens.value)) {
-      lens.value.forEach((_, i) => {
-        recurse(lens.descendArrayElement(i));
-      });
-    }
-
-    if (lens.isJsonObject()) {
-      for (const k of Object.keys(lens.value)) {
-        if (!lens.wasRemoved(k)) {
-          recurse(lens.descendObjectField(k));
-        }
-      }
-    }
-  }
-
-  function applyPatches(patches: JsonPatch[]) {
-    return JsonPatch.apply(root, ...patches);
   }
 }
 

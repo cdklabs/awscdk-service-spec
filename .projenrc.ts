@@ -1,6 +1,5 @@
 import * as pj from 'projen';
 import { MergeQueue, MonorepoRoot, MonorepoTypeScriptProject } from './projenrc';
-import * as canonicalize from 'canonicalize';
 
 const lfsPatterns = ['sources/**/*.json'];
 
@@ -10,7 +9,6 @@ const repo = new MonorepoRoot({
   description: "Monorepo for the AWS CDK's service spec",
   projenrcTs: true,
 
-  eslint: true,
   prettier: true,
   prettierOptions: {
     settings: {
@@ -71,7 +69,12 @@ for (const tsconfig of [serviceSpecSources.tsconfig, serviceSpecSources.tsconfig
 }
 
 const serviceSpecSchemaTask = serviceSpecSources.addTask('gen-schemas', {
-  steps: ['CloudFormationRegistryResource', 'ResourceSpecification', 'StatefulResources'].map((typeName: string) => ({
+  steps: [
+    'CloudFormationRegistryResource',
+    'ResourceSpecification',
+    'CloudFormationDocumentation',
+    'StatefulResources',
+  ].map((typeName: string) => ({
     exec: [
       'ts-json-schema-generator',
       '--tsconfig',
@@ -119,32 +122,24 @@ const cfnResources = new MonorepoTypeScriptProject({
   parent: repo,
   name: '@aws-cdk/cfn-resources',
   description: 'L1 constructs for all CloudFormation Resources',
-  devDeps: [
-    typewriter,
-    serviceSpecBuild,
-    serviceSpecSources,
-    'ts-node',
-    '@jsii/spec',
-    'fs-extra',
-    '@types/fs-extra@ts3.9',
-  ],
+  deps: ['aws-cdk-lib@^2'],
+  peerDeps: ['constructs@^10.0.0'],
+  devDeps: [typewriter, serviceSpecBuild, tsKb, 'ts-node', '@jsii/spec', 'fs-extra', '@types/fs-extra@^9', '@swc/core'],
+});
+cfnResources.eslint?.addOverride({
+  files: ['src/cli/**/*.ts', 'test/**/*.ts'],
+  rules: {
+    'import/no-extraneous-dependencies': 'off',
+  },
 });
 cfnResources.addGitIgnore('src/services/**');
+cfnResources.tsconfigDev.file.addOverride('ts-node.swc', true);
 cfnResources.preCompileTask.spawn(
   cfnResources.tasks.addTask('generate', {
-    exec: 'ts-node src/cli/generate.ts',
+    exec: 'ts-node --project tsconfig.dev.json src/cli/main.ts',
     receiveArgs: true,
   }),
 );
 cfnResources.synth();
-
-// Formatting
-repo.vscode?.extensions.addRecommendations('esbenp.prettier-vscode', 'dbaeumer.vscode-eslint');
-repo.vscode?.settings.addSetting('editor.defaultFormatter', 'esbenp.prettier-vscode');
-repo.vscode?.settings.addSetting('eslint.format.enable', true);
-repo.vscode?.settings.addSettings({ 'editor.defaultFormatter': 'dbaeumer.vscode-eslint' }, [
-  'javascript',
-  'typescript',
-]);
 
 repo.synth();

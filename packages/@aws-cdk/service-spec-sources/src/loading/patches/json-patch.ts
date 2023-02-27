@@ -93,7 +93,7 @@ export class JsonPatch {
     return new JsonPatch({ op: 'test', path, value });
   }
 
-  private constructor(private readonly operation: Operation) {}
+  private constructor(public readonly operation: Operation) {}
 
   /**
    * Returns the JSON representation of this JSON patch operation.

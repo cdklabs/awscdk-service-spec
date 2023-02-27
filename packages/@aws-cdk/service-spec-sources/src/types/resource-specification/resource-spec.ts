@@ -12,7 +12,6 @@ export interface ResourceSpecification {
  * We don't have the tightest possible typing on this, since we only need a couple of fields.
  */
 export namespace resourcespec {
-
   export interface ResourceType {
     readonly AdditionalProperties?: boolean;
     readonly Documentation?: string;
@@ -45,5 +44,4 @@ export namespace resourcespec {
     readonly PrimitiveItemType?: string;
     readonly DuplicatesAllowed?: boolean;
   }
-
 }

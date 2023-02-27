@@ -28,19 +28,19 @@
       },
       "steps": [
         {
-          "exec": "npm-check-updates --dep dev --upgrade --target=minor --reject='@types/fs-extra,@cdklabs/typewriter,@aws-cdk/service-spec-build,@aws-cdk/service-spec-sources'"
+          "exec": "npm-check-updates --dep dev --upgrade --target=minor --reject='constructs,@cdklabs/typewriter,@aws-cdk/service-spec-build,@cdklabs/tskb'"
         },
         {
-          "exec": "npm-check-updates --dep optional --upgrade --target=minor --reject='@types/fs-extra,@cdklabs/typewriter,@aws-cdk/service-spec-build,@aws-cdk/service-spec-sources'"
+          "exec": "npm-check-updates --dep optional --upgrade --target=minor --reject='constructs,@cdklabs/typewriter,@aws-cdk/service-spec-build,@cdklabs/tskb'"
         },
         {
-          "exec": "npm-check-updates --dep peer --upgrade --target=minor --reject='@types/fs-extra,@cdklabs/typewriter,@aws-cdk/service-spec-build,@aws-cdk/service-spec-sources'"
+          "exec": "npm-check-updates --dep peer --upgrade --target=minor --reject='constructs,@cdklabs/typewriter,@aws-cdk/service-spec-build,@cdklabs/tskb'"
         },
         {
-          "exec": "npm-check-updates --dep prod --upgrade --target=minor --reject='@types/fs-extra,@cdklabs/typewriter,@aws-cdk/service-spec-build,@aws-cdk/service-spec-sources'"
+          "exec": "npm-check-updates --dep prod --upgrade --target=minor --reject='constructs,@cdklabs/typewriter,@aws-cdk/service-spec-build,@cdklabs/tskb'"
         },
         {
-          "exec": "npm-check-updates --dep bundle --upgrade --target=minor --reject='@types/fs-extra,@cdklabs/typewriter,@aws-cdk/service-spec-build,@aws-cdk/service-spec-sources'"
+          "exec": "npm-check-updates --dep bundle --upgrade --target=minor --reject='constructs,@cdklabs/typewriter,@aws-cdk/service-spec-build,@cdklabs/tskb'"
         }
       ]
     },
@@ -75,7 +75,7 @@
       "name": "generate",
       "steps": [
         {
-          "exec": "ts-node src/cli/generate.ts",
+          "exec": "ts-node --project tsconfig.dev.json src/cli/main.ts",
           "receiveArgs": true
         }
       ]

@@ -1,4 +1,3 @@
-
 export type Invariant = void;
 
 export type EvolutionInvariantPred<A> = (previous: A, current: A) => boolean;

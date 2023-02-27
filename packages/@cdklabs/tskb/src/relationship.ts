@@ -84,7 +84,6 @@ export function emptyRelationship<F extends string, T extends string>(
       }
     },
   };
-
 }
 
 export function isRelationshipCollection(x: unknown): x is AnyRelationshipCollection {

@@ -1,0 +1,43 @@
+{
+  "$ref": "#/definitions/CloudFormationDocumentation",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "CloudFormationDocumentation": {
+      "additionalProperties": false,
+      "properties": {
+        "Types": {
+          "additionalProperties": {
+            "$ref": "#/definitions/cfndocs.TypeDocumentation"
+          },
+          "description": "Mapping type name to type documentation\n\nName will be either:\n\n- `AWS::Service::Resource`\n- `AWS::Service::Resource.PropertyType`",
+          "type": "object"
+        }
+      },
+      "required": [
+        "Types"
+      ],
+      "type": "object"
+    },
+    "cfndocs.TypeDocumentation": {
+      "additionalProperties": false,
+      "properties": {
+        "attributes": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "description": {
+          "type": "string"
+        },
+        "properties": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    }
+  }
+}

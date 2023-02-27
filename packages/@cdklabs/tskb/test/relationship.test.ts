@@ -1,4 +1,12 @@
-import { Database, emptyCollection, emptyRelationship, Entity, EntityCollection, Relationship, RelationshipCollection } from '../src';
+import {
+  Database,
+  emptyCollection,
+  emptyRelationship,
+  Entity,
+  EntityCollection,
+  Relationship,
+  RelationshipCollection,
+} from '../src';
 
 interface Thing extends Entity {
   readonly name: string;
@@ -56,7 +64,7 @@ describe.each([false, true])('database with some entities (saveAndLoad: %p)', (s
   });
 
   test('follow relationships forward: widgets can be found', () => {
-    const a = mustFind('thing', x => x.name === 'A');
+    const a = mustFind('thing', (x) => x.name === 'A');
     expect(db.follow('hasWidget', a)).toEqual([
       {
         to: expect.objectContaining({ color: 'green' }),
@@ -70,7 +78,7 @@ describe.each([false, true])('database with some entities (saveAndLoad: %p)', (s
   });
 
   test('follow relationships backward: things can be found', () => {
-    const purpleWidget = mustFind('widget', w => w.color === 'purple');
+    const purpleWidget = mustFind('widget', (w) => w.color === 'purple');
     expect(db.incoming('hasWidget', purpleWidget)).toEqual([
       {
         from: expect.objectContaining({ name: 'B' }),
@@ -80,7 +88,10 @@ describe.each([false, true])('database with some entities (saveAndLoad: %p)', (s
   });
 });
 
-function mustFind<K extends Parameters<Database<DbSchema>['all']>[0]>(key: K, pred: (x: EntityType<DbSchema[K]>) => boolean) {
+function mustFind<K extends Parameters<Database<DbSchema>['all']>[0]>(
+  key: K,
+  pred: (x: EntityType<DbSchema[K]>) => boolean,
+) {
   const x = db.all(key).find(pred);
   if (!x) {
     throw new Error(`Could not find ${key} with ${pred}`);
