@@ -1,10 +1,21 @@
+import canonicalize from 'canonicalize';
 import { JsonLens } from '../../src/loading/patches/json-lens';
 import { applyPatcher, Patcher } from '../../src/loading/patches/patching';
 import {
+  canonicalizeDefaultOnBoolean,
+  canonicalizeRegexInFormat,
   canonicalizeTypeOperators,
   dropRedundantTypeOperatorsInMetricStream,
   explodeTypeArray,
+  makeKeywordDropper,
+  minMaxItemsOnObject,
+  missingTypeField,
+  noIncorrectDefaultType,
+  patchMinLengthOnInteger,
   removeBooleanPatterns,
+  removeEmptyRequiredArray,
+  removeMinMaxLengthOnObject,
+  removeSuspiciousPatterns,
   replaceArrayLengthProps,
 } from '../../src/loading/patches/registry-patches';
 
@@ -253,6 +264,63 @@ describe('patches', () => {
     });
   });
 
+  describe(canonicalizeDefaultOnBoolean, () => {
+    test('boolean stays the same', () => {
+      const obj = {
+        type: 'boolean',
+        default: false,
+      };
+
+      const { root: patchedObj } = applyPatcher(obj, canonicalizeDefaultOnBoolean as Patcher<JsonLens>);
+
+      expect(patchedObj).toEqual(obj);
+    });
+
+    test('string is canonicalized to boolean', () => {
+      const obj = {
+        type: 'boolean',
+        default: 'true',
+      };
+
+      const { root: patchedObj } = applyPatcher(obj, canonicalizeDefaultOnBoolean as Patcher<JsonLens>);
+
+      expect(canonicalize(patchedObj)).toEqual(
+        canonicalize({
+          type: 'boolean',
+          default: true,
+        }),
+      );
+    });
+  });
+
+  describe(patchMinLengthOnInteger, () => {
+    test('base case', () => {});
+  });
+
+  describe(canonicalizeRegexInFormat, () => {
+    test('base case', () => {});
+  });
+
+  describe(removeEmptyRequiredArray, () => {
+    test('base case', () => {});
+  });
+
+  describe(noIncorrectDefaultType, () => {
+    test('base case', () => {});
+  });
+
+  describe(removeMinMaxLengthOnObject, () => {
+    test('base case', () => {});
+  });
+
+  describe(removeSuspiciousPatterns, () => {
+    test('base case', () => {});
+  });
+
+  describe(missingTypeField, () => {
+    test('base case', () => {});
+  });
+
   describe(dropRedundantTypeOperatorsInMetricStream, () => {
     test('removes the specific type operator in metric stream', () => {
       const obj = {
@@ -285,5 +353,13 @@ describe('patches', () => {
 
       expect(patchedObj).toEqual({ typeName: 'AWS::CloudWatch::MetricStream' });
     });
+  });
+
+  describe(minMaxItemsOnObject, () => {
+    test('base case', () => {});
+  });
+
+  describe(makeKeywordDropper, () => {
+    test('base case', () => {});
   });
 });

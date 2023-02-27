@@ -349,7 +349,7 @@ function deepDedupe<A>(xs: A[]): A[] {
   return ret;
 }
 
-export function deepMerge(x: any, y: any): any {
+function deepMerge(x: any, y: any): any {
   const returnObj = JSON.parse(JSON.stringify(x));
   for (const [k, v] of Object.entries(y)) {
     if (Array.isArray(v) && Array.isArray(returnObj[k])) {
@@ -401,7 +401,7 @@ function dropIrrelevantKeywords(lens: JsonObjectLens, typeDescription: string, w
   }
 }
 
-function makeKeywordDropper(typeName: string, witness: TypeKeyWitness<any>) {
+export function makeKeywordDropper(typeName: string, witness: TypeKeyWitness<any>) {
   return (lens: JsonObjectLens) => {
     if (lens.value.type === typeName) {
       dropIrrelevantKeywords(lens, `type=${typeName}`, witness);

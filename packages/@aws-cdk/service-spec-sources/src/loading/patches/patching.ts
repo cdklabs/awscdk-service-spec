@@ -83,8 +83,9 @@ export class SchemaLens implements JsonLens, JsonObjectLens, JsonArrayLens {
   renameProperty(reason: string, oldName: string, newName: string, fx?: (x: any) => any): void {
     if (this.isJsonObject()) {
       if (fx) {
-        this.recordPatch(reason, JsonPatch.add(`${this.jsonPath}/${newName}`, fx(this.value[oldName])));
+        // patch to remove oldName must be added first in case oldName === newName
         this.recordPatch(reason, JsonPatch.remove(`${this.jsonPath}/${oldName}`));
+        this.recordPatch(reason, JsonPatch.add(`${this.jsonPath}/${newName}`, fx(this.value[oldName])));
       } else {
         this.recordPatch(reason, JsonPatch.move(`${this.jsonPath}/${oldName}`, `${this.jsonPath}/${newName}`));
       }
