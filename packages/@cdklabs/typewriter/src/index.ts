@@ -1,5 +1,8 @@
+export * from './callable';
+export * from './external-module';
 export * from './interface';
 export * from './module';
+export * from './parameter';
 export * from './property';
 export * from './renderer';
 export * from './scope';
@@ -7,3 +10,5 @@ export * from './type-member';
 export * from './type-ref';
 export * from './type';
 export * from './utils';
+export * from './statements';
+export * as stmt from './statements/builder';
