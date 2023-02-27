@@ -1,40 +1,69 @@
-import { DatabaseSchema, PropertyType, Resource } from '@aws-cdk/service-spec';
+import { DatabaseSchema, Property, PropertyType, Resource } from '@aws-cdk/service-spec';
 import { Database } from '@cdklabs/tskb';
-import { Case, InterfaceSpec, InterfaceType, MemberKind, Module, TypeReferenceSpec } from '@cdklabs/typewriter';
+import { Callable, Case, InterfaceType, MemberKind, TypeReferenceSpec, stmt, TypeKind } from '@cdklabs/typewriter';
 import * as jsii from '@jsii/spec';
-import { ServiceModule } from './service';
+import { CdkCore } from './cdk';
+import { ResourceModule } from './resource';
 
-export class AstBuilder<T extends Module> {
+export class AstBuilder {
   /**
    * @deprecated should be replaced by a new forService once services are available
    */
-  public static forResource(resource: string, db: Database<DatabaseSchema>): AstBuilder<ServiceModule> {
-    const resourceId = resource.split('::').slice(1).join('.').toLowerCase();
-    const scope = new ServiceModule(resourceId);
+  public static forResource(resource: string, db: Database<DatabaseSchema>): AstBuilder {
+    const parts = resource.split('::');
+    const scope = new ResourceModule(parts[1], parts[2]);
 
-    return new AstBuilder<ServiceModule>(scope, db);
+    return new AstBuilder(scope, db);
   }
 
-  protected constructor(public readonly scope: T, public readonly db: Database<DatabaseSchema>) {}
+  protected readonly core: CdkCore;
+
+  protected constructor(public readonly scope: ResourceModule, public readonly db: Database<DatabaseSchema>) {
+    this.core = new CdkCore('aws-cdk-lib', scope);
+  }
 
   public addResource(r: Resource) {
-    new InterfaceType(this.scope, this.resourcePropsSpec(r));
+    const propsInterface = new InterfaceType(this.scope, {
+      export: true,
+      name: `Cfn${r.name}Props`,
+      kind: TypeKind.Interface,
+    });
+    for (const [name, prop] of Object.entries(r.properties)) {
+      this.addResourceProperty(propsInterface, name, prop);
+    }
   }
 
-  protected resourcePropsSpec(r: Resource): InterfaceSpec {
-    const propsInterface = `Cfn${r.name}Props`;
+  protected addResourceProperty(propsInterface: InterfaceType, name: string, property: Property) {
+    propsInterface.addProperty({
+      kind: MemberKind.Property,
+      name: Case.firstCharToLower(name),
+      type: this.propertyTypeToTypeReferenceSpec(property.type),
+      immutable: true,
+    });
 
-    return {
-      export: true,
-      name: propsInterface,
-      kind: jsii.TypeKind.Interface,
-      properties: Object.entries(r.properties).map(([name, p]) => ({
-        kind: MemberKind.Property,
-        name: Case.firstCharToLower(name),
-        type: this.propertyTypeToTypeReferenceSpec(p.type),
-        immutable: true,
-      })),
-    };
+    const propToCfn = new Callable(this.scope, {
+      kind: TypeKind.Function,
+      name: `cfn${this.scope.resource}${name}PropertyToCloudFormation`,
+      parameters: [
+        {
+          name: 'properties',
+          type: {
+            primitive: jsii.PrimitiveType.Any,
+          },
+        },
+      ],
+      returnType: {
+        primitive: jsii.PrimitiveType.Any,
+      },
+    });
+    propToCfn.body = [
+      stmt.ret(
+        stmt.object({
+          // @TODO this needs to iterate over the properties on the type
+          Manifest: this.core.objectToCloudFormation(stmt.sym('properties').asObject().prop('manifest')),
+        }),
+      ),
+    ];
   }
 
   protected propertyTypeToTypeReferenceSpec(type: PropertyType): TypeReferenceSpec {
@@ -69,7 +98,7 @@ export class AstBuilder<T extends Module> {
           const theType = new InterfaceType(this.scope, {
             export: true,
             name: ref.name,
-            kind: jsii.TypeKind.Interface,
+            kind: TypeKind.Interface,
           });
           Object.entries(ref.properties).forEach(([name, p]) =>
             theType.addProperty({
@@ -79,6 +108,7 @@ export class AstBuilder<T extends Module> {
               immutable: true,
             }),
           );
+
           return theType;
         }
       case 'json':

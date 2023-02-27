@@ -1,9 +1,10 @@
 import * as jsii from '@jsii/spec';
 import { Property, PropertySpec } from './property';
 import { Scope } from './scope';
-import { Type } from './type';
+import { Type, TypeKind } from './type';
 
-export interface InterfaceSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn'> {
+export interface InterfaceSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' | 'kind'> {
+  kind: TypeKind.Interface;
   export?: boolean;
   properties?: PropertySpec[];
 }

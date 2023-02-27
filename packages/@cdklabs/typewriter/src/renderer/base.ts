@@ -1,6 +1,7 @@
-import * as jsii from '@jsii/spec';
+import { Callable } from '../callable';
 import { InterfaceType } from '../interface';
 import { Module } from '../module';
+import { TypeKind } from '../type';
 
 export interface RenderOptions {
   indentation?: number | string;
@@ -31,10 +32,12 @@ export abstract class Renderer {
   protected renderModuleTypes(mod: Module, indentationLevel: number): string[] {
     return mod.types.map((t) => {
       switch (t.kind) {
-        case jsii.TypeKind.Interface:
+        case TypeKind.Interface:
           return this.renderInterface(t as InterfaceType, indentationLevel);
+        case TypeKind.Function:
+          return this.renderCallable(t as Callable, indentationLevel);
         default:
-          throw `Unknown type: ${t.kind}`;
+          throw `Unknown type: ${t.kind} for ${t.fqn}. Skipping.`;
       }
     });
   }
@@ -43,6 +46,11 @@ export abstract class Renderer {
    * Render an interface.
    */
   protected abstract renderInterface(interfaceType: InterfaceType, indentationLevel: number): string;
+
+  /**
+   * Render a callable.
+   */
+  protected abstract renderCallable(func: Callable, indentationLevel: number): string;
 
   /**
    * Indent text to the specified level.

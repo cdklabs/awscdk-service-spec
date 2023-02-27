@@ -1,30 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`AWS::ApiGateway::RestApi 1`] = `
-"export interface S3Location {
-  readonly bucket: string;
-
-  readonly eTag: string;
-
-  readonly version: string;
-
-  readonly key: string;
-}
-
-
-export interface EndpointConfiguration {
-  readonly types: Array<string>;
-
-  readonly vpcEndpointIds: Array<string>;
-}
-
-
-export interface Tag {
-  readonly key: string;
-
-  readonly value: string;
-}
-
+"import * as cdk from "aws-cdk-lib";
 
 export interface CfnRestApiProps {
   readonly apiKeySourceType: string;
@@ -57,14 +34,135 @@ export interface CfnRestApiProps {
 
   readonly tags: Array<Tag>;
 }
-"
-`;
 
-exports[`AWS::IAM::Role 1`] = `
-"export interface Policy {
-  readonly policyDocument: any;
 
-  readonly policyName: string;
+// @ts-ignore TS6133
+function cfnRestApiApiKeySourceTypePropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnRestApiBinaryMediaTypesPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnRestApiBodyPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+export interface S3Location {
+  readonly bucket: string;
+
+  readonly eTag: string;
+
+  readonly version: string;
+
+  readonly key: string;
+}
+
+
+// @ts-ignore TS6133
+function cfnRestApiBodyS3LocationPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnRestApiCloneFromPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+export interface EndpointConfiguration {
+  readonly types: Array<string>;
+
+  readonly vpcEndpointIds: Array<string>;
+}
+
+
+// @ts-ignore TS6133
+function cfnRestApiEndpointConfigurationPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnRestApiDescriptionPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnRestApiDisableExecuteApiEndpointPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnRestApiFailOnWarningsPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnRestApiNamePropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnRestApiMinimumCompressionSizePropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnRestApiModePropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnRestApiPolicyPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnRestApiParametersPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -74,6 +172,18 @@ export interface Tag {
   readonly value: string;
 }
 
+
+// @ts-ignore TS6133
+function cfnRestApiTagsPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+"
+`;
+
+exports[`AWS::IAM::Role 1`] = `
+"import * as cdk from "aws-cdk-lib";
 
 export interface CfnRoleProps {
   readonly assumeRolePolicyDocument: any;
@@ -94,77 +204,97 @@ export interface CfnRoleProps {
 
   readonly tags: Array<Tag>;
 }
-"
-`;
 
-exports[`AWS::Lambda::Function 1`] = `
-"export interface TracingConfig {
-  readonly mode: string;
+
+// @ts-ignore TS6133
+function cfnRoleAssumeRolePolicyDocumentPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
-export interface VpcConfig {
-  readonly securityGroupIds: Array<string>;
-
-  readonly subnetIds: Array<string>;
+// @ts-ignore TS6133
+function cfnRoleDescriptionPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
-export interface SnapStart {
-  readonly applyOn: string;
+// @ts-ignore TS6133
+function cfnRoleManagedPolicyArnsPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
-export interface FileSystemConfig {
-  readonly arn: string;
+// @ts-ignore TS6133
+function cfnRoleMaxSessionDurationPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
 
-  readonly localMountPath: string;
+
+// @ts-ignore TS6133
+function cfnRolePathPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnRolePermissionsBoundaryPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+export interface Policy {
+  readonly policyDocument: any;
+
+  readonly policyName: string;
+}
+
+
+// @ts-ignore TS6133
+function cfnRolePoliciesPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnRoleRoleNamePropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 export interface Tag {
-  readonly value: string;
-
   readonly key: string;
+
+  readonly value: string;
 }
 
 
-export interface ImageConfig {
-  readonly workingDirectory: string;
-
-  readonly command: Array<string>;
-
-  readonly entryPoint: Array<string>;
+// @ts-ignore TS6133
+function cfnRoleTagsPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
+"
+`;
 
-
-export interface DeadLetterConfig {
-  readonly targetArn: string;
-}
-
-
-export interface Code {
-  readonly s3ObjectVersion: string;
-
-  readonly s3Bucket: string;
-
-  readonly zipFile: string;
-
-  readonly s3Key: string;
-
-  readonly imageUri: string;
-}
-
-
-export interface Environment {
-  readonly variables: Map<string, string>;
-}
-
-
-export interface EphemeralStorage {
-  readonly size: number;
-}
-
+exports[`AWS::Lambda::Function 1`] = `
+"import * as cdk from "aws-cdk-lib";
 
 export interface CfnFunctionProps {
   readonly description: string;
@@ -213,12 +343,325 @@ export interface CfnFunctionProps {
 
   readonly architectures: Array<string>;
 }
+
+
+// @ts-ignore TS6133
+function cfnFunctionDescriptionPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+export interface TracingConfig {
+  readonly mode: string;
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionTracingConfigPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+export interface VpcConfig {
+  readonly securityGroupIds: Array<string>;
+
+  readonly subnetIds: Array<string>;
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionVpcConfigPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionReservedConcurrentExecutionsPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+export interface SnapStart {
+  readonly applyOn: string;
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionSnapStartPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+export interface FileSystemConfig {
+  readonly arn: string;
+
+  readonly localMountPath: string;
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionFileSystemConfigsPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionFunctionNamePropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionRuntimePropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionKmsKeyArnPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionPackageTypePropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionCodeSigningConfigArnPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionLayersPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+export interface Tag {
+  readonly value: string;
+
+  readonly key: string;
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionTagsPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+export interface ImageConfig {
+  readonly workingDirectory: string;
+
+  readonly command: Array<string>;
+
+  readonly entryPoint: Array<string>;
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionImageConfigPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionMemorySizePropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+export interface DeadLetterConfig {
+  readonly targetArn: string;
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionDeadLetterConfigPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionTimeoutPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionHandlerPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+export interface Code {
+  readonly s3ObjectVersion: string;
+
+  readonly s3Bucket: string;
+
+  readonly zipFile: string;
+
+  readonly s3Key: string;
+
+  readonly imageUri: string;
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionCodePropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionRolePropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+export interface Environment {
+  readonly variables: Map<string, string>;
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionEnvironmentPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+export interface EphemeralStorage {
+  readonly size: number;
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionEphemeralStoragePropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnFunctionArchitecturesPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
 "
 `;
 
 exports[`AWS::S3::Bucket 1`] = `
-"export interface AccelerateConfiguration {
+"import * as cdk from "aws-cdk-lib";
+
+export interface CfnBucketProps {
+  readonly accelerateConfiguration: AccelerateConfiguration;
+
+  readonly accessControl: string;
+
+  readonly analyticsConfigurations: Array<AnalyticsConfiguration>;
+
+  readonly bucketEncryption: BucketEncryption;
+
+  readonly bucketName: string;
+
+  readonly corsConfiguration: CorsConfiguration;
+
+  readonly intelligentTieringConfigurations: Array<IntelligentTieringConfiguration>;
+
+  readonly inventoryConfigurations: Array<InventoryConfiguration>;
+
+  readonly lifecycleConfiguration: LifecycleConfiguration;
+
+  readonly loggingConfiguration: LoggingConfiguration;
+
+  readonly metricsConfigurations: Array<MetricsConfiguration>;
+
+  readonly notificationConfiguration: NotificationConfiguration;
+
+  readonly objectLockConfiguration: ObjectLockConfiguration;
+
+  readonly objectLockEnabled: boolean;
+
+  readonly ownershipControls: OwnershipControls;
+
+  readonly publicAccessBlockConfiguration: PublicAccessBlockConfiguration;
+
+  readonly replicationConfiguration: ReplicationConfiguration;
+
+  readonly tags: Array<Tag>;
+
+  readonly versioningConfiguration: VersioningConfiguration;
+
+  readonly websiteConfiguration: WebsiteConfiguration;
+}
+
+
+export interface AccelerateConfiguration {
   readonly accelerationStatus: string;
+}
+
+
+// @ts-ignore TS6133
+function cfnBucketAccelerateConfigurationPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnBucketAccessControlPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -263,6 +706,14 @@ export interface Destination {
 }
 
 
+// @ts-ignore TS6133
+function cfnBucketAnalyticsConfigurationsPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
 export interface BucketEncryption {
   readonly serverSideEncryptionConfiguration: Array<ServerSideEncryptionRule>;
 }
@@ -279,6 +730,22 @@ export interface ServerSideEncryptionByDefault {
   readonly kMSMasterKeyID: string;
 
   readonly sSEAlgorithm: string;
+}
+
+
+// @ts-ignore TS6133
+function cfnBucketBucketEncryptionPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnBucketBucketNamePropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -302,6 +769,14 @@ export interface CorsRule {
 }
 
 
+// @ts-ignore TS6133
+function cfnBucketCorsConfigurationPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
 export interface IntelligentTieringConfiguration {
   readonly id: string;
 
@@ -322,6 +797,14 @@ export interface Tiering {
 }
 
 
+// @ts-ignore TS6133
+function cfnBucketIntelligentTieringConfigurationsPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
 export interface InventoryConfiguration {
   readonly destination: Destination;
 
@@ -336,6 +819,14 @@ export interface InventoryConfiguration {
   readonly prefix: string;
 
   readonly scheduleFrequency: string;
+}
+
+
+// @ts-ignore TS6133
+function cfnBucketInventoryConfigurationsPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -409,10 +900,26 @@ export interface Transition {
 }
 
 
+// @ts-ignore TS6133
+function cfnBucketLifecycleConfigurationPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
 export interface LoggingConfiguration {
   readonly destinationBucketName: string;
 
   readonly logFilePrefix: string;
+}
+
+
+// @ts-ignore TS6133
+function cfnBucketLoggingConfigurationPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -424,6 +931,14 @@ export interface MetricsConfiguration {
   readonly prefix: string;
 
   readonly tagFilters: Array<TagFilter>;
+}
+
+
+// @ts-ignore TS6133
+function cfnBucketMetricsConfigurationsPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -487,6 +1002,14 @@ export interface TopicConfiguration {
 }
 
 
+// @ts-ignore TS6133
+function cfnBucketNotificationConfigurationPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
 export interface ObjectLockConfiguration {
   readonly objectLockEnabled: string;
 
@@ -508,6 +1031,22 @@ export interface DefaultRetention {
 }
 
 
+// @ts-ignore TS6133
+function cfnBucketObjectLockConfigurationPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnBucketObjectLockEnabledPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
 export interface OwnershipControls {
   readonly rules: Array<OwnershipControlsRule>;
 }
@@ -515,6 +1054,14 @@ export interface OwnershipControls {
 
 export interface OwnershipControlsRule {
   readonly objectOwnership: string;
+}
+
+
+// @ts-ignore TS6133
+function cfnBucketOwnershipControlsPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -526,6 +1073,14 @@ export interface PublicAccessBlockConfiguration {
   readonly ignorePublicAcls: boolean;
 
   readonly restrictPublicBuckets: boolean;
+}
+
+
+// @ts-ignore TS6133
+function cfnBucketPublicAccessBlockConfigurationPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -639,6 +1194,14 @@ export interface SseKmsEncryptedObjects {
 }
 
 
+// @ts-ignore TS6133
+function cfnBucketReplicationConfigurationPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
 export interface Tag {
   readonly key: string;
 
@@ -646,8 +1209,24 @@ export interface Tag {
 }
 
 
+// @ts-ignore TS6133
+function cfnBucketTagsPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
 export interface VersioningConfiguration {
   readonly status: string;
+}
+
+
+// @ts-ignore TS6133
+function cfnBucketVersioningConfigurationPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -696,57 +1275,17 @@ export interface RedirectAllRequestsTo {
 }
 
 
-export interface CfnBucketProps {
-  readonly accelerateConfiguration: AccelerateConfiguration;
-
-  readonly accessControl: string;
-
-  readonly analyticsConfigurations: Array<AnalyticsConfiguration>;
-
-  readonly bucketEncryption: BucketEncryption;
-
-  readonly bucketName: string;
-
-  readonly corsConfiguration: CorsConfiguration;
-
-  readonly intelligentTieringConfigurations: Array<IntelligentTieringConfiguration>;
-
-  readonly inventoryConfigurations: Array<InventoryConfiguration>;
-
-  readonly lifecycleConfiguration: LifecycleConfiguration;
-
-  readonly loggingConfiguration: LoggingConfiguration;
-
-  readonly metricsConfigurations: Array<MetricsConfiguration>;
-
-  readonly notificationConfiguration: NotificationConfiguration;
-
-  readonly objectLockConfiguration: ObjectLockConfiguration;
-
-  readonly objectLockEnabled: boolean;
-
-  readonly ownershipControls: OwnershipControls;
-
-  readonly publicAccessBlockConfiguration: PublicAccessBlockConfiguration;
-
-  readonly replicationConfiguration: ReplicationConfiguration;
-
-  readonly tags: Array<Tag>;
-
-  readonly versioningConfiguration: VersioningConfiguration;
-
-  readonly websiteConfiguration: WebsiteConfiguration;
+// @ts-ignore TS6133
+function cfnBucketWebsiteConfigurationPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 "
 `;
 
 exports[`AWS::SQS::Queue 1`] = `
-"export interface Tag {
-  readonly key: string;
-
-  readonly value: string;
-}
-
+"import * as cdk from "aws-cdk-lib";
 
 export interface CfnQueueProps {
   readonly contentBasedDeduplication: boolean;
@@ -781,16 +1320,178 @@ export interface CfnQueueProps {
 
   readonly visibilityTimeout: number;
 }
+
+
+// @ts-ignore TS6133
+function cfnQueueContentBasedDeduplicationPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnQueueDeduplicationScopePropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnQueueDelaySecondsPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnQueueFifoQueuePropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnQueueFifoThroughputLimitPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnQueueKmsDataKeyReusePeriodSecondsPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnQueueKmsMasterKeyIdPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnQueueSqsManagedSseEnabledPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnQueueMaximumMessageSizePropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnQueueMessageRetentionPeriodPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnQueueQueueNamePropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnQueueReceiveMessageWaitTimeSecondsPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnQueueRedriveAllowPolicyPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnQueueRedrivePolicyPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+export interface Tag {
+  readonly key: string;
+
+  readonly value: string;
+}
+
+
+// @ts-ignore TS6133
+function cfnQueueTagsPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnQueueVisibilityTimeoutPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
 "
 `;
 
 exports[`Alexa::ASK::Skill 1`] = `
-"export interface AuthenticationConfiguration {
+"import * as cdk from "aws-cdk-lib";
+
+export interface CfnSkillProps {
+  readonly authenticationConfiguration: AuthenticationConfiguration;
+
+  readonly vendorId: string;
+
+  readonly skillPackage: SkillPackage;
+}
+
+
+export interface AuthenticationConfiguration {
   readonly clientId: string;
 
   readonly refreshToken: string;
 
   readonly clientSecret: string;
+}
+
+
+// @ts-ignore TS6133
+function cfnSkillAuthenticationConfigurationPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
+}
+
+
+// @ts-ignore TS6133
+function cfnSkillVendorIdPropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -812,12 +1513,11 @@ export interface Overrides {
 }
 
 
-export interface CfnSkillProps {
-  readonly authenticationConfiguration: AuthenticationConfiguration;
-
-  readonly vendorId: string;
-
-  readonly skillPackage: SkillPackage;
+// @ts-ignore TS6133
+function cfnSkillSkillPackagePropertyToCloudFormation(properties: any): any {
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 "
 `;
