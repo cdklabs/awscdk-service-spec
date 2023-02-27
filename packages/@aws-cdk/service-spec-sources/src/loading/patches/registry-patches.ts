@@ -31,7 +31,7 @@ export const patchCloudFormationRegistry = onlyObjects(
     removeMinMaxLengthOnObject,
     removeSuspiciousPatterns,
     missingTypeField,
-    minimizeTypeOperators,
+    dropRedundantTypeOperatorsInMetricStream,
     minMaxItemsOnObject,
     makeKeywordDropper('string', STRING_KEY_WITNESS),
     makeKeywordDropper('object', OBJECT_KEY_WITNESS),
@@ -168,47 +168,41 @@ export function canonicalizeTypeOperators(op: 'oneOf' | 'anyOf' | 'allOf') {
     if (!deepEqual(lens.value, replacement)) {
       lens.replaceValue(NO_MISTAKE, replacement);
     }
-
-    // Let's not try to be too clever for now
-    /*
-    switch (newBranches.length) {
-      case 0:
-        lens.removeProperty(`empty ${op}`, op);
-        break;
-      case 1:
-        lens.replaceProperty(`unnecessary ${op}`, op, newBranches[0]);
-        break;
-      default:
-        const replacement = { [op]: newBranches };
-        if (!deepEqual(lens.value, replacement)) {
-          lens.replaceValue(NO_MISTAKE, replacement);
-        }
-        break;
-    }
-    */
   };
 }
 
-export function minimizeTypeOperators(lens: JsonObjectLens) {
-  for (const type of ['oneOf', 'anyOf', 'allOf']) {
-    const val = lens.value[type];
-    if (Array.isArray(val) && val.length === 1) {
-      const onlyOption = val[0];
-      lens.removeProperty(`redundant type operator ${type}`, type);
-      lens.replaceValue(`redundant type operator ${type}`, {
-        ...restOfObjectWithout(lens.value, [type]),
-        ...onlyOption,
-      });
-      return;
-    }
-
-    // This may cause duplicates in parent type operators.
-    // We'll handle them on the next pass if necessary.
-    if (Array.isArray(val) && Object.keys(val).length !== Object.keys(deepDedupe(val)).length) {
-      lens.replaceValue(NO_MISTAKE, {
-        [type]: deepDedupe(val),
-      });
-    }
+export function dropRedundantTypeOperatorsInMetricStream(lens: JsonObjectLens) {
+  if (
+    isRoot(lens) &&
+    lens.value.typeName === 'AWS::CloudWatch::MetricStream' &&
+    canonicalize(lens.value.anyOf) ===
+      canonicalize([
+        {
+          required: ['FirehoseArn', 'RoleArn', 'OutputFormat'],
+        },
+        {
+          allOf: [
+            {
+              required: ['FirehoseArn', 'RoleArn', 'OutputFormat'],
+            },
+          ],
+        },
+        {
+          oneOf: [
+            {
+              required: ['IncludeFilters'],
+            },
+            {
+              required: ['ExcludeFilters'],
+            },
+          ],
+        },
+      ])
+  ) {
+    lens.removeProperty(
+      'AWS::CloudWatch::MetricStream has redundant anyOf that cannot be interpreted as a valid type operator',
+      'anyOf',
+    );
   }
 }
 

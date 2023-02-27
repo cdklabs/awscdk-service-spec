@@ -2,7 +2,7 @@ import { JsonLens } from '../../src/loading/patches/json-lens';
 import { applyPatcher, Patcher } from '../../src/loading/patches/patching';
 import {
   canonicalizeTypeOperators,
-  minimizeTypeOperators,
+  dropRedundantTypeOperatorsInMetricStream,
   explodeTypeArray,
   removeBooleanPatterns,
   replaceArrayLengthProps,
@@ -253,9 +253,10 @@ describe('patches', () => {
     });
   });
 
-  describe(minimizeTypeOperators, () => {
-    test('removes type operators with 1 element', () => {
+  describe(dropRedundantTypeOperatorsInMetricStream, () => {
+    test('removes the specific type operator in metric stream', () => {
       const obj = {
+        typeName: 'AWS::CloudWatch::MetricStream',
         anyOf: [
           {
             required: ['FirehoseArn', 'RoleArn', 'OutputFormat'],
@@ -280,25 +281,9 @@ describe('patches', () => {
         ],
       };
 
-      const { root: patchedObj } = applyPatcher(obj, minimizeTypeOperators as Patcher<JsonLens>);
+      const { root: patchedObj } = applyPatcher(obj, dropRedundantTypeOperatorsInMetricStream as Patcher<JsonLens>);
 
-      expect(patchedObj).toEqual({
-        anyOf: [
-          {
-            required: ['FirehoseArn', 'RoleArn', 'OutputFormat'],
-          },
-          {
-            oneOf: [
-              {
-                required: ['IncludeFilters'],
-              },
-              {
-                required: ['ExcludeFilters'],
-              },
-            ],
-          },
-        ],
-      });
+      expect(patchedObj).toEqual({ typeName: 'AWS::CloudWatch::MetricStream' });
     });
   });
 });
