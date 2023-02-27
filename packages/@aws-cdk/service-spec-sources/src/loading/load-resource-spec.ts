@@ -6,7 +6,9 @@ import { ResourceSpecification } from '../types';
 export async function loadDefaultResourceSpecification(
   mustValidate = true,
 ): Promise<LoadResult<ResourceSpecification>> {
-  const loader = await Loader.fromSchemaFile<ResourceSpecification>('ResourceSpecification.schema.json', mustValidate);
+  const loader = await Loader.fromSchemaFile<ResourceSpecification>('ResourceSpecification.schema.json', {
+    mustValidate,
+  });
 
   const result = await loader.loadFile(
     path.join(

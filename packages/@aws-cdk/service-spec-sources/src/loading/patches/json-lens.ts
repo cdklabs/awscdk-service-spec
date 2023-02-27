@@ -1,5 +1,8 @@
 export const NO_MISTAKE = 'no-mistake';
 
+/**
+ * A lens that points to a location in a JSON data structure
+ */
 export interface JsonLens {
   /** Filename of the file */
   readonly fileName: string;
@@ -15,6 +18,9 @@ export interface JsonLens {
 
   /** Type test for whether the current lens points to an object. */
   isJsonObject(): this is JsonObjectLens;
+
+  /** Type test for whether the current lens points to an array. */
+  isJsonArray(): this is JsonArrayLens;
 
   /** Fully replace the current value with a different one. */
   replaceValue(reason: string, newValue: any): void;
@@ -36,5 +42,12 @@ export interface JsonObjectLens extends JsonLens {
   replaceProperty(reason: string, name: string, value: any): void;
 
   /** Recurse through the object field. */
-  descendObjectField(key: string, value: any): void;
+  descendObjectField(key: string, value: any): JsonLens;
+}
+
+export interface JsonArrayLens extends JsonLens {
+  readonly value: unknown[];
+
+  /** Recurse through the object field. */
+  descendArrayElement(index: number): JsonLens;
 }

@@ -1,4 +1,4 @@
-import { JsonLens, JsonObjectLens } from './json-lens';
+import { JsonArrayLens, JsonLens, JsonObjectLens, NO_MISTAKE } from './json-lens';
 import { JsonPatch } from './json-patch';
 
 interface SchemaLensOptions {
@@ -14,14 +14,14 @@ interface SchemaLensOptions {
  * A patch that indicates a mistake by upstream users
  */
 export interface PatchReport {
-  readonly subject: any;
+  readonly subject: SchemaLens;
   readonly fileName: string;
   readonly path: string;
   readonly patch: JsonPatch;
   readonly reason: string;
 }
 
-export class SchemaLens implements JsonLens, JsonObjectLens {
+export class SchemaLens implements JsonLens, JsonObjectLens, JsonArrayLens {
   /** Filename of the file */
   readonly fileName: string;
 
@@ -58,6 +58,10 @@ export class SchemaLens implements JsonLens, JsonObjectLens {
   /** Type test for whether the current lens points to a json object. */
   isJsonObject(): this is JsonObjectLens {
     return typeof this.value === 'object' && this.value && !Array.isArray(this.value);
+  }
+
+  isJsonArray(): this is JsonArrayLens {
+    return Array.isArray(this.value);
   }
 
   wasRemoved(key: string) {
@@ -129,7 +133,85 @@ export class SchemaLens implements JsonLens, JsonObjectLens {
       path: this.jsonPath,
       patch,
       reason,
-      subject: this.value,
+      subject: this,
     });
+  }
+}
+
+export type Patcher<L extends JsonLens> = (lens: L) => void;
+
+export type JsonLensPatcher = Patcher<JsonLens>;
+
+export function makeCompositePatcher<L extends JsonLens>(...patchers: Patcher<L>[]): Patcher<L> {
+  return (lens) => {
+    for (const patcher of patchers) {
+      patcher(lens);
+    }
+  };
+}
+
+export function onlyObjects(patcher: Patcher<JsonObjectLens>): Patcher<JsonLens> {
+  return (lens) => {
+    if (lens.isJsonObject()) {
+      patcher(lens);
+    }
+  };
+}
+
+/**
+ * Apply a patcher to a data structure
+ */
+export function applyPatcher(root: any, patcher: JsonLensPatcher) {
+  // Do multiple iterations to find a fixpoint for the patching
+  const patchSets = new Array<PatchReport[]>();
+  let maxIterations = 10;
+  while (maxIterations) {
+    const schema = new SchemaLens(root, { fileName: '' });
+    recurse(schema);
+    if (!schema.hasPatches) {
+      break;
+    }
+    patchSets.push(schema.reports);
+
+    if (--maxIterations === 0) {
+      throw new Error(
+        [
+          'Patching JSON failed to stabilize. Infinite recursion? Most recent patchsets:',
+          JSON.stringify(patchSets.slice(-2), undefined, 2),
+        ].join('\n'),
+      );
+    }
+    try {
+      root = applyPatches(schema.patches);
+    } catch (e) {
+      // We may have produced patches that no longer cleanly apply depending on what other patches have done.
+      // Catch those occurrences and give it another go on the next round.
+    }
+  }
+
+  // Only report the first iteration's patch set, it's the only one whose changes relate to the input
+  // file in a meaningful way.
+  return { root, patches: patchSets[0].filter((p) => p.reason !== NO_MISTAKE) };
+
+  function recurse(lens: SchemaLens) {
+    patcher(lens);
+
+    if (Array.isArray(lens.value)) {
+      lens.value.forEach((_, i) => {
+        recurse(lens.descendArrayElement(i));
+      });
+    }
+
+    if (lens.isJsonObject()) {
+      for (const k of Object.keys(lens.value)) {
+        if (!lens.wasRemoved(k)) {
+          recurse(lens.descendObjectField(k));
+        }
+      }
+    }
+  }
+
+  function applyPatches(patches: JsonPatch[]) {
+    return JsonPatch.apply(root, ...patches);
   }
 }

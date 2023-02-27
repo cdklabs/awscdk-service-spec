@@ -32,12 +32,11 @@ export async function buildDatabase(options: BuildDatabaseOptions = {}) {
     }
   }
 
-  const docs = await sources.loadDefaultCloudFormationDocs();
+  const docs = loadResult(await sources.loadDefaultCloudFormationDocs());
   readCloudFormationDocumentation(db, docs, warnings);
 
-  const stateful = await sources.loadDefaultStatefulResources();
-  warnings.push(...stateful.warnings);
-  readStatefulResources(db, stateful.value, warnings);
+  const stateful = loadResult(await sources.loadDefaultStatefulResources());
+  readStatefulResources(db, stateful, warnings);
 
   return { db, warnings };
 

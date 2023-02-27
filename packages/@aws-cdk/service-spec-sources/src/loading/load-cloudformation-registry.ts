@@ -3,6 +3,7 @@ import * as util from 'util';
 import * as _glob from 'glob';
 import { combineLoadResults, Loader, LoadResult } from './loader';
 import { CloudFormationRegistryResource } from '../types';
+import { patchCloudFormationRegistry } from './patches/registry-patches';
 
 const glob = util.promisify(_glob.glob);
 
@@ -12,7 +13,10 @@ export async function loadCloudFormationRegistryDirectory(
 ): Promise<LoadResult<CloudFormationRegistryResource[]>> {
   const loader = await Loader.fromSchemaFile<CloudFormationRegistryResource>(
     'CloudFormationRegistryResource.schema.json',
-    mustValidate,
+    {
+      mustValidate,
+      patcher: patchCloudFormationRegistry,
+    },
   );
 
   const files = await glob(path.join(directory, '*.json'));
@@ -35,11 +39,11 @@ export async function loadDefaultCloudFormationRegistryResources(
         const resources = await loadCloudFormationRegistryDirectory(directoryName, mustValidate);
 
         return {
+          ...resources,
           value: {
             regionName,
             resources: resources.value,
           },
-          warnings: resources.warnings,
         };
       }),
     ),

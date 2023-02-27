@@ -1,6 +1,5 @@
 import * as pj from 'projen';
 import { MergeQueue, MonorepoRoot, MonorepoTypeScriptProject } from './projenrc';
-import * as canonicalize from 'canonicalize';
 
 const lfsPatterns = ['sources/**/*.json'];
 
