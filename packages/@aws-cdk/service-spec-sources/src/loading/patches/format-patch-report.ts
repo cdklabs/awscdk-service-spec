@@ -8,11 +8,12 @@ import { PatchReport } from './patching';
 export function formatPatchReport(report: PatchReport): string {
   const parts = new Array<string>();
   const indents = new Array<string>();
-  parts.push(`${report.fileName}\n`);
-  parts.push(`--------------------------------\n`);
-  parts.push(`${report.path}: ${report.reason}\n`);
+  emit(`${report.fileName.trimEnd()}\n`);
+  emit(`--------------------------------\n`);
+  emit(`${report.path || '/'}: ${report.reason}\n`);
 
-  indents.push('  '); // To put the -, + markers into later
+  indents.push('    '); // To put the [-], [+] markers into later
+  emit(indents[0]);
 
   emitParentThen(report.subject, () => {
     emitPatch(report.subject, report.patch);
@@ -34,7 +35,8 @@ export function formatPatchReport(report: PatchReport): string {
         const key = lastPart(lens.jsonPath);
         emit(`"${key}": `);
         block();
-        emit('}');
+        indents.pop();
+        emit('\n}');
       } else if (grampy.isJsonArray()) {
         emit('[\n');
         const ix = parseInt(lastPart(lens.jsonPath), 10);
@@ -42,37 +44,42 @@ export function formatPatchReport(report: PatchReport): string {
           emit('...,\n');
         }
         block();
-        emit(']');
+        indents.pop();
+        emit('\n]');
       }
-
-      indents.pop();
     });
   }
 
   function emitPatch(lens: JsonLens, patch: JsonPatch) {
     if (lens.isJsonObject()) {
+      indents.push('  ');
+      emit('{\n');
+
       switch (patch.operation.op) {
         case 'add':
-          emit(`[[+]]"${patch.operation.path}": ${JSON.stringify(patch.operation.value)},`);
+          emit(`<<[+]>>"${lastPart(patch.operation.path)}": ${JSON.stringify(patch.operation.value)},`);
           break;
         case 'copy':
-          emit(`[[+]]"${patch.operation.path}": ${JSON.stringify(lens.value[patch.operation.from])},`);
+          emit(`<<[+]>>"${lastPart(patch.operation.path)}": ${JSON.stringify(lens.value[patch.operation.from])},`);
           break;
         case 'move':
-          const movedValue = lens.value[patch.operation.from];
-          emit(`[[-]]"${patch.operation.from}": ${JSON.stringify(movedValue)},`);
-          emit(`[[+]]"${patch.operation.path}": ${JSON.stringify(movedValue)},`);
+          const movedValue = lens.value[lastPart(patch.operation.from)];
+          emit(`<<[-]>>"${lastPart(patch.operation.from)}": ${JSON.stringify(movedValue)},`);
+          emit(`<<[+]>>"${lastPart(patch.operation.path)}": ${JSON.stringify(movedValue)},`);
           break;
         case 'remove':
-          const removedValue = lens.value[patch.operation.path];
-          emit(`[[-]]"${patch.operation.path}": ${JSON.stringify(removedValue)},`);
+          const removedValue = lens.value[lastPart(patch.operation.path)];
+          emit(`<<[-]>>"${lastPart(patch.operation.path)}": ${JSON.stringify(removedValue)},`);
           break;
         case 'replace':
-          const oldValue = lens.value[patch.operation.path];
-          emit(`[[-]]"${patch.operation.path}": ${JSON.stringify(oldValue)},`);
-          emit(`[[+]]"${patch.operation.path}": ${JSON.stringify(patch.operation.value)},`);
+          const oldValue = lens.value[lastPart(patch.operation.path)];
+          emit(`<<[-]>>"${lastPart(patch.operation.path)}": ${JSON.stringify(oldValue)},`);
+          emit(`<<[+]>>"${lastPart(patch.operation.path)}": ${JSON.stringify(patch.operation.value)},`);
           break;
       }
+
+      indents.pop();
+      emit('\n}');
     } else {
       emit('Do not support printing this patch yet...');
     }
@@ -86,11 +93,11 @@ export function formatPatchReport(report: PatchReport): string {
   }
 
   /**
-   * Move anything in the special marker [[...]] to the front of the line
+   * Move anything in the special marker <<...>> to the front of the line
    */
   function moveMarkersToFront(x: string): string {
-    const re = /^(\s+)\[\[([^\]])\]\]/gm;
-    return x.replace(re, (_, spaces: string, sym: string) => `${sym}${spaces.substring(0)}`);
+    const re = /^(\s*)<<([^>]*)>>/gm;
+    return x.replace(re, (_, spaces: string, sym: string) => `${sym}${spaces.substring(sym.length)}`);
   }
 }
 

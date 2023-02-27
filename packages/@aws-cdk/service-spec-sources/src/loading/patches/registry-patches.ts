@@ -17,7 +17,6 @@ import { makeCompositePatcher, onlyObjects } from './patching';
  */
 export const patchCloudFormationRegistry = onlyObjects(
   makeCompositePatcher(
-    removeAdditionalProperties,
     replaceArrayLengthProps,
     removeBooleanPatterns,
     explodeTypeArray,
@@ -42,16 +41,6 @@ export const patchCloudFormationRegistry = onlyObjects(
     makeKeywordDropper('null', NULL_KEY_WITNESS),
   ),
 );
-
-/**
- * The property 'additionalProperties' should only exist on object types.
- * This function removes any instances of 'additionalProperties' on non-objects.
- */
-export function removeAdditionalProperties(lens: JsonObjectLens) {
-  if (lens.value.type !== 'object' && lens.value.additionalProperties !== undefined) {
-    lens.removeProperty('additionalProperties may only exist on object types', 'additionalProperties');
-  }
-}
 
 /**
  * Arrays use 'minItems' and 'maxItems' to delineate boundaries.

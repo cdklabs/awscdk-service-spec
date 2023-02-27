@@ -42,13 +42,11 @@ export class SchemaLens implements JsonLens, JsonObjectLens, JsonArrayLens {
 
   constructor(value: any, options: SchemaLensOptions) {
     this.value = value;
-    this.rootPath = options.rootPath ?? [];
+    this.rootPath = options.rootPath ? [...options.rootPath, this] : [this];
     this.jsonPath = options.jsonPath ?? '';
     this.fileName = options.fileName;
     this.reports = options.reportInto ?? [];
     this.patches = options.patchInto ?? [];
-
-    this.rootPath.push(this);
   }
 
   public get hasPatches() {
@@ -191,7 +189,8 @@ export function applyPatcher(root: any, patcher: JsonLensPatcher) {
 
   // Only report the first iteration's patch set, it's the only one whose changes relate to the input
   // file in a meaningful way.
-  return { root, patches: patchSets[0].filter((p) => p.reason !== NO_MISTAKE) };
+  const firstPatchSet: PatchReport[] = patchSets[0] ?? [];
+  return { root, patches: firstPatchSet.filter((p) => p.reason !== NO_MISTAKE) };
 
   function recurse(lens: SchemaLens) {
     patcher(lens);

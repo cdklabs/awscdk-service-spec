@@ -12,7 +12,7 @@ async function main() {
     console.log(`${allResources.patchesApplied.length} patches applied to sources`);
 
     for (const patch of allResources.patchesApplied) {
-      console.log(formatPatchReport(patch));
+      console.log(formatPatchReport(patch) + '\n');
     }
   }
 
