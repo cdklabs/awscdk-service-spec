@@ -48,6 +48,7 @@ export const allPatchers = onlyObjects(
     removeMinMaxLengthOnObject,
     removeSuspiciousPatterns,
     missingTypeField,
+    minimizeTypeOperators,
     minMaxItemsOnObject,
     makeKeywordDropper('string', STRING_KEY_WITNESS),
     makeKeywordDropper('object', OBJECT_KEY_WITNESS),
@@ -174,7 +175,7 @@ export function canonicalizeTypeOperators(op: 'oneOf' | 'anyOf' | 'allOf') {
     // Only normalize 'oneOf' if we're not at the root. We make an exception for these.
     // Don't do anything if 'oneOf' appears in the position of a property name, that's valid without
     // invoking its special powers.
-    if (isRoot(lens) || !isInSchemaPosition(lens) || (isPropertyOrDefinition(lens) && onlyTypeOperator(op, lens))) {
+    if (isRoot(lens) || !isInSchemaPosition(lens)) {
       return;
     }
 
@@ -430,7 +431,7 @@ function deepDedupe<A>(xs: A[]): A[] {
   return ret;
 }
 
-function deepMerge(x: any, y: any): any {
+export function deepMerge(x: any, y: any): any {
   const returnObj = JSON.parse(JSON.stringify(x));
   for (const [k, v] of Object.entries(y)) {
     if (Array.isArray(v) && Array.isArray(returnObj[k])) {
@@ -456,16 +457,6 @@ function deepEqual(x: any, y: any) {
  */
 function isInSchemaPosition(lens: JsonLens) {
   return !lens.jsonPath.endsWith('/properties');
-}
-
-function isPropertyOrDefinition(lens: JsonLens) {
-  const paths = lens.jsonPath.split('/');
-  return ['properties', 'definitions'].includes(paths[paths.length - 2]);
-}
-
-function onlyTypeOperator(op: 'oneOf' | 'anyOf' | 'allOf', lens: JsonLens) {
-  const keys = Object.keys(lens.value as any);
-  return keys.length === 1 && keys[0] === op;
 }
 
 function isRoot(lens: JsonLens) {
