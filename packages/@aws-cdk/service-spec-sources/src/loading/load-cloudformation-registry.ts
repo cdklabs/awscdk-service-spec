@@ -2,8 +2,8 @@ import * as path from 'path';
 import * as util from 'util';
 import * as _glob from 'glob';
 import { combineLoadResults, Loader, LoadResult } from './loader';
-import { CloudFormationRegistryResource } from '../types';
 import { patchCloudFormationRegistry } from './patches/registry-patches';
+import { CloudFormationRegistryResource } from '../types';
 
 const glob = util.promisify(_glob.glob);
 
