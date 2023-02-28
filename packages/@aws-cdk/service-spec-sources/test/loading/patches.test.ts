@@ -1,4 +1,3 @@
-import { STRING_KEY_WITNESS } from '../../src/loading/patches/field-witnesses';
 import { JsonLens, JsonObjectLens } from '../../src/loading/patches/json-lens';
 import { applyPatcher, Patcher } from '../../src/loading/patches/patching';
 import {
@@ -513,7 +512,7 @@ describe('patches', () => {
         },
       };
 
-      const patchedObj = patchObject(obj, makeKeywordDropper('string', STRING_KEY_WITNESS));
+      const patchedObj = patchObject(obj, makeKeywordDropper());
 
       expect(patchedObj).toEqual({
         root: {

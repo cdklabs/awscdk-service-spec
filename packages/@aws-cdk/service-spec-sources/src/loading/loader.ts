@@ -89,7 +89,7 @@ export class Loader<A> {
     return combineLoadResults(await seqMap(fileNames, async (fileName) => this.loadFile(fileName)));
   }
 
-  private annotateWithFilename<A>(fileName: string, x: Result<LoadResult<A>>): Result<LoadResult<A>> {
+  private annotateWithFilename<B>(fileName: string, x: Result<LoadResult<B>>): Result<LoadResult<B>> {
     if (this.options.errorRootDirectory !== undefined) {
       fileName = path.relative(this.options.errorRootDirectory, fileName);
     }
