@@ -223,7 +223,7 @@ export function canonicalizeRegexInFormat(lens: JsonObjectLens) {
   if (
     lens.value.type === 'string' &&
     lens.value.format !== undefined &&
-    lens.value.format === 'string' &&
+    typeof lens.value.format === 'string' &&
     !['uri', 'timestamp', 'date-time'].includes(lens.value.format)
   ) {
     // Format as a regex, store it in 'pattern' instead
