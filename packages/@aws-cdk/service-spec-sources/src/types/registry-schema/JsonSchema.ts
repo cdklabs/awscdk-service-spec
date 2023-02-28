@@ -207,14 +207,16 @@ export namespace jsonschema {
 
       const parts = path.substring(2).split('/');
       let current = root;
+      let lastKey: string | undefined;
       while (true) {
-        const name = parts.shift();
-        if (!name) {
+        if (parts.length === 0) {
           break;
         }
-        current = current[name];
+        lastKey = parts.shift()!;
+        current = current[lastKey];
       }
-      return { schema: current, referenceName: parts[parts.length - 1] };
+      throw new Error('Oops');
+      return { schema: current, referenceName: lastKey };
     };
     return resolve;
   }

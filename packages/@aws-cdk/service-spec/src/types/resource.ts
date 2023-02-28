@@ -63,7 +63,7 @@ Invariants.push(
 
 export type PropertyType = PrimitiveType | DefinitionReference | ArrayType<PropertyType> | MapType<PropertyType>;
 
-export type PrimitiveType = StringType | NumberType | BooleanType | JsonType;
+export type PrimitiveType = StringType | NumberType | BooleanType | JsonType | NullType;
 
 export interface StringType {
   readonly type: 'string';
@@ -78,6 +78,10 @@ export interface BooleanType {
 }
 export interface JsonType {
   readonly type: 'json';
+}
+
+export interface NullType {
+  readonly type: 'null';
 }
 
 export interface DefinitionReference {

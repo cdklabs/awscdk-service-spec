@@ -90,6 +90,13 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
           referenceName: resolved.referenceName,
         };
         return schemaTypeToModelType(propertyName, firstResolved, fail);
+      } else if (jsonschema.isAllOf(resolved.schema)) {
+        // FIME: Do a proper thing here
+        const firstResolved: jsonschema.ResolvedSchema = {
+          schema: resolved.schema.allOf[0],
+          referenceName: resolved.referenceName,
+        };
+        return schemaTypeToModelType(propertyName, firstResolved, fail);
       } else {
         switch (resolved.schema.type) {
           case 'string':
@@ -111,6 +118,9 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
           case 'number':
           case 'integer':
             return { type: 'number' };
+
+          case 'null':
+            return { type: 'null' };
         }
       }
     });
