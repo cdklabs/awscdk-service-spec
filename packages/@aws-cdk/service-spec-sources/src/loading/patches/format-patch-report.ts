@@ -55,34 +55,80 @@ export function formatPatchReport(report: PatchReport): string {
       indents.push('  ');
       emit('{\n');
 
-      switch (patch.operation.op) {
-        case 'add':
-          emit(`<<[+]>>"${lastPart(patch.operation.path)}": ${JSON.stringify(patch.operation.value)},`);
-          break;
-        case 'copy':
-          emit(`<<[+]>>"${lastPart(patch.operation.path)}": ${JSON.stringify(lens.value[patch.operation.from])},`);
-          break;
-        case 'move':
-          const movedValue = lens.value[lastPart(patch.operation.from)];
-          emit(`<<[-]>>"${lastPart(patch.operation.from)}": ${JSON.stringify(movedValue)},`);
-          emit(`<<[+]>>"${lastPart(patch.operation.path)}": ${JSON.stringify(movedValue)},`);
-          break;
-        case 'remove':
-          const removedValue = lens.value[lastPart(patch.operation.path)];
-          emit(`<<[-]>>"${lastPart(patch.operation.path)}": ${JSON.stringify(removedValue)},`);
-          break;
-        case 'replace':
-          const oldValue = lens.value[lastPart(patch.operation.path)];
-          emit(`<<[-]>>"${lastPart(patch.operation.path)}": ${JSON.stringify(oldValue)},`);
-          emit(`<<[+]>>"${lastPart(patch.operation.path)}": ${JSON.stringify(patch.operation.value)},`);
-          break;
-      }
+      const modifiedKey = lastPart(patch.operation.op === 'move' ? patch.operation.from : patch.operation.path);
+
+      emitPropertiesUntil(lens.value, modifiedKey, () => {
+        switch (patch.operation.op) {
+          case 'add':
+            emit(`<<[+]>>"${modifiedKey}": ${JSON.stringify(patch.operation.value)},`);
+            break;
+          case 'copy':
+            emit(`<<[+]>>"${modifiedKey}": ${JSON.stringify(lens.value[patch.operation.from])},`);
+            break;
+          case 'move':
+            const movedValue = lens.value[lastPart(patch.operation.from)];
+            emit(`<<[-]>>"${modifiedKey}": ${JSON.stringify(movedValue)},\n`);
+            emit(`<<[+]>>"${lastPart(patch.operation.path)}": ${JSON.stringify(movedValue)},`);
+            break;
+          case 'remove':
+            const removedValue = lens.value[lastPart(patch.operation.path)];
+            emit(`<<[-]>>"${modifiedKey}": ${JSON.stringify(removedValue)},`);
+            break;
+          case 'replace':
+            const oldValue = lens.value[lastPart(patch.operation.path)];
+            emit(`<<[-]>>"${modifiedKey}": ${JSON.stringify(oldValue)},\n`);
+            emit(`<<[+]>>"${modifiedKey}": ${JSON.stringify(patch.operation.value)},`);
+            break;
+        }
+      });
 
       indents.pop();
       emit('\n}');
     } else {
       emit('Do not support printing this patch yet...');
     }
+  }
+
+  /**
+   * Emit properties of the given object until we get to the given property
+   */
+  function emitPropertiesUntil(x: Record<string, unknown>, when: string, block: () => void) {
+    let first = true;
+    let invoked = false;
+    for (const [key, value] of Object.entries(x)) {
+      if (!first) {
+        emit('\n');
+      }
+      first = false;
+
+      if (key === when) {
+        block();
+        invoked = true;
+      } else {
+        emit(`"${key}": `);
+        emitAbridged(value);
+      }
+    }
+
+    if (!invoked) {
+      if (!first) {
+        emit('\n');
+      }
+      block();
+    }
+  }
+
+  /**
+   * Emit an abridged representation of this value
+   */
+  function emitAbridged(x: unknown) {
+    if (Array.isArray(x)) {
+      return emit(`[ ... ]`);
+    }
+    if (x && typeof x === 'object') {
+      return emit(`{ ... }`);
+    }
+    return emit(JSON.stringify(x));
   }
 
   function emit(x: string): void {

@@ -167,6 +167,7 @@ export function applyPatcher(root: any, patcher: JsonLensPatcher) {
   // Do multiple iterations to find a fixpoint for the patching
   const patchSets = new Array<PatchReport[]>();
   let maxIterations = 10;
+
   while (maxIterations) {
     const schema = new SchemaLens(root, { fileName: '' });
     recurse(schema);
@@ -179,16 +180,22 @@ export function applyPatcher(root: any, patcher: JsonLensPatcher) {
       throw new Error(
         [
           'Patching JSON failed to stabilize. Infinite recursion? Most recent patchsets:',
-          JSON.stringify(patchSets.slice(-2), undefined, 2),
+          JSON.stringify(
+            patchSets.slice(-2).map((ps) =>
+              ps.map((p) => ({
+                reason: p.reason,
+                patch: p.patch.operation,
+                subject: p.subject.value,
+                path: p.path,
+              })),
+            ),
+            undefined,
+            2,
+          ),
         ].join('\n'),
       );
     }
-    try {
-      root = applyPatches(schema.patches);
-    } catch (e) {
-      // We may have produced patches that no longer cleanly apply depending on what other patches have done.
-      // Catch those occurrences and give it another go on the next round.
-    }
+    root = bestEffortApplyPatches(root, schema.patches);
   }
 
   // Only report the first iteration's patch set, it's the only one whose changes relate to the input
@@ -214,7 +221,18 @@ export function applyPatcher(root: any, patcher: JsonLensPatcher) {
     }
   }
 
-  function applyPatches(patches: JsonPatch[]) {
-    return JsonPatch.apply(root, ...patches);
+  /**
+   * Apply patches in order, skipping patches that don't apply due to errors
+   */
+  function bestEffortApplyPatches(x: any, patches: JsonPatch[]) {
+    for (const patch of patches) {
+      try {
+        x = JsonPatch.applyClone(x, patch);
+      } catch (e) {
+        // We may have produced patches that no longer cleanly apply depending on what other patches have done.
+        // Catch those occurrences and give it another go on the next round.
+      }
+    }
+    return x;
   }
 }

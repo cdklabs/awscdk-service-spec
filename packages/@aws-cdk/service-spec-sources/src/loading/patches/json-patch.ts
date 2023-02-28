@@ -22,14 +22,36 @@ import { applyPatch, Operation } from 'fast-json-patch';
 export class JsonPatch {
   /**
    * Applies a set of JSON-Patch (RFC-6902) operations to `document` and returns the result.
+   *
+   * Mutates the object in-place.
+   *
    * @param document The document to patch
    * @param ops The operations to apply
    * @returns The result document
    */
-  public static apply(document: any, ...ops: JsonPatch[]): any {
+  public static applyMutate(document: any, ...ops: JsonPatch[]): any {
     const result = applyPatch(
       document,
       ops.map((o) => o._toJson()),
+    );
+    return result.newDocument;
+  }
+
+  /**
+   * Applies a set of JSON-Patch (RFC-6902) operations to `document` and returns the result.
+   *
+   * Clones the object.
+   *
+   * @param document The document to patch
+   * @param ops The operations to apply
+   * @returns The result document
+   */
+  public static applyClone(document: any, ...ops: JsonPatch[]): any {
+    const result = applyPatch(
+      document,
+      ops.map((o) => o._toJson()),
+      false,
+      false,
     );
     return result.newDocument;
   }

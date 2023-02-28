@@ -28,18 +28,11 @@ export const patchCloudFormationRegistry = onlyObjects(
     canonicalizeRegexInFormat,
     removeEmptyRequiredArray,
     noIncorrectDefaultType,
-    removeMinMaxLengthOnObject,
     removeSuspiciousPatterns,
     missingTypeField,
     dropRedundantTypeOperatorsInMetricStream,
     minMaxItemsOnObject,
-    makeKeywordDropper('string', STRING_KEY_WITNESS),
-    makeKeywordDropper('object', OBJECT_KEY_WITNESS),
-    makeKeywordDropper('array', ARRAY_KEY_WITNESS),
-    makeKeywordDropper('boolean', BOOLEAN_KEY_WITNESS),
-    makeKeywordDropper('integer', NUMBER_KEY_WITNESS),
-    makeKeywordDropper('number', NUMBER_KEY_WITNESS),
-    makeKeywordDropper('null', NULL_KEY_WITNESS),
+    makeKeywordDropper(),
   ),
 );
 
@@ -58,7 +51,7 @@ export function replaceArrayLengthProps(lens: JsonObjectLens) {
   }
 
   if (lens.value.maxLength !== undefined) {
-    lens.renameProperty('array lengths are specified using maxItens, not maxLength', 'maxLength', 'maxItems');
+    lens.renameProperty('array lengths are specified using maxItems, not maxLength', 'maxLength', 'maxItems');
   }
 }
 
@@ -221,7 +214,7 @@ export function patchMinLengthOnInteger(lens: JsonObjectLens) {
 }
 
 export function canonicalizeDefaultOnBoolean(lens: JsonObjectLens) {
-  if (lens.value.type === 'boolean' && typeof lens.value.default === 'string') {
+  if (lens.value.type === 'boolean' && typeOf(lens.value.default) === 'string') {
     lens.renameProperty('canonicalize default type', 'default', 'default', (d) => d === 'true');
   }
 }
@@ -230,7 +223,7 @@ export function canonicalizeRegexInFormat(lens: JsonObjectLens) {
   if (
     lens.value.type === 'string' &&
     lens.value.format !== undefined &&
-    typeof lens.value.format === 'string' &&
+    lens.value.format === 'string' &&
     !['uri', 'timestamp', 'date-time'].includes(lens.value.format)
   ) {
     // Format as a regex, store it in 'pattern' instead
@@ -256,31 +249,20 @@ export function removeEmptyRequiredArray(lens: JsonObjectLens) {
  * We're seeing `type: string` with `default: <boolean>`.
  */
 export function noIncorrectDefaultType(lens: JsonObjectLens) {
-  if (
-    typeof lens.value.type === 'string' &&
-    lens.value.default !== undefined &&
-    typeof lens.value.default !== lens.value.type
-  ) {
-    lens.removeProperty(
-      `default value for type='${lens.value.type}' cannot be '${typeof lens.value.default}'`,
-      'default',
-    );
-  }
-}
+  if (typeof lens.value.type === 'string' && lens.value.default !== undefined) {
+    const defaultType = typeOf(lens.value.default);
 
-/**
- * We're seeing `type: object` with `minLength/maxLength`.
- *
- * I think people intend for this to represent the maximum string length of
- * the JSONification of this object, but it's not valid JSON Schema.
- */
-export function removeMinMaxLengthOnObject(lens: JsonObjectLens) {
-  if (lens.value.type === 'object') {
-    if (lens.value.minLength) {
-      lens.removeProperty('minLength does not make sense on an object type', 'minLength');
+    const numberTypes = ['integer', 'number'];
+    if (numberTypes.includes(lens.value.type) && numberTypes.includes(defaultType)) {
+      // These are equivalent
+      return;
     }
-    if (lens.value.maxLength) {
-      lens.removeProperty('maxLength does not make sense on an object type', 'maxLength');
+
+    if (defaultType !== lens.value.type) {
+      lens.removeProperty(
+        `default value for type='${lens.value.type}' cannot be '${typeOf(lens.value.default)}'`,
+        'default',
+      );
     }
   }
 }
@@ -381,6 +363,37 @@ function isRoot(lens: JsonLens) {
   return lens.rootPath.length === 1;
 }
 
+export function makeKeywordDropper() {
+  const witnesses: Record<string, TypeKeyWitness<any>> = {
+    string: STRING_KEY_WITNESS,
+    object: OBJECT_KEY_WITNESS,
+    array: ARRAY_KEY_WITNESS,
+    boolean: BOOLEAN_KEY_WITNESS,
+    integer: NUMBER_KEY_WITNESS,
+    number: NUMBER_KEY_WITNESS,
+    null: NULL_KEY_WITNESS,
+  };
+
+  return (lens: JsonObjectLens) => {
+    if (Array.isArray(lens.value.type)) {
+      dropIrrelevantKeywords(
+        lens,
+        `any of type: '${lens.value.type}'`,
+        Object.assign({}, ...lens.value.type.map(witness)),
+      );
+    } else if (typeof lens.value.type === 'string') {
+      dropIrrelevantKeywords(lens, `type: '${lens.value.type}'`, witness(lens.value.type));
+    }
+  };
+
+  function witness(x: string) {
+    if (!witnesses[x]) {
+      throw new Error(`Don't have witness for type: ${x}`);
+    }
+    return witnesses[x];
+  }
+}
+
 /**
  * Drop keywords that aren't in a field witness
  *
@@ -399,14 +412,6 @@ function dropIrrelevantKeywords(lens: JsonObjectLens, typeDescription: string, w
       lens.removeProperty(`${key} does not apply to ${typeDescription}`, key);
     }
   }
-}
-
-export function makeKeywordDropper(typeName: string, witness: TypeKeyWitness<any>) {
-  return (lens: JsonObjectLens) => {
-    if (lens.value.type === typeName) {
-      dropIrrelevantKeywords(lens, `type=${typeName}`, witness);
-    }
-  };
 }
 
 function witnessForType(type: string): TypeKeyWitness<any> {
@@ -428,4 +433,11 @@ function witnessForType(type: string): TypeKeyWitness<any> {
     default:
       throw new Error(`Don't recognize type: ${type}`);
   }
+}
+
+function typeOf(x: unknown) {
+  if (Array.isArray(x)) {
+    return 'array';
+  }
+  return typeof x;
 }

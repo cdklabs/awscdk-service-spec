@@ -21,6 +21,11 @@ export interface LoadOptions {
    * Patches to apply to the data before it is validated
    */
   readonly patcher?: JsonLensPatcher;
+
+  /**
+   * If present, make filenames in errors relative to this directory
+   */
+  readonly errorRootDirectory?: string;
 }
 
 export class Loader<A> {
@@ -69,7 +74,7 @@ export class Loader<A> {
    * - Adds warnings to the Loader object if validation is WARNING.
    */
   public async loadFile(fileName: string): Promise<Result<LoadResult<A>>> {
-    return annotateWithFilename(
+    return this.annotateWithFilename(
       fileName,
       await this.load(JSON.parse(await fs.readFile(fileName, { encoding: 'utf-8' }))),
     );
@@ -82,6 +87,22 @@ export class Loader<A> {
    */
   public async loadFiles(fileNames: string[]): Promise<LoadResult<A[]>> {
     return combineLoadResults(await seqMap(fileNames, async (fileName) => this.loadFile(fileName)));
+  }
+
+  private annotateWithFilename<A>(fileName: string, x: Result<LoadResult<A>>): Result<LoadResult<A>> {
+    if (this.options.errorRootDirectory !== undefined) {
+      fileName = path.relative(this.options.errorRootDirectory, fileName);
+    }
+
+    if (isFailure(x)) {
+      return locateFailure(fileName)(x);
+    }
+
+    return {
+      value: x.value,
+      patchesApplied: x.patchesApplied.map((p) => ({ ...p, fileName })),
+      warnings: x.warnings.map(locateFailure(fileName)),
+    };
   }
 }
 
@@ -121,18 +142,6 @@ export interface LoadResult<A> {
    * Patches that were applied by the patcher (if any)
    */
   readonly patchesApplied: PatchReport[];
-}
-
-function annotateWithFilename<A>(fileName: string, x: Result<LoadResult<A>>): Result<LoadResult<A>> {
-  if (isFailure(x)) {
-    return locateFailure(fileName)(x);
-  }
-
-  return {
-    value: x.value,
-    patchesApplied: x.patchesApplied.map((p) => ({ ...p, fileName })),
-    warnings: x.warnings.map(locateFailure(fileName)),
-  };
 }
 
 export function combineLoadResults<A>(xs: Result<LoadResult<A>>[]): LoadResult<A[]> {
