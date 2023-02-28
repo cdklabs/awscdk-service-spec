@@ -215,7 +215,6 @@ export namespace jsonschema {
         lastKey = parts.shift()!;
         current = current[lastKey];
       }
-      throw new Error('Oops');
       return { schema: current, referenceName: lastKey };
     };
     return resolve;
