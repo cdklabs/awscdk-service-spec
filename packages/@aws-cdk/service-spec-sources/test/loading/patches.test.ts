@@ -14,7 +14,6 @@ import {
   patchMinLengthOnInteger,
   removeBooleanPatterns,
   removeEmptyRequiredArray,
-  removeMinMaxLengthOnObject,
   removeSuspiciousPatterns,
   replaceArrayLengthProps,
 } from '../../src/loading/patches/registry-patches';
@@ -354,20 +353,6 @@ describe('patches', () => {
       const patchedObj = patchObject(obj, noIncorrectDefaultType);
 
       expect(patchedObj).toEqual({ type: 'string' });
-    });
-  });
-
-  describe(removeMinMaxLengthOnObject, () => {
-    test('removes min/maxLength on objects', () => {
-      const obj = {
-        type: 'object',
-        minLength: 1,
-        maxLength: 5,
-      };
-
-      const patchedObj = patchObject(obj, removeMinMaxLengthOnObject);
-
-      expect(patchedObj).toEqual({ type: 'object' });
     });
   });
 
