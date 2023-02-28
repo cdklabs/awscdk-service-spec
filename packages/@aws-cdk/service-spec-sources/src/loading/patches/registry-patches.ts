@@ -405,7 +405,7 @@ function dropIrrelevantKeywords(lens: JsonObjectLens, typeDescription: string, w
     return;
   }
 
-  const protectedKeys = ['anyOf', 'oneOf', 'allOf'];
+  const protectedKeys = ['anyOf', 'oneOf', 'allOf', '$ref'];
 
   for (const key of Object.keys(lens.value)) {
     if (!witness[key] && !protectedKeys.includes(key)) {
