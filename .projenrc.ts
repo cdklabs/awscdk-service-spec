@@ -60,7 +60,7 @@ const serviceSpecSources = new MonorepoTypeScriptProject({
   parent: repo,
   name: '@aws-cdk/service-spec-sources',
   description: 'Sources for the service spec',
-  deps: ['ajv', 'glob', tsKb],
+  deps: ['ajv', 'glob', tsKb, 'fast-json-patch', 'canonicalize'],
   devDeps: ['ts-json-schema-generator', '@types/glob', 'ajv-cli'],
   private: true,
 });

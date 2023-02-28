@@ -1,47 +1,54 @@
 import * as path from 'path';
 import * as util from 'util';
-import { Failure, isFailure, isSuccess, Result } from '@cdklabs/tskb';
 import * as _glob from 'glob';
-import { Loader, SchemaValidation } from './loader';
+import { combineLoadResults, Loader, LoadResult } from './loader';
+import { patchCloudFormationRegistry } from './patches/registry-patches';
 import { CloudFormationRegistryResource } from '../types';
 
 const glob = util.promisify(_glob.glob);
 
 export async function loadCloudFormationRegistryDirectory(
   directory: string,
-  validate = SchemaValidation.FAIL,
-): Promise<Array<Result<CloudFormationRegistryResource>>> {
+  mustValidate = true,
+  errorRootDirectory?: string,
+): Promise<LoadResult<CloudFormationRegistryResource[]>> {
   const loader = await Loader.fromSchemaFile<CloudFormationRegistryResource>(
     'CloudFormationRegistryResource.schema.json',
-    validate,
+    {
+      mustValidate,
+      patcher: patchCloudFormationRegistry,
+      errorRootDirectory,
+    },
   );
 
   const files = await glob(path.join(directory, '*.json'));
-  const results = await loader.loadFiles(files);
-
-  return [...results.filter(isSuccess), ...loader.failures];
+  return loader.loadFiles(files);
 }
 
 export interface CloudFormationRegistryResources {
   readonly regionName: string;
   readonly resources: Array<CloudFormationRegistryResource>;
-  readonly failures: Failure[];
 }
 
 export async function loadDefaultCloudFormationRegistryResources(
-  validate = SchemaValidation.FAIL,
-): Promise<CloudFormationRegistryResources[]> {
-  return Promise.all(
-    (await glob(path.join(__dirname, '../../../../../sources/CloudFormationSchema/*'))).map(async (directoryName) => {
-      const regionName = path.basename(directoryName);
-      const resources = await loadCloudFormationRegistryDirectory(directoryName, validate);
+  mustValidate = true,
+): Promise<LoadResult<CloudFormationRegistryResources[]>> {
+  const errorRootDirectory = path.join(__dirname, '../../../../../sources/CloudFormationSchema');
+  const files = await glob(`${errorRootDirectory}/*`);
+  return combineLoadResults(
+    await Promise.all(
+      files.map(async (directoryName) => {
+        const regionName = path.basename(directoryName);
+        const resources = await loadCloudFormationRegistryDirectory(directoryName, mustValidate, errorRootDirectory);
 
-      const ret: CloudFormationRegistryResources = {
-        regionName,
-        resources: resources.filter(isSuccess),
-        failures: resources.filter(isFailure),
-      };
-      return ret;
-    }),
+        return {
+          ...resources,
+          value: {
+            regionName,
+            resources: resources.value,
+          },
+        };
+      }),
+    ),
   );
 }

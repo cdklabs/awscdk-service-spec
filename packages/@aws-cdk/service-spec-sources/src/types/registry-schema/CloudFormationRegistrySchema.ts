@@ -49,7 +49,7 @@ export interface CloudFormationRegistryResource extends ImplicitJsonSchemaRecord
   /**
    * Reusable schema type definitions used in this schema.
    */
-  readonly definitions?: Record<string, jsonschema.ConcreteSchema>;
+  readonly definitions?: Record<string, jsonschema.Schema>; // FIXME: Kaizen changed this from ConcreteSchema to fix 1 isue.
   readonly handlers?: Handlers;
   readonly tagging?: ResourceTagging;
   readonly taggable?: boolean;
@@ -83,6 +83,27 @@ export interface CloudFormationRegistryResource extends ImplicitJsonSchemaRecord
    * ```
    */
   readonly propertyTransform?: Record<string, string>;
+
+  /**
+   * Technically this should have been canonicalized out, but that will complicate a lot of the rest of the code.
+   *
+   * So we allow embedded oneOfs/anyOfs, only at the top level.
+   */
+  readonly oneOf?: CommonTypeCombinatorFields[];
+  readonly anyOf?: CommonTypeCombinatorFields[];
+}
+
+/**
+ * Type combinator fields we commonly see at the resource level
+ *
+ * (They can be nested)
+ */
+interface CommonTypeCombinatorFields {
+  readonly required?: string[];
+  readonly type?: string;
+  readonly oneOf?: CommonTypeCombinatorFields[];
+  readonly anyOf?: CommonTypeCombinatorFields[];
+  readonly allOf?: CommonTypeCombinatorFields[];
 }
 
 export type ReplacementStrategy = 'delete_then_create';

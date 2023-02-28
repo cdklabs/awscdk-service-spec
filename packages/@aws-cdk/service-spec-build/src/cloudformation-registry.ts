@@ -76,26 +76,52 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
     return tryCatch(fail, (): Result<PropertyType> => {
       const nameHint = resolved.referenceName ?? propertyName;
 
-      switch (resolved.schema.type) {
-        case 'string':
-          return { type: 'string' };
+      if (jsonschema.isOneOf(resolved.schema)) {
+        // FIXME: Do a proper thing here
+        const firstResolved: jsonschema.ResolvedSchema = {
+          schema: resolved.schema.oneOf[0],
+          referenceName: resolved.referenceName,
+        };
+        return schemaTypeToModelType(propertyName, firstResolved, fail);
+      } else if (jsonschema.isAnyOf(resolved.schema)) {
+        // FIME: Do a proper thing here
+        const firstResolved: jsonschema.ResolvedSchema = {
+          schema: resolved.schema.anyOf[0],
+          referenceName: resolved.referenceName,
+        };
+        return schemaTypeToModelType(propertyName, firstResolved, fail);
+      } else if (jsonschema.isAllOf(resolved.schema)) {
+        // FIME: Do a proper thing here
+        const firstResolved: jsonschema.ResolvedSchema = {
+          schema: resolved.schema.allOf[0],
+          referenceName: resolved.referenceName,
+        };
+        return schemaTypeToModelType(propertyName, firstResolved, fail);
+      } else {
+        switch (resolved.schema.type) {
+          case 'string':
+            return { type: 'string' };
 
-        case 'array':
-          // FIXME: insertionOrder, uniqueItems
-          return using(schemaTypeToModelType(nameHint, resolve(resolved.schema.items), fail), (element) => ({
-            type: 'array',
-            element,
-          }));
+          case 'array':
+            // FIXME: insertionOrder, uniqueItems
+            return using(schemaTypeToModelType(nameHint, resolve(resolved.schema.items), fail), (element) => ({
+              type: 'array',
+              element,
+            }));
 
-        case 'boolean':
-          return { type: 'boolean' };
+          case 'boolean':
+            return { type: 'boolean' };
 
-        case 'object':
-          return schemaObjectToModelType(nameHint, resolved.schema, fail);
+          case 'object':
+            return schemaObjectToModelType(nameHint, resolved.schema, fail);
 
-        case 'number':
-        case 'integer':
-          return { type: 'number' };
+          case 'number':
+          case 'integer':
+            return { type: 'number' };
+
+          case 'null':
+            return { type: 'null' };
+        }
       }
     });
   }

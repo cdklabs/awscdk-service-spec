@@ -1,24 +1,22 @@
 import { emptyDatabase } from '@aws-cdk/service-spec';
 import * as sources from '@aws-cdk/service-spec-sources';
-import { SchemaValidation } from '@aws-cdk/service-spec-sources';
-import { Failures } from '@cdklabs/tskb';
+import { LoadResult } from '@aws-cdk/service-spec-sources';
+import { assertSuccess, Failures, Result } from '@cdklabs/tskb';
 import { readCloudFormationDocumentation } from './cloudformation-docs';
 import { readCloudFormationRegistryResource } from './cloudformation-registry';
 import { readStatefulResources } from './stateful-resources';
 
 export interface BuildDatabaseOptions {
-  readonly validateJsonSchema?: SchemaValidation;
+  readonly mustValidate?: boolean;
 }
 
 export async function buildDatabase(options: BuildDatabaseOptions = {}) {
   const db = emptyDatabase();
-  const fails: Failures = [];
+  const warnings: Failures = [];
 
-  const resourceSpec = await sources.loadDefaultResourceSpecification();
+  const resourceSpec = loadResult(await sources.loadDefaultResourceSpecification());
 
-  for (const resources of await sources.loadDefaultCloudFormationRegistryResources(options.validateJsonSchema)) {
-    fails.push(...resources.failures);
-
+  for (const resources of loadResult(await sources.loadDefaultCloudFormationRegistryResources(options.mustValidate))) {
     const region = db.allocate('region', {
       name: resources.regionName,
     });
@@ -27,17 +25,24 @@ export async function buildDatabase(options: BuildDatabaseOptions = {}) {
       const res = readCloudFormationRegistryResource({
         db,
         resource,
-        fails,
+        fails: warnings,
         specResource: resourceSpec.ResourceTypes[resource.typeName],
       });
       db.link('regionHasResource', region, res);
     }
   }
 
-  const docs = await sources.loadDefaultCloudFormationDocs();
-  readCloudFormationDocumentation(db, docs, fails);
+  const docs = loadResult(await sources.loadDefaultCloudFormationDocs());
+  readCloudFormationDocumentation(db, docs, warnings);
 
-  readStatefulResources(db, await sources.loadDefaultStatefulResources(), fails);
+  const stateful = loadResult(await sources.loadDefaultStatefulResources());
+  readStatefulResources(db, stateful, warnings);
 
-  return { db, fails };
+  return { db, warnings };
+
+  function loadResult<A>(x: Result<LoadResult<A>>): A {
+    assertSuccess(x);
+    warnings.push(...x.warnings);
+    return x.value;
+  }
 }

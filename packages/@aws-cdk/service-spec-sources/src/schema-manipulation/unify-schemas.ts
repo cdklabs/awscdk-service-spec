@@ -19,6 +19,16 @@ export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result
     return a;
   }
 
+  if (jsonschema.isOneOf(a) || jsonschema.isAnyOf(a) || jsonschema.isAllOf(a)) {
+    // FIXME: not implemented yet
+    return a;
+  }
+
+  if (jsonschema.isOneOf(b) || jsonschema.isAnyOf(b) || jsonschema.isAllOf(b)) {
+    // FIXME: not implemented yet
+    return a;
+  }
+
   if (jsonschema.isReference(a) || jsonschema.isReference(b)) {
     return jsonschema.isReference(a) && jsonschema.isReference(b) && a.$ref === b.$ref
       ? a
@@ -56,8 +66,8 @@ export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result
         type: 'array',
         ...meta,
         items,
-        minLength: combine(a.minLength, b.minLength, (x, y) => Math.min(x, y)),
-        maxLength: combine(a.maxLength, b.maxLength, (x, y) => Math.max(x, y)),
+        minLength: combine(a.minItems, b.minItems, (x, y) => Math.min(x, y)),
+        maxLength: combine(a.maxItems, b.maxItems, (x, y) => Math.max(x, y)),
         uniqueItems: combine(a.uniqueItems, b.uniqueItems, (x, y) => x && y),
         // FIXME: insertionOrder ??
       }));
@@ -101,6 +111,10 @@ export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result
         return unifyRecordTypes(meta, a, b);
       }
       return unifyMapTypes(meta, a, b);
+
+    case 'null':
+      // Optionality will be recorded somewhere else
+      return b;
   }
 }
 

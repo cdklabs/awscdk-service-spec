@@ -95,6 +95,14 @@
       "type": "runtime"
     },
     {
+      "name": "canonicalize",
+      "type": "runtime"
+    },
+    {
+      "name": "fast-json-patch",
+      "type": "runtime"
+    },
+    {
       "name": "glob",
       "type": "runtime"
     }
