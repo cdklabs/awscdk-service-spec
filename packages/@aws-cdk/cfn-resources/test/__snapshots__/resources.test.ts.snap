@@ -123,19 +123,25 @@ export interface CfnRestApiProps {
 
 // @ts-ignore TS6133
 function cfnRestApiApiKeySourceTypePropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnRestApiBinaryMediaTypesPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnRestApiBodyPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -173,13 +179,17 @@ export interface S3Location {
 
 // @ts-ignore TS6133
 function cfnRestApiBodyS3LocationPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnRestApiCloneFromPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -209,55 +219,73 @@ export interface EndpointConfiguration {
 
 // @ts-ignore TS6133
 function cfnRestApiEndpointConfigurationPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnRestApiDescriptionPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnRestApiDisableExecuteApiEndpointPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnRestApiFailOnWarningsPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnRestApiNamePropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnRestApiMinimumCompressionSizePropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnRestApiModePropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnRestApiPolicyPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnRestApiParametersPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -273,7 +301,9 @@ export interface Tag {
 
 // @ts-ignore TS6133
 function cfnRestApiTagsPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 "
 `;
@@ -373,37 +403,49 @@ export interface CfnRoleProps {
 
 // @ts-ignore TS6133
 function cfnRoleAssumeRolePolicyDocumentPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnRoleDescriptionPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnRoleManagedPolicyArnsPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnRoleMaxSessionDurationPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnRolePathPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnRolePermissionsBoundaryPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -433,13 +475,17 @@ export interface Policy {
 
 // @ts-ignore TS6133
 function cfnRolePoliciesPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnRoleRoleNamePropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -468,7 +514,9 @@ export interface Tag {
 
 // @ts-ignore TS6133
 function cfnRoleTagsPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 "
 `;
@@ -641,7 +689,9 @@ export interface CfnFunctionProps {
 
 // @ts-ignore TS6133
 function cfnFunctionDescriptionPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -661,7 +711,9 @@ export interface TracingConfig {
 
 // @ts-ignore TS6133
 function cfnFunctionTracingConfigPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -691,13 +743,17 @@ export interface VpcConfig {
 
 // @ts-ignore TS6133
 function cfnFunctionVpcConfigPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnFunctionReservedConcurrentExecutionsPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -717,7 +773,9 @@ export interface SnapStart {
 
 // @ts-ignore TS6133
 function cfnFunctionSnapStartPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -742,43 +800,57 @@ export interface FileSystemConfig {
 
 // @ts-ignore TS6133
 function cfnFunctionFileSystemConfigsPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnFunctionFunctionNamePropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnFunctionRuntimePropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnFunctionKmsKeyArnPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnFunctionPackageTypePropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnFunctionCodeSigningConfigArnPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnFunctionLayersPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -804,7 +876,9 @@ export interface Tag {
 
 // @ts-ignore TS6133
 function cfnFunctionTagsPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -841,13 +915,17 @@ export interface ImageConfig {
 
 // @ts-ignore TS6133
 function cfnFunctionImageConfigPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnFunctionMemorySizePropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -867,19 +945,25 @@ export interface DeadLetterConfig {
 
 // @ts-ignore TS6133
 function cfnFunctionDeadLetterConfigPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnFunctionTimeoutPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnFunctionHandlerPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -926,13 +1010,17 @@ export interface Code {
 
 // @ts-ignore TS6133
 function cfnFunctionCodePropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnFunctionRolePropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -955,7 +1043,9 @@ export interface Environment {
 
 // @ts-ignore TS6133
 function cfnFunctionEnvironmentPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -976,13 +1066,17 @@ export interface EphemeralStorage {
 
 // @ts-ignore TS6133
 function cfnFunctionEphemeralStoragePropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnFunctionArchitecturesPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 "
 `;
@@ -1156,13 +1250,17 @@ export interface AccelerateConfiguration {
 
 // @ts-ignore TS6133
 function cfnBucketAccelerateConfigurationPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnBucketAccessControlPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -1290,7 +1388,9 @@ export interface Destination {
 
 // @ts-ignore TS6133
 function cfnBucketAnalyticsConfigurationsPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -1365,13 +1465,17 @@ export interface ServerSideEncryptionByDefault {
 
 // @ts-ignore TS6133
 function cfnBucketBucketEncryptionPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnBucketBucketNamePropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -1439,7 +1543,9 @@ export interface CorsRule {
 
 // @ts-ignore TS6133
 function cfnBucketCorsConfigurationPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -1507,7 +1613,9 @@ export interface Tiering {
 
 // @ts-ignore TS6133
 function cfnBucketIntelligentTieringConfigurationsPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -1566,7 +1674,9 @@ export interface InventoryConfiguration {
 
 // @ts-ignore TS6133
 function cfnBucketInventoryConfigurationsPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -1798,7 +1908,9 @@ export interface Transition {
 
 // @ts-ignore TS6133
 function cfnBucketLifecycleConfigurationPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -1830,7 +1942,9 @@ export interface LoggingConfiguration {
 
 // @ts-ignore TS6133
 function cfnBucketLoggingConfigurationPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -1872,7 +1986,9 @@ export interface MetricsConfiguration {
 
 // @ts-ignore TS6133
 function cfnBucketMetricsConfigurationsPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -2068,7 +2184,9 @@ export interface TopicConfiguration {
 
 // @ts-ignore TS6133
 function cfnBucketNotificationConfigurationPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -2147,13 +2265,17 @@ export interface DefaultRetention {
 
 // @ts-ignore TS6133
 function cfnBucketObjectLockConfigurationPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnBucketObjectLockEnabledPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -2191,7 +2313,9 @@ export interface OwnershipControlsRule {
 
 // @ts-ignore TS6133
 function cfnBucketOwnershipControlsPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -2247,7 +2371,9 @@ export interface PublicAccessBlockConfiguration {
 
 // @ts-ignore TS6133
 function cfnBucketPublicAccessBlockConfigurationPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -2622,7 +2748,9 @@ export interface SseKmsEncryptedObjects {
 
 // @ts-ignore TS6133
 function cfnBucketReplicationConfigurationPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -2638,7 +2766,9 @@ export interface Tag {
 
 // @ts-ignore TS6133
 function cfnBucketTagsPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -2659,7 +2789,9 @@ export interface VersioningConfiguration {
 
 // @ts-ignore TS6133
 function cfnBucketVersioningConfigurationPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -2816,7 +2948,9 @@ export interface RedirectAllRequestsTo {
 
 // @ts-ignore TS6133
 function cfnBucketWebsiteConfigurationPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 "
 `;
@@ -2999,85 +3133,113 @@ export interface CfnQueueProps {
 
 // @ts-ignore TS6133
 function cfnQueueContentBasedDeduplicationPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnQueueDeduplicationScopePropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnQueueDelaySecondsPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnQueueFifoQueuePropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnQueueFifoThroughputLimitPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnQueueKmsDataKeyReusePeriodSecondsPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnQueueKmsMasterKeyIdPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnQueueSqsManagedSseEnabledPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnQueueMaximumMessageSizePropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnQueueMessageRetentionPeriodPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnQueueQueueNamePropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnQueueReceiveMessageWaitTimeSecondsPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnQueueRedriveAllowPolicyPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnQueueRedrivePolicyPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -3103,13 +3265,17 @@ export interface Tag {
 
 // @ts-ignore TS6133
 function cfnQueueTagsPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnQueueVisibilityTimeoutPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 "
 `;
@@ -3180,13 +3346,17 @@ export interface AuthenticationConfiguration {
 
 // @ts-ignore TS6133
 function cfnSkillAuthenticationConfigurationPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
 // @ts-ignore TS6133
 function cfnSkillVendorIdPropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 
 
@@ -3250,7 +3420,9 @@ export interface Overrides {
 
 // @ts-ignore TS6133
 function cfnSkillSkillPackagePropertyToCloudFormation(properties: any): any {
-  return /* @todo ObjectLiteral */;
+  return {
+    "Manifest": cdk.objectToCloudFormation(properties.manifest),
+  };
 }
 "
 `;

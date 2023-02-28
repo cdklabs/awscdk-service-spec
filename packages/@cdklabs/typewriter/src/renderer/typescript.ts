@@ -6,7 +6,7 @@ import { Property } from '../property';
 import {
   ObjectPropertyAccess,
   ObjectLiteral,
-  ReturnStatement as ReturnExpression,
+  ReturnStatement,
   Statement,
   LocalSymbol,
   InvokeCallable,
@@ -82,13 +82,14 @@ export class TypeScriptRenderer extends Renderer {
       ...this.indent(this.renderDocs(func), lvl),
       this.indent(`// @ts-ignore TS6133`, lvl),
       this.indent(`function ${func.name}(${params})${returnType} {`, lvl),
-      ...func.body.map((s) => this.renderStatement(s, lvl + 1)),
+      // We already have the curlies
+      ...func.body.statements.map((s) => this.renderStatement(s, lvl + 1)),
       this.indent('}\n', lvl),
     ].join('\n');
   }
 
   protected renderStatement(stmnt: Statement, lvl: number): string {
-    if (stmnt instanceof ReturnExpression) {
+    if (stmnt instanceof ReturnStatement) {
       return this.renderReturnStatement(stmnt, lvl);
     }
 
@@ -110,7 +111,7 @@ export class TypeScriptRenderer extends Renderer {
   }
 
   protected renderInvokeCallable(name: string, args: Statement[], lvl: number): string {
-    const argList = args.map((arg) => this.renderStatement(arg, lvl));
+    const argList = args.map((arg) => this.renderExpression(arg, lvl));
     return this.indent(`${name}(${argList.join(', ').trim()})`, lvl);
   }
 
@@ -119,7 +120,7 @@ export class TypeScriptRenderer extends Renderer {
       this.indent('{', lvl),
       obj.entries
         .map(([key, val]) =>
-          this.indent(`${JSON.stringify(key)}: ${this.renderStatement(val, lvl + 1).trim()},`, lvl + 1),
+          this.indent(`${JSON.stringify(key)}: ${this.renderExpression(val, lvl + 1).trim()},`, lvl + 1),
         )
         .join('\n'),
       this.indent('}', lvl),
@@ -137,12 +138,12 @@ export class TypeScriptRenderer extends Renderer {
     return symbol.name;
   }
 
-  protected renderReturnStatement(ret: ReturnExpression, lvl: number) {
+  protected renderReturnStatement(ret: ReturnStatement, lvl: number) {
     if (!ret.expression) {
       return this.indent('return;', lvl);
     }
 
-    return this.indent(`return ${this.renderStatement(ret.expression, lvl).trim()};`, lvl);
+    return this.indent(`return ${this.renderExpression(ret.expression, lvl).trim()};`, lvl);
   }
 
   protected renderDocs(x: Documented, options: DocOptions = {}): string[] {

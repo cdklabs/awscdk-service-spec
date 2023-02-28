@@ -1,3 +1,4 @@
+import { Block } from './block';
 import { Parameter, ParameterSpec } from './parameter';
 import { Scope } from './scope';
 import { CallableStatement, InvokeCallable, InvokeStatement, Statement } from './statements';
@@ -9,12 +10,15 @@ interface CallableSpec extends TypeSpec {
   name: string;
   parameters?: ParameterSpec[];
   returnType?: TypeReferenceSpec;
-  body?: Statement[];
+  body?: Block;
 }
 
 export class Callable extends Type implements CallableStatement {
+  public readonly body: Block;
+
   public constructor(public readonly scope: Scope, public readonly spec: CallableSpec) {
     super(scope, spec);
+    this.body = spec.body ?? new Block();
   }
 
   invoke(...args: Statement[]): InvokeStatement {
@@ -31,13 +35,5 @@ export class Callable extends Type implements CallableStatement {
 
   public get parameters(): Parameter[] {
     return (this.spec.parameters ?? []).map((p) => new Parameter(this, p));
-  }
-
-  public get body(): Statement[] {
-    return this.spec.body ?? [];
-  }
-
-  public set body(statements: Statement[]) {
-    this.spec.body = statements;
   }
 }

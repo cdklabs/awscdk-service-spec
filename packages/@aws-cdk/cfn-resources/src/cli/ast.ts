@@ -66,14 +66,14 @@ export class AstBuilder {
         primitive: jsii.PrimitiveType.Any,
       },
     });
-    propToCfn.body = [
+    propToCfn.body.add(
       stmt.ret(
         stmt.object({
           // @TODO this needs to iterate over the properties on the type
           Manifest: this.core.objectToCloudFormation(stmt.sym('properties').asObject().prop('manifest')),
         }),
       ),
-    ];
+    );
   }
 
   protected propertyTypeToTypeReferenceSpec(type: PropertyType): TypeReferenceSpec {
