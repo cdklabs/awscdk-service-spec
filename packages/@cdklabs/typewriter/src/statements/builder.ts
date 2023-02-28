@@ -1,5 +1,5 @@
-import { ObjectLiteral } from './objects';
-import { LocalSymbol } from './references';
+import { ObjectLiteral } from '../expressions/objects';
+import { LocalSymbol } from '../expressions/references';
 import { ReturnStatement, Statement } from './statements';
 
 export function sym(name: string): LocalSymbol {

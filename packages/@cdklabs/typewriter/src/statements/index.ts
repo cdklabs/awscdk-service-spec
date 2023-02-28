@@ -1,3 +1,3 @@
-export * from './objects';
-export * from './references';
+export * from '../expressions/objects';
+export * from '../expressions/references';
 export * from './statements';

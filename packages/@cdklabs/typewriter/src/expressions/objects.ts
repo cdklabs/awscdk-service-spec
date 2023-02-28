@@ -1,11 +1,11 @@
 import { LocalSymbol } from './references';
-import { InvokeCallable, InvokeStatement } from './statements';
 import { Callable } from '../callable';
 import { Expression } from '../expression';
+import { InvokeCallable, InvokeExpression } from './invoke';
 
 export interface ObjectLike {
   prop(property: string): ObjectPropertyAccess;
-  invoke(method: string, ...args: Expression[]): InvokeStatement;
+  invoke(method: string, ...args: Expression[]): InvokeExpression;
 }
 
 export class ObjectPropertyAccess implements Expression {
@@ -13,14 +13,14 @@ export class ObjectPropertyAccess implements Expression {
   public constructor(public readonly obj: ObjectLiteral | ObjectReference, public readonly property: string) {}
 }
 
-export class ObjectMethodInvoke implements InvokeStatement {
+export class ObjectMethodInvoke implements InvokeExpression {
   public constructor(
     public readonly obj: ObjectLiteral | ObjectReference,
     public readonly method: string,
     public readonly args: Expression[] = [],
   ) {}
 
-  with(...args: Expression[]): InvokeStatement {
+  with(...args: Expression[]): InvokeExpression {
     return new ObjectMethodInvoke(this.obj, this.method, args);
   }
 }
@@ -41,7 +41,7 @@ export class ObjectLiteral implements Expression, ObjectLike {
     return new ObjectPropertyAccess(this, property);
   }
 
-  public invoke(name: string, ...args: Expression[]): InvokeStatement {
+  public invoke(name: string, ...args: Expression[]): InvokeExpression {
     const callable = this.contents[name];
     if (callable && callable instanceof Callable) {
       return new InvokeCallable(callable, args);

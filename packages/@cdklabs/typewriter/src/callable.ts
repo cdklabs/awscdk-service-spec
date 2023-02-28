@@ -1,7 +1,8 @@
 import { Block } from './block';
+import { CallableStatement, InvokeCallable, InvokeExpression } from './expressions/invoke';
 import { Parameter, ParameterSpec } from './parameter';
 import { Scope } from './scope';
-import { CallableStatement, InvokeCallable, InvokeStatement, Statement } from './statements';
+import { Statement } from './statements';
 import { Type, TypeKind, TypeSpec } from './type';
 import { TypeReference, TypeReferenceSpec } from './type-ref';
 
@@ -21,7 +22,7 @@ export class Callable extends Type implements CallableStatement {
     this.body = spec.body ?? new Block();
   }
 
-  invoke(...args: Statement[]): InvokeStatement {
+  invoke(...args: Statement[]): InvokeExpression {
     return new InvokeCallable(this, args);
   }
 

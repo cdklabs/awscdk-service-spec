@@ -9,14 +9,15 @@ import {
   ReturnStatement,
   Statement,
   LocalSymbol,
-  InvokeCallable,
   ObjectMethodInvoke,
   ObjectReference,
+  ExpressionStatement,
 } from '../statements';
 import { MemberVisibility } from '../type-member';
 import { TypeReference } from '../type-ref';
 import { Documented } from '../documented';
 import { Expression } from '../expression';
+import { InvokeCallable } from '../expressions/invoke';
 
 export class TypeScriptRenderer extends Renderer {
   protected renderModule(mod: Module, lvl: number): string {
@@ -91,6 +92,9 @@ export class TypeScriptRenderer extends Renderer {
   protected renderStatement(stmnt: Statement, lvl: number): string {
     if (stmnt instanceof ReturnStatement) {
       return this.renderReturnStatement(stmnt, lvl);
+    }
+    if (stmnt instanceof ExpressionStatement) {
+      return this.renderExpression(stmnt.expression, lvl);
     }
 
     return `/* @todo ${stmnt.constructor.name} */`;
