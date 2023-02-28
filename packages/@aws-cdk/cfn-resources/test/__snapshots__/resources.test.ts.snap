@@ -30,7 +30,7 @@ export interface CfnRestApiProps {
 
   readonly policy: any;
 
-  readonly parameters: any;
+  readonly parameters: Map<string, string>;
 
   readonly tags: Array<Tag>;
 }
@@ -255,7 +255,7 @@ function cfnRolePermissionsBoundaryPropertyToCloudFormation(properties: any): an
 
 
 export interface Policy {
-  readonly policyDocument: any;
+  readonly policyDocument: string;
 
   readonly policyName: string;
 }
