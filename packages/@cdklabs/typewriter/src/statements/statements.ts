@@ -1,9 +1,14 @@
 import { Callable } from '../callable';
+import { Expression } from '../expression';
 
-export interface Statement {}
+export interface Statement {
+  readonly comments?: string[];
+}
 
 export class ReturnStatement implements Statement {
-  public constructor(public readonly statement?: Statement) {}
+  readonly comments?: string[];
+
+  public constructor(public readonly expression?: Expression) {}
 }
 
 export interface InvokeStatement extends Statement {

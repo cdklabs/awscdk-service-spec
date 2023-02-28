@@ -1,13 +1,13 @@
 import { ExternalModule } from '@cdklabs/typewriter';
-import { Statement } from '@cdklabs/typewriter/src/statements';
+import { Expression } from '@cdklabs/typewriter/src/expression';
 
 export class CdkCore extends ExternalModule {
-  public objectToCloudFormation(...args: Statement[]) {
+  public objectToCloudFormation(...args: Expression[]) {
     return this.import('cdk')
       .invoke('objectToCloudFormation')
       .with(...args);
   }
-  public stringToCloudFormation(...args: Statement[]) {
+  public stringToCloudFormation(...args: Expression[]) {
     return this.import('cdk')
       .invoke('stringToCloudFormation')
       .with(...args);

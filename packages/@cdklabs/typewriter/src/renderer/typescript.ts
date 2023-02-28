@@ -16,6 +16,7 @@ import {
 import { MemberVisibility } from '../type-member';
 import { TypeReference } from '../type-ref';
 import { Documented } from '../documented';
+import { Expression } from '../expression';
 
 export class TypeScriptRenderer extends Renderer {
   protected renderModule(mod: Module, lvl: number): string {
@@ -89,7 +90,13 @@ export class TypeScriptRenderer extends Renderer {
   protected renderStatement(stmnt: Statement, lvl: number): string {
     if (stmnt instanceof ReturnExpression) {
       return this.renderReturnStatement(stmnt, lvl);
-    } else if (stmnt instanceof ObjectLiteral) {
+    }
+
+    return `/* @todo ${stmnt.constructor.name} */`;
+  }
+
+  protected renderExpression(stmnt: Expression, lvl: number): string {
+    if (stmnt instanceof ObjectLiteral) {
       return this.renderObjectLiteral(stmnt, lvl);
     } else if (stmnt instanceof ObjectPropertyAccess) {
       return this.renderObjectAccess(stmnt.obj, stmnt.property, lvl);
@@ -131,11 +138,11 @@ export class TypeScriptRenderer extends Renderer {
   }
 
   protected renderReturnStatement(ret: ReturnExpression, lvl: number) {
-    if (!ret.statement) {
+    if (!ret.expression) {
       return this.indent('return;', lvl);
     }
 
-    return this.indent(`return ${this.renderStatement(ret.statement, lvl).trim()};`, lvl);
+    return this.indent(`return ${this.renderStatement(ret.expression, lvl).trim()};`, lvl);
   }
 
   protected renderDocs(x: Documented, options: DocOptions = {}): string[] {
