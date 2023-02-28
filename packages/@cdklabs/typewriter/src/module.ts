@@ -1,4 +1,4 @@
-import { InterfaceType } from './interface';
+import { StructType } from './struct';
 import { Scope } from './scope';
 import { Type } from './type';
 
@@ -34,8 +34,8 @@ export class Module extends Scope {
   /**
    * All interfaces in this module/namespace (not submodules)
    */
-  public get interfaces(): readonly InterfaceType[] {
-    return this.types.filter((t) => t instanceof InterfaceType).map((t) => t as InterfaceType);
+  public get interfaces(): readonly StructType[] {
+    return this.types.filter((t) => t instanceof StructType).map((t) => t as StructType);
   }
 
   public addType(type: Type): void {

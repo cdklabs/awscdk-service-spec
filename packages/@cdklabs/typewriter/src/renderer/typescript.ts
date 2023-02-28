@@ -1,6 +1,6 @@
 import { Renderer } from './base';
 import { Callable } from '../callable';
-import { InterfaceType } from '../interface';
+import { StructType } from '../struct';
 import { Module } from '../module';
 import { Property } from '../property';
 import {
@@ -15,6 +15,7 @@ import {
 } from '../statements';
 import { MemberVisibility } from '../type-member';
 import { TypeReference } from '../type-ref';
+import { Documented } from '../documented';
 
 export class TypeScriptRenderer extends Renderer {
   protected renderModule(mod: Module, lvl: number): string {
@@ -25,12 +26,13 @@ export class TypeScriptRenderer extends Renderer {
     return mod.imports.map(([name, scope]) => `import * as ${name} from "${scope.fqn}";`).join('\n');
   }
 
-  protected renderInterface(interfaceType: InterfaceType, lvl: number): string {
-    const modifiers = interfaceType.modifiers.length ? interfaceType.modifiers.join(' ') + ' ' : '';
+  protected renderStruct(structType: StructType, lvl: number): string {
+    const modifiers = structType.modifiers.length ? structType.modifiers.join(' ') + ' ' : '';
 
     return [
-      this.indent(`${modifiers}interface ${interfaceType.name} {`, lvl),
-      Array.from(interfaceType.properties.values())
+      ...this.indent(this.renderDocs(structType, { forceStruct: true }), lvl),
+      this.indent(`${modifiers}interface ${structType.name} {`, lvl),
+      Array.from(structType.properties.values())
         .filter((p) => p.visibility === MemberVisibility.Public)
         .map((p) => this.renderProperty(p, lvl + 1))
         .join('\n\n'),
@@ -39,10 +41,13 @@ export class TypeScriptRenderer extends Renderer {
   }
 
   protected renderProperty(property: Property, level = 0): string {
-    return this.indent(
-      `${property.spec.immutable ? 'readonly ' : ''}${property.name}: ${this.renderTypeRef(property.type)};`,
-      level,
-    );
+    return [
+      ...this.indent(this.renderDocs(property), level),
+      this.indent(
+        `${property.spec.immutable ? 'readonly ' : ''}${property.name}: ${this.renderTypeRef(property.type)};`,
+        level,
+      ),
+    ].join('\n');
   }
 
   protected renderTypeRef(ref: TypeReference): string {
@@ -73,6 +78,7 @@ export class TypeScriptRenderer extends Renderer {
     const params = func.parameters.map((p) => `${p.name}: ${this.renderTypeRef(p.type)}`).join(', ');
     const returnType = func.returnType ? `: ${this.renderTypeRef(func.returnType)}` : '';
     return [
+      ...this.indent(this.renderDocs(func), lvl),
       this.indent(`// @ts-ignore TS6133`, lvl),
       this.indent(`function ${func.name}(${params})${returnType} {`, lvl),
       ...func.body.map((s) => this.renderStatement(s, lvl + 1)),
@@ -131,4 +137,55 @@ export class TypeScriptRenderer extends Renderer {
 
     return this.indent(`return ${this.renderStatement(ret.statement, lvl).trim()};`, lvl);
   }
+
+  protected renderDocs(x: Documented, options: DocOptions = {}): string[] {
+    const ret = new Array();
+    line(x.docs?.summary);
+    parBreak();
+    line(x.docs?.remarks);
+    parBreak();
+    if (options?.forceStruct) {
+      line('@struct');
+    }
+    tagged('deprecated', x.docs?.deprecated);
+    tagged('stability', x.docs?.stability);
+    tagged('default -', x.docs?.default);
+    tagged('returns', x.docs?.returns);
+    tagged('example', `\n${x.docs?.example ?? ''}`);
+
+    while (ret.length > 0 && ret[ret.length - 1] === '') {
+      ret.pop();
+    }
+
+    if (ret.length === 0) {
+      return [];
+    }
+
+    return ['/**', ...ret.map((x) => ` * ${x.trimEnd()}`), ' */'];
+
+    function line(x: string | undefined) {
+      if (x?.trim()) {
+        ret.push(...x.split('\n'));
+      }
+    }
+
+    function tagged(tag: string, x: string | undefined) {
+      if (x?.trim()) {
+        ret.push(...`@${tag} ${x}`.split('\n'));
+      }
+    }
+
+    function parBreak() {
+      if (ret.length > 0) {
+        ret.push('');
+      }
+    }
+  }
+}
+
+export interface DocOptions {
+  /**
+   * Emit an annotation that forces jsii to recognize this type as a struct
+   */
+  readonly forceStruct?: boolean;
 }

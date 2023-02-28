@@ -1,4 +1,5 @@
 import * as jsii from '@jsii/spec';
+import { Documented } from './documented';
 import { Scope } from './scope';
 
 /**
@@ -18,7 +19,7 @@ export interface TypeSpec extends Omit<jsii.TypeBase, 'assembly' | 'fqn' | 'kind
 /**
  * An abstract jsii type
  */
-export abstract class Type {
+export abstract class Type implements Documented {
   /**
    * The simple name of the type (MyClass).
    */
@@ -38,6 +39,13 @@ export abstract class Type {
    */
   public get kind(): TypeKind {
     return this.spec.kind;
+  }
+
+  /**
+   * Documentation for this type
+   */
+  public get docs() {
+    return this.spec.docs;
   }
 
   public constructor(public readonly scope: Scope, public readonly spec: TypeSpec) {

@@ -1,5 +1,5 @@
 import { Callable } from '../callable';
-import { InterfaceType } from '../interface';
+import { StructType } from '../struct';
 import { Module } from '../module';
 import { TypeKind } from '../type';
 
@@ -33,7 +33,7 @@ export abstract class Renderer {
     return mod.types.map((t) => {
       switch (t.kind) {
         case TypeKind.Interface:
-          return this.renderInterface(t as InterfaceType, indentationLevel);
+          return this.renderStruct(t as StructType, indentationLevel);
         case TypeKind.Function:
           return this.renderCallable(t as Callable, indentationLevel);
         default:
@@ -45,7 +45,7 @@ export abstract class Renderer {
   /**
    * Render an interface.
    */
-  protected abstract renderInterface(interfaceType: InterfaceType, indentationLevel: number): string;
+  protected abstract renderStruct(interfaceType: StructType, indentationLevel: number): string;
 
   /**
    * Render a callable.
@@ -55,8 +55,12 @@ export abstract class Renderer {
   /**
    * Indent text to the specified level.
    */
-  public indent(text: string, level: number): string {
-    return this.getIndentation(level) + text;
+  public indent(text: string[], level: number): string[];
+  public indent(text: string, level: number): string;
+  public indent(text: string | string[], level: number): string | string[] {
+    return Array.isArray(text)
+      ? text.map((text) => this.getIndentation(level) + text)
+      : this.getIndentation(level) + text;
   }
 
   protected setIndentationSymbol(symbol: number | string = 2): string {

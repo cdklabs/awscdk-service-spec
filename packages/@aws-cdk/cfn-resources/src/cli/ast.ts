@@ -1,9 +1,12 @@
-import { DatabaseSchema, Property, PropertyType, Resource } from '@aws-cdk/service-spec';
+import { DatabaseSchema, Property, PropertyType, Resource, TypeDefinition } from '@aws-cdk/service-spec';
 import { Database } from '@cdklabs/tskb';
-import { Callable, Case, InterfaceType, MemberKind, TypeReferenceSpec, stmt, TypeKind } from '@cdklabs/typewriter';
+import { Callable, Case, StructType, MemberKind, TypeReferenceSpec, stmt, TypeKind } from '@cdklabs/typewriter';
+import { DocsSpec } from '@cdklabs/typewriter/src/documented';
 import * as jsii from '@jsii/spec';
+import { Stability } from '@jsii/spec';
 import { CdkCore } from './cdk';
 import { ResourceModule } from './resource';
+import { splitSummary } from './split-summary';
 
 export class AstBuilder {
   /**
@@ -23,22 +26,29 @@ export class AstBuilder {
   }
 
   public addResource(r: Resource) {
-    const propsInterface = new InterfaceType(this.scope, {
+    const propsInterface = new StructType(this.scope, {
       export: true,
       name: `Cfn${r.name}Props`,
       kind: TypeKind.Interface,
+      docs: {
+        ...splitDocumentation(r.documentation),
+        stability: Stability.External,
+      },
     });
     for (const [name, prop] of Object.entries(r.properties)) {
       this.addResourceProperty(propsInterface, name, prop);
     }
   }
 
-  protected addResourceProperty(propsInterface: InterfaceType, name: string, property: Property) {
+  protected addResourceProperty(propsInterface: StructType, name: string, property: Property) {
     propsInterface.addProperty({
       kind: MemberKind.Property,
       name: Case.firstCharToLower(name),
       type: this.propertyTypeToTypeReferenceSpec(property.type),
       immutable: true,
+      docs: {
+        ...splitDocumentation(property.documentation),
+      },
     });
 
     const propToCfn = new Callable(this.scope, {
@@ -90,27 +100,7 @@ export class AstBuilder {
         };
       case 'ref':
         const ref = this.db.get('typeDefinition', type.reference.$ref);
-        try {
-          return this.scope.findType(ref.name);
-        } catch {
-          // We need to first create the Interface without properties, in case of a recursive type.
-          // This way when a property is added that recursively uses the type, it already exists (albeit without properties) and can be referenced
-          const theType = new InterfaceType(this.scope, {
-            export: true,
-            name: ref.name,
-            kind: TypeKind.Interface,
-          });
-          Object.entries(ref.properties).forEach(([name, p]) =>
-            theType.addProperty({
-              kind: MemberKind.Property,
-              name: Case.firstCharToLower(name),
-              type: this.propertyTypeToTypeReferenceSpec(p.type),
-              immutable: true,
-            }),
-          );
-
-          return theType;
-        }
+        return this.obtainTypeReference(ref);
       case 'json':
       default:
         return {
@@ -118,4 +108,43 @@ export class AstBuilder {
         };
     }
   }
+
+  private obtainTypeReference(ref: TypeDefinition) {
+    try {
+      return this.scope.findType(ref.name);
+    } catch {
+      return this.createTypeReference(ref);
+    }
+  }
+
+  private createTypeReference(ref: TypeDefinition) {
+    // We need to first create the Interface without properties, in case of a recursive type.
+    // This way when a property is added that recursively uses the type, it already exists (albeit without properties) and can be referenced
+    const theType = new StructType(this.scope, {
+      export: true,
+      name: ref.name,
+      kind: TypeKind.Interface,
+      docs: {
+        ...splitDocumentation(ref.documentation),
+      },
+    });
+    Object.entries(ref.properties).forEach(([name, p]) =>
+      theType.addProperty({
+        kind: MemberKind.Property,
+        name: Case.firstCharToLower(name),
+        type: this.propertyTypeToTypeReferenceSpec(p.type),
+        immutable: true,
+        docs: {
+          ...splitDocumentation(p.documentation),
+        },
+      }),
+    );
+
+    return theType;
+  }
+}
+
+function splitDocumentation(x: string | undefined): Pick<DocsSpec, 'summary' | 'remarks'> {
+  const [summary, remarks] = splitSummary(x);
+  return { summary, remarks };
 }

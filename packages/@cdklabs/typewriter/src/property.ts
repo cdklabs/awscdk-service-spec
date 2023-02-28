@@ -1,10 +1,12 @@
 import * as jsii from '@jsii/spec';
-import { InterfaceType } from './interface';
+import { DocsSpec } from './documented';
+import { StructType } from './struct';
 import { MemberKind, MemberVisibility, TypeMember } from './type-member';
 import { TypeReference } from './type-ref';
 
-export interface PropertySpec extends Omit<jsii.Property, 'assembly' | 'fqn'> {
+export interface PropertySpec extends Omit<jsii.Property, 'assembly' | 'fqn' | 'docs'> {
   kind: MemberKind.Property;
+  docs?: DocsSpec;
 }
 
 export class Property extends TypeMember {
@@ -39,7 +41,7 @@ export class Property extends TypeMember {
     return new TypeReference(this.scope.scope, this.spec.type);
   }
 
-  public constructor(public readonly scope: InterfaceType, public readonly spec: PropertySpec) {
+  public constructor(public readonly scope: StructType, public readonly spec: PropertySpec) {
     super(scope, spec);
   }
 }

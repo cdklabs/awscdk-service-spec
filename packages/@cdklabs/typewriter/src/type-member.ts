@@ -1,9 +1,11 @@
-import { InterfaceType } from './interface';
+import { DocsSpec, Documented } from './documented';
+import { StructType } from './struct';
 import { Property as PropertyType } from './property';
 
 export interface TypeMemberSpec {
   name: string;
   kind: MemberKind;
+  docs?: DocsSpec;
 }
 
 export enum MemberKind {
@@ -18,7 +20,7 @@ export enum MemberVisibility {
   Private = 'Private',
 }
 
-export abstract class TypeMember {
+export abstract class TypeMember implements Documented {
   /**
    * The simple name of the type (MyClass).
    */
@@ -40,9 +42,16 @@ export abstract class TypeMember {
     return `${this.scope.fqn}#${this.name}`;
   }
 
+  /**
+   * Documentation for this type member
+   */
+  public get docs() {
+    return this.spec.docs;
+  }
+
   public abstract visibility: MemberVisibility;
 
-  public constructor(public readonly scope: InterfaceType, public readonly spec: TypeMemberSpec) {}
+  public constructor(public readonly scope: StructType, public readonly spec: TypeMemberSpec) {}
 
   /**
    * Simple Human readable string representation of the property.

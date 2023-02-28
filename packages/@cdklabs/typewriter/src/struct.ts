@@ -3,13 +3,13 @@ import { Property, PropertySpec } from './property';
 import { Scope } from './scope';
 import { Type, TypeKind } from './type';
 
-export interface InterfaceSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' | 'kind'> {
+export interface StructSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' | 'kind'> {
   kind: TypeKind.Interface;
   export?: boolean;
   properties?: PropertySpec[];
 }
 
-export class InterfaceType extends Type {
+export class StructType extends Type {
   /**
    * Lists all direct properties of the interface
    */
@@ -35,7 +35,7 @@ export class InterfaceType extends Type {
     return modifiers;
   }
 
-  public constructor(public scope: Scope, public readonly spec: InterfaceSpec) {
+  public constructor(public scope: Scope, public readonly spec: StructSpec) {
     super(scope, spec);
   }
 

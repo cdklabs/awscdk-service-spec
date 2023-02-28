@@ -1,6 +1,6 @@
 export * from './callable';
 export * from './external-module';
-export * from './interface';
+export * from './struct';
 export * from './module';
 export * from './parameter';
 export * from './property';
