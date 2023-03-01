@@ -1,9 +1,10 @@
 import { DatabaseSchema, Property, PropertyType, Resource, TypeDefinition } from '@aws-cdk/service-spec';
 import { Database } from '@cdklabs/tskb';
-import { Callable, Case, StructType, MemberKind, TypeReferenceSpec, stmt, TypeKind } from '@cdklabs/typewriter';
+import { Callable, Case, StructType, TypeReferenceSpec, stmt, TypeKind } from '@cdklabs/typewriter';
 import { DocsSpec } from '@cdklabs/typewriter/src/documented';
 import * as jsii from '@jsii/spec';
 import { Stability } from '@jsii/spec';
+import { cloudFormationDocLink } from '../naming/doclink';
 import { CdkCore } from './cdk';
 import { ResourceModule } from './resource';
 import { splitSummary } from './split-summary';
@@ -33,23 +34,18 @@ export class AstBuilder {
       docs: {
         ...splitDocumentation(r.documentation),
         stability: Stability.External,
+        see: cloudFormationDocLink({
+          resourceType: r.cloudFormationType,
+        }),
       },
     });
     for (const [name, prop] of Object.entries(r.properties)) {
-      this.addResourceProperty(propsInterface, name, prop);
+      this.addResourceProperty(propsInterface, name, prop, r);
     }
   }
 
-  protected addResourceProperty(propsInterface: StructType, name: string, property: Property) {
-    propsInterface.addProperty({
-      kind: MemberKind.Property,
-      name: Case.firstCharToLower(name),
-      type: this.propertyTypeToTypeReferenceSpec(property.type),
-      immutable: true,
-      docs: {
-        ...splitDocumentation(property.documentation),
-      },
-    });
+  protected addResourceProperty(propsInterface: StructType, name: string, property: Property, parent: Resource) {
+    this.addStructProperty(propsInterface, name, property, parent);
 
     const propToCfn = new Callable(this.scope, {
       kind: TypeKind.Function,
@@ -126,25 +122,63 @@ export class AstBuilder {
       kind: TypeKind.Interface,
       docs: {
         ...splitDocumentation(ref.documentation),
+        see: cloudFormationDocLink({
+          resourceType: this.resourceOfType(ref).cloudFormationType,
+          propTypeName: ref.name,
+        }),
       },
     });
-    Object.entries(ref.properties).forEach(([name, p]) =>
-      theType.addProperty({
-        kind: MemberKind.Property,
-        name: Case.firstCharToLower(name),
-        type: this.propertyTypeToTypeReferenceSpec(p.type),
-        immutable: true,
-        docs: {
-          ...splitDocumentation(p.documentation),
-        },
-      }),
-    );
+    Object.entries(ref.properties).forEach(([name, p]) => {
+      this.addStructProperty(theType, name, p, ref);
+    });
 
     return theType;
+  }
+
+  private addStructProperty(
+    struct: StructType,
+    propertyName: string,
+    property: Property,
+    parent: Resource | TypeDefinition,
+  ) {
+    let resource: Resource;
+    let propTypeName: string | undefined;
+    if (isResource(parent)) {
+      resource = parent;
+    } else {
+      resource = this.resourceOfType(parent);
+      propTypeName = parent.name;
+    }
+
+    struct.addProperty({
+      name: Case.firstCharToLower(propertyName),
+      type: this.propertyTypeToTypeReferenceSpec(property.type),
+      optional: !property.required,
+      docs: {
+        ...splitDocumentation(property.documentation),
+        default: property.defaultValue ?? undefined,
+        see: cloudFormationDocLink({
+          resourceType: resource.cloudFormationType,
+          propTypeName,
+          propName: propertyName,
+        }),
+      },
+    });
+  }
+
+  /**
+   * Return the resource that a type definition belongs to
+   */
+  private resourceOfType(ref: TypeDefinition) {
+    return this.db.incoming('usesType', ref).only().from;
   }
 }
 
 function splitDocumentation(x: string | undefined): Pick<DocsSpec, 'summary' | 'remarks'> {
   const [summary, remarks] = splitSummary(x);
   return { summary, remarks };
+}
+
+function isResource(x: Resource | TypeDefinition): x is Resource {
+  return !!(x as Resource).cloudFormationType;
 }

@@ -63,6 +63,7 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
           type,
           documentation: resolved.schema.description,
           required: ifTrue((source.required ?? []).includes(name)),
+          defaultValue: describeDefault(resolved.schema),
         };
       });
     }
@@ -165,15 +166,38 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
     return { type: 'ref', reference: ref(typeDef) };
   }
 
+  function describeDefault(schema: jsonschema.ConcreteSchema): string | undefined {
+    if (jsonschema.isAllOf(schema) || jsonschema.isAnyOf(schema) || jsonschema.isOneOf(schema)) {
+      return undefined;
+    }
+
+    switch (schema.type) {
+      case 'string':
+      case 'number':
+      case 'integer':
+      case 'boolean':
+        return schema.default !== undefined ? JSON.stringify(schema.default) : undefined;
+    }
+
+    return undefined;
+  }
+
   function copyAttributes(source: CloudFormationRegistryResource, target: ResourceProperties, fail: Fail) {
     // The attributes are (currently) in `readOnlyResources`. Because of a representation issue, this doesn't cover
     // everything, so also look for the legacy spec.
+
     const attributeNames = Array.from(
       new Set([
         ...(source.readOnlyProperties ?? []).map(simplePropNameFromJsonPtr),
         ...Object.keys(options.specResource?.Attributes ?? {}),
       ]),
-    );
+    )
+      // In the Registry spec, compound attributes will look like 'Container/Prop', in the legacy
+      // spec they will look like 'Container.Prop'. Some Registry resources incorrectly use '.' as well.
+      // Normalize here.
+      .map((x) => x.replace(/\./g, '/'))
+      // Then drop compound attributes for now.
+      .filter((x) => !x.includes('/'));
 
     for (const name of attributeNames) {
       if (!source.properties[name]) {

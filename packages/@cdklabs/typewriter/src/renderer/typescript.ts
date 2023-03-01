@@ -43,10 +43,11 @@ export class TypeScriptRenderer extends Renderer {
   }
 
   protected renderProperty(property: Property, level = 0): string {
+    const qmark = property.optional ? '?' : '';
     return [
       ...this.indent(this.renderDocs(property), level),
       this.indent(
-        `${property.spec.immutable ? 'readonly ' : ''}${property.name}: ${this.renderTypeRef(property.type)};`,
+        `${property.spec.immutable ? 'readonly ' : ''}${property.name}${qmark}: ${this.renderTypeRef(property.type)};`,
         level,
       ),
     ].join('\n');
@@ -163,6 +164,7 @@ export class TypeScriptRenderer extends Renderer {
     tagged('stability', el.docs?.stability);
     tagged('default -', el.docs?.default);
     tagged('returns', el.docs?.returns);
+    tagged('see', el.docs?.see);
     tagged('example', `\n${el.docs?.example ?? ''}`);
 
     while (ret.length > 0 && ret[ret.length - 1] === '') {

@@ -1,5 +1,11 @@
 # Generated sources
 
+Make sure the database is up-to-date:
+
+```
+(cd ../service-spec-build && yarn compile && yarn build:db)
+```
+
 Run as follows:
 
 ```

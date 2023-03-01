@@ -2,6 +2,7 @@ import * as jsii from '@jsii/spec';
 import { Property, PropertySpec } from './property';
 import { Scope } from './scope';
 import { Type, TypeKind } from './type';
+import { MemberKind } from './type-member';
 
 export interface StructSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' | 'kind'> {
   kind: TypeKind.Interface;
@@ -42,10 +43,14 @@ export class StructType extends Type {
   /**
    * Adds a property to the interface
    */
-  public addProperty(spec: PropertySpec) {
+  public addProperty(spec: Omit<PropertySpec, 'immutable' | 'kind'>) {
     if (!this.spec.properties) {
       this.spec.properties = [];
     }
-    this.spec.properties.push(spec);
+    this.spec.properties.push({
+      ...spec,
+      immutable: true,
+      kind: MemberKind.Property,
+    });
   }
 }

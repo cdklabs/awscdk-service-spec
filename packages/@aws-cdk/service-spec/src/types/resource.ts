@@ -46,6 +46,7 @@ export interface Property {
   required?: boolean;
   type: PropertyType;
   wasOnceJson?: boolean;
+  defaultValue?: string;
 }
 
 export interface Attribute {
