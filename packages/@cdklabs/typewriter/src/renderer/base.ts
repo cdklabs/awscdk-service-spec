@@ -58,9 +58,7 @@ export abstract class Renderer {
   public indent(text: string[], level: number): string[];
   public indent(text: string, level: number): string;
   public indent(text: string | string[], level: number): string | string[] {
-    return Array.isArray(text)
-      ? text.map((text) => this.getIndentation(level) + text)
-      : this.getIndentation(level) + text;
+    return Array.isArray(text) ? text.map((t) => this.getIndentation(level) + t) : this.getIndentation(level) + text;
   }
 
   protected setIndentationSymbol(symbol: number | string = 2): string {

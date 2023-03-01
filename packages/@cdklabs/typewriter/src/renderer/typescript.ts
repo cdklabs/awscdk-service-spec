@@ -150,20 +150,20 @@ export class TypeScriptRenderer extends Renderer {
     return this.indent(`return ${this.renderExpression(ret.expression, lvl).trim()};`, lvl);
   }
 
-  protected renderDocs(x: Documented, options: DocOptions = {}): string[] {
+  protected renderDocs(el: Documented, options: DocOptions = {}): string[] {
     const ret = new Array();
-    line(x.docs?.summary);
+    line(el.docs?.summary);
     parBreak();
-    line(x.docs?.remarks);
+    line(el.docs?.remarks);
     parBreak();
     if (options?.forceStruct) {
       line('@struct');
     }
-    tagged('deprecated', x.docs?.deprecated);
-    tagged('stability', x.docs?.stability);
-    tagged('default -', x.docs?.default);
-    tagged('returns', x.docs?.returns);
-    tagged('example', `\n${x.docs?.example ?? ''}`);
+    tagged('deprecated', el.docs?.deprecated);
+    tagged('stability', el.docs?.stability);
+    tagged('default -', el.docs?.default);
+    tagged('returns', el.docs?.returns);
+    tagged('example', `\n${el.docs?.example ?? ''}`);
 
     while (ret.length > 0 && ret[ret.length - 1] === '') {
       ret.pop();
