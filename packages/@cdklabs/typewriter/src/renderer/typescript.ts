@@ -190,7 +190,7 @@ export class TypeScriptRenderer extends Renderer {
     }
 
     function parBreak() {
-      if (ret.length > 0) {
+      if (ret.length > 0 && ret[ret.length - 1] !== '') {
         ret.push('');
       }
     }

@@ -52,7 +52,10 @@ const typewriter = new MonorepoTypeScriptProject({
   parent: repo,
   name: '@cdklabs/typewriter',
   description: 'Write typed code for jsii',
-  deps: ['@jsii/spec'],
+  deps: [
+    '@jsii/spec',
+    'camelcase@^6', // camelcase 7 uses ESM
+  ],
 });
 typewriter.synth();
 
@@ -124,7 +127,18 @@ const cfnResources = new MonorepoTypeScriptProject({
   description: 'L1 constructs for all CloudFormation Resources',
   deps: ['aws-cdk-lib@^2'],
   peerDeps: ['constructs@^10.0.0'],
-  devDeps: [typewriter, serviceSpecBuild, tsKb, 'ts-node', '@jsii/spec', 'fs-extra', '@types/fs-extra@^9', '@swc/core'],
+  devDeps: [
+    typewriter,
+    serviceSpec,
+    serviceSpecBuild,
+    tsKb,
+    'camelcase',
+    'ts-node',
+    '@jsii/spec',
+    'fs-extra',
+    '@types/fs-extra@^9',
+    '@swc/core',
+  ],
 });
 cfnResources.eslint?.addOverride({
   files: ['src/cli/**/*.ts', 'test/**/*.ts'],

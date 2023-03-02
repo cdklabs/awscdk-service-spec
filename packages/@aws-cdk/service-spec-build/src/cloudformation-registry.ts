@@ -1,4 +1,11 @@
-import { PropertyType, Resource, ResourceProperties, SpecDatabase, TypeDefinition } from '@aws-cdk/service-spec';
+import {
+  Deprecation,
+  PropertyType,
+  Resource,
+  ResourceProperties,
+  SpecDatabase,
+  TypeDefinition,
+} from '@aws-cdk/service-spec';
 import {
   CloudFormationRegistryResource,
   ImplicitJsonSchemaRecord,
@@ -40,6 +47,11 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
     for (const propPtr of resource.readOnlyProperties ?? []) {
       const propName = simplePropNameFromJsonPtr(propPtr);
       delete res.properties[propName];
+    }
+
+    for (const propPtr of resource.deprecatedProperties ?? []) {
+      const propName = simplePropNameFromJsonPtr(propPtr);
+      (res.properties[propName] ?? {}).deprecated = Deprecation.WARN;
     }
 
     copyAttributes(resource, res.attributes, failure.in(resource.typeName));

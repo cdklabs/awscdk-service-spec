@@ -1,11 +1,16 @@
-import { DatabaseSchema, Property, PropertyType, Resource, TypeDefinition } from '@aws-cdk/service-spec';
+import { DatabaseSchema, Deprecation, Property, PropertyType, Resource, TypeDefinition } from '@aws-cdk/service-spec';
 import { Database } from '@cdklabs/tskb';
-import { Callable, Case, StructType, TypeReferenceSpec, stmt, TypeKind } from '@cdklabs/typewriter';
+import { Callable, StructType, TypeReferenceSpec, stmt, TypeKind } from '@cdklabs/typewriter';
 import { DocsSpec } from '@cdklabs/typewriter/src/documented';
 import * as jsii from '@jsii/spec';
 import { Stability } from '@jsii/spec';
-import { cloudFormationDocLink } from '../naming/doclink';
 import { CdkCore } from './cdk';
+import {
+  propertyNameFromCloudFormation,
+  propStructNameFromResource,
+  structNameFromTypeDefinition,
+} from './naming/conventions';
+import { cloudFormationDocLink } from './naming/doclink';
 import { ResourceModule } from './resource';
 import { splitSummary } from './split-summary';
 
@@ -29,7 +34,7 @@ export class AstBuilder {
   public addResource(r: Resource) {
     const propsInterface = new StructType(this.scope, {
       export: true,
-      name: `Cfn${r.name}Props`,
+      name: propStructNameFromResource(r),
       kind: TypeKind.Interface,
       docs: {
         ...splitDocumentation(r.documentation),
@@ -106,30 +111,28 @@ export class AstBuilder {
   }
 
   private obtainTypeReference(ref: TypeDefinition) {
-    try {
-      return this.scope.findType(ref.name);
-    } catch {
-      return this.createTypeReference(ref);
-    }
+    const ret = this.scope.tryFindType(structNameFromTypeDefinition(ref));
+    return ret ?? this.createTypeReference(ref);
   }
 
-  private createTypeReference(ref: TypeDefinition) {
+  private createTypeReference(def: TypeDefinition) {
     // We need to first create the Interface without properties, in case of a recursive type.
     // This way when a property is added that recursively uses the type, it already exists (albeit without properties) and can be referenced
     const theType = new StructType(this.scope, {
       export: true,
-      name: ref.name,
+      name: structNameFromTypeDefinition(def),
       kind: TypeKind.Interface,
       docs: {
-        ...splitDocumentation(ref.documentation),
+        ...splitDocumentation(def.documentation),
         see: cloudFormationDocLink({
-          resourceType: this.resourceOfType(ref).cloudFormationType,
-          propTypeName: ref.name,
+          resourceType: this.resourceOfType(def).cloudFormationType,
+          propTypeName: def.name,
         }),
       },
     });
-    Object.entries(ref.properties).forEach(([name, p]) => {
-      this.addStructProperty(theType, name, p, ref);
+
+    Object.entries(def.properties).forEach(([name, p]) => {
+      this.addStructProperty(theType, name, p, def);
     });
 
     return theType;
@@ -151,7 +154,7 @@ export class AstBuilder {
     }
 
     struct.addProperty({
-      name: Case.firstCharToLower(propertyName),
+      name: propertyNameFromCloudFormation(propertyName),
       type: this.propertyTypeToTypeReferenceSpec(property.type),
       optional: !property.required,
       docs: {
@@ -162,8 +165,20 @@ export class AstBuilder {
           propTypeName,
           propName: propertyName,
         }),
+        deprecated: deprecationMessage(),
       },
     });
+
+    function deprecationMessage(): string | undefined {
+      switch (property.deprecated) {
+        case Deprecation.WARN:
+          return 'this property has been deprecated';
+        case Deprecation.IGNORE:
+          return 'this property will be ignored';
+      }
+
+      return undefined;
+    }
   }
 
   /**

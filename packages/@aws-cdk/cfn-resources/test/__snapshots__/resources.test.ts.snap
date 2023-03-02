@@ -12,76 +12,99 @@ exports[`AWS::ApiGateway::RestApi 1`] = `
  * 
  * @struct
  * @stability external
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html
  */
 export interface CfnRestApiProps {
   /**
    * The source of the API key for metering requests according to a usage plan.
    * 
    * Valid values are: \`HEADER\` to read the API key from the \`X-API-Key\` header of a request. \`AUTHORIZER\` to read the API key from the \`UsageIdentifierKey\` from a custom authorizer.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-apikeysourcetype
    */
-  readonly apiKeySourceType: string;
+  readonly apiKeySourceType?: string;
 
   /**
    * The list of binary media types supported by the RestApi.
    * 
    * By default, the RestApi supports only UTF-8-encoded text payloads.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-binarymediatypes
    */
-  readonly binaryMediaTypes: Array<string>;
+  readonly binaryMediaTypes?: Array<string>;
 
   /**
    * An OpenAPI specification that defines a set of RESTful APIs in JSON format.
    * 
    * For YAML templates, you can also provide the specification in YAML format.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-body
    */
-  readonly body: any;
+  readonly body?: any;
 
   /**
    * The Amazon Simple Storage Service (Amazon S3) location that points to an OpenAPI file, which defines a set of RESTful APIs in JSON or YAML format.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-bodys3location
    */
-  readonly bodyS3Location: S3Location;
+  readonly bodyS3Location?: S3LocationProperty;
 
   /**
    * The ID of the RestApi that you want to clone from.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-clonefrom
    */
-  readonly cloneFrom: string;
+  readonly cloneFrom?: string;
 
   /**
    * A list of the endpoint types of the API.
    * 
    * Use this property when creating an API. When importing an existing API, specify the endpoint configuration types using the \`Parameters\` property.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-endpointconfiguration
    */
-  readonly endpointConfiguration: EndpointConfiguration;
+  readonly endpointConfiguration?: EndpointConfigurationProperty;
 
   /**
    * The description of the RestApi.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-description
    */
-  readonly description: string;
+  readonly description?: string;
 
   /**
    * Specifies whether clients can invoke your API by using the default \`execute-api\` endpoint.
    * 
    * By default, clients can invoke your API with the default \`https://{api_id}.execute-api.{region}.amazonaws.com\` endpoint. To require that clients use a custom domain name to invoke your API, disable the default endpoint
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-disableexecuteapiendpoint
    */
-  readonly disableExecuteApiEndpoint: boolean;
+  readonly disableExecuteApiEndpoint?: boolean;
 
   /**
    * A query parameter to indicate whether to rollback the API update ( \`true\` ) or not ( \`false\` ) when a warning is encountered.
    * 
    * The default value is \`false\` .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-failonwarnings
    */
-  readonly failOnWarnings: boolean;
+  readonly failOnWarnings?: boolean;
 
   /**
    * The name of the RestApi.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-name
    */
-  readonly name: string;
+  readonly name?: string;
 
   /**
    * A nullable integer that is used to enable compression (with non-negative between 0 and 10485760 (10M) bytes, inclusive) or disable compression (with a null value) on an API.
    * 
    * When compression is enabled, compression or decompression is not applied on the payload if the payload size is smaller than this value. Setting it to zero allows compression for any payload size.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-minimumcompressionsize
    */
-  readonly minimumCompressionSize: number;
+  readonly minimumCompressionSize?: number;
 
   /**
    * This property applies only when you use OpenAPI to define your REST API.
@@ -95,29 +118,37 @@ export interface CfnRestApiProps {
    * For \`merge\` , the new API definition takes precedence, but any container types such as endpoint configurations and binary media types are merged with the existing API. Use \`merge\` to define top-level \`RestApi\` properties in addition to using OpenAPI. Generally, it's preferred to use API Gateway's OpenAPI extensions to model these properties.
    * 
    * If you don't specify this property, a default value is chosen. For REST APIs created before March 29, 2021, the default is \`overwrite\` . Otherwise, the default value is \`merge\` .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-mode
    */
-  readonly mode: string;
+  readonly mode?: string;
 
   /**
    * A policy document that contains the permissions for the \`RestApi\` resource.
    * 
    * To set the ARN for the policy, use the \`!Join\` intrinsic function with \`""\` as delimiter and values of \`"execute-api:/"\` and \`"*"\` .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-policy
    */
-  readonly policy: any;
+  readonly policy?: any;
 
   /**
    * Custom header parameters as part of the request.
    * 
    * For example, to exclude DocumentationParts from an imported API, set \`ignore=documentation\` as a \`parameters\` value, as in the AWS CLI command of \`aws apigateway import-rest-api --parameters ignore=documentation --body 'file:///path/to/imported-api-body.json'\` .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-parameters
    */
-  readonly parameters: Map<string, string>;
+  readonly parameters?: Map<string, string>;
 
   /**
    * The key-value map of strings.
    * 
    * The valid character set is [a-zA-Z+-=._:/]. The tag key can be up to 128 characters and must not start with \`aws:\` . The tag value can be up to 256 characters.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-tags
    */
-  readonly tags: Array<Tag>;
+  readonly tags?: Array<TagProperty>;
 }
 
 
@@ -151,29 +182,38 @@ function cfnRestApiBodyPropertyToCloudFormation(properties: any): any {
  * > On January 1, 2016, the Swagger Specification was donated to the [OpenAPI initiative](https://docs.aws.amazon.com/https://www.openapis.org/) , becoming the foundation of the OpenAPI Specification.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-s3location.html
  */
-export interface S3Location {
+export interface S3LocationProperty {
   /**
    * The name of the S3 bucket where the OpenAPI file is stored.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-s3location.html#cfn-apigateway-restapi-s3location-bucket
    */
-  readonly bucket: string;
+  readonly bucket?: string;
 
   /**
    * The Amazon S3 ETag (a file checksum) of the OpenAPI file.
    * 
    * If you don't specify a value, API Gateway skips ETag validation of your OpenAPI file.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-s3location.html#cfn-apigateway-restapi-s3location-etag
    */
-  readonly eTag: string;
+  readonly eTag?: string;
 
   /**
    * For versioning-enabled buckets, a specific version of the OpenAPI file.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-s3location.html#cfn-apigateway-restapi-s3location-version
    */
-  readonly version: string;
+  readonly version?: string;
 
   /**
    * The file name of the OpenAPI file (Amazon S3 object name).
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-s3location.html#cfn-apigateway-restapi-s3location-key
    */
-  readonly key: string;
+  readonly key?: string;
 }
 
 
@@ -199,21 +239,26 @@ function cfnRestApiCloneFromPropertyToCloudFormation(properties: any): any {
  * \`EndpointConfiguration\` is a property of the [AWS::ApiGateway::RestApi](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html) resource.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-endpointconfiguration.html
  */
-export interface EndpointConfiguration {
+export interface EndpointConfigurationProperty {
   /**
    * A list of endpoint types of an API (RestApi) or its custom domain name (DomainName).
    * 
    * For an edge-optimized API and its custom domain name, the endpoint type is \`"EDGE"\` . For a regional API and its custom domain name, the endpoint type is \`REGIONAL\` . For a private API, the endpoint type is \`PRIVATE\` .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-endpointconfiguration.html#cfn-apigateway-restapi-endpointconfiguration-types
    */
-  readonly types: Array<string>;
+  readonly types?: Array<string>;
 
   /**
    * A list of VpcEndpointIds of an API (RestApi) against which to create Route53 ALIASes.
    * 
    * It is only supported for \`PRIVATE\` endpoint type.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-endpointconfiguration.html#cfn-apigateway-restapi-endpointconfiguration-vpcendpointids
    */
-  readonly vpcEndpointIds: Array<string>;
+  readonly vpcEndpointIds?: Array<string>;
 }
 
 
@@ -291,10 +336,17 @@ function cfnRestApiParametersPropertyToCloudFormation(properties: any): any {
 
 /**
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-tag.html
  */
-export interface Tag {
+export interface TagProperty {
+  /**
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-tag.html#cfn-apigateway-restapi-tag-key
+   */
   readonly key: string;
 
+  /**
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-tag.html#cfn-apigateway-restapi-tag-value
+   */
   readonly value: string;
 }
 
@@ -318,26 +370,33 @@ exports[`AWS::IAM::Role 1`] = `
  * 
  * @struct
  * @stability external
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
  */
 export interface CfnRoleProps {
   /**
    * The trust policy that is associated with this role.
    * 
    * Trust policies define which entities can assume the role. You can associate only one trust policy with a role. For an example of a policy that can be used to assume a role, see [Template Examples](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#aws-resource-iam-role--examples) . For more information about the elements that you can use in an IAM policy, see [IAM Policy Elements Reference](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html) in the *IAM User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-assumerolepolicydocument
    */
   readonly assumeRolePolicyDocument: any;
 
   /**
    * A description of the role that you provide.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-description
    */
-  readonly description: string;
+  readonly description?: string;
 
   /**
    * A list of Amazon Resource Names (ARNs) of the IAM managed policies that you want to attach to the role.
    * 
    * For more information about ARNs, see [Amazon Resource Names (ARNs) and AWS Service Namespaces](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html) in the *AWS General Reference* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-managedpolicyarns
    */
-  readonly managedPolicyArns: Array<string>;
+  readonly managedPolicyArns?: Array<string>;
 
   /**
    * The maximum session duration (in seconds) that you want to set for the specified role.
@@ -345,8 +404,10 @@ export interface CfnRoleProps {
    * If you do not specify a value for this setting, the default value of one hour is applied. This setting can have a value from 1 hour to 12 hours.
    * 
    * Anyone who assumes the role from the AWS CLI or API can use the \`DurationSeconds\` API parameter or the \`duration-seconds\` AWS CLI parameter to request a longer session. The \`MaxSessionDuration\` setting determines the maximum duration that can be requested using the \`DurationSeconds\` parameter. If users don't specify a value for the \`DurationSeconds\` parameter, their security credentials are valid for one hour by default. This applies when you use the \`AssumeRole*\` API operations or the \`assume-role*\` AWS CLI operations but does not apply when you use those operations to create a console URL. For more information, see [Using IAM roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use.html) in the *IAM User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-maxsessionduration
    */
-  readonly maxSessionDuration: number;
+  readonly maxSessionDuration?: number;
 
   /**
    * The path to the role. For more information about paths, see [IAM Identifiers](https://docs.aws.amazon.com/IAM/latest/UserGuide/Using_Identifiers.html) in the *IAM User Guide* .
@@ -354,15 +415,19 @@ export interface CfnRoleProps {
    * This parameter is optional. If it is not included, it defaults to a slash (/).
    * 
    * This parameter allows (through its [regex pattern](https://docs.aws.amazon.com/http://wikipedia.org/wiki/regex) ) a string of characters consisting of either a forward slash (/) by itself or a string that must begin and end with forward slashes. In addition, it can contain any ASCII character from the ! ( \`\\u0021\` ) through the DEL character ( \`\\u007F\` ), including most punctuation characters, digits, and upper and lowercased letters.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path
    */
-  readonly path: string;
+  readonly path?: string;
 
   /**
    * The ARN of the policy used to set the permissions boundary for the role.
    * 
    * For more information about permissions boundaries, see [Permissions boundaries for IAM identities](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html) in the *IAM User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary
    */
-  readonly permissionsBoundary: string;
+  readonly permissionsBoundary?: string;
 
   /**
    * Adds or updates an inline policy document that is embedded in the specified IAM role.
@@ -374,8 +439,10 @@ export interface CfnRoleProps {
    * For information about limits on the number of inline policies that you can embed with a role, see [Limitations on IAM Entities](https://docs.aws.amazon.com/IAM/latest/UserGuide/LimitationsOnEntities.html) in the *IAM User Guide* .
    * 
    * > If an external policy (such as \`AWS::IAM::Policy\` or \`AWS::IAM::ManagedPolicy\` ) has a \`Ref\` to a role and if a resource (such as \`AWS::ECS::Service\` ) also has a \`Ref\` to the same role, add a \`DependsOn\` attribute to the resource to make the resource depend on the external policy. This dependency ensures that the role's policy is available throughout the resource's lifecycle. For example, when you delete a stack with an \`AWS::ECS::Service\` resource, the \`DependsOn\` attribute ensures that AWS CloudFormation deletes the \`AWS::ECS::Service\` resource before deleting its role's policy.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-policies
    */
-  readonly policies: Array<Policy>;
+  readonly policies?: Array<PolicyProperty>;
 
   /**
    * A name for the IAM role, up to 64 characters in length.
@@ -389,15 +456,19 @@ export interface CfnRoleProps {
    * If you specify a name, you must specify the \`CAPABILITY_NAMED_IAM\` value to acknowledge your template's capabilities. For more information, see [Acknowledging IAM Resources in AWS CloudFormation Templates](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-iam-template.html#using-iam-capabilities) .
    * 
    * > Naming an IAM resource can cause an unrecoverable error if you reuse the same template in multiple Regions. To prevent this, we recommend using \`Fn::Join\` and \`AWS::Region\` to create a Region-specific name, as in the following example: \`{"Fn::Join": ["", [{"Ref": "AWS::Region"}, {"Ref": "MyResourceName"}]]}\` .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-rolename
    */
-  readonly roleName: string;
+  readonly roleName?: string;
 
   /**
    * A list of tags that are attached to the role.
    * 
    * For more information about tagging, see [Tagging IAM resources](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html) in the *IAM User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-tags
    */
-  readonly tags: Array<Tag>;
+  readonly tags?: Array<TagProperty>;
 }
 
 
@@ -457,17 +528,22 @@ function cfnRolePermissionsBoundaryPropertyToCloudFormation(properties: any): an
  * For more information about managed policies, refer to [Managed Policies and Inline Policies](https://docs.aws.amazon.com/IAM/latest/UserGuide/policies-managed-vs-inline.html) in the *IAM User Guide* .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-policy.html
  */
-export interface Policy {
+export interface PolicyProperty {
   /**
    * The entire contents of the policy that defines permissions.
    * 
    * For more information, see [Overview of JSON policies](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html#access_policies-json) .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-policy.html#cfn-iam-role-policy-policydocument
    */
   readonly policyDocument: string;
 
   /**
    * The friendly name (not ARN) identifying the policy.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-policy.html#cfn-iam-role-policy-policyname
    */
   readonly policyName: string;
 }
@@ -492,14 +568,16 @@ function cfnRoleRoleNamePropertyToCloudFormation(properties: any): any {
 /**
  * A key-value pair to associate with a resource.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-tag.html
  */
-export interface Tag {
+export interface TagProperty {
   /**
    * The key name of the tag.
    * 
    * You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-tag.html#cfn-iam-role-tag-key
    */
   readonly key: string;
 
@@ -507,6 +585,8 @@ export interface Tag {
    * The value for the tag.
    * 
    * You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-tag.html#cfn-iam-role-tag-value
    */
   readonly value: string;
 }
@@ -541,32 +621,43 @@ exports[`AWS::Lambda::Function 1`] = `
  * 
  * @struct
  * @stability external
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html
  */
 export interface CfnFunctionProps {
   /**
    * A description of the function.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-description
    */
-  readonly description: string;
+  readonly description?: string;
 
   /**
    * Set \`Mode\` to \`Active\` to sample and trace a subset of incoming requests with [X-Ray](https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html) .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tracingconfig
    */
-  readonly tracingConfig: TracingConfig;
+  readonly tracingConfig?: TracingConfigProperty;
 
   /**
    * For network connectivity to AWS resources in a [VPC](https://docs.aws.amazon.com/lambda/latest/dg/configuration-network.html) , specify a list of security groups and subnets in the VPC.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-vpcconfig
    */
-  readonly vpcConfig: VpcConfig;
+  readonly vpcConfig?: VpcConfigProperty;
 
   /**
    * The number of simultaneous executions to reserve for the function.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-reservedconcurrentexecutions
    */
-  readonly reservedConcurrentExecutions: number;
+  readonly reservedConcurrentExecutions?: number;
 
   /**
    * The function's [AWS Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html) setting.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-snapstart
    */
-  readonly snapStart: SnapStart;
+  readonly snapStart?: SnapStartProperty;
 
   /**
    * Connection settings for an Amazon EFS file system.
@@ -574,8 +665,10 @@ export interface CfnFunctionProps {
    * To connect a function to a file system, a mount target must be available in every Availability Zone that your function connects to. If your template contains an [AWS::EFS::MountTarget](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-efs-mounttarget.html) resource, you must also specify a \`DependsOn\` attribute to ensure that the mount target is created or updated before the function.
    * 
    * For more information about using the \`DependsOn\` attribute, see [DependsOn Attribute](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-dependson.html) .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-filesystemconfigs
    */
-  readonly fileSystemConfigs: Array<FileSystemConfig>;
+  readonly fileSystemConfigs?: Array<FileSystemConfigProperty>;
 
   /**
    * The name of the Lambda function, up to 64 characters in length.
@@ -583,107 +676,141 @@ export interface CfnFunctionProps {
    * If you don't specify a name, AWS CloudFormation generates one.
    * 
    * If you specify a name, you cannot perform updates that require replacement of this resource. You can perform updates that require no or some interruption. If you must replace the resource, specify a new name.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-functionname
    */
-  readonly functionName: string;
+  readonly functionName?: string;
 
   /**
    * The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html) . Runtime is required if the deployment package is a .zip file archive.
    * 
    * The following list includes deprecated runtimes. For more information, see [Runtime deprecation policy](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-support-policy) .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime
    */
-  readonly runtime: string;
+  readonly runtime?: string;
 
   /**
    * The ARN of the AWS Key Management Service ( AWS KMS ) customer managed key that's used to encrypt your function's [environment variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-encryption) . When [Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart-security.html) is activated, this key is also used to encrypt your function's snapshot. If you don't provide a customer managed key, Lambda uses a default service key.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-kmskeyarn
    */
-  readonly kmsKeyArn: string;
+  readonly kmsKeyArn?: string;
 
   /**
    * The type of deployment package.
    * 
    * Set to \`Image\` for container image and set \`Zip\` for .zip file archive.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-packagetype
    */
-  readonly packageType: string;
+  readonly packageType?: string;
 
   /**
    * To enable code signing for this function, specify the ARN of a code-signing configuration.
    * 
    * A code-signing configuration
    * includes a set of signing profiles, which define the trusted publishers for this function.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-codesigningconfigarn
    */
-  readonly codeSigningConfigArn: string;
+  readonly codeSigningConfigArn?: string;
 
   /**
    * A list of [function layers](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html) to add to the function's execution environment. Specify each layer by its ARN, including the version.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-layers
    */
-  readonly layers: Array<string>;
+  readonly layers?: Array<string>;
 
   /**
    * A list of [tags](https://docs.aws.amazon.com/lambda/latest/dg/tagging.html) to apply to the function.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tags
    */
-  readonly tags: Array<Tag>;
+  readonly tags?: Array<TagProperty>;
 
   /**
    * Configuration values that override the container image Dockerfile settings.
    * 
    * For more information, see [Container image settings](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-parms) .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-imageconfig
    */
-  readonly imageConfig: ImageConfig;
+  readonly imageConfig?: ImageConfigProperty;
 
   /**
    * The amount of [memory available to the function](https://docs.aws.amazon.com/lambda/latest/dg/configuration-function-common.html#configuration-memory-console) at runtime. Increasing the function memory also increases its CPU allocation. The default value is 128 MB. The value can be any multiple of 1 MB.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-memorysize
    */
-  readonly memorySize: number;
+  readonly memorySize?: number;
 
   /**
    * A dead-letter queue configuration that specifies the queue or topic where Lambda sends asynchronous events when they fail processing.
    * 
    * For more information, see [Dead-letter queues](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html#invocation-dlq) .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-deadletterconfig
    */
-  readonly deadLetterConfig: DeadLetterConfig;
+  readonly deadLetterConfig?: DeadLetterConfigProperty;
 
   /**
    * The amount of time (in seconds) that Lambda allows a function to run before stopping it.
    * 
    * The default is 3 seconds. The maximum allowed value is 900 seconds. For more information, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html) .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-timeout
    */
-  readonly timeout: number;
+  readonly timeout?: number;
 
   /**
    * The name of the method within your code that Lambda calls to run your function.
    * 
    * Handler is required if the deployment package is a .zip file archive. The format includes the file name. It can also include namespaces and other qualifiers, depending on the runtime. For more information, see [Lambda programming model](https://docs.aws.amazon.com/lambda/latest/dg/foundation-progmodel.html) .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-handler
    */
-  readonly handler: string;
+  readonly handler?: string;
 
   /**
    * The code for the function.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-code
    */
-  readonly code: Code;
+  readonly code: CodeProperty;
 
   /**
    * The Amazon Resource Name (ARN) of the function's execution role.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-role
    */
   readonly role: string;
 
   /**
    * Environment variables that are accessible from function code during execution.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-environment
    */
-  readonly environment: Environment;
+  readonly environment?: EnvironmentProperty;
 
   /**
    * The size of the function's \`/tmp\` directory in MB.
    * 
    * The default value is 512, but it can be any whole number between 512 and 10,240 MB.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage
    */
-  readonly ephemeralStorage: EphemeralStorage;
+  readonly ephemeralStorage?: EphemeralStorageProperty;
 
   /**
    * The instruction set architecture that the function supports.
    * 
    * Enter a string array with one of the valid values (arm64 or x86_64). The default value is \`x86_64\` .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures
    */
-  readonly architectures: Array<string>;
+  readonly architectures?: Array<string>;
 }
 
 
@@ -698,14 +825,16 @@ function cfnFunctionDescriptionPropertyToCloudFormation(properties: any): any {
 /**
  * The function's [AWS X-Ray](https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html) tracing configuration. To sample and record incoming requests, set \`Mode\` to \`Active\` .
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-tracingconfig.html
  */
-export interface TracingConfig {
+export interface TracingConfigProperty {
   /**
    * The tracing mode.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-tracingconfig.html#cfn-lambda-function-tracingconfig-mode
    */
-  readonly mode: string;
+  readonly mode?: string;
 }
 
 
@@ -727,17 +856,22 @@ function cfnFunctionTracingConfigPropertyToCloudFormation(properties: any): any 
  * > To monitor network interfaces, AWS CloudFormation needs the \`ec2:DescribeNetworkInterfaces\` permission. It obtains this from the user or role that modifies the stack. If you don't provide this permission, AWS CloudFormation does not wait for network interfaces to be deleted.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-vpcconfig.html
  */
-export interface VpcConfig {
+export interface VpcConfigProperty {
   /**
    * A list of VPC security group IDs.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-vpcconfig.html#cfn-lambda-function-vpcconfig-securitygroupids
    */
-  readonly securityGroupIds: Array<string>;
+  readonly securityGroupIds?: Array<string>;
 
   /**
    * A list of VPC subnet IDs.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-vpcconfig.html#cfn-lambda-function-vpcconfig-subnetids
    */
-  readonly subnetIds: Array<string>;
+  readonly subnetIds?: Array<string>;
 }
 
 
@@ -760,12 +894,14 @@ function cfnFunctionReservedConcurrentExecutionsPropertyToCloudFormation(propert
 /**
  * The function's [AWS Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html) setting.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-snapstart.html
  */
-export interface SnapStart {
+export interface SnapStartProperty {
   /**
    * Set \`ApplyOn\` to \`PublishedVersions\` to create a snapshot of the initialized execution environment when you publish a function version.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-snapstart.html#cfn-lambda-function-snapstart-applyon
    */
   readonly applyOn: string;
 }
@@ -782,17 +918,21 @@ function cfnFunctionSnapStartPropertyToCloudFormation(properties: any): any {
 /**
  * Details about the connection between a Lambda function and an [Amazon EFS file system](https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html) .
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-filesystemconfig.html
  */
-export interface FileSystemConfig {
+export interface FileSystemConfigProperty {
   /**
    * The Amazon Resource Name (ARN) of the Amazon EFS access point that provides access to the file system.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-filesystemconfig.html#cfn-lambda-function-filesystemconfig-arn
    */
   readonly arn: string;
 
   /**
    * The path where the function can access the file system, starting with \`/mnt/\` .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-filesystemconfig.html#cfn-lambda-function-filesystemconfig-localmountpath
    */
   readonly localMountPath: string;
 }
@@ -856,19 +996,24 @@ function cfnFunctionLayersPropertyToCloudFormation(properties: any): any {
 
 /**
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-tag.html
  */
-export interface Tag {
+export interface TagProperty {
   /**
    * The value for the tag.
    * 
    * You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-tag.html#cfn-lambda-function-tag-value
    */
-  readonly value: string;
+  readonly value?: string;
 
   /**
    * The key name of the tag.
    * 
    * You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-tag.html#cfn-lambda-function-tag-key
    */
   readonly key: string;
 }
@@ -888,28 +1033,35 @@ function cfnFunctionTagsPropertyToCloudFormation(properties: any): any {
  * For more information, see [Container image settings](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-parms) .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-imageconfig.html
  */
-export interface ImageConfig {
+export interface ImageConfigProperty {
   /**
    * Specifies the working directory.
    * 
    * The length of the directory string cannot exceed 1,000 characters.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-imageconfig.html#cfn-lambda-function-imageconfig-workingdirectory
    */
-  readonly workingDirectory: string;
+  readonly workingDirectory?: string;
 
   /**
    * Specifies parameters that you want to pass in with ENTRYPOINT.
    * 
    * You can specify a maximum of 1,500 parameters in the list.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-imageconfig.html#cfn-lambda-function-imageconfig-command
    */
-  readonly command: Array<string>;
+  readonly command?: Array<string>;
 
   /**
    * Specifies the entry point to their application, which is typically the location of the runtime executable.
    * 
    * You can specify a maximum of 1,500 string entries in the list.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-imageconfig.html#cfn-lambda-function-imageconfig-entrypoint
    */
-  readonly entryPoint: Array<string>;
+  readonly entryPoint?: Array<string>;
 }
 
 
@@ -932,14 +1084,16 @@ function cfnFunctionMemorySizePropertyToCloudFormation(properties: any): any {
 /**
  * The [dead-letter queue](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html#dlq) for failed asynchronous invocations.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-deadletterconfig.html
  */
-export interface DeadLetterConfig {
+export interface DeadLetterConfigProperty {
   /**
    * The Amazon Resource Name (ARN) of an Amazon SQS queue or Amazon SNS topic.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-deadletterconfig.html#cfn-lambda-function-deadletterconfig-targetarn
    */
-  readonly targetArn: string;
+  readonly targetArn?: string;
 }
 
 
@@ -973,19 +1127,24 @@ function cfnFunctionHandlerPropertyToCloudFormation(properties: any): any {
  * Changes to a deployment package in Amazon S3 are not detected automatically during stack updates. To update the function code, change the object key or version in the template.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html
  */
-export interface Code {
+export interface CodeProperty {
   /**
    * For versioned objects, the version of the deployment package object to use.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-s3objectversion
    */
-  readonly s3ObjectVersion: string;
+  readonly s3ObjectVersion?: string;
 
   /**
    * An Amazon S3 bucket in the same AWS Region as your function.
    * 
    * The bucket can be in a different AWS account .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-s3bucket
    */
-  readonly s3Bucket: string;
+  readonly s3Bucket?: string;
 
   /**
    * (Node.js and Python) The source code of your Lambda function. If you include your function source inline with this parameter, AWS CloudFormation places it in a file named \`index\` and zips it to create a [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html) . This zip file cannot exceed 4MB. For the \`Handler\` property, the first part of the handler identifier must be \`index\` . For example, \`index.handler\` .
@@ -993,18 +1152,24 @@ export interface Code {
    * For JSON, you must escape quotes and special characters such as newline ( \`\\n\` ) with a backslash.
    * 
    * If you specify a function that interacts with an AWS CloudFormation custom resource, you don't have to write your own functions to send responses to the custom resource that invoked the function. AWS CloudFormation provides a response module ( [cfn-response](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-lambda-function-code-cfnresponsemodule.html) ) that simplifies sending responses. See [Using AWS Lambda with AWS CloudFormation](https://docs.aws.amazon.com/lambda/latest/dg/services-cloudformation.html) for details.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-zipfile
    */
-  readonly zipFile: string;
+  readonly zipFile?: string;
 
   /**
    * The Amazon S3 key of the deployment package.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-s3key
    */
-  readonly s3Key: string;
+  readonly s3Key?: string;
 
   /**
    * URI of a [container image](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html) in the Amazon ECR registry.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-imageuri
    */
-  readonly imageUri: string;
+  readonly imageUri?: string;
 }
 
 
@@ -1030,14 +1195,17 @@ function cfnFunctionRolePropertyToCloudFormation(properties: any): any {
  * You can use environment variables to adjust your function's behavior without updating code. An environment variable is a pair of strings that are stored in a function's version-specific configuration.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html
  */
-export interface Environment {
+export interface EnvironmentProperty {
   /**
    * Environment variable key-value pairs.
    * 
    * For more information, see [Using Lambda environment variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html) .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-environment.html#cfn-lambda-function-environment-variables
    */
-  readonly variables: Map<string, string>;
+  readonly variables?: Map<string, string>;
 }
 
 
@@ -1055,10 +1223,13 @@ function cfnFunctionEnvironmentPropertyToCloudFormation(properties: any): any {
  * The default value is 512, but it can be any whole number between 512 and 10,240 MB.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-ephemeralstorage.html
  */
-export interface EphemeralStorage {
+export interface EphemeralStorageProperty {
   /**
    * The size of the function's \`/tmp\` directory.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-ephemeralstorage.html#cfn-lambda-function-ephemeralstorage-size
    */
   readonly size: number;
 }
@@ -1093,14 +1264,17 @@ exports[`AWS::S3::Bucket 1`] = `
  * 
  * @struct
  * @stability external
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html
  */
 export interface CfnBucketProps {
   /**
    * Configures the transfer acceleration state for an Amazon S3 bucket.
    * 
    * For more information, see [Amazon S3 Transfer Acceleration](https://docs.aws.amazon.com/AmazonS3/latest/dev/transfer-acceleration.html) in the *Amazon S3 User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-accelerateconfiguration
    */
-  readonly accelerateConfiguration: AccelerateConfiguration;
+  readonly accelerateConfiguration?: AccelerateConfigurationProperty;
 
   /**
    * A canned access control list (ACL) that grants predefined permissions to the bucket.
@@ -1108,20 +1282,26 @@ export interface CfnBucketProps {
    * For more information about canned ACLs, see [Canned ACL](https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl) in the *Amazon S3 User Guide* .
    * 
    * Be aware that the syntax for this property differs from the information provided in the *Amazon S3 User Guide* . The AccessControl property is case-sensitive and must be one of the following values: Private, PublicRead, PublicReadWrite, AuthenticatedRead, LogDeliveryWrite, BucketOwnerRead, BucketOwnerFullControl, or AwsExecRead.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-accesscontrol
    */
-  readonly accessControl: string;
+  readonly accessControl?: string;
 
   /**
    * Specifies the configuration and any analyses for the analytics filter of an Amazon S3 bucket.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-analyticsconfigurations
    */
-  readonly analyticsConfigurations: Array<AnalyticsConfiguration>;
+  readonly analyticsConfigurations?: Array<AnalyticsConfigurationProperty>;
 
   /**
    * Specifies default encryption for a bucket using server-side encryption with Amazon S3-managed keys (SSE-S3) or AWS KMS-managed keys (SSE-KMS) bucket.
    * 
    * For information about the Amazon S3 default encryption feature, see [Amazon S3 Default Encryption for S3 Buckets](https://docs.aws.amazon.com/AmazonS3/latest/dev/bucket-encryption.html) in the *Amazon S3 User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-bucketencryption
    */
-  readonly bucketEncryption: BucketEncryption;
+  readonly bucketEncryption?: BucketEncryptionProperty;
 
   /**
    * A name for the bucket.
@@ -1129,51 +1309,67 @@ export interface CfnBucketProps {
    * If you don't specify a name, AWS CloudFormation generates a unique ID and uses that ID for the bucket name. The bucket name must contain only lowercase letters, numbers, periods (.), and dashes (-) and must follow [Amazon S3 bucket restrictions and limitations](https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html) . For more information, see [Rules for naming Amazon S3 buckets](https://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html#bucketnamingrules) in the *Amazon S3 User Guide* .
    * 
    * > If you specify a name, you can't perform updates that require replacement of this resource. You can perform updates that require no or some interruption. If you need to replace the resource, specify a new name.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-bucketname
    */
-  readonly bucketName: string;
+  readonly bucketName?: string;
 
   /**
    * Describes the cross-origin access configuration for objects in an Amazon S3 bucket.
    * 
    * For more information, see [Enabling Cross-Origin Resource Sharing](https://docs.aws.amazon.com/AmazonS3/latest/dev/cors.html) in the *Amazon S3 User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-corsconfiguration
    */
-  readonly corsConfiguration: CorsConfiguration;
+  readonly corsConfiguration?: CorsConfigurationProperty;
 
   /**
    * Defines how Amazon S3 handles Intelligent-Tiering storage.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-intelligenttieringconfigurations
    */
-  readonly intelligentTieringConfigurations: Array<IntelligentTieringConfiguration>;
+  readonly intelligentTieringConfigurations?: Array<IntelligentTieringConfigurationProperty>;
 
   /**
    * Specifies the inventory configuration for an Amazon S3 bucket.
    * 
    * For more information, see [GET Bucket inventory](https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETInventoryConfig.html) in the *Amazon S3 API Reference* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-inventoryconfigurations
    */
-  readonly inventoryConfigurations: Array<InventoryConfiguration>;
+  readonly inventoryConfigurations?: Array<InventoryConfigurationProperty>;
 
   /**
    * Specifies the lifecycle configuration for objects in an Amazon S3 bucket.
    * 
    * For more information, see [Object Lifecycle Management](https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lifecycle-mgmt.html) in the *Amazon S3 User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-lifecycleconfiguration
    */
-  readonly lifecycleConfiguration: LifecycleConfiguration;
+  readonly lifecycleConfiguration?: LifecycleConfigurationProperty;
 
   /**
    * Settings that define where logs are stored.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-loggingconfiguration
    */
-  readonly loggingConfiguration: LoggingConfiguration;
+  readonly loggingConfiguration?: LoggingConfigurationProperty;
 
   /**
    * Specifies a metrics configuration for the CloudWatch request metrics (specified by the metrics configuration ID) from an Amazon S3 bucket.
    * 
    * If you're updating an existing metrics configuration, note that this is a full replacement of the existing metrics configuration. If you don't include the elements you want to keep, they are erased. For more information, see [PutBucketMetricsConfiguration](https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTMetricConfiguration.html) .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-metricsconfigurations
    */
-  readonly metricsConfigurations: Array<MetricsConfiguration>;
+  readonly metricsConfigurations?: Array<MetricsConfigurationProperty>;
 
   /**
    * Configuration that defines how Amazon S3 handles bucket notifications.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-notificationconfiguration
    */
-  readonly notificationConfiguration: NotificationConfiguration;
+  readonly notificationConfiguration?: NotificationConfigurationProperty;
 
   /**
    * Places an Object Lock configuration on the specified bucket.
@@ -1183,25 +1379,33 @@ export interface CfnBucketProps {
    * > - The \`DefaultRetention\` settings require both a mode and a period.
    * > - The \`DefaultRetention\` period can be either \`Days\` or \`Years\` but you must select one. You cannot specify \`Days\` and \`Years\` at the same time.
    * > - You can only enable Object Lock for new buckets. If you want to turn on Object Lock for an existing bucket, contact AWS Support.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-objectlockconfiguration
    */
-  readonly objectLockConfiguration: ObjectLockConfiguration;
+  readonly objectLockConfiguration?: ObjectLockConfigurationProperty;
 
   /**
    * Indicates whether this bucket has an Object Lock configuration enabled.
    * 
    * Enable \`ObjectLockEnabled\` when you apply \`ObjectLockConfiguration\` to a bucket.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-objectlockenabled
    */
-  readonly objectLockEnabled: boolean;
+  readonly objectLockEnabled?: boolean;
 
   /**
    * Configuration that defines how Amazon S3 handles Object Ownership rules.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-ownershipcontrols
    */
-  readonly ownershipControls: OwnershipControls;
+  readonly ownershipControls?: OwnershipControlsProperty;
 
   /**
    * Configuration that defines how Amazon S3 handles public access.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-publicaccessblockconfiguration
    */
-  readonly publicAccessBlockConfiguration: PublicAccessBlockConfiguration;
+  readonly publicAccessBlockConfiguration?: PublicAccessBlockConfigurationProperty;
 
   /**
    * Configuration for replicating objects in an S3 bucket.
@@ -1209,27 +1413,35 @@ export interface CfnBucketProps {
    * To enable replication, you must also enable versioning by using the \`VersioningConfiguration\` property.
    * 
    * Amazon S3 can store replicated objects in a single destination bucket or multiple destination buckets. The destination bucket or buckets must already exist.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-replicationconfiguration
    */
-  readonly replicationConfiguration: ReplicationConfiguration;
+  readonly replicationConfiguration?: ReplicationConfigurationProperty;
 
   /**
    * An arbitrary set of tags (key-value pairs) for this S3 bucket.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-tags
    */
-  readonly tags: Array<Tag>;
+  readonly tags?: Array<TagProperty>;
 
   /**
    * Enables multiple versions of all objects in this bucket.
    * 
    * You might enable versioning to prevent objects from being deleted or overwritten by mistake or to archive objects so that you can retrieve previous versions of them.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-versioningconfiguration
    */
-  readonly versioningConfiguration: VersioningConfiguration;
+  readonly versioningConfiguration?: VersioningConfigurationProperty;
 
   /**
    * Information used to configure the bucket as a static website.
    * 
    * For more information, see [Hosting Websites on Amazon S3](https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteHosting.html) .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-websiteconfiguration
    */
-  readonly websiteConfiguration: WebsiteConfiguration;
+  readonly websiteConfiguration?: WebsiteConfigurationProperty;
 }
 
 
@@ -1239,10 +1451,13 @@ export interface CfnBucketProps {
  * For more information, see [Amazon S3 Transfer Acceleration](https://docs.aws.amazon.com/AmazonS3/latest/dev/transfer-acceleration.html) in the *Amazon S3 User Guide* .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-accelerateconfiguration.html
  */
-export interface AccelerateConfiguration {
+export interface AccelerateConfigurationProperty {
   /**
    * Specifies the transfer acceleration status of the bucket.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-accelerateconfiguration.html#cfn-s3-bucket-accelerateconfiguration-accelerationstatus
    */
   readonly accelerationStatus: string;
 }
@@ -1267,48 +1482,60 @@ function cfnBucketAccessControlPropertyToCloudFormation(properties: any): any {
 /**
  * Specifies the configuration and any analyses for the analytics filter of an Amazon S3 bucket.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-analyticsconfiguration.html
  */
-export interface AnalyticsConfiguration {
+export interface AnalyticsConfigurationProperty {
   /**
    * The tags to use when evaluating an analytics filter.
    * 
    * The analytics only includes objects that meet the filter's criteria. If no filter is specified, all of the contents of the bucket are included in the analysis.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-analyticsconfiguration.html#cfn-s3-bucket-analyticsconfiguration-tagfilters
    */
-  readonly tagFilters: Array<TagFilter>;
+  readonly tagFilters?: Array<TagFilterProperty>;
 
   /**
    * Contains data related to access patterns to be collected and made available to analyze the tradeoffs between different storage classes.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-analyticsconfiguration.html#cfn-s3-bucket-analyticsconfiguration-storageclassanalysis
    */
-  readonly storageClassAnalysis: StorageClassAnalysis;
+  readonly storageClassAnalysis: StorageClassAnalysisProperty;
 
   /**
    * The ID that identifies the analytics configuration.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-analyticsconfiguration.html#cfn-s3-bucket-analyticsconfiguration-id
    */
   readonly id: string;
 
   /**
    * The prefix that an object must have to be included in the analytics results.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-analyticsconfiguration.html#cfn-s3-bucket-analyticsconfiguration-prefix
    */
-  readonly prefix: string;
+  readonly prefix?: string;
 }
 
 
 /**
  * Specifies tags to use to identify a subset of objects for an Amazon S3 bucket.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tagfilter.html
  */
-export interface TagFilter {
+export interface TagFilterProperty {
   /**
    * The tag value.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tagfilter.html#cfn-s3-bucket-tagfilter-value
    */
   readonly value: string;
 
   /**
    * The tag key.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tagfilter.html#cfn-s3-bucket-tagfilter-key
    */
   readonly key: string;
 }
@@ -1317,33 +1544,39 @@ export interface TagFilter {
 /**
  * Specifies data related to access patterns to be collected and made available to analyze the tradeoffs between different storage classes for an Amazon S3 bucket.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-storageclassanalysis.html
  */
-export interface StorageClassAnalysis {
+export interface StorageClassAnalysisProperty {
   /**
    * Specifies how data related to the storage class analysis for an Amazon S3 bucket should be exported.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-storageclassanalysis.html#cfn-s3-bucket-storageclassanalysis-dataexport
    */
-  readonly dataExport: DataExport;
+  readonly dataExport?: DataExportProperty;
 }
 
 
 /**
  * Specifies how data related to the storage class analysis for an Amazon S3 bucket should be exported.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-dataexport.html
  */
-export interface DataExport {
+export interface DataExportProperty {
   /**
    * The place to store the data for an analysis.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-dataexport.html#cfn-s3-bucket-dataexport-destination
    */
-  readonly destination: Destination;
+  readonly destination: DestinationProperty;
 
   /**
    * The version of the output schema to use when exporting data.
    * 
    * Must be \`V_1\` .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-dataexport.html#cfn-s3-bucket-dataexport-outputschemaversion
    */
   readonly outputSchemaVersion: string;
 }
@@ -1352,12 +1585,14 @@ export interface DataExport {
 /**
  * Specifies information about where to publish analysis or configuration results for an Amazon S3 bucket.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-destination.html
  */
-export interface Destination {
+export interface DestinationProperty {
   /**
    * The Amazon Resource Name (ARN) of the bucket to which data is exported.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-destination.html#cfn-s3-bucket-destination-bucketarn
    */
   readonly bucketArn: string;
 
@@ -1367,13 +1602,17 @@ export interface Destination {
    * If no account ID is provided, the owner is not validated before exporting data.
    * 
    * > Although this value is optional, we strongly recommend that you set it to help prevent problems if the destination bucket ownership changes.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-destination.html#cfn-s3-bucket-destination-bucketaccountid
    */
-  readonly bucketAccountId: string;
+  readonly bucketAccountId?: string;
 
   /**
    * Specifies the file format used when exporting data to Amazon S3.
    * 
    * *Allowed values* : \`CSV\` | \`ORC\` | \`Parquet\`
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-destination.html#cfn-s3-bucket-destination-format
    */
   readonly format: string;
 
@@ -1381,8 +1620,10 @@ export interface Destination {
    * The prefix to use when exporting data.
    * 
    * The prefix is prepended to all results.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-destination.html#cfn-s3-bucket-destination-prefix
    */
-  readonly prefix: string;
+  readonly prefix?: string;
 }
 
 
@@ -1400,37 +1641,44 @@ function cfnBucketAnalyticsConfigurationsPropertyToCloudFormation(properties: an
  * For information about the Amazon S3 default encryption feature, see [Amazon S3 Default Encryption for S3 Buckets](https://docs.aws.amazon.com/AmazonS3/latest/dev/bucket-encryption.html) in the *Amazon S3 User Guide* .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucketencryption.html
  */
-export interface BucketEncryption {
+export interface BucketEncryptionProperty {
   /**
    * Specifies the default server-side-encryption configuration.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucketencryption.html#cfn-s3-bucket-bucketencryption-serversideencryptionconfiguration
    */
-  readonly serverSideEncryptionConfiguration: Array<ServerSideEncryptionRule>;
+  readonly serverSideEncryptionConfiguration: Array<ServerSideEncryptionRuleProperty>;
 }
 
 
 /**
  * Specifies the default server-side encryption configuration.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-serversideencryptionrule.html
  */
-export interface ServerSideEncryptionRule {
+export interface ServerSideEncryptionRuleProperty {
   /**
    * Specifies whether Amazon S3 should use an S3 Bucket Key with server-side encryption using KMS (SSE-KMS) for new objects in the bucket.
    * 
    * Existing objects are not affected. Setting the \`BucketKeyEnabled\` element to \`true\` causes Amazon S3 to use an S3 Bucket Key. By default, S3 Bucket Key is not enabled.
    * 
    * For more information, see [Amazon S3 Bucket Keys](https://docs.aws.amazon.com/AmazonS3/latest/dev/bucket-key.html) in the *Amazon S3 User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-serversideencryptionrule.html#cfn-s3-bucket-serversideencryptionrule-bucketkeyenabled
    */
-  readonly bucketKeyEnabled: boolean;
+  readonly bucketKeyEnabled?: boolean;
 
   /**
    * Specifies the default server-side encryption to apply to new objects in the bucket.
    * 
    * If a PUT Object request doesn't specify any server-side encryption, this default encryption will be applied.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-serversideencryptionrule.html#cfn-s3-bucket-serversideencryptionrule-serversideencryptionbydefault
    */
-  readonly serverSideEncryptionByDefault: ServerSideEncryptionByDefault;
+  readonly serverSideEncryptionByDefault?: ServerSideEncryptionByDefaultProperty;
 }
 
 
@@ -1440,8 +1688,9 @@ export interface ServerSideEncryptionRule {
  * If a PUT Object request doesn't specify any server-side encryption, this default encryption will be applied. If you don't specify a customer managed key at configuration, Amazon S3 automatically creates an AWS KMS key in your AWS account the first time that you add an object encrypted with SSE-KMS to a bucket. By default, Amazon S3 uses this KMS key for SSE-KMS. For more information, see [PUT Bucket encryption](https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTencryption.html) in the *Amazon S3 API Reference* .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-serversideencryptionbydefault.html
  */
-export interface ServerSideEncryptionByDefault {
+export interface ServerSideEncryptionByDefaultProperty {
   /**
    * KMS key ID to use for the default encryption. This parameter is allowed if SSEAlgorithm is aws:kms.
    * 
@@ -1453,13 +1702,17 @@ export interface ServerSideEncryptionByDefault {
    * - Key ARN: \`arn:aws:kms:us-east-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab\`
    * 
    * > Amazon S3 only supports symmetric KMS keys and not asymmetric KMS keys. For more information, see [Using Symmetric and Asymmetric Keys](https://docs.aws.amazon.com//kms/latest/developerguide/symmetric-asymmetric.html) in the *AWS Key Management Service Developer Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-serversideencryptionbydefault.html#cfn-s3-bucket-serversideencryptionbydefault-kmsmasterkeyid
    */
-  readonly kMSMasterKeyID: string;
+  readonly kmsMasterKeyId?: string;
 
   /**
    * Server-side encryption algorithm to use for the default encryption.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-serversideencryptionbydefault.html#cfn-s3-bucket-serversideencryptionbydefault-ssealgorithm
    */
-  readonly sSEAlgorithm: string;
+  readonly sseAlgorithm: string;
 }
 
 
@@ -1485,59 +1738,74 @@ function cfnBucketBucketNamePropertyToCloudFormation(properties: any): any {
  * For more information, see [Enabling Cross-Origin Resource Sharing](https://docs.aws.amazon.com/AmazonS3/latest/dev/cors.html) in the *Amazon S3 User Guide* .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-corsconfiguration.html
  */
-export interface CorsConfiguration {
+export interface CorsConfigurationProperty {
   /**
    * A set of origins and methods (cross-origin access that you want to allow).
    * 
    * You can add up to 100 rules to the configuration.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-corsconfiguration.html#cfn-s3-bucket-corsconfiguration-corsrules
    */
-  readonly corsRules: Array<CorsRule>;
+  readonly corsRules: Array<CorsRuleProperty>;
 }
 
 
 /**
  * Specifies a cross-origin access rule for an Amazon S3 bucket.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-corsrule.html
  */
-export interface CorsRule {
+export interface CorsRuleProperty {
   /**
    * Headers that are specified in the \`Access-Control-Request-Headers\` header.
    * 
    * These headers are allowed in a preflight OPTIONS request. In response to any preflight OPTIONS request, Amazon S3 returns any requested headers that are allowed.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-corsrule.html#cfn-s3-bucket-corsrule-allowedheaders
    */
-  readonly allowedHeaders: Array<string>;
+  readonly allowedHeaders?: Array<string>;
 
   /**
    * An HTTP method that you allow the origin to run.
    * 
    * *Allowed values* : \`GET\` | \`PUT\` | \`HEAD\` | \`POST\` | \`DELETE\`
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-corsrule.html#cfn-s3-bucket-corsrule-allowedmethods
    */
   readonly allowedMethods: Array<string>;
 
   /**
    * One or more origins you want customers to be able to access the bucket from.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-corsrule.html#cfn-s3-bucket-corsrule-allowedorigins
    */
   readonly allowedOrigins: Array<string>;
 
   /**
    * One or more headers in the response that you want customers to be able to access from their applications (for example, from a JavaScript \`XMLHttpRequest\` object).
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-corsrule.html#cfn-s3-bucket-corsrule-exposedheaders
    */
-  readonly exposedHeaders: Array<string>;
+  readonly exposedHeaders?: Array<string>;
 
   /**
    * A unique identifier for this rule.
    * 
    * The value must be no more than 255 characters.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-corsrule.html#cfn-s3-bucket-corsrule-id
    */
-  readonly id: string;
+  readonly id?: string;
 
   /**
    * The time in seconds that your browser is to cache the preflight response for the specified resource.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-corsrule.html#cfn-s3-bucket-corsrule-maxage
    */
-  readonly maxAge: number;
+  readonly maxAge?: number;
 }
 
 
@@ -1555,27 +1823,36 @@ function cfnBucketCorsConfigurationPropertyToCloudFormation(properties: any): an
  * For information about the S3 Intelligent-Tiering storage class, see [Storage class for automatically optimizing frequently and infrequently accessed objects](https://docs.aws.amazon.com/AmazonS3/latest/dev/storage-class-intro.html#sc-dynamic-data-access) .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-intelligenttieringconfiguration.html
  */
-export interface IntelligentTieringConfiguration {
+export interface IntelligentTieringConfigurationProperty {
   /**
    * The ID used to identify the S3 Intelligent-Tiering configuration.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-intelligenttieringconfiguration.html#cfn-s3-bucket-intelligenttieringconfiguration-id
    */
   readonly id: string;
 
   /**
    * An object key name prefix that identifies the subset of objects to which the rule applies.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-intelligenttieringconfiguration.html#cfn-s3-bucket-intelligenttieringconfiguration-prefix
    */
-  readonly prefix: string;
+  readonly prefix?: string;
 
   /**
    * Specifies the status of the configuration.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-intelligenttieringconfiguration.html#cfn-s3-bucket-intelligenttieringconfiguration-status
    */
   readonly status: string;
 
   /**
    * A container for a key-value pair.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-intelligenttieringconfiguration.html#cfn-s3-bucket-intelligenttieringconfiguration-tagfilters
    */
-  readonly tagFilters: Array<TagFilter>;
+  readonly tagFilters?: Array<TagFilterProperty>;
 
   /**
    * Specifies a list of S3 Intelligent-Tiering storage class tiers in the configuration.
@@ -1583,22 +1860,26 @@ export interface IntelligentTieringConfiguration {
    * At least one tier must be defined in the list. At most, you can specify two tiers in the list, one for each available AccessTier: \`ARCHIVE_ACCESS\` and \`DEEP_ARCHIVE_ACCESS\` .
    * 
    * > You only need Intelligent Tiering Configuration enabled on a bucket if you want to automatically move objects stored in the Intelligent-Tiering storage class to Archive Access or Deep Archive Access tiers.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-intelligenttieringconfiguration.html#cfn-s3-bucket-intelligenttieringconfiguration-tierings
    */
-  readonly tierings: Array<Tiering>;
+  readonly tierings: Array<TieringProperty>;
 }
 
 
 /**
  * The S3 Intelligent-Tiering storage class is designed to optimize storage costs by automatically moving data to the most cost-effective storage access tier, without additional operational overhead.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tiering.html
  */
-export interface Tiering {
+export interface TieringProperty {
   /**
    * S3 Intelligent-Tiering access tier.
    * 
    * See [Storage class for automatically optimizing frequently and infrequently accessed objects](https://docs.aws.amazon.com/AmazonS3/latest/dev/storage-class-intro.html#sc-dynamic-data-access) for a list of access tiers in the S3 Intelligent-Tiering storage class.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tiering.html#cfn-s3-bucket-tiering-accesstier
    */
   readonly accessTier: string;
 
@@ -1606,6 +1887,8 @@ export interface Tiering {
    * The number of consecutive days of no access after which an object will be eligible to be transitioned to the corresponding tier.
    * 
    * The minimum number of days specified for Archive Access tier must be at least 90 days and Deep Archive Access tier must be at least 180 days. The maximum can be up to 2 years (730 days).
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tiering.html#cfn-s3-bucket-tiering-days
    */
   readonly days: number;
 }
@@ -1625,22 +1908,29 @@ function cfnBucketIntelligentTieringConfigurationsPropertyToCloudFormation(prope
  * For more information, see [GET Bucket inventory](https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETInventoryConfig.html) in the *Amazon S3 API Reference* .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-inventoryconfiguration.html
  */
-export interface InventoryConfiguration {
+export interface InventoryConfigurationProperty {
   /**
    * Contains information about where to publish the inventory results.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-inventoryconfiguration.html#cfn-s3-bucket-inventoryconfiguration-destination
    */
-  readonly destination: Destination;
+  readonly destination: DestinationProperty;
 
   /**
    * Specifies whether the inventory is enabled or disabled.
    * 
    * If set to \`True\` , an inventory list is generated. If set to \`False\` , no inventory list is generated.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-inventoryconfiguration.html#cfn-s3-bucket-inventoryconfiguration-enabled
    */
   readonly enabled: boolean;
 
   /**
    * The ID used to identify the inventory configuration.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-inventoryconfiguration.html#cfn-s3-bucket-inventoryconfiguration-id
    */
   readonly id: string;
 
@@ -1648,6 +1938,8 @@ export interface InventoryConfiguration {
    * Object versions to include in the inventory list.
    * 
    * If set to \`All\` , the list includes all the object versions, which adds the version-related fields \`VersionId\` , \`IsLatest\` , and \`DeleteMarker\` to the list. If set to \`Current\` , the list does not contain these version-related fields.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-inventoryconfiguration.html#cfn-s3-bucket-inventoryconfiguration-includedobjectversions
    */
   readonly includedObjectVersions: string;
 
@@ -1655,18 +1947,24 @@ export interface InventoryConfiguration {
    * Contains the optional fields that are included in the inventory results.
    * 
    * *Valid values* : \`Size | LastModifiedDate | StorageClass | ETag | IsMultipartUploaded | ReplicationStatus | EncryptionStatus | ObjectLockRetainUntilDate | ObjectLockMode | ObjectLockLegalHoldStatus | IntelligentTieringAccessTier | BucketKeyStatus\`
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-inventoryconfiguration.html#cfn-s3-bucket-inventoryconfiguration-optionalfields
    */
-  readonly optionalFields: Array<string>;
+  readonly optionalFields?: Array<string>;
 
   /**
    * Specifies the inventory filter prefix.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-inventoryconfiguration.html#cfn-s3-bucket-inventoryconfiguration-prefix
    */
-  readonly prefix: string;
+  readonly prefix?: string;
 
   /**
    * Specifies the schedule for generating inventory results.
    * 
    * *Allowed values* : \`Daily\` | \`Weekly\`
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-inventoryconfiguration.html#cfn-s3-bucket-inventoryconfiguration-schedulefrequency
    */
   readonly scheduleFrequency: string;
 }
@@ -1686,12 +1984,15 @@ function cfnBucketInventoryConfigurationsPropertyToCloudFormation(properties: an
  * For more information, see [Object Lifecycle Management](https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lifecycle-mgmt.html) in the *Amazon S3 User Guide* .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-lifecycleconfiguration.html
  */
-export interface LifecycleConfiguration {
+export interface LifecycleConfigurationProperty {
   /**
    * A lifecycle rule for individual objects in an Amazon S3 bucket.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-lifecycleconfiguration.html#cfn-s3-bucket-lifecycleconfiguration-rules
    */
-  readonly rules: Array<Rule>;
+  readonly rules: Array<RuleProperty>;
 }
 
 
@@ -1703,109 +2004,142 @@ export interface LifecycleConfiguration {
  * You must specify at least one of the following properties: \`AbortIncompleteMultipartUpload\` , \`ExpirationDate\` , \`ExpirationInDays\` , \`NoncurrentVersionExpirationInDays\` , \`NoncurrentVersionTransition\` , \`NoncurrentVersionTransitions\` , \`Transition\` , or \`Transitions\` .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html
  */
-export interface Rule {
+export interface RuleProperty {
   /**
    * Specifies a lifecycle rule that stops incomplete multipart uploads to an Amazon S3 bucket.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html#cfn-s3-bucket-rule-abortincompletemultipartupload
    */
-  readonly abortIncompleteMultipartUpload: AbortIncompleteMultipartUpload;
+  readonly abortIncompleteMultipartUpload?: AbortIncompleteMultipartUploadProperty;
 
   /**
    * Indicates when objects are deleted from Amazon S3 and Amazon S3 Glacier.
    * 
    * The date value must be in ISO 8601 format. The time is always midnight UTC. If you specify an expiration and transition time, you must use the same time unit for both properties (either in days or by date). The expiration time must also be later than the transition time.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html#cfn-s3-bucket-rule-expirationdate
    */
-  readonly expirationDate: string;
+  readonly expirationDate?: string;
 
   /**
    * Indicates the number of days after creation when objects are deleted from Amazon S3 and Amazon S3 Glacier.
    * 
    * If you specify an expiration and transition time, you must use the same time unit for both properties (either in days or by date). The expiration time must also be later than the transition time.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html#cfn-s3-bucket-rule-expirationindays
    */
-  readonly expirationInDays: number;
+  readonly expirationInDays?: number;
 
   /**
    * Indicates whether Amazon S3 will remove a delete marker without any noncurrent versions.
    * 
    * If set to true, the delete marker will be removed if there are no noncurrent versions. This cannot be specified with \`ExpirationInDays\` , \`ExpirationDate\` , or \`TagFilters\` .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html#cfn-s3-bucket-rule-expiredobjectdeletemarker
    */
-  readonly expiredObjectDeleteMarker: boolean;
+  readonly expiredObjectDeleteMarker?: boolean;
 
   /**
    * Unique identifier for the rule.
    * 
    * The value can't be longer than 255 characters.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html#cfn-s3-bucket-rule-id
    */
-  readonly id: string;
+  readonly id?: string;
 
   /**
    * (Deprecated.) For buckets with versioning enabled (or suspended), specifies the time, in days, between when a new version of the object is uploaded to the bucket and when old versions of the object expire. When object versions expire, Amazon S3 permanently deletes them. If you specify a transition and expiration time, the expiration time must be later than the transition time.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html#cfn-s3-bucket-rule-noncurrentversionexpirationindays
    */
-  readonly noncurrentVersionExpirationInDays: number;
+  readonly noncurrentVersionExpirationInDays?: number;
 
   /**
    * Specifies when noncurrent object versions expire.
    * 
    * Upon expiration, Amazon S3 permanently deletes the noncurrent object versions. You set this lifecycle configuration action on a bucket that has versioning enabled (or suspended) to request that Amazon S3 delete noncurrent object versions at a specific period in the object's lifetime.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html#cfn-s3-bucket-rule-noncurrentversionexpiration
    */
-  readonly noncurrentVersionExpiration: NoncurrentVersionExpiration;
+  readonly noncurrentVersionExpiration?: NoncurrentVersionExpirationProperty;
 
   /**
    * (Deprecated.) For buckets with versioning enabled (or suspended), specifies when non-current objects transition to a specified storage class. If you specify a transition and expiration time, the expiration time must be later than the transition time. If you specify this property, don't specify the \`NoncurrentVersionTransitions\` property.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html#cfn-s3-bucket-rule-noncurrentversiontransition
    */
-  readonly noncurrentVersionTransition: NoncurrentVersionTransition;
+  readonly noncurrentVersionTransition?: NoncurrentVersionTransitionProperty;
 
   /**
    * For buckets with versioning enabled (or suspended), one or more transition rules that specify when non-current objects transition to a specified storage class.
    * 
    * If you specify a transition and expiration time, the expiration time must be later than the transition time. If you specify this property, don't specify the \`NoncurrentVersionTransition\` property.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html#cfn-s3-bucket-rule-noncurrentversiontransitions
    */
-  readonly noncurrentVersionTransitions: Array<NoncurrentVersionTransition>;
+  readonly noncurrentVersionTransitions?: Array<NoncurrentVersionTransitionProperty>;
 
   /**
    * Object key prefix that identifies one or more objects to which this rule applies.
    * 
    * > Replacement must be made for object keys containing special characters (such as carriage returns) when using XML requests. For more information, see [XML related object key constraints](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints) .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html#cfn-s3-bucket-rule-prefix
    */
-  readonly prefix: string;
+  readonly prefix?: string;
 
   /**
    * If \`Enabled\` , the rule is currently being applied.
    * 
    * If \`Disabled\` , the rule is not currently being applied.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html#cfn-s3-bucket-rule-status
    */
   readonly status: string;
 
   /**
    * Tags to use to identify a subset of objects to which the lifecycle rule applies.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html#cfn-s3-bucket-rule-tagfilters
    */
-  readonly tagFilters: Array<TagFilter>;
+  readonly tagFilters?: Array<TagFilterProperty>;
 
   /**
    * Specifies the minimum object size in bytes for this rule to apply to.
    * 
    * Objects must be larger than this value in bytes. For more information about size based rules, see [Lifecycle configuration using size-based rules](https://docs.aws.amazon.com/AmazonS3/latest/userguide/lifecycle-configuration-examples.html#lc-size-rules) in the *Amazon S3 User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html#cfn-s3-bucket-rule-objectsizegreaterthan
    */
-  readonly objectSizeGreaterThan: string;
+  readonly objectSizeGreaterThan?: string;
 
   /**
    * Specifies the maximum object size in bytes for this rule to apply to.
    * 
    * Objects must be smaller than this value in bytes. For more information about sized based rules, see [Lifecycle configuration using size-based rules](https://docs.aws.amazon.com/AmazonS3/latest/userguide/lifecycle-configuration-examples.html#lc-size-rules) in the *Amazon S3 User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html#cfn-s3-bucket-rule-objectsizelessthan
    */
-  readonly objectSizeLessThan: string;
+  readonly objectSizeLessThan?: string;
 
   /**
    * (Deprecated.) Specifies when an object transitions to a specified storage class. If you specify an expiration and transition time, you must use the same time unit for both properties (either in days or by date). The expiration time must also be later than the transition time. If you specify this property, don't specify the \`Transitions\` property.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html#cfn-s3-bucket-rule-transition
    */
-  readonly transition: Transition;
+  readonly transition?: TransitionProperty;
 
   /**
    * One or more transition rules that specify when an object transitions to a specified storage class.
    * 
    * If you specify an expiration and transition time, you must use the same time unit for both properties (either in days or by date). The expiration time must also be later than the transition time. If you specify this property, don't specify the \`Transition\` property.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html#cfn-s3-bucket-rule-transitions
    */
-  readonly transitions: Array<Transition>;
+  readonly transitions?: Array<TransitionProperty>;
 }
 
 
@@ -1815,10 +2149,13 @@ export interface Rule {
  * For more information, see [Stopping Incomplete Multipart Uploads Using a Bucket Lifecycle Policy](https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html#mpu-abort-incomplete-mpu-lifecycle-config) in the *Amazon S3 User Guide* .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-abortincompletemultipartupload.html
  */
-export interface AbortIncompleteMultipartUpload {
+export interface AbortIncompleteMultipartUploadProperty {
   /**
    * Specifies the number of days after which Amazon S3 stops an incomplete multipart upload.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-abortincompletemultipartupload.html#cfn-s3-bucket-abortincompletemultipartupload-daysafterinitiation
    */
   readonly daysAfterInitiation: number;
 }
@@ -1830,12 +2167,15 @@ export interface AbortIncompleteMultipartUpload {
  * Upon expiration, Amazon S3 permanently deletes the noncurrent object versions. You set this lifecycle configuration action on a bucket that has versioning enabled (or suspended) to request that Amazon S3 delete noncurrent object versions at a specific period in the object's lifetime.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-noncurrentversionexpiration.html
  */
-export interface NoncurrentVersionExpiration {
+export interface NoncurrentVersionExpirationProperty {
   /**
    * Specifies the number of days an object is noncurrent before Amazon S3 can perform the associated action.
    * 
    * For information about the noncurrent days calculations, see [How Amazon S3 Calculates When an Object Became Noncurrent](https://docs.aws.amazon.com/AmazonS3/latest/dev/intro-lifecycle-rules.html#non-current-days-calculations) in the *Amazon S3 User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-noncurrentversionexpiration.html#cfn-s3-bucket-noncurrentversionexpiration-noncurrentdays
    */
   readonly noncurrentDays: number;
 
@@ -1843,8 +2183,10 @@ export interface NoncurrentVersionExpiration {
    * Specifies how many noncurrent versions Amazon S3 will retain.
    * 
    * If there are this many more recent noncurrent versions, Amazon S3 will take the associated action. For more information about noncurrent versions, see [Lifecycle configuration elements](https://docs.aws.amazon.com/AmazonS3/latest/userguide/intro-lifecycle-rules.html) in the *Amazon S3 User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-noncurrentversionexpiration.html#cfn-s3-bucket-noncurrentversionexpiration-newernoncurrentversions
    */
-  readonly newerNoncurrentVersions: number;
+  readonly newerNoncurrentVersions?: number;
 }
 
 
@@ -1854,10 +2196,13 @@ export interface NoncurrentVersionExpiration {
  * If your bucket is versioning-enabled (or versioning is suspended), you can set this action to request that Amazon S3 transition noncurrent object versions to the \`STANDARD_IA\` , \`ONEZONE_IA\` , \`INTELLIGENT_TIERING\` , \`GLACIER_IR\` , \`GLACIER\` , or \`DEEP_ARCHIVE\` storage class at a specific period in the object's lifetime. If you specify this property, don't specify the \`NoncurrentVersionTransitions\` property.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-noncurrentversiontransition.html
  */
-export interface NoncurrentVersionTransition {
+export interface NoncurrentVersionTransitionProperty {
   /**
    * The class of storage used to store the object.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-noncurrentversiontransition.html#cfn-s3-bucket-noncurrentversiontransition-storageclass
    */
   readonly storageClass: string;
 
@@ -1865,6 +2210,8 @@ export interface NoncurrentVersionTransition {
    * Specifies the number of days an object is noncurrent before Amazon S3 can perform the associated action.
    * 
    * For information about the noncurrent days calculations, see [How Amazon S3 Calculates How Long an Object Has Been Noncurrent](https://docs.aws.amazon.com/AmazonS3/latest/dev/intro-lifecycle-rules.html#non-current-days-calculations) in the *Amazon S3 User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-noncurrentversiontransition.html#cfn-s3-bucket-noncurrentversiontransition-transitionindays
    */
   readonly transitionInDays: number;
 
@@ -1872,8 +2219,10 @@ export interface NoncurrentVersionTransition {
    * Specifies how many noncurrent versions Amazon S3 will retain.
    * 
    * If there are this many more recent noncurrent versions, Amazon S3 will take the associated action. For more information about noncurrent versions, see [Lifecycle configuration elements](https://docs.aws.amazon.com/AmazonS3/latest/userguide/intro-lifecycle-rules.html) in the *Amazon S3 User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-noncurrentversiontransition.html#cfn-s3-bucket-noncurrentversiontransition-newernoncurrentversions
    */
-  readonly newerNoncurrentVersions: number;
+  readonly newerNoncurrentVersions?: number;
 }
 
 
@@ -1883,10 +2232,13 @@ export interface NoncurrentVersionTransition {
  * For more information about Amazon S3 lifecycle configuration rules, see [Transitioning Objects Using Amazon S3 Lifecycle](https://docs.aws.amazon.com/AmazonS3/latest/dev/lifecycle-transition-general-considerations.html) in the *Amazon S3 User Guide* .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-transition.html
  */
-export interface Transition {
+export interface TransitionProperty {
   /**
    * The storage class to which you want the object to transition.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-transition.html#cfn-s3-bucket-transition-storageclass
    */
   readonly storageClass: string;
 
@@ -1894,15 +2246,19 @@ export interface Transition {
    * Indicates when objects are transitioned to the specified storage class.
    * 
    * The date value must be in ISO 8601 format. The time is always midnight UTC.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-transition.html#cfn-s3-bucket-transition-transitiondate
    */
-  readonly transitionDate: string;
+  readonly transitionDate?: string;
 
   /**
    * Indicates the number of days after creation when objects are transitioned to the specified storage class.
    * 
    * The value must be a positive integer.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-transition.html#cfn-s3-bucket-transition-transitionindays
    */
-  readonly transitionInDays: number;
+  readonly transitionInDays?: number;
 }
 
 
@@ -1922,21 +2278,26 @@ function cfnBucketLifecycleConfigurationPropertyToCloudFormation(properties: any
  * > To successfully complete the \`AWS::S3::Bucket LoggingConfiguration\` request, you must have \`s3:PutObject\` and \`s3:PutObjectAcl\` in your IAM permissions.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-loggingconfiguration.html
  */
-export interface LoggingConfiguration {
+export interface LoggingConfigurationProperty {
   /**
    * The name of the bucket where Amazon S3 should store server access log files.
    * 
    * You can store log files in any bucket that you own. By default, logs are stored in the bucket where the \`LoggingConfiguration\` property is defined.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-loggingconfiguration.html#cfn-s3-bucket-loggingconfiguration-destinationbucketname
    */
-  readonly destinationBucketName: string;
+  readonly destinationBucketName?: string;
 
   /**
    * A prefix for all log object keys.
    * 
    * If you store log files from multiple Amazon S3 buckets in a single bucket, you can use a prefix to distinguish which log files came from which bucket.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-loggingconfiguration.html#cfn-s3-bucket-loggingconfiguration-logfileprefix
    */
-  readonly logFilePrefix: string;
+  readonly logFilePrefix?: string;
 }
 
 
@@ -1954,33 +2315,42 @@ function cfnBucketLoggingConfigurationPropertyToCloudFormation(properties: any):
  * If you're updating an existing metrics configuration, note that this is a full replacement of the existing metrics configuration. If you don't include the elements you want to keep, they are erased. For examples, see [AWS::S3::Bucket](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket.html#aws-properties-s3-bucket--examples) . For more information, see [PUT Bucket metrics](https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTMetricConfiguration.html) in the *Amazon S3 API Reference* .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-metricsconfiguration.html
  */
-export interface MetricsConfiguration {
+export interface MetricsConfigurationProperty {
   /**
    * The access point that was used while performing operations on the object.
    * 
    * The metrics configuration only includes objects that meet the filter's criteria.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-metricsconfiguration.html#cfn-s3-bucket-metricsconfiguration-accesspointarn
    */
-  readonly accessPointArn: string;
+  readonly accessPointArn?: string;
 
   /**
    * The ID used to identify the metrics configuration.
    * 
    * This can be any value you choose that helps you identify your metrics configuration.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-metricsconfiguration.html#cfn-s3-bucket-metricsconfiguration-id
    */
   readonly id: string;
 
   /**
    * The prefix that an object must have to be included in the metrics results.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-metricsconfiguration.html#cfn-s3-bucket-metricsconfiguration-prefix
    */
-  readonly prefix: string;
+  readonly prefix?: string;
 
   /**
    * Specifies a list of tag filters to use as a metrics configuration filter.
    * 
    * The metrics configuration includes only objects that meet the filter's criteria.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-metricsconfiguration.html#cfn-s3-bucket-metricsconfiguration-tagfilters
    */
-  readonly tagFilters: Array<TagFilter>;
+  readonly tagFilters?: Array<TagFilterProperty>;
 }
 
 
@@ -2004,27 +2374,36 @@ function cfnBucketMetricsConfigurationsPropertyToCloudFormation(properties: any)
  * > For more information on permissions, see [AWS::Lambda::Permission](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-permission.html) and [Granting Permissions to Publish Event Notification Messages to a Destination](https://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html#grant-destinations-permissions-to-s3) .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-notificationconfiguration.html
  */
-export interface NotificationConfiguration {
+export interface NotificationConfigurationProperty {
   /**
    * Enables delivery of events to Amazon EventBridge.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-notificationconfiguration.html#cfn-s3-bucket-notificationconfiguration-eventbridgeconfiguration
    */
-  readonly eventBridgeConfiguration: EventBridgeConfiguration;
+  readonly eventBridgeConfiguration?: EventBridgeConfigurationProperty;
 
   /**
    * Describes the AWS Lambda functions to invoke and the events for which to invoke them.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-notificationconfiguration.html#cfn-s3-bucket-notificationconfiguration-lambdaconfigurations
    */
-  readonly lambdaConfigurations: Array<LambdaConfiguration>;
+  readonly lambdaConfigurations?: Array<LambdaConfigurationProperty>;
 
   /**
    * The Amazon Simple Queue Service queues to publish messages to and the events for which to publish messages.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-notificationconfiguration.html#cfn-s3-bucket-notificationconfiguration-queueconfigurations
    */
-  readonly queueConfigurations: Array<QueueConfiguration>;
+  readonly queueConfigurations?: Array<QueueConfigurationProperty>;
 
   /**
    * The topic to which notifications are sent and the events for which notifications are generated.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-notificationconfiguration.html#cfn-s3-bucket-notificationconfiguration-topicconfigurations
    */
-  readonly topicConfigurations: Array<TopicConfiguration>;
+  readonly topicConfigurations?: Array<TopicConfigurationProperty>;
 }
 
 
@@ -2034,10 +2413,13 @@ export interface NotificationConfiguration {
  * Unlike other destinations, delivery of events to EventBridge can be either enabled or disabled for a bucket. If enabled, all events will be sent to EventBridge and you can use EventBridge rules to route events to additional targets. For more information, see [What Is Amazon EventBridge](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html) in the *Amazon EventBridge User Guide*
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-eventbridgeconfiguration.html
  */
-export interface EventBridgeConfiguration {
+export interface EventBridgeConfigurationProperty {
   /**
    * Enables delivery of events to Amazon EventBridge.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-eventbridgeconfiguration.html#cfn-s3-bucket-eventbridgeconfiguration-eventbridgeenabled
    */
   readonly eventBridgeEnabled: boolean;
 }
@@ -2046,14 +2428,16 @@ export interface EventBridgeConfiguration {
 /**
  * Describes the AWS Lambda functions to invoke and the events for which to invoke them.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-lambdaconfiguration.html
  */
-export interface LambdaConfiguration {
+export interface LambdaConfigurationProperty {
   /**
    * The Amazon S3 bucket event for which to invoke the AWS Lambda function.
    * 
    * For more information, see [Supported Event Types](https://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html) in the *Amazon S3 User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-lambdaconfiguration.html#cfn-s3-bucket-lambdaconfiguration-event
    */
   readonly event: string;
 
@@ -2061,11 +2445,15 @@ export interface LambdaConfiguration {
    * The filtering rules that determine which objects invoke the AWS Lambda function.
    * 
    * For example, you can create a filter so that only image files with a \`.jpg\` extension invoke the function when they are added to the Amazon S3 bucket.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-lambdaconfiguration.html#cfn-s3-bucket-lambdaconfiguration-filter
    */
-  readonly filter: NotificationFilter;
+  readonly filter?: NotificationFilterProperty;
 
   /**
    * The Amazon Resource Name (ARN) of the AWS Lambda function that Amazon S3 invokes when the specified event type occurs.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-lambdaconfiguration.html#cfn-s3-bucket-lambdaconfiguration-function
    */
   readonly function: string;
 }
@@ -2077,12 +2465,15 @@ export interface LambdaConfiguration {
  * For information about key name filtering, see [Configuring Event Notifications](https://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html) in the *Amazon S3 User Guide* .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-notificationfilter.html
  */
-export interface NotificationFilter {
+export interface NotificationFilterProperty {
   /**
    * A container for object key name prefix and suffix filtering rules.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-notificationfilter.html#cfn-s3-bucket-notificationfilter-s3key
    */
-  readonly s3Key: S3KeyFilter;
+  readonly s3Key: S3KeyFilterProperty;
 }
 
 
@@ -2094,31 +2485,38 @@ export interface NotificationFilter {
  * > The same type of filter rule cannot be used more than once. For example, you cannot specify two prefix rules.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-s3keyfilter.html
  */
-export interface S3KeyFilter {
+export interface S3KeyFilterProperty {
   /**
    * A list of containers for the key-value pair that defines the criteria for the filter rule.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-s3keyfilter.html#cfn-s3-bucket-s3keyfilter-rules
    */
-  readonly rules: Array<FilterRule>;
+  readonly rules: Array<FilterRuleProperty>;
 }
 
 
 /**
  * Specifies the Amazon S3 object key name to filter on and whether to filter on the suffix or prefix of the key name.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-filterrule.html
  */
-export interface FilterRule {
+export interface FilterRuleProperty {
   /**
    * The object key name prefix or suffix identifying one or more objects to which the filtering rule applies.
    * 
    * The maximum length is 1,024 characters. Overlapping prefixes and suffixes are not supported. For more information, see [Configuring Event Notifications](https://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html) in the *Amazon S3 User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-filterrule.html#cfn-s3-bucket-filterrule-name
    */
   readonly name: string;
 
   /**
    * The value that the filter searches for in object key names.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-filterrule.html#cfn-s3-bucket-filterrule-value
    */
   readonly value: string;
 }
@@ -2127,14 +2525,16 @@ export interface FilterRule {
 /**
  * Specifies the configuration for publishing messages to an Amazon Simple Queue Service (Amazon SQS) queue when Amazon S3 detects specified events.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-queueconfiguration.html
  */
-export interface QueueConfiguration {
+export interface QueueConfigurationProperty {
   /**
    * The Amazon S3 bucket event about which you want to publish messages to Amazon SQS.
    * 
    * For more information, see [Supported Event Types](https://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html) in the *Amazon S3 User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-queueconfiguration.html#cfn-s3-bucket-queueconfiguration-event
    */
   readonly event: string;
 
@@ -2142,13 +2542,17 @@ export interface QueueConfiguration {
    * The filtering rules that determine which objects trigger notifications.
    * 
    * For example, you can create a filter so that Amazon S3 sends notifications only when image files with a \`.jpg\` extension are added to the bucket. For more information, see [Configuring event notifications using object key name filtering](https://docs.aws.amazon.com/AmazonS3/latest/user-guide/notification-how-to-filtering.html) in the *Amazon S3 User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-queueconfiguration.html#cfn-s3-bucket-queueconfiguration-filter
    */
-  readonly filter: NotificationFilter;
+  readonly filter?: NotificationFilterProperty;
 
   /**
    * The Amazon Resource Name (ARN) of the Amazon SQS queue to which Amazon S3 publishes a message when it detects events of the specified type.
    * 
    * FIFO queues are not allowed when enabling an SQS queue as the event notification destination.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-queueconfiguration.html#cfn-s3-bucket-queueconfiguration-queue
    */
   readonly queue: string;
 }
@@ -2157,14 +2561,16 @@ export interface QueueConfiguration {
 /**
  * A container for specifying the configuration for publication of messages to an Amazon Simple Notification Service (Amazon SNS) topic when Amazon S3 detects specified events.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-topicconfiguration.html
  */
-export interface TopicConfiguration {
+export interface TopicConfigurationProperty {
   /**
    * The Amazon S3 bucket event about which to send notifications.
    * 
    * For more information, see [Supported Event Types](https://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html) in the *Amazon S3 User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-topicconfiguration.html#cfn-s3-bucket-topicconfiguration-event
    */
   readonly event: string;
 
@@ -2172,11 +2578,15 @@ export interface TopicConfiguration {
    * The filtering rules that determine for which objects to send notifications.
    * 
    * For example, you can create a filter so that Amazon S3 sends notifications only when image files with a \`.jpg\` extension are added to the bucket.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-topicconfiguration.html#cfn-s3-bucket-topicconfiguration-filter
    */
-  readonly filter: NotificationFilter;
+  readonly filter?: NotificationFilterProperty;
 
   /**
    * The Amazon Resource Name (ARN) of the Amazon SNS topic to which Amazon S3 publishes a message when it detects events of the specified type.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-topicconfiguration.html#cfn-s3-bucket-topicconfiguration-topic
    */
   readonly topic: string;
 }
@@ -2196,21 +2606,26 @@ function cfnBucketNotificationConfigurationPropertyToCloudFormation(properties: 
  * The rule specified in the Object Lock configuration will be applied by default to every new object placed in the specified bucket. For more information, see [Locking Objects](https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lock.html) .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-objectlockconfiguration.html
  */
-export interface ObjectLockConfiguration {
+export interface ObjectLockConfigurationProperty {
   /**
    * Indicates whether this bucket has an Object Lock configuration enabled.
    * 
    * Enable \`ObjectLockEnabled\` when you apply \`ObjectLockConfiguration\` to a bucket.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-objectlockconfiguration.html#cfn-s3-bucket-objectlockconfiguration-objectlockenabled
    */
-  readonly objectLockEnabled: string;
+  readonly objectLockEnabled?: string;
 
   /**
    * Specifies the Object Lock rule for the specified object.
    * 
    * Enable this rule when you apply \`ObjectLockConfiguration\` to a bucket. If Object Lock is turned on, bucket settings require both \`Mode\` and a period of either \`Days\` or \`Years\` . You cannot specify \`Days\` and \`Years\` at the same time. For more information, see [ObjectLockRule](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-objectlockrule.html) and [DefaultRetention](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-defaultretention.html) .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-objectlockconfiguration.html#cfn-s3-bucket-objectlockconfiguration-rule
    */
-  readonly rule: ObjectLockRule;
+  readonly rule?: ObjectLockRuleProperty;
 }
 
 
@@ -2220,14 +2635,17 @@ export interface ObjectLockConfiguration {
  * Enable the this rule when you apply \`ObjectLockConfiguration\` to a bucket.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-objectlockrule.html
  */
-export interface ObjectLockRule {
+export interface ObjectLockRuleProperty {
   /**
    * The default Object Lock retention mode and period that you want to apply to new objects placed in the specified bucket.
    * 
    * If Object Lock is turned on, bucket settings require both \`Mode\` and a period of either \`Days\` or \`Years\` . You cannot specify \`Days\` and \`Years\` at the same time. For more information about allowable values for mode and period, see [DefaultRetention](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-defaultretention.html) .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-objectlockrule.html#cfn-s3-bucket-objectlockrule-defaultretention
    */
-  readonly defaultRetention: DefaultRetention;
+  readonly defaultRetention?: DefaultRetentionProperty;
 }
 
 
@@ -2238,28 +2656,35 @@ export interface ObjectLockRule {
  * > - The \`DefaultRetention\` period can be either \`Days\` or \`Years\` but you must select one. You cannot specify \`Days\` and \`Years\` at the same time.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-defaultretention.html
  */
-export interface DefaultRetention {
+export interface DefaultRetentionProperty {
   /**
    * The number of years that you want to specify for the default retention period.
    * 
    * If Object Lock is turned on, you must specify \`Mode\` and specify either \`Days\` or \`Years\` .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-defaultretention.html#cfn-s3-bucket-defaultretention-years
    */
-  readonly years: number;
+  readonly years?: number;
 
   /**
    * The number of days that you want to specify for the default retention period.
    * 
    * If Object Lock is turned on, you must specify \`Mode\` and specify either \`Days\` or \`Years\` .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-defaultretention.html#cfn-s3-bucket-defaultretention-days
    */
-  readonly days: number;
+  readonly days?: number;
 
   /**
    * The default Object Lock retention mode you want to apply to new objects placed in the specified bucket.
    * 
    * If Object Lock is turned on, you must specify \`Mode\` and specify either \`Days\` or \`Years\` .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-defaultretention.html#cfn-s3-bucket-defaultretention-mode
    */
-  readonly mode: string;
+  readonly mode?: string;
 }
 
 
@@ -2285,12 +2710,15 @@ function cfnBucketObjectLockEnabledPropertyToCloudFormation(properties: any): an
  * S3 Object Ownership is an Amazon S3 bucket-level setting that you can use to disable access control lists (ACLs) and take ownership of every object in your bucket, simplifying access management for data stored in Amazon S3. For more information, see [Controlling ownership of objects and disabling ACLs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html) in the *Amazon S3 User Guide* .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-ownershipcontrols.html
  */
-export interface OwnershipControls {
+export interface OwnershipControlsProperty {
   /**
    * Specifies the container element for Object Ownership rules.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-ownershipcontrols.html#cfn-s3-bucket-ownershipcontrols-rules
    */
-  readonly rules: Array<OwnershipControlsRule>;
+  readonly rules: Array<OwnershipControlsRuleProperty>;
 }
 
 
@@ -2300,14 +2728,17 @@ export interface OwnershipControls {
  * S3 Object Ownership is an Amazon S3 bucket-level setting that you can use to disable access control lists (ACLs) and take ownership of every object in your bucket, simplifying access management for data stored in Amazon S3. For more information, see [Controlling ownership of objects and disabling ACLs](https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html) in the *Amazon S3 User Guide* .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-ownershipcontrolsrule.html
  */
-export interface OwnershipControlsRule {
+export interface OwnershipControlsRuleProperty {
   /**
    * Specifies an Object Ownership rule.
    * 
    * *Allowed values* : \`BucketOwnerEnforced\` | \`ObjectWriter\` | \`BucketOwnerPreferred\`
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-ownershipcontrolsrule.html#cfn-s3-bucket-ownershipcontrolsrule-objectownership
    */
-  readonly objectOwnership: string;
+  readonly objectOwnership?: string;
 }
 
 
@@ -2325,8 +2756,9 @@ function cfnBucketOwnershipControlsPropertyToCloudFormation(properties: any): an
  * You can enable the configuration options in any combination. For more information about when Amazon S3 considers a bucket or object public, see [The Meaning of "Public"](https://docs.aws.amazon.com/AmazonS3/latest/dev/access-control-block-public-access.html#access-control-block-public-access-policy-status) in the *Amazon S3 User Guide* .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-publicaccessblockconfiguration.html
  */
-export interface PublicAccessBlockConfiguration {
+export interface PublicAccessBlockConfigurationProperty {
   /**
    * Specifies whether Amazon S3 should block public access control lists (ACLs) for this bucket and objects in this bucket.
    * 
@@ -2337,8 +2769,10 @@ export interface PublicAccessBlockConfiguration {
    * - PUT Bucket calls fail if the request includes a public ACL.
    * 
    * Enabling this setting doesn't affect existing policies or ACLs.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-publicaccessblockconfiguration.html#cfn-s3-bucket-publicaccessblockconfiguration-blockpublicacls
    */
-  readonly blockPublicAcls: boolean;
+  readonly blockPublicAcls?: boolean;
 
   /**
    * Specifies whether Amazon S3 should block public bucket policies for this bucket.
@@ -2346,8 +2780,10 @@ export interface PublicAccessBlockConfiguration {
    * Setting this element to \`TRUE\` causes Amazon S3 to reject calls to PUT Bucket policy if the specified bucket policy allows public access.
    * 
    * Enabling this setting doesn't affect existing bucket policies.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-publicaccessblockconfiguration.html#cfn-s3-bucket-publicaccessblockconfiguration-blockpublicpolicy
    */
-  readonly blockPublicPolicy: boolean;
+  readonly blockPublicPolicy?: boolean;
 
   /**
    * Specifies whether Amazon S3 should ignore public ACLs for this bucket and objects in this bucket.
@@ -2355,8 +2791,10 @@ export interface PublicAccessBlockConfiguration {
    * Setting this element to \`TRUE\` causes Amazon S3 to ignore all public ACLs on this bucket and objects in this bucket.
    * 
    * Enabling this setting doesn't affect the persistence of any existing ACLs and doesn't prevent new public ACLs from being set.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-publicaccessblockconfiguration.html#cfn-s3-bucket-publicaccessblockconfiguration-ignorepublicacls
    */
-  readonly ignorePublicAcls: boolean;
+  readonly ignorePublicAcls?: boolean;
 
   /**
    * Specifies whether Amazon S3 should restrict public bucket policies for this bucket.
@@ -2364,8 +2802,10 @@ export interface PublicAccessBlockConfiguration {
    * Setting this element to \`TRUE\` restricts access to this bucket to only AWS service principals and authorized users within this account if the bucket has a public policy.
    * 
    * Enabling this setting doesn't affect previously stored bucket policies, except that public and cross-account access within any public bucket policy, including non-public delegation to specific accounts, is blocked.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-publicaccessblockconfiguration.html#cfn-s3-bucket-publicaccessblockconfiguration-restrictpublicbuckets
    */
-  readonly restrictPublicBuckets: boolean;
+  readonly restrictPublicBuckets?: boolean;
 }
 
 
@@ -2383,12 +2823,15 @@ function cfnBucketPublicAccessBlockConfigurationPropertyToCloudFormation(propert
  * You can add up to 1,000 rules. The maximum size of a replication configuration is 2 MB.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationconfiguration.html
  */
-export interface ReplicationConfiguration {
+export interface ReplicationConfigurationProperty {
   /**
    * The Amazon Resource Name (ARN) of the AWS Identity and Access Management (IAM) role that Amazon S3 assumes when replicating objects.
    * 
    * For more information, see [How to Set Up Replication](https://docs.aws.amazon.com/AmazonS3/latest/dev/replication-how-setup.html) in the *Amazon S3 User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationconfiguration.html#cfn-s3-bucket-replicationconfiguration-role
    */
   readonly role: string;
 
@@ -2396,18 +2839,20 @@ export interface ReplicationConfiguration {
    * A container for one or more replication rules.
    * 
    * A replication configuration must have at least one rule and can contain a maximum of 1,000 rules.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationconfiguration.html#cfn-s3-bucket-replicationconfiguration-rules
    */
-  readonly rules: Array<ReplicationRule>;
+  readonly rules: Array<ReplicationRuleProperty>;
 }
 
 
 /**
  * Specifies which Amazon S3 objects to replicate and where to store the replicas.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationrule.html
  */
-export interface ReplicationRule {
+export interface ReplicationRuleProperty {
   /**
    * Specifies whether Amazon S3 replicates delete markers.
    * 
@@ -2416,13 +2861,17 @@ export interface ReplicationRule {
    * For more information about delete marker replication, see [Basic Rule Configuration](https://docs.aws.amazon.com/AmazonS3/latest/dev/delete-marker-replication.html) .
    * 
    * > If you are using an earlier version of the replication configuration, Amazon S3 handles replication of delete markers differently. For more information, see [Backward Compatibility](https://docs.aws.amazon.com/AmazonS3/latest/dev/replication-add-config.html#replication-backward-compat-considerations) .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationrule.html#cfn-s3-bucket-replicationrule-deletemarkerreplication
    */
-  readonly deleteMarkerReplication: DeleteMarkerReplication;
+  readonly deleteMarkerReplication?: DeleteMarkerReplicationProperty;
 
   /**
    * A container for information about the replication destination and its configurations including enabling the S3 Replication Time Control (S3 RTC).
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationrule.html#cfn-s3-bucket-replicationrule-destination
    */
-  readonly destination: ReplicationDestination;
+  readonly destination: ReplicationDestinationProperty;
 
   /**
    * A filter that identifies the subset of objects to which the replication rule applies.
@@ -2430,15 +2879,19 @@ export interface ReplicationRule {
    * A \`Filter\` must specify exactly one \`Prefix\` , \`TagFilter\` , or an \`And\` child element. The use of the filter field indicates that this is a V2 replication configuration. This field isn't supported in a V1 replication configuration.
    * 
    * > V1 replication configuration only supports filtering by key prefix. To filter using a V1 replication configuration, add the \`Prefix\` directly as a child element of the \`Rule\` element.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationrule.html#cfn-s3-bucket-replicationrule-filter
    */
-  readonly filter: ReplicationRuleFilter;
+  readonly filter?: ReplicationRuleFilterProperty;
 
   /**
    * A unique identifier for the rule.
    * 
    * The maximum value is 255 characters. If you don't specify a value, AWS CloudFormation generates a random ID. When using a V2 replication configuration this property is capitalized as "ID".
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationrule.html#cfn-s3-bucket-replicationrule-id
    */
-  readonly id: string;
+  readonly id?: string;
 
   /**
    * An object key name prefix that identifies the object or objects to which the rule applies.
@@ -2446,8 +2899,10 @@ export interface ReplicationRule {
    * The maximum prefix length is 1,024 characters. To include all objects in a bucket, specify an empty string. To filter using a V1 replication configuration, add the \`Prefix\` directly as a child element of the \`Rule\` element.
    * 
    * > Replacement must be made for object keys containing special characters (such as carriage returns) when using XML requests. For more information, see [XML related object key constraints](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints) .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationrule.html#cfn-s3-bucket-replicationrule-prefix
    */
-  readonly prefix: string;
+  readonly prefix?: string;
 
   /**
    * The priority indicates which rule has precedence whenever two or more replication rules conflict.
@@ -2455,18 +2910,24 @@ export interface ReplicationRule {
    * Amazon S3 will attempt to replicate objects according to all replication rules. However, if there are two or more rules with the same destination bucket, then objects will be replicated according to the rule with the highest priority. The higher the number, the higher the priority.
    * 
    * For more information, see [Replication](https://docs.aws.amazon.com/AmazonS3/latest/dev/replication.html) in the *Amazon S3 User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationrule.html#cfn-s3-bucket-replicationrule-priority
    */
-  readonly priority: number;
+  readonly priority?: number;
 
   /**
    * A container that describes additional filters for identifying the source objects that you want to replicate.
    * 
    * You can choose to enable or disable the replication of these objects.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationrule.html#cfn-s3-bucket-replicationrule-sourceselectioncriteria
    */
-  readonly sourceSelectionCriteria: SourceSelectionCriteria;
+  readonly sourceSelectionCriteria?: SourceSelectionCriteriaProperty;
 
   /**
    * Specifies whether the rule is enabled.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationrule.html#cfn-s3-bucket-replicationrule-status
    */
   readonly status: string;
 }
@@ -2482,30 +2943,35 @@ export interface ReplicationRule {
  * > If you are using an earlier version of the replication configuration, Amazon S3 handles replication of delete markers differently. For more information, see [Backward Compatibility](https://docs.aws.amazon.com/AmazonS3/latest/dev/replication-add-config.html#replication-backward-compat-considerations) .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-deletemarkerreplication.html
  */
-export interface DeleteMarkerReplication {
+export interface DeleteMarkerReplicationProperty {
   /**
    * Indicates whether to replicate delete markers.
    * 
    * Disabled by default.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-deletemarkerreplication.html#cfn-s3-bucket-deletemarkerreplication-status
    */
-  readonly status: string;
+  readonly status?: string;
 }
 
 
 /**
  * A container for information about the replication destination and its configurations including enabling the S3 Replication Time Control (S3 RTC).
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationdestination.html
  */
-export interface ReplicationDestination {
+export interface ReplicationDestinationProperty {
   /**
    * Specify this only in a cross-account scenario (where source and destination bucket owners are not the same), and you want to change replica ownership to the AWS account that owns the destination bucket.
    * 
    * If this is not specified in the replication configuration, the replicas are owned by same AWS account that owns the source object.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationdestination.html#cfn-s3-bucket-replicationdestination-accesscontroltranslation
    */
-  readonly accessControlTranslation: AccessControlTranslation;
+  readonly accessControlTranslation?: AccessControlTranslationProperty;
 
   /**
    * Destination bucket owner account ID.
@@ -2513,30 +2979,40 @@ export interface ReplicationDestination {
    * In a cross-account scenario, if you direct Amazon S3 to change replica ownership to the AWS account that owns the destination bucket by specifying the \`AccessControlTranslation\` property, this is the account ID of the destination bucket owner. For more information, see [Cross-Region Replication Additional Configuration: Change Replica Owner](https://docs.aws.amazon.com/AmazonS3/latest/dev/crr-change-owner.html) in the *Amazon S3 User Guide* .
    * 
    * If you specify the \`AccessControlTranslation\` property, the \`Account\` property is required.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationdestination.html#cfn-s3-bucket-replicationdestination-account
    */
-  readonly account: string;
+  readonly account?: string;
 
   /**
    * The Amazon Resource Name (ARN) of the bucket where you want Amazon S3 to store the results.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationdestination.html#cfn-s3-bucket-replicationdestination-bucket
    */
   readonly bucket: string;
 
   /**
    * Specifies encryption-related information.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationdestination.html#cfn-s3-bucket-replicationdestination-encryptionconfiguration
    */
-  readonly encryptionConfiguration: EncryptionConfiguration;
+  readonly encryptionConfiguration?: EncryptionConfigurationProperty;
 
   /**
    * A container specifying replication metrics-related settings enabling replication metrics and events.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationdestination.html#cfn-s3-bucket-replicationdestination-metrics
    */
-  readonly metrics: Metrics;
+  readonly metrics?: MetricsProperty;
 
   /**
    * A container specifying S3 Replication Time Control (S3 RTC), including whether S3 RTC is enabled and the time when all objects and operations on objects must be replicated.
    * 
    * Must be specified together with a \`Metrics\` block.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationdestination.html#cfn-s3-bucket-replicationdestination-replicationtime
    */
-  readonly replicationTime: ReplicationTime;
+  readonly replicationTime?: ReplicationTimeProperty;
 
   /**
    * The storage class to use when replicating objects, such as S3 Standard or reduced redundancy.
@@ -2544,8 +3020,10 @@ export interface ReplicationDestination {
    * By default, Amazon S3 uses the storage class of the source object to create the object replica.
    * 
    * For valid values, see the \`StorageClass\` element of the [PUT Bucket replication](https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTreplication.html) action in the *Amazon S3 API Reference* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationdestination.html#cfn-s3-bucket-replicationdestination-storageclass
    */
-  readonly storageClass: string;
+  readonly storageClass?: string;
 }
 
 
@@ -2555,12 +3033,15 @@ export interface ReplicationDestination {
  * If this is not specified in the replication configuration, the replicas are owned by same AWS account that owns the source object.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-accesscontroltranslation.html
  */
-export interface AccessControlTranslation {
+export interface AccessControlTranslationProperty {
   /**
    * Specifies the replica ownership.
    * 
    * For default and valid values, see [PUT bucket replication](https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTreplication.html) in the *Amazon S3 API Reference* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-accesscontroltranslation.html#cfn-s3-bucket-accesscontroltranslation-owner
    */
   readonly owner: string;
 }
@@ -2569,33 +3050,39 @@ export interface AccessControlTranslation {
 /**
  * Specifies encryption-related information for an Amazon S3 bucket that is a destination for replicated objects.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-encryptionconfiguration.html
  */
-export interface EncryptionConfiguration {
+export interface EncryptionConfigurationProperty {
   /**
    * Specifies the ID (Key ARN or Alias ARN) of the customer managed AWS KMS key stored in AWS Key Management Service (KMS) for the destination bucket.
    * 
    * Amazon S3 uses this key to encrypt replica objects. Amazon S3 only supports symmetric encryption KMS keys. For more information, see [Asymmetric keys in AWS KMS](https://docs.aws.amazon.com//kms/latest/developerguide/symmetric-asymmetric.html) in the *AWS Key Management Service Developer Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-encryptionconfiguration.html#cfn-s3-bucket-encryptionconfiguration-replicakmskeyid
    */
-  readonly replicaKmsKeyID: string;
+  readonly replicaKmsKeyId: string;
 }
 
 
 /**
  * A container specifying replication metrics-related settings enabling replication metrics and events.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-metrics.html
  */
-export interface Metrics {
+export interface MetricsProperty {
   /**
    * A container specifying the time threshold for emitting the \`s3:Replication:OperationMissedThreshold\` event.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-metrics.html#cfn-s3-bucket-metrics-eventthreshold
    */
-  readonly eventThreshold: ReplicationTimeValue;
+  readonly eventThreshold?: ReplicationTimeValueProperty;
 
   /**
    * Specifies whether the replication metrics are enabled.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-metrics.html#cfn-s3-bucket-metrics-status
    */
   readonly status: string;
 }
@@ -2604,14 +3091,16 @@ export interface Metrics {
 /**
  * A container specifying the time value for S3 Replication Time Control (S3 RTC) and replication metrics \`EventThreshold\` .
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationtimevalue.html
  */
-export interface ReplicationTimeValue {
+export interface ReplicationTimeValueProperty {
   /**
    * Contains an integer specifying time in minutes.
    * 
    * Valid value: 15
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationtimevalue.html#cfn-s3-bucket-replicationtimevalue-minutes
    */
   readonly minutes: number;
 }
@@ -2623,17 +3112,22 @@ export interface ReplicationTimeValue {
  * Must be specified together with a \`Metrics\` block.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationtime.html
  */
-export interface ReplicationTime {
+export interface ReplicationTimeProperty {
   /**
    * Specifies whether the replication time is enabled.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationtime.html#cfn-s3-bucket-replicationtime-status
    */
   readonly status: string;
 
   /**
    * A container specifying the time by which replication should be complete for all objects and operations on objects.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationtime.html#cfn-s3-bucket-replicationtime-time
    */
-  readonly time: ReplicationTimeValue;
+  readonly time: ReplicationTimeValueProperty;
 }
 
 
@@ -2643,8 +3137,9 @@ export interface ReplicationTime {
  * A \`Filter\` must specify exactly one \`Prefix\` , \`TagFilter\` , or an \`And\` child element.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationrulefilter.html
  */
-export interface ReplicationRuleFilter {
+export interface ReplicationRuleFilterProperty {
   /**
    * A container for specifying rule filters.
    * 
@@ -2652,22 +3147,28 @@ export interface ReplicationRuleFilter {
    * 
    * - If you specify both a \`Prefix\` and a \`TagFilter\` , wrap these filters in an \`And\` tag.
    * - If you specify a filter based on multiple tags, wrap the \`TagFilter\` elements in an \`And\` tag.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationrulefilter.html#cfn-s3-bucket-replicationrulefilter-and
    */
-  readonly and: ReplicationRuleAndOperator;
+  readonly and?: ReplicationRuleAndOperatorProperty;
 
   /**
    * An object key name prefix that identifies the subset of objects to which the rule applies.
    * 
    * > Replacement must be made for object keys containing special characters (such as carriage returns) when using XML requests. For more information, see [XML related object key constraints](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints) .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationrulefilter.html#cfn-s3-bucket-replicationrulefilter-prefix
    */
-  readonly prefix: string;
+  readonly prefix?: string;
 
   /**
    * A container for specifying a tag key and value.
    * 
    * The rule applies only to objects that have the tag in their tag set.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationrulefilter.html#cfn-s3-bucket-replicationrulefilter-tagfilter
    */
-  readonly tagFilter: TagFilter;
+  readonly tagFilter?: TagFilterProperty;
 }
 
 
@@ -2682,17 +3183,22 @@ export interface ReplicationRuleFilter {
  * - If you specify a filter based on multiple tags, wrap the \`TagFilter\` elements in an \`And\` tag
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationruleandoperator.html
  */
-export interface ReplicationRuleAndOperator {
+export interface ReplicationRuleAndOperatorProperty {
   /**
    * An object key name prefix that identifies the subset of objects to which the rule applies.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationruleandoperator.html#cfn-s3-bucket-replicationruleandoperator-prefix
    */
-  readonly prefix: string;
+  readonly prefix?: string;
 
   /**
    * An array of tags containing key and value pairs.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationruleandoperator.html#cfn-s3-bucket-replicationruleandoperator-tagfilters
    */
-  readonly tagFilters: Array<TagFilter>;
+  readonly tagFilters?: Array<TagFilterProperty>;
 }
 
 
@@ -2702,31 +3208,38 @@ export interface ReplicationRuleAndOperator {
  * You can choose to enable or disable the replication of these objects.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-sourceselectioncriteria.html
  */
-export interface SourceSelectionCriteria {
+export interface SourceSelectionCriteriaProperty {
   /**
    * A filter that you can specify for selection for modifications on replicas.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-sourceselectioncriteria.html#cfn-s3-bucket-sourceselectioncriteria-replicamodifications
    */
-  readonly replicaModifications: ReplicaModifications;
+  readonly replicaModifications?: ReplicaModificationsProperty;
 
   /**
    * A container for filter information for the selection of Amazon S3 objects encrypted with AWS KMS.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-sourceselectioncriteria.html#cfn-s3-bucket-sourceselectioncriteria-ssekmsencryptedobjects
    */
-  readonly sseKmsEncryptedObjects: SseKmsEncryptedObjects;
+  readonly sseKmsEncryptedObjects?: SseKmsEncryptedObjectsProperty;
 }
 
 
 /**
  * A filter that you can specify for selection for modifications on replicas.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicamodifications.html
  */
-export interface ReplicaModifications {
+export interface ReplicaModificationsProperty {
   /**
    * Specifies whether Amazon S3 replicates modifications on replicas.
    * 
    * *Allowed values* : \`Enabled\` | \`Disabled\`
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicamodifications.html#cfn-s3-bucket-replicamodifications-status
    */
   readonly status: string;
 }
@@ -2735,12 +3248,14 @@ export interface ReplicaModifications {
 /**
  * A container for filter information for the selection of S3 objects encrypted with AWS KMS.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-ssekmsencryptedobjects.html
  */
-export interface SseKmsEncryptedObjects {
+export interface SseKmsEncryptedObjectsProperty {
   /**
    * Specifies whether Amazon S3 replicates objects created with server-side encryption using an AWS KMS key stored in AWS Key Management Service.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-ssekmsencryptedobjects.html#cfn-s3-bucket-ssekmsencryptedobjects-status
    */
   readonly status: string;
 }
@@ -2756,10 +3271,17 @@ function cfnBucketReplicationConfigurationPropertyToCloudFormation(properties: a
 
 /**
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tag.html
  */
-export interface Tag {
+export interface TagProperty {
+  /**
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tag.html#cfn-s3-bucket-tag-key
+   */
   readonly key: string;
 
+  /**
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tag.html#cfn-s3-bucket-tag-value
+   */
   readonly value: string;
 }
 
@@ -2778,10 +3300,14 @@ function cfnBucketTagsPropertyToCloudFormation(properties: any): any {
  * For more information, see [PUT Bucket versioning](https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTVersioningStatus.html) in the *Amazon S3 API Reference* .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-versioningconfiguration.html
  */
-export interface VersioningConfiguration {
+export interface VersioningConfigurationProperty {
   /**
    * The versioning state of the bucket.
+   * 
+   * @default - "Suspended"
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-versioningconfiguration.html#cfn-s3-bucket-versioningconfiguration-status
    */
   readonly status: string;
 }
@@ -2798,31 +3324,39 @@ function cfnBucketVersioningConfigurationPropertyToCloudFormation(properties: an
 /**
  * Specifies website configuration parameters for an Amazon S3 bucket.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-websiteconfiguration.html
  */
-export interface WebsiteConfiguration {
+export interface WebsiteConfigurationProperty {
   /**
    * The name of the error document for the website.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-websiteconfiguration.html#cfn-s3-bucket-websiteconfiguration-errordocument
    */
-  readonly errorDocument: string;
+  readonly errorDocument?: string;
 
   /**
    * The name of the index document for the website.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-websiteconfiguration.html#cfn-s3-bucket-websiteconfiguration-indexdocument
    */
-  readonly indexDocument: string;
+  readonly indexDocument?: string;
 
   /**
    * Rules that define when a redirect is applied and the redirect behavior.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-websiteconfiguration.html#cfn-s3-bucket-websiteconfiguration-routingrules
    */
-  readonly routingRules: Array<RoutingRule>;
+  readonly routingRules?: Array<RoutingRuleProperty>;
 
   /**
    * The redirect behavior for every request to this bucket's website endpoint.
    * 
    * > If you specify this property, you can't specify any other property.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-websiteconfiguration.html#cfn-s3-bucket-websiteconfiguration-redirectallrequeststo
    */
-  readonly redirectAllRequestsTo: RedirectAllRequestsTo;
+  readonly redirectAllRequestsTo?: RedirectAllRequestsToProperty;
 }
 
 
@@ -2832,21 +3366,26 @@ export interface WebsiteConfiguration {
  * For more information about routing rules, see [Configuring advanced conditional redirects](https://docs.aws.amazon.com/AmazonS3/latest/dev/how-to-page-redirect.html#advanced-conditional-redirects) in the *Amazon S3 User Guide* .
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-routingrule.html
  */
-export interface RoutingRule {
+export interface RoutingRuleProperty {
   /**
    * Container for redirect information.
    * 
    * You can redirect requests to another host, to another page, or with another protocol. In the event of an error, you can specify a different error code to return.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-routingrule.html#cfn-s3-bucket-routingrule-redirectrule
    */
-  readonly redirectRule: RedirectRule;
+  readonly redirectRule: RedirectRuleProperty;
 
   /**
    * A container for describing a condition that must be met for the specified redirect to apply.
    * 
    * For example, 1. If request is for pages in the \`/docs\` folder, redirect to the \`/documents\` folder. 2. If request results in HTTP error 4xx, redirect request to another host where you might process the error.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-routingrule.html#cfn-s3-bucket-routingrule-routingrulecondition
    */
-  readonly routingRuleCondition: RoutingRuleCondition;
+  readonly routingRuleCondition?: RoutingRuleConditionProperty;
 }
 
 
@@ -2856,26 +3395,33 @@ export interface RoutingRule {
  * In the event of an error, you can specify a different error code to return.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-redirectrule.html
  */
-export interface RedirectRule {
+export interface RedirectRuleProperty {
   /**
    * The host name to use in the redirect request.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-redirectrule.html#cfn-s3-bucket-redirectrule-hostname
    */
-  readonly hostName: string;
+  readonly hostName?: string;
 
   /**
    * The HTTP redirect code to use on the response.
    * 
    * Not required if one of the siblings is present.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-redirectrule.html#cfn-s3-bucket-redirectrule-httpredirectcode
    */
-  readonly httpRedirectCode: string;
+  readonly httpRedirectCode?: string;
 
   /**
    * Protocol to use when redirecting requests.
    * 
    * The default is the protocol that is used in the original request.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-redirectrule.html#cfn-s3-bucket-redirectrule-protocol
    */
-  readonly protocol: string;
+  readonly protocol?: string;
 
   /**
    * The object key prefix to use in the redirect request.
@@ -2883,8 +3429,10 @@ export interface RedirectRule {
    * For example, to redirect requests for all pages with prefix \`docs/\` (objects in the \`docs/\` folder) to \`documents/\` , you can set a condition block with \`KeyPrefixEquals\` set to \`docs/\` and in the Redirect set \`ReplaceKeyPrefixWith\` to \`/documents\` . Not required if one of the siblings is present. Can be present only if \`ReplaceKeyWith\` is not provided.
    * 
    * > Replacement must be made for object keys containing special characters (such as carriage returns) when using XML requests. For more information, see [XML related object key constraints](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints) .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-redirectrule.html#cfn-s3-bucket-redirectrule-replacekeyprefixwith
    */
-  readonly replaceKeyPrefixWith: string;
+  readonly replaceKeyPrefixWith?: string;
 
   /**
    * The specific object key to use in the redirect request.
@@ -2892,8 +3440,10 @@ export interface RedirectRule {
    * For example, redirect request to \`error.html\` . Not required if one of the siblings is present. Can be present only if \`ReplaceKeyPrefixWith\` is not provided.
    * 
    * > Replacement must be made for object keys containing special characters (such as carriage returns) when using XML requests. For more information, see [XML related object key constraints](https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-xml-related-constraints) .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-redirectrule.html#cfn-s3-bucket-redirectrule-replacekeywith
    */
-  readonly replaceKeyWith: string;
+  readonly replaceKeyWith?: string;
 }
 
 
@@ -2903,16 +3453,19 @@ export interface RedirectRule {
  * For example, 1. If request is for pages in the \`/docs\` folder, redirect to the \`/documents\` folder. 2. If request results in HTTP error 4xx, redirect request to another host where you might process the error.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-routingrulecondition.html
  */
-export interface RoutingRuleCondition {
+export interface RoutingRuleConditionProperty {
   /**
    * The object key name prefix when the redirect is applied.
    * 
    * For example, to redirect requests for \`ExamplePage.html\` , the key prefix will be \`ExamplePage.html\` . To redirect request for all pages with the prefix \`docs/\` , the key prefix will be \`/docs\` , which identifies all objects in the docs/ folder.
    * 
    * Required when the parent element \`Condition\` is specified and sibling \`HttpErrorCodeReturnedEquals\` is not specified. If both conditions are specified, both must be true for the redirect to be applied.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-routingrulecondition.html#cfn-s3-bucket-routingrulecondition-keyprefixequals
    */
-  readonly keyPrefixEquals: string;
+  readonly keyPrefixEquals?: string;
 
   /**
    * The HTTP error code when the redirect is applied.
@@ -2920,20 +3473,24 @@ export interface RoutingRuleCondition {
    * In the event of an error, if the error code equals this value, then the specified redirect is applied.
    * 
    * Required when parent element \`Condition\` is specified and sibling \`KeyPrefixEquals\` is not specified. If both are specified, then both must be true for the redirect to be applied.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-routingrulecondition.html#cfn-s3-bucket-routingrulecondition-httperrorcodereturnedequals
    */
-  readonly httpErrorCodeReturnedEquals: string;
+  readonly httpErrorCodeReturnedEquals?: string;
 }
 
 
 /**
  * Specifies the redirect behavior of all requests to a website endpoint of an Amazon S3 bucket.
  * 
- * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-redirectallrequeststo.html
  */
-export interface RedirectAllRequestsTo {
+export interface RedirectAllRequestsToProperty {
   /**
    * Name of the host where requests are redirected.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-redirectallrequeststo.html#cfn-s3-bucket-redirectallrequeststo-hostname
    */
   readonly hostName: string;
 
@@ -2941,8 +3498,10 @@ export interface RedirectAllRequestsTo {
    * Protocol to use when redirecting requests.
    * 
    * The default is the protocol that is used in the original request.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-redirectallrequeststo.html#cfn-s3-bucket-redirectallrequeststo-protocol
    */
-  readonly protocol: string;
+  readonly protocol?: string;
 }
 
 
@@ -2974,14 +3533,17 @@ exports[`AWS::SQS::Queue 1`] = `
  * 
  * @struct
  * @stability external
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html
  */
 export interface CfnQueueProps {
   /**
    * For first-in-first-out (FIFO) queues, specifies whether to enable content-based deduplication.
    * 
    * During the deduplication interval, Amazon SQS treats messages that are sent with identical content as duplicates and delivers only one copy of the message. For more information, see the \`ContentBasedDeduplication\` attribute for the \`[CreateQueue](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_CreateQueue.html)\` action in the *Amazon SQS API Reference* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-contentbaseddeduplication
    */
-  readonly contentBasedDeduplication: boolean;
+  readonly contentBasedDeduplication?: boolean;
 
   /**
    * For high throughput for FIFO queues, specifies whether message deduplication occurs at the message group or queue level.
@@ -2989,22 +3551,28 @@ export interface CfnQueueProps {
    * Valid values are \`messageGroup\` and \`queue\` .
    * 
    * To enable high throughput for a FIFO queue, set this attribute to \`messageGroup\` *and* set the \`FifoThroughputLimit\` attribute to \`perMessageGroupId\` . If you set these attributes to anything other than these values, normal throughput is in effect and deduplication occurs as specified. For more information, see [High throughput for FIFO queues](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/high-throughput-fifo.html) and [Quotas related to messages](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/quotas-messages.html) in the *Amazon SQS Developer Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-deduplicationscope
    */
-  readonly deduplicationScope: string;
+  readonly deduplicationScope?: string;
 
   /**
    * The time in seconds for which the delivery of all messages in the queue is delayed.
    * 
    * You can specify an integer value of \`0\` to \`900\` (15 minutes). The default value is \`0\` .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-delayseconds
    */
-  readonly delaySeconds: number;
+  readonly delaySeconds?: number;
 
   /**
    * If set to true, creates a FIFO queue.
    * 
    * If you don't specify this property, Amazon SQS creates a standard queue. For more information, see [FIFO queues](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html) in the *Amazon SQS Developer Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-fifoqueue
    */
-  readonly fifoQueue: boolean;
+  readonly fifoQueue?: boolean;
 
   /**
    * For high throughput for FIFO queues, specifies whether the FIFO queue throughput quota applies to the entire queue or per message group.
@@ -3012,8 +3580,10 @@ export interface CfnQueueProps {
    * Valid values are \`perQueue\` and \`perMessageGroupId\` .
    * 
    * To enable high throughput for a FIFO queue, set this attribute to \`perMessageGroupId\` *and* set the \`DeduplicationScope\` attribute to \`messageGroup\` . If you set these attributes to anything other than these values, normal throughput is in effect and deduplication occurs as specified. For more information, see [High throughput for FIFO queues](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/high-throughput-fifo.html) and [Quotas related to messages](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/quotas-messages.html) in the *Amazon SQS Developer Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-fifothroughputlimit
    */
-  readonly fifoThroughputLimit: string;
+  readonly fifoThroughputLimit?: string;
 
   /**
    * The length of time in seconds for which Amazon SQS can reuse a data key to encrypt or decrypt messages before calling AWS KMS again.
@@ -3021,8 +3591,10 @@ export interface CfnQueueProps {
    * The value must be an integer between 60 (1 minute) and 86,400 (24 hours). The default is 300 (5 minutes).
    * 
    * > A shorter time period provides better security, but results in more calls to AWS KMS , which might incur charges after Free Tier. For more information, see [Encryption at rest](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-server-side-encryption.html#sqs-how-does-the-data-key-reuse-period-work) in the *Amazon SQS Developer Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-kmsdatakeyreuseperiodseconds
    */
-  readonly kmsDataKeyReusePeriodSeconds: number;
+  readonly kmsDataKeyReusePeriodSeconds?: number;
 
   /**
    * The ID of an AWS Key Management Service (KMS) for Amazon SQS , or a custom KMS.
@@ -3033,29 +3605,37 @@ export interface CfnQueueProps {
    * - [CreateQueue](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_CreateQueue.html) in the *Amazon SQS API Reference*
    * - [Request Parameters](https://docs.aws.amazon.com/kms/latest/APIReference/API_DescribeKey.html#API_DescribeKey_RequestParameters) in the *AWS Key Management Service API Reference*
    * - The Key Management Service (KMS) section of the [AWS Key Management Service Best Practices](https://docs.aws.amazon.com/https://d0.awsstatic.com/whitepapers/aws-kms-best-practices.pdf) whitepaper
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-kmsmasterkeyid
    */
-  readonly kmsMasterKeyId: string;
+  readonly kmsMasterKeyId?: string;
 
   /**
    * Enables server-side queue encryption using SQS owned encryption keys.
    * 
    * Only one server-side encryption option is supported per queue (for example, [SSE-KMS](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-sse-existing-queue.html) or [SSE-SQS](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-sqs-sse-queue.html) ).
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-sqsmanagedsseenabled
    */
-  readonly sqsManagedSseEnabled: boolean;
+  readonly sqsManagedSseEnabled?: boolean;
 
   /**
    * The limit of how many bytes that a message can contain before Amazon SQS rejects it.
    * 
    * You can specify an integer value from \`1,024\` bytes (1 KiB) to \`262,144\` bytes (256 KiB). The default value is \`262,144\` (256 KiB).
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-maximummessagesize
    */
-  readonly maximumMessageSize: number;
+  readonly maximumMessageSize?: number;
 
   /**
    * The number of seconds that Amazon SQS retains a message.
    * 
    * You can specify an integer value from \`60\` seconds (1 minute) to \`1,209,600\` seconds (14 days). The default value is \`345,600\` seconds (4 days).
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-messageretentionperiod
    */
-  readonly messageRetentionPeriod: number;
+  readonly messageRetentionPeriod?: number;
 
   /**
    * A name for the queue.
@@ -3065,15 +3645,19 @@ export interface CfnQueueProps {
    * If you don't specify a name, AWS CloudFormation generates a unique physical ID and uses that ID for the queue name. For more information, see [Name type](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-name.html) in the *AWS CloudFormation User Guide* .
    * 
    * > If you specify a name, you can't perform updates that require replacement of this resource. You can perform updates that require no or some interruption. If you must replace the resource, specify a new name.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-queuename
    */
-  readonly queueName: string;
+  readonly queueName?: string;
 
   /**
    * Specifies the duration, in seconds, that the ReceiveMessage action call waits until a message is in the queue in order to include it in the response, rather than returning an empty response if a message isn't yet available.
    * 
    * You can specify an integer from 1 to 20. Short polling is used as the default or when you specify 0 for this property. For more information, see [Consuming messages using long polling](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-short-and-long-polling.html#sqs-long-polling) in the *Amazon SQS Developer Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-receivemessagewaittimeseconds
    */
-  readonly receiveMessageWaitTimeSeconds: number;
+  readonly receiveMessageWaitTimeSeconds?: number;
 
   /**
    * The string that includes the parameters for the permissions for the dead-letter queue redrive permission and which source queues can specify dead-letter queues as a JSON object.
@@ -3086,8 +3670,10 @@ export interface CfnQueueProps {
    * - \`denyAll\` : No source queues can specify this queue as the dead-letter queue.
    * - \`byQueue\` : Only queues specified by the \`sourceQueueArns\` parameter can specify this queue as the dead-letter queue.
    * - \`sourceQueueArns\` : The Amazon Resource Names (ARN)s of the source queues that can specify this queue as the dead-letter queue and redrive messages. You can specify this parameter only when the \`redrivePermission\` parameter is set to \`byQueue\` . You can specify up to 10 source queue ARNs. To allow more than 10 source queues to specify dead-letter queues, set the \`redrivePermission\` parameter to \`allowAll\` .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-redriveallowpolicy
    */
-  readonly redriveAllowPolicy: any;
+  readonly redriveAllowPolicy?: any;
 
   /**
    * The string that includes the parameters for the dead-letter queue functionality of the source queue as a JSON object.
@@ -3108,15 +3694,19 @@ export interface CfnQueueProps {
    * \`deadLetterTargetArn : *String*\`
    * 
    * \`maxReceiveCount : *Integer*\`
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-redrivepolicy
    */
-  readonly redrivePolicy: any;
+  readonly redrivePolicy?: any;
 
   /**
    * The tags that you attach to this queue.
    * 
    * For more information, see [Resource tag](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html) in the *AWS CloudFormation User Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-tags
    */
-  readonly tags: Array<Tag>;
+  readonly tags?: Array<TagProperty>;
 
   /**
    * The length of time during which a message will be unavailable after a message is delivered from the queue.
@@ -3126,8 +3716,10 @@ export interface CfnQueueProps {
    * Values must be from 0 to 43,200 seconds (12 hours). If you don't specify a value, AWS CloudFormation uses the default value of 30 seconds.
    * 
    * For more information about Amazon SQS queue visibility timeouts, see [Visibility timeout](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html) in the *Amazon SQS Developer Guide* .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-visibilitytimeout
    */
-  readonly visibilityTimeout: number;
+  readonly visibilityTimeout?: number;
 }
 
 
@@ -3245,12 +3837,15 @@ function cfnQueueRedrivePolicyPropertyToCloudFormation(properties: any): any {
 
 /**
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-tag.html
  */
-export interface Tag {
+export interface TagProperty {
   /**
    * The key name of the tag.
    * 
    * You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-tag.html#cfn-sqs-queue-tag-key
    */
   readonly key: string;
 
@@ -3258,6 +3853,8 @@ export interface Tag {
    * The value for the tag.
    * 
    * You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-tag.html#cfn-sqs-queue-tag-value
    */
   readonly value: string;
 }
@@ -3290,19 +3887,24 @@ exports[`Alexa::ASK::Skill 1`] = `
  * 
  * @struct
  * @stability external
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ask-skill.html
  */
 export interface CfnSkillProps {
   /**
    * Login with Amazon (LWA) configuration used to authenticate with the Alexa service.
    * 
    * Only Login with Amazon clients created through the  are supported. The client ID, client secret, and refresh token are required.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ask-skill.html#cfn-ask-skill-authenticationconfiguration
    */
-  readonly authenticationConfiguration: AuthenticationConfiguration;
+  readonly authenticationConfiguration: AuthenticationConfigurationProperty;
 
   /**
    * The vendor ID associated with the Amazon developer account that will host the skill.
    * 
    * Details for retrieving the vendor ID are in  . The provided LWA credentials must be linked to the developer account associated with this vendor ID.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ask-skill.html#cfn-ask-skill-vendorid
    */
   readonly vendorId: string;
 
@@ -3310,8 +3912,10 @@ export interface CfnSkillProps {
    * Configuration for the skill package that contains the components of the Alexa skill.
    * 
    * Skill packages are retrieved from an Amazon S3 bucket and key and used to create and update the skill. For more information about the skill package format, see the  .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ask-skill.html#cfn-ask-skill-skillpackage
    */
-  readonly skillPackage: SkillPackage;
+  readonly skillPackage: SkillPackageProperty;
 }
 
 
@@ -3323,10 +3927,13 @@ export interface CfnSkillProps {
  * \`AuthenticationConfiguration\` is a property of the \`Alexa::ASK::Skill\` resource.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ask-skill-authenticationconfiguration.html
  */
-export interface AuthenticationConfiguration {
+export interface AuthenticationConfigurationProperty {
   /**
    * Client ID from Login with Amazon (LWA).
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ask-skill-authenticationconfiguration.html#cfn-ask-skill-authenticationconfiguration-clientid
    */
   readonly clientId: string;
 
@@ -3334,11 +3941,15 @@ export interface AuthenticationConfiguration {
    * Refresh token from Login with Amazon (LWA).
    * 
    * This token is secret.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ask-skill-authenticationconfiguration.html#cfn-ask-skill-authenticationconfiguration-refreshtoken
    */
   readonly refreshToken: string;
 
   /**
    * Client secret from Login with Amazon (LWA).
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ask-skill-authenticationconfiguration.html#cfn-ask-skill-authenticationconfiguration-clientsecret
    */
   readonly clientSecret: string;
 }
@@ -3368,32 +3979,43 @@ function cfnSkillVendorIdPropertyToCloudFormation(properties: any): any {
  * \`SkillPackage\` is a property of the \`Alexa::ASK::Skill\` resource.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ask-skill-skillpackage.html
  */
-export interface SkillPackage {
+export interface SkillPackageProperty {
   /**
    * ARN of the IAM role that grants the Alexa service ( \`alexa-appkit.amazon.com\` ) permission to access the bucket and retrieve the skill package. This property is optional. If you do not provide it, the bucket must be publicly accessible or configured with a policy that allows this access. Otherwise, AWS CloudFormation cannot create the skill.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ask-skill-skillpackage.html#cfn-ask-skill-skillpackage-s3bucketrole
    */
-  readonly s3BucketRole: string;
+  readonly s3BucketRole?: string;
 
   /**
    * Overrides to the skill package to apply when creating or updating the skill.
    * 
    * Values provided here do not modify the contents of the original skill package. Currently, only overriding values inside of the skill manifest component of the package is supported.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ask-skill-skillpackage.html#cfn-ask-skill-skillpackage-overrides
    */
-  readonly overrides: Overrides;
+  readonly overrides?: OverridesProperty;
 
   /**
    * If you have S3 versioning enabled, the version ID of the skill package.zip file.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ask-skill-skillpackage.html#cfn-ask-skill-skillpackage-s3objectversion
    */
-  readonly s3ObjectVersion: string;
+  readonly s3ObjectVersion?: string;
 
   /**
    * The name of the Amazon S3 bucket where the .zip file that contains the skill package is stored.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ask-skill-skillpackage.html#cfn-ask-skill-skillpackage-s3bucket
    */
   readonly s3Bucket: string;
 
   /**
    * The location and name of the skill package .zip file.
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ask-skill-skillpackage.html#cfn-ask-skill-skillpackage-s3key
    */
   readonly s3Key: string;
 }
@@ -3407,14 +4029,17 @@ export interface SkillPackage {
  * \`Overrides\` is a property of the \`Alexa::ASK::Skill SkillPackage\` property type.
  * 
  * @struct
+ * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ask-skill-overrides.html
  */
-export interface Overrides {
+export interface OverridesProperty {
   /**
    * Overrides to apply to the skill manifest inside of the skill package.
    * 
    * The skill manifest contains metadata about the skill. For more information, see  .
+   * 
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ask-skill-overrides.html#cfn-ask-skill-overrides-manifest
    */
-  readonly manifest: any;
+  readonly manifest?: any;
 }
 
 

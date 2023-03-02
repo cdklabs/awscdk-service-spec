@@ -17,6 +17,7 @@
     "projen": "npx projen"
   },
   "devDependencies": {
+    "@aws-cdk/service-spec": "^0.0.0",
     "@aws-cdk/service-spec-build": "^0.0.0",
     "@cdklabs/tskb": "^0.0.0",
     "@cdklabs/typewriter": "^0.0.0",
@@ -27,6 +28,7 @@
     "@types/node": "^14",
     "@typescript-eslint/eslint-plugin": "^5",
     "@typescript-eslint/parser": "^5",
+    "camelcase": "^6.3.0",
     "constructs": "10.0.0",
     "eslint": "^8",
     "eslint-config-prettier": "^8.6.0",
