@@ -133,7 +133,7 @@ export namespace jsonschema {
     /**
      * Whether to treat the order as significant
      *
-     * In other words, does this array model a "sequence" or a "set".
+     * In other words, does this array model a "sequence" or a "multiset".
      *
      * - `true` (default): order is significant, the array is a sequence.
      * - `false`: order is insignificant, the array is a set.
@@ -151,6 +151,16 @@ export namespace jsonschema {
     // readonly minLength?: number;
     readonly default?: any[];
     readonly examples?: any[];
+
+    /**
+     * Does this array describe full reality?
+     *
+     * - If `Standard`, real elements must be exactly equal to the given array.
+     * - If `AttributeList`, the real array may be a superset of the given array.
+     *
+     * @see https://github.com/aws-cloudformation/cloudformation-resource-schema#arraytype
+     */
+    readonly arrayType?: 'AttributeList' | 'Standard';
   }
 
   export interface Boolean extends Annotatable {
