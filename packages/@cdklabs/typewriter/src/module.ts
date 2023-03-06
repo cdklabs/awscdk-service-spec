@@ -1,12 +1,12 @@
 import { StructType } from './struct';
 import { Scope } from './scope';
-import { Type } from './type';
+import { TypeDeclaration } from './type-declaration';
 
 /**
  * A module
  */
 export class Module extends Scope {
-  protected readonly typeMap: Map<string, Type> = new Map<string, Type>();
+  protected readonly typeMap: Map<string, TypeDeclaration> = new Map<string, TypeDeclaration>();
   protected readonly importMap: Map<string, Scope> = new Map<string, Scope>();
 
   public get name(): string {
@@ -20,7 +20,7 @@ export class Module extends Scope {
   /**
    * All types in this module/namespace (not submodules)
    */
-  public get types(): Type[] {
+  public get types(): TypeDeclaration[] {
     return Array.from(this.typeMap.values());
   }
 
@@ -38,7 +38,7 @@ export class Module extends Scope {
     return this.types.filter((t) => t instanceof StructType).map((t) => t as StructType);
   }
 
-  public addType(type: Type): void {
+  public addType(type: TypeDeclaration): void {
     this.typeMap.set(type.fqn, type);
   }
 

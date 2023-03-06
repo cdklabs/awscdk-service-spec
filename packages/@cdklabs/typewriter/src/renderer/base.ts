@@ -1,7 +1,7 @@
 import { Callable } from '../callable';
 import { StructType } from '../struct';
 import { Module } from '../module';
-import { TypeKind } from '../type';
+import { TypeKind } from '../type-declaration';
 
 export interface RenderOptions {
   indentation?: number | string;

@@ -1,6 +1,6 @@
 import { Module } from './module';
 import { Scope } from './scope';
-import { LocalSymbol, ObjectLike } from './statements';
+import LocalSymbol, { ObjectLike } from './statements';
 
 export class ExternalModule extends Module {
   public constructor(fqn: string, public readonly scope: Scope) {

@@ -1,3 +1,3 @@
-export interface Expression {
+export class Expression {
   readonly comments?: string[];
 }

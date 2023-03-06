@@ -1,15 +1,10 @@
-import { ObjectLiteral } from '../expressions/objects';
-import { LocalSymbol } from '../expressions/references';
-import { ReturnStatement, Statement } from './statements';
-
-export function sym(name: string): LocalSymbol {
-  return new LocalSymbol(name);
-}
-
-export function object(data: Record<string, Statement> = {}): Statement {
-  return new ObjectLiteral(data);
-}
+import { Expression } from '../expression';
+import { IfThenElse, ReturnStatement, Statement } from './statements';
 
 export function ret(statement?: Statement): Statement {
   return new ReturnStatement(statement);
+}
+
+export function if_(condition: Expression) {
+  return new IfThenElse(condition);
 }

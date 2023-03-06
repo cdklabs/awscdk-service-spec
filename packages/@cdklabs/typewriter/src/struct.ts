@@ -1,7 +1,7 @@
 import * as jsii from '@jsii/spec';
 import { Property, PropertySpec } from './property';
 import { Scope } from './scope';
-import { Type, TypeKind } from './type';
+import { TypeDeclaration, TypeKind } from './type-declaration';
 import { MemberKind } from './type-member';
 
 export interface StructSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' | 'kind'> {
@@ -10,7 +10,7 @@ export interface StructSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' 
   properties?: PropertySpec[];
 }
 
-export class StructType extends Type {
+export class StructType extends TypeDeclaration {
   /**
    * Lists all direct properties of the interface
    */

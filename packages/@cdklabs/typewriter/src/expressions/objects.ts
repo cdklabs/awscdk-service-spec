@@ -8,26 +8,31 @@ export interface ObjectLike {
   invoke(method: string, ...args: Expression[]): InvokeExpression;
 }
 
-export class ObjectPropertyAccess implements Expression {
+export class ObjectPropertyAccess extends Expression {
   readonly comments?: string[];
-  public constructor(public readonly obj: ObjectLiteral | ObjectReference, public readonly property: string) {}
+  public constructor(public readonly obj: ObjectLiteral | ObjectReference, public readonly property: string) {
+    super();
+  }
 }
 
-export class ObjectMethodInvoke implements InvokeExpression {
+export class ObjectMethodInvoke extends InvokeExpression {
   public constructor(
     public readonly obj: ObjectLiteral | ObjectReference,
     public readonly method: string,
     public readonly args: Expression[] = [],
-  ) {}
+  ) {
+    super();
+  }
 
   with(...args: Expression[]): InvokeExpression {
     return new ObjectMethodInvoke(this.obj, this.method, args);
   }
 }
 
-export class ObjectLiteral implements Expression, ObjectLike {
-  readonly comments?: string[];
-  public constructor(public readonly contents: Record<string, Expression> = {}) {}
+export class ObjectLiteral extends Expression implements ObjectLike {
+  public constructor(public readonly contents: Record<string, Expression> = {}) {
+    super();
+  }
 
   public get keys(): string[] {
     return Object.keys(this.contents);
@@ -61,5 +66,23 @@ export class ObjectReference extends LocalSymbol implements ObjectLike {
   }
   public invoke(method: string, ...args: Expression[]): ObjectMethodInvoke {
     return new ObjectMethodInvoke(this, method, args);
+  }
+}
+
+export class NotExpression extends Expression {
+  constructor(public readonly operand: Expression) {
+    super();
+  }
+}
+
+export class EqualsExpression extends Expression {
+  constructor(public readonly left: Expression, public readonly right: Expression) {
+    super();
+  }
+}
+
+export class JsLiteralExpression extends Expression {
+  constructor(public readonly value: any) {
+    super();
   }
 }

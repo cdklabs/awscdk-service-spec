@@ -1,9 +1,9 @@
 import { Callable } from './callable';
-import { TypeReference, TypeReferenceSpec } from './type-ref';
+import { Type } from './type';
 
 export interface ParameterSpec {
   name: string;
-  type: TypeReferenceSpec;
+  type: Type;
 }
 
 export class Parameter {
@@ -13,7 +13,7 @@ export class Parameter {
     return this.spec.name;
   }
 
-  public get type(): TypeReference {
-    return new TypeReference(this.scope.scope, this.spec.type);
+  public get type(): Type {
+    return this.spec.type;
   }
 }

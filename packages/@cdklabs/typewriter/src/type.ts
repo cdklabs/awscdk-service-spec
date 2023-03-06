@@ -1,61 +1,104 @@
 import * as jsii from '@jsii/spec';
-import { Documented } from './documented';
 import { Scope } from './scope';
+import { TypeDeclaration } from './type-declaration';
+
+export type TypeReferenceSpec = jsii.TypeReference;
 
 /**
- * Kinds of types.
+ * A reference to an existing type in the given scope
  */
-export enum TypeKind {
-  Class = 'class',
-  Enum = 'enum',
-  Interface = 'interface',
-  Function = 'function',
-}
-
-export interface TypeSpec extends Omit<jsii.TypeBase, 'assembly' | 'fqn' | 'kind'> {
-  kind: TypeKind;
-}
-
-/**
- * An abstract jsii type
- */
-export abstract class Type implements Documented {
-  /**
-   * The simple name of the type (MyClass).
-   */
-  public get name(): string {
-    return this.spec.name;
+export class Type {
+  public static any(scope: Scope) {
+    return new Type(scope, { primitive: jsii.PrimitiveType.Any });
   }
 
-  /**
-   * The fully qualified name of the type (``<assembly>.<namespace>.<name>``)
-   */
-  public get fqn(): string {
-    return `${this.scope.fqn}.${this.name}`;
+  public static void(scope: Scope) {
+    return new Type(scope);
   }
 
-  /**
-   * The kind of the type.
-   */
-  public get kind(): TypeKind {
-    return this.spec.kind;
+  public get fqn(): string | undefined {
+    return jsii.isNamedTypeReference(this.spec) ? this.spec.fqn : undefined;
   }
 
-  /**
-   * Documentation for this type
-   */
-  public get docs() {
-    return this.spec.docs;
-  }
+  public constructor(public readonly scope: Scope, public readonly spec?: TypeReferenceSpec) {}
 
-  public constructor(public readonly scope: Scope, public readonly spec: TypeSpec) {
-    scope.addType(this);
-  }
-
-  /**
-   * Simple Human readable string representation of the type.
-   */
   public toString(): string {
-    return `${this.kind} ${this.fqn}`;
+    if (this.void) {
+      return 'void';
+    }
+    if (this.primitive) {
+      return this.primitive;
+    }
+    if (this.fqn) {
+      return this.fqn;
+    }
+
+    if (this.arrayOfType) {
+      return `Array<${this.arrayOfType.toString()}>`;
+    }
+    if (this.mapOfType) {
+      return `Map<string => ${this.mapOfType.toString()}>`;
+    }
+    if (this.unionOfTypes) {
+      return this.unionOfTypes.map((x) => x.toString()).join(' | ');
+    }
+
+    throw new Error(`Unknown type reference: ${JSON.stringify(this.spec)}`);
+  }
+
+  public get void(): boolean {
+    return !this.spec;
+  }
+
+  public get isAny(): boolean {
+    return this.primitive === 'any';
+  }
+
+  public get primitive(): string | undefined {
+    if (!jsii.isPrimitiveTypeReference(this.spec)) {
+      return undefined;
+    }
+
+    return this.spec.primitive;
+  }
+
+  public get type(): TypeDeclaration | undefined {
+    if (!jsii.isNamedTypeReference(this.spec)) {
+      return undefined;
+    }
+
+    return this.scope.findType(this.spec.fqn);
+  }
+
+  public get arrayOfType(): Type | undefined {
+    if (!jsii.isCollectionTypeReference(this.spec)) {
+      return undefined;
+    }
+
+    if (this.spec.collection.kind !== jsii.CollectionKind.Array) {
+      return undefined;
+    }
+
+    return new Type(this.scope, this.spec.collection.elementtype);
+  }
+
+  public get mapOfType(): Type | undefined {
+    if (!jsii.isCollectionTypeReference(this.spec)) {
+      return undefined;
+    }
+
+    if (this.spec.collection.kind !== jsii.CollectionKind.Map) {
+      return undefined;
+    }
+
+    return new Type(this.scope, this.spec.collection.elementtype);
+  }
+
+  public get unionOfTypes(): Type[] | undefined {
+    if (!jsii.isUnionTypeReference(this.spec)) {
+      return undefined;
+    }
+
+    return this.spec.union.types.map((t) => new Type(this.scope, t));
   }
 }

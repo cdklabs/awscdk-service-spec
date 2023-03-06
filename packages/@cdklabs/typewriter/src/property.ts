@@ -2,7 +2,7 @@ import * as jsii from '@jsii/spec';
 import { DocsSpec } from './documented';
 import { StructType } from './struct';
 import { MemberKind, MemberVisibility, TypeMember } from './type-member';
-import { TypeReference } from './type-ref';
+import { Type } from './type';
 
 export interface PropertySpec extends Omit<jsii.Property, 'assembly' | 'fqn' | 'docs'> {
   kind: MemberKind.Property;
@@ -37,8 +37,8 @@ export class Property extends TypeMember {
   /**
    * The type of the property as a reference.
    */
-  public get type(): TypeReference {
-    return new TypeReference(this.scope.scope, this.spec.type);
+  public get type(): Type {
+    return new Type(this.scope.scope, this.spec.type);
   }
 
   public constructor(public readonly scope: StructType, public readonly spec: PropertySpec) {

@@ -3,18 +3,17 @@ import { Callable } from '../callable';
 import { StructType } from '../struct';
 import { Module } from '../module';
 import { Property } from '../property';
-import {
+import LocalSymbol, {
   ObjectPropertyAccess,
   ObjectLiteral,
   ReturnStatement,
   Statement,
-  LocalSymbol,
   ObjectMethodInvoke,
   ObjectReference,
   ExpressionStatement,
 } from '../statements';
 import { MemberVisibility } from '../type-member';
-import { TypeReference } from '../type-ref';
+import { Type } from '../type';
 import { Documented } from '../documented';
 import { Expression } from '../expression';
 import { InvokeCallable } from '../expressions/invoke';
@@ -53,7 +52,7 @@ export class TypeScriptRenderer extends Renderer {
     ].join('\n');
   }
 
-  protected renderTypeRef(ref: TypeReference): string {
+  protected renderTypeRef(ref: Type): string {
     if (ref.void) {
       return 'void';
     }

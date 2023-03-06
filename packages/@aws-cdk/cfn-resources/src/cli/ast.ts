@@ -1,6 +1,6 @@
 import { DatabaseSchema, Deprecation, Property, PropertyType, Resource, TypeDefinition } from '@aws-cdk/service-spec';
 import { Database } from '@cdklabs/tskb';
-import { Callable, StructType, TypeReferenceSpec, stmt, TypeKind } from '@cdklabs/typewriter';
+import { Callable, StructType, TypeReferenceSpec, expr, stmt, TypeKind, Type } from '@cdklabs/typewriter';
 import { DocsSpec } from '@cdklabs/typewriter/src/documented';
 import * as jsii from '@jsii/spec';
 import { Stability } from '@jsii/spec';
@@ -11,6 +11,7 @@ import {
   structNameFromTypeDefinition,
 } from './naming/conventions';
 import { cloudFormationDocLink } from './naming/doclink';
+import { PropMapping } from './prop-mapping';
 import { ResourceModule } from './resource';
 import { splitSummary } from './split-summary';
 
@@ -44,37 +45,36 @@ export class AstBuilder {
         }),
       },
     });
+    const mapping = new PropMapping();
     for (const [name, prop] of Object.entries(r.properties)) {
-      this.addResourceProperty(propsInterface, name, prop, r);
+      this.addStructProperty(propsInterface, mapping, name, prop, r);
     }
+
+    this.makeStructMapper(propsInterface, mapping);
   }
 
-  protected addResourceProperty(propsInterface: StructType, name: string, property: Property, parent: Resource) {
-    this.addStructProperty(propsInterface, name, property, parent);
-
+  protected makeStructMapper(propsInterface: StructType, mapping: PropMapping) {
     const propToCfn = new Callable(this.scope, {
       kind: TypeKind.Function,
-      name: `cfn${this.scope.resource}${name}PropertyToCloudFormation`,
+      name: `convert${propsInterface.name}ToCloudFormation`,
       parameters: [
         {
           name: 'properties',
-          type: {
-            primitive: jsii.PrimitiveType.Any,
-          },
+          type: propsInterface.type,
         },
       ],
-      returnType: {
-        primitive: jsii.PrimitiveType.Any,
-      },
+      returnType: Type.any(this.scope),
     });
-    propToCfn.body.do((body) => {
-      body.return_(
-        stmt.object({
-          // @TODO this needs to iterate over the properties on the type
-          Manifest: this.core.objectToCloudFormation(stmt.sym('properties').asObject().prop('manifest')),
-        }),
-      );
-    });
+
+    const propsObj = expr.sym('properties').asObject();
+
+
+    propToCfn.body.add(
+      stmt.if(expr.not(
+      stmt.ret(expr.object(mapping.cfnFromTs().map(([cfn, ts]) => [cfn, propsObj.prop(ts)] as const))),
+    );
+
+    return propToCfn;
   }
 
   protected propertyTypeToTypeReferenceSpec(type: PropertyType): TypeReferenceSpec {
@@ -131,8 +131,9 @@ export class AstBuilder {
       },
     });
 
+    const mapping = new PropMapping();
     Object.entries(def.properties).forEach(([name, p]) => {
-      this.addStructProperty(theType, name, p, def);
+      this.addStructProperty(theType, mapping, name, p, def);
     });
 
     return theType;
@@ -140,6 +141,7 @@ export class AstBuilder {
 
   private addStructProperty(
     struct: StructType,
+    map: PropMapping,
     propertyName: string,
     property: Property,
     parent: Resource | TypeDefinition,
@@ -152,6 +154,8 @@ export class AstBuilder {
       resource = this.resourceOfType(parent);
       propTypeName = parent.name;
     }
+
+    map.add(propertyName, propertyNameFromCloudFormation(propertyName));
 
     struct.addProperty({
       name: propertyNameFromCloudFormation(propertyName),
