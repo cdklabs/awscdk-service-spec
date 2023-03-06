@@ -1,11 +1,10 @@
-import { LocalSymbol } from './references';
 import { Callable } from '../callable';
 import { Expression } from '../expression';
-import { InvokeCallable, InvokeExpression } from './invoke';
+import { InvokeCallable } from './invoke';
 
-export interface ObjectLike {
-  prop(property: string): ObjectPropertyAccess;
-  invoke(method: string, ...args: Expression[]): InvokeExpression;
+export interface ObjectLike extends Expression {
+  prop(property: string): Expression;
+  invoke(method: string, ...args: Expression[]): Expression;
 }
 
 export class ObjectPropertyAccess extends Expression {
@@ -15,17 +14,13 @@ export class ObjectPropertyAccess extends Expression {
   }
 }
 
-export class ObjectMethodInvoke extends InvokeExpression {
+export class ObjectMethodInvoke extends Expression {
   public constructor(
     public readonly obj: ObjectLiteral | ObjectReference,
     public readonly method: string,
     public readonly args: Expression[] = [],
   ) {
     super();
-  }
-
-  with(...args: Expression[]): InvokeExpression {
-    return new ObjectMethodInvoke(this.obj, this.method, args);
   }
 }
 
@@ -42,11 +37,11 @@ export class ObjectLiteral extends Expression implements ObjectLike {
     return Object.entries(this.contents);
   }
 
-  public prop(property: string): ObjectPropertyAccess {
+  public prop(property: string): Expression {
     return new ObjectPropertyAccess(this, property);
   }
 
-  public invoke(name: string, ...args: Expression[]): InvokeExpression {
+  public invoke(name: string, ...args: Expression[]): Expression {
     const callable = this.contents[name];
     if (callable && callable instanceof Callable) {
       return new InvokeCallable(callable, args);
@@ -56,10 +51,8 @@ export class ObjectLiteral extends Expression implements ObjectLike {
   }
 }
 
-export class ObjectReference extends LocalSymbol implements ObjectLike {
-  public constructor(public readonly symbol: LocalSymbol) {
-    super(symbol.name);
-  }
+export class ObjectReference implements ObjectLike {
+  public constructor(public readonly symbol: Expression) {}
 
   public prop(property: string): ObjectPropertyAccess {
     return new ObjectPropertyAccess(this, property);

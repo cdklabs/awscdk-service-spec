@@ -1,7 +1,8 @@
 import { Callable } from '../callable';
 import { StructType } from '../struct';
 import { Module } from '../module';
-import { TypeKind } from '../type-declaration';
+import { SymbolKind } from '../symbol';
+import { Emitter } from './emitter';
 
 export interface RenderOptions {
   indentation?: number | string;
@@ -9,6 +10,7 @@ export interface RenderOptions {
 
 export abstract class Renderer {
   protected symbol: string;
+  private emitter = new Emitter();
 
   public constructor(options: RenderOptions = {}) {
     this.symbol = this.setIndentationSymbol(options.indentation);
@@ -18,47 +20,56 @@ export abstract class Renderer {
    * Render a renderable to a string.
    */
   public render(scope: Module): string {
-    return this.renderModule(scope, 0);
+    this.emitter = new Emitter();
+    this.renderModule(scope);
+    return this.emitter.toString();
   }
 
   /**
    * Render a module.
    */
-  protected abstract renderModule(scope: Module, indentationLevel: number): string;
+  protected abstract renderModule(scope: Module): void;
 
   /**
    * Render types of a module.
    */
-  protected renderModuleTypes(mod: Module, indentationLevel: number): string[] {
-    return mod.types.map((t) => {
+  protected renderModuleTypes(mod: Module): void {
+    for (const t of mod.types) {
       switch (t.kind) {
-        case TypeKind.Interface:
-          return this.renderStruct(t as StructType, indentationLevel);
-        case TypeKind.Function:
-          return this.renderCallable(t as Callable, indentationLevel);
+        case SymbolKind.Interface:
+          this.renderStruct(t as StructType);
+          this.emit('\n\n');
+          break;
+        case SymbolKind.Function:
+          this.renderCallable(t as Callable);
+          this.emit('\n\n');
+          break;
         default:
           throw `Unknown type: ${t.kind} for ${t.fqn}. Skipping.`;
       }
-    });
+    }
   }
 
   /**
    * Render an interface.
    */
-  protected abstract renderStruct(interfaceType: StructType, indentationLevel: number): string;
+  protected abstract renderStruct(interfaceType: StructType): void;
 
   /**
    * Render a callable.
    */
-  protected abstract renderCallable(func: Callable, indentationLevel: number): string;
+  protected abstract renderCallable(func: Callable): void;
 
-  /**
-   * Indent text to the specified level.
-   */
-  public indent(text: string[], level: number): string[];
-  public indent(text: string, level: number): string;
-  public indent(text: string | string[], level: number): string | string[] {
-    return Array.isArray(text) ? text.map((t) => this.getIndentation(level) + t) : this.getIndentation(level) + text;
+  protected indent() {
+    this.emitter.indent(this.symbol);
+  }
+
+  protected unindent() {
+    this.emitter.unindent();
+  }
+
+  protected emit(x: string) {
+    this.emitter.emit(x);
   }
 
   protected setIndentationSymbol(symbol: number | string = 2): string {
@@ -67,9 +78,5 @@ export abstract class Renderer {
     }
 
     return symbol;
-  }
-
-  protected getIndentation(level: number): string {
-    return this.symbol.repeat(level);
   }
 }

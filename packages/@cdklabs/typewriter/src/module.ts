@@ -1,6 +1,10 @@
 import { StructType } from './struct';
 import { Scope } from './scope';
 import { TypeDeclaration } from './type-declaration';
+import { ObjectLike } from './expressions/objects';
+import { Identifier } from './expressions/identifier';
+import { Expression } from './expression';
+import { InvokeCallable } from './expressions';
 
 /**
  * A module
@@ -44,5 +48,27 @@ export class Module extends Scope {
 
   public addImport(scope: Scope, name: string): void {
     this.importMap.set(name, scope);
+  }
+
+  public import(module: Module, as: string): AliasedModuleImport {
+    module.addImport(this, as);
+    return new AliasedModuleImport(this, as);
+  }
+}
+
+export class AliasedModuleImport implements ObjectLike {
+  comments?: string[] | undefined;
+  constructor(public readonly module: Module, public readonly as: string) {}
+
+  public prop(property: string): Identifier {
+    const type = this.module.tryFindType(property);
+    if (!type) {
+      throw new Error(`Module ${this.module.fqn} does not have member ${property}`);
+    }
+    return new Identifier(`${this.as}.${property}`);
+  }
+
+  public invoke(method: string, ...args: Expression[]): Expression {
+    return new InvokeCallable(this.prop(method), args);
   }
 }

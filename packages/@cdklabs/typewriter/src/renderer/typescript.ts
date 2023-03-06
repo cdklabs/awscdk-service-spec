@@ -3,154 +3,210 @@ import { Callable } from '../callable';
 import { StructType } from '../struct';
 import { Module } from '../module';
 import { Property } from '../property';
-import LocalSymbol, {
-  ObjectPropertyAccess,
-  ObjectLiteral,
-  ReturnStatement,
-  Statement,
-  ObjectMethodInvoke,
-  ObjectReference,
-  ExpressionStatement,
-} from '../statements';
+import { ReturnStatement, Statement, ExpressionStatement, IfThenElse, Block } from '../statements';
 import { MemberVisibility } from '../type-member';
 import { Type } from '../type';
 import { Documented } from '../documented';
 import { Expression } from '../expression';
 import { InvokeCallable } from '../expressions/invoke';
+import { Identifier, ObjectLiteral, ObjectMethodInvoke, ObjectPropertyAccess, ObjectReference } from '../expressions';
 
 export class TypeScriptRenderer extends Renderer {
-  protected renderModule(mod: Module, lvl: number): string {
-    return [this.renderImports(mod), this.renderModuleTypes(mod, lvl).join('\n\n')].join('\n\n');
+  protected renderModule(mod: Module) {
+    this.renderImports(mod);
+    this.renderModuleTypes(mod);
   }
 
-  protected renderImports(mod: Module): string {
-    return mod.imports.map(([name, scope]) => `import * as ${name} from "${scope.fqn}";`).join('\n');
+  protected renderImports(mod: Module) {
+    for (const [name, scope] of mod.imports) {
+      this.emit(`import * as ${name} from "${scope.fqn}";\n`);
+    }
   }
 
-  protected renderStruct(structType: StructType, lvl: number): string {
+  protected emitBlock(header: string, block: () => void) {
+    this.indent();
+    this.emit(header);
+    this.emit('{\n');
+    block();
+    this.unindent();
+    this.emit('\n}');
+  }
+
+  protected emitList<A>(xs: A[], sep: string, block: (x: A) => void) {
+    let first = true;
+    for (const x of xs) {
+      if (!first) {
+        this.emit(sep);
+      }
+      first = false;
+
+      block(x);
+    }
+  }
+
+  protected renderStruct(structType: StructType) {
     const modifiers = structType.modifiers.length ? structType.modifiers.join(' ') + ' ' : '';
 
-    return [
-      ...this.indent(this.renderDocs(structType, { forceStruct: true }), lvl),
-      this.indent(`${modifiers}interface ${structType.name} {`, lvl),
-      Array.from(structType.properties.values())
-        .filter((p) => p.visibility === MemberVisibility.Public)
-        .map((p) => this.renderProperty(p, lvl + 1))
-        .join('\n\n'),
-      this.indent('}\n', lvl),
-    ].join('\n');
+    this.renderDocs(structType, { forceStruct: true });
+    this.emitBlock(`${modifiers}interface ${structType.name}`, () => {
+      const props = Array.from(structType.properties.values()).filter((p) => p.visibility === MemberVisibility.Public);
+
+      this.emitList(props, '\n\n', (p) => this.renderProperty(p));
+    });
   }
 
-  protected renderProperty(property: Property, level = 0): string {
+  protected renderProperty(property: Property) {
+    this.renderDocs(property);
+
     const qmark = property.optional ? '?' : '';
-    return [
-      ...this.indent(this.renderDocs(property), level),
-      this.indent(
-        `${property.spec.immutable ? 'readonly ' : ''}${property.name}${qmark}: ${this.renderTypeRef(property.type)};`,
-        level,
-      ),
-    ].join('\n');
+    this.emit(`${property.spec.immutable ? 'readonly ' : ''}${property.name}${qmark}: `);
+    this.renderTypeRef(property.type);
+    this.emit(';');
   }
 
-  protected renderTypeRef(ref: Type): string {
+  protected renderTypeRef(ref: Type): void {
     if (ref.void) {
-      return 'void';
+      return this.emit('void');
     }
     if (ref.primitive) {
-      return ref.primitive;
+      return this.emit(ref.primitive);
     }
     if (ref.fqn) {
-      return ref.scope.findType(ref.fqn).name;
+      return this.emit(ref.scope.findType(ref.fqn).name);
     }
 
     if (ref.arrayOfType) {
-      return `Array<${this.renderTypeRef(ref.arrayOfType)}>`;
+      this.emit(`Array<`);
+      this.renderTypeRef(ref.arrayOfType);
+      this.emit('>');
+      return;
     }
     if (ref.mapOfType) {
-      return `Map<string, ${this.renderTypeRef(ref.mapOfType)}>`;
+      this.emit(`Map<string, `);
+      this.renderTypeRef(ref.mapOfType);
+      this.emit('>');
+      return;
     }
     if (ref.unionOfTypes) {
-      return ref.unionOfTypes.map((x) => this.renderTypeRef(x)).join(' | ');
+      return this.emitList(ref.unionOfTypes, ' | ', (x) => this.renderTypeRef(x));
     }
 
-    return 'any';
+    this.emit('any');
   }
 
-  protected renderCallable(func: Callable, lvl: number): string {
+  protected renderCallable(func: Callable) {
+    this.renderDocs(func);
+    this.emit(`// @ts-ignore TS6133\n`);
+
     const params = func.parameters.map((p) => `${p.name}: ${this.renderTypeRef(p.type)}`).join(', ');
     const returnType = func.returnType ? `: ${this.renderTypeRef(func.returnType)}` : '';
-    return [
-      ...this.indent(this.renderDocs(func), lvl),
-      this.indent(`// @ts-ignore TS6133`, lvl),
-      this.indent(`function ${func.name}(${params})${returnType} {`, lvl),
-      // We already have the curlies
-      ...func.body.statements.map((s) => this.renderStatement(s, lvl + 1)),
-      this.indent('}\n', lvl),
-    ].join('\n');
+    this.emit(`function ${func.name}(${params})${returnType} `);
+    this.renderBlock(func.body);
   }
 
-  protected renderStatement(stmnt: Statement, lvl: number): string {
+  protected renderStatement(stmnt: Statement) {
     if (stmnt instanceof ReturnStatement) {
-      return this.renderReturnStatement(stmnt, lvl);
+      return this.renderReturnStatement(stmnt);
     }
     if (stmnt instanceof ExpressionStatement) {
-      return this.renderExpression(stmnt.expression, lvl);
+      return this.renderExpression(stmnt.expression);
+    }
+    if (stmnt instanceof IfThenElse) {
+      return this.renderIfThenElse(stmnt);
+    }
+    if (stmnt instanceof Block) {
+      return this.renderBlock(stmnt);
     }
 
-    return `/* @todo ${stmnt.constructor.name} */`;
+    this.emit(`/* @todo ${stmnt.constructor.name} */`);
   }
 
-  protected renderExpression(stmnt: Expression, lvl: number): string {
+  protected renderExpression(stmnt: Expression): void {
     if (stmnt instanceof ObjectLiteral) {
-      return this.renderObjectLiteral(stmnt, lvl);
+      return this.renderObjectLiteral(stmnt);
     } else if (stmnt instanceof ObjectPropertyAccess) {
-      return this.renderObjectAccess(stmnt.obj, stmnt.property, lvl);
+      return this.renderObjectAccess(stmnt.obj, stmnt.property);
     } else if (stmnt instanceof ObjectMethodInvoke) {
-      return this.renderInvokeCallable(`${this.renderObjectAccess(stmnt.obj, stmnt.method, lvl)}`, stmnt.args, lvl);
+      return this.renderObjectMethodInvoke(stmnt);
     } else if (stmnt instanceof InvokeCallable) {
-      return this.renderInvokeCallable(stmnt.callable.name, stmnt.args, lvl);
+      return this.renderInvokeCallable(stmnt);
+    } else if (stmnt instanceof Identifier) {
+      return this.renderIdentifier(stmnt);
     }
 
-    return `/* @todo ${stmnt.constructor.name} */`;
+    this.emit(`/* @todo ${stmnt.constructor.name} */`);
   }
 
-  protected renderInvokeCallable(name: string, args: Statement[], lvl: number): string {
-    const argList = args.map((arg) => this.renderExpression(arg, lvl));
-    return this.indent(`${name}(${argList.join(', ').trim()})`, lvl);
+  protected renderIdentifier(id: Identifier) {
+    this.emit(id.name);
   }
 
-  protected renderObjectLiteral(obj: ObjectLiteral, lvl: number) {
-    return [
-      this.indent('{', lvl),
-      obj.entries
-        .map(([key, val]) =>
-          this.indent(`${JSON.stringify(key)}: ${this.renderExpression(val, lvl + 1).trim()},`, lvl + 1),
-        )
-        .join('\n'),
-      this.indent('}', lvl),
-    ].join('\n');
+  protected renderObjectMethodInvoke(omi: ObjectMethodInvoke) {
+    this.renderObjectAccess(omi.obj, omi.method);
+    this.emit('(');
+    this.emitList(omi.args, ', ', (arg) => this.renderExpression(arg));
+    this.emit(')');
   }
 
-  protected renderObjectAccess(obj: ObjectLiteral | ObjectReference, member: string, lvl: number): string {
+  protected renderInvokeCallable(ic: InvokeCallable) {
+    this.renderExpression(ic.callable);
+    this.emit('(');
+    this.emitList(ic.args, ', ', (arg) => this.renderExpression(arg));
+    this.emit(')');
+  }
+
+  protected renderBlock(obj: Block) {
+    this.emitBlock('', () => {
+      this.emitList(obj.statements, '\n', (s) => this.renderStatement(s));
+    });
+  }
+
+  protected renderObjectLiteral(obj: ObjectLiteral) {
+    this.emitBlock('', () => {
+      this.emitList(obj.entries, ',\n', ([key, val]) => {
+        this.emit(`${JSON.stringify(key)}: `);
+        this.renderExpression(val);
+      });
+    });
+  }
+
+  protected renderObjectAccess(obj: ObjectLiteral | ObjectReference, member: string) {
     if (obj instanceof ObjectLiteral) {
-      return this.indent(`(${this.renderObjectLiteral(obj, lvl)}).${member}`, lvl);
+      this.emit('(');
+      this.renderObjectLiteral(obj);
+      this.emit(').');
+      this.emit(member);
+      return;
     }
-    return this.indent(`${this.renderSymbol(obj.symbol)}.${member}`, lvl);
+
+    this.renderExpression(obj.symbol);
+    this.emit('.');
+    this.emit(member);
   }
 
-  protected renderSymbol(symbol: LocalSymbol): string {
-    return symbol.name;
-  }
-
-  protected renderReturnStatement(ret: ReturnStatement, lvl: number) {
+  protected renderReturnStatement(ret: ReturnStatement) {
     if (!ret.expression) {
-      return this.indent('return;', lvl);
+      return this.emit('return;');
     }
 
-    return this.indent(`return ${this.renderExpression(ret.expression, lvl).trim()};`, lvl);
+    this.emit(`return `);
+    this.renderExpression(ret.expression);
+    this.emit(';');
   }
 
-  protected renderDocs(el: Documented, options: DocOptions = {}): string[] {
+  protected renderIfThenElse(ifThen: IfThenElse) {
+    this.emit('if (');
+    this.renderExpression(ifThen.condition);
+    this.emit(') ');
+
+    this.renderStatement(ifThen.thenStatement ?? new Block());
+    if (ifThen.elseStatement) {
+      this.emit(' else');
+      this.renderStatement(ifThen.elseStatement);
+    }
+  }
+
+  protected renderDocs(el: Documented, options: DocOptions = {}): void {
     const ret = new Array();
     line(el.docs?.summary);
     parBreak();
@@ -171,10 +227,14 @@ export class TypeScriptRenderer extends Renderer {
     }
 
     if (ret.length === 0) {
-      return [];
+      return;
     }
 
-    return ['/**', ...ret.map((x) => ` * ${x.trimEnd()}`), ' */'];
+    this.emit('/**\n');
+    for (const x of ret) {
+      this.emit(` * ${x.trimEnd()}\n`);
+    }
+    this.emit(' */\n');
 
     function line(x: string | undefined) {
       if (x?.trim()) {

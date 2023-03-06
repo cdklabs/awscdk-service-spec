@@ -1,10 +1,10 @@
 import { DatabaseSchema, Deprecation, Property, PropertyType, Resource, TypeDefinition } from '@aws-cdk/service-spec';
 import { Database } from '@cdklabs/tskb';
-import { Callable, StructType, TypeReferenceSpec, expr, stmt, TypeKind, Type } from '@cdklabs/typewriter';
+import { Callable, StructType, TypeReferenceSpec, expr, stmt, Type, AliasedModuleImport } from '@cdklabs/typewriter';
 import { DocsSpec } from '@cdklabs/typewriter/src/documented';
 import * as jsii from '@jsii/spec';
 import { Stability } from '@jsii/spec';
-import { CdkCore } from './cdk';
+import { CDK_CORE } from './cdk';
 import {
   propertyNameFromCloudFormation,
   propStructNameFromResource,
@@ -26,17 +26,16 @@ export class AstBuilder {
     return new AstBuilder(scope, db);
   }
 
-  protected readonly core: CdkCore;
+  private core: AliasedModuleImport;
 
   protected constructor(public readonly scope: ResourceModule, public readonly db: Database<DatabaseSchema>) {
-    this.core = new CdkCore('aws-cdk-lib', scope);
+    this.core = CDK_CORE.import(scope, 'cdk');
   }
 
   public addResource(r: Resource) {
     const propsInterface = new StructType(this.scope, {
       export: true,
       name: propStructNameFromResource(r),
-      kind: TypeKind.Interface,
       docs: {
         ...splitDocumentation(r.documentation),
         stability: Stability.External,
@@ -55,7 +54,6 @@ export class AstBuilder {
 
   protected makeStructMapper(propsInterface: StructType, mapping: PropMapping) {
     const propToCfn = new Callable(this.scope, {
-      kind: TypeKind.Function,
       name: `convert${propsInterface.name}ToCloudFormation`,
       parameters: [
         {
@@ -68,9 +66,9 @@ export class AstBuilder {
 
     const propsObj = expr.sym('properties').asObject();
 
-
     propToCfn.body.add(
-      stmt.if(expr.not(
+      stmt.if_(expr.not(this.core.invoke('canInspect', propsObj))).then(stmt.ret(propsObj)),
+      // FIXME: Validation here
       stmt.ret(expr.object(mapping.cfnFromTs().map(([cfn, ts]) => [cfn, propsObj.prop(ts)] as const))),
     );
 
@@ -121,7 +119,6 @@ export class AstBuilder {
     const theType = new StructType(this.scope, {
       export: true,
       name: structNameFromTypeDefinition(def),
-      kind: TypeKind.Interface,
       docs: {
         ...splitDocumentation(def.documentation),
         see: cloudFormationDocLink({

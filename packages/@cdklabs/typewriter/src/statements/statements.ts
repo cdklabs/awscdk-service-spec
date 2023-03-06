@@ -1,28 +1,34 @@
 import { Expression } from '../expression';
 
-export interface Statement {
+export class Statement {
   readonly comments?: string[];
 }
 
-export class ReturnStatement implements Statement {
+export class ReturnStatement extends Statement {
   readonly comments?: string[];
 
-  public constructor(public readonly expression?: Expression) {}
+  public constructor(public readonly expression?: Expression) {
+    super();
+  }
 }
 
-export class ExpressionStatement implements Statement {
+export class ExpressionStatement extends Statement {
   readonly comments?: string[];
 
-  public constructor(public readonly expression: Expression) {}
+  public constructor(public readonly expression: Expression) {
+    super();
+  }
 }
 
-export class IfThenElse implements Statement {
+export class IfThenElse extends Statement {
   readonly comments?: string[];
 
   public thenStatement?: Statement;
   public elseStatement?: Statement;
 
-  public constructor(public readonly condition: Expression) {}
+  public constructor(public readonly condition: Expression) {
+    super();
+  }
 
   public then(then_: Statement) {
     this.thenStatement = then_;

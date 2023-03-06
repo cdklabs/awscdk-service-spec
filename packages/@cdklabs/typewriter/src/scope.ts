@@ -20,11 +20,6 @@ export abstract class Scope {
    */
   public abstract addType(type: TypeDeclaration): void;
 
-  /**
-   * Register a import to the scope
-   */
-  public abstract addImport(scope: Scope, name: string): void;
-
   public tryFindType(fqnOrName: string): TypeDeclaration | undefined {
     return this.typeMap.get(fqnOrName) || this.typeMap.get(`${this.fqn}.${fqnOrName}`);
   }

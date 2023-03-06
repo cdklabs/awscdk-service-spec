@@ -1,4 +1,4 @@
-import { Statement } from './statements';
+import { Statement } from '.';
 
 export class Block implements Statement {
   public readonly comments?: string[];

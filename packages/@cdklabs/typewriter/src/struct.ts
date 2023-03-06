@@ -1,16 +1,18 @@
 import * as jsii from '@jsii/spec';
 import { Property, PropertySpec } from './property';
 import { Scope } from './scope';
-import { TypeDeclaration, TypeKind } from './type-declaration';
+import { SymbolKind } from './symbol';
+import { TypeDeclaration } from './type-declaration';
 import { MemberKind } from './type-member';
 
 export interface StructSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' | 'kind'> {
-  kind: TypeKind.Interface;
   export?: boolean;
   properties?: PropertySpec[];
 }
 
 export class StructType extends TypeDeclaration {
+  public readonly kind = SymbolKind.Interface;
+
   /**
    * Lists all direct properties of the interface
    */

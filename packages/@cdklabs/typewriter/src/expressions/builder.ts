@@ -1,9 +1,9 @@
 import { Expression } from '../expression';
 import { EqualsExpression, JsLiteralExpression, NotExpression, ObjectLiteral } from '../expressions/objects';
-import { LocalSymbol } from '../expressions/references';
+import { Identifier } from './identifier';
 
-export function sym(name: string): LocalSymbol {
-  return new LocalSymbol(name);
+export function sym(name: string): Identifier {
+  return new Identifier(name);
 }
 
 export function object(data?: Record<string, Expression> | Array<readonly [string, Expression]>): Expression {

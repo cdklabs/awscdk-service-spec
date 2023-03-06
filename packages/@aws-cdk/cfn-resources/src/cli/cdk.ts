@@ -1,15 +1,13 @@
-import { ExternalModule } from '@cdklabs/typewriter';
-import { Expression } from '@cdklabs/typewriter/src/expression';
+import { Callable, ExternalModule } from '@cdklabs/typewriter';
 
 export class CdkCore extends ExternalModule {
-  public objectToCloudFormation(...args: Expression[]) {
-    return this.import('cdk')
-      .invoke('objectToCloudFormation')
-      .with(...args);
-  }
-  public stringToCloudFormation(...args: Expression[]) {
-    return this.import('cdk')
-      .invoke('stringToCloudFormation')
-      .with(...args);
+  constructor(fqn: string) {
+    super(fqn);
+
+    this.addType(new Callable(this, { name: 'objectToCloudFormation' }));
+    this.addType(new Callable(this, { name: 'stringToCloudFormation' }));
+    this.addType(new Callable(this, { name: 'canInspect' }));
   }
 }
+
+export const CDK_CORE = new CdkCore('aws-cdk-lib');
