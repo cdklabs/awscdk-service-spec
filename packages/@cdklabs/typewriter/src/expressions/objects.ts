@@ -9,7 +9,10 @@ export interface ObjectLike extends Expression {
 
 export class ObjectPropertyAccess extends Expression {
   readonly comments?: string[];
-  public constructor(public readonly obj: ObjectLiteral | ObjectReference, public readonly property: string) {
+  public constructor(
+    public readonly obj: ObjectLiteral | ObjectReference | Expression,
+    public readonly property: string,
+  ) {
     super();
   }
 }
@@ -51,8 +54,10 @@ export class ObjectLiteral extends Expression implements ObjectLike {
   }
 }
 
-export class ObjectReference implements ObjectLike {
-  public constructor(public readonly symbol: Expression) {}
+export class ObjectReference extends Expression implements ObjectLike {
+  public constructor(public readonly symbol: Expression) {
+    super();
+  }
 
   public prop(property: string): ObjectPropertyAccess {
     return new ObjectPropertyAccess(this, property);

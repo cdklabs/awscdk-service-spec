@@ -22,7 +22,7 @@ export class Callable extends TypeDeclaration {
   public constructor(public readonly scope: Scope, public readonly spec: CallableSpec) {
     super(scope, spec);
     this.body = spec.body ?? new Block();
-    this.returnType = spec.returnType ?? Type.void(scope);
+    this.returnType = spec.returnType ?? Type.VOID;
   }
 
   invoke(...args: Expression[]): Expression {

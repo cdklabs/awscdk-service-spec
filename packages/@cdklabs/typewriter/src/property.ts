@@ -4,9 +4,10 @@ import { StructType } from './struct';
 import { MemberKind, MemberVisibility, TypeMember } from './type-member';
 import { Type } from './type';
 
-export interface PropertySpec extends Omit<jsii.Property, 'assembly' | 'fqn' | 'docs'> {
+export interface PropertySpec extends Omit<jsii.Property, 'assembly' | 'fqn' | 'docs' | 'type'> {
   kind: MemberKind.Property;
   docs?: DocsSpec;
+  type: Type;
 }
 
 export class Property extends TypeMember {
@@ -37,11 +38,10 @@ export class Property extends TypeMember {
   /**
    * The type of the property as a reference.
    */
-  public get type(): Type {
-    return new Type(this.scope.scope, this.spec.type);
-  }
+  public readonly type: Type;
 
   public constructor(public readonly scope: StructType, public readonly spec: PropertySpec) {
     super(scope, spec);
+    this.type = spec.type;
   }
 }

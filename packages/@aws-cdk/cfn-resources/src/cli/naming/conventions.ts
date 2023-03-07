@@ -1,4 +1,5 @@
 import { Resource, TypeDefinition } from '@aws-cdk/service-spec';
+import { TypeDeclaration } from '@cdklabs/typewriter';
 import camelcase from 'camelcase';
 
 /**
@@ -52,4 +53,8 @@ export function classNameFromResource(res: Resource) {
 
 export function propStructNameFromResource(res: Resource) {
   return `${classNameFromResource(res)}Props`;
+}
+
+export function mapperNameFromType(struct: TypeDeclaration) {
+  return `convert${struct.name}ToCloudFormation`;
 }

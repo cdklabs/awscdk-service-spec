@@ -1,29 +1,79 @@
-import * as jsii from '@jsii/spec';
 import { Scope } from './scope';
 import { TypeDeclaration } from './type-declaration';
 
-export type TypeReferenceSpec = jsii.TypeReference;
+export enum PrimitiveType {
+  /**
+   * A JSON date (represented as it's ISO-8601 string form).
+   */
+  Date = 'date',
+  /**
+   * A plain string.
+   */
+  String = 'string',
+  /**
+   * A number (integer or float).
+   */
+  Number = 'number',
+  /**
+   * A boolean value.
+   */
+  Boolean = 'boolean',
+  /**
+   * A JSON object
+   */
+  Json = 'json',
+  /**
+   * Value with "any" or "unknown" type (aka Object). Values typed `any` may
+   * be `null` or `undefined`.
+   */
+  Any = 'any',
+
+  /**
+   * No type
+   */
+  Void = 'void',
+}
+
+export type TypeReferenceSpec =
+  | { readonly fqn: string }
+  | { readonly primitive: PrimitiveType }
+  | { readonly collection: { readonly kind: 'map' | 'array'; readonly elementType: Type } }
+  | { readonly union: Type[] };
 
 /**
  * A reference to an existing type in the given scope
  */
 export class Type {
-  public static any(scope: Scope) {
-    return new Type(scope, { primitive: jsii.PrimitiveType.Any });
+  public static readonly ANY = new Type({ primitive: PrimitiveType.Any });
+  public static readonly VOID = new Type({ primitive: PrimitiveType.Void });
+  public static readonly STRING = new Type({ primitive: PrimitiveType.String });
+  public static readonly NUMBER = new Type({ primitive: PrimitiveType.Number });
+  public static readonly BOOLEAN = new Type({ primitive: PrimitiveType.Boolean });
+
+  public static fromFqn(scope: Scope, fqn: string) {
+    return new Type({ fqn }, scope);
   }
 
-  public static void(scope: Scope) {
-    return new Type(scope);
+  public static arrayOf(elementType: Type) {
+    return new Type({ collection: { kind: 'array', elementType } });
   }
 
-  public get fqn(): string | undefined {
-    return jsii.isNamedTypeReference(this.spec) ? this.spec.fqn : undefined;
+  public static mapOf(elementType: Type) {
+    return new Type({ collection: { kind: 'map', elementType } });
   }
 
-  public constructor(public readonly scope: Scope, public readonly spec?: TypeReferenceSpec) {}
+  public readonly spec: TypeReferenceSpec;
+
+  private constructor(spec?: TypeReferenceSpec, public readonly scope?: Scope) {
+    this.spec = spec ?? { primitive: PrimitiveType.Void };
+
+    if (isFqnSpec(this.spec) && !scope) {
+      throw new Error(`FQN types must have a scope`);
+    }
+  }
 
   public toString(): string {
-    if (this.void) {
+    if (this.isVoid) {
       return 'void';
     }
     if (this.primitive) {
@@ -46,59 +96,57 @@ export class Type {
     throw new Error(`Unknown type reference: ${JSON.stringify(this.spec)}`);
   }
 
-  public get void(): boolean {
+  public get fqn(): string | undefined {
+    return this.spec && isFqnSpec(this.spec) ? this.spec.fqn : undefined;
+  }
+
+  public get isVoid(): boolean {
     return !this.spec;
   }
 
   public get isAny(): boolean {
-    return this.primitive === 'any';
+    return this.primitive === PrimitiveType.Any;
   }
 
-  public get primitive(): string | undefined {
-    if (!jsii.isPrimitiveTypeReference(this.spec)) {
-      return undefined;
-    }
-
-    return this.spec.primitive;
+  public get primitive(): PrimitiveType | undefined {
+    return isPrimitiveSpec(this.spec) ? this.spec.primitive : undefined;
   }
 
-  public get type(): TypeDeclaration | undefined {
-    if (!jsii.isNamedTypeReference(this.spec)) {
-      return undefined;
-    }
-
-    return this.scope.findType(this.spec.fqn);
+  public get declaration(): TypeDeclaration | undefined {
+    return isFqnSpec(this.spec) ? this.scope?.tryFindType(this.spec.fqn) : undefined;
   }
 
   public get arrayOfType(): Type | undefined {
-    if (!jsii.isCollectionTypeReference(this.spec)) {
-      return undefined;
-    }
-
-    if (this.spec.collection.kind !== jsii.CollectionKind.Array) {
-      return undefined;
-    }
-
-    return new Type(this.scope, this.spec.collection.elementtype);
+    return isCollectionSpec(this.spec) && this.spec.collection.kind === 'array'
+      ? this.spec.collection.elementType
+      : undefined;
   }
 
   public get mapOfType(): Type | undefined {
-    if (!jsii.isCollectionTypeReference(this.spec)) {
-      return undefined;
-    }
-
-    if (this.spec.collection.kind !== jsii.CollectionKind.Map) {
-      return undefined;
-    }
-
-    return new Type(this.scope, this.spec.collection.elementtype);
+    return isCollectionSpec(this.spec) && this.spec.collection.kind === 'map'
+      ? this.spec.collection.elementType
+      : undefined;
   }
 
   public get unionOfTypes(): Type[] | undefined {
-    if (!jsii.isUnionTypeReference(this.spec)) {
-      return undefined;
-    }
-
-    return this.spec.union.types.map((t) => new Type(this.scope, t));
+    return isUnionSpec(this.spec) ? this.spec.union : undefined;
   }
+}
+
+function isFqnSpec(x: TypeReferenceSpec): x is Extract<TypeReferenceSpec, { fqn: string }> {
+  return !!(x as any).fqn;
+}
+
+function isPrimitiveSpec(x: TypeReferenceSpec): x is Extract<TypeReferenceSpec, { primitive: PrimitiveType }> {
+  return !!(x as any).primitive;
+}
+
+function isCollectionSpec(
+  x: TypeReferenceSpec,
+): x is Extract<TypeReferenceSpec, { collection: { kind: 'map' | 'array'; elementType: Type } }> {
+  return !!(x as any).collection;
+}
+
+function isUnionSpec(x: TypeReferenceSpec): x is Extract<TypeReferenceSpec, { union: Type[] }> {
+  return !!(x as any).union;
 }

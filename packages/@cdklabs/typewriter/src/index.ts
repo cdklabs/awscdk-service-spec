@@ -13,3 +13,5 @@ export * from './utils';
 export * from './statements';
 export * as stmt from './statements/builder';
 export * as expr from './expressions/builder';
+export * from './expressions';
+export * from './expression';

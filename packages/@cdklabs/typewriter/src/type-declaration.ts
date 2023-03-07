@@ -49,9 +49,7 @@ export abstract class TypeDeclaration extends Symbol implements Documented {
     super(spec.name);
 
     scope.addType(this);
-    this.type = new Type(scope, {
-      fqn: this.fqn,
-    });
+    this.type = Type.fromFqn(scope, this.fqn);
   }
 
   /**

@@ -5,7 +5,7 @@ import { SymbolKind } from './symbol';
 import { TypeDeclaration } from './type-declaration';
 import { MemberKind } from './type-member';
 
-export interface StructSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' | 'kind'> {
+export interface StructSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' | 'kind' | 'properties'> {
   export?: boolean;
   properties?: PropertySpec[];
 }

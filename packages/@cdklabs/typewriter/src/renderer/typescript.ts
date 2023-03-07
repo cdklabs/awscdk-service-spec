@@ -9,7 +9,14 @@ import { Type } from '../type';
 import { Documented } from '../documented';
 import { Expression } from '../expression';
 import { InvokeCallable } from '../expressions/invoke';
-import { Identifier, ObjectLiteral, ObjectMethodInvoke, ObjectPropertyAccess, ObjectReference } from '../expressions';
+import {
+  Identifier,
+  NotExpression,
+  ObjectLiteral,
+  ObjectMethodInvoke,
+  ObjectPropertyAccess,
+  ObjectReference,
+} from '../expressions';
 
 export class TypeScriptRenderer extends Renderer {
   protected renderModule(mod: Module) {
@@ -21,12 +28,20 @@ export class TypeScriptRenderer extends Renderer {
     for (const [name, scope] of mod.imports) {
       this.emit(`import * as ${name} from "${scope.fqn}";\n`);
     }
+
+    if (mod.imports.length > 0) {
+      this.emit('\n');
+    }
   }
 
   protected emitBlock(header: string, block: () => void) {
     this.indent();
     this.emit(header);
-    this.emit('{\n');
+    if (header) {
+      this.emit(' {\n');
+    } else {
+      this.emit('{\n');
+    }
     block();
     this.unindent();
     this.emit('\n}');
@@ -65,14 +80,15 @@ export class TypeScriptRenderer extends Renderer {
   }
 
   protected renderTypeRef(ref: Type): void {
-    if (ref.void) {
+    if (ref.isVoid) {
       return this.emit('void');
     }
     if (ref.primitive) {
       return this.emit(ref.primitive);
     }
-    if (ref.fqn) {
-      return this.emit(ref.scope.findType(ref.fqn).name);
+    const decl = ref.declaration;
+    if (decl) {
+      return this.emit(decl.name);
     }
 
     if (ref.arrayOfType) {
@@ -98,43 +114,52 @@ export class TypeScriptRenderer extends Renderer {
     this.renderDocs(func);
     this.emit(`// @ts-ignore TS6133\n`);
 
-    const params = func.parameters.map((p) => `${p.name}: ${this.renderTypeRef(p.type)}`).join(', ');
-    const returnType = func.returnType ? `: ${this.renderTypeRef(func.returnType)}` : '';
-    this.emit(`function ${func.name}(${params})${returnType} `);
+    this.emit(`function ${func.name}(`);
+    this.emitList(func.parameters, ', ', (p) => {
+      this.emit(`${p.name}: `);
+      this.renderTypeRef(p.type);
+    });
+    this.emit(')');
+    if (func.returnType) {
+      this.emit(': ');
+      this.renderTypeRef(func.returnType);
+    }
+
+    this.emit(' ');
     this.renderBlock(func.body);
   }
 
   protected renderStatement(stmnt: Statement) {
-    if (stmnt instanceof ReturnStatement) {
-      return this.renderReturnStatement(stmnt);
-    }
-    if (stmnt instanceof ExpressionStatement) {
-      return this.renderExpression(stmnt.expression);
-    }
-    if (stmnt instanceof IfThenElse) {
-      return this.renderIfThenElse(stmnt);
-    }
-    if (stmnt instanceof Block) {
-      return this.renderBlock(stmnt);
-    }
+    // FIXME: Comments
+    const success = dispatchType(stmnt, [
+      typeCase(ReturnStatement, (x) => this.renderReturnStatement(x)),
+      typeCase(ExpressionStatement, (x) => this.renderExpression(x.expression)),
+      typeCase(IfThenElse, (x) => this.renderIfThenElse(x)),
+      typeCase(Block, (x) => this.renderBlock(x)),
+    ]);
 
-    this.emit(`/* @todo ${stmnt.constructor.name} */`);
+    if (!success) {
+      this.emit(`/* @todo ${stmnt.constructor.name} */`);
+    }
   }
 
-  protected renderExpression(stmnt: Expression): void {
-    if (stmnt instanceof ObjectLiteral) {
-      return this.renderObjectLiteral(stmnt);
-    } else if (stmnt instanceof ObjectPropertyAccess) {
-      return this.renderObjectAccess(stmnt.obj, stmnt.property);
-    } else if (stmnt instanceof ObjectMethodInvoke) {
-      return this.renderObjectMethodInvoke(stmnt);
-    } else if (stmnt instanceof InvokeCallable) {
-      return this.renderInvokeCallable(stmnt);
-    } else if (stmnt instanceof Identifier) {
-      return this.renderIdentifier(stmnt);
-    }
+  protected renderExpression(expr: Expression): void {
+    const success = dispatchType(expr, [
+      typeCase(ObjectLiteral, (x) => this.renderObjectLiteral(x)),
+      typeCase(ObjectPropertyAccess, (x) => this.renderObjectAccess(x)),
+      typeCase(ObjectMethodInvoke, (x) => this.renderObjectMethodInvoke(x)),
+      typeCase(InvokeCallable, (x) => this.renderInvokeCallable(x)),
+      typeCase(Identifier, (x) => this.renderIdentifier(x)),
+      typeCase(ObjectReference, (x) => this.renderExpression(x.symbol)),
+      typeCase(NotExpression, (x) => {
+        this.emit('!');
+        this.renderExpression(x.operand);
+      }),
+    ]);
 
-    this.emit(`/* @todo ${stmnt.constructor.name} */`);
+    if (!success) {
+      this.emit(`/* @todo ${expr.constructor.name} */`);
+    }
   }
 
   protected renderIdentifier(id: Identifier) {
@@ -142,7 +167,8 @@ export class TypeScriptRenderer extends Renderer {
   }
 
   protected renderObjectMethodInvoke(omi: ObjectMethodInvoke) {
-    this.renderObjectAccess(omi.obj, omi.method);
+    // FIXME: Simplify
+    this.renderObjectAccess(new ObjectPropertyAccess(omi.obj, omi.method));
     this.emit('(');
     this.emitList(omi.args, ', ', (arg) => this.renderExpression(arg));
     this.emit(')');
@@ -170,18 +196,22 @@ export class TypeScriptRenderer extends Renderer {
     });
   }
 
-  protected renderObjectAccess(obj: ObjectLiteral | ObjectReference, member: string) {
-    if (obj instanceof ObjectLiteral) {
+  protected renderObjectAccess(access: ObjectPropertyAccess) {
+    // FIXME: Simplify
+    if (access.obj instanceof ObjectLiteral) {
       this.emit('(');
-      this.renderObjectLiteral(obj);
+      this.renderObjectLiteral(access.obj);
       this.emit(').');
-      this.emit(member);
+      this.emit(access.property);
       return;
     }
-
-    this.renderExpression(obj.symbol);
+    if (access.obj instanceof ObjectReference) {
+      this.renderExpression(access.obj.symbol);
+    } else {
+      this.renderExpression(access.obj);
+    }
     this.emit('.');
-    this.emit(member);
+    this.emit(access.property);
   }
 
   protected renderReturnStatement(ret: ReturnStatement) {
@@ -261,4 +291,20 @@ export interface DocOptions {
    * Emit an annotation that forces jsii to recognize this type as a struct
    */
   readonly forceStruct?: boolean;
+}
+
+type TypeCase<A> = { ctr: new (...args: any[]) => A; then: (x: A) => void };
+
+function dispatchType<A extends object>(x: A, cases: Array<TypeCase<any>>): boolean {
+  for (const { ctr, then } of cases) {
+    if (x instanceof ctr) {
+      then(x);
+      return true;
+    }
+  }
+  return false;
+}
+
+function typeCase<A extends object>(ctr: TypeCase<A>['ctr'], then: TypeCase<A>['then']): TypeCase<A> {
+  return { ctr, then };
 }

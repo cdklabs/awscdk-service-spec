@@ -1,11 +1,11 @@
 import { DatabaseSchema, Deprecation, Property, PropertyType, Resource, TypeDefinition } from '@aws-cdk/service-spec';
 import { Database } from '@cdklabs/tskb';
-import { Callable, StructType, TypeReferenceSpec, expr, stmt, Type, AliasedModuleImport } from '@cdklabs/typewriter';
+import { Callable, StructType, expr, stmt, Type, AliasedModuleImport, TypeDeclaration } from '@cdklabs/typewriter';
 import { DocsSpec } from '@cdklabs/typewriter/src/documented';
-import * as jsii from '@jsii/spec';
 import { Stability } from '@jsii/spec';
 import { CDK_CORE } from './cdk';
 import {
+  mapperNameFromType,
   propertyNameFromCloudFormation,
   propStructNameFromResource,
   structNameFromTypeDefinition,
@@ -44,7 +44,7 @@ export class AstBuilder {
         }),
       },
     });
-    const mapping = new PropMapping();
+    const mapping = new PropMapping(this.core);
     for (const [name, prop] of Object.entries(r.properties)) {
       this.addStructProperty(propsInterface, mapping, name, prop, r);
     }
@@ -54,14 +54,14 @@ export class AstBuilder {
 
   protected makeStructMapper(propsInterface: StructType, mapping: PropMapping) {
     const propToCfn = new Callable(this.scope, {
-      name: `convert${propsInterface.name}ToCloudFormation`,
+      name: mapperNameFromType(propsInterface),
       parameters: [
         {
           name: 'properties',
           type: propsInterface.type,
         },
       ],
-      returnType: Type.any(this.scope),
+      returnType: Type.ANY,
     });
 
     const propsObj = expr.sym('properties').asObject();
@@ -69,46 +69,34 @@ export class AstBuilder {
     propToCfn.body.add(
       stmt.if_(expr.not(this.core.invoke('canInspect', propsObj))).then(stmt.ret(propsObj)),
       // FIXME: Validation here
-      stmt.ret(expr.object(mapping.cfnFromTs().map(([cfn, ts]) => [cfn, propsObj.prop(ts)] as const))),
+      stmt.ret(expr.object(mapping.cfnProperties().map((cfn) => [cfn, mapping.mapProp(cfn, propsObj)] as const))),
     );
 
     return propToCfn;
   }
 
-  protected propertyTypeToTypeReferenceSpec(type: PropertyType): TypeReferenceSpec {
+  protected propertyTypeToTypeReferenceSpec(type: PropertyType): Type {
     switch (type?.type) {
       case 'string':
+        return Type.STRING;
       case 'number':
+        return Type.NUMBER;
       case 'boolean':
-        return {
-          primitive: type.type as jsii.PrimitiveType,
-        };
+        return Type.BOOLEAN;
       case 'array':
-        return {
-          collection: {
-            kind: jsii.CollectionKind.Array,
-            elementtype: this.propertyTypeToTypeReferenceSpec(type.element) as any,
-          },
-        };
+        return Type.arrayOf(this.propertyTypeToTypeReferenceSpec(type.element));
       case 'map':
-        return {
-          collection: {
-            kind: jsii.CollectionKind.Map,
-            elementtype: this.propertyTypeToTypeReferenceSpec(type.element) as any,
-          },
-        };
+        return Type.mapOf(this.propertyTypeToTypeReferenceSpec(type.element));
       case 'ref':
         const ref = this.db.get('typeDefinition', type.reference.$ref);
-        return this.obtainTypeReference(ref);
+        return this.obtainTypeReference(ref).type;
       case 'json':
       default:
-        return {
-          primitive: jsii.PrimitiveType.Any,
-        };
+        return Type.ANY;
     }
   }
 
-  private obtainTypeReference(ref: TypeDefinition) {
+  private obtainTypeReference(ref: TypeDefinition): TypeDeclaration {
     const ret = this.scope.tryFindType(structNameFromTypeDefinition(ref));
     return ret ?? this.createTypeReference(ref);
   }
@@ -128,10 +116,12 @@ export class AstBuilder {
       },
     });
 
-    const mapping = new PropMapping();
+    const mapping = new PropMapping(this.core);
     Object.entries(def.properties).forEach(([name, p]) => {
       this.addStructProperty(theType, mapping, name, p, def);
     });
+
+    this.makeStructMapper(theType, mapping);
 
     return theType;
   }
@@ -152,11 +142,14 @@ export class AstBuilder {
       propTypeName = parent.name;
     }
 
-    map.add(propertyName, propertyNameFromCloudFormation(propertyName));
+    const name = propertyNameFromCloudFormation(propertyName);
+    const type = this.propertyTypeToTypeReferenceSpec(property.type);
+
+    map.add(propertyName, name, type);
 
     struct.addProperty({
-      name: propertyNameFromCloudFormation(propertyName),
-      type: this.propertyTypeToTypeReferenceSpec(property.type),
+      name,
+      type,
       optional: !property.required,
       docs: {
         ...splitDocumentation(property.documentation),
