@@ -1,17 +1,16 @@
 import { StructType } from './struct';
-import { Scope } from './scope';
+import { IImport, Scope } from './scope';
 import { TypeDeclaration } from './type-declaration';
-import { ObjectLike } from './expressions/objects';
 import { Identifier } from './expressions/identifier';
 import { Expression } from './expression';
-import { InvokeCallable } from './expressions';
+import { ObjectPropertyAccess } from './expressions';
+import { ThingSymbol } from './symbol';
 
 /**
  * A module
  */
 export class Module extends Scope {
   protected readonly typeMap: Map<string, TypeDeclaration> = new Map<string, TypeDeclaration>();
-  protected readonly importMap: Map<string, Scope> = new Map<string, Scope>();
 
   public get name(): string {
     return this.fqn;
@@ -29,13 +28,6 @@ export class Module extends Scope {
   }
 
   /**
-   * All imports in this module
-   */
-  public get imports(): Array<[string, Scope]> {
-    return Array.from(this.importMap.entries());
-  }
-
-  /**
    * All interfaces in this module/namespace (not submodules)
    */
   public get interfaces(): readonly StructType[] {
@@ -46,29 +38,26 @@ export class Module extends Scope {
     this.typeMap.set(type.fqn, type);
   }
 
-  public addImport(scope: Scope, name: string): void {
-    this.importMap.set(name, scope);
+  public import(intoModule: Module, as: string) {
+    intoModule.addImportedScope(this, new AliasedModuleImport(this, as));
   }
 
-  public import(module: Module, as: string): AliasedModuleImport {
-    module.addImport(this, as);
-    return new AliasedModuleImport(this, as);
+  public toString() {
+    return `module '${this.fqn}'`;
   }
 }
 
-export class AliasedModuleImport implements ObjectLike {
-  comments?: string[] | undefined;
-  constructor(public readonly module: Module, public readonly as: string) {}
+class AliasedModuleImport implements IImport {
+  public readonly importAlias?: string | undefined;
+  public readonly moduleSource: string;
 
-  public prop(property: string): Identifier {
-    const type = this.module.tryFindType(property);
-    if (!type) {
-      throw new Error(`Module ${this.module.fqn} does not have member ${property}`);
-    }
-    return new Identifier(`${this.as}.${property}`);
+  constructor(public readonly module: Module, public readonly as: string) {
+    this.importAlias = as;
+    this.moduleSource = module.fqn;
   }
 
-  public invoke(method: string, ...args: Expression[]): Expression {
-    return new InvokeCallable(this.prop(method), args);
+  referenceSymbol(sym: ThingSymbol): Expression {
+    // We just assume that this symbol exists. We can't properly check it, yet...
+    return new ObjectPropertyAccess(new Identifier(this.as), sym.name);
   }
 }

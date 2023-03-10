@@ -58,3 +58,15 @@ export function propStructNameFromResource(res: Resource) {
 export function mapperNameFromType(struct: TypeDeclaration) {
   return `convert${struct.name}ToCloudFormation`;
 }
+
+export function reverseMapperNameFromType(struct: TypeDeclaration) {
+  return `${struct.name}FromCloudFormation`;
+}
+
+export function staticResourceTypeName() {
+  return 'CFN_RESOURCE_TYPE_NAME';
+}
+
+export function attributePropertyName(attrName: string) {
+  return `attr${attrName.replace(/[^a-zA-Z0-9]/g, '')}`;
+}

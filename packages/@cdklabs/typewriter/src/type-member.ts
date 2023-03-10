@@ -1,11 +1,18 @@
 import { DocsSpec, Documented } from './documented';
-import { StructType } from './struct';
 import { Property as PropertyType } from './property';
+import { MemberType } from './member-type';
+import { CallableDeclaration, CallableSpec } from './callable';
+import { Block, Statement } from './statements';
+import { Type } from './type';
+import { Parameter, ParameterSpec } from './parameter';
+import { Expression } from './expression';
+import { ObjectPropertyAccess } from './expressions';
 
 export interface TypeMemberSpec {
   name: string;
-  kind: MemberKind;
   docs?: DocsSpec;
+  abstract?: boolean;
+  static?: boolean;
 }
 
 export enum MemberKind {
@@ -31,9 +38,7 @@ export abstract class TypeMember implements Documented {
   /**
    * The kind of the type.
    */
-  public get kind(): MemberKind {
-    return this.spec.kind;
-  }
+  public abstract readonly kind: MemberKind;
 
   /**
    * The fully qualified name of the member (``<assembly>.<namespace>.<name>#member``)
@@ -49,9 +54,17 @@ export abstract class TypeMember implements Documented {
     return this.spec.docs;
   }
 
+  public get abstract() {
+    return this.spec.abstract ?? false;
+  }
+
+  public get static() {
+    return this.spec.static ?? false;
+  }
+
   public abstract visibility: MemberVisibility;
 
-  public constructor(public readonly scope: StructType, public readonly spec: TypeMemberSpec) {}
+  public constructor(public readonly scope: MemberType, public readonly spec: TypeMemberSpec) {}
 
   /**
    * Simple Human readable string representation of the property.
@@ -66,4 +79,73 @@ export abstract class TypeMember implements Documented {
   public isProperty(): this is PropertyType {
     return this.kind === MemberKind.Property;
   }
+}
+
+export interface MethodSpec extends CallableSpec {
+  visibility?: MemberVisibility;
+}
+
+export class Method extends TypeMember implements CallableDeclaration {
+  public readonly returnType: Type;
+  public readonly visibility: MemberVisibility;
+  public readonly parameters = new Array<Parameter>();
+  private _body?: Block;
+
+  constructor(public readonly type: MemberType, public readonly methodSpec: MethodSpec) {
+    super(type, methodSpec);
+    this._body = methodSpec.body;
+    this.returnType = methodSpec.returnType ?? Type.VOID;
+    this.visibility = methodSpec.visibility ?? MemberVisibility.Public;
+    for (const p of methodSpec.parameters ?? []) {
+      this.parameters.push(new Parameter(this, p));
+    }
+  }
+
+  public get body(): Block | undefined {
+    return this._body;
+  }
+
+  public get kind(): MemberKind {
+    return MemberKind.Method;
+  }
+
+  public get name(): string {
+    return this.spec.name;
+  }
+
+  public bind(receiver: Expression) {
+    return new ObjectPropertyAccess(receiver, this.name);
+  }
+
+  public addParameter(spec: ParameterSpec) {
+    const p = new Parameter(this, spec);
+    this.parameters.push(p);
+    return p;
+  }
+
+  public addBody(...stmts: Statement[]) {
+    if (!this._body) {
+      this._body = new Block();
+    }
+    this._body.add(...stmts);
+  }
+}
+
+export interface InitializerSpec extends Omit<MethodSpec, 'name' | 'returnType'> {}
+
+export class Initializer extends Method implements CallableDeclaration {
+  constructor(public readonly type: MemberType, public readonly initializerSpec: InitializerSpec) {
+    super(type, {
+      name: 'constructor',
+      returnType: type.type,
+    });
+  }
+
+  public get kind(): MemberKind {
+    return MemberKind.Initializer;
+  }
+}
+
+export function isCallable(x: unknown) {
+  return x && typeof x === 'object' && !!(x as any).asSymbol;
 }

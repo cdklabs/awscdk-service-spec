@@ -1,30 +1,16 @@
 import * as jsii from '@jsii/spec';
-import { Property, PropertySpec } from './property';
+import { MemberType } from './member-type';
+import { PropertySpec } from './property';
 import { Scope } from './scope';
 import { SymbolKind } from './symbol';
-import { TypeDeclaration } from './type-declaration';
-import { MemberKind } from './type-member';
 
 export interface StructSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' | 'kind' | 'properties'> {
   export?: boolean;
   properties?: PropertySpec[];
 }
 
-export class StructType extends TypeDeclaration {
-  public readonly kind = SymbolKind.Interface;
-
-  /**
-   * Lists all direct properties of the interface
-   */
-  public get properties(): Map<string, Property> {
-    const result = new Map<string, Property>();
-
-    for (const p of this.spec.properties ?? []) {
-      result.set(p.name, new Property(this, p));
-    }
-
-    return result;
-  }
+export class StructType extends MemberType {
+  public readonly kind = SymbolKind.Struct;
 
   /**
    * List the modifiers of the interface
@@ -45,14 +31,10 @@ export class StructType extends TypeDeclaration {
   /**
    * Adds a property to the interface
    */
-  public addProperty(spec: Omit<PropertySpec, 'immutable' | 'kind'>) {
-    if (!this.spec.properties) {
-      this.spec.properties = [];
-    }
-    this.spec.properties.push({
+  public addProperty(spec: Omit<PropertySpec, 'immutable'>) {
+    return super.addProperty({
       ...spec,
       immutable: true,
-      kind: MemberKind.Property,
     });
   }
 }

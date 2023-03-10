@@ -1,8 +1,11 @@
-import { Callable } from '../callable';
+import { FreeFunction } from '../callable';
 import { StructType } from '../struct';
 import { Module } from '../module';
 import { SymbolKind } from '../symbol';
 import { Emitter } from './emitter';
+import { ClassType } from '../class';
+import { InterfaceType } from '../interface';
+import { Scope } from '../scope';
 
 export interface RenderOptions {
   indentation?: number | string;
@@ -11,6 +14,11 @@ export interface RenderOptions {
 export abstract class Renderer {
   protected symbol: string;
   private emitter = new Emitter();
+
+  /**
+   * Stack of visible scopes during rendering, closest first
+   */
+  private scopeStack = new Array<Scope>();
 
   public constructor(options: RenderOptions = {}) {
     this.symbol = this.setIndentationSymbol(options.indentation);
@@ -34,20 +42,24 @@ export abstract class Renderer {
    * Render types of a module.
    */
   protected renderModuleTypes(mod: Module): void {
-    for (const t of mod.types) {
+    this.emitList(mod.types, '\n\n', (t) => {
       switch (t.kind) {
-        case SymbolKind.Interface:
+        case SymbolKind.Struct:
           this.renderStruct(t as StructType);
-          this.emit('\n\n');
+          break;
+        case SymbolKind.Interface:
+          this.renderInterface(t as InterfaceType);
           break;
         case SymbolKind.Function:
-          this.renderCallable(t as Callable);
-          this.emit('\n\n');
+          this.renderFunction(t as FreeFunction);
+          break;
+        case SymbolKind.Class:
+          this.renderClass(t as ClassType);
           break;
         default:
           throw `Unknown type: ${t.kind} for ${t.fqn}. Skipping.`;
       }
-    }
+    });
   }
 
   /**
@@ -56,9 +68,19 @@ export abstract class Renderer {
   protected abstract renderStruct(interfaceType: StructType): void;
 
   /**
+   * Render an interface.
+   */
+  protected abstract renderInterface(interfaceType: InterfaceType): void;
+
+  /**
    * Render a callable.
    */
-  protected abstract renderCallable(func: Callable): void;
+  protected abstract renderFunction(func: FreeFunction): void;
+
+  /**
+   * Render a class.
+   */
+  protected abstract renderClass(cls: ClassType): void;
 
   protected indent() {
     this.emitter.indent(this.symbol);
@@ -78,5 +100,30 @@ export abstract class Renderer {
     }
 
     return symbol;
+  }
+
+  protected emitList<A>(xs: Iterable<A>, sep: string, block: (x: A) => void) {
+    let first = true;
+    for (const x of xs) {
+      if (!first) {
+        this.emit(sep);
+      }
+      first = false;
+
+      block(x);
+    }
+  }
+
+  protected withScope(scope: Scope, block: () => void) {
+    this.scopeStack.unshift(scope);
+    try {
+      block();
+    } finally {
+      this.scopeStack.shift();
+    }
+  }
+
+  protected get scopes(): ReadonlyArray<Scope> {
+    return this.scopeStack;
   }
 }

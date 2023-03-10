@@ -1,16 +1,20 @@
 import * as jsii from '@jsii/spec';
 import { DocsSpec } from './documented';
-import { StructType } from './struct';
 import { MemberKind, MemberVisibility, TypeMember } from './type-member';
 import { Type } from './type';
+import { MemberType } from './member-type';
+import { Expression } from './expression';
+import { ObjectPropertyAccess } from './expressions';
 
-export interface PropertySpec extends Omit<jsii.Property, 'assembly' | 'fqn' | 'docs' | 'type'> {
-  kind: MemberKind.Property;
+export interface PropertySpec extends Omit<jsii.Property, 'assembly' | 'fqn' | 'docs' | 'type' | 'kind'> {
   docs?: DocsSpec;
   type: Type;
+  initializer?: Expression;
 }
 
 export class Property extends TypeMember {
+  public readonly kind = MemberKind.Property;
+
   /**
    * Indicates if this property only has a getter (immutable).
    */
@@ -35,13 +39,26 @@ export class Property extends TypeMember {
     return MemberVisibility.Public;
   }
 
+  public get initializer() {
+    return this.spec.initializer;
+  }
+
   /**
    * The type of the property as a reference.
    */
   public readonly type: Type;
 
-  public constructor(public readonly scope: StructType, public readonly spec: PropertySpec) {
-    super(scope, spec);
+  public constructor(public readonly scope: MemberType, public readonly spec: PropertySpec) {
+    super(scope, {
+      ...spec,
+    });
     this.type = spec.type;
+  }
+
+  /**
+   * Read a property from an object
+   */
+  public from(x: Expression): Expression {
+    return new ObjectPropertyAccess(x, this.name);
   }
 }

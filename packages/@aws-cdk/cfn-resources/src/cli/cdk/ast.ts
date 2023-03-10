@@ -1,19 +1,20 @@
 import { DatabaseSchema, Deprecation, Property, PropertyType, Resource, TypeDefinition } from '@aws-cdk/service-spec';
 import { Database } from '@cdklabs/tskb';
-import { Callable, StructType, expr, stmt, Type, AliasedModuleImport, TypeDeclaration } from '@cdklabs/typewriter';
-import { DocsSpec } from '@cdklabs/typewriter/src/documented';
+import { StructType, expr, stmt, Type, TypeDeclaration, FreeFunction } from '@cdklabs/typewriter';
 import { Stability } from '@jsii/spec';
-import { CDK_CORE } from './cdk';
+import { CDK_CORE, CONSTRUCTS } from './cdk';
+import { ResourceClass } from './resource-class';
 import {
+  classNameFromResource,
   mapperNameFromType,
   propertyNameFromCloudFormation,
   propStructNameFromResource,
   structNameFromTypeDefinition,
-} from './naming/conventions';
-import { cloudFormationDocLink } from './naming/doclink';
-import { PropMapping } from './prop-mapping';
-import { ResourceModule } from './resource';
-import { splitSummary } from './split-summary';
+} from '../naming/conventions';
+import { cloudFormationDocLink } from '../naming/doclink';
+import { PropMapping } from '../prop-mapping';
+import { ResourceModule } from '../resource';
+import { splitDocumentation } from '../split-summary';
 
 export class AstBuilder {
   /**
@@ -26,34 +27,47 @@ export class AstBuilder {
     return new AstBuilder(scope, db);
   }
 
-  private core: AliasedModuleImport;
-
   protected constructor(public readonly scope: ResourceModule, public readonly db: Database<DatabaseSchema>) {
-    this.core = CDK_CORE.import(scope, 'cdk');
+    CDK_CORE.import(scope, 'cdk');
+    CONSTRUCTS.import(scope, 'constructs');
+    CDK_CORE.helpers.import(scope, 'cfn_parse');
   }
 
   public addResource(r: Resource) {
+    const propsType = this.addResourcePropsType(r);
+
+    new ResourceClass(this.scope, {
+      res: r,
+      propsType,
+      typeHost: {
+        typeFromSpecType: this.typeFromSpecType.bind(this),
+      },
+    });
+  }
+
+  protected addResourcePropsType(r: Resource) {
     const propsInterface = new StructType(this.scope, {
       export: true,
       name: propStructNameFromResource(r),
       docs: {
-        ...splitDocumentation(r.documentation),
+        summary: `Properties for defining a \`${classNameFromResource(r)}\``,
         stability: Stability.External,
         see: cloudFormationDocLink({
           resourceType: r.cloudFormationType,
         }),
       },
     });
-    const mapping = new PropMapping(this.core);
+    const mapping = new PropMapping();
     for (const [name, prop] of Object.entries(r.properties)) {
       this.addStructProperty(propsInterface, mapping, name, prop, r);
     }
 
     this.makeStructMapper(propsInterface, mapping);
+    return propsInterface;
   }
 
   protected makeStructMapper(propsInterface: StructType, mapping: PropMapping) {
-    const propToCfn = new Callable(this.scope, {
+    const propToCfn = new FreeFunction(this.scope, {
       name: mapperNameFromType(propsInterface),
       parameters: [
         {
@@ -64,10 +78,10 @@ export class AstBuilder {
       returnType: Type.ANY,
     });
 
-    const propsObj = expr.sym('properties').asObject();
+    const propsObj = expr.ident('properties');
 
-    propToCfn.body.add(
-      stmt.if_(expr.not(this.core.invoke('canInspect', propsObj))).then(stmt.ret(propsObj)),
+    propToCfn.addBody(
+      stmt.if_(expr.not(CDK_CORE.canInspect(propsObj))).then(stmt.ret(propsObj)),
       // FIXME: Validation here
       stmt.ret(expr.object(mapping.cfnProperties().map((cfn) => [cfn, mapping.mapProp(cfn, propsObj)] as const))),
     );
@@ -75,7 +89,7 @@ export class AstBuilder {
     return propToCfn;
   }
 
-  protected propertyTypeToTypeReferenceSpec(type: PropertyType): Type {
+  protected typeFromSpecType(type: PropertyType): Type {
     switch (type?.type) {
       case 'string':
         return Type.STRING;
@@ -84,9 +98,9 @@ export class AstBuilder {
       case 'boolean':
         return Type.BOOLEAN;
       case 'array':
-        return Type.arrayOf(this.propertyTypeToTypeReferenceSpec(type.element));
+        return Type.arrayOf(this.typeFromSpecType(type.element));
       case 'map':
-        return Type.mapOf(this.propertyTypeToTypeReferenceSpec(type.element));
+        return Type.mapOf(this.typeFromSpecType(type.element));
       case 'ref':
         const ref = this.db.get('typeDefinition', type.reference.$ref);
         return this.obtainTypeReference(ref).type;
@@ -116,7 +130,7 @@ export class AstBuilder {
       },
     });
 
-    const mapping = new PropMapping(this.core);
+    const mapping = new PropMapping();
     Object.entries(def.properties).forEach(([name, p]) => {
       this.addStructProperty(theType, mapping, name, p, def);
     });
@@ -143,7 +157,7 @@ export class AstBuilder {
     }
 
     const name = propertyNameFromCloudFormation(propertyName);
-    const type = this.propertyTypeToTypeReferenceSpec(property.type);
+    const type = this.typeFromSpecType(property.type);
 
     map.add(propertyName, name, type);
 
@@ -181,11 +195,6 @@ export class AstBuilder {
   private resourceOfType(ref: TypeDefinition) {
     return this.db.incoming('usesType', ref).only().from;
   }
-}
-
-function splitDocumentation(x: string | undefined): Pick<DocsSpec, 'summary' | 'remarks'> {
-  const [summary, remarks] = splitSummary(x);
-  return { summary, remarks };
 }
 
 function isResource(x: Resource | TypeDefinition): x is Resource {

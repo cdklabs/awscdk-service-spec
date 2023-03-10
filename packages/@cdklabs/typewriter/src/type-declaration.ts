@@ -2,8 +2,7 @@ import * as jsii from '@jsii/spec';
 import { Documented } from './documented';
 import { Scope } from './scope';
 import { Type } from './type';
-import { Symbol, SymbolKind } from './symbol';
-import { Identifier } from './expressions/identifier';
+import { ThingSymbol, SymbolKind } from './symbol';
 
 export interface TypeSpec extends Omit<jsii.TypeBase, 'assembly' | 'fqn' | 'kind'> {
   exported?: boolean;
@@ -12,7 +11,7 @@ export interface TypeSpec extends Omit<jsii.TypeBase, 'assembly' | 'fqn' | 'kind
 /**
  * An abstract jsii type
  */
-export abstract class TypeDeclaration extends Symbol implements Documented {
+export abstract class TypeDeclaration implements Documented {
   /**
    * The simple name of the type (MyClass).
    */
@@ -44,12 +43,13 @@ export abstract class TypeDeclaration extends Symbol implements Documented {
   }
 
   public readonly type: Type;
+  public readonly symbol: ThingSymbol;
 
   public constructor(public readonly scope: Scope, public readonly spec: TypeSpec) {
-    super(spec.name);
+    this.symbol = new ThingSymbol(spec.name, scope);
 
     scope.addType(this);
-    this.type = Type.fromFqn(scope, this.fqn);
+    this.type = Type.fromName(scope, this.name);
   }
 
   /**
@@ -57,12 +57,5 @@ export abstract class TypeDeclaration extends Symbol implements Documented {
    */
   public toString(): string {
     return `${this.kind} ${this.fqn}`;
-  }
-
-  /**
-   * Reference this type
-   */
-  public asSymbol() {
-    return new Identifier(this.name);
   }
 }

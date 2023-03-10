@@ -1,7 +1,7 @@
-import { AliasedModuleImport, expr, Type } from '@cdklabs/typewriter';
-import { Expression, InvokeCallable, ObjectPropertyAccess } from '@cdklabs/typewriter';
+import { expr, Type } from '@cdklabs/typewriter';
+import { Expression, ObjectPropertyAccess } from '@cdklabs/typewriter';
 import { PrimitiveType } from '@jsii/spec';
-import { mapperNameFromType } from './naming/conventions';
+import { CDK_CORE } from './cdk/cdk';
 
 /**
  * Retain a list of properties with their CloudFormation and TypeScript names
@@ -10,7 +10,7 @@ export class PropMapping {
   private readonly cfn2ts: Record<string, string> = {};
   private readonly cfnTypes: Record<string, Type> = {};
 
-  constructor(private readonly core: AliasedModuleImport) {}
+  constructor() {}
 
   public add(cfnName: string, tsName: string, type: Type) {
     this.cfn2ts[cfnName] = tsName;
@@ -25,50 +25,47 @@ export class PropMapping {
     return Object.keys(this.cfn2ts);
   }
 
-  public mapProp(cfnName: string, struct: Expression) {
+  public mapProp(cfnName: string, struct: Expression): Expression {
     const value = new ObjectPropertyAccess(struct, this.cfn2ts[cfnName]);
     const type = this.cfnTypes[cfnName];
     if (!type) {
       throw new Error(`No type for ${cfnName}`);
     }
 
-    const mapper = this.typeMapper(type);
-    return new InvokeCallable(mapper, [value]);
+    return this.typeMapper(type).call(value);
   }
 
   private typeMapper(type: Type): Expression {
     if (type.isAny) {
-      return this.core.prop('objectToCloudFormation');
+      return CDK_CORE.objectToCloudFormation;
     }
     switch (type.primitive) {
       case PrimitiveType.String:
-        return this.core.prop('stringToCloudFormation');
+        return CDK_CORE.stringToCloudFormation;
       case PrimitiveType.Date:
-        return this.core.prop('dateToCloudFormation');
+        return CDK_CORE.dateToCloudFormation;
       case PrimitiveType.Number:
-        return this.core.prop('numberToCloudFormation');
+        return CDK_CORE.numberToCloudFormation;
       case PrimitiveType.Json:
-        return this.core.prop('objectToCloudFormation');
+        return CDK_CORE.objectToCloudFormation;
       case PrimitiveType.Any:
-        return this.core.prop('objectToCloudFormation');
+        return CDK_CORE.objectToCloudFormation;
       case PrimitiveType.Boolean:
-        return this.core.prop('booleanToCloudFormation');
+        return CDK_CORE.booleanToCloudFormation;
     }
 
     if (type.arrayOfType) {
-      return this.core.invoke('listMapper', this.typeMapper(type.arrayOfType));
+      return CDK_CORE.listMapper(this.typeMapper(type.arrayOfType));
     }
 
     if (type.mapOfType) {
-      return this.core.invoke('hashMapper', this.typeMapper(type.mapOfType));
+      return CDK_CORE.hashMapper(this.typeMapper(type.mapOfType));
     }
 
-    if (type.declaration) {
-      // We're just going to assume this thing lives in the same scope
-      // FIXME: This should have been an object reference
-      return expr.sym(mapperNameFromType(type.declaration));
+    if (type.symbol) {
+      return expr.sym(type.symbol);
     }
 
-    return expr.sym(`/* @todo typeMapper(${type}) */`);
+    return expr.ident(`/* @todo typeMapper(${type}) */`);
   }
 }

@@ -1,7 +1,7 @@
 import path from 'path';
 import { TypeScriptRenderer } from '@cdklabs/typewriter';
 import * as fs from 'fs-extra';
-import { AstBuilder } from './ast';
+import { AstBuilder } from './cdk/ast';
 import { loadDatabase } from './db';
 
 function debug(...messages: string[]) {

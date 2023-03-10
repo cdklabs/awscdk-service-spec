@@ -1,4 +1,5 @@
 import { Scope } from './scope';
+import { ThingSymbol } from './symbol';
 import { TypeDeclaration } from './type-declaration';
 
 export enum PrimitiveType {
@@ -50,8 +51,8 @@ export class Type {
   public static readonly NUMBER = new Type({ primitive: PrimitiveType.Number });
   public static readonly BOOLEAN = new Type({ primitive: PrimitiveType.Boolean });
 
-  public static fromFqn(scope: Scope, fqn: string) {
-    return new Type({ fqn }, scope);
+  public static fromName(scope: Scope, name: string) {
+    return new Type({ fqn: name }, scope, new ThingSymbol(name, scope));
   }
 
   public static arrayOf(elementType: Type) {
@@ -64,7 +65,7 @@ export class Type {
 
   public readonly spec: TypeReferenceSpec;
 
-  private constructor(spec?: TypeReferenceSpec, public readonly scope?: Scope) {
+  private constructor(spec?: TypeReferenceSpec, public readonly scope?: Scope, public readonly symbol?: ThingSymbol) {
     this.spec = spec ?? { primitive: PrimitiveType.Void };
 
     if (isFqnSpec(this.spec) && !scope) {
