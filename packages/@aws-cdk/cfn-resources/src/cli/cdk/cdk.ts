@@ -1,10 +1,10 @@
-import { expr, Expression, ExternalModule, Scope, Type } from '@cdklabs/typewriter';
+import { $E, $T, expr, Expression, ExternalModule, Scope, Type } from '@cdklabs/typewriter';
 import { ThingSymbol } from '@cdklabs/typewriter';
 
 export class CdkCore extends ExternalModule {
   public readonly CfnResource = Type.fromName(this, 'CfnResource');
   public readonly IInspectable = Type.fromName(this, 'IInspectable');
-  public readonly Token = Type.fromName(this, 'Token');
+  public readonly Token = $T(Type.fromName(this, 'Token'));
   public readonly ResolutionTypeHint = Type.fromName(this, 'ResolutionTypeHint');
   public readonly helpers = new CdkInternalHelpers(this);
 
@@ -23,15 +23,15 @@ export class CdkCore extends ExternalModule {
   }
 
   public tokenAsString(arg: Expression) {
-    return expr.type(this.Token).callMethod('asString', arg);
+    return this.Token.asString(arg);
   }
 
   public tokenAsNumber(arg: Expression) {
-    return expr.type(this.Token).callMethod('asNumber', arg);
+    return this.Token.asNumber(arg);
   }
 
   public tokenAsList(arg: Expression) {
-    return expr.type(this.Token).callMethod('asList', arg);
+    return this.Token.asList(arg);
   }
 }
 
@@ -54,23 +54,6 @@ export class Constructs extends ExternalModule {
 export const CDK_CORE = new CdkCore('aws-cdk-lib');
 export const CONSTRUCTS = new Constructs();
 
-/**
- * This might need to be lifted, it'll do for now
- *
- * An Expression that you can call as `expr(args)`, instead of having
- * to write `expr.call(args)`.
- */
-type CallableExprSym = Expression & {
-  (...args: Expression[]): Expression;
-};
-
-function makeCallableExpr(scope: Scope, name: string): CallableExprSym {
-  const exp = expr.sym(new ThingSymbol(name, scope));
-
-  const fn = (...args: Expression[]): Expression => {
-    return exp.call(...args);
-  };
-
-  Object.setPrototypeOf(fn, Object.getPrototypeOf(exp));
-  return Object.assign(fn, exp);
+function makeCallableExpr(scope: Scope, name: string) {
+  return $E(expr.sym(new ThingSymbol(name, scope)));
 }

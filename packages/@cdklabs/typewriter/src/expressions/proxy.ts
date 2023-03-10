@@ -1,4 +1,7 @@
+import * as expr from './builder';
 import { Expression } from '../expression';
+import { Type } from '../type';
+import { NewExpression } from './objects';
 
 const isProxy = Symbol();
 
@@ -15,34 +18,71 @@ const isProxy = Symbol();
  * (It's not necessarily clear that this is a good idea... it may become very unclear
  * what is actually running code and what is building an AST).
  */
-export function $E(exp: Expression): ExpressionProxy {
+export function $E(exp: Expression): ExpressionProxy<Expression> {
   // If it is already a proxy, don't wrap it again
   if ((exp as any)[isProxy]) {
-    return exp as ExpressionProxy;
+    return exp as ExpressionProxy<Expression>;
   }
 
   // First, we MUST start with a Function, because any other object will not be
   // considered callable by JavaScript.
-
   const fn = (...args: Expression[]): Expression => {
     return exp.call(...args);
   };
 
-  const ret = new Proxy(Object.assign(fn, exp), {
-    get: (_target, key) => {
-      if (key === isProxy) {
-        return true;
-      }
-      return key in exp ? (exp as any)[key] : $E(exp.prop(String(key)));
-    },
-    set: () => false,
-    has: () => true,
-  }) as any;
+  const ret = new Proxy(Object.assign(fn, exp), EXPRESSION_HANDLERS);
   Object.setPrototypeOf(ret, Object.getPrototypeOf(exp));
-  return ret;
+  return ret as any;
 }
 
-export type ExpressionProxy = Expression & {
-  (...args: Expression[]): ExpressionProxy;
-  [key: string]: ExpressionProxy;
+const EXPRESSION_HANDLERS: ProxyHandler<Expression> = {
+  get: (exp, key) => {
+    if (key === isProxy) {
+      return true;
+    }
+    return key in exp ? (exp as any)[key] : $E(exp.prop(String(key)));
+  },
+  set: () => false,
+  has: () => true,
+};
+
+export type ExpressionProxy<E> = E & {
+  (...args: Expression[]): ExpressionProxy<E>;
+  [key: string]: ExpressionProxy<E>;
+};
+
+export type TypeExpressionProxy<T> = T & {
+  (...args: Expression[]): ExpressionProxy<Expression>;
+  [key: string]: ExpressionProxy<Expression>;
+  new (...args: Expression[]): T;
+};
+
+/**
+ * Make a proxy for a type
+ */
+export function $T(type: Type): TypeExpressionProxy<Type> {
+  // If it is already a proxy, don't wrap it again
+  if ((type as any)[isProxy]) {
+    return type as TypeExpressionProxy<Type>;
+  }
+
+  // First, we MUST start with a Function, because any other object will not be
+  // considered callable by JavaScript.
+  const ret = new Proxy(type, TYPE_HANDLERS);
+  Object.setPrototypeOf(ret, Object.getPrototypeOf(type));
+  return ret as any;
+}
+
+const TYPE_HANDLERS: ProxyHandler<Type> = {
+  get: (type, key) => {
+    if (key === isProxy) {
+      return true;
+    }
+    return key in type ? (type as any)[key] : $E(expr.type(type).prop(String(key)));
+  },
+  construct: (type, args) => {
+    return new NewExpression(expr.type(type), ...args);
+  },
+  set: () => false,
+  has: () => true,
 };
