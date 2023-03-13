@@ -1,4 +1,4 @@
-export class Emitter {
+export class IndentedStringBuilder {
   private readonly indents = new Array<string>();
   private readonly parts = new Array<string>();
 

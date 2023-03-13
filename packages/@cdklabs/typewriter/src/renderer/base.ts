@@ -2,7 +2,7 @@ import { FreeFunction } from '../callable';
 import { StructType } from '../struct';
 import { Module } from '../module';
 import { SymbolKind } from '../symbol';
-import { Emitter } from './emitter';
+import { IndentedStringBuilder } from './indented-string-builder';
 import { ClassType } from '../class';
 import { InterfaceType } from '../interface';
 import { Scope } from '../scope';
@@ -13,7 +13,7 @@ export interface RenderOptions {
 
 export abstract class Renderer {
   protected symbol: string;
-  private emitter = new Emitter();
+  private emitter = new IndentedStringBuilder();
 
   /**
    * Stack of visible scopes during rendering, closest first
@@ -28,7 +28,7 @@ export abstract class Renderer {
    * Render a renderable to a string.
    */
   public render(scope: Module): string {
-    this.emitter = new Emitter();
+    this.emitter = new IndentedStringBuilder();
     this.renderModule(scope);
     return this.emitter.toString();
   }
