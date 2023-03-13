@@ -37,6 +37,9 @@ export class CdkCore extends ExternalModule {
 
 export class CdkInternalHelpers extends ExternalModule {
   public readonly FromCloudFormationOptions = Type.fromName(this, 'FromCloudFormationOptions');
+  public readonly FromCloudFormationResult = $T(Type.fromName(this, 'FromCloudFormationResult'));
+  public readonly FromCloudFormation = $T(Type.fromName(this, 'FromCloudFormation'));
+  public readonly FromCloudFormationPropertyObject = Type.fromName(this, 'FromCloudFormationPropertyObject');
 
   constructor(parent: CdkCore) {
     super(`${parent.fqn}/lib/helpers-internal`);

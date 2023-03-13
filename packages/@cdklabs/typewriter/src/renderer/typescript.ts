@@ -22,17 +22,23 @@ import { Documented } from '../documented';
 import { Expression, SymbolReference } from '../expression';
 import { InvokeCallable } from '../expressions/invoke';
 import {
+  BinOp,
   DestructuringBind,
   Identifier,
+  IsNotNullish,
+  IsObject,
   JsLiteralExpression,
   NewExpression,
   NotExpression,
+  Null,
   ObjectLiteral,
   ObjectMethodInvoke,
   ObjectPropertyAccess,
   Structure,
+  Ternary,
   ThisInstance,
   TruthyOr,
+  Undefined,
 } from '../expressions';
 import { ClassType } from '../class';
 import { InterfaceType } from '../interface';
@@ -158,7 +164,7 @@ export class TypeScriptRenderer extends Renderer {
     this.emit(method.name);
     this.emit('(');
     this.emitList(method.parameters, ', ', (p) => {
-      this.emit(p.name);
+      this.emit(p.identifier);
       this.emit(': ');
       this.renderType(p.type);
     });
@@ -237,7 +243,7 @@ export class TypeScriptRenderer extends Renderer {
 
     this.emit(`function ${func.name}(`);
     this.emitList(func.parameters, ', ', (p) => {
-      this.emit(`${p.name}: `);
+      this.emit(`${p.identifier}: `);
       this.renderType(p.type);
     });
     this.emit(')');
@@ -338,6 +344,38 @@ export class TypeScriptRenderer extends Renderer {
         this.emitList(x.names, ', ', (x) => this.renderExpression(x));
         this.emit(x.structure === Structure.Array ? ']' : ' }');
       }),
+      typeCase(Ternary, (x) =>
+        this.parenthesized(() => {
+          this.renderExpression(x.condition);
+          this.emit(' ? ');
+          this.renderExpression(x.thenExpression ?? new Identifier('/* @error missing then */'));
+          this.emit(' : ');
+          this.renderExpression(x.elseExpression ?? new Identifier('/* @error missing else */'));
+        }),
+      ),
+      typeCase(Null, () => this.emit('null')),
+      typeCase(Undefined, () => this.emit('undefined')),
+      typeCase(BinOp, (x) =>
+        this.parenthesized(() => {
+          this.renderExpression(x.lhs);
+          this.emit(` ${x.op} `);
+          this.renderExpression(x.rhs);
+        }),
+      ),
+      typeCase(IsObject, (x) =>
+        this.parenthesized(() => {
+          this.renderExpression(x.operand);
+          this.emit(' && typeof ');
+          this.renderExpression(x.operand);
+          this.emit(" == 'object' && !Array.isArray(");
+          this.renderExpression(x.operand);
+          this.emit(')');
+        }),
+      ),
+      typeCase(IsNotNullish, (x) => {
+        this.renderExpression(x.operand);
+        this.emit(' != null');
+      }),
     ]);
 
     if (!success) {
@@ -346,7 +384,7 @@ export class TypeScriptRenderer extends Renderer {
   }
 
   protected renderIdentifier(id: Identifier) {
-    this.emit(id.name);
+    this.emit(id.identifier);
   }
 
   protected renderObjectMethodInvoke(omi: ObjectMethodInvoke) {
@@ -433,7 +471,7 @@ export class TypeScriptRenderer extends Renderer {
 
     if (isCallableDeclaration(el)) {
       for (const param of el.parameters) {
-        tagged(`param ${param.name}`, param.documentation);
+        tagged(`param ${param.identifier}`, param.documentation);
       }
     }
 
@@ -468,6 +506,30 @@ export class TypeScriptRenderer extends Renderer {
         ret.push('');
       }
     }
+  }
+
+  private parenthesized(block: () => void) {
+    this.openParen();
+    block();
+    this.closeParen();
+  }
+
+  /**
+   * Open a parenthesized subexpression
+   *
+   * For now emits unconditionally, we can do something smart later.
+   */
+  private openParen() {
+    this.emit('(');
+  }
+
+  /**
+   * Close a parenthesized subexpression
+   *
+   * For now emits unconditionally, we can do something smart later.
+   */
+  private closeParen() {
+    this.emit(')');
   }
 }
 

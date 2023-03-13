@@ -55,12 +55,14 @@ export function propStructNameFromResource(res: Resource) {
   return `${classNameFromResource(res)}Props`;
 }
 
-export function mapperNameFromType(struct: TypeDeclaration) {
-  return `convert${struct.name}ToCloudFormation`;
+export function cfnProducerNameFromType(struct: TypeDeclaration | string) {
+  const name = typeof struct === 'string' ? struct : struct.name;
+  return `convert${name}ToCloudFormation`;
 }
 
-export function reverseMapperNameFromType(struct: TypeDeclaration) {
-  return `${struct.name}FromCloudFormation`;
+export function cfnParserNameFromType(struct: TypeDeclaration | string) {
+  const name = typeof struct === 'string' ? struct : struct.name;
+  return `${name}FromCloudFormation`;
 }
 
 export function staticResourceTypeName() {

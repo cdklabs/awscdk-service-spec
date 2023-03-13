@@ -2,7 +2,7 @@ import { DocsSpec, Documented } from './documented';
 import { Property as PropertyType } from './property';
 import { MemberType } from './member-type';
 import { CallableDeclaration, CallableSpec } from './callable';
-import { Block, Statement } from './statements';
+import { Block, ExpressionStatement, Statement } from './statements';
 import { Type } from './type';
 import { Parameter, ParameterSpec } from './parameter';
 import { Expression } from './expression';
@@ -123,11 +123,11 @@ export class Method extends TypeMember implements CallableDeclaration {
     return p;
   }
 
-  public addBody(...stmts: Statement[]) {
+  public addBody(...stmts: Array<Statement | Expression>) {
     if (!this._body) {
       this._body = new Block();
     }
-    this._body.add(...stmts);
+    this._body.add(...stmts.map((x) => (x instanceof Statement ? x : new ExpressionStatement(x))));
   }
 }
 

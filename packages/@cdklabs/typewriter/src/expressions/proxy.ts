@@ -27,7 +27,7 @@ export function $E(exp: Expression): ExpressionProxy<Expression> {
   // First, we MUST start with a Function, because any other object will not be
   // considered callable by JavaScript.
   const fn = (...args: Expression[]): Expression => {
-    return exp.call(...args);
+    return $E(exp.call(...args));
   };
 
   const ret = new Proxy(Object.assign(fn, exp), EXPRESSION_HANDLERS);
@@ -47,14 +47,14 @@ const EXPRESSION_HANDLERS: ProxyHandler<Expression> = {
 };
 
 export type ExpressionProxy<E> = E & {
-  (...args: Expression[]): ExpressionProxy<E>;
-  [key: string]: ExpressionProxy<E>;
+  (...args: Expression[]): ExpressionProxy<Expression>;
+  [key: string]: ExpressionProxy<Expression>;
 };
 
 export type TypeExpressionProxy<T> = T & {
   (...args: Expression[]): ExpressionProxy<Expression>;
   [key: string]: ExpressionProxy<Expression>;
-  new (...args: Expression[]): T;
+  new (...args: Expression[]): Expression;
 };
 
 /**
@@ -66,9 +66,13 @@ export function $T(type: Type): TypeExpressionProxy<Type> {
     return type as TypeExpressionProxy<Type>;
   }
 
-  // First, we MUST start with a Function, because any other object will not be
-  // considered callable by JavaScript.
-  const ret = new Proxy(type, TYPE_HANDLERS);
+  // First, we MUST start with a non-arrow Function, otherwise JavaScript will not consider this
+  // object to be constructible (and the 'new' operator will fail before we can intercept it).
+  const fn = function (): Expression {
+    throw new Error('This should never be called');
+  };
+
+  const ret = new Proxy(Object.assign(fn, type), TYPE_HANDLERS);
   Object.setPrototypeOf(ret, Object.getPrototypeOf(type));
   return ret as any;
 }

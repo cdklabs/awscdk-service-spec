@@ -1,7 +1,7 @@
 import { Block } from './statements/block';
 import { Parameter, ParameterSpec } from './parameter';
 import { Scope } from './scope';
-import { Statement } from './statements';
+import { ExpressionStatement, Statement } from './statements';
 import { TypeDeclaration, TypeSpec } from './type-declaration';
 import { Type } from './type';
 import { SymbolKind } from './symbol';
@@ -33,6 +33,7 @@ export interface CallableExpr {
 export class FreeFunction extends TypeDeclaration implements CallableDeclaration {
   public readonly returnType: Type;
   public readonly kind = SymbolKind.Function;
+  public readonly parameters = new Array<Parameter>();
 
   private _body?: Block;
 
@@ -40,14 +41,13 @@ export class FreeFunction extends TypeDeclaration implements CallableDeclaration
     super(scope, spec);
     this._body = spec.body;
     this.returnType = spec.returnType ?? Type.VOID;
+    for (const p of this.spec.parameters ?? []) {
+      this.addParameter(p);
+    }
   }
 
   public get name(): string {
     return this.spec.name;
-  }
-
-  public get parameters(): Parameter[] {
-    return (this.spec.parameters ?? []).map((p) => new Parameter(this, p));
   }
 
   public get fn(): Expression {
@@ -58,11 +58,17 @@ export class FreeFunction extends TypeDeclaration implements CallableDeclaration
     return this._body;
   }
 
-  public addBody(...stmts: Statement[]) {
+  public addBody(...stmts: Array<Statement | Expression>) {
     if (!this._body) {
       this._body = new Block();
     }
-    this._body.add(...stmts);
+    this._body.add(...stmts.map((x) => (x instanceof Statement ? x : new ExpressionStatement(x))));
+  }
+
+  public addParameter(spec: ParameterSpec) {
+    const p = new Parameter(this, spec);
+    this.parameters.push(p);
+    return p;
   }
 }
 

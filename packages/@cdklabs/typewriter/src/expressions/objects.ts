@@ -75,4 +75,50 @@ export class DestructuringBind extends Expression {
   }
 }
 
+export class Ternary extends Expression {
+  public constructor(
+    public readonly condition: Expression,
+    public thenExpression?: Expression,
+    public elseExpression?: Expression,
+  ) {
+    super();
+  }
+
+  public then(then_: Expression) {
+    this.thenExpression = then_;
+    return this;
+  }
+
+  public else(else_: Expression) {
+    this.elseExpression = else_;
+    return this;
+  }
+}
+
 export class ThisInstance extends Expression {}
+
+export class Null extends Expression {}
+
+export const NULL = new Null();
+
+export class Undefined extends Expression {}
+
+export const UNDEFINED = new Undefined();
+
+export class BinOp extends Expression {
+  constructor(public readonly lhs: Expression, public readonly op: string, public readonly rhs: Expression) {
+    super();
+  }
+}
+
+export class IsObject extends Expression {
+  constructor(public readonly operand: Expression) {
+    super();
+  }
+}
+
+export class IsNotNullish extends Expression {
+  constructor(public readonly operand: Expression) {
+    super();
+  }
+}

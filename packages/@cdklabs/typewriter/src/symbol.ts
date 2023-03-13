@@ -23,6 +23,17 @@ export enum SymbolKind {
 export class ThingSymbol {
   constructor(public readonly name: string, public readonly scope: Scope) {}
 
+  /**
+   * Change the name of a symbol while keeping the scope the same
+   */
+  public changeName(newName: string | ((x: string) => string)) {
+    if (typeof newName === 'string') {
+      return new ThingSymbol(newName, this.scope);
+    } else {
+      return new ThingSymbol(newName(this.name), this.scope);
+    }
+  }
+
   public toString() {
     return this.name;
   }

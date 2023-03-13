@@ -1,6 +1,7 @@
 import { PropertyType, Resource } from '@aws-cdk/service-spec';
 import {
   $E,
+  $T,
   Block,
   ClassType,
   expr,
@@ -16,7 +17,7 @@ import { Stability } from '@jsii/spec';
 import {
   attributePropertyName,
   classNameFromResource,
-  reverseMapperNameFromType,
+  cfnParserNameFromType,
   staticResourceTypeName,
 } from '../naming/conventions';
 import { cloudFormationDocLink } from '../naming/doclink';
@@ -107,27 +108,26 @@ export class ResourceClass extends ClassType {
 
     const scope = factory.addParameter({ name: 'scope', type: CONSTRUCTS.Construct });
     const id = factory.addParameter({ name: 'id', type: Type.STRING });
-    const resourceAttributes = factory.addParameter({ name: 'resourceAttributes', type: Type.ANY });
-    const options = factory.addParameter({
-      name: 'options',
-      type: CDK_CORE.helpers.FromCloudFormationOptions,
-    });
+    const resourceAttributes = $E(factory.addParameter({ name: 'resourceAttributes', type: Type.ANY }));
+    const options = $E(
+      factory.addParameter({
+        name: 'options',
+        type: CDK_CORE.helpers.FromCloudFormationOptions,
+      }),
+    );
 
     const resourceProperties = expr.ident('resourceProperties');
-    const propsResult = expr.ident('resourceProperties');
-    const ret = expr.ident('ret');
+    const propsResult = $E(expr.ident('resourceProperties'));
+    const ret = $E(expr.ident('ret'));
 
     // FIXME: Reverse mapper
-    const reverseMapper = expr.ident(reverseMapperNameFromType(propsType));
+    const reverseMapper = expr.ident(cfnParserNameFromType(propsType));
 
     factory.addBody(
       stmt.assign(resourceAttributes, new TruthyOr(resourceAttributes, expr.lit({}))),
-      stmt.constVar(
-        resourceProperties,
-        options.prop('parser').callMethod('parseValue', resourceAttributes.prop('Properties')),
-      ),
+      stmt.constVar(resourceProperties, options.parser.parseValue(resourceAttributes.Properties)),
       stmt.constVar(propsResult, reverseMapper.call(resourceProperties)),
-      stmt.constVar(ret, this.newInstance(scope, id, propsResult.prop('value'))),
+      stmt.constVar(ret, this.newInstance(scope, id, propsResult.value)),
     );
 
     const propKey = expr.ident('propKey');
@@ -135,12 +135,10 @@ export class ResourceClass extends ClassType {
     factory.addBody(
       stmt
         .forConst(expr.destructuringArray(propKey, propVal))
-        .in(expr.builtInFn('Object.entries', propsResult.prop('extraProperties')))
-        .do(Block.with(stmt.expr(ret.callMethod('addPropertyOverride', propKey, propVal)))),
-    );
+        .in(expr.builtInFn('Object.entries', propsResult.extraProperties))
+        .do(Block.with(stmt.expr(ret.addPropertyOverride(propKey, propVal)))),
 
-    factory.addBody(
-      stmt.expr(options.prop('parser').callMethod('handleAttributes', ret, resourceAttributes, id)),
+      options.parser.handleAttributes(ret, resourceAttributes, id),
       stmt.ret(ret),
     );
   }
@@ -175,7 +173,7 @@ export class ResourceClass extends ClassType {
         _scope,
         id,
         expr.object({
-          type: expr.sym(this.symbol).prop(staticResourceTypeName()),
+          type: $T(this.type)[staticResourceTypeName()],
           properties: props,
         }),
       ),
@@ -188,7 +186,9 @@ export class ResourceClass extends ClassType {
         .map((p) => stmt.expr(CDK_CORE.requireProperty(props, expr.lit(p.name), $this))),
 
       stmt.sep(),
+    );
 
+    init.addBody(
       // Attributes
       ...this.mappableAttributes().map(({ name, tokenizer }) => stmt.assign($this[name], tokenizer)),
 

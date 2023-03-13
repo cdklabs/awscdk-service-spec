@@ -1,6 +1,9 @@
+import { NewExpression } from './expressions';
 import { Scope } from './scope';
+import * as expr from './expressions/builder';
 import { ThingSymbol } from './symbol';
 import { TypeDeclaration } from './type-declaration';
+import { Expression } from './expression';
 
 export enum PrimitiveType {
   /**
@@ -36,7 +39,7 @@ export enum PrimitiveType {
 }
 
 export type TypeReferenceSpec =
-  | { readonly fqn: string }
+  | { readonly fqn: string; readonly genericArguments?: Type[] }
   | { readonly primitive: PrimitiveType }
   | { readonly collection: { readonly kind: 'map' | 'array'; readonly elementType: Type } }
   | { readonly union: Type[] };
@@ -51,8 +54,8 @@ export class Type {
   public static readonly NUMBER = new Type({ primitive: PrimitiveType.Number });
   public static readonly BOOLEAN = new Type({ primitive: PrimitiveType.Boolean });
 
-  public static fromName(scope: Scope, name: string) {
-    return new Type({ fqn: name }, scope, new ThingSymbol(name, scope));
+  public static fromName(scope: Scope, name: string, genericArguments?: Type[]) {
+    return new Type({ fqn: name, genericArguments }, scope, new ThingSymbol(name, scope));
   }
 
   public static arrayOf(elementType: Type) {
@@ -131,6 +134,21 @@ export class Type {
 
   public get unionOfTypes(): Type[] | undefined {
     return isUnionSpec(this.spec) ? this.spec.union : undefined;
+  }
+
+  public get genericArguments(): Type[] | undefined {
+    return isFqnSpec(this.spec) ? this.spec.genericArguments ?? [] : [];
+  }
+
+  public withGenericArguments(...genericArguments: Type[]): Type {
+    if (!isFqnSpec(this.spec)) {
+      throw new Error('withGenericArguments: currently only supported for user-defined types!');
+    }
+    return new Type({ fqn: this.spec.fqn, genericArguments }, this.scope, this.symbol);
+  }
+
+  public newInstance(...args: Expression[]) {
+    return new NewExpression(expr.type(this), ...args);
   }
 }
 

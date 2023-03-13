@@ -1,14 +1,15 @@
 import { DatabaseSchema, Deprecation, Property, PropertyType, Resource, TypeDefinition } from '@aws-cdk/service-spec';
 import { Database } from '@cdklabs/tskb';
-import { StructType, expr, stmt, Type, TypeDeclaration, FreeFunction } from '@cdklabs/typewriter';
+import { StructType, expr, stmt, Type, TypeDeclaration, FreeFunction, IsObject, $E } from '@cdklabs/typewriter';
 import { Stability } from '@jsii/spec';
 import { CDK_CORE, CONSTRUCTS } from './cdk';
 import { ResourceClass } from './resource-class';
 import {
   classNameFromResource,
-  mapperNameFromType,
+  cfnProducerNameFromType,
   propertyNameFromCloudFormation,
   propStructNameFromResource,
+  cfnParserNameFromType,
   structNameFromTypeDefinition,
 } from '../naming/conventions';
 import { cloudFormationDocLink } from '../naming/doclink';
@@ -62,31 +63,74 @@ export class AstBuilder {
       this.addStructProperty(propsInterface, mapping, name, prop, r);
     }
 
-    this.makeStructMapper(propsInterface, mapping);
+    this.makeCfnProducer(propsInterface, mapping);
+    this.makeCfnParser(propsInterface, mapping);
     return propsInterface;
   }
 
-  protected makeStructMapper(propsInterface: StructType, mapping: PropMapping) {
-    const propToCfn = new FreeFunction(this.scope, {
-      name: mapperNameFromType(propsInterface),
-      parameters: [
-        {
-          name: 'properties',
-          type: propsInterface.type,
-        },
-      ],
+  /**
+   * Make the function that translates code -> CFN
+   */
+  protected makeCfnProducer(propsInterface: StructType, mapping: PropMapping) {
+    const producer = new FreeFunction(this.scope, {
+      name: cfnProducerNameFromType(propsInterface),
       returnType: Type.ANY,
     });
 
-    const propsObj = expr.ident('properties');
+    const propsObj = producer.addParameter({
+      name: 'properties',
+      type: propsInterface.type,
+    });
 
-    propToCfn.addBody(
+    producer.addBody(
       stmt.if_(expr.not(CDK_CORE.canInspect(propsObj))).then(stmt.ret(propsObj)),
       // FIXME: Validation here
-      stmt.ret(expr.object(mapping.cfnProperties().map((cfn) => [cfn, mapping.mapProp(cfn, propsObj)] as const))),
+      stmt.ret(
+        expr.object(mapping.cfnProperties().map((cfn) => [cfn, mapping.produceProperty(cfn, propsObj)] as const)),
+      ),
     );
 
-    return propToCfn;
+    return producer;
+  }
+
+  /**
+   * Make the function that translates CFN -> code
+   */
+  protected makeCfnParser(propsInterface: StructType, mapping: PropMapping) {
+    const parser = new FreeFunction(this.scope, {
+      name: cfnParserNameFromType(propsInterface),
+      returnType: CDK_CORE.helpers.FromCloudFormationResult.withGenericArguments(propsInterface.type),
+    });
+
+    const propsObj = parser.addParameter({
+      name: 'properties',
+      type: Type.ANY,
+    });
+
+    const $ret = $E(expr.ident('ret'));
+
+    parser.addBody(
+      stmt.assign(propsObj, expr.cond(expr.binOp(propsObj, '==', expr.NULL)).then(expr.lit({})).else(propsObj)),
+      stmt
+        .if_(expr.not(new IsObject(propsObj)))
+        .then(stmt.ret(new CDK_CORE.helpers.FromCloudFormationResult(propsObj))),
+
+      stmt.constVar(
+        $ret,
+        CDK_CORE.helpers.FromCloudFormationPropertyObject.withGenericArguments(propsInterface.type).newInstance(),
+      ),
+
+      ...mapping
+        .cfnFromTs()
+        .map(([cfnName, tsName]) =>
+          $ret.addPropertyResult(expr.lit(tsName), expr.lit(cfnName), mapping.parseProperty(cfnName, propsObj)),
+        ),
+
+      $ret.addUnrecognizedPropertiesAsExtra(propsObj),
+      stmt.ret($ret),
+    );
+
+    return parser;
   }
 
   protected typeFromSpecType(type: PropertyType): Type {
@@ -135,7 +179,8 @@ export class AstBuilder {
       this.addStructProperty(theType, mapping, name, p, def);
     });
 
-    this.makeStructMapper(theType, mapping);
+    this.makeCfnProducer(theType, mapping);
+    this.makeCfnParser(theType, mapping);
 
     return theType;
   }

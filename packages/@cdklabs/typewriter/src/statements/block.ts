@@ -1,9 +1,10 @@
-import { Statement, StatementSeparator } from '.';
+import { Expression } from '../expression';
+import { ExpressionStatement, Statement, StatementSeparator } from './statements';
 
 export class Block extends Statement {
-  public static with(...stmts: Statement[]) {
+  public static with(...stmts: Array<Statement | Expression>) {
     const ret = new Block();
-    ret.add(...stmts);
+    ret.add(...stmts.map((x) => (x instanceof Statement ? x : new ExpressionStatement(x))));
     return ret;
   }
 

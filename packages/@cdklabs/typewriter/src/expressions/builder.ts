@@ -1,11 +1,14 @@
 import { Expression, SymbolReference } from '../expression';
 import {
+  BinOp,
   DestructuringBind,
   EqualsExpression,
   JsLiteralExpression,
   NotExpression,
+  Null,
   ObjectLiteral,
   Structure,
+  Ternary,
   ThisInstance,
 } from '../expressions/objects';
 import { ThingSymbol } from '../symbol';
@@ -13,8 +16,8 @@ import { Type } from '../type';
 import { Identifier } from './identifier';
 import { InvokeCallable } from './invoke';
 
-export function ident(name: string): Identifier {
-  return new Identifier(name);
+export function ident(identifier: string): Identifier {
+  return new Identifier(identifier);
 }
 
 export function sym(sym: ThingSymbol): Expression {
@@ -58,4 +61,14 @@ export function type(x: Type) {
     throw new Error(`Cannot reference type ${x}. Not a user-defined type.`);
   }
   return sym(x.symbol);
+}
+
+export function cond(condition: Expression, thenExpression?: Expression, elseExpression?: Expression): Ternary {
+  return new Ternary(condition, thenExpression, elseExpression);
+}
+
+export const NULL = new Null();
+
+export function binOp(lhs: Expression, op: string, rhs: Expression) {
+  return new BinOp(lhs, op, rhs);
 }
