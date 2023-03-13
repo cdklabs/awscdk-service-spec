@@ -1,10 +1,10 @@
 import * as jsii from '@jsii/spec';
 import { DocsSpec } from './documented';
-import { MemberKind, MemberVisibility, TypeMember } from './type-member';
-import { Type } from './type';
-import { MemberType } from './member-type';
 import { Expression } from './expression';
 import { ObjectPropertyAccess } from './expressions';
+import { MemberType } from './member-type';
+import { Type } from './type';
+import { MemberKind, MemberVisibility, TypeMember } from './type-member';
 
 export interface PropertySpec extends Omit<jsii.Property, 'assembly' | 'fqn' | 'docs' | 'type' | 'kind'> {
   docs?: DocsSpec;

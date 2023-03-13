@@ -1,12 +1,12 @@
-import { DocsSpec, Documented } from './documented';
-import { Property as PropertyType } from './property';
-import { MemberType } from './member-type';
 import { CallableDeclaration, CallableSpec } from './callable';
-import { Block, ExpressionStatement, Statement } from './statements';
-import { Type } from './type';
-import { Parameter, ParameterSpec } from './parameter';
+import { DocsSpec, Documented } from './documented';
 import { Expression } from './expression';
 import { ObjectPropertyAccess } from './expressions';
+import { MemberType } from './member-type';
+import { Parameter, ParameterSpec } from './parameter';
+import { Property as PropertyType } from './property';
+import { Block, ExpressionStatement, Statement } from './statements';
+import { Type } from './type';
 
 export interface TypeMemberSpec {
   name: string;

@@ -1,4 +1,3 @@
-import { Expression } from '../expression';
 import {
   AssignmentStatement,
   StatementSeparator,
@@ -10,6 +9,7 @@ import {
   Statement,
   VariableDeclaration,
 } from './statements';
+import { Expression } from '../expression';
 
 export function ret(e?: Expression): Statement {
   return new ReturnStatement(e);
@@ -35,8 +35,8 @@ export function letVar(lhs: Expression, rhs: Expression) {
   return new VariableDeclaration(Mut.Mutable, lhs, rhs);
 }
 
-export function expr(expr: Expression) {
-  return new ExpressionStatement(expr);
+export function expr(exp: Expression) {
+  return new ExpressionStatement(exp);
 }
 
 export function sep() {

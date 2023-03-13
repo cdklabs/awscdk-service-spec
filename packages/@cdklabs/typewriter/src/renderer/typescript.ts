@@ -1,26 +1,8 @@
 import { Renderer } from './base';
 import { CallableDeclaration, isCallableDeclaration } from '../callable';
-import { StructType } from '../struct';
-import { Module } from '../module';
-import { Property } from '../property';
-import {
-  ReturnStatement,
-  Statement,
-  ExpressionStatement,
-  IfThenElse,
-  Block,
-  AssignmentStatement,
-  VariableDeclaration,
-  Mut,
-  SuperInitializer,
-  ForLoop,
-  StatementSeparator,
-} from '../statements';
-import { Initializer, MemberVisibility, Method } from '../type-member';
-import { Type } from '../type';
+import { ClassType } from '../class';
 import { Documented } from '../documented';
 import { Expression, SymbolReference } from '../expression';
-import { InvokeCallable } from '../expressions/invoke';
 import {
   BinOp,
   DestructuringBind,
@@ -40,9 +22,27 @@ import {
   TruthyOr,
   Undefined,
 } from '../expressions';
-import { ClassType } from '../class';
+import { InvokeCallable } from '../expressions/invoke';
 import { InterfaceType } from '../interface';
+import { Module } from '../module';
+import { Property } from '../property';
+import {
+  ReturnStatement,
+  Statement,
+  ExpressionStatement,
+  IfThenElse,
+  Block,
+  AssignmentStatement,
+  VariableDeclaration,
+  Mut,
+  SuperInitializer,
+  ForLoop,
+  StatementSeparator,
+} from '../statements';
+import { StructType } from '../struct';
 import { ThingSymbol } from '../symbol';
+import { Type } from '../type';
+import { Initializer, MemberVisibility, Method } from '../type-member';
 
 export class TypeScriptRenderer extends Renderer {
   protected renderModule(mod: Module) {
@@ -341,7 +341,7 @@ export class TypeScriptRenderer extends Renderer {
       typeCase(SymbolReference, (x) => this.renderSymbol(x.symbol)),
       typeCase(DestructuringBind, (x) => {
         this.emit(x.structure === Structure.Array ? '[' : '{ ');
-        this.emitList(x.names, ', ', (x) => this.renderExpression(x));
+        this.emitList(x.names, ', ', (e) => this.renderExpression(e));
         this.emit(x.structure === Structure.Array ? ']' : ' }');
       }),
       typeCase(Ternary, (x) =>

@@ -1,11 +1,11 @@
-import { FreeFunction } from '../callable';
-import { StructType } from '../struct';
-import { Module } from '../module';
-import { SymbolKind } from '../symbol';
 import { IndentedStringBuilder } from './indented-string-builder';
+import { FreeFunction } from '../callable';
 import { ClassType } from '../class';
 import { InterfaceType } from '../interface';
+import { Module } from '../module';
 import { Scope } from '../scope';
+import { StructType } from '../struct';
+import { SymbolKind } from '../symbol';
 
 export interface RenderOptions {
   indentation?: number | string;

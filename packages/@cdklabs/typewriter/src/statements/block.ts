@@ -1,5 +1,5 @@
-import { Expression } from '../expression';
 import { ExpressionStatement, Statement, StatementSeparator } from './statements';
+import { Expression } from '../expression';
 
 export class Block extends Statement {
   public static with(...stmts: Array<Statement | Expression>) {

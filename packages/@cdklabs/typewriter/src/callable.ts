@@ -1,13 +1,13 @@
-import { Block } from './statements/block';
+import { Documented } from './documented';
+import { Expression } from './expression';
+import { Identifier } from './expressions';
 import { Parameter, ParameterSpec } from './parameter';
 import { Scope } from './scope';
 import { ExpressionStatement, Statement } from './statements';
-import { TypeDeclaration, TypeSpec } from './type-declaration';
-import { Type } from './type';
+import { Block } from './statements/block';
 import { SymbolKind } from './symbol';
-import { Identifier } from './expressions';
-import { Documented } from './documented';
-import { Expression } from './expression';
+import { Type } from './type';
+import { TypeDeclaration, TypeSpec } from './type-declaration';
 
 export interface CallableSpec extends TypeSpec {
   name: string;

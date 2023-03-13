@@ -1,10 +1,10 @@
-import { StructType } from './struct';
-import { IImport, Scope } from './scope';
-import { TypeDeclaration } from './type-declaration';
-import { Identifier } from './expressions/identifier';
 import { Expression } from './expression';
 import { ObjectPropertyAccess } from './expressions';
+import { Identifier } from './expressions/identifier';
+import { IImport, Scope } from './scope';
+import { StructType } from './struct';
 import { ThingSymbol } from './symbol';
+import { TypeDeclaration } from './type-declaration';
 
 /**
  * A module

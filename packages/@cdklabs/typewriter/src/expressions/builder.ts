@@ -1,3 +1,5 @@
+import { Identifier } from './identifier';
+import { InvokeCallable } from './invoke';
 import { Expression, SymbolReference } from '../expression';
 import {
   BinOp,
@@ -13,15 +15,13 @@ import {
 } from '../expressions/objects';
 import { ThingSymbol } from '../symbol';
 import { Type } from '../type';
-import { Identifier } from './identifier';
-import { InvokeCallable } from './invoke';
 
 export function ident(identifier: string): Identifier {
   return new Identifier(identifier);
 }
 
-export function sym(sym: ThingSymbol): Expression {
-  return new SymbolReference(sym);
+export function sym(symb: ThingSymbol): Expression {
+  return new SymbolReference(symb);
 }
 
 export function object(data?: Record<string, Expression> | Array<readonly [string, Expression]>): Expression {

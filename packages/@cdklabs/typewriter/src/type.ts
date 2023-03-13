@@ -1,9 +1,9 @@
+import { Expression } from './expression';
 import { NewExpression } from './expressions';
-import { Scope } from './scope';
 import * as expr from './expressions/builder';
+import { Scope } from './scope';
 import { ThingSymbol } from './symbol';
 import { TypeDeclaration } from './type-declaration';
-import { Expression } from './expression';
 
 export enum PrimitiveType {
   /**

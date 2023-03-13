@@ -1,8 +1,8 @@
 import * as jsii from '@jsii/spec';
 import { Documented } from './documented';
 import { Scope } from './scope';
-import { Type } from './type';
 import { ThingSymbol, SymbolKind } from './symbol';
+import { Type } from './type';
 
 export interface TypeSpec extends Omit<jsii.TypeBase, 'assembly' | 'fqn' | 'kind'> {
   exported?: boolean;
