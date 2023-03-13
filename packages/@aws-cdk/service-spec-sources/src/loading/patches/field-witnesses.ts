@@ -60,6 +60,7 @@ export const ARRAY_KEY_WITNESS: TypeKeyWitness<jsonschema.SchemaArray> = {
   minItems: true,
   title: true,
   uniqueItems: true,
+  arrayType: true,
 };
 
 export const BOOLEAN_KEY_WITNESS: TypeKeyWitness<jsonschema.Boolean> = {
