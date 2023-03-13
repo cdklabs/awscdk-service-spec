@@ -103,14 +103,7 @@ export class Database<S extends object> {
     const toLinks = col.forward.get(from.$id) ?? [];
     const ret = toLinks.map((i) => ({ to: this.get(col.toColl, i.$id), ...removeId(i) } as any));
 
-    return Object.assign(ret, {
-      only() {
-        if (ret.length !== 1) {
-          throw new Error(`Expected exactly 1 ${String(key)} from ${from}, found ${ret.length}`);
-        }
-        return ret[0];
-      },
-    });
+    return addOnlyMethod(ret, `${String(key)} from ${from}`);
   }
 
   /**
@@ -124,14 +117,7 @@ export class Database<S extends object> {
     const fromIds = col.backward.get(to.$id) ?? [];
     const ret = fromIds.map((i) => ({ from: this.get(col.fromColl, i.$id), ...removeId(i) } as any));
 
-    return Object.assign(ret, {
-      only() {
-        if (ret.length !== 1) {
-          throw new Error(`Expected exactly 1 incoming ${String(key)} to ${to}, found ${ret.length}`);
-        }
-        return ret[0];
-      },
-    });
+    return addOnlyMethod(ret, `${String(key)} to ${to}`);
   }
 
   public e<E extends Entity>(entity: Plain<E>): E {
@@ -224,4 +210,18 @@ export interface Edges<A> extends ReadonlyArray<A> {
    * Return the first and only element, throwing if there are != 1 elements
    */
   only(): A;
+}
+
+function addOnlyMethod<A>(xs: A[], description: string): Edges<A> {
+  return Object.defineProperties(xs, {
+    only: {
+      enumerable: false,
+      value: () => {
+        if (xs.length !== 1) {
+          throw new Error(`Expected exactly 1 ${description}, found ${xs.length}`);
+        }
+        return xs[0];
+      },
+    },
+  }) as any;
 }

@@ -51,6 +51,11 @@ describe.each([false, true])('database with some entities (saveAndLoad: %p)', (s
       value: 'B',
     });
 
+    db.allocate('thing', {
+      name: 'C',
+      value: 'C',
+    });
+
     db.link('hasWidget', a, db.allocate('widget', { color: 'green' }), { count: 1 });
     db.link('hasWidget', a, db.allocate('widget', { color: 'blue' }), { count: 2 });
     db.link('hasWidget', b, db.allocate('widget', { color: 'purple' }), { count: 5 });
@@ -75,6 +80,27 @@ describe.each([false, true])('database with some entities (saveAndLoad: %p)', (s
         count: 2,
       },
     ]);
+  });
+
+  describe('only() method', () => {
+    test('does not throw if there is exactly one thing to find', () => {
+      const b = mustFind('thing', (x) => x.name === 'B');
+      expect(db.follow('hasWidget', b).only()).toEqual(
+        expect.objectContaining({
+          to: expect.objectContaining({ color: 'purple' }),
+        }),
+      );
+    });
+
+    test('throws if there are 0 things to find', () => {
+      const c = mustFind('thing', (x) => x.name === 'C');
+      expect(() => expect(db.follow('hasWidget', c).only())).toThrow(/found 0/);
+    });
+
+    test('throws if there are more than 1 things to find', () => {
+      const a = mustFind('thing', (x) => x.name === 'A');
+      expect(() => expect(db.follow('hasWidget', a).only())).toThrow(/found 2/);
+    });
   });
 
   test('follow relationships backward: things can be found', () => {
