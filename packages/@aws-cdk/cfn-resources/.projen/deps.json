@@ -49,6 +49,10 @@
       "type": "build"
     },
     {
+      "name": "aws-cdk-lib",
+      "type": "build"
+    },
+    {
       "name": "camelcase",
       "type": "build"
     },

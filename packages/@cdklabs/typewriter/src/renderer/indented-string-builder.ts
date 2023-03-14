@@ -17,6 +17,9 @@ export class IndentedStringBuilder {
   }
 
   public toString() {
-    return this.parts.join('');
+    return this.parts
+      .join('')
+      .replace(/[ \t]+\n/g, '\n')
+      .trimEnd();
   }
 }

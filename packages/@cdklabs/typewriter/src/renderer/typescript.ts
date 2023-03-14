@@ -47,6 +47,7 @@ import { Initializer, MemberVisibility, Method } from '../type-member';
 export class TypeScriptRenderer extends Renderer {
   protected renderModule(mod: Module) {
     this.withScope(mod, () => {
+      this.emit('/* eslint-disable prettier/prettier */\n');
       this.renderImports(mod);
       this.renderModuleTypes(mod);
     });
@@ -86,7 +87,7 @@ export class TypeScriptRenderer extends Renderer {
     this.emitBlock(`${modifiers}interface ${structType.name}`, () => {
       const props = Array.from(structType.properties.values()).filter((p) => p.visibility === MemberVisibility.Public);
 
-      this.emitList(props, '\n\n', (p) => this.renderProperty(p));
+      this.emitList(props, '\n\n', (p) => this.renderProperty(p, 'interface'));
     });
   }
 
@@ -109,12 +110,15 @@ export class TypeScriptRenderer extends Renderer {
       const members = [
         ...classType.properties.filter((p) => p.static),
         ...classType.methods.filter((p) => p.static),
-        ...classType.properties.filter((p) => !p.static),
+        ...classType.properties.filter((p) => !p.static && !p.isGetterSetter),
         ...(classType.initializer ? [classType.initializer] : []),
+        ...classType.properties.filter((p) => !p.static && p.isGetterSetter),
         ...classType.methods.filter((p) => !p.static),
       ];
 
-      this.emitList(members, '\n\n', (m) => (m instanceof Property ? this.renderProperty(m) : this.renderMethod(m)));
+      this.emitList(members, '\n\n', (m) =>
+        m instanceof Property ? this.renderProperty(m, 'class') : this.renderMethod(m, 'class'),
+      );
     });
   }
 
@@ -122,7 +126,7 @@ export class TypeScriptRenderer extends Renderer {
     const modifiers = classType.modifiers.length ? classType.modifiers.join(' ') + ' ' : '';
 
     this.renderDocs(classType);
-    this.emit(`${modifiers}class ${classType.name}`);
+    this.emit(`${modifiers}interface ${classType.name}`);
 
     if (classType.extends.length > 0) {
       this.emit(' extends ');
@@ -132,21 +136,47 @@ export class TypeScriptRenderer extends Renderer {
     this.emitBlock(' ', () => {
       const members = [...classType.properties, ...classType.methods];
 
-      this.emitList(members, '\n\n', (m) => (m instanceof Property ? this.renderProperty(m) : this.renderMethod(m)));
+      this.emitList(members, '\n\n', (m) =>
+        m instanceof Property ? this.renderProperty(m, 'interface') : this.renderMethod(m, 'interface'),
+      );
     });
   }
 
-  protected renderProperty(property: Property) {
+  protected renderProperty(property: Property, parent: 'interface' | 'class') {
+    if (parent === 'class' && property.isGetterSetter && !property.abstract) {
+      this.renderGetterSetterProperty(property);
+    } else {
+      this.renderRegularProperty(property, parent);
+    }
+  }
+
+  protected renderRegularProperty(property: Property, parent: 'interface' | 'class') {
     this.renderDocs(property);
     if (property.abstract) {
       this.emit('abstract ');
     }
 
-    const qmark = property.optional ? '?' : '';
-    this.emit(`${property.spec.immutable ? 'readonly ' : ''}${property.name}${qmark}: `);
+    if (parent === 'class') {
+      this.emit(visibilityToString(property.visibility));
+      this.emit(' ');
+    }
+
+    if (property.static) {
+      this.emit('static ');
+    }
+
+    // Regular property
+    if (property.immutable) {
+      this.emit('readonly ');
+    }
+    this.emit(property.name);
+    if (property.optional) {
+      this.emit('?');
+    }
+    this.emit(': ');
     this.renderType(property.type);
 
-    if (property.initializer) {
+    if (property.initializer && parent === 'class') {
       this.emit(' = ');
       this.renderExpression(property.initializer);
     }
@@ -154,17 +184,65 @@ export class TypeScriptRenderer extends Renderer {
     this.emit(';');
   }
 
-  protected renderMethod(method: Method) {
+  protected renderGetterSetterProperty(property: Property) {
+    const renderGs = (block: Block, getSet: string, args: Array<[Expression, Type]>, returnType?: Type) => {
+      this.renderDocs(property);
+
+      this.emit(visibilityToString(property.visibility));
+      this.emit(' ');
+
+      if (property.static) {
+        this.emit('static ');
+      }
+      this.emit(getSet);
+      this.emit(' ');
+
+      this.emit(property.name);
+      this.emit('(');
+      this.emitList(args, ', ', ([name, type]) => {
+        this.renderExpression(name);
+        this.emit(': ');
+        this.renderType(type);
+      });
+      this.emit(')');
+
+      if (returnType) {
+        this.emit(': ');
+        this.renderType(returnType);
+      }
+      this.emit(' ');
+      this.renderBlock(block);
+    };
+
+    const propertyType = property.optional ? property.type.optional() : property.type;
+
+    if (property.getter) {
+      renderGs(property.getter, 'get', [], propertyType);
+    }
+
+    if (property.setter) {
+      this.emit('\n');
+      const value = new Identifier('value');
+      renderGs(property.setter(value), 'set', [[value, propertyType]]);
+    }
+  }
+
+  protected renderMethod(method: Method, parent: 'interface' | 'class') {
     this.renderDocs(method);
-    this.emit(visibilityToString(method.visibility));
-    this.emit(' ');
+    if (parent === 'class') {
+      this.emit(visibilityToString(method.visibility));
+      this.emit(' ');
+    }
+    if (method.static) {
+      this.emit('static ');
+    }
     if (method.abstract) {
       this.emit('abstract ');
     }
     this.emit(method.name);
     this.emit('(');
     this.emitList(method.parameters, ', ', (p) => {
-      this.emit(p.identifier);
+      this.emit(p._identifier_);
       this.emit(': ');
       this.renderType(p.type);
     });
@@ -196,7 +274,13 @@ export class TypeScriptRenderer extends Renderer {
     }
 
     if (ref.symbol) {
-      return this.renderSymbol(ref.symbol);
+      this.renderSymbol(ref.symbol);
+      if (ref.genericArguments && ref.genericArguments.length > 0) {
+        this.emit('<');
+        this.emitList(ref.genericArguments, ', ', (t) => this.renderType(t));
+        this.emit('>');
+      }
+      return;
     }
 
     if (ref.arrayOfType) {
@@ -206,7 +290,7 @@ export class TypeScriptRenderer extends Renderer {
       return;
     }
     if (ref.mapOfType) {
-      this.emit(`Map<string, `);
+      this.emit(`Record<string, `);
       this.renderType(ref.mapOfType);
       this.emit('>');
       return;
@@ -243,7 +327,7 @@ export class TypeScriptRenderer extends Renderer {
 
     this.emit(`function ${func.name}(`);
     this.emitList(func.parameters, ', ', (p) => {
-      this.emit(`${p.identifier}: `);
+      this.emit(`${p._identifier_}: `);
       this.renderType(p.type);
     });
     this.emit(')');
@@ -322,58 +406,58 @@ export class TypeScriptRenderer extends Renderer {
       typeCase(ObjectMethodInvoke, (x) => this.renderObjectMethodInvoke(x)),
       typeCase(InvokeCallable, (x) => this.renderInvokeCallable(x)),
       typeCase(Identifier, (x) => this.renderIdentifier(x)),
-      typeCase(JsLiteralExpression, (x) => this.emit(JSON.stringify(x.value))),
+      typeCase(JsLiteralExpression, (x) => this.emit(JSON.stringify(x._value_))),
       typeCase(ThisInstance, () => this.emit('this')),
       typeCase(NotExpression, (x) => {
         this.emit('!');
-        this.renderExpression(x.operand);
+        this.renderExpression(x._operand_);
       }),
       typeCase(NewExpression, (x) => {
         this.emit('new ');
-        this.renderExpression(x.ctr);
-        this.renderArgs(x.args);
+        this.renderType(x._typ_);
+        this.renderArgs(x._args_);
       }),
       typeCase(TruthyOr, (x) => {
-        this.renderExpression(x.value);
+        this.renderExpression(x._value_);
         this.emit(' || ');
-        this.renderExpression(x.defaultValue);
+        this.renderExpression(x._defaultValue_);
       }),
       typeCase(SymbolReference, (x) => this.renderSymbol(x.symbol)),
       typeCase(DestructuringBind, (x) => {
-        this.emit(x.structure === Structure.Array ? '[' : '{ ');
-        this.emitList(x.names, ', ', (e) => this.renderExpression(e));
-        this.emit(x.structure === Structure.Array ? ']' : ' }');
+        this.emit(x._structure_ === Structure.Array ? '[' : '{ ');
+        this.emitList(x._names_, ', ', (e) => this.renderExpression(e));
+        this.emit(x._structure_ === Structure.Array ? ']' : ' }');
       }),
       typeCase(Ternary, (x) =>
         this.parenthesized(() => {
-          this.renderExpression(x.condition);
+          this.renderExpression(x._condition_);
           this.emit(' ? ');
-          this.renderExpression(x.thenExpression ?? new Identifier('/* @error missing then */'));
+          this.renderExpression(x._thenExpression_ ?? new Identifier('/* @error missing then */'));
           this.emit(' : ');
-          this.renderExpression(x.elseExpression ?? new Identifier('/* @error missing else */'));
+          this.renderExpression(x._elseExpression_ ?? new Identifier('/* @error missing else */'));
         }),
       ),
       typeCase(Null, () => this.emit('null')),
       typeCase(Undefined, () => this.emit('undefined')),
       typeCase(BinOp, (x) =>
         this.parenthesized(() => {
-          this.renderExpression(x.lhs);
-          this.emit(` ${x.op} `);
-          this.renderExpression(x.rhs);
+          this.renderExpression(x._lhs_);
+          this.emit(` ${x._op_} `);
+          this.renderExpression(x._rhs_);
         }),
       ),
       typeCase(IsObject, (x) =>
         this.parenthesized(() => {
-          this.renderExpression(x.operand);
+          this.renderExpression(x._operand_);
           this.emit(' && typeof ');
-          this.renderExpression(x.operand);
+          this.renderExpression(x._operand_);
           this.emit(" == 'object' && !Array.isArray(");
-          this.renderExpression(x.operand);
+          this.renderExpression(x._operand_);
           this.emit(')');
         }),
       ),
       typeCase(IsNotNullish, (x) => {
-        this.renderExpression(x.operand);
+        this.renderExpression(x._operand_);
         this.emit(' != null');
       }),
     ]);
@@ -384,18 +468,18 @@ export class TypeScriptRenderer extends Renderer {
   }
 
   protected renderIdentifier(id: Identifier) {
-    this.emit(id.identifier);
+    this.emit(id._identifier_);
   }
 
   protected renderObjectMethodInvoke(omi: ObjectMethodInvoke) {
     // FIXME: Simplify
-    this.renderObjectAccess(new ObjectPropertyAccess(omi.obj, omi.method));
-    this.renderArgs(omi.args);
+    this.renderObjectAccess(new ObjectPropertyAccess(omi._obj_, omi._method_));
+    this.renderArgs(omi._args_);
   }
 
   protected renderInvokeCallable(ic: InvokeCallable) {
-    this.renderExpression(ic.callable);
-    this.renderArgs(ic.args);
+    this.renderExpression(ic._callable_);
+    this.renderArgs(ic._args_);
   }
 
   protected renderBlock(obj: Block) {
@@ -420,15 +504,15 @@ export class TypeScriptRenderer extends Renderer {
   }
 
   protected renderObjectAccess(access: ObjectPropertyAccess) {
-    if (access.obj instanceof ObjectLiteral) {
+    if (access._obj_ instanceof ObjectLiteral) {
       this.emit('(');
-      this.renderObjectLiteral(access.obj);
+      this.renderObjectLiteral(access._obj_);
       this.emit(')');
     } else {
-      this.renderExpression(access.obj);
+      this.renderExpression(access._obj_);
     }
     this.emit('.');
-    this.emit(access.property);
+    this.emit(access._property_);
   }
 
   protected renderReturnStatement(ret: ReturnStatement) {
@@ -471,7 +555,7 @@ export class TypeScriptRenderer extends Renderer {
 
     if (isCallableDeclaration(el)) {
       for (const param of el.parameters) {
-        tagged(`param ${param.identifier}`, param.documentation);
+        tagged(`param ${param._identifier_}`, param.documentation);
       }
     }
 
@@ -485,7 +569,7 @@ export class TypeScriptRenderer extends Renderer {
 
     this.emit('/**\n');
     for (const x of ret) {
-      this.emit(` * ${x.trimEnd()}\n`);
+      this.emit(` * ${x.replace(/\*\//g, '* /')}`.trimEnd() + '\n');
     }
     this.emit(' */\n');
 

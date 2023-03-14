@@ -3,6 +3,7 @@ import { DocsSpec } from './documented';
 import { Expression } from './expression';
 import { ObjectPropertyAccess } from './expressions';
 import { MemberType } from './member-type';
+import { Block } from './statements/block';
 import { Type } from './type';
 import { MemberKind, MemberVisibility, TypeMember } from './type-member';
 
@@ -10,6 +11,8 @@ export interface PropertySpec extends Omit<jsii.Property, 'assembly' | 'fqn' | '
   docs?: DocsSpec;
   type: Type;
   initializer?: Expression;
+  getterBody?: Block;
+  setterBody?: (value: Expression) => Block;
 }
 
 export class Property extends TypeMember {
@@ -60,5 +63,17 @@ export class Property extends TypeMember {
    */
   public from(x: Expression): Expression {
     return new ObjectPropertyAccess(x, this.name);
+  }
+
+  public get getter() {
+    return this.spec.getterBody;
+  }
+
+  public get setter() {
+    return this.spec.setterBody;
+  }
+
+  public get isGetterSetter() {
+    return this.getter || this.setter;
   }
 }

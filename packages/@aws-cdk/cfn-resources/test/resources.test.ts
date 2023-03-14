@@ -1,7 +1,7 @@
 import { DatabaseSchema } from '@aws-cdk/service-spec';
 import { Database } from '@cdklabs/tskb';
 import { TypeScriptRenderer } from '@cdklabs/typewriter';
-import { AstBuilder } from '../src/cli/ast';
+import { AstBuilder } from '../src/cli/cdk/ast';
 import { loadDatabase } from '../src/cli/db';
 
 const renderer = new TypeScriptRenderer();

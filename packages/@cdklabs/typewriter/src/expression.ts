@@ -2,15 +2,15 @@ import { InvokeCallable, ObjectMethodInvoke, ObjectPropertyAccess } from './expr
 import { ThingSymbol } from './symbol';
 
 export class Expression {
-  readonly comments?: string[];
+  public readonly _comments_?: string[];
 
   /**
    * Declare a private field to make this type nominally typed
    */
-  private readonly isExpression = true;
+  private readonly _isExpression_ = true;
 
   constructor() {
-    Array.isArray(this.isExpression);
+    Array.isArray(this._isExpression_);
   }
 
   public prop(property: string): ObjectPropertyAccess {

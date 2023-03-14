@@ -1,8 +1,7 @@
-import { CallableSpec } from './callable';
 import { Property, PropertySpec } from './property';
 import { SymbolKind } from './symbol';
 import { TypeDeclaration } from './type-declaration';
-import { Method } from './type-member';
+import { Method, MethodSpec } from './type-member';
 
 /**
  * A type that has members
@@ -39,7 +38,7 @@ export abstract class MemberType extends TypeDeclaration {
     );
   }
 
-  public addMethod(spec: CallableSpec) {
+  public addMethod(spec: MethodSpec) {
     const m = new Method(this, spec);
     this._methods.push(m);
     return m;

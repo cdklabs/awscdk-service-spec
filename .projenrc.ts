@@ -138,6 +138,7 @@ const cfnResources = new MonorepoTypeScriptProject({
     'fs-extra',
     '@types/fs-extra@^9',
     '@swc/core',
+    'aws-cdk-lib',
   ],
 });
 cfnResources.eslint?.addOverride({

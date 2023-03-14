@@ -1,6 +1,5 @@
 import { Expression } from './expression';
 import { NewExpression } from './expressions';
-import * as expr from './expressions/builder';
 import { MemberType } from './member-type';
 import { PropertySpec } from './property';
 import { Scope } from './scope';
@@ -62,6 +61,6 @@ export class ClassType extends MemberType {
   }
 
   public newInstance(...args: Expression[]) {
-    return new NewExpression(expr.sym(this.symbol), ...args);
+    return new NewExpression(this.type, ...args);
   }
 }

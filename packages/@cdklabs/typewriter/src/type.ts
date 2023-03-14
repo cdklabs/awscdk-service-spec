@@ -1,6 +1,5 @@
 import { Expression } from './expression';
 import { NewExpression } from './expressions';
-import * as expr from './expressions/builder';
 import { Scope } from './scope';
 import { ThingSymbol } from './symbol';
 import { TypeDeclaration } from './type-declaration';
@@ -22,6 +21,10 @@ export enum PrimitiveType {
    * A boolean value.
    */
   Boolean = 'boolean',
+  /**
+   * The value "Undefined"
+   */
+  Undefined = 'undefined',
   /**
    * A JSON object
    */
@@ -53,6 +56,7 @@ export class Type {
   public static readonly STRING = new Type({ primitive: PrimitiveType.String });
   public static readonly NUMBER = new Type({ primitive: PrimitiveType.Number });
   public static readonly BOOLEAN = new Type({ primitive: PrimitiveType.Boolean });
+  public static readonly UNDEFINED = new Type({ primitive: PrimitiveType.Undefined });
 
   public static fromName(scope: Scope, name: string, genericArguments?: Type[]) {
     return new Type({ fqn: name, genericArguments }, scope, new ThingSymbol(name, scope));
@@ -64,6 +68,10 @@ export class Type {
 
   public static mapOf(elementType: Type) {
     return new Type({ collection: { kind: 'map', elementType } });
+  }
+
+  public static unionOf(...types: Type[]) {
+    return new Type({ union: types });
   }
 
   public readonly spec: TypeReferenceSpec;
@@ -148,7 +156,11 @@ export class Type {
   }
 
   public newInstance(...args: Expression[]) {
-    return new NewExpression(expr.type(this), ...args);
+    return new NewExpression(this, ...args);
+  }
+
+  public optional() {
+    return Type.unionOf(this, Type.UNDEFINED);
   }
 }
 

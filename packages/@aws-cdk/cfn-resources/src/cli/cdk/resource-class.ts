@@ -6,6 +6,7 @@ import {
   ClassType,
   expr,
   Expression,
+  MemberVisibility,
   Scope,
   stmt,
   StructType,
@@ -19,6 +20,7 @@ import {
   classNameFromResource,
   cfnParserNameFromType,
   staticResourceTypeName,
+  cfnProducerNameFromType,
 } from '../naming/conventions';
 import { cloudFormationDocLink } from '../naming/doclink';
 import { splitDocumentation } from '../split-summary';
@@ -89,11 +91,15 @@ export class ResourceClass extends ClassType {
     }
 
     this.makeConstructor();
+    this.makeInspectMethod();
+    this.makeCfnProperties();
+    this.makeRenderProperties();
   }
 
   protected addFromCloudFormationFactory(propsType: StructType) {
     const factory = this.addMethod({
       name: '_fromCloudFormation',
+      returnType: this.type,
       docs: {
         summary: `Build a ${this.name} from CloudFormation properties`,
         remarks: [
@@ -117,7 +123,7 @@ export class ResourceClass extends ClassType {
     );
 
     const resourceProperties = expr.ident('resourceProperties');
-    const propsResult = $E(expr.ident('resourceProperties'));
+    const propsResult = $E(expr.ident('propsResult'));
     const ret = $E(expr.ident('ret'));
 
     // FIXME: Reverse mapper
@@ -197,6 +203,55 @@ export class ResourceClass extends ClassType {
     );
   }
 
+  private makeInspectMethod() {
+    const inspect = this.addMethod({
+      name: 'inspect',
+      docs: {
+        summary: 'Examines the CloudFormation resource and discloses attributes',
+      },
+    });
+    const $inspector = $E(
+      inspect.addParameter({
+        name: 'inspector',
+        type: CDK_CORE.TreeInspector,
+        documentation: 'tree inspector to collect and process attributes',
+      }),
+    );
+    inspect.addBody(
+      $inspector.addAttribute(
+        expr.lit('aws:cdk:cloudformation:type'),
+        $E(expr.sym(this.symbol))[staticResourceTypeName()],
+      ),
+      $inspector.addAttribute(expr.lit('aws:cdk:cloudformation:props'), $E(expr.this_()).cfnProperties),
+    );
+  }
+
+  private makeCfnProperties() {
+    const $this = $E(expr.this_());
+
+    this.addProperty({
+      name: 'cfnProperties',
+      type: Type.mapOf(Type.ANY),
+      protected: true,
+      getterBody: Block.with(
+        stmt.ret(expr.object(Object.fromEntries(this.opts.propsType.properties.map((p) => [p.name, $this[p.name]])))),
+      ),
+    });
+  }
+
+  private makeRenderProperties() {
+    const m = this.addMethod({
+      name: 'renderProperties',
+      returnType: Type.mapOf(Type.ANY),
+      visibility: MemberVisibility.Protected,
+    });
+    const props = m.addParameter({
+      name: 'props',
+      type: Type.mapOf(Type.ANY),
+    });
+    m.addBody(stmt.ret($E(expr.ident(cfnProducerNameFromType(this.opts.propsType)))(props)));
+  }
+
   private mappableAttributes() {
     return Object.entries(this.opts.res.attributes).flatMap(([attrName, attr]) => {
       let type: Type | undefined;
@@ -209,12 +264,12 @@ export class ResourceClass extends ClassType {
         );
       } else if (attr.type.type === 'number') {
         type = Type.NUMBER;
-        tokenizer = CDK_CORE.tokenAsString(
+        tokenizer = CDK_CORE.tokenAsNumber(
           expr.this_().callMethod('getAtt', expr.lit(attrName), expr.type(CDK_CORE.ResolutionTypeHint).prop('NUMBER')),
         );
       } else if (attr.type.type === 'array' && attr.type.element.type === 'string') {
         type = Type.arrayOf(Type.STRING);
-        tokenizer = CDK_CORE.tokenAsString(
+        tokenizer = CDK_CORE.tokenAsList(
           expr
             .this_()
             .callMethod('getAtt', expr.lit(attrName), expr.type(CDK_CORE.ResolutionTypeHint).prop('STRING_LIST')),

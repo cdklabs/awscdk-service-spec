@@ -79,7 +79,7 @@ export class AstBuilder {
 
     const propsObj = producer.addParameter({
       name: 'properties',
-      type: propsInterface.type,
+      type: Type.ANY,
     });
 
     producer.addBody(

@@ -4,6 +4,7 @@ import { ThingSymbol } from '@cdklabs/typewriter';
 export class CdkCore extends ExternalModule {
   public readonly CfnResource = Type.fromName(this, 'CfnResource');
   public readonly IInspectable = Type.fromName(this, 'IInspectable');
+  public readonly TreeInspector = Type.fromName(this, 'TreeInspector');
   public readonly Token = $T(Type.fromName(this, 'Token'));
   public readonly ResolutionTypeHint = Type.fromName(this, 'ResolutionTypeHint');
   public readonly helpers = new CdkInternalHelpers(this);
@@ -42,7 +43,7 @@ export class CdkInternalHelpers extends ExternalModule {
   public readonly FromCloudFormationPropertyObject = Type.fromName(this, 'FromCloudFormationPropertyObject');
 
   constructor(parent: CdkCore) {
-    super(`${parent.fqn}/lib/helpers-internal`);
+    super(`${parent.fqn}/core/lib/helpers-internal`);
   }
 }
 

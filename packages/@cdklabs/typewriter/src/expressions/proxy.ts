@@ -40,7 +40,8 @@ const EXPRESSION_HANDLERS: ProxyHandler<Expression> = {
     if (key === isProxy) {
       return true;
     }
-    return key in exp ? (exp as any)[key] : $E(exp.prop(String(key)));
+    // Function has '.name', but we never want that
+    return key in exp && key !== 'name' ? (exp as any)[key] : $E(exp.prop(String(key)));
   },
   set: () => false,
   has: () => true,
@@ -85,7 +86,7 @@ const TYPE_HANDLERS: ProxyHandler<Type> = {
     return key in type ? (type as any)[key] : $E(expr.type(type).prop(String(key)));
   },
   construct: (type, args) => {
-    return new NewExpression(expr.type(type), ...args);
+    return new NewExpression(type, ...args);
   },
   set: () => false,
   has: () => true,
