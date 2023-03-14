@@ -15,6 +15,7 @@ import {
   Type,
 } from '@cdklabs/typewriter';
 import { Stability } from '@jsii/spec';
+import { CDK_CORE, CONSTRUCTS } from './cdk';
 import {
   attributePropertyName,
   classNameFromResource,
@@ -24,7 +25,6 @@ import {
 } from '../naming/conventions';
 import { cloudFormationDocLink } from '../naming/doclink';
 import { splitDocumentation } from '../split-summary';
-import { CDK_CORE, CONSTRUCTS } from './cdk';
 
 export interface ITypeHost {
   typeFromSpecType(type: PropertyType): Type;

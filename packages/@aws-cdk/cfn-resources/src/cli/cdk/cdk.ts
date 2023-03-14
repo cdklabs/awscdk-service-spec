@@ -1,5 +1,4 @@
-import { $E, $T, expr, Expression, ExternalModule, Scope, Type } from '@cdklabs/typewriter';
-import { ThingSymbol } from '@cdklabs/typewriter';
+import { $E, $T, expr, Expression, ExternalModule, Scope, ThingSymbol, Type } from '@cdklabs/typewriter';
 
 export class CdkCore extends ExternalModule {
   public readonly CfnResource = Type.fromName(this, 'CfnResource');

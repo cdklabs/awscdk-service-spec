@@ -1,5 +1,4 @@
-import { expr, IsNotNullish, Type, UNDEFINED } from '@cdklabs/typewriter';
-import { Expression, ObjectPropertyAccess } from '@cdklabs/typewriter';
+import { expr, Expression, ObjectPropertyAccess, IsNotNullish, Type, UNDEFINED } from '@cdklabs/typewriter';
 import { PrimitiveType } from '@jsii/spec';
 import { CDK_CORE } from './cdk/cdk';
 import { cfnParserNameFromType, cfnProducerNameFromType } from './naming/conventions';
