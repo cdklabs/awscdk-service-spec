@@ -11,17 +11,10 @@ beforeAll(async () => {
   db = await loadDatabase();
 });
 
-test.each([
-  'Alexa::ASK::Skill',
-  'AWS::ApiGateway::RestApi',
-  'AWS::IAM::Role',
-  'AWS::Lambda::Function',
-  'AWS::S3::Bucket',
-  'AWS::SQS::Queue',
-])('%s', (cloudFormationType) => {
-  const resource = db.lookup('resource', 'cloudFormationType', 'equals', cloudFormationType)[0];
+test.each(['alexa-ask', 'aws-chatbot', 'aws-scheduler', 'aws-sqs'])('%s', (serviceName) => {
+  const service = db.lookup('service', 'name', 'equals', serviceName)[0];
 
-  const ast = AstBuilder.forResource(resource, db);
+  const ast = AstBuilder.forService(service, db);
 
   expect(renderer.render(ast.scope)).toMatchSnapshot();
 });

@@ -3,7 +3,10 @@ import * as sources from '@aws-cdk/service-spec-sources';
 import { LoadResult } from '@aws-cdk/service-spec-sources';
 import { assertSuccess, Failures, Result } from '@cdklabs/tskb';
 import { readCloudFormationDocumentation } from './cloudformation-docs';
-import { readCloudFormationRegistryResource } from './cloudformation-registry';
+import {
+  readCloudFormationRegistryResource,
+  readCloudFormationRegistryServiceFromResource,
+} from './cloudformation-registry';
 import { readStatefulResources } from './stateful-resources';
 
 export interface BuildDatabaseOptions {
@@ -29,6 +32,13 @@ export async function buildDatabase(options: BuildDatabaseOptions = {}) {
         specResource: resourceSpec.ResourceTypes[resource.typeName],
       });
       db.link('regionHasResource', region, res);
+
+      const service = readCloudFormationRegistryServiceFromResource({
+        db,
+        resource,
+      });
+      db.link('regionHasService', region, service);
+      db.link('hasResource', service, res);
     }
   }
 
