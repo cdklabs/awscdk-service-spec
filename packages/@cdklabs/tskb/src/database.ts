@@ -98,10 +98,12 @@ export class Database<S extends object> {
   public follow<K extends RelKeys<S>>(
     key: K,
     from: RelFrom<RelType<S[K]>>,
-  ): Array<ToLink<RelTo<RelType<S[K]>>, RelAttr<RelType<S[K]>>>> {
+  ): Edges<ToLink<RelTo<RelType<S[K]>>, RelAttr<RelType<S[K]>>>> {
     const col: AnyRelationshipCollection = this.schema[key] as any;
     const toLinks = col.forward.get(from.$id) ?? [];
-    return toLinks.map((i) => ({ to: this.get(col.toColl, i.$id), ...removeId(i) })) as any;
+    const ret = toLinks.map((i) => ({ to: this.get(col.toColl, i.$id), ...removeId(i) } as any));
+
+    return addOnlyMethod(ret, `${String(key)} from ${from}`);
   }
 
   /**
@@ -110,10 +112,12 @@ export class Database<S extends object> {
   public incoming<K extends RelKeys<S>>(
     key: K,
     to: RelTo<RelType<S[K]>>,
-  ): Array<FromLink<RelFrom<RelType<S[K]>>, RelAttr<RelType<S[K]>>>> {
+  ): Edges<FromLink<RelFrom<RelType<S[K]>>, RelAttr<RelType<S[K]>>>> {
     const col: AnyRelationshipCollection = this.schema[key] as any;
     const fromIds = col.backward.get(to.$id) ?? [];
-    return fromIds.map((i) => ({ from: this.get(col.fromColl, i.$id), ...removeId(i) })) as any;
+    const ret = fromIds.map((i) => ({ from: this.get(col.fromColl, i.$id), ...removeId(i) } as any));
+
+    return addOnlyMethod(ret, `${String(key)} to ${to}`);
   }
 
   public e<E extends Entity>(entity: Plain<E>): E {
@@ -200,3 +204,24 @@ type IndexesOf<A> = A extends EntityCollection<any, any> ? keyof A['indexes'] : 
 type LookupsOf<A, I extends IndexesOf<A>> = A extends EntityCollection<any, any>
   ? keyof A['indexes'][I]['lookups']
   : never;
+
+export interface Edges<A> extends ReadonlyArray<A> {
+  /**
+   * Return the first and only element, throwing if there are != 1 elements
+   */
+  only(): A;
+}
+
+function addOnlyMethod<A>(xs: A[], description: string): Edges<A> {
+  return Object.defineProperties(xs, {
+    only: {
+      enumerable: false,
+      value: () => {
+        if (xs.length !== 1) {
+          throw new Error(`Expected exactly 1 ${description}, found ${xs.length}`);
+        }
+        return xs[0];
+      },
+    },
+  }) as any;
+}

@@ -40,6 +40,9 @@
       "path": "../../@cdklabs/typewriter"
     },
     {
+      "path": "../service-spec"
+    },
+    {
       "path": "../service-spec-build"
     },
     {

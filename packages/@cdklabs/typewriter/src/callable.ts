@@ -1,43 +1,77 @@
+import { Documented } from './documented';
+import { Expression } from './expression';
+import { Identifier } from './expressions';
 import { Parameter, ParameterSpec } from './parameter';
 import { Scope } from './scope';
-import { CallableStatement, InvokeCallable, InvokeStatement, Statement } from './statements';
-import { Type, TypeKind, TypeSpec } from './type';
-import { TypeReference, TypeReferenceSpec } from './type-ref';
+import { ExpressionStatement, Statement } from './statements';
+import { Block } from './statements/block';
+import { SymbolKind } from './symbol';
+import { Type } from './type';
+import { TypeDeclaration, TypeSpec } from './type-declaration';
 
-interface CallableSpec extends TypeSpec {
-  kind: TypeKind.Function;
+export interface CallableSpec extends TypeSpec {
   name: string;
   parameters?: ParameterSpec[];
-  returnType?: TypeReferenceSpec;
-  body?: Statement[];
+  returnType?: Type;
+  body?: Block;
 }
 
-export class Callable extends Type implements CallableStatement {
-  public constructor(public readonly scope: Scope, public readonly spec: CallableSpec) {
-    super(scope, spec);
-  }
+export interface CallableDeclaration extends Documented {
+  readonly body?: Block;
+  readonly returnType: Type;
+  readonly name: string;
+  readonly parameters: Parameter[];
+}
 
-  invoke(...args: Statement[]): InvokeStatement {
-    return new InvokeCallable(this, args);
+export interface CallableExpr {
+  invoke(...args: Expression[]): Expression;
+}
+
+/**
+ * Can't be called "Function"
+ */
+export class FreeFunction extends TypeDeclaration implements CallableDeclaration {
+  public readonly returnType: Type;
+  public readonly kind = SymbolKind.Function;
+  public readonly parameters = new Array<Parameter>();
+
+  private _body?: Block;
+
+  constructor(public readonly scope: Scope, public readonly spec: CallableSpec) {
+    super(scope, spec);
+    this._body = spec.body;
+    this.returnType = spec.returnType ?? Type.VOID;
+    for (const p of this.spec.parameters ?? []) {
+      this.addParameter(p);
+    }
   }
 
   public get name(): string {
     return this.spec.name;
   }
 
-  public get returnType(): TypeReference {
-    return new TypeReference(this.scope, this.spec.returnType);
+  public get fn(): Expression {
+    return new Identifier(this.name);
   }
 
-  public get parameters(): Parameter[] {
-    return (this.spec.parameters ?? []).map((p) => new Parameter(this, p));
+  public get body(): Block | undefined {
+    return this._body;
   }
 
-  public get body(): Statement[] {
-    return this.spec.body ?? [];
+  public addBody(...stmts: Array<Statement | Expression>) {
+    if (!this._body) {
+      this._body = new Block();
+    }
+    this._body.add(...stmts.map((x) => (x instanceof Statement ? x : new ExpressionStatement(x))));
   }
 
-  public set body(statements: Statement[]) {
-    this.spec.body = statements;
+  public addParameter(spec: ParameterSpec) {
+    const p = new Parameter(this, spec);
+    this.parameters.push(p);
+    return p;
   }
+}
+
+export function isCallableDeclaration(x: unknown): x is CallableDeclaration {
+  return x && typeof x === 'object' && (x as any).parameters;
 }

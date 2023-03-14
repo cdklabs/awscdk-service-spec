@@ -1,27 +1,18 @@
-import * as jsii from '@jsii/spec';
-import { Property, PropertySpec } from './property';
+import { MemberType } from './member-type';
+import { PropertySpec } from './property';
 import { Scope } from './scope';
-import { Type, TypeKind } from './type';
+import { SymbolKind } from './symbol';
+import { Type } from './type';
+import { TypeSpec } from './type-declaration';
 
-export interface InterfaceSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' | 'kind'> {
-  kind: TypeKind.Interface;
+export interface InterfaceSpec extends TypeSpec {
   export?: boolean;
   properties?: PropertySpec[];
+  extends?: Type[];
 }
 
-export class InterfaceType extends Type {
-  /**
-   * Lists all direct properties of the interface
-   */
-  public get properties(): Map<string, Property> {
-    const result = new Map<string, Property>();
-
-    for (const p of this.spec.properties ?? []) {
-      result.set(p.name, new Property(this, p));
-    }
-
-    return result;
-  }
+export class InterfaceType extends MemberType {
+  public readonly kind = SymbolKind.Interface;
 
   /**
    * List the modifiers of the interface
@@ -39,13 +30,7 @@ export class InterfaceType extends Type {
     super(scope, spec);
   }
 
-  /**
-   * Adds a property to the interface
-   */
-  public addProperty(spec: PropertySpec) {
-    if (!this.spec.properties) {
-      this.spec.properties = [];
-    }
-    this.spec.properties.push(spec);
+  public get extends() {
+    return this.spec.extends ?? [];
   }
 }

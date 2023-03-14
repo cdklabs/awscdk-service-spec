@@ -1,13 +1,23 @@
 import * as jsii from '@jsii/spec';
-import { InterfaceType } from './interface';
+import { DocsSpec } from './documented';
+import { Expression } from './expression';
+import { ObjectPropertyAccess } from './expressions';
+import { MemberType } from './member-type';
+import { Block } from './statements/block';
+import { Type } from './type';
 import { MemberKind, MemberVisibility, TypeMember } from './type-member';
-import { TypeReference } from './type-ref';
 
-export interface PropertySpec extends Omit<jsii.Property, 'assembly' | 'fqn'> {
-  kind: MemberKind.Property;
+export interface PropertySpec extends Omit<jsii.Property, 'assembly' | 'fqn' | 'docs' | 'type' | 'kind'> {
+  docs?: DocsSpec;
+  type: Type;
+  initializer?: Expression;
+  getterBody?: Block;
+  setterBody?: (value: Expression) => Block;
 }
 
 export class Property extends TypeMember {
+  public readonly kind = MemberKind.Property;
+
   /**
    * Indicates if this property only has a getter (immutable).
    */
@@ -32,14 +42,38 @@ export class Property extends TypeMember {
     return MemberVisibility.Public;
   }
 
+  public get initializer() {
+    return this.spec.initializer;
+  }
+
   /**
    * The type of the property as a reference.
    */
-  public get type(): TypeReference {
-    return new TypeReference(this.scope.scope, this.spec.type);
+  public readonly type: Type;
+
+  public constructor(public readonly scope: MemberType, public readonly spec: PropertySpec) {
+    super(scope, {
+      ...spec,
+    });
+    this.type = spec.type;
   }
 
-  public constructor(public readonly scope: InterfaceType, public readonly spec: PropertySpec) {
-    super(scope, spec);
+  /**
+   * Read a property from an object
+   */
+  public from(x: Expression): Expression {
+    return new ObjectPropertyAccess(x, this.name);
+  }
+
+  public get getter() {
+    return this.spec.getterBody;
+  }
+
+  public get setter() {
+    return this.spec.setterBody;
+  }
+
+  public get isGetterSetter() {
+    return this.getter || this.setter;
   }
 }

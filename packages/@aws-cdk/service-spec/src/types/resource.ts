@@ -46,11 +46,32 @@ export interface Property {
   required?: boolean;
   type: PropertyType;
   wasOnceJson?: boolean;
+  defaultValue?: string;
+  deprecated?: Deprecation;
 }
 
 export interface Attribute {
   documentation?: string;
   type: PropertyType;
+}
+
+export enum Deprecation {
+  /**
+   * Not deprecated
+   */
+  NONE = 'NONE',
+
+  /**
+   * Warn about use
+   */
+  WARN = 'WARN',
+
+  /**
+   * Do not emit the value at all
+   *
+   * (Handle properties that were incorrectly added to the spec)
+   */
+  IGNORE = 'IGNORE',
 }
 
 // FIXME: Should properties & attributes be entities or not?
@@ -76,6 +97,7 @@ export interface NumberType {
 export interface BooleanType {
   readonly type: 'boolean';
 }
+
 export interface JsonType {
   readonly type: 'json';
 }

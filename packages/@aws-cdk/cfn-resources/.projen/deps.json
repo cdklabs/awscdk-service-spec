@@ -1,6 +1,10 @@
 {
   "dependencies": [
     {
+      "name": "@aws-cdk/service-spec",
+      "type": "build"
+    },
+    {
       "name": "@aws-cdk/service-spec-build",
       "type": "build"
     },
@@ -42,6 +46,14 @@
     {
       "name": "@typescript-eslint/parser",
       "version": "^5",
+      "type": "build"
+    },
+    {
+      "name": "aws-cdk-lib",
+      "type": "build"
+    },
+    {
+      "name": "camelcase",
       "type": "build"
     },
     {

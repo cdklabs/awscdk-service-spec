@@ -1,13 +1,16 @@
-import { InterfaceType } from './interface';
-import { Scope } from './scope';
-import { Type } from './type';
+import { Expression } from './expression';
+import { ObjectPropertyAccess } from './expressions';
+import { Identifier } from './expressions/identifier';
+import { IImport, Scope } from './scope';
+import { StructType } from './struct';
+import { ThingSymbol } from './symbol';
+import { TypeDeclaration } from './type-declaration';
 
 /**
  * A module
  */
 export class Module extends Scope {
-  protected readonly typeMap: Map<string, Type> = new Map<string, Type>();
-  protected readonly importMap: Map<string, Scope> = new Map<string, Scope>();
+  protected readonly typeMap: Map<string, TypeDeclaration> = new Map<string, TypeDeclaration>();
 
   public get name(): string {
     return this.fqn;
@@ -20,29 +23,41 @@ export class Module extends Scope {
   /**
    * All types in this module/namespace (not submodules)
    */
-  public get types(): Type[] {
+  public get types(): TypeDeclaration[] {
     return Array.from(this.typeMap.values());
-  }
-
-  /**
-   * All imports in this module
-   */
-  public get imports(): Array<[string, Scope]> {
-    return Array.from(this.importMap.entries());
   }
 
   /**
    * All interfaces in this module/namespace (not submodules)
    */
-  public get interfaces(): readonly InterfaceType[] {
-    return this.types.filter((t) => t instanceof InterfaceType).map((t) => t as InterfaceType);
+  public get interfaces(): readonly StructType[] {
+    return this.types.filter((t) => t instanceof StructType).map((t) => t as StructType);
   }
 
-  public addType(type: Type): void {
+  public addType(type: TypeDeclaration): void {
     this.typeMap.set(type.fqn, type);
   }
 
-  public addImport(scope: Scope, name: string): void {
-    this.importMap.set(name, scope);
+  public import(intoModule: Module, as: string) {
+    intoModule.addImportedScope(this, new AliasedModuleImport(this, as));
+  }
+
+  public toString() {
+    return `module '${this.fqn}'`;
+  }
+}
+
+class AliasedModuleImport implements IImport {
+  public readonly importAlias?: string | undefined;
+  public readonly moduleSource: string;
+
+  constructor(public readonly module: Module, public readonly as: string) {
+    this.importAlias = as;
+    this.moduleSource = module.fqn;
+  }
+
+  referenceSymbol(sym: ThingSymbol): Expression {
+    // We just assume that this symbol exists. We can't properly check it, yet...
+    return new ObjectPropertyAccess(new Identifier(this.as), sym.name);
   }
 }

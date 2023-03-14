@@ -1,7 +1,11 @@
-import { Callable } from '../callable';
+import { IndentedStringBuilder } from './indented-string-builder';
+import { FreeFunction } from '../callable';
+import { ClassType } from '../class';
 import { InterfaceType } from '../interface';
 import { Module } from '../module';
-import { TypeKind } from '../type';
+import { Scope } from '../scope';
+import { StructType } from '../struct';
+import { SymbolKind } from '../symbol';
 
 export interface RenderOptions {
   indentation?: number | string;
@@ -9,6 +13,12 @@ export interface RenderOptions {
 
 export abstract class Renderer {
   protected symbol: string;
+  private emitter = new IndentedStringBuilder();
+
+  /**
+   * Stack of visible scopes during rendering, closest first
+   */
+  private scopeStack = new Array<Scope>();
 
   public constructor(options: RenderOptions = {}) {
     this.symbol = this.setIndentationSymbol(options.indentation);
@@ -18,24 +28,34 @@ export abstract class Renderer {
    * Render a renderable to a string.
    */
   public render(scope: Module): string {
-    return this.renderModule(scope, 0);
+    this.emitter = new IndentedStringBuilder();
+    this.renderModule(scope);
+    return this.emitter.toString();
   }
 
   /**
    * Render a module.
    */
-  protected abstract renderModule(scope: Module, indentationLevel: number): string;
+  protected abstract renderModule(scope: Module): void;
 
   /**
    * Render types of a module.
    */
-  protected renderModuleTypes(mod: Module, indentationLevel: number): string[] {
-    return mod.types.map((t) => {
+  protected renderModuleTypes(mod: Module): void {
+    this.emitList(mod.types, '\n\n', (t) => {
       switch (t.kind) {
-        case TypeKind.Interface:
-          return this.renderInterface(t as InterfaceType, indentationLevel);
-        case TypeKind.Function:
-          return this.renderCallable(t as Callable, indentationLevel);
+        case SymbolKind.Struct:
+          this.renderStruct(t as StructType);
+          break;
+        case SymbolKind.Interface:
+          this.renderInterface(t as InterfaceType);
+          break;
+        case SymbolKind.Function:
+          this.renderFunction(t as FreeFunction);
+          break;
+        case SymbolKind.Class:
+          this.renderClass(t as ClassType);
+          break;
         default:
           throw `Unknown type: ${t.kind} for ${t.fqn}. Skipping.`;
       }
@@ -45,18 +65,33 @@ export abstract class Renderer {
   /**
    * Render an interface.
    */
-  protected abstract renderInterface(interfaceType: InterfaceType, indentationLevel: number): string;
+  protected abstract renderStruct(interfaceType: StructType): void;
+
+  /**
+   * Render an interface.
+   */
+  protected abstract renderInterface(interfaceType: InterfaceType): void;
 
   /**
    * Render a callable.
    */
-  protected abstract renderCallable(func: Callable, indentationLevel: number): string;
+  protected abstract renderFunction(func: FreeFunction): void;
 
   /**
-   * Indent text to the specified level.
+   * Render a class.
    */
-  public indent(text: string, level: number): string {
-    return this.getIndentation(level) + text;
+  protected abstract renderClass(cls: ClassType): void;
+
+  protected indent() {
+    this.emitter.indent(this.symbol);
+  }
+
+  protected unindent() {
+    this.emitter.unindent();
+  }
+
+  protected emit(x: string) {
+    this.emitter.emit(x);
   }
 
   protected setIndentationSymbol(symbol: number | string = 2): string {
@@ -67,7 +102,28 @@ export abstract class Renderer {
     return symbol;
   }
 
-  protected getIndentation(level: number): string {
-    return this.symbol.repeat(level);
+  protected emitList<A>(xs: Iterable<A>, sep: string, block: (x: A) => void) {
+    let first = true;
+    for (const x of xs) {
+      if (!first) {
+        this.emit(sep);
+      }
+      first = false;
+
+      block(x);
+    }
+  }
+
+  protected withScope(scope: Scope, block: () => void) {
+    this.scopeStack.unshift(scope);
+    try {
+      block();
+    } finally {
+      this.scopeStack.shift();
+    }
+  }
+
+  protected get scopes(): ReadonlyArray<Scope> {
+    return this.scopeStack;
   }
 }

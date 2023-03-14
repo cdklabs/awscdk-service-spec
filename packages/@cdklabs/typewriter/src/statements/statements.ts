@@ -1,24 +1,104 @@
-import { Callable } from '../callable';
+import { Expression } from '../expression';
 
-export interface Statement {}
+export class Statement {
+  readonly comments?: string[];
 
-export class ReturnStatement implements Statement {
-  public constructor(public readonly statement?: Statement) {}
-}
+  /**
+   * Declare a private field to make this type nominally typed
+   */
+  private readonly isStatement = true;
 
-export interface InvokeStatement extends Statement {
-  with(...args: Statement[]): InvokeStatement;
-}
-
-export class InvokeCallable implements InvokeStatement {
-  public constructor(public readonly callable: Callable, public readonly args: Statement[] = []) {}
-
-  with(...args: Statement[]): InvokeStatement {
-    throw new InvokeCallable(this.callable, args);
+  constructor() {
+    Array.isArray(this.isStatement);
   }
 }
 
-export interface CallableStatement {
-  readonly name: string;
-  invoke(...args: Statement[]): InvokeStatement;
+export class ReturnStatement extends Statement {
+  readonly comments?: string[];
+
+  public constructor(public readonly expression?: Expression) {
+    super();
+  }
 }
+
+export class ExpressionStatement extends Statement {
+  readonly comments?: string[];
+
+  public constructor(public readonly expression: Expression) {
+    super();
+  }
+}
+
+export class AssignmentStatement extends Statement {
+  readonly comments?: string[];
+
+  public constructor(public readonly lhs: Expression, public readonly rhs: Expression) {
+    super();
+  }
+}
+
+export enum Mut {
+  Mutable,
+  Immutable,
+}
+
+export class VariableDeclaration extends Statement {
+  readonly comments?: string[];
+
+  public constructor(public readonly mut: Mut, public readonly varName: Expression, public readonly rhs: Expression) {
+    super();
+  }
+}
+
+export class IfThenElse extends Statement {
+  readonly comments?: string[];
+
+  public thenStatement?: Statement;
+  public elseStatement?: Statement;
+
+  public constructor(public readonly condition: Expression) {
+    super();
+  }
+
+  public then(then_: Statement) {
+    this.thenStatement = then_;
+    return this;
+  }
+
+  public else(else_: Statement) {
+    this.elseStatement = else_;
+    return this;
+  }
+}
+
+export class ForLoop extends Statement {
+  constructor(
+    public readonly mut: Mut,
+    public readonly iterator: Expression,
+    public iterable?: Expression,
+    public loopBody?: Statement,
+  ) {
+    super();
+  }
+
+  public in(iterable: Expression) {
+    this.iterable = iterable;
+    return this;
+  }
+
+  public do(statement: Statement) {
+    this.loopBody = statement;
+    return this;
+  }
+}
+
+export class SuperInitializer extends Statement {
+  public readonly args: Expression[];
+
+  constructor(...args: Expression[]) {
+    super();
+    this.args = args;
+  }
+}
+
+export class StatementSeparator extends Statement {}

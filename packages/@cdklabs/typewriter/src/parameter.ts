@@ -1,19 +1,25 @@
-import { Callable } from './callable';
-import { TypeReference, TypeReferenceSpec } from './type-ref';
+import { CallableDeclaration } from './callable';
+import { Identifier } from './expressions';
+import { Type } from './type';
 
 export interface ParameterSpec {
   name: string;
-  type: TypeReferenceSpec;
+  type: Type;
+  documentation?: string;
 }
 
-export class Parameter {
-  public constructor(public readonly scope: Callable, public readonly spec: ParameterSpec) {}
+/**
+ * It's just neat if Parameter extends Identifier so you can use it directly in the body definition
+ */
+export class Parameter extends Identifier {
+  public readonly documentation?: string;
 
-  public get name(): string {
-    return this.spec.name;
+  public constructor(public readonly scope: CallableDeclaration, public readonly spec: ParameterSpec) {
+    super(spec.name);
+    this.documentation = spec.documentation;
   }
 
-  public get type(): TypeReference {
-    return new TypeReference(this.scope.scope, this.spec.type);
+  public get type(): Type {
+    return this.spec.type;
   }
 }
