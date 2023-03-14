@@ -3,6 +3,7 @@ import {
   PropertyType,
   Resource,
   ResourceProperties,
+  Service,
   SpecDatabase,
   TypeDefinition,
 } from '@aws-cdk/service-spec';
@@ -21,6 +22,11 @@ export interface LoadCloudFormationRegistryResourceOptions {
   readonly resource: CloudFormationRegistryResource;
   readonly fails: Failures;
   readonly specResource?: resourcespec.ResourceType;
+}
+export interface LoadCloudFormationRegistryServiceFromResourceOptions {
+  readonly db: SpecDatabase;
+  readonly resource: CloudFormationRegistryResource;
+  readonly resourceTypeNameSeparator?: string;
 }
 
 export function readCloudFormationRegistryResource(options: LoadCloudFormationRegistryResourceOptions) {
@@ -235,6 +241,29 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
       cb(x);
     }
   }
+}
+
+export function readCloudFormationRegistryServiceFromResource(
+  options: LoadCloudFormationRegistryServiceFromResourceOptions,
+): Service {
+  const { db, resource, resourceTypeNameSeparator = '::' } = options;
+  const parts = resource.typeName.split(resourceTypeNameSeparator);
+
+  const name = `${parts[0]}-${parts[1]}`.toLowerCase();
+  const shortName = parts[1].toLowerCase();
+
+  const existing = db.lookup('service', 'name', 'equals', name);
+
+  if (existing.length !== 0) {
+    return existing[0];
+  }
+
+  const service = db.allocate('service', {
+    name,
+    shortName,
+  });
+
+  return service;
 }
 
 function last<A>(xs: A[]): A {

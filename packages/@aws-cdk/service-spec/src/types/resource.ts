@@ -123,6 +123,7 @@ export interface MapType<E> {
 
 export type HasResource = Relationship<Service, Resource>;
 export type RegionHasResource = Relationship<Region, Resource>;
+export type RegionHasService = Relationship<Region, Service>;
 export type ResourceDoc = Relationship<Resource, Documentation>;
 
 export type ServiceInRegion = Relationship<Region, Service>;

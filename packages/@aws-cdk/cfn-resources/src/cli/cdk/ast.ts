@@ -1,6 +1,14 @@
-import { DatabaseSchema, Deprecation, Property, PropertyType, Resource, TypeDefinition } from '@aws-cdk/service-spec';
+import {
+  DatabaseSchema,
+  Deprecation,
+  Property,
+  PropertyType,
+  Resource,
+  Service,
+  TypeDefinition,
+} from '@aws-cdk/service-spec';
 import { Database } from '@cdklabs/tskb';
-import { StructType, expr, stmt, Type, TypeDeclaration, FreeFunction, IsObject, $E } from '@cdklabs/typewriter';
+import { StructType, expr, stmt, Type, TypeDeclaration, FreeFunction, IsObject, $E, Module } from '@cdklabs/typewriter';
 import { Stability } from '@jsii/spec';
 import { CDK_CORE, CONSTRUCTS } from './cdk';
 import { ResourceClass } from './resource-class';
@@ -15,20 +23,33 @@ import {
 import { cloudFormationDocLink } from '../naming/doclink';
 import { PropMapping } from '../prop-mapping';
 import { ResourceModule } from '../resource';
+import { ServiceModule } from '../service';
 import { splitDocumentation } from '../split-summary';
 
-export class AstBuilder {
-  /**
-   * @deprecated should be replaced by a new forService once services are available
-   */
-  public static forResource(resource: string, db: Database<DatabaseSchema>): AstBuilder {
-    const parts = resource.split('::');
-    const scope = new ResourceModule(parts[1], parts[2]);
+export class AstBuilder<T extends Module> {
+  public static forService(service: Service, db: Database<DatabaseSchema>): AstBuilder<ServiceModule> {
+    const scope = new ServiceModule(service.name, service.shortName);
+    const ast = new AstBuilder(scope, db);
 
-    return new AstBuilder(scope, db);
+    const resources = db.follow('hasResource', service);
+    for (const link of resources) {
+      ast.addResource(link.to);
+    }
+
+    return ast;
   }
 
-  protected constructor(public readonly scope: ResourceModule, public readonly db: Database<DatabaseSchema>) {
+  public static forResource(resource: Resource, db: Database<DatabaseSchema>): AstBuilder<ResourceModule> {
+    const parts = resource.cloudFormationType.toLowerCase().split('::');
+    const scope = new ResourceModule(parts[1], parts[2]);
+
+    const ast = new AstBuilder(scope, db);
+    ast.addResource(resource);
+
+    return ast;
+  }
+
+  protected constructor(public readonly scope: T, public readonly db: Database<DatabaseSchema>) {
     CDK_CORE.import(scope, 'cdk');
     CONSTRUCTS.import(scope, 'constructs');
     CDK_CORE.helpers.import(scope, 'cfn_parse');
