@@ -132,6 +132,9 @@
           "exec": "yarn upgrade npm-check-updates"
         },
         {
+          "exec": "npm-check-updates --dep=dev,optional,peer,prod,bundle --upgrade --target=minor"
+        },
+        {
           "exec": "yarn workspaces run check-for-updates"
         },
         {

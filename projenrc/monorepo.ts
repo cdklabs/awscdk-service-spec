@@ -117,6 +117,7 @@ export class MonorepoRoot extends pj.typescript.TypeScriptProject {
       description: 'Upgrade dependencies in all workspaces',
       steps: [
         { exec: 'yarn upgrade npm-check-updates' },
+        { exec: 'npm-check-updates --dep=dev,optional,peer,prod,bundle --upgrade --target=minor' },
         { exec: 'yarn workspaces run check-for-updates' },
         { exec: 'yarn install --check-files' },
         { exec: 'yarn upgrade' },
