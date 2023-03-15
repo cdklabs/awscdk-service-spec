@@ -66,7 +66,7 @@
       "description": "Synthesize project files",
       "steps": [
         {
-          "exec": "(cd `git rev-parse --show-toplevel`; npx projen default)"
+          "exec": "cd ../../.. && npx projen default"
         }
       ]
     },

@@ -68,7 +68,7 @@
       "name": "fmt",
       "steps": [
         {
-          "exec": "eslint --ext .ts --fix projenrc .projenrc.ts"
+          "exec": "eslint --ext .ts --fix --no-error-on-unmatched-pattern projenrc .projenrc.ts"
         }
       ]
     },
