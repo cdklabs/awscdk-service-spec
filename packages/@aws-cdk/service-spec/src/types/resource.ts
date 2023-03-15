@@ -31,7 +31,21 @@ export interface Resource extends Entity {
   readonly validations?: unknown;
   identifier?: ResourceIdentifier;
   isStateful?: boolean;
+
+  /**
+   * The name of the property that contains the tags
+   *
+   * Undefined if the resource is not taggable.
+   */
+  tagPropertyName?: string;
+
+  /**
+   * What type of tags
+   */
+  tagType?: TagType;
 }
+
+export type TagType = 'standard' | 'asg' | 'map';
 
 export type ResourceProperties = Record<string, Property>;
 
@@ -82,9 +96,23 @@ Invariants.push(
   ),
 );
 
-export type PropertyType = PrimitiveType | DefinitionReference | ArrayType<PropertyType> | MapType<PropertyType>;
+export type PropertyType =
+  | PrimitiveType
+  | BuiltInType
+  | DefinitionReference
+  | ArrayType<PropertyType>
+  | MapType<PropertyType>;
 
 export type PrimitiveType = StringType | NumberType | BooleanType | JsonType | NullType;
+
+export function isPrimitiveType(x: PropertyType): x is PrimitiveType {
+  return (x as any).type;
+}
+
+export interface BuiltInType {
+  readonly type: 'builtIn';
+  readonly builtInType: 'tag';
+}
 
 export interface StringType {
   readonly type: 'string';

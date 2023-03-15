@@ -38,8 +38,15 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
 
   const existing = db.lookup('resource', 'cloudFormationType', 'equals', resource.typeName);
 
-  let res: Resource;
-  if (existing.length === 0) {
+  if (existing.length > 0) {
+    // FIXME: Probably recurse into the properties to see if they are different...
+    return existing[0];
+  }
+
+  let res: Resource; // Closed over by many of the functions here
+  return allocateNewResource();
+
+  function allocateNewResource() {
     res = db.allocate('resource', {
       cloudFormationType: resource.typeName,
       documentation: resource.description,
@@ -61,12 +68,11 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
     }
 
     copyAttributes(resource, res.attributes, failure.in(resource.typeName));
-  } else {
-    // FIXME: Probably recurse into the properties to see if they are different...
-    res = existing[0];
-  }
 
-  return res;
+    handleTags(failure.in(resource.typeName));
+
+    return res;
+  }
 
   function recurseProperties(source: ImplicitJsonSchemaRecord, target: ResourceProperties, fail: Fail) {
     if (!source.properties) {
@@ -231,6 +237,28 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
           required: ifTrue((source.required ?? []).includes(name)),
         };
       });
+    }
+  }
+
+  function handleTags(fail: Fail) {
+    const taggable = resource?.tagging?.taggable ?? resource.taggable ?? true;
+    if (taggable) {
+      const tagProp = simplePropNameFromJsonPtr(resource.tagging?.tagProperty ?? '/properties/Tags');
+      const tagType = resource.properties[tagProp];
+      if (!tagType) {
+        fails.push(fail(`marked as taggable, but tagProperty does not exist: ${tagProp}`));
+      } else {
+        const resolvedType = resolve(tagType).schema;
+        res.tagPropertyName = tagProp;
+        if (res.cloudFormationType === 'AWS::AutoScaling::AutoScalingGroup') {
+          res.tagType = 'asg';
+        } else if (jsonschema.isObject(resolvedType) && jsonschema.isMapLikeObject(resolvedType)) {
+          res.tagType = 'map';
+        } else {
+          res.tagType = 'standard';
+        }
+        res.properties[tagProp].type = { type: 'array', element: { type: 'builtIn', builtInType: 'tag' } };
+      }
     }
   }
 

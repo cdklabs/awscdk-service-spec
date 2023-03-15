@@ -24,6 +24,20 @@ export namespace jsonschema {
     [k: string]: unknown;
   }
 
+  export type CombiningSchema<X> = OneOf<X> | AnyOf<X> | AllOf<X>;
+
+  export function isCombining(x: ConcreteSchema): x is CombiningSchema<ConcreteSchema> {
+    return isOneOf(x) || isAnyOf(x) || isAllOf(x);
+  }
+
+  export function isSingleton(x: ConcreteSchema): x is Exclude<ConcreteSchema, CombiningSchema<ConcreteSchema>> {
+    return !isCombining(x);
+  }
+
+  export function isObject(x: ConcreteSchema): x is Object {
+    return isSingleton(x) && x.type === 'object';
+  }
+
   export type Object = MapLikeObject | RecordLikeObject;
 
   export interface AnyOf<S> extends Annotatable {

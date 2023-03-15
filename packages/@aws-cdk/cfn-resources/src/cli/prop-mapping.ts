@@ -46,12 +46,13 @@ export class PropMapping {
   }
 
   private typeProducer(type: Type): Mapper {
-    if (type.isAny) {
+    if (type.equals(CDK_CORE.CfnTag)) {
       return {
-        produce: CDK_CORE.objectToCloudFormation,
-        parse: CDK_CORE.helpers.FromCloudFormation.getAny,
+        produce: CDK_CORE.cfnTagToCloudFormation,
+        parse: CDK_CORE.helpers.FromCloudFormation.getCfnTag,
       };
     }
+
     switch (type.primitive) {
       case PrimitiveType.String:
         return {

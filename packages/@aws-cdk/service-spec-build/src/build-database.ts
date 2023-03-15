@@ -1,6 +1,7 @@
 import { emptyDatabase } from '@aws-cdk/service-spec';
 import * as sources from '@aws-cdk/service-spec-sources';
 import { LoadResult } from '@aws-cdk/service-spec-sources';
+import { PatchReport } from '@aws-cdk/service-spec-sources/src/loading/patches/patching';
 import { assertSuccess, Failures, Result } from '@cdklabs/tskb';
 import { readCloudFormationDocumentation } from './cloudformation-docs';
 import {
@@ -16,6 +17,7 @@ export interface BuildDatabaseOptions {
 export async function buildDatabase(options: BuildDatabaseOptions = {}) {
   const db = emptyDatabase();
   const warnings: Failures = [];
+  const patchesApplied: PatchReport[] = [];
 
   const resourceSpec = loadResult(await sources.loadDefaultResourceSpecification());
 
@@ -48,11 +50,12 @@ export async function buildDatabase(options: BuildDatabaseOptions = {}) {
   const stateful = loadResult(await sources.loadDefaultStatefulResources());
   readStatefulResources(db, stateful, warnings);
 
-  return { db, warnings };
+  return { db, warnings, patchesApplied };
 
   function loadResult<A>(x: Result<LoadResult<A>>): A {
     assertSuccess(x);
     warnings.push(...x.warnings);
+    patchesApplied.push(...x.patchesApplied);
     return x.value;
   }
 }

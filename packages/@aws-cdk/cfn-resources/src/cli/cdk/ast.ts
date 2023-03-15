@@ -169,6 +169,11 @@ export class AstBuilder<T extends Module> {
       case 'ref':
         const ref = this.db.get('typeDefinition', type.reference.$ref);
         return this.obtainTypeReference(ref).type;
+      case 'builtIn':
+        switch (type.builtInType) {
+          case 'tag':
+            return CDK_CORE.CfnTag;
+        }
       case 'json':
       default:
         return Type.ANY;

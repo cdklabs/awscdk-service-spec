@@ -1,4 +1,4 @@
-import { PropertyType, Resource } from '@aws-cdk/service-spec';
+import { PropertyType, Resource, TagType } from '@aws-cdk/service-spec';
 import {
   $E,
   $T,
@@ -22,6 +22,7 @@ import {
   cfnParserNameFromType,
   staticResourceTypeName,
   cfnProducerNameFromType,
+  propertyNameFromCloudFormation,
 } from '../naming/conventions';
 import { cloudFormationDocLink } from '../naming/doclink';
 import { splitDocumentation } from '../split-summary';
@@ -79,11 +80,11 @@ export class ResourceClass extends ClassType {
     }
 
     // Copy properties onto class properties
-    for (const prop of opts.propsType.properties) {
+    for (const { name, prop, memberOptional, memberType } of this.mappableProperties()) {
       this.addProperty({
-        name: prop.name,
-        type: prop.type,
-        optional: prop.optional,
+        name: name,
+        type: memberType,
+        optional: memberOptional,
         docs: {
           summary: prop.docs?.summary,
         },
@@ -187,9 +188,9 @@ export class ResourceClass extends ClassType {
       stmt.sep(),
 
       // Validate required properties
-      ...this.opts.propsType.properties
-        .filter((p) => !p.optional)
-        .map((p) => stmt.expr(CDK_CORE.requireProperty(props, expr.lit(p.name), $this))),
+      ...this.mappableProperties()
+        .filter(({ prop }) => !prop.optional)
+        .map(({ name }) => CDK_CORE.requireProperty(props, expr.lit(name), $this)),
 
       stmt.sep(),
     );
@@ -199,7 +200,7 @@ export class ResourceClass extends ClassType {
       ...this.mappableAttributes().map(({ name, tokenizer }) => stmt.assign($this[name], tokenizer)),
 
       // Props
-      ...this.opts.propsType.properties.map((prop) => stmt.assign($this[prop.name], prop.from(props))),
+      ...this.mappableProperties().map(({ name, initializer }) => stmt.assign($this[name], initializer(props))),
     );
   }
 
@@ -226,19 +227,31 @@ export class ResourceClass extends ClassType {
     );
   }
 
+  /**
+   * Make the cfnProperties getter
+   *
+   * This produces a set of properties that are going to be passed into renderProperties().
+   */
   private makeCfnProperties() {
-    const $this = $E(expr.this_());
-
     this.addProperty({
       name: 'cfnProperties',
       type: Type.mapOf(Type.ANY),
       protected: true,
       getterBody: Block.with(
-        stmt.ret(expr.object(Object.fromEntries(this.opts.propsType.properties.map((p) => [p.name, $this[p.name]])))),
+        stmt.ret(
+          expr.object(
+            Object.fromEntries(this.mappableProperties().map(({ name, valueToRender }) => [name, valueToRender])),
+          ),
+        ),
       ),
     });
   }
 
+  /**
+   * Make the renderProperties() method
+   *
+   * This forwards straight to the props type mapper
+   */
   private makeRenderProperties() {
     const m = this.addMethod({
       name: 'renderProperties',
@@ -253,30 +266,71 @@ export class ResourceClass extends ClassType {
   }
 
   private mappableAttributes() {
+    const $this = $E(expr.this_());
+    const $ResolutionTypeHint = $T(CDK_CORE.ResolutionTypeHint);
+
     return Object.entries(this.opts.res.attributes).flatMap(([attrName, attr]) => {
       let type: Type | undefined;
       let tokenizer: Expression = expr.ident('<dummy>');
 
       if (attr.type.type === 'string') {
         type = Type.STRING;
-        tokenizer = CDK_CORE.tokenAsString(
-          expr.this_().callMethod('getAtt', expr.lit(attrName), expr.type(CDK_CORE.ResolutionTypeHint).prop('STRING')),
-        );
+        tokenizer = CDK_CORE.tokenAsString($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.STRING));
       } else if (attr.type.type === 'number') {
         type = Type.NUMBER;
-        tokenizer = CDK_CORE.tokenAsNumber(
-          expr.this_().callMethod('getAtt', expr.lit(attrName), expr.type(CDK_CORE.ResolutionTypeHint).prop('NUMBER')),
-        );
+        tokenizer = CDK_CORE.tokenAsNumber($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.NUMBER));
       } else if (attr.type.type === 'array' && attr.type.element.type === 'string') {
         type = Type.arrayOf(Type.STRING);
-        tokenizer = CDK_CORE.tokenAsList(
-          expr
-            .this_()
-            .callMethod('getAtt', expr.lit(attrName), expr.type(CDK_CORE.ResolutionTypeHint).prop('STRING_LIST')),
-        );
+        tokenizer = CDK_CORE.tokenAsList($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.STRING_LIST));
       }
 
       return type ? [{ attrName, attr, name: attributePropertyName(attrName), type, tokenizer }] : [];
     });
+  }
+
+  private mappableProperties() {
+    const $this = $E(expr.this_());
+    return this.opts.propsType.properties.map((prop) => {
+      // FIXME: Would be nicer to thread this value through
+      const isTagType = prop.name === propertyNameFromCloudFormation(this.opts.res.tagPropertyName ?? '');
+
+      if (isTagType) {
+        return {
+          // The property must be called 'tags' for the resource to count as ITaggable
+          name: 'tags',
+          prop,
+          memberOptional: false,
+          memberType: CDK_CORE.TagManager,
+          initializer: (props: Expression) =>
+            new CDK_CORE.TagManager(
+              translateTagType(this.opts.res.tagType ?? 'standard'),
+              expr.lit(this.opts.res.cloudFormationType),
+              prop.from(props),
+              expr.object({ tagPropertyName: expr.lit(prop.name) }),
+            ),
+          valueToRender: $this.tags.renderTags(),
+        };
+      }
+
+      return {
+        name: prop.name,
+        prop,
+        memberOptional: prop.optional,
+        memberType: prop.type,
+        initializer: (props: Expression) => prop.from(props),
+        valueToRender: $this[prop.name],
+      };
+    });
+  }
+}
+
+function translateTagType(x: TagType) {
+  switch (x) {
+    case 'standard':
+      return CDK_CORE.TagType.STANDARD;
+    case 'asg':
+      return CDK_CORE.TagType.AUTOSCALING_GROUP;
+    case 'map':
+      return CDK_CORE.TagType.MAP;
   }
 }

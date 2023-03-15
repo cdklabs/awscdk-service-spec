@@ -26,6 +26,8 @@ export const patchCloudFormationRegistry = onlyObjects(
     canonicalizeDefaultOnBoolean,
     patchMinLengthOnInteger,
     canonicalizeRegexInFormat,
+    markAsNonTaggable,
+    incorrectTagPropertyFormat,
     removeEmptyRequiredArray,
     noIncorrectDefaultType,
     removeSuspiciousPatterns,
@@ -233,6 +235,45 @@ export function canonicalizeRegexInFormat(lens: JsonObjectLens) {
     } else {
       lens.removeProperty('redundant regex in format', 'format');
     }
+  }
+}
+
+/**
+ * All resources are taggable by default, but not all of them have the required 'Tags' property
+ *
+ * If nothing else is configured and the resource doesn't have the 'Tags' property, it should
+ * have been marked as non-taggable.
+ */
+export function markAsNonTaggable(lens: JsonObjectLens) {
+  if (!isRoot(lens)) {
+    return;
+  }
+
+  if (lens.value.taggable !== undefined || lens.value.tagging !== undefined) {
+    // User configured something, we trust them
+    return;
+  }
+
+  const properties: Record<string, unknown> = (lens.value.properties as any) ?? {};
+  if (!properties.Tags) {
+    lens.addProperty('Resource does not have "Tags" property so should be marked non-taggable', 'taggable', false);
+  }
+}
+
+/**
+ * `tagProperty` must look like `/properties/Tags`. It may not look like `#/properties/Tags`.
+ */
+export function incorrectTagPropertyFormat(lens: JsonObjectLens) {
+  if (
+    lens.jsonPath === '/tagging' &&
+    typeof lens.value.tagProperty === 'string' &&
+    lens.value.tagProperty.startsWith('#/')
+  ) {
+    lens.replaceProperty(
+      'tagProperty should look like "/properties/Tags", not "#/properties/Tags"',
+      'tagProperty',
+      lens.value.tagProperty.substring(1),
+    );
   }
 }
 
