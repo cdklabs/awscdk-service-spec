@@ -23,36 +23,21 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "stripInternal": true,
-    "target": "ES2019"
+    "target": "ES2019",
+    "composite": true,
+    "outDir": "lib"
   },
   "include": [
-    ".projenrc.ts",
-    "projenrc/**/*.ts"
+    ".projenrc.js",
+    "src/**/*.ts",
+    "test/**/*.ts"
   ],
   "exclude": [
     "node_modules"
   ],
   "references": [
     {
-      "path": "packages/@cdklabs/tskb"
-    },
-    {
-      "path": "packages/@cdklabs/typewriter"
-    },
-    {
-      "path": "packages/@aws-cdk/service-spec-sources"
-    },
-    {
-      "path": "packages/@aws-cdk/service-spec"
-    },
-    {
-      "path": "packages/@aws-cdk/service-spec-build"
-    },
-    {
-      "path": "packages/@aws-cdk/cfn-resources"
-    },
-    {
-      "path": "packages/@aws-cdk/cfn2ts"
+      "path": "../cfn-resources"
     }
   ]
 }

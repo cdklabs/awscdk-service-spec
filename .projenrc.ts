@@ -170,4 +170,16 @@ cfnResources.preCompileTask.spawn(
 );
 cfnResources.synth();
 
+const cfn2ts = new yarn.TypeScriptWorkspace({
+  parent: repo,
+  name: '@aws-cdk/cfn2ts',
+  description: 'Drop-in replacement for cfn2ts',
+  private: true,
+  deps: [cfnResources, 'yargs', 'fs-extra'],
+});
+cfn2ts.addBins({
+  cfn2ts: 'bin/cfn2ts',
+});
+cfn2ts.synth();
+
 repo.synth();

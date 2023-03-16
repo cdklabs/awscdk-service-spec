@@ -1,21 +1,8 @@
-# Generated sources
-
-Make sure the database is up-to-date:
-
-```console
-(cd ../service-spec-build && yarn compile && yarn build:db)
-```
-
-Run as follows:
-
-```console
-yarn compile # (or npx tsc -b)
-node lib/cli/main
-```
+# Drop-in replacement for cfn2ts
 
 ## Use as cfn2ts replacement
 
-You can use `@aws-cdk/cfn-resources` as a drop-in replacement for `cfn2ts`.
+You can use this packages as a drop-in replacement for `cfn2ts`.
 
 - In `awscdk-service-spec`:
   - `yarn build` to do a complete build
