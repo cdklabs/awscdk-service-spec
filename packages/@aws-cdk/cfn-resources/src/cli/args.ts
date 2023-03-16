@@ -1,4 +1,10 @@
-export function parseArgv(argv: string[], namedArgs: string[]) {
+export function parseArgv(
+  argv: string[],
+  namedArgs: string[],
+): {
+  args: Record<string, string>;
+  options: Record<string, string | boolean>;
+} {
   return {
     args: Object.fromEntries(
       argv
