@@ -7,6 +7,7 @@ import {
   expr,
   Expression,
   MemberVisibility,
+  Scope,
   stmt,
   StructType,
   SuperInitializer,
@@ -14,7 +15,7 @@ import {
   Type,
 } from '@cdklabs/typewriter';
 import { Stability } from '@jsii/spec';
-import { AwsCdkLibModule } from '../modules';
+import { CDK_CORE, CONSTRUCTS } from './cdk';
 import {
   attributePropertyName,
   classNameFromResource,
@@ -36,7 +37,7 @@ export interface ResourceClassSpec {
 }
 
 export class ResourceClass extends ClassType {
-  constructor(public readonly scope: AwsCdkLibModule, private readonly opts: ResourceClassSpec) {
+  constructor(scope: Scope, private readonly opts: ResourceClassSpec) {
     super(scope, {
       export: true,
       name: classNameFromResource(opts.res),
@@ -47,8 +48,8 @@ export class ResourceClass extends ClassType {
           resourceType: opts.res.cloudFormationType,
         }),
       },
-      extends: scope.CDK_CORE.CfnResource,
-      implements: [scope.CDK_CORE.IInspectable],
+      extends: CDK_CORE.CfnResource,
+      implements: [CDK_CORE.IInspectable],
     });
 
     this.addProperty({
@@ -111,13 +112,13 @@ export class ResourceClass extends ClassType {
       },
     });
 
-    const scope = factory.addParameter({ name: 'scope', type: this.scope.CONSTRUCTS.Construct });
+    const scope = factory.addParameter({ name: 'scope', type: CONSTRUCTS.Construct });
     const id = factory.addParameter({ name: 'id', type: Type.STRING });
     const resourceAttributes = $E(factory.addParameter({ name: 'resourceAttributes', type: Type.ANY }));
     const options = $E(
       factory.addParameter({
         name: 'options',
-        type: this.scope.CDK_CORE.helpers.FromCloudFormationOptions,
+        type: CDK_CORE.helpers.FromCloudFormationOptions,
       }),
     );
 
@@ -157,7 +158,7 @@ export class ResourceClass extends ClassType {
     });
     const _scope = init.addParameter({
       name: 'scope',
-      type: this.scope.CONSTRUCTS.Construct,
+      type: CONSTRUCTS.Construct,
       documentation: 'Scope in which this resource is defined',
     });
     const id = init.addParameter({
@@ -188,7 +189,7 @@ export class ResourceClass extends ClassType {
       // Validate required properties
       ...this.opts.propsType.properties
         .filter((p) => !p.optional)
-        .map((p) => stmt.expr(this.scope.CDK_CORE.requireProperty(props, expr.lit(p.name), $this))),
+        .map((p) => stmt.expr(CDK_CORE.requireProperty(props, expr.lit(p.name), $this))),
 
       stmt.sep(),
     );
@@ -212,7 +213,7 @@ export class ResourceClass extends ClassType {
     const $inspector = $E(
       inspect.addParameter({
         name: 'inspector',
-        type: this.scope.CDK_CORE.TreeInspector,
+        type: CDK_CORE.TreeInspector,
         documentation: 'tree inspector to collect and process attributes',
       }),
     );
@@ -258,28 +259,20 @@ export class ResourceClass extends ClassType {
 
       if (attr.type.type === 'string') {
         type = Type.STRING;
-        tokenizer = this.scope.CDK_CORE.tokenAsString(
-          expr
-            .this_()
-            .callMethod('getAtt', expr.lit(attrName), expr.type(this.scope.CDK_CORE.ResolutionTypeHint).prop('STRING')),
+        tokenizer = CDK_CORE.tokenAsString(
+          expr.this_().callMethod('getAtt', expr.lit(attrName), expr.type(CDK_CORE.ResolutionTypeHint).prop('STRING')),
         );
       } else if (attr.type.type === 'number') {
         type = Type.NUMBER;
-        tokenizer = this.scope.CDK_CORE.tokenAsNumber(
-          expr
-            .this_()
-            .callMethod('getAtt', expr.lit(attrName), expr.type(this.scope.CDK_CORE.ResolutionTypeHint).prop('NUMBER')),
+        tokenizer = CDK_CORE.tokenAsNumber(
+          expr.this_().callMethod('getAtt', expr.lit(attrName), expr.type(CDK_CORE.ResolutionTypeHint).prop('NUMBER')),
         );
       } else if (attr.type.type === 'array' && attr.type.element.type === 'string') {
         type = Type.arrayOf(Type.STRING);
-        tokenizer = this.scope.CDK_CORE.tokenAsList(
+        tokenizer = CDK_CORE.tokenAsList(
           expr
             .this_()
-            .callMethod(
-              'getAtt',
-              expr.lit(attrName),
-              expr.type(this.scope.CDK_CORE.ResolutionTypeHint).prop('STRING_LIST'),
-            ),
+            .callMethod('getAtt', expr.lit(attrName), expr.type(CDK_CORE.ResolutionTypeHint).prop('STRING_LIST')),
         );
       }
 

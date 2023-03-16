@@ -1,6 +1,6 @@
 import { $E, $T, expr, Expression, ExternalModule, Scope, ThingSymbol, Type } from '@cdklabs/typewriter';
 
-export interface ModuleImports {
+export interface ModuleImportLocations {
   /**
    * The import name used import the core module
    * @default 'aws-cdk-lib'
@@ -19,7 +19,7 @@ export class CdkCore extends ExternalModule {
   public readonly TreeInspector = Type.fromName(this, 'TreeInspector');
   public readonly Token = $T(Type.fromName(this, 'Token'));
   public readonly ResolutionTypeHint = Type.fromName(this, 'ResolutionTypeHint');
-  public readonly helpers = new CdkInternalHelpers(this, this.helpersImportName);
+  public readonly helpers = new CdkInternalHelpers(this);
 
   public readonly objectToCloudFormation = makeCallableExpr(this, 'objectToCloudFormation');
   public readonly stringToCloudFormation = makeCallableExpr(this, 'stringToCloudFormation');
@@ -31,7 +31,7 @@ export class CdkCore extends ExternalModule {
   public readonly hashMapper = makeCallableExpr(this, 'hashMapper');
   public readonly requireProperty = makeCallableExpr(this, 'requireProperty');
 
-  constructor(fqn: string, private readonly helpersImportName?: string) {
+  constructor(fqn: string) {
     super(fqn);
   }
 
@@ -54,8 +54,8 @@ export class CdkInternalHelpers extends ExternalModule {
   public readonly FromCloudFormation = $T(Type.fromName(this, 'FromCloudFormation'));
   public readonly FromCloudFormationPropertyObject = Type.fromName(this, 'FromCloudFormationPropertyObject');
 
-  constructor(parent: CdkCore, importName?: string) {
-    super(importName ?? `${parent.fqn}/core/lib/helpers-internal`);
+  constructor(parent: CdkCore) {
+    super(`${parent.fqn}/core/lib/helpers-internal`);
   }
 }
 
@@ -66,6 +66,9 @@ export class Constructs extends ExternalModule {
     super('constructs');
   }
 }
+
+export const CDK_CORE = new CdkCore('aws-cdk-lib');
+export const CONSTRUCTS = new Constructs();
 
 function makeCallableExpr(scope: Scope, name: string) {
   return $E(expr.sym(new ThingSymbol(name, scope)));

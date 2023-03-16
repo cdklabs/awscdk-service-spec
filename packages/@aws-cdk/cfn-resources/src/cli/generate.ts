@@ -4,7 +4,7 @@ import { Database } from '@cdklabs/tskb';
 import { TypeScriptRenderer } from '@cdklabs/typewriter';
 import * as fs from 'fs-extra';
 import { AstBuilder } from './cdk/ast';
-import { ModuleImports } from './cdk/cdk';
+import { ModuleImportLocations } from './cdk/cdk';
 import { loadDatabase } from './db';
 import { debug } from './log';
 
@@ -32,9 +32,9 @@ export interface GenerateOptions {
    */
   readonly services?: string[];
   /**
-   * The import names used to import modules
+   * Override the locations modules are imported from
    */
-  readonly importNames?: ModuleImports;
+  readonly importLocations?: ModuleImportLocations;
 }
 
 export async function generate(options: GenerateOptions) {
@@ -42,7 +42,7 @@ export async function generate(options: GenerateOptions) {
     process.env.DEBUG = '1';
   }
   debug('Options', options);
-  const { outputPath, filePattern, clearOutput, importNames } = options;
+  const { outputPath, filePattern, clearOutput, importLocations: importNames } = options;
 
   const db = await loadDatabase();
   const renderer = new TypeScriptRenderer();
@@ -50,7 +50,7 @@ export async function generate(options: GenerateOptions) {
   let resourceCount = 0;
   const services = getServices(db, options.services).map((s) => {
     debug(s.name, 'ast');
-    const ast = AstBuilder.forService(s, { db, importNames });
+    const ast = AstBuilder.forService(s, { db, importLocations: importNames });
     resourceCount += db.follow('hasResource', s).length;
     return ast.scope;
   });

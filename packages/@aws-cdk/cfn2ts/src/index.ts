@@ -25,7 +25,7 @@ export default async function (
     outputPath: outPath ?? 'lib',
     clearOutput: false,
     services: scopes.map((s) => s.replace('::', '-').toLowerCase()),
-    importNames: {
+    importLocations: {
       core: coreImport,
       coreHelpers: `${coreImport}/${coreImport === '.' ? '' : 'lib/'}helpers-internal`,
     },

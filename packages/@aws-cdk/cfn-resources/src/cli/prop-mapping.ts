@@ -1,6 +1,6 @@
 import { expr, Expression, ObjectPropertyAccess, IsNotNullish, Type, UNDEFINED } from '@cdklabs/typewriter';
 import { PrimitiveType } from '@jsii/spec';
-import { AwsCdkLibModule } from './modules';
+import { CDK_CORE } from './cdk/cdk';
 import { cfnParserNameFromType, cfnProducerNameFromType } from './naming/conventions';
 
 /**
@@ -10,7 +10,7 @@ export class PropMapping {
   private readonly cfn2ts: Record<string, string> = {};
   private readonly cfnTypes: Record<string, Type> = {};
 
-  constructor(public readonly scope: AwsCdkLibModule) {}
+  constructor() {}
 
   public add(cfnName: string, tsName: string, type: Type) {
     this.cfn2ts[cfnName] = tsName;
@@ -48,54 +48,54 @@ export class PropMapping {
   private typeProducer(type: Type): Mapper {
     if (type.isAny) {
       return {
-        produce: this.scope.CDK_CORE.objectToCloudFormation,
-        parse: this.scope.CDK_CORE.helpers.FromCloudFormation.getAny,
+        produce: CDK_CORE.objectToCloudFormation,
+        parse: CDK_CORE.helpers.FromCloudFormation.getAny,
       };
     }
     switch (type.primitive) {
       case PrimitiveType.String:
         return {
-          produce: this.scope.CDK_CORE.stringToCloudFormation,
-          parse: this.scope.CDK_CORE.helpers.FromCloudFormation.getString,
+          produce: CDK_CORE.stringToCloudFormation,
+          parse: CDK_CORE.helpers.FromCloudFormation.getString,
         };
       case PrimitiveType.Date:
         return {
-          produce: this.scope.CDK_CORE.dateToCloudFormation,
-          parse: this.scope.CDK_CORE.helpers.FromCloudFormation.getDate,
+          produce: CDK_CORE.dateToCloudFormation,
+          parse: CDK_CORE.helpers.FromCloudFormation.getDate,
         };
       case PrimitiveType.Number:
         return {
-          produce: this.scope.CDK_CORE.numberToCloudFormation,
-          parse: this.scope.CDK_CORE.helpers.FromCloudFormation.getNumber,
+          produce: CDK_CORE.numberToCloudFormation,
+          parse: CDK_CORE.helpers.FromCloudFormation.getNumber,
         };
       case PrimitiveType.Json:
         return {
-          produce: this.scope.CDK_CORE.objectToCloudFormation,
-          parse: this.scope.CDK_CORE.helpers.FromCloudFormation.getAny,
+          produce: CDK_CORE.objectToCloudFormation,
+          parse: CDK_CORE.helpers.FromCloudFormation.getAny,
         };
       case PrimitiveType.Any:
         return {
-          produce: this.scope.CDK_CORE.objectToCloudFormation,
-          parse: this.scope.CDK_CORE.helpers.FromCloudFormation.getAny,
+          produce: CDK_CORE.objectToCloudFormation,
+          parse: CDK_CORE.helpers.FromCloudFormation.getAny,
         };
       case PrimitiveType.Boolean:
         return {
-          produce: this.scope.CDK_CORE.booleanToCloudFormation,
-          parse: this.scope.CDK_CORE.helpers.FromCloudFormation.getBoolean,
+          produce: CDK_CORE.booleanToCloudFormation,
+          parse: CDK_CORE.helpers.FromCloudFormation.getBoolean,
         };
     }
 
     if (type.arrayOfType) {
       return {
-        produce: this.scope.CDK_CORE.listMapper(this.typeProducer(type.arrayOfType).produce),
-        parse: this.scope.CDK_CORE.helpers.FromCloudFormation.getArray(this.typeProducer(type.arrayOfType).parse),
+        produce: CDK_CORE.listMapper(this.typeProducer(type.arrayOfType).produce),
+        parse: CDK_CORE.helpers.FromCloudFormation.getArray(this.typeProducer(type.arrayOfType).parse),
       };
     }
 
     if (type.mapOfType) {
       return {
-        produce: this.scope.CDK_CORE.hashMapper(this.typeProducer(type.mapOfType).produce),
-        parse: this.scope.CDK_CORE.helpers.FromCloudFormation.getMap(this.typeProducer(type.mapOfType).parse),
+        produce: CDK_CORE.hashMapper(this.typeProducer(type.mapOfType).produce),
+        parse: CDK_CORE.helpers.FromCloudFormation.getMap(this.typeProducer(type.mapOfType).parse),
       };
     }
 

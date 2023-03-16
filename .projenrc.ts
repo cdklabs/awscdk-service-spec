@@ -177,9 +177,6 @@ const cfn2ts = new yarn.TypeScriptWorkspace({
   private: true,
   deps: [cfnResources, 'yargs', 'fs-extra'],
 });
-cfn2ts.addBins({
-  cfn2ts: 'bin/cfn2ts',
-});
 cfn2ts.synth();
 
 repo.synth();
