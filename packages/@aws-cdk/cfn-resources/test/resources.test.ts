@@ -21,7 +21,7 @@ test.each([
 ])('%s', (cloudFormationType) => {
   const resource = db.lookup('resource', 'cloudFormationType', 'equals', cloudFormationType)[0];
 
-  const ast = AstBuilder.forResource(resource, db);
+  const ast = AstBuilder.forResource(resource, { db });
 
   expect(renderer.render(ast.scope)).toMatchSnapshot();
 });

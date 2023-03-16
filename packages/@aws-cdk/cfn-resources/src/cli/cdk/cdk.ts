@@ -1,12 +1,25 @@
 import { $E, $T, expr, Expression, ExternalModule, Scope, ThingSymbol, Type } from '@cdklabs/typewriter';
 
+export interface ModuleImports {
+  /**
+   * The import name used import the core module
+   * @default 'aws-cdk-lib'
+   */
+  readonly core?: string;
+  /**
+   * The import name used to import core helpers module
+   * @default 'aws-cdk-lib/core/lib/helpers-internal'
+   */
+  readonly coreHelpers?: string;
+}
+
 export class CdkCore extends ExternalModule {
   public readonly CfnResource = Type.fromName(this, 'CfnResource');
   public readonly IInspectable = Type.fromName(this, 'IInspectable');
   public readonly TreeInspector = Type.fromName(this, 'TreeInspector');
   public readonly Token = $T(Type.fromName(this, 'Token'));
   public readonly ResolutionTypeHint = Type.fromName(this, 'ResolutionTypeHint');
-  public readonly helpers = new CdkInternalHelpers(this);
+  public readonly helpers = new CdkInternalHelpers(this, this.helpersImportName);
 
   public readonly objectToCloudFormation = makeCallableExpr(this, 'objectToCloudFormation');
   public readonly stringToCloudFormation = makeCallableExpr(this, 'stringToCloudFormation');
@@ -18,7 +31,7 @@ export class CdkCore extends ExternalModule {
   public readonly hashMapper = makeCallableExpr(this, 'hashMapper');
   public readonly requireProperty = makeCallableExpr(this, 'requireProperty');
 
-  constructor(fqn: string) {
+  constructor(fqn: string, private readonly helpersImportName?: string) {
     super(fqn);
   }
 
@@ -41,8 +54,8 @@ export class CdkInternalHelpers extends ExternalModule {
   public readonly FromCloudFormation = $T(Type.fromName(this, 'FromCloudFormation'));
   public readonly FromCloudFormationPropertyObject = Type.fromName(this, 'FromCloudFormationPropertyObject');
 
-  constructor(parent: CdkCore) {
-    super(`${parent.fqn}/core/lib/helpers-internal`);
+  constructor(parent: CdkCore, importName?: string) {
+    super(importName ?? `${parent.fqn}/core/lib/helpers-internal`);
   }
 }
 
@@ -53,9 +66,6 @@ export class Constructs extends ExternalModule {
     super('constructs');
   }
 }
-
-export const CDK_CORE = new CdkCore('aws-cdk-lib');
-export const CONSTRUCTS = new Constructs();
 
 function makeCallableExpr(scope: Scope, name: string) {
   return $E(expr.sym(new ThingSymbol(name, scope)));

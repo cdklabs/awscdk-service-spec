@@ -1,11 +1,12 @@
 import path from 'path';
+import { DatabaseSchema } from '@aws-cdk/service-spec';
+import { Database } from '@cdklabs/tskb';
 import { TypeScriptRenderer } from '@cdklabs/typewriter';
 import * as fs from 'fs-extra';
 import { AstBuilder } from './cdk/ast';
+import { ModuleImports } from './cdk/cdk';
 import { loadDatabase } from './db';
 import { debug } from './log';
-import { Database } from '@cdklabs/tskb';
-import { DatabaseSchema } from '@aws-cdk/service-spec';
 
 export interface GenerateOptions {
   /**
@@ -30,6 +31,10 @@ export interface GenerateOptions {
    * The services to generate files for.
    */
   readonly services?: string[];
+  /**
+   * The import names used to import modules
+   */
+  readonly importNames?: ModuleImports;
 }
 
 export async function generate(options: GenerateOptions) {
@@ -37,18 +42,20 @@ export async function generate(options: GenerateOptions) {
     process.env.DEBUG = '1';
   }
   debug('Options', options);
-  const { outputPath, filePattern, clearOutput } = options;
+  const { outputPath, filePattern, clearOutput, importNames } = options;
 
   const db = await loadDatabase();
   const renderer = new TypeScriptRenderer();
 
+  let resourceCount = 0;
   const services = getServices(db, options.services).map((s) => {
     debug(s.name, 'ast');
-    const ast = AstBuilder.forService(s, db);
+    const ast = AstBuilder.forService(s, { db, importNames });
+    resourceCount += db.follow('hasResource', s).length;
     return ast.scope;
   });
 
-  console.log('Generating %i Resources for %i Services', db.all('resource').length, db.all('service').length);
+  console.log('Generating %i Resources for %i Services', resourceCount, services.length);
 
   if (clearOutput) {
     fs.removeSync(outputPath);

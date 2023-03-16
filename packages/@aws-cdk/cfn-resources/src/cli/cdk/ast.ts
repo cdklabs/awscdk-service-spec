@@ -8,10 +8,11 @@ import {
   TypeDefinition,
 } from '@aws-cdk/service-spec';
 import { Database } from '@cdklabs/tskb';
-import { StructType, expr, stmt, Type, TypeDeclaration, FreeFunction, IsObject, $E, Module } from '@cdklabs/typewriter';
+import { StructType, expr, stmt, Type, TypeDeclaration, FreeFunction, IsObject, $E } from '@cdklabs/typewriter';
 import { Stability } from '@jsii/spec';
-import { CDK_CORE, CONSTRUCTS } from './cdk';
+import { ModuleImports } from './cdk';
 import { ResourceClass } from './resource-class';
+import { AwsCdkLibModule, ResourceModule, ServiceModule } from '../modules';
 import {
   classNameFromResource,
   cfnProducerNameFromType,
@@ -22,16 +23,22 @@ import {
 } from '../naming/conventions';
 import { cloudFormationDocLink } from '../naming/doclink';
 import { PropMapping } from '../prop-mapping';
-import { ResourceModule } from '../resource';
-import { ServiceModule } from '../service';
 import { splitDocumentation } from '../split-summary';
 
-export class AstBuilder<T extends Module> {
-  public static forService(service: Service, db: Database<DatabaseSchema>): AstBuilder<ServiceModule> {
-    const scope = new ServiceModule(service.name, service.shortName);
-    const ast = new AstBuilder(scope, db);
+export interface AstBuilderProps {
+  readonly db: Database<DatabaseSchema>;
+  /**
+   * The import names used to import modules
+   */
+  readonly importNames?: ModuleImports;
+}
 
-    const resources = db.follow('hasResource', service);
+export class AstBuilder<T extends AwsCdkLibModule> {
+  public static forService(service: Service, props: AstBuilderProps): AstBuilder<ServiceModule> {
+    const scope = new ServiceModule(service.name, service.shortName, props.importNames);
+    const ast = new AstBuilder(scope, props.db);
+
+    const resources = props.db.follow('hasResource', service);
     for (const link of resources) {
       ast.addResource(link.to);
     }
@@ -39,20 +46,20 @@ export class AstBuilder<T extends Module> {
     return ast;
   }
 
-  public static forResource(resource: Resource, db: Database<DatabaseSchema>): AstBuilder<ResourceModule> {
+  public static forResource(resource: Resource, props: AstBuilderProps): AstBuilder<ResourceModule> {
     const parts = resource.cloudFormationType.toLowerCase().split('::');
-    const scope = new ResourceModule(parts[1], parts[2]);
+    const scope = new ResourceModule(parts[1], parts[2], props.importNames);
 
-    const ast = new AstBuilder(scope, db);
+    const ast = new AstBuilder(scope, props.db);
     ast.addResource(resource);
 
     return ast;
   }
 
   protected constructor(public readonly scope: T, public readonly db: Database<DatabaseSchema>) {
-    CDK_CORE.import(scope, 'cdk');
-    CONSTRUCTS.import(scope, 'constructs');
-    CDK_CORE.helpers.import(scope, 'cfn_parse');
+    this.scope.CDK_CORE.import(scope, 'cdk');
+    this.scope.CONSTRUCTS.import(scope, 'constructs');
+    this.scope.CDK_CORE.helpers.import(scope, 'cfn_parse');
   }
 
   public addResource(r: Resource) {
@@ -79,7 +86,7 @@ export class AstBuilder<T extends Module> {
         }),
       },
     });
-    const mapping = new PropMapping();
+    const mapping = new PropMapping(this.scope);
     for (const [name, prop] of Object.entries(r.properties)) {
       this.addStructProperty(propsInterface, mapping, name, prop, r);
     }
@@ -104,7 +111,7 @@ export class AstBuilder<T extends Module> {
     });
 
     producer.addBody(
-      stmt.if_(expr.not(CDK_CORE.canInspect(propsObj))).then(stmt.ret(propsObj)),
+      stmt.if_(expr.not(this.scope.CDK_CORE.canInspect(propsObj))).then(stmt.ret(propsObj)),
       // FIXME: Validation here
       stmt.ret(
         expr.object(mapping.cfnProperties().map((cfn) => [cfn, mapping.produceProperty(cfn, propsObj)] as const)),
@@ -120,7 +127,7 @@ export class AstBuilder<T extends Module> {
   protected makeCfnParser(propsInterface: StructType, mapping: PropMapping) {
     const parser = new FreeFunction(this.scope, {
       name: cfnParserNameFromType(propsInterface),
-      returnType: CDK_CORE.helpers.FromCloudFormationResult.withGenericArguments(propsInterface.type),
+      returnType: this.scope.CDK_CORE.helpers.FromCloudFormationResult.withGenericArguments(propsInterface.type),
     });
 
     const propsObj = parser.addParameter({
@@ -134,11 +141,13 @@ export class AstBuilder<T extends Module> {
       stmt.assign(propsObj, expr.cond(expr.binOp(propsObj, '==', expr.NULL)).then(expr.lit({})).else(propsObj)),
       stmt
         .if_(expr.not(new IsObject(propsObj)))
-        .then(stmt.ret(new CDK_CORE.helpers.FromCloudFormationResult(propsObj))),
+        .then(stmt.ret(new this.scope.CDK_CORE.helpers.FromCloudFormationResult(propsObj))),
 
       stmt.constVar(
         $ret,
-        CDK_CORE.helpers.FromCloudFormationPropertyObject.withGenericArguments(propsInterface.type).newInstance(),
+        this.scope.CDK_CORE.helpers.FromCloudFormationPropertyObject.withGenericArguments(
+          propsInterface.type,
+        ).newInstance(),
       ),
 
       ...mapping
@@ -195,7 +204,7 @@ export class AstBuilder<T extends Module> {
       },
     });
 
-    const mapping = new PropMapping();
+    const mapping = new PropMapping(this.scope);
     Object.entries(def.properties).forEach(([name, p]) => {
       this.addStructProperty(theType, mapping, name, p, def);
     });
