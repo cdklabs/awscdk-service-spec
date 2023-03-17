@@ -10,7 +10,7 @@ import {
 import { Database } from '@cdklabs/tskb';
 import { StructType, expr, stmt, Type, TypeDeclaration, FreeFunction, IsObject, $E, Module } from '@cdklabs/typewriter';
 import { Stability } from '@jsii/spec';
-import { CDK_CORE, CONSTRUCTS } from './cdk';
+import { CDK_CORE, CONSTRUCTS, ModuleImportLocations } from './cdk';
 import { ResourceClass } from './resource-class';
 import {
   classNameFromResource,
@@ -22,16 +22,40 @@ import {
 } from '../naming/conventions';
 import { cloudFormationDocLink } from '../naming/doclink';
 import { PropMapping } from '../prop-mapping';
-import { ResourceModule } from '../resource';
-import { ServiceModule } from '../service';
 import { splitDocumentation } from '../split-summary';
 
-export class AstBuilder<T extends Module> {
-  public static forService(service: Service, db: Database<DatabaseSchema>): AstBuilder<ServiceModule> {
-    const scope = new ServiceModule(service.name, service.shortName);
-    const ast = new AstBuilder(scope, db);
+/**
+ * A module containing a single resource
+ */
+export class ResourceModule extends Module {
+  public constructor(public readonly service: string, public readonly resource: string) {
+    super(`@aws-cdk/${service}/${resource}-l1`);
+  }
+}
 
-    const resources = db.follow('hasResource', service);
+/**
+ * A module containing a service
+ */
+export class ServiceModule extends Module {
+  public constructor(public readonly service: string, public readonly shortName: string) {
+    super(`@aws-cdk/${service}`);
+  }
+}
+
+export interface AstBuilderProps {
+  readonly db: Database<DatabaseSchema>;
+  /**
+   * Override the locations modules are imported from
+   */
+  readonly importLocations?: ModuleImportLocations;
+}
+
+export class AstBuilder<T extends Module> {
+  public static forService(service: Service, props: AstBuilderProps): AstBuilder<ServiceModule> {
+    const scope = new ServiceModule(service.name, service.shortName);
+    const ast = new AstBuilder(scope, props);
+
+    const resources = props.db.follow('hasResource', service);
     for (const link of resources) {
       ast.addResource(link.to);
     }
@@ -39,20 +63,23 @@ export class AstBuilder<T extends Module> {
     return ast;
   }
 
-  public static forResource(resource: Resource, db: Database<DatabaseSchema>): AstBuilder<ResourceModule> {
+  public static forResource(resource: Resource, props: AstBuilderProps): AstBuilder<ResourceModule> {
     const parts = resource.cloudFormationType.toLowerCase().split('::');
     const scope = new ResourceModule(parts[1], parts[2]);
 
-    const ast = new AstBuilder(scope, db);
+    const ast = new AstBuilder(scope, props);
     ast.addResource(resource);
 
     return ast;
   }
+  public readonly db: Database<DatabaseSchema>;
 
-  protected constructor(public readonly scope: T, public readonly db: Database<DatabaseSchema>) {
-    CDK_CORE.import(scope, 'cdk');
+  protected constructor(public readonly scope: T, props: AstBuilderProps) {
+    this.db = props.db;
+
+    CDK_CORE.import(scope, 'cdk', { fromLocation: props.importLocations?.core });
     CONSTRUCTS.import(scope, 'constructs');
-    CDK_CORE.helpers.import(scope, 'cfn_parse');
+    CDK_CORE.helpers.import(scope, 'cfn_parse', { fromLocation: props.importLocations?.coreHelpers });
   }
 
   public addResource(r: Resource) {

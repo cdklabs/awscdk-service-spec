@@ -1,5 +1,18 @@
 import { $E, $T, expr, Expression, ExternalModule, Scope, ThingSymbol, Type } from '@cdklabs/typewriter';
 
+export interface ModuleImportLocations {
+  /**
+   * The import name used import the core module
+   * @default 'aws-cdk-lib'
+   */
+  readonly core?: string;
+  /**
+   * The import name used to import core helpers module
+   * @default 'aws-cdk-lib/core/lib/helpers-internal'
+   */
+  readonly coreHelpers?: string;
+}
+
 export class CdkCore extends ExternalModule {
   public readonly CfnResource = Type.fromName(this, 'CfnResource');
   public readonly IInspectable = Type.fromName(this, 'IInspectable');

@@ -47,6 +47,9 @@
     },
     {
       "path": "packages/@aws-cdk/cfn-resources"
+    },
+    {
+      "path": "packages/@aws-cdk/cfn2ts"
     }
   ]
 }
