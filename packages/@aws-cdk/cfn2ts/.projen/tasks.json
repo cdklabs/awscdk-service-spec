@@ -28,19 +28,19 @@
       },
       "steps": [
         {
-          "exec": "npm-check-updates --dep dev --upgrade --target=minor --reject='@cdklabs/tskb'"
+          "exec": "npm-check-updates --dep dev --upgrade --target=minor --reject='@aws-cdk/cfn-resources'"
         },
         {
-          "exec": "npm-check-updates --dep optional --upgrade --target=minor --reject='@cdklabs/tskb'"
+          "exec": "npm-check-updates --dep optional --upgrade --target=minor --reject='@aws-cdk/cfn-resources'"
         },
         {
-          "exec": "npm-check-updates --dep peer --upgrade --target=minor --reject='@cdklabs/tskb'"
+          "exec": "npm-check-updates --dep peer --upgrade --target=minor --reject='@aws-cdk/cfn-resources'"
         },
         {
-          "exec": "npm-check-updates --dep prod --upgrade --target=minor --reject='@cdklabs/tskb'"
+          "exec": "npm-check-updates --dep prod --upgrade --target=minor --reject='@aws-cdk/cfn-resources'"
         },
         {
-          "exec": "npm-check-updates --dep bundle --upgrade --target=minor --reject='@cdklabs/tskb'"
+          "exec": "npm-check-updates --dep bundle --upgrade --target=minor --reject='@aws-cdk/cfn-resources'"
         }
       ]
     },
@@ -91,15 +91,7 @@
     },
     "package": {
       "name": "package",
-      "description": "Creates the distribution package",
-      "steps": [
-        {
-          "exec": "mkdir -p dist/js"
-        },
-        {
-          "exec": "mv $(npm pack) dist/js/"
-        }
-      ]
+      "description": "Creates the distribution package"
     },
     "post-compile": {
       "name": "post-compile",

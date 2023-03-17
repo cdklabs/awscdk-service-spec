@@ -68,7 +68,7 @@
       "name": "fmt",
       "steps": [
         {
-          "exec": "eslint --ext .ts --fix projenrc .projenrc.ts"
+          "exec": "eslint --ext .ts --fix --no-error-on-unmatched-pattern projenrc .projenrc.ts"
         }
       ]
     },
@@ -130,6 +130,9 @@
       "steps": [
         {
           "exec": "yarn upgrade npm-check-updates"
+        },
+        {
+          "exec": "npm-check-updates --dep=dev,optional,peer,prod,bundle --upgrade --target=minor"
         },
         {
           "exec": "yarn workspaces run check-for-updates"

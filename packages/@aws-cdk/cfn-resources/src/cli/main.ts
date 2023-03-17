@@ -1,37 +1,32 @@
 import path from 'path';
-import { TypeScriptRenderer } from '@cdklabs/typewriter';
-import * as fs from 'fs-extra';
-import { AstBuilder } from './cdk/ast';
-import { loadDatabase } from './db';
+import { parseArgv } from './args';
+import { generate } from './generate';
+import { debug } from './log';
 
-function debug(...messages: string[]) {
-  if (process.env.DEBUG) {
-    console.debug(...messages);
+async function main(argv: string[]) {
+  const { args, options } = parseArgv(argv, ['output']);
+  if (options.debug) {
+    process.env.DEBUG = '1';
   }
-}
+  debug('CLI args', args, options);
 
-async function main() {
-  const db = await loadDatabase();
-  const renderer = new TypeScriptRenderer();
+  const outputPath = args.output ?? path.join(__dirname, '..', 'services');
+  const filePattern = (options.pattern as string) ?? path.join('%package%', '%shortname%.generated.ts');
+  const params = ['%package%', '%service%', '%shortname%'];
+  const containsParam = params.reduce((found, param) => found || filePattern.includes(param), false);
+  if (!containsParam) {
+    throw `Error: --pattern must contain one of [${params.join(', ')}]`;
+  }
 
-  const services = db.all('service').map((s) => {
-    debug(s.name, 'ast');
-    const ast = AstBuilder.forService(s, db);
-    return ast.scope;
+  await generate({
+    outputPath,
+    filePattern,
+    clearOutput: options['clear-output'] as boolean,
+    debug: options.debug as boolean,
   });
-
-  console.log('Generating %i Resources for %i Services', db.all('resource').length, db.all('service').length);
-
-  const outputPath = path.join(__dirname, '../services/');
-  fs.removeSync(outputPath);
-  for (const s of services) {
-    debug(`${s.service}`, 'render');
-    const filePath = path.join(outputPath, s.name, `${s.shortName}-generated.ts`).toLowerCase();
-    fs.outputFileSync(filePath, renderer.render(s));
-  }
 }
 
-main().catch((e) => {
+main(process.argv.splice(2)).catch((e) => {
   console.error(e);
   process.exitCode = 1;
 });

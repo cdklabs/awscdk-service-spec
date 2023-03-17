@@ -14,7 +14,7 @@ beforeAll(async () => {
 test.each(['alexa-ask', 'aws-chatbot', 'aws-scheduler', 'aws-sqs'])('%s', (serviceName) => {
   const service = db.lookup('service', 'name', 'equals', serviceName)[0];
 
-  const ast = AstBuilder.forService(service, db);
+  const ast = AstBuilder.forService(service, { db });
 
   expect(renderer.render(ast.scope)).toMatchSnapshot();
 });
