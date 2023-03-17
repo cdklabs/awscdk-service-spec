@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@types/node": "^14",
-    "cdklabs-projen-project-types": "^0.1.45",
+    "cdklabs-projen-project-types": "^0.1.47",
     "eslint-config-prettier": "^8.7.0",
     "eslint-plugin-prettier": "^4.2.1",
     "npm-check-updates": "^16",
