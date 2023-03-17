@@ -50,7 +50,7 @@ export class ResourceClass extends ClassType {
         }),
       },
       extends: CDK_CORE.CfnResource,
-      implements: [CDK_CORE.IInspectable],
+      implements: [CDK_CORE.IInspectable, ...(opts.res.tagPropertyName !== undefined ? [CDK_CORE.ITaggable] : [])],
     });
 
     this.addProperty({

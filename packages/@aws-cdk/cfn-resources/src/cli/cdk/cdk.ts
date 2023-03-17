@@ -11,6 +11,7 @@ export class CdkCore extends ExternalModule {
   public readonly CfnTag = Type.fromName(this, 'CfnTag');
   public readonly TagManager = $T(Type.fromName(this, 'TagManager'));
   public readonly TagType = $T(Type.fromName(this, 'TagType'));
+  public readonly ITaggable = Type.fromName(this, 'ITaggable');
 
   public readonly objectToCloudFormation = makeCallableExpr(this, 'objectToCloudFormation');
   public readonly stringToCloudFormation = makeCallableExpr(this, 'stringToCloudFormation');
