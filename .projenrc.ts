@@ -1,5 +1,6 @@
 import * as pj from 'projen';
 import { yarn } from 'cdklabs-projen-project-types';
+import { AwsCdkIntgrationTest } from './projenrc/aws-cdk-integration-test';
 
 const lfsPatterns = ['sources/**/*.json'];
 
@@ -178,5 +179,8 @@ const cfn2ts = new yarn.TypeScriptWorkspace({
   deps: [cfnResources, 'yargs', 'fs-extra'],
 });
 cfn2ts.synth();
+
+// Add integration test with aws-cdk
+new AwsCdkIntgrationTest(cfn2ts);
 
 repo.synth();
