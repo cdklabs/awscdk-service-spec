@@ -318,7 +318,7 @@ function CfnRestApiPropsFromCloudFormation(properties: any): cfn_parse.FromCloud
  * @stability external
  * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html
  */
-export class CfnRestApi extends cdk.CfnResource implements cdk.IInspectable {
+export class CfnRestApi extends cdk.CfnResource implements cdk.IInspectable, cdk.ITaggable {
   /**
    * The CloudFormation resource type name for this resource class.
    */
@@ -702,7 +702,7 @@ function CfnRolePropsFromCloudFormation(properties: any): cfn_parse.FromCloudFor
  * @stability external
  * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
  */
-export class CfnRole extends cdk.CfnResource implements cdk.IInspectable {
+export class CfnRole extends cdk.CfnResource implements cdk.IInspectable, cdk.ITaggable {
   /**
    * The CloudFormation resource type name for this resource class.
    */
@@ -1532,7 +1532,7 @@ function CfnFunctionPropsFromCloudFormation(properties: any): cfn_parse.FromClou
  * @stability external
  * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html
  */
-export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable {
+export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cdk.ITaggable {
   /**
    * The CloudFormation resource type name for this resource class.
    */
@@ -5059,7 +5059,7 @@ function CfnBucketPropsFromCloudFormation(properties: any): cfn_parse.FromCloudF
  * @stability external
  * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html
  */
-export class CfnBucket extends cdk.CfnResource implements cdk.IInspectable {
+export class CfnBucket extends cdk.CfnResource implements cdk.IInspectable, cdk.ITaggable {
   /**
    * The CloudFormation resource type name for this resource class.
    */
@@ -5581,7 +5581,7 @@ function CfnQueuePropsFromCloudFormation(properties: any): cfn_parse.FromCloudFo
  * @stability external
  * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html
  */
-export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable {
+export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.ITaggable {
   /**
    * The CloudFormation resource type name for this resource class.
    */

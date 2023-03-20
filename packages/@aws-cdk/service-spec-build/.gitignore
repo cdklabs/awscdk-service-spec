@@ -44,3 +44,4 @@ junit.xml
 !/.eslintrc.json
 !/.eslintrc.js
 db.json
+db-build-report.txt

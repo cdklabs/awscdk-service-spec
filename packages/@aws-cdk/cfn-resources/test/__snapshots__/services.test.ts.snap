@@ -1779,7 +1779,7 @@ function CfnScheduleGroupPropsFromCloudFormation(properties: any): cfn_parse.Fro
  * @stability external
  * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-scheduler-schedulegroup.html
  */
-export class CfnScheduleGroup extends cdk.CfnResource implements cdk.IInspectable {
+export class CfnScheduleGroup extends cdk.CfnResource implements cdk.IInspectable, cdk.ITaggable {
   /**
    * The CloudFormation resource type name for this resource class.
    */
@@ -2155,7 +2155,7 @@ function CfnQueuePropsFromCloudFormation(properties: any): cfn_parse.FromCloudFo
  * @stability external
  * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html
  */
-export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable {
+export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.ITaggable {
   /**
    * The CloudFormation resource type name for this resource class.
    */
