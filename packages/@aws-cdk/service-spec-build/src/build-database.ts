@@ -1,7 +1,6 @@
 import { emptyDatabase } from '@aws-cdk/service-spec';
 import * as sources from '@aws-cdk/service-spec-sources';
-import { LoadResult } from '@aws-cdk/service-spec-sources';
-import { PatchReport } from '@aws-cdk/service-spec-sources/src/loading/patches/patching';
+import { LoadResult, PatchReport } from '@aws-cdk/service-spec-sources';
 import { assertSuccess, Failures, Result } from '@cdklabs/tskb';
 import { readCloudFormationDocumentation } from './cloudformation-docs';
 import {
