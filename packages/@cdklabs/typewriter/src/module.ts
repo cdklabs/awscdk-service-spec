@@ -7,6 +7,17 @@ import { ThingSymbol } from './symbol';
 import { TypeDeclaration } from './type-declaration';
 
 /**
+ * Props to change module import behavior
+ */
+export interface ModuleImportProps {
+  /**
+   * Override the location the module is imported from
+   * @default - FQN of the imported module
+   */
+  readonly fromLocation?: string;
+}
+
+/**
  * A module
  */
 export class Module extends Scope {
@@ -38,8 +49,8 @@ export class Module extends Scope {
     this.typeMap.set(type.fqn, type);
   }
 
-  public import(intoModule: Module, as: string) {
-    intoModule.addImportedScope(this, new AliasedModuleImport(this, as));
+  public import(intoModule: Module, as: string, props: ModuleImportProps = {}) {
+    intoModule.addImportedScope(this, new AliasedModuleImport(props.fromLocation ?? this.fqn, as));
   }
 
   public toString() {
@@ -48,16 +59,10 @@ export class Module extends Scope {
 }
 
 class AliasedModuleImport implements IImport {
-  public readonly importAlias?: string | undefined;
-  public readonly moduleSource: string;
-
-  constructor(public readonly module: Module, public readonly as: string) {
-    this.importAlias = as;
-    this.moduleSource = module.fqn;
-  }
+  constructor(public readonly moduleSource: string, public readonly importAlias: string) {}
 
   referenceSymbol(sym: ThingSymbol): Expression {
     // We just assume that this symbol exists. We can't properly check it, yet...
-    return new ObjectPropertyAccess(new Identifier(this.as), sym.name);
+    return new ObjectPropertyAccess(new Identifier(this.importAlias), sym.name);
   }
 }

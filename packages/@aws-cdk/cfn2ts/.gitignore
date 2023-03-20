@@ -3,8 +3,6 @@
 !/.projen/tasks.json
 !/.projen/deps.json
 !/.projen/files.json
-!/.github/workflows/pull-request-lint.yml
-!/.github/workflows/auto-approve.yml
 !/package.json
 !/LICENSE
 !/.npmignore
@@ -31,11 +29,10 @@ jspm_packages/
 *.tgz
 .yarn-integrity
 .cache
-.DS_Store
 !/.projenrc.js
-!/.github/workflows/build.yml
-!/.github/workflows/upgrade.yml
-!/.github/pull_request_template.md
+/test-reports/
+junit.xml
+/coverage/
 !/.prettierignore
 !/.prettierrc.json
 !/test/
@@ -45,8 +42,4 @@ jspm_packages/
 /lib
 /dist/
 !/.eslintrc.json
-!/.vscode/extensions.json
-!/.vscode/settings.json
-!/awscdk-service-spec.code-workspace
-!/.github/workflows/auto-merge.yml
-!/.github/workflows/test-aws-cdk-integration.yml
+!/.eslintrc.js
