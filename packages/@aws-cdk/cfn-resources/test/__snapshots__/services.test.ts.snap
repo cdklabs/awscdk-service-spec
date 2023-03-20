@@ -77,13 +77,37 @@ export interface AuthenticationConfigurationProperty {
   readonly clientSecret: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`AuthenticationConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`AuthenticationConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function AuthenticationConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("clientId", cdk.requiredValidator)(properties.clientId));
+  errors.collect(cdk.propertyValidator("clientId", cdk.validateString)(properties.clientId));
+  errors.collect(cdk.propertyValidator("clientSecret", cdk.requiredValidator)(properties.clientSecret));
+  errors.collect(cdk.propertyValidator("clientSecret", cdk.validateString)(properties.clientSecret));
+  errors.collect(cdk.propertyValidator("refreshToken", cdk.requiredValidator)(properties.refreshToken));
+  errors.collect(cdk.propertyValidator("refreshToken", cdk.validateString)(properties.refreshToken));
+  return errors.wrap("supplied properties not correct for \\"AuthenticationConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertAuthenticationConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  AuthenticationConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "ClientId": cdk.stringToCloudFormation(properties.clientId),
-    "RefreshToken": cdk.stringToCloudFormation(properties.refreshToken),
-    "ClientSecret": cdk.stringToCloudFormation(properties.clientSecret)
+    "ClientSecret": cdk.stringToCloudFormation(properties.clientSecret),
+    "RefreshToken": cdk.stringToCloudFormation(properties.refreshToken)
   };
 }
 
@@ -93,8 +117,8 @@ function AuthenticationConfigurationPropertyFromCloudFormation(properties: any):
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<AuthenticationConfigurationProperty>();
   ret.addPropertyResult("clientId", "ClientId", (properties.ClientId != null ? cfn_parse.FromCloudFormation.getString(properties.ClientId) : undefined));
-  ret.addPropertyResult("refreshToken", "RefreshToken", (properties.RefreshToken != null ? cfn_parse.FromCloudFormation.getString(properties.RefreshToken) : undefined));
   ret.addPropertyResult("clientSecret", "ClientSecret", (properties.ClientSecret != null ? cfn_parse.FromCloudFormation.getString(properties.ClientSecret) : undefined));
+  ret.addPropertyResult("refreshToken", "RefreshToken", (properties.RefreshToken != null ? cfn_parse.FromCloudFormation.getString(properties.RefreshToken) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -169,9 +193,28 @@ export interface OverridesProperty {
   readonly manifest?: any;
 }
 
+/**
+ * Determine whether the given properties match those of a \`OverridesProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`OverridesProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function OverridesPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("manifest", cdk.validateObject)(properties.manifest));
+  return errors.wrap("supplied properties not correct for \\"OverridesProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertOverridesPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  OverridesPropertyValidator(properties).assertSuccess();
   return {
     "Manifest": cdk.objectToCloudFormation(properties.manifest)
   };
@@ -187,15 +230,40 @@ function OverridesPropertyFromCloudFormation(properties: any): cfn_parse.FromClo
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`SkillPackageProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`SkillPackageProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function SkillPackagePropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("overrides", OverridesPropertyValidator)(properties.overrides));
+  errors.collect(cdk.propertyValidator("s3Bucket", cdk.requiredValidator)(properties.s3Bucket));
+  errors.collect(cdk.propertyValidator("s3Bucket", cdk.validateString)(properties.s3Bucket));
+  errors.collect(cdk.propertyValidator("s3BucketRole", cdk.validateString)(properties.s3BucketRole));
+  errors.collect(cdk.propertyValidator("s3Key", cdk.requiredValidator)(properties.s3Key));
+  errors.collect(cdk.propertyValidator("s3Key", cdk.validateString)(properties.s3Key));
+  errors.collect(cdk.propertyValidator("s3ObjectVersion", cdk.validateString)(properties.s3ObjectVersion));
+  return errors.wrap("supplied properties not correct for \\"SkillPackageProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertSkillPackagePropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  SkillPackagePropertyValidator(properties).assertSuccess();
   return {
-    "S3BucketRole": cdk.stringToCloudFormation(properties.s3BucketRole),
     "Overrides": convertOverridesPropertyToCloudFormation(properties.overrides),
-    "S3ObjectVersion": cdk.stringToCloudFormation(properties.s3ObjectVersion),
     "S3Bucket": cdk.stringToCloudFormation(properties.s3Bucket),
-    "S3Key": cdk.stringToCloudFormation(properties.s3Key)
+    "S3BucketRole": cdk.stringToCloudFormation(properties.s3BucketRole),
+    "S3Key": cdk.stringToCloudFormation(properties.s3Key),
+    "S3ObjectVersion": cdk.stringToCloudFormation(properties.s3ObjectVersion)
   };
 }
 
@@ -204,22 +272,46 @@ function SkillPackagePropertyFromCloudFormation(properties: any): cfn_parse.From
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<SkillPackageProperty>();
-  ret.addPropertyResult("s3BucketRole", "S3BucketRole", (properties.S3BucketRole != null ? cfn_parse.FromCloudFormation.getString(properties.S3BucketRole) : undefined));
   ret.addPropertyResult("overrides", "Overrides", (properties.Overrides != null ? OverridesPropertyFromCloudFormation(properties.Overrides) : undefined));
-  ret.addPropertyResult("s3ObjectVersion", "S3ObjectVersion", (properties.S3ObjectVersion != null ? cfn_parse.FromCloudFormation.getString(properties.S3ObjectVersion) : undefined));
   ret.addPropertyResult("s3Bucket", "S3Bucket", (properties.S3Bucket != null ? cfn_parse.FromCloudFormation.getString(properties.S3Bucket) : undefined));
+  ret.addPropertyResult("s3BucketRole", "S3BucketRole", (properties.S3BucketRole != null ? cfn_parse.FromCloudFormation.getString(properties.S3BucketRole) : undefined));
   ret.addPropertyResult("s3Key", "S3Key", (properties.S3Key != null ? cfn_parse.FromCloudFormation.getString(properties.S3Key) : undefined));
+  ret.addPropertyResult("s3ObjectVersion", "S3ObjectVersion", (properties.S3ObjectVersion != null ? cfn_parse.FromCloudFormation.getString(properties.S3ObjectVersion) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+}
+
+/**
+ * Determine whether the given properties match those of a \`CfnSkillProps\`
+ *
+ * @param properties - the TypeScript properties of a \`CfnSkillProps\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnSkillPropsValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("authenticationConfiguration", cdk.requiredValidator)(properties.authenticationConfiguration));
+  errors.collect(cdk.propertyValidator("authenticationConfiguration", AuthenticationConfigurationPropertyValidator)(properties.authenticationConfiguration));
+  errors.collect(cdk.propertyValidator("skillPackage", cdk.requiredValidator)(properties.skillPackage));
+  errors.collect(cdk.propertyValidator("skillPackage", SkillPackagePropertyValidator)(properties.skillPackage));
+  errors.collect(cdk.propertyValidator("vendorId", cdk.requiredValidator)(properties.vendorId));
+  errors.collect(cdk.propertyValidator("vendorId", cdk.validateString)(properties.vendorId));
+  return errors.wrap("supplied properties not correct for \\"CfnSkillProps\\"");
 }
 
 // @ts-ignore TS6133
 function convertCfnSkillPropsToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  CfnSkillPropsValidator(properties).assertSuccess();
   return {
     "AuthenticationConfiguration": convertAuthenticationConfigurationPropertyToCloudFormation(properties.authenticationConfiguration),
-    "VendorId": cdk.stringToCloudFormation(properties.vendorId),
-    "SkillPackage": convertSkillPackagePropertyToCloudFormation(properties.skillPackage)
+    "SkillPackage": convertSkillPackagePropertyToCloudFormation(properties.skillPackage),
+    "VendorId": cdk.stringToCloudFormation(properties.vendorId)
   };
 }
 
@@ -229,8 +321,8 @@ function CfnSkillPropsFromCloudFormation(properties: any): cfn_parse.FromCloudFo
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSkillProps>();
   ret.addPropertyResult("authenticationConfiguration", "AuthenticationConfiguration", (properties.AuthenticationConfiguration != null ? AuthenticationConfigurationPropertyFromCloudFormation(properties.AuthenticationConfiguration) : undefined));
-  ret.addPropertyResult("vendorId", "VendorId", (properties.VendorId != null ? cfn_parse.FromCloudFormation.getString(properties.VendorId) : undefined));
   ret.addPropertyResult("skillPackage", "SkillPackage", (properties.SkillPackage != null ? SkillPackagePropertyFromCloudFormation(properties.SkillPackage) : undefined));
+  ret.addPropertyResult("vendorId", "VendorId", (properties.VendorId != null ? cfn_parse.FromCloudFormation.getString(properties.VendorId) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -418,17 +510,47 @@ export interface CfnSlackChannelConfigurationProps {
   readonly userRoleRequired?: boolean;
 }
 
+/**
+ * Determine whether the given properties match those of a \`CfnSlackChannelConfigurationProps\`
+ *
+ * @param properties - the TypeScript properties of a \`CfnSlackChannelConfigurationProps\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnSlackChannelConfigurationPropsValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("configurationName", cdk.requiredValidator)(properties.configurationName));
+  errors.collect(cdk.propertyValidator("configurationName", cdk.validateString)(properties.configurationName));
+  errors.collect(cdk.propertyValidator("guardrailPolicies", cdk.listValidator(cdk.validateString))(properties.guardrailPolicies));
+  errors.collect(cdk.propertyValidator("iamRoleArn", cdk.requiredValidator)(properties.iamRoleArn));
+  errors.collect(cdk.propertyValidator("iamRoleArn", cdk.validateString)(properties.iamRoleArn));
+  errors.collect(cdk.propertyValidator("loggingLevel", cdk.validateString)(properties.loggingLevel));
+  errors.collect(cdk.propertyValidator("slackChannelId", cdk.requiredValidator)(properties.slackChannelId));
+  errors.collect(cdk.propertyValidator("slackChannelId", cdk.validateString)(properties.slackChannelId));
+  errors.collect(cdk.propertyValidator("slackWorkspaceId", cdk.requiredValidator)(properties.slackWorkspaceId));
+  errors.collect(cdk.propertyValidator("slackWorkspaceId", cdk.validateString)(properties.slackWorkspaceId));
+  errors.collect(cdk.propertyValidator("snsTopicArns", cdk.listValidator(cdk.validateString))(properties.snsTopicArns));
+  errors.collect(cdk.propertyValidator("userRoleRequired", cdk.validateBoolean)(properties.userRoleRequired));
+  return errors.wrap("supplied properties not correct for \\"CfnSlackChannelConfigurationProps\\"");
+}
+
 // @ts-ignore TS6133
 function convertCfnSlackChannelConfigurationPropsToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  CfnSlackChannelConfigurationPropsValidator(properties).assertSuccess();
   return {
-    "SlackWorkspaceId": cdk.stringToCloudFormation(properties.slackWorkspaceId),
-    "SlackChannelId": cdk.stringToCloudFormation(properties.slackChannelId),
     "ConfigurationName": cdk.stringToCloudFormation(properties.configurationName),
-    "IamRoleArn": cdk.stringToCloudFormation(properties.iamRoleArn),
-    "SnsTopicArns": cdk.listMapper(cdk.stringToCloudFormation)(properties.snsTopicArns),
-    "LoggingLevel": cdk.stringToCloudFormation(properties.loggingLevel),
     "GuardrailPolicies": cdk.listMapper(cdk.stringToCloudFormation)(properties.guardrailPolicies),
+    "IamRoleArn": cdk.stringToCloudFormation(properties.iamRoleArn),
+    "LoggingLevel": cdk.stringToCloudFormation(properties.loggingLevel),
+    "SlackChannelId": cdk.stringToCloudFormation(properties.slackChannelId),
+    "SlackWorkspaceId": cdk.stringToCloudFormation(properties.slackWorkspaceId),
+    "SnsTopicArns": cdk.listMapper(cdk.stringToCloudFormation)(properties.snsTopicArns),
     "UserRoleRequired": cdk.booleanToCloudFormation(properties.userRoleRequired)
   };
 }
@@ -438,13 +560,13 @@ function CfnSlackChannelConfigurationPropsFromCloudFormation(properties: any): c
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSlackChannelConfigurationProps>();
-  ret.addPropertyResult("slackWorkspaceId", "SlackWorkspaceId", (properties.SlackWorkspaceId != null ? cfn_parse.FromCloudFormation.getString(properties.SlackWorkspaceId) : undefined));
-  ret.addPropertyResult("slackChannelId", "SlackChannelId", (properties.SlackChannelId != null ? cfn_parse.FromCloudFormation.getString(properties.SlackChannelId) : undefined));
   ret.addPropertyResult("configurationName", "ConfigurationName", (properties.ConfigurationName != null ? cfn_parse.FromCloudFormation.getString(properties.ConfigurationName) : undefined));
-  ret.addPropertyResult("iamRoleArn", "IamRoleArn", (properties.IamRoleArn != null ? cfn_parse.FromCloudFormation.getString(properties.IamRoleArn) : undefined));
-  ret.addPropertyResult("snsTopicArns", "SnsTopicArns", (properties.SnsTopicArns != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.SnsTopicArns) : undefined));
-  ret.addPropertyResult("loggingLevel", "LoggingLevel", (properties.LoggingLevel != null ? cfn_parse.FromCloudFormation.getString(properties.LoggingLevel) : undefined));
   ret.addPropertyResult("guardrailPolicies", "GuardrailPolicies", (properties.GuardrailPolicies != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.GuardrailPolicies) : undefined));
+  ret.addPropertyResult("iamRoleArn", "IamRoleArn", (properties.IamRoleArn != null ? cfn_parse.FromCloudFormation.getString(properties.IamRoleArn) : undefined));
+  ret.addPropertyResult("loggingLevel", "LoggingLevel", (properties.LoggingLevel != null ? cfn_parse.FromCloudFormation.getString(properties.LoggingLevel) : undefined));
+  ret.addPropertyResult("slackChannelId", "SlackChannelId", (properties.SlackChannelId != null ? cfn_parse.FromCloudFormation.getString(properties.SlackChannelId) : undefined));
+  ret.addPropertyResult("slackWorkspaceId", "SlackWorkspaceId", (properties.SlackWorkspaceId != null ? cfn_parse.FromCloudFormation.getString(properties.SlackWorkspaceId) : undefined));
+  ret.addPropertyResult("snsTopicArns", "SnsTopicArns", (properties.SnsTopicArns != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.SnsTopicArns) : undefined));
   ret.addPropertyResult("userRoleRequired", "UserRoleRequired", (properties.UserRoleRequired != null ? cfn_parse.FromCloudFormation.getBoolean(properties.UserRoleRequired) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
@@ -720,12 +842,33 @@ export interface FlexibleTimeWindowProperty {
   readonly maximumWindowInMinutes?: number;
 }
 
+/**
+ * Determine whether the given properties match those of a \`FlexibleTimeWindowProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`FlexibleTimeWindowProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function FlexibleTimeWindowPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("maximumWindowInMinutes", cdk.validateNumber)(properties.maximumWindowInMinutes));
+  errors.collect(cdk.propertyValidator("mode", cdk.requiredValidator)(properties.mode));
+  errors.collect(cdk.propertyValidator("mode", cdk.validateString)(properties.mode));
+  return errors.wrap("supplied properties not correct for \\"FlexibleTimeWindowProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertFlexibleTimeWindowPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  FlexibleTimeWindowPropertyValidator(properties).assertSuccess();
   return {
-    "Mode": cdk.stringToCloudFormation(properties.mode),
-    "MaximumWindowInMinutes": cdk.numberToCloudFormation(properties.maximumWindowInMinutes)
+    "MaximumWindowInMinutes": cdk.numberToCloudFormation(properties.maximumWindowInMinutes),
+    "Mode": cdk.stringToCloudFormation(properties.mode)
   };
 }
 
@@ -734,8 +877,8 @@ function FlexibleTimeWindowPropertyFromCloudFormation(properties: any): cfn_pars
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<FlexibleTimeWindowProperty>();
-  ret.addPropertyResult("mode", "Mode", (properties.Mode != null ? cfn_parse.FromCloudFormation.getString(properties.Mode) : undefined));
   ret.addPropertyResult("maximumWindowInMinutes", "MaximumWindowInMinutes", (properties.MaximumWindowInMinutes != null ? cfn_parse.FromCloudFormation.getNumber(properties.MaximumWindowInMinutes) : undefined));
+  ret.addPropertyResult("mode", "Mode", (properties.Mode != null ? cfn_parse.FromCloudFormation.getString(properties.Mode) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -841,9 +984,28 @@ export interface DeadLetterConfigProperty {
   readonly arn?: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`DeadLetterConfigProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`DeadLetterConfigProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function DeadLetterConfigPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("arn", cdk.validateString)(properties.arn));
+  return errors.wrap("supplied properties not correct for \\"DeadLetterConfigProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertDeadLetterConfigPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  DeadLetterConfigPropertyValidator(properties).assertSuccess();
   return {
     "Arn": cdk.stringToCloudFormation(properties.arn)
   };
@@ -883,9 +1045,29 @@ export interface RetryPolicyProperty {
   readonly maximumRetryAttempts?: number;
 }
 
+/**
+ * Determine whether the given properties match those of a \`RetryPolicyProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`RetryPolicyProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function RetryPolicyPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("maximumEventAgeInSeconds", cdk.validateNumber)(properties.maximumEventAgeInSeconds));
+  errors.collect(cdk.propertyValidator("maximumRetryAttempts", cdk.validateNumber)(properties.maximumRetryAttempts));
+  return errors.wrap("supplied properties not correct for \\"RetryPolicyProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertRetryPolicyPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  RetryPolicyPropertyValidator(properties).assertSuccess();
   return {
     "MaximumEventAgeInSeconds": cdk.numberToCloudFormation(properties.maximumEventAgeInSeconds),
     "MaximumRetryAttempts": cdk.numberToCloudFormation(properties.maximumRetryAttempts)
@@ -1081,13 +1263,35 @@ export interface AwsVpcConfigurationProperty {
   readonly assignPublicIp?: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`AwsVpcConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`AwsVpcConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function AwsVpcConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("assignPublicIp", cdk.validateString)(properties.assignPublicIp));
+  errors.collect(cdk.propertyValidator("securityGroups", cdk.listValidator(cdk.validateString))(properties.securityGroups));
+  errors.collect(cdk.propertyValidator("subnets", cdk.requiredValidator)(properties.subnets));
+  errors.collect(cdk.propertyValidator("subnets", cdk.listValidator(cdk.validateString))(properties.subnets));
+  return errors.wrap("supplied properties not correct for \\"AwsVpcConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertAwsVpcConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  AwsVpcConfigurationPropertyValidator(properties).assertSuccess();
   return {
-    "Subnets": cdk.listMapper(cdk.stringToCloudFormation)(properties.subnets),
+    "AssignPublicIp": cdk.stringToCloudFormation(properties.assignPublicIp),
     "SecurityGroups": cdk.listMapper(cdk.stringToCloudFormation)(properties.securityGroups),
-    "AssignPublicIp": cdk.stringToCloudFormation(properties.assignPublicIp)
+    "Subnets": cdk.listMapper(cdk.stringToCloudFormation)(properties.subnets)
   };
 }
 
@@ -1096,16 +1300,35 @@ function AwsVpcConfigurationPropertyFromCloudFormation(properties: any): cfn_par
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<AwsVpcConfigurationProperty>();
-  ret.addPropertyResult("subnets", "Subnets", (properties.Subnets != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.Subnets) : undefined));
-  ret.addPropertyResult("securityGroups", "SecurityGroups", (properties.SecurityGroups != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.SecurityGroups) : undefined));
   ret.addPropertyResult("assignPublicIp", "AssignPublicIp", (properties.AssignPublicIp != null ? cfn_parse.FromCloudFormation.getString(properties.AssignPublicIp) : undefined));
+  ret.addPropertyResult("securityGroups", "SecurityGroups", (properties.SecurityGroups != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.SecurityGroups) : undefined));
+  ret.addPropertyResult("subnets", "Subnets", (properties.Subnets != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.Subnets) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+}
+
+/**
+ * Determine whether the given properties match those of a \`NetworkConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`NetworkConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function NetworkConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("awsvpcConfiguration", AwsVpcConfigurationPropertyValidator)(properties.awsvpcConfiguration));
+  return errors.wrap("supplied properties not correct for \\"NetworkConfigurationProperty\\"");
 }
 
 // @ts-ignore TS6133
 function convertNetworkConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  NetworkConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "AwsvpcConfiguration": convertAwsVpcConfigurationPropertyToCloudFormation(properties.awsvpcConfiguration)
   };
@@ -1156,13 +1379,35 @@ export interface CapacityProviderStrategyItemProperty {
   readonly base?: number;
 }
 
+/**
+ * Determine whether the given properties match those of a \`CapacityProviderStrategyItemProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`CapacityProviderStrategyItemProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CapacityProviderStrategyItemPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("base", cdk.validateNumber)(properties.base));
+  errors.collect(cdk.propertyValidator("capacityProvider", cdk.requiredValidator)(properties.capacityProvider));
+  errors.collect(cdk.propertyValidator("capacityProvider", cdk.validateString)(properties.capacityProvider));
+  errors.collect(cdk.propertyValidator("weight", cdk.validateNumber)(properties.weight));
+  return errors.wrap("supplied properties not correct for \\"CapacityProviderStrategyItemProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertCapacityProviderStrategyItemPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  CapacityProviderStrategyItemPropertyValidator(properties).assertSuccess();
   return {
+    "Base": cdk.numberToCloudFormation(properties.base),
     "CapacityProvider": cdk.stringToCloudFormation(properties.capacityProvider),
-    "Weight": cdk.numberToCloudFormation(properties.weight),
-    "Base": cdk.numberToCloudFormation(properties.base)
+    "Weight": cdk.numberToCloudFormation(properties.weight)
   };
 }
 
@@ -1171,9 +1416,9 @@ function CapacityProviderStrategyItemPropertyFromCloudFormation(properties: any)
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CapacityProviderStrategyItemProperty>();
+  ret.addPropertyResult("base", "Base", (properties.Base != null ? cfn_parse.FromCloudFormation.getNumber(properties.Base) : undefined));
   ret.addPropertyResult("capacityProvider", "CapacityProvider", (properties.CapacityProvider != null ? cfn_parse.FromCloudFormation.getString(properties.CapacityProvider) : undefined));
   ret.addPropertyResult("weight", "Weight", (properties.Weight != null ? cfn_parse.FromCloudFormation.getNumber(properties.Weight) : undefined));
-  ret.addPropertyResult("base", "Base", (properties.Base != null ? cfn_parse.FromCloudFormation.getNumber(properties.Base) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -1204,12 +1449,32 @@ export interface PlacementConstraintProperty {
   readonly expression?: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`PlacementConstraintProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`PlacementConstraintProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function PlacementConstraintPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("expression", cdk.validateString)(properties.expression));
+  errors.collect(cdk.propertyValidator("type", cdk.validateString)(properties.type));
+  return errors.wrap("supplied properties not correct for \\"PlacementConstraintProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertPlacementConstraintPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  PlacementConstraintPropertyValidator(properties).assertSuccess();
   return {
-    "Type": cdk.stringToCloudFormation(properties.type),
-    "Expression": cdk.stringToCloudFormation(properties.expression)
+    "Expression": cdk.stringToCloudFormation(properties.expression),
+    "Type": cdk.stringToCloudFormation(properties.type)
   };
 }
 
@@ -1218,8 +1483,8 @@ function PlacementConstraintPropertyFromCloudFormation(properties: any): cfn_par
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<PlacementConstraintProperty>();
-  ret.addPropertyResult("type", "Type", (properties.Type != null ? cfn_parse.FromCloudFormation.getString(properties.Type) : undefined));
   ret.addPropertyResult("expression", "Expression", (properties.Expression != null ? cfn_parse.FromCloudFormation.getString(properties.Expression) : undefined));
+  ret.addPropertyResult("type", "Type", (properties.Type != null ? cfn_parse.FromCloudFormation.getString(properties.Type) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -1250,12 +1515,32 @@ export interface PlacementStrategyProperty {
   readonly field?: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`PlacementStrategyProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`PlacementStrategyProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function PlacementStrategyPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("field", cdk.validateString)(properties.field));
+  errors.collect(cdk.propertyValidator("type", cdk.validateString)(properties.type));
+  return errors.wrap("supplied properties not correct for \\"PlacementStrategyProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertPlacementStrategyPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  PlacementStrategyPropertyValidator(properties).assertSuccess();
   return {
-    "Type": cdk.stringToCloudFormation(properties.type),
-    "Field": cdk.stringToCloudFormation(properties.field)
+    "Field": cdk.stringToCloudFormation(properties.field),
+    "Type": cdk.stringToCloudFormation(properties.type)
   };
 }
 
@@ -1264,30 +1549,63 @@ function PlacementStrategyPropertyFromCloudFormation(properties: any): cfn_parse
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<PlacementStrategyProperty>();
-  ret.addPropertyResult("type", "Type", (properties.Type != null ? cfn_parse.FromCloudFormation.getString(properties.Type) : undefined));
   ret.addPropertyResult("field", "Field", (properties.Field != null ? cfn_parse.FromCloudFormation.getString(properties.Field) : undefined));
+  ret.addPropertyResult("type", "Type", (properties.Type != null ? cfn_parse.FromCloudFormation.getString(properties.Type) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+}
+
+/**
+ * Determine whether the given properties match those of a \`EcsParametersProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`EcsParametersProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function EcsParametersPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("capacityProviderStrategy", cdk.listValidator(CapacityProviderStrategyItemPropertyValidator))(properties.capacityProviderStrategy));
+  errors.collect(cdk.propertyValidator("enableEcsManagedTags", cdk.validateBoolean)(properties.enableEcsManagedTags));
+  errors.collect(cdk.propertyValidator("enableExecuteCommand", cdk.validateBoolean)(properties.enableExecuteCommand));
+  errors.collect(cdk.propertyValidator("group", cdk.validateString)(properties.group));
+  errors.collect(cdk.propertyValidator("launchType", cdk.validateString)(properties.launchType));
+  errors.collect(cdk.propertyValidator("networkConfiguration", NetworkConfigurationPropertyValidator)(properties.networkConfiguration));
+  errors.collect(cdk.propertyValidator("placementConstraints", cdk.listValidator(PlacementConstraintPropertyValidator))(properties.placementConstraints));
+  errors.collect(cdk.propertyValidator("placementStrategy", cdk.listValidator(PlacementStrategyPropertyValidator))(properties.placementStrategy));
+  errors.collect(cdk.propertyValidator("platformVersion", cdk.validateString)(properties.platformVersion));
+  errors.collect(cdk.propertyValidator("propagateTags", cdk.validateString)(properties.propagateTags));
+  errors.collect(cdk.propertyValidator("referenceId", cdk.validateString)(properties.referenceId));
+  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.listValidator(cdk.validateString)))(properties.tags));
+  errors.collect(cdk.propertyValidator("taskCount", cdk.validateNumber)(properties.taskCount));
+  errors.collect(cdk.propertyValidator("taskDefinitionArn", cdk.requiredValidator)(properties.taskDefinitionArn));
+  errors.collect(cdk.propertyValidator("taskDefinitionArn", cdk.validateString)(properties.taskDefinitionArn));
+  return errors.wrap("supplied properties not correct for \\"EcsParametersProperty\\"");
 }
 
 // @ts-ignore TS6133
 function convertEcsParametersPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  EcsParametersPropertyValidator(properties).assertSuccess();
   return {
-    "TaskDefinitionArn": cdk.stringToCloudFormation(properties.taskDefinitionArn),
-    "TaskCount": cdk.numberToCloudFormation(properties.taskCount),
-    "LaunchType": cdk.stringToCloudFormation(properties.launchType),
-    "NetworkConfiguration": convertNetworkConfigurationPropertyToCloudFormation(properties.networkConfiguration),
-    "PlatformVersion": cdk.stringToCloudFormation(properties.platformVersion),
-    "Group": cdk.stringToCloudFormation(properties.group),
     "CapacityProviderStrategy": cdk.listMapper(convertCapacityProviderStrategyItemPropertyToCloudFormation)(properties.capacityProviderStrategy),
     "EnableECSManagedTags": cdk.booleanToCloudFormation(properties.enableEcsManagedTags),
     "EnableExecuteCommand": cdk.booleanToCloudFormation(properties.enableExecuteCommand),
+    "Group": cdk.stringToCloudFormation(properties.group),
+    "LaunchType": cdk.stringToCloudFormation(properties.launchType),
+    "NetworkConfiguration": convertNetworkConfigurationPropertyToCloudFormation(properties.networkConfiguration),
     "PlacementConstraints": cdk.listMapper(convertPlacementConstraintPropertyToCloudFormation)(properties.placementConstraints),
     "PlacementStrategy": cdk.listMapper(convertPlacementStrategyPropertyToCloudFormation)(properties.placementStrategy),
+    "PlatformVersion": cdk.stringToCloudFormation(properties.platformVersion),
     "PropagateTags": cdk.stringToCloudFormation(properties.propagateTags),
     "ReferenceId": cdk.stringToCloudFormation(properties.referenceId),
-    "Tags": cdk.listMapper(cdk.hashMapper(cdk.stringToCloudFormation))(properties.tags)
+    "Tags": cdk.listMapper(cdk.hashMapper(cdk.stringToCloudFormation))(properties.tags),
+    "TaskCount": cdk.numberToCloudFormation(properties.taskCount),
+    "TaskDefinitionArn": cdk.stringToCloudFormation(properties.taskDefinitionArn)
   };
 }
 
@@ -1296,20 +1614,20 @@ function EcsParametersPropertyFromCloudFormation(properties: any): cfn_parse.Fro
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<EcsParametersProperty>();
-  ret.addPropertyResult("taskDefinitionArn", "TaskDefinitionArn", (properties.TaskDefinitionArn != null ? cfn_parse.FromCloudFormation.getString(properties.TaskDefinitionArn) : undefined));
-  ret.addPropertyResult("taskCount", "TaskCount", (properties.TaskCount != null ? cfn_parse.FromCloudFormation.getNumber(properties.TaskCount) : undefined));
-  ret.addPropertyResult("launchType", "LaunchType", (properties.LaunchType != null ? cfn_parse.FromCloudFormation.getString(properties.LaunchType) : undefined));
-  ret.addPropertyResult("networkConfiguration", "NetworkConfiguration", (properties.NetworkConfiguration != null ? NetworkConfigurationPropertyFromCloudFormation(properties.NetworkConfiguration) : undefined));
-  ret.addPropertyResult("platformVersion", "PlatformVersion", (properties.PlatformVersion != null ? cfn_parse.FromCloudFormation.getString(properties.PlatformVersion) : undefined));
-  ret.addPropertyResult("group", "Group", (properties.Group != null ? cfn_parse.FromCloudFormation.getString(properties.Group) : undefined));
   ret.addPropertyResult("capacityProviderStrategy", "CapacityProviderStrategy", (properties.CapacityProviderStrategy != null ? cfn_parse.FromCloudFormation.getArray(CapacityProviderStrategyItemPropertyFromCloudFormation)(properties.CapacityProviderStrategy) : undefined));
   ret.addPropertyResult("enableEcsManagedTags", "EnableECSManagedTags", (properties.EnableECSManagedTags != null ? cfn_parse.FromCloudFormation.getBoolean(properties.EnableECSManagedTags) : undefined));
   ret.addPropertyResult("enableExecuteCommand", "EnableExecuteCommand", (properties.EnableExecuteCommand != null ? cfn_parse.FromCloudFormation.getBoolean(properties.EnableExecuteCommand) : undefined));
+  ret.addPropertyResult("group", "Group", (properties.Group != null ? cfn_parse.FromCloudFormation.getString(properties.Group) : undefined));
+  ret.addPropertyResult("launchType", "LaunchType", (properties.LaunchType != null ? cfn_parse.FromCloudFormation.getString(properties.LaunchType) : undefined));
+  ret.addPropertyResult("networkConfiguration", "NetworkConfiguration", (properties.NetworkConfiguration != null ? NetworkConfigurationPropertyFromCloudFormation(properties.NetworkConfiguration) : undefined));
   ret.addPropertyResult("placementConstraints", "PlacementConstraints", (properties.PlacementConstraints != null ? cfn_parse.FromCloudFormation.getArray(PlacementConstraintPropertyFromCloudFormation)(properties.PlacementConstraints) : undefined));
   ret.addPropertyResult("placementStrategy", "PlacementStrategy", (properties.PlacementStrategy != null ? cfn_parse.FromCloudFormation.getArray(PlacementStrategyPropertyFromCloudFormation)(properties.PlacementStrategy) : undefined));
+  ret.addPropertyResult("platformVersion", "PlatformVersion", (properties.PlatformVersion != null ? cfn_parse.FromCloudFormation.getString(properties.PlatformVersion) : undefined));
   ret.addPropertyResult("propagateTags", "PropagateTags", (properties.PropagateTags != null ? cfn_parse.FromCloudFormation.getString(properties.PropagateTags) : undefined));
   ret.addPropertyResult("referenceId", "ReferenceId", (properties.ReferenceId != null ? cfn_parse.FromCloudFormation.getString(properties.ReferenceId) : undefined));
   ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString))(properties.Tags) : undefined));
+  ret.addPropertyResult("taskCount", "TaskCount", (properties.TaskCount != null ? cfn_parse.FromCloudFormation.getNumber(properties.TaskCount) : undefined));
+  ret.addPropertyResult("taskDefinitionArn", "TaskDefinitionArn", (properties.TaskDefinitionArn != null ? cfn_parse.FromCloudFormation.getString(properties.TaskDefinitionArn) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -1336,9 +1654,31 @@ export interface EventBridgeParametersProperty {
   readonly source: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`EventBridgeParametersProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`EventBridgeParametersProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function EventBridgeParametersPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("detailType", cdk.requiredValidator)(properties.detailType));
+  errors.collect(cdk.propertyValidator("detailType", cdk.validateString)(properties.detailType));
+  errors.collect(cdk.propertyValidator("source", cdk.requiredValidator)(properties.source));
+  errors.collect(cdk.propertyValidator("source", cdk.validateString)(properties.source));
+  return errors.wrap("supplied properties not correct for \\"EventBridgeParametersProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertEventBridgeParametersPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  EventBridgeParametersPropertyValidator(properties).assertSuccess();
   return {
     "DetailType": cdk.stringToCloudFormation(properties.detailType),
     "Source": cdk.stringToCloudFormation(properties.source)
@@ -1373,9 +1713,29 @@ export interface KinesisParametersProperty {
   readonly partitionKey: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`KinesisParametersProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`KinesisParametersProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function KinesisParametersPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("partitionKey", cdk.requiredValidator)(properties.partitionKey));
+  errors.collect(cdk.propertyValidator("partitionKey", cdk.validateString)(properties.partitionKey));
+  return errors.wrap("supplied properties not correct for \\"KinesisParametersProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertKinesisParametersPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  KinesisParametersPropertyValidator(properties).assertSuccess();
   return {
     "PartitionKey": cdk.stringToCloudFormation(properties.partitionKey)
   };
@@ -1428,9 +1788,31 @@ export interface SageMakerPipelineParameterProperty {
   readonly value: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`SageMakerPipelineParameterProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`SageMakerPipelineParameterProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function SageMakerPipelineParameterPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("name", cdk.requiredValidator)(properties.name));
+  errors.collect(cdk.propertyValidator("name", cdk.validateString)(properties.name));
+  errors.collect(cdk.propertyValidator("value", cdk.requiredValidator)(properties.value));
+  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
+  return errors.wrap("supplied properties not correct for \\"SageMakerPipelineParameterProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertSageMakerPipelineParameterPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  SageMakerPipelineParameterPropertyValidator(properties).assertSuccess();
   return {
     "Name": cdk.stringToCloudFormation(properties.name),
     "Value": cdk.stringToCloudFormation(properties.value)
@@ -1448,9 +1830,28 @@ function SageMakerPipelineParameterPropertyFromCloudFormation(properties: any): 
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`SageMakerPipelineParametersProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`SageMakerPipelineParametersProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function SageMakerPipelineParametersPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("pipelineParameterList", cdk.listValidator(SageMakerPipelineParameterPropertyValidator))(properties.pipelineParameterList));
+  return errors.wrap("supplied properties not correct for \\"SageMakerPipelineParametersProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertSageMakerPipelineParametersPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  SageMakerPipelineParametersPropertyValidator(properties).assertSuccess();
   return {
     "PipelineParameterList": cdk.listMapper(convertSageMakerPipelineParameterPropertyToCloudFormation)(properties.pipelineParameterList)
   };
@@ -1481,9 +1882,28 @@ export interface SqsParametersProperty {
   readonly messageGroupId?: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`SqsParametersProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`SqsParametersProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function SqsParametersPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("messageGroupId", cdk.validateString)(properties.messageGroupId));
+  return errors.wrap("supplied properties not correct for \\"SqsParametersProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertSqsParametersPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  SqsParametersPropertyValidator(properties).assertSuccess();
   return {
     "MessageGroupId": cdk.stringToCloudFormation(properties.messageGroupId)
   };
@@ -1499,18 +1919,48 @@ function SqsParametersPropertyFromCloudFormation(properties: any): cfn_parse.Fro
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`TargetProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`TargetProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function TargetPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("arn", cdk.requiredValidator)(properties.arn));
+  errors.collect(cdk.propertyValidator("arn", cdk.validateString)(properties.arn));
+  errors.collect(cdk.propertyValidator("deadLetterConfig", DeadLetterConfigPropertyValidator)(properties.deadLetterConfig));
+  errors.collect(cdk.propertyValidator("ecsParameters", EcsParametersPropertyValidator)(properties.ecsParameters));
+  errors.collect(cdk.propertyValidator("eventBridgeParameters", EventBridgeParametersPropertyValidator)(properties.eventBridgeParameters));
+  errors.collect(cdk.propertyValidator("input", cdk.validateString)(properties.input));
+  errors.collect(cdk.propertyValidator("kinesisParameters", KinesisParametersPropertyValidator)(properties.kinesisParameters));
+  errors.collect(cdk.propertyValidator("retryPolicy", RetryPolicyPropertyValidator)(properties.retryPolicy));
+  errors.collect(cdk.propertyValidator("roleArn", cdk.requiredValidator)(properties.roleArn));
+  errors.collect(cdk.propertyValidator("roleArn", cdk.validateString)(properties.roleArn));
+  errors.collect(cdk.propertyValidator("sageMakerPipelineParameters", SageMakerPipelineParametersPropertyValidator)(properties.sageMakerPipelineParameters));
+  errors.collect(cdk.propertyValidator("sqsParameters", SqsParametersPropertyValidator)(properties.sqsParameters));
+  return errors.wrap("supplied properties not correct for \\"TargetProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertTargetPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  TargetPropertyValidator(properties).assertSuccess();
   return {
     "Arn": cdk.stringToCloudFormation(properties.arn),
-    "RoleArn": cdk.stringToCloudFormation(properties.roleArn),
     "DeadLetterConfig": convertDeadLetterConfigPropertyToCloudFormation(properties.deadLetterConfig),
-    "RetryPolicy": convertRetryPolicyPropertyToCloudFormation(properties.retryPolicy),
-    "Input": cdk.stringToCloudFormation(properties.input),
     "EcsParameters": convertEcsParametersPropertyToCloudFormation(properties.ecsParameters),
     "EventBridgeParameters": convertEventBridgeParametersPropertyToCloudFormation(properties.eventBridgeParameters),
+    "Input": cdk.stringToCloudFormation(properties.input),
     "KinesisParameters": convertKinesisParametersPropertyToCloudFormation(properties.kinesisParameters),
+    "RetryPolicy": convertRetryPolicyPropertyToCloudFormation(properties.retryPolicy),
+    "RoleArn": cdk.stringToCloudFormation(properties.roleArn),
     "SageMakerPipelineParameters": convertSageMakerPipelineParametersPropertyToCloudFormation(properties.sageMakerPipelineParameters),
     "SqsParameters": convertSqsParametersPropertyToCloudFormation(properties.sqsParameters)
   };
@@ -1522,22 +1972,54 @@ function TargetPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudF
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<TargetProperty>();
   ret.addPropertyResult("arn", "Arn", (properties.Arn != null ? cfn_parse.FromCloudFormation.getString(properties.Arn) : undefined));
-  ret.addPropertyResult("roleArn", "RoleArn", (properties.RoleArn != null ? cfn_parse.FromCloudFormation.getString(properties.RoleArn) : undefined));
   ret.addPropertyResult("deadLetterConfig", "DeadLetterConfig", (properties.DeadLetterConfig != null ? DeadLetterConfigPropertyFromCloudFormation(properties.DeadLetterConfig) : undefined));
-  ret.addPropertyResult("retryPolicy", "RetryPolicy", (properties.RetryPolicy != null ? RetryPolicyPropertyFromCloudFormation(properties.RetryPolicy) : undefined));
-  ret.addPropertyResult("input", "Input", (properties.Input != null ? cfn_parse.FromCloudFormation.getString(properties.Input) : undefined));
   ret.addPropertyResult("ecsParameters", "EcsParameters", (properties.EcsParameters != null ? EcsParametersPropertyFromCloudFormation(properties.EcsParameters) : undefined));
   ret.addPropertyResult("eventBridgeParameters", "EventBridgeParameters", (properties.EventBridgeParameters != null ? EventBridgeParametersPropertyFromCloudFormation(properties.EventBridgeParameters) : undefined));
+  ret.addPropertyResult("input", "Input", (properties.Input != null ? cfn_parse.FromCloudFormation.getString(properties.Input) : undefined));
   ret.addPropertyResult("kinesisParameters", "KinesisParameters", (properties.KinesisParameters != null ? KinesisParametersPropertyFromCloudFormation(properties.KinesisParameters) : undefined));
+  ret.addPropertyResult("retryPolicy", "RetryPolicy", (properties.RetryPolicy != null ? RetryPolicyPropertyFromCloudFormation(properties.RetryPolicy) : undefined));
+  ret.addPropertyResult("roleArn", "RoleArn", (properties.RoleArn != null ? cfn_parse.FromCloudFormation.getString(properties.RoleArn) : undefined));
   ret.addPropertyResult("sageMakerPipelineParameters", "SageMakerPipelineParameters", (properties.SageMakerPipelineParameters != null ? SageMakerPipelineParametersPropertyFromCloudFormation(properties.SageMakerPipelineParameters) : undefined));
   ret.addPropertyResult("sqsParameters", "SqsParameters", (properties.SqsParameters != null ? SqsParametersPropertyFromCloudFormation(properties.SqsParameters) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`CfnScheduleProps\`
+ *
+ * @param properties - the TypeScript properties of a \`CfnScheduleProps\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnSchedulePropsValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("description", cdk.validateString)(properties.description));
+  errors.collect(cdk.propertyValidator("endDate", cdk.validateString)(properties.endDate));
+  errors.collect(cdk.propertyValidator("flexibleTimeWindow", cdk.requiredValidator)(properties.flexibleTimeWindow));
+  errors.collect(cdk.propertyValidator("flexibleTimeWindow", FlexibleTimeWindowPropertyValidator)(properties.flexibleTimeWindow));
+  errors.collect(cdk.propertyValidator("groupName", cdk.validateString)(properties.groupName));
+  errors.collect(cdk.propertyValidator("kmsKeyArn", cdk.validateString)(properties.kmsKeyArn));
+  errors.collect(cdk.propertyValidator("name", cdk.validateString)(properties.name));
+  errors.collect(cdk.propertyValidator("scheduleExpression", cdk.requiredValidator)(properties.scheduleExpression));
+  errors.collect(cdk.propertyValidator("scheduleExpression", cdk.validateString)(properties.scheduleExpression));
+  errors.collect(cdk.propertyValidator("scheduleExpressionTimezone", cdk.validateString)(properties.scheduleExpressionTimezone));
+  errors.collect(cdk.propertyValidator("startDate", cdk.validateString)(properties.startDate));
+  errors.collect(cdk.propertyValidator("state", cdk.validateString)(properties.state));
+  errors.collect(cdk.propertyValidator("target", cdk.requiredValidator)(properties.target));
+  errors.collect(cdk.propertyValidator("target", TargetPropertyValidator)(properties.target));
+  return errors.wrap("supplied properties not correct for \\"CfnScheduleProps\\"");
+}
+
 // @ts-ignore TS6133
 function convertCfnSchedulePropsToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  CfnSchedulePropsValidator(properties).assertSuccess();
   return {
     "Description": cdk.stringToCloudFormation(properties.description),
     "EndDate": cdk.stringToCloudFormation(properties.endDate),
@@ -1753,9 +2235,29 @@ export interface CfnScheduleGroupProps {
   readonly tags?: Array<cdk.CfnTag>;
 }
 
+/**
+ * Determine whether the given properties match those of a \`CfnScheduleGroupProps\`
+ *
+ * @param properties - the TypeScript properties of a \`CfnScheduleGroupProps\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnScheduleGroupPropsValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("name", cdk.validateString)(properties.name));
+  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
+  return errors.wrap("supplied properties not correct for \\"CfnScheduleGroupProps\\"");
+}
+
 // @ts-ignore TS6133
 function convertCfnScheduleGroupPropsToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  CfnScheduleGroupPropsValidator(properties).assertSuccess();
   return {
     "Name": cdk.stringToCloudFormation(properties.name),
     "Tags": cdk.listMapper(cdk.numberToCloudFormation)(properties.tags)
@@ -2090,9 +2592,43 @@ export interface CfnQueueProps {
   readonly visibilityTimeout?: number;
 }
 
+/**
+ * Determine whether the given properties match those of a \`CfnQueueProps\`
+ *
+ * @param properties - the TypeScript properties of a \`CfnQueueProps\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnQueuePropsValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("contentBasedDeduplication", cdk.validateBoolean)(properties.contentBasedDeduplication));
+  errors.collect(cdk.propertyValidator("deduplicationScope", cdk.validateString)(properties.deduplicationScope));
+  errors.collect(cdk.propertyValidator("delaySeconds", cdk.validateNumber)(properties.delaySeconds));
+  errors.collect(cdk.propertyValidator("fifoQueue", cdk.validateBoolean)(properties.fifoQueue));
+  errors.collect(cdk.propertyValidator("fifoThroughputLimit", cdk.validateString)(properties.fifoThroughputLimit));
+  errors.collect(cdk.propertyValidator("kmsDataKeyReusePeriodSeconds", cdk.validateNumber)(properties.kmsDataKeyReusePeriodSeconds));
+  errors.collect(cdk.propertyValidator("kmsMasterKeyId", cdk.validateString)(properties.kmsMasterKeyId));
+  errors.collect(cdk.propertyValidator("maximumMessageSize", cdk.validateNumber)(properties.maximumMessageSize));
+  errors.collect(cdk.propertyValidator("messageRetentionPeriod", cdk.validateNumber)(properties.messageRetentionPeriod));
+  errors.collect(cdk.propertyValidator("queueName", cdk.validateString)(properties.queueName));
+  errors.collect(cdk.propertyValidator("receiveMessageWaitTimeSeconds", cdk.validateNumber)(properties.receiveMessageWaitTimeSeconds));
+  errors.collect(cdk.propertyValidator("redriveAllowPolicy", cdk.validateObject)(properties.redriveAllowPolicy));
+  errors.collect(cdk.propertyValidator("redrivePolicy", cdk.validateObject)(properties.redrivePolicy));
+  errors.collect(cdk.propertyValidator("sqsManagedSseEnabled", cdk.validateBoolean)(properties.sqsManagedSseEnabled));
+  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
+  errors.collect(cdk.propertyValidator("visibilityTimeout", cdk.validateNumber)(properties.visibilityTimeout));
+  return errors.wrap("supplied properties not correct for \\"CfnQueueProps\\"");
+}
+
 // @ts-ignore TS6133
 function convertCfnQueuePropsToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  CfnQueuePropsValidator(properties).assertSuccess();
   return {
     "ContentBasedDeduplication": cdk.booleanToCloudFormation(properties.contentBasedDeduplication),
     "DeduplicationScope": cdk.stringToCloudFormation(properties.deduplicationScope),
@@ -2101,13 +2637,13 @@ function convertCfnQueuePropsToCloudFormation(properties: any): any {
     "FifoThroughputLimit": cdk.stringToCloudFormation(properties.fifoThroughputLimit),
     "KmsDataKeyReusePeriodSeconds": cdk.numberToCloudFormation(properties.kmsDataKeyReusePeriodSeconds),
     "KmsMasterKeyId": cdk.stringToCloudFormation(properties.kmsMasterKeyId),
-    "SqsManagedSseEnabled": cdk.booleanToCloudFormation(properties.sqsManagedSseEnabled),
     "MaximumMessageSize": cdk.numberToCloudFormation(properties.maximumMessageSize),
     "MessageRetentionPeriod": cdk.numberToCloudFormation(properties.messageRetentionPeriod),
     "QueueName": cdk.stringToCloudFormation(properties.queueName),
     "ReceiveMessageWaitTimeSeconds": cdk.numberToCloudFormation(properties.receiveMessageWaitTimeSeconds),
     "RedriveAllowPolicy": cdk.objectToCloudFormation(properties.redriveAllowPolicy),
     "RedrivePolicy": cdk.objectToCloudFormation(properties.redrivePolicy),
+    "SqsManagedSseEnabled": cdk.booleanToCloudFormation(properties.sqsManagedSseEnabled),
     "Tags": cdk.listMapper(cdk.numberToCloudFormation)(properties.tags),
     "VisibilityTimeout": cdk.numberToCloudFormation(properties.visibilityTimeout)
   };
@@ -2125,13 +2661,13 @@ function CfnQueuePropsFromCloudFormation(properties: any): cfn_parse.FromCloudFo
   ret.addPropertyResult("fifoThroughputLimit", "FifoThroughputLimit", (properties.FifoThroughputLimit != null ? cfn_parse.FromCloudFormation.getString(properties.FifoThroughputLimit) : undefined));
   ret.addPropertyResult("kmsDataKeyReusePeriodSeconds", "KmsDataKeyReusePeriodSeconds", (properties.KmsDataKeyReusePeriodSeconds != null ? cfn_parse.FromCloudFormation.getNumber(properties.KmsDataKeyReusePeriodSeconds) : undefined));
   ret.addPropertyResult("kmsMasterKeyId", "KmsMasterKeyId", (properties.KmsMasterKeyId != null ? cfn_parse.FromCloudFormation.getString(properties.KmsMasterKeyId) : undefined));
-  ret.addPropertyResult("sqsManagedSseEnabled", "SqsManagedSseEnabled", (properties.SqsManagedSseEnabled != null ? cfn_parse.FromCloudFormation.getBoolean(properties.SqsManagedSseEnabled) : undefined));
   ret.addPropertyResult("maximumMessageSize", "MaximumMessageSize", (properties.MaximumMessageSize != null ? cfn_parse.FromCloudFormation.getNumber(properties.MaximumMessageSize) : undefined));
   ret.addPropertyResult("messageRetentionPeriod", "MessageRetentionPeriod", (properties.MessageRetentionPeriod != null ? cfn_parse.FromCloudFormation.getNumber(properties.MessageRetentionPeriod) : undefined));
   ret.addPropertyResult("queueName", "QueueName", (properties.QueueName != null ? cfn_parse.FromCloudFormation.getString(properties.QueueName) : undefined));
   ret.addPropertyResult("receiveMessageWaitTimeSeconds", "ReceiveMessageWaitTimeSeconds", (properties.ReceiveMessageWaitTimeSeconds != null ? cfn_parse.FromCloudFormation.getNumber(properties.ReceiveMessageWaitTimeSeconds) : undefined));
   ret.addPropertyResult("redriveAllowPolicy", "RedriveAllowPolicy", (properties.RedriveAllowPolicy != null ? cfn_parse.FromCloudFormation.getAny(properties.RedriveAllowPolicy) : undefined));
   ret.addPropertyResult("redrivePolicy", "RedrivePolicy", (properties.RedrivePolicy != null ? cfn_parse.FromCloudFormation.getAny(properties.RedrivePolicy) : undefined));
+  ret.addPropertyResult("sqsManagedSseEnabled", "SqsManagedSseEnabled", (properties.SqsManagedSseEnabled != null ? cfn_parse.FromCloudFormation.getBoolean(properties.SqsManagedSseEnabled) : undefined));
   ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
   ret.addPropertyResult("visibilityTimeout", "VisibilityTimeout", (properties.VisibilityTimeout != null ? cfn_parse.FromCloudFormation.getNumber(properties.VisibilityTimeout) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
@@ -2380,9 +2916,31 @@ export interface CfnQueuePolicyProps {
   readonly queues: Array<string>;
 }
 
+/**
+ * Determine whether the given properties match those of a \`CfnQueuePolicyProps\`
+ *
+ * @param properties - the TypeScript properties of a \`CfnQueuePolicyProps\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnQueuePolicyPropsValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("policyDocument", cdk.requiredValidator)(properties.policyDocument));
+  errors.collect(cdk.propertyValidator("policyDocument", cdk.validateObject)(properties.policyDocument));
+  errors.collect(cdk.propertyValidator("queues", cdk.requiredValidator)(properties.queues));
+  errors.collect(cdk.propertyValidator("queues", cdk.listValidator(cdk.validateString))(properties.queues));
+  return errors.wrap("supplied properties not correct for \\"CfnQueuePolicyProps\\"");
+}
+
 // @ts-ignore TS6133
 function convertCfnQueuePolicyPropsToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  CfnQueuePolicyPropsValidator(properties).assertSuccess();
   return {
     "PolicyDocument": cdk.objectToCloudFormation(properties.policyDocument),
     "Queues": cdk.listMapper(cdk.stringToCloudFormation)(properties.queues)

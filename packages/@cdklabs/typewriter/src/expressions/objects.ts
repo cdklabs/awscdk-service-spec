@@ -123,3 +123,9 @@ export class IsNotNullish extends Expression {
     super();
   }
 }
+
+export class StrContact extends Expression {
+  constructor(public readonly _operands_: Expression[]) {
+    super();
+  }
+}

@@ -1,3 +1,4 @@
+import { Block } from './block';
 import {
   AssignmentStatement,
   StatementSeparator,
@@ -41,4 +42,8 @@ export function expr(exp: Expression) {
 
 export function sep() {
   return new StatementSeparator();
+}
+
+export function block(...stmts: Array<Statement | Expression>) {
+  return Block.with(...stmts);
 }

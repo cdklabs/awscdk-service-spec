@@ -1,6 +1,6 @@
 import * as jsii from '@jsii/spec';
 import { MemberType } from './member-type';
-import { PropertySpec } from './property';
+import { Property, PropertySpec } from './property';
 import { Scope } from './scope';
 import { SymbolKind } from './symbol';
 
@@ -31,7 +31,7 @@ export class StructType extends MemberType {
   /**
    * Adds a property to the interface
    */
-  public addProperty(spec: Omit<PropertySpec, 'immutable'>) {
+  public addProperty(spec: Omit<PropertySpec, 'immutable'>): Property {
     return super.addProperty({
       ...spec,
       immutable: true,
