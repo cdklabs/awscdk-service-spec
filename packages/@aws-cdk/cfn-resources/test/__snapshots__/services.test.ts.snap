@@ -2260,7 +2260,7 @@ function convertCfnScheduleGroupPropsToCloudFormation(properties: any): any {
   CfnScheduleGroupPropsValidator(properties).assertSuccess();
   return {
     "Name": cdk.stringToCloudFormation(properties.name),
-    "Tags": cdk.listMapper(cdk.numberToCloudFormation)(properties.tags)
+    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags)
   };
 }
 
@@ -2644,7 +2644,7 @@ function convertCfnQueuePropsToCloudFormation(properties: any): any {
     "RedriveAllowPolicy": cdk.objectToCloudFormation(properties.redriveAllowPolicy),
     "RedrivePolicy": cdk.objectToCloudFormation(properties.redrivePolicy),
     "SqsManagedSseEnabled": cdk.booleanToCloudFormation(properties.sqsManagedSseEnabled),
-    "Tags": cdk.listMapper(cdk.numberToCloudFormation)(properties.tags),
+    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags),
     "VisibilityTimeout": cdk.numberToCloudFormation(properties.visibilityTimeout)
   };
 }
