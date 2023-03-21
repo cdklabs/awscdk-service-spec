@@ -1,0 +1,2302 @@
+<svg version="1.1" baseProfile="full" width="11849.3" height="1380.0" viewbox="0 0 11849.25 1380" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+<desc >#.interface: fill=lightblue
+#.enumeration: fill=lightgreen
+#.type: fill=lightgray
+[FreeFunction|+returnType: Type;+kind: SymbolKind.Function;+parameters: Parameter\[\];-_body: Block \| undefined;+scope: Scope;+spec: CallableSpec|+addBody(): void;+addParameter(): Parameter]
+[&lt;interface&gt;CallableSpec|+name: string;+parameters: ParameterSpec\[\] \| undefined;+returnType: Type \| undefined;+body: Block \| undefined|]
+[&lt;interface&gt;CallableDeclaration|+body: Block \| undefined;+returnType: Type;+name: string;+parameters: Parameter\[\]|]
+[&lt;interface&gt;CallableExpr||+invoke(): Expression]
+[TypeDeclaration]&lt;:-[FreeFunction]
+[CallableDeclaration]&lt;:--[FreeFunction]
+[TypeSpec]&lt;:--[CallableSpec]
+[Documented]&lt;:--[CallableDeclaration]
+[ClassType|+kind: SymbolKind.Class;+nestedDeclarations: TypeDeclaration\[\];-_initializer: Initializer \| undefined;+scope: Scope;+spec: ClassSpec|+addInitializer(): Initializer;+newInstance(): NewExpression;+addNestedType(): A]
+[&lt;interface&gt;ClassSpec|+export: boolean \| undefined;+properties: PropertySpec\[\] \| undefined;+abstract: boolean \| undefined;+extends: Type \| undefined;+implements: Type\[\] \| undefined|]
+[MemberType]&lt;:-[ClassType]
+[TypeSpec]&lt;:--[ClassSpec]
+[&lt;interface&gt;Documented|+docs: DocsSpec \| undefined|]
+[Expression|+_comments_: string\[\] \| undefined;-_isExpression_: true|+prop(): ObjectPropertyAccess;+callMethod(): ObjectMethodInvoke;+call(): InvokeCallable;+asStmt(): Statement]
+[SymbolReference|+symbol: ThingSymbol|]
+[Expression]&lt;:-[SymbolReference]
+[ExternalModule||]
+[Module]&lt;:-[ExternalModule]
+[InterfaceType|+kind: SymbolKind.Interface;+scope: Scope;+spec: InterfaceSpec|]
+[&lt;interface&gt;InterfaceSpec|+export: boolean \| undefined;+properties: PropertySpec\[\] \| undefined;+extends: Type\[\] \| undefined|]
+[MemberType]&lt;:-[InterfaceType]
+[TypeSpec]&lt;:--[InterfaceSpec]
+[MemberType|+kind: SymbolKind;-_properties: Property\[\];-_methods: Method\[\]|+addProperty(): Property;+addMethod(): Method]
+[TypeDeclaration]&lt;:-[MemberType]
+[Module|#typeMap: Map&lt;string, TypeDeclaration&gt;;+fqn: string|+addType(): void;+import(): void;+toString(): string]
+[AliasedModuleImport|+moduleSource: string;+importAlias: string|+referenceSymbol(): Expression]
+[&lt;interface&gt;ModuleImportProps|+fromLocation: string \| undefined|]
+[Scope]&lt;:-[Module]
+[IImport]&lt;:--[AliasedModuleImport]
+[Parameter|+documentation: string \| undefined;+scope: CallableDeclaration;+spec: ParameterSpec|]
+[&lt;interface&gt;ParameterSpec|+name: string;+type: Type;+documentation: string \| undefined|]
+[Identifier]&lt;:-[Parameter]
+[Property|+kind: MemberKind.Property;+type: Type;+scope: MemberType;+spec: PropertySpec|+from(): Expression]
+[&lt;interface&gt;PropertySpec|+docs: DocsSpec \| undefined;+type: Type;+initializer: Expression \| undefined;+getterBody: Block \| undefined;+setterBody: ((value: Expression) =&gt; Block) \| undefined|]
+[TypeMember]&lt;:-[Property]
+[Scope|+fqn: string;+name: string;#typeMap: ReadonlyMap&lt;string, TypeDeclaration&gt;;#importMap: Map&lt;Scope, IImport&gt;|+addType(): void;+tryFindType(): TypeDeclaration \| undefined;+findType(): TypeDeclaration;+addImportedScope(): void;+findImportFor(): IImport \| undefined;+toString(): string]
+[AmbientScope|+fqn: string;+name: string;#typeMap: Map&lt;string, TypeDeclaration&gt;|+addType(): void]
+[&lt;interface&gt;IImport|+importAlias: string \| undefined;+importedSymbols: string\[\] \| undefined;+moduleSource: string|+referenceSymbol(): Expression]
+[Scope]&lt;:-[AmbientScope]
+[StructType|+kind: SymbolKind.Struct;+scope: Scope;+spec: StructSpec|+addProperty(): Property]
+[&lt;interface&gt;StructSpec|+export: boolean \| undefined;+properties: PropertySpec\[\] \| undefined|]
+[MemberType]&lt;:-[StructType]
+[ThingSymbol|+name: string;+scope: Scope|+changeName(): ThingSymbol;+toString(): string]
+[&lt;enumeration&gt;SymbolKind|Class;Enum;Struct;Interface;Function]
+[TypeDeclaration|+kind: SymbolKind;+type: Type;+symbol: ThingSymbol;+scope: Scope;+spec: TypeSpec|+toString(): string]
+[&lt;interface&gt;TypeSpec|+exported: boolean \| undefined|]
+[Documented]&lt;:--[TypeDeclaration]
+[TypeMember|+kind: MemberKind;+visibility: MemberVisibility;+scope: MemberType;+spec: TypeMemberSpec|+toString(): string;+isProperty(): boolean]
+[Method|+returnType: Type;+visibility: MemberVisibility;+parameters: Parameter\[\];-_body: Block \| undefined;+type: MemberType;+methodSpec: MethodSpec|+bind(): ObjectPropertyAccess;+addParameter(): Parameter;+addBody(): void]
+[Initializer|+type: MemberType;+initializerSpec: InitializerSpec|]
+[&lt;interface&gt;TypeMemberSpec|+name: string;+docs: DocsSpec \| undefined;+abstract: boolean \| undefined;+static: boolean \| undefined|]
+[&lt;interface&gt;MethodSpec|+visibility: MemberVisibility \| undefined|]
+[&lt;interface&gt;InitializerSpec||]
+[&lt;enumeration&gt;MemberKind|Initializer;Method;Property]
+[&lt;enumeration&gt;MemberVisibility|Public;Protected;Private]
+[Documented]&lt;:--[TypeMember]
+[TypeMember]&lt;:-[Method]
+[CallableDeclaration]&lt;:--[Method]
+[Method]&lt;:-[Initializer]
+[CallableDeclaration]&lt;:--[Initializer]
+[CallableSpec]&lt;:--[MethodSpec]
+[Type|+static ANY: Type;+static VOID: Type;+static STRING: Type;+static NUMBER: Type;+static BOOLEAN: Type;+static UNDEFINED: Type;+spec: TypeReferenceSpec;+scope: Scope \| undefined;+symbol: ThingSymbol \| undefined|+static fromName(): Type;+static arrayOf(): Type;+static mapOf(): Type;+static unionOf(): Type;+toString(): string;+withGenericArguments(): Type;+newInstance(): NewExpression;+optional(): Type;+equals(): boolean]
+[&lt;enumeration&gt;PrimitiveType|Date;String;Number;Boolean;Undefined;Json;Any;Void]
+[Identifier|+_identifier_: string|]
+[Expression]&lt;:-[Identifier]
+[InvokeCallable|+_callable_: Expression;+_args_: Expression\[\]|]
+[Expression]&lt;:-[InvokeCallable]
+[ObjectPropertyAccess|+_comments_: string\[\] \| undefined;+_obj_: Expression;+_property_: string|]
+[ObjectMethodInvoke|+_obj_: Expression;+_method_: string;+_args_: Expression\[\]|]
+[ObjectLiteral|+_contents_: Record&lt;string, Expression&gt;|]
+[NotExpression|+_operand_: Expression|]
+[EqualsExpression|+_left_: Expression;+_right_: Expression|]
+[JsLiteralExpression|+_value_: any|]
+[NewExpression|+_args_: Expression\[\];+_typ_: Type|]
+[TruthyOr|+_value_: Expression;+_defaultValue_: Expression|]
+[DestructuringBind|+_structure_: Structure;+_names_: Expression\[\]|]
+[Ternary|+_condition_: Expression;+_thenExpression_: Expression \| undefined;+_elseExpression_: Expression \| undefined|+then(): this;+else(): this]
+[ThisInstance||]
+[Null||]
+[Undefined||]
+[BinOp|+_lhs_: Expression;+_op_: string;+_rhs_: Expression|]
+[IsObject|+_operand_: Expression|]
+[IsNotNullish|+_operand_: Expression|]
+[StrContact|+_operands_: Expression\[\]|]
+[&lt;enumeration&gt;Structure|Array;Object]
+[Expression]&lt;:-[ObjectPropertyAccess]
+[Expression]&lt;:-[ObjectMethodInvoke]
+[Expression]&lt;:-[ObjectLiteral]
+[Expression]&lt;:-[NotExpression]
+[Expression]&lt;:-[EqualsExpression]
+[Expression]&lt;:-[JsLiteralExpression]
+[Expression]&lt;:-[NewExpression]
+[Expression]&lt;:-[TruthyOr]
+[Expression]&lt;:-[DestructuringBind]
+[Expression]&lt;:-[Ternary]
+[Expression]&lt;:-[ThisInstance]
+[Expression]&lt;:-[Null]
+[Expression]&lt;:-[Undefined]
+[Expression]&lt;:-[BinOp]
+[Expression]&lt;:-[IsObject]
+[Expression]&lt;:-[IsNotNullish]
+[Expression]&lt;:-[StrContact]
+[BuiltInFunction|+_args_: Expression\[\];+_jsBuiltinName_: string|]
+[Expression]&lt;:-[BuiltInFunction]
+[Renderer|#symbol: string;-emitter: IndentedStringBuilder;-scopeStack: Scope\[\]|+render(): string;#renderModule(): void;#renderModuleTypes(): void;#renderStruct(): void;#renderInterface(): void;#renderFunction(): void;#renderClass(): void;#indent(): void;#unindent(): void;#emit(): void;#setIndentationSymbol(): string;#emitList(): void;#withScope(): void]
+[&lt;interface&gt;RenderOptions|+indentation: string \| number \| undefined|]
+[IndentedStringBuilder|-indents: string\[\];-parts: string\[\]|+indent(): void;+unindent(): void;+emit(): void;+toString(): string]
+[TypeScriptRenderer||#renderModule(): void;#renderImports(): void;#emitBlock(): void;#renderStruct(): void;#renderClass(): void;#renderInterface(): void;#renderProperty(): void;#renderRegularProperty(): void;#renderGetterSetterProperty(): void;#renderMethod(): void;#renderSymbol(): void;#renderType(): void;#expressionFromSymbol(): Expression;#renderFunction(): void;#renderStatement(): void;#renderExpression(): void;#renderIdentifier(): void;#renderObjectMethodInvoke(): void;#renderInvokeCallable(): void;#renderBlock(): void;#renderArgs(): void;#renderObjectLiteral(): void;#renderObjectAccess(): void;#renderReturnStatement(): void;#renderIfThenElse(): void;#renderDocs(): void;-parenthesized(): void;-openParen(): void;-closeParen(): void]
+[&lt;interface&gt;DocOptions|+forceStruct: boolean \| undefined|]
+[&lt;type&gt;TypeCase&lt;A&gt;|+ctr: new (...args: any\[\]) =&gt; A;+then: (x: A) =&gt; void|]
+[Renderer]&lt;:-[TypeScriptRenderer]
+[Block|+comments: string\[\] \| undefined;-_statements: Statement\[\]|+static with(): Block;+add(): void]
+[Statement]&lt;:-[Block]
+[Statement|+comments: string\[\] \| undefined;-isStatement: true|]
+[ReturnStatement|+comments: string\[\] \| undefined;+expression: Expression \| undefined|]
+[ExpressionStatement|+comments: string\[\] \| undefined;+expression: Expression|]
+[AssignmentStatement|+comments: string\[\] \| undefined;+lhs: Expression;+rhs: Expression|]
+[VariableDeclaration|+comments: string\[\] \| undefined;+mut: Mut;+varName: Expression;+rhs: Expression|]
+[IfThenElse|+comments: string\[\] \| undefined;+thenStatement: Statement \| undefined;+elseStatement: Statement \| undefined;+condition: Expression|+then(): this;+else(): this]
+[ForLoop|+mut: Mut;+iterator: Expression;+iterable: Expression \| undefined;+loopBody: Statement \| undefined|+in(): this;+do(): this]
+[SuperInitializer|+args: Expression\[\]|]
+[StatementSeparator||]
+[&lt;enumeration&gt;Mut|Mutable;Immutable]
+[Statement]&lt;:-[ReturnStatement]
+[Statement]&lt;:-[ExpressionStatement]
+[Statement]&lt;:-[AssignmentStatement]
+[Statement]&lt;:-[VariableDeclaration]
+[Statement]&lt;:-[IfThenElse]
+[Statement]&lt;:-[ForLoop]
+[Statement]&lt;:-[SuperInitializer]
+[Statement]&lt;:-[StatementSeparator]</desc>
+<g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="12pt" font-family="Helvetica" font-weight="normal" font-style="normal">
+<g transform="translate(0.5, 0.5)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" stroke-width="3.0" stroke-linejoin="round" stroke-linecap="round" stroke="#33322E">
+<g stroke="transparent" fill="transparent">
+<rect x="0.0" y="0.0" height="1380.0" width="11849.3" stroke="none"></rect>
+</g>
+<g transform="translate(8, 8)" fill="#33322E">
+<g transform="translate(20, 20)" fill="#eee8d5" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal">
+<path d="M1164.1 707.2 L1109 883 L771.5 970.5954198473282 L771.5 970.6 " fill="none"></path>
+<path d="M1169.1 708.8 L1164.1 707.2 L1159.0 705.6 L1168.0 694.5 Z"></path>
+<g stroke-dasharray="6 6">
+<path d="M872.0 684.4 L650.5 883 L650.5 910.5 L650.5 910.5 " fill="none"></path>
+</g>
+<path d="M875.5 688.4 L872.0 684.4 L868.4 680.4 L881.9 675.5 Z"></path>
+<g stroke-dasharray="6 6">
+<path d="M2663.8 209.3 L2466.25 353 L2466.25 560.5 L2466.3 560.5 " fill="none"></path>
+</g>
+<path d="M2667.0 213.7 L2663.8 209.3 L2660.7 205.0 L2674.6 201.5 Z"></path>
+<g stroke-dasharray="6 6">
+<path d="M1038.6 212.6 L946 353 L946 560.5 L946.0 560.5 " fill="none"></path>
+</g>
+<path d="M1043.0 215.6 L1038.6 212.6 L1034.1 209.7 L1045.9 201.5 Z"></path>
+<path d="M1750.5 1045.7 L1546.5 1121 L1546.5 1141 L1546.5 1141.0 " fill="none"></path>
+<path d="M1752.3 1050.7 L1750.5 1045.7 L1748.6 1040.7 L1763.0 1041.1 Z"></path>
+<g stroke-dasharray="6 6">
+<path d="M2753.2 212.6 L2845.75 353 L2845.75 553 L2845.8 553.0 " fill="none"></path>
+</g>
+<path d="M2757.6 209.7 L2753.2 212.6 L2748.7 215.6 L2745.8 201.5 Z"></path>
+<path d="M6219.0 178.3 L3823.25 353 L3823.25 583 L3823.3 583.0 " fill="none"></path>
+<path d="M6219.3 183.6 L6219.0 178.3 L6218.6 173.0 L6232.3 177.3 Z"></path>
+<path d="M245.5 700.3 L245.5 883 L245.5 978.5 L245.5 978.5 " fill="none"></path>
+<path d="M250.8 700.3 L245.5 700.3 L240.2 700.3 L245.5 687.0 Z"></path>
+<path d="M1869.0 1084.3 L1869 1121 L1869 1182.5 L1869.0 1182.5 " fill="none"></path>
+<path d="M1874.3 1084.3 L1869.0 1084.3 L1863.7 1084.3 L1869.0 1071.0 Z"></path>
+<g stroke-dasharray="6 6">
+<path d="M2827.2 206.2 L3212.75 353 L3212.75 568 L3212.8 568.0 " fill="none"></path>
+</g>
+<path d="M2829.1 201.3 L2827.2 206.2 L2825.3 211.2 L2814.7 201.5 Z"></path>
+<path d="M1227.2 706.9 L1297 883 L1763 979.9475524475524 L1763.0 979.9 " fill="none"></path>
+<path d="M1232.2 704.9 L1227.2 706.9 L1222.3 708.9 L1222.3 694.5 Z"></path>
+<path d="M317.7 282.3 L245.5 353 L245.5 549 L245.5 549.0 " fill="none"></path>
+<path d="M321.4 286.1 L317.7 282.3 L314.0 278.5 L327.2 273.0 Z"></path>
+<g stroke-dasharray="6 6">
+<path d="M3551.3 241.3 L3551.25 353 L3551.25 564 L3551.3 564.0 " fill="none"></path>
+</g>
+<path d="M3556.6 241.3 L3551.3 241.3 L3545.9 241.3 L3551.3 228.0 Z"></path>
+<path d="M4044.3 666.3 L4044.25 883 L4044.25 952 L4044.3 952.0 " fill="none"></path>
+<path d="M4049.6 666.3 L4044.3 666.3 L4038.9 666.3 L4044.3 653.0 Z"></path>
+<path d="M1406.8 706.9 L1337 883 L2021.75 984.255358807083 L2021.8 984.3 " fill="none"></path>
+<path d="M1411.7 708.9 L1406.8 706.9 L1401.8 704.9 L1411.7 694.5 Z"></path>
+<path d="M554.3 282.3 L626.5 353 L626.5 556.5 L626.5 556.5 " fill="none"></path>
+<path d="M558.0 278.5 L554.3 282.3 L550.6 286.1 L544.8 273.0 Z"></path>
+<path d="M1987.2 1055.1 L2134 1121 L2134 1171 L2134.0 1171.0 " fill="none"></path>
+<path d="M1989.3 1050.2 L1987.2 1055.1 L1985.0 1059.9 L1975.0 1049.6 Z"></path>
+<g stroke-dasharray="6 6">
+<path d="M1099.4 212.6 L1192 353 L1192 541.5 L1192.0 541.5 " fill="none"></path>
+</g>
+<path d="M1103.9 209.7 L1099.4 212.6 L1095.0 215.6 L1092.1 201.5 Z"></path>
+<g stroke-dasharray="6 6">
+<path d="M1150.9 207.5 L1442 353 L1442 541.5 L1442.0 541.5 " fill="none"></path>
+</g>
+<path d="M1153.3 202.7 L1150.9 207.5 L1148.5 212.2 L1139.0 201.5 Z"></path>
+<path d="M1448.8 707.8 L1462 883 L1444.8991596638655 903 L1444.9 903.0 " fill="none"></path>
+<path d="M1454.1 707.4 L1448.8 707.8 L1443.5 708.2 L1447.8 694.5 Z"></path>
+<g stroke-dasharray="6 6">
+<path d="M946.0 688.8 L946 883 L1231.75 965.0863005431503 L1231.8 965.1 " fill="none"></path>
+</g>
+<path d="M951.3 688.8 L946.0 688.8 L940.7 688.8 L946.0 675.5 Z"></path>
+<path d="M1360.3 1114.3 L1360.25 1121 L1269.7455156950673 1190 L1269.7 1190.0 " fill="none"></path>
+<path d="M1365.6 1114.3 L1360.3 1114.3 L1354.9 1114.3 L1360.3 1101.0 Z"></path>
+<g stroke-dasharray="6 6">
+<path d="M956.7 688.7 L986 883 L986 1002 L986 1002 L986 1121 L986 1121 L1127.0941704035874 1190 L1127.1 1190.0 " fill="none"></path>
+</g>
+<path d="M961.9 687.9 L956.7 688.7 L951.4 689.5 L954.7 675.5 Z"></path>
+<g stroke-dasharray="6 6">
+<path d="M2466.3 688.8 L2466.25 883 L2466.25 967 L2466.3 967.0 " fill="none"></path>
+</g>
+<path d="M2471.6 688.8 L2466.3 688.8 L2460.9 688.8 L2466.3 675.5 Z"></path>
+<path d="M6219.0 179.4 L4044.25 353 L4044.25 583 L4044.3 583.0 " fill="none"></path>
+<path d="M6219.4 184.7 L6219.0 179.4 L6218.5 174.1 L6232.3 178.4 Z"></path>
+<path d="M6219.0 180.8 L4270.75 353 L4270.75 575.5 L4270.8 575.5 " fill="none"></path>
+<path d="M6219.4 186.1 L6219.0 180.8 L6218.5 175.5 L6232.3 179.6 Z"></path>
+<path d="M6219.0 183.0 L4555.75 353 L4555.75 568 L4555.8 568.0 " fill="none"></path>
+<path d="M6219.5 188.3 L6219.0 183.0 L6218.4 177.7 L6232.3 181.7 Z"></path>
+<path d="M6219.0 186.0 L4832.75 353 L4832.75 568 L4832.8 568.0 " fill="none"></path>
+<path d="M6219.7 191.3 L6219.0 186.0 L6218.4 180.7 L6232.3 184.4 Z"></path>
+<path d="M6219.1 190.8 L5138.75 353 L5138.75 583 L5138.8 583.0 " fill="none"></path>
+<path d="M6219.9 196.1 L6219.1 190.8 L6218.3 185.5 L6232.3 188.8 Z"></path>
+<path d="M6219.2 199.1 L5455.25 353 L5455.25 583 L5455.3 583.0 " fill="none"></path>
+<path d="M6220.2 204.3 L6219.2 199.1 L6218.1 193.8 L6232.3 196.4 Z"></path>
+<path d="M6219.4 210.1 L5689.75 353 L5689.75 575.5 L5689.8 575.5 " fill="none"></path>
+<path d="M6220.8 215.2 L6219.4 210.1 L6218.0 204.9 L6232.3 206.6 Z"></path>
+<path d="M6219.8 229.5 L5904.75 353 L5904.75 583 L5904.8 583.0 " fill="none"></path>
+<path d="M6221.8 234.5 L6219.8 229.5 L6217.9 224.6 L6232.3 224.7 Z"></path>
+<path d="M6265.0 250.9 L6124.75 353 L6124.75 575.5 L6124.8 575.5 " fill="none"></path>
+<path d="M6268.1 255.2 L6265.0 250.9 L6261.8 246.5 L6275.7 243.0 Z"></path>
+<path d="M6380.8 256.3 L6380.75 353 L6380.75 575.5 L6380.8 575.5 " fill="none"></path>
+<path d="M6386.1 256.3 L6380.8 256.3 L6375.4 256.3 L6380.8 243.0 Z"></path>
+<path d="M6500.4 250.7 L6645.75 353 L6645.75 575.5 L6645.8 575.5 " fill="none"></path>
+<path d="M6503.4 246.3 L6500.4 250.7 L6497.3 255.0 L6489.4 243.0 Z"></path>
+<path d="M6542.0 217.5 L6969.75 353 L6969.75 549 L6969.8 549.0 " fill="none"></path>
+<path d="M6543.6 212.5 L6542.0 217.5 L6540.4 222.6 L6529.3 213.5 Z"></path>
+<path d="M6542.3 201.2 L7248.75 353 L7248.75 594.5 L7248.8 594.5 " fill="none"></path>
+<path d="M6543.4 196.0 L6542.3 201.2 L6541.2 206.4 L6529.3 198.4 Z"></path>
+<path d="M6542.4 197.0 L7370.25 353 L7370.25 594.5 L7370.3 594.5 " fill="none"></path>
+<path d="M6543.3 191.7 L6542.4 197.0 L6541.4 202.2 L6529.3 194.5 Z"></path>
+<path d="M6542.4 193.9 L7481.75 353 L7481.75 594.5 L7481.8 594.5 " fill="none"></path>
+<path d="M6543.3 188.6 L6542.4 193.9 L6541.5 199.1 L6529.3 191.7 Z"></path>
+<path d="M6542.4 190.2 L7654.75 353 L7654.75 568 L7654.8 568.0 " fill="none"></path>
+<path d="M6543.2 184.9 L6542.4 190.2 L6541.7 195.4 L6529.3 188.2 Z"></path>
+<path d="M6542.5 186.6 L7884.25 353 L7884.25 583 L7884.3 583.0 " fill="none"></path>
+<path d="M6543.1 181.3 L6542.5 186.6 L6541.8 191.9 L6529.3 184.9 Z"></path>
+<path d="M6542.5 183.7 L8134.25 353 L8134.25 583 L8134.3 583.0 " fill="none"></path>
+<path d="M6543.1 178.4 L6542.5 183.7 L6541.9 189.0 L6529.3 182.3 Z"></path>
+<path d="M6542.5 181.5 L8393.75 353 L8393.75 583 L8393.8 583.0 " fill="none"></path>
+<path d="M6543.0 176.2 L6542.5 181.5 L6542.0 186.8 L6529.3 180.3 Z"></path>
+<path d="M6542.5 179.8 L8651.75 353 L8651.75 575.5 L8651.8 575.5 " fill="none"></path>
+<path d="M6543.0 174.5 L6542.5 179.8 L6542.1 185.1 L6529.3 178.7 Z"></path>
+<path d="M8955.8 331.3 L8955.75 353 L8955.75 373 L8955.8 373.0 " fill="none"></path>
+<path d="M8961.1 331.3 L8955.8 331.3 L8950.4 331.3 L8955.8 318.0 Z"></path>
+<path d="M10482.0 186.8 L9288.75 353 L9288.75 556.5 L9288.8 556.5 " fill="none"></path>
+<path d="M10482.8 192.1 L10482.0 186.8 L10481.3 181.5 L10495.3 185.0 Z"></path>
+<path d="M10482.1 193.3 L9613.75 353 L9613.75 575.5 L9613.8 575.5 " fill="none"></path>
+<path d="M10483.1 198.5 L10482.1 193.3 L10481.2 188.0 L10495.3 190.9 Z"></path>
+<path d="M10482.4 205.8 L9938.75 353 L9938.75 575.5 L9938.8 575.5 " fill="none"></path>
+<path d="M10483.8 211.0 L10482.4 205.8 L10481.0 200.7 L10495.3 202.4 Z"></path>
+<path d="M10528.2 214.8 L10243.75 353 L10243.75 568 L10243.8 568.0 " fill="none"></path>
+<path d="M10530.6 219.6 L10528.2 214.8 L10525.9 210.0 L10540.2 209.0 Z"></path>
+<path d="M10604.5 221.3 L10548.75 353 L10548.75 560.5 L10548.8 560.5 " fill="none"></path>
+<path d="M10609.5 223.4 L10604.5 221.3 L10599.6 219.2 L10609.7 209.0 Z"></path>
+<path d="M10696.9 216.9 L10883.75 353 L10883.75 541.5 L10883.8 541.5 " fill="none"></path>
+<path d="M10700.0 212.5 L10696.9 216.9 L10693.7 221.2 L10686.1 209.0 Z"></path>
+<path d="M10773.0 211.6 L11228.25 353 L11228.25 541.5 L11228.3 541.5 " fill="none"></path>
+<path d="M10774.6 206.5 L10773.0 211.6 L10771.4 216.7 L10760.3 207.7 Z"></path>
+<path d="M10773.3 197.8 L11494.75 353 L11494.75 583 L11494.8 583.0 " fill="none"></path>
+<path d="M10774.4 192.6 L10773.3 197.8 L10772.2 203.0 L10760.3 195.0 Z"></path>
+<path d="M10773.4 191.7 L11706.25 353 L11706.25 594.5 L11706.3 594.5 " fill="none"></path>
+<path d="M10774.3 186.4 L10773.4 191.7 L10772.5 196.9 L10760.3 189.4 Z"></path>
+<g data-name="FreeFunction">
+<g fill="#eee8d5" stroke="#33322E" data-name="FreeFunction">
+<rect x="530.0" y="911.0" height="183.0" width="242.0" data-name="FreeFunction"></rect>
+<path d="M530.0 942.0 L772.0 942.0" fill="none" data-name="FreeFunction"></path>
+<path d="M530.0 1048.0 L772.0 1048.0" fill="none" data-name="FreeFunction"></path>
+</g>
+<g transform="translate(530, 911)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="FreeFunction">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="FreeFunction">
+<a id="src/callable.ts.FreeFunction" xlink:href="src/callable.ts"><text x="113.0" y="13.5" stroke="none" text-anchor="middle" data-name="FreeFunction">FreeFunction</text></a>
+
+</g>
+</g>
+<g transform="translate(530, 942)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="FreeFunction">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="FreeFunction">
+<text x="0.0" y="13.5" stroke="none" data-name="FreeFunction">+returnType: Type</text>
+<text x="0.0" y="28.5" stroke="none" data-name="FreeFunction">+kind: SymbolKind.Function</text>
+<text x="0.0" y="43.5" stroke="none" data-name="FreeFunction">+parameters: Parameter[]</text>
+<text x="0.0" y="58.5" stroke="none" data-name="FreeFunction">-_body: Block | undefined</text>
+<text x="0.0" y="73.5" stroke="none" data-name="FreeFunction">+scope: Scope</text>
+<text x="0.0" y="88.5" stroke="none" data-name="FreeFunction">+spec: CallableSpec</text>
+
+</g>
+</g>
+<g transform="translate(530, 1048)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="FreeFunction">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="FreeFunction">
+<text x="0.0" y="13.5" stroke="none" data-name="FreeFunction">+addBody(): void</text>
+<text x="0.0" y="28.5" stroke="none" data-name="FreeFunction">+addParameter(): Parameter</text>
+
+</g>
+</g>
+</g>
+<g data-name="CallableSpec">
+<g fill="lightblue" stroke="#33322E" data-name="CallableSpec">
+<rect x="2290.0" y="561.0" height="115.0" width="352.0" data-name="CallableSpec"></rect>
+<path d="M2290.0 592.0 L2642.0 592.0" fill="none" data-name="CallableSpec"></path>
+<path d="M2290.0 668.0 L2642.0 668.0" fill="none" data-name="CallableSpec"></path>
+</g>
+<g transform="translate(2290, 561)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CallableSpec">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="CallableSpec">
+<a id="src/callable.ts.CallableSpec" xlink:href="src/callable.ts"><text x="168.0" y="13.5" stroke="none" text-anchor="middle" data-name="CallableSpec">CallableSpec</text></a>
+
+</g>
+</g>
+<g transform="translate(2290, 592)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CallableSpec">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="CallableSpec">
+<text x="0.0" y="13.5" stroke="none" data-name="CallableSpec">+name: string</text>
+<text x="0.0" y="28.5" stroke="none" data-name="CallableSpec">+parameters: ParameterSpec[] | undefined</text>
+<text x="0.0" y="43.5" stroke="none" data-name="CallableSpec">+returnType: Type | undefined</text>
+<text x="0.0" y="58.5" stroke="none" data-name="CallableSpec">+body: Block | undefined</text>
+
+</g>
+</g>
+<g transform="translate(2290, 668)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CallableSpec">
+<g transform="translate(8, 8)" fill="#33322E" data-name="CallableSpec">
+
+</g>
+</g>
+</g>
+<g data-name="CallableDeclaration">
+<g fill="lightblue" stroke="#33322E" data-name="CallableDeclaration">
+<rect x="837.0" y="561.0" height="115.0" width="218.0" data-name="CallableDeclaration"></rect>
+<path d="M837.0 592.0 L1055.0 592.0" fill="none" data-name="CallableDeclaration"></path>
+<path d="M837.0 668.0 L1055.0 668.0" fill="none" data-name="CallableDeclaration"></path>
+</g>
+<g transform="translate(837, 561)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CallableDeclaration">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="CallableDeclaration">
+<a id="src/callable.ts.CallableDeclaration" xlink:href="src/callable.ts"><text x="101.0" y="13.5" stroke="none" text-anchor="middle" data-name="CallableDeclaration">CallableDeclaration</text></a>
+
+</g>
+</g>
+<g transform="translate(837, 592)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CallableDeclaration">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="CallableDeclaration">
+<text x="0.0" y="13.5" stroke="none" data-name="CallableDeclaration">+body: Block | undefined</text>
+<text x="0.0" y="28.5" stroke="none" data-name="CallableDeclaration">+returnType: Type</text>
+<text x="0.0" y="43.5" stroke="none" data-name="CallableDeclaration">+name: string</text>
+<text x="0.0" y="58.5" stroke="none" data-name="CallableDeclaration">+parameters: Parameter[]</text>
+
+</g>
+</g>
+<g transform="translate(837, 668)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CallableDeclaration">
+<g transform="translate(8, 8)" fill="#33322E" data-name="CallableDeclaration">
+
+</g>
+</g>
+</g>
+<g data-name="CallableExpr">
+<g fill="lightblue" stroke="#33322E" data-name="CallableExpr">
+<rect x="0.0" y="132.0" height="70.0" width="188.0" data-name="CallableExpr"></rect>
+<path d="M0.0 163.0 L188.0 163.0" fill="none" data-name="CallableExpr"></path>
+<path d="M0.0 171.0 L188.0 171.0" fill="none" data-name="CallableExpr"></path>
+</g>
+<g transform="translate(0, 132)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CallableExpr">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="CallableExpr">
+<a id="src/callable.ts.CallableExpr" xlink:href="src/callable.ts"><text x="86.0" y="13.5" stroke="none" text-anchor="middle" data-name="CallableExpr">CallableExpr</text></a>
+
+</g>
+</g>
+<g transform="translate(0, 163)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CallableExpr">
+<g transform="translate(8, 8)" fill="#33322E" data-name="CallableExpr">
+
+</g>
+</g>
+<g transform="translate(0, 171)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="CallableExpr">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="CallableExpr">
+<text x="0.0" y="13.5" stroke="none" data-name="CallableExpr">+invoke(): Expression</text>
+
+</g>
+</g>
+</g>
+<g data-name="ClassType">
+<g fill="#eee8d5" stroke="#33322E" data-name="ClassType">
+<rect x="1383.0" y="1141.0" height="183.0" width="328.0" data-name="ClassType"></rect>
+<path d="M1383.0 1172.0 L1711.0 1172.0" fill="none" data-name="ClassType"></path>
+<path d="M1383.0 1263.0 L1711.0 1263.0" fill="none" data-name="ClassType"></path>
+</g>
+<g transform="translate(1383, 1141)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ClassType">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="ClassType">
+<a id="src/class.ts.ClassType" xlink:href="src/class.ts"><text x="156.0" y="13.5" stroke="none" text-anchor="middle" data-name="ClassType">ClassType</text></a>
+
+</g>
+</g>
+<g transform="translate(1383, 1172)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ClassType">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ClassType">
+<text x="0.0" y="13.5" stroke="none" data-name="ClassType">+kind: SymbolKind.Class</text>
+<text x="0.0" y="28.5" stroke="none" data-name="ClassType">+nestedDeclarations: TypeDeclaration[]</text>
+<text x="0.0" y="43.5" stroke="none" data-name="ClassType">-_initializer: Initializer | undefined</text>
+<text x="0.0" y="58.5" stroke="none" data-name="ClassType">+scope: Scope</text>
+<text x="0.0" y="73.5" stroke="none" data-name="ClassType">+spec: ClassSpec</text>
+
+</g>
+</g>
+<g transform="translate(1383, 1263)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ClassType">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ClassType">
+<text x="0.0" y="13.5" stroke="none" data-name="ClassType">+addInitializer(): Initializer</text>
+<text x="0.0" y="28.5" stroke="none" data-name="ClassType">+newInstance(): NewExpression</text>
+<text x="0.0" y="43.5" stroke="none" data-name="ClassType">+addNestedType(): A</text>
+
+</g>
+</g>
+</g>
+<g data-name="ClassSpec">
+<g fill="lightblue" stroke="#33322E" data-name="ClassSpec">
+<rect x="2682.0" y="553.0" height="130.0" width="327.0" data-name="ClassSpec"></rect>
+<path d="M2682.0 584.0 L3009.0 584.0" fill="none" data-name="ClassSpec"></path>
+<path d="M2682.0 675.0 L3009.0 675.0" fill="none" data-name="ClassSpec"></path>
+</g>
+<g transform="translate(2682, 553)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ClassSpec">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="ClassSpec">
+<a id="src/class.ts.ClassSpec" xlink:href="src/class.ts"><text x="155.5" y="13.5" stroke="none" text-anchor="middle" data-name="ClassSpec">ClassSpec</text></a>
+
+</g>
+</g>
+<g transform="translate(2682, 584)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ClassSpec">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ClassSpec">
+<text x="0.0" y="13.5" stroke="none" data-name="ClassSpec">+export: boolean | undefined</text>
+<text x="0.0" y="28.5" stroke="none" data-name="ClassSpec">+properties: PropertySpec[] | undefined</text>
+<text x="0.0" y="43.5" stroke="none" data-name="ClassSpec">+abstract: boolean | undefined</text>
+<text x="0.0" y="58.5" stroke="none" data-name="ClassSpec">+extends: Type | undefined</text>
+<text x="0.0" y="73.5" stroke="none" data-name="ClassSpec">+implements: Type[] | undefined</text>
+
+</g>
+</g>
+<g transform="translate(2682, 675)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ClassSpec">
+<g transform="translate(8, 8)" fill="#33322E" data-name="ClassSpec">
+
+</g>
+</g>
+</g>
+<g data-name="Documented">
+<g fill="lightblue" stroke="#33322E" data-name="Documented">
+<rect x="945.0" y="132.0" height="70.0" width="248.0" data-name="Documented"></rect>
+<path d="M945.0 163.0 L1193.0 163.0" fill="none" data-name="Documented"></path>
+<path d="M945.0 194.0 L1193.0 194.0" fill="none" data-name="Documented"></path>
+</g>
+<g transform="translate(945, 132)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Documented">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Documented">
+<a id="src/documented.ts.Documented" xlink:href="src/documented.ts"><text x="116.0" y="13.5" stroke="none" text-anchor="middle" data-name="Documented">Documented</text></a>
+
+</g>
+</g>
+<g transform="translate(945, 163)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Documented">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Documented">
+<text x="0.0" y="13.5" stroke="none" data-name="Documented">+docs: DocsSpec | undefined</text>
+
+</g>
+</g>
+<g transform="translate(945, 194)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Documented">
+<g transform="translate(8, 8)" fill="#33322E" data-name="Documented">
+
+</g>
+</g>
+</g>
+<g data-name="Expression">
+<g fill="#eee8d5" stroke="#33322E" data-name="Expression">
+<rect x="6232.0" y="90.0" height="153.0" width="297.0" data-name="Expression"></rect>
+<path d="M6232.0 121.0 L6529.0 121.0" fill="none" data-name="Expression"></path>
+<path d="M6232.0 167.0 L6529.0 167.0" fill="none" data-name="Expression"></path>
+</g>
+<g transform="translate(6232, 90)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Expression">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Expression">
+<a id="src/expression.ts.Expression" xlink:href="src/expression.ts"><text x="140.5" y="13.5" stroke="none" text-anchor="middle" data-name="Expression">Expression</text></a>
+
+</g>
+</g>
+<g transform="translate(6232, 121)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Expression">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Expression">
+<text x="0.0" y="13.5" stroke="none" data-name="Expression">+_comments_: string[] | undefined</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Expression">-_isExpression_: true</text>
+
+</g>
+</g>
+<g transform="translate(6232, 167)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Expression">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Expression">
+<text x="0.0" y="13.5" stroke="none" data-name="Expression">+prop(): ObjectPropertyAccess</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Expression">+callMethod(): ObjectMethodInvoke</text>
+<text x="0.0" y="43.5" stroke="none" data-name="Expression">+call(): InvokeCallable</text>
+<text x="0.0" y="58.5" stroke="none" data-name="Expression">+asStmt(): Statement</text>
+
+</g>
+</g>
+</g>
+<g data-name="SymbolReference">
+<g fill="#eee8d5" stroke="#33322E" data-name="SymbolReference">
+<rect x="3726.0" y="583.0" height="70.0" width="194.0" data-name="SymbolReference"></rect>
+<path d="M3726.0 614.0 L3920.0 614.0" fill="none" data-name="SymbolReference"></path>
+<path d="M3726.0 645.0 L3920.0 645.0" fill="none" data-name="SymbolReference"></path>
+</g>
+<g transform="translate(3726, 583)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="SymbolReference">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="SymbolReference">
+<a id="src/expression.ts.SymbolReference" xlink:href="src/expression.ts"><text x="89.0" y="13.5" stroke="none" text-anchor="middle" data-name="SymbolReference">SymbolReference</text></a>
+
+</g>
+</g>
+<g transform="translate(3726, 614)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="SymbolReference">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="SymbolReference">
+<text x="0.0" y="13.5" stroke="none" data-name="SymbolReference">+symbol: ThingSymbol</text>
+
+</g>
+</g>
+<g transform="translate(3726, 645)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="SymbolReference">
+<g transform="translate(8, 8)" fill="#33322E" data-name="SymbolReference">
+
+</g>
+</g>
+</g>
+<g data-name="ExternalModule">
+<g fill="#eee8d5" stroke="#33322E" data-name="ExternalModule">
+<rect x="176.0" y="979.0" height="47.0" width="139.0" data-name="ExternalModule"></rect>
+<path d="M176.0 1010.0 L315.0 1010.0" fill="none" data-name="ExternalModule"></path>
+<path d="M176.0 1018.0 L315.0 1018.0" fill="none" data-name="ExternalModule"></path>
+</g>
+<g transform="translate(176, 979)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ExternalModule">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="ExternalModule">
+<a id="src/external-module.ts.ExternalModule" xlink:href="src/external-module.ts"><text x="61.5" y="13.5" stroke="none" text-anchor="middle" data-name="ExternalModule">ExternalModule</text></a>
+
+</g>
+</g>
+<g transform="translate(176, 1010)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ExternalModule">
+<g transform="translate(8, 8)" fill="#33322E" data-name="ExternalModule">
+
+</g>
+</g>
+<g transform="translate(176, 1018)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ExternalModule">
+<g transform="translate(8, 8)" fill="#33322E" data-name="ExternalModule">
+
+</g>
+</g>
+</g>
+<g data-name="InterfaceType">
+<g fill="#eee8d5" stroke="#33322E" data-name="InterfaceType">
+<rect x="1751.0" y="1183.0" height="100.0" width="237.0" data-name="InterfaceType"></rect>
+<path d="M1751.0 1214.0 L1988.0 1214.0" fill="none" data-name="InterfaceType"></path>
+<path d="M1751.0 1275.0 L1988.0 1275.0" fill="none" data-name="InterfaceType"></path>
+</g>
+<g transform="translate(1751, 1183)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="InterfaceType">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="InterfaceType">
+<a id="src/interface.ts.InterfaceType" xlink:href="src/interface.ts"><text x="110.5" y="13.5" stroke="none" text-anchor="middle" data-name="InterfaceType">InterfaceType</text></a>
+
+</g>
+</g>
+<g transform="translate(1751, 1214)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="InterfaceType">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="InterfaceType">
+<text x="0.0" y="13.5" stroke="none" data-name="InterfaceType">+kind: SymbolKind.Interface</text>
+<text x="0.0" y="28.5" stroke="none" data-name="InterfaceType">+scope: Scope</text>
+<text x="0.0" y="43.5" stroke="none" data-name="InterfaceType">+spec: InterfaceSpec</text>
+
+</g>
+</g>
+<g transform="translate(1751, 1275)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="InterfaceType">
+<g transform="translate(8, 8)" fill="#33322E" data-name="InterfaceType">
+
+</g>
+</g>
+</g>
+<g data-name="InterfaceSpec">
+<g fill="lightblue" stroke="#33322E" data-name="InterfaceSpec">
+<rect x="3049.0" y="568.0" height="100.0" width="327.0" data-name="InterfaceSpec"></rect>
+<path d="M3049.0 599.0 L3376.0 599.0" fill="none" data-name="InterfaceSpec"></path>
+<path d="M3049.0 660.0 L3376.0 660.0" fill="none" data-name="InterfaceSpec"></path>
+</g>
+<g transform="translate(3049, 568)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="InterfaceSpec">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="InterfaceSpec">
+<a id="src/interface.ts.InterfaceSpec" xlink:href="src/interface.ts"><text x="155.5" y="13.5" stroke="none" text-anchor="middle" data-name="InterfaceSpec">InterfaceSpec</text></a>
+
+</g>
+</g>
+<g transform="translate(3049, 599)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="InterfaceSpec">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="InterfaceSpec">
+<text x="0.0" y="13.5" stroke="none" data-name="InterfaceSpec">+export: boolean | undefined</text>
+<text x="0.0" y="28.5" stroke="none" data-name="InterfaceSpec">+properties: PropertySpec[] | undefined</text>
+<text x="0.0" y="43.5" stroke="none" data-name="InterfaceSpec">+extends: Type[] | undefined</text>
+
+</g>
+</g>
+<g transform="translate(3049, 660)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="InterfaceSpec">
+<g transform="translate(8, 8)" fill="#33322E" data-name="InterfaceSpec">
+
+</g>
+</g>
+</g>
+<g data-name="MemberType">
+<g fill="#eee8d5" stroke="#33322E" data-name="MemberType">
+<rect x="1763.0" y="933.0" height="138.0" width="212.0" data-name="MemberType"></rect>
+<path d="M1763.0 964.0 L1975.0 964.0" fill="none" data-name="MemberType"></path>
+<path d="M1763.0 1025.0 L1975.0 1025.0" fill="none" data-name="MemberType"></path>
+</g>
+<g transform="translate(1763, 933)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="MemberType">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="MemberType">
+<a id="src/member-type.ts.MemberType" xlink:href="src/member-type.ts"><text x="98.0" y="13.5" stroke="none" text-anchor="middle" data-name="MemberType">MemberType</text></a>
+
+</g>
+</g>
+<g transform="translate(1763, 964)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="MemberType">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="MemberType">
+<text x="0.0" y="13.5" stroke="none" data-name="MemberType">+kind: SymbolKind</text>
+<text x="0.0" y="28.5" stroke="none" data-name="MemberType">-_properties: Property[]</text>
+<text x="0.0" y="43.5" stroke="none" data-name="MemberType">-_methods: Method[]</text>
+
+</g>
+</g>
+<g transform="translate(1763, 1025)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="MemberType">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="MemberType">
+<text x="0.0" y="13.5" stroke="none" data-name="MemberType">+addProperty(): Property</text>
+<text x="0.0" y="28.5" stroke="none" data-name="MemberType">+addMethod(): Method</text>
+
+</g>
+</g>
+</g>
+<g data-name="Module">
+<g fill="#eee8d5" stroke="#33322E" data-name="Module">
+<rect x="75.0" y="549.0" height="138.0" width="341.0" data-name="Module"></rect>
+<path d="M75.0 580.0 L416.0 580.0" fill="none" data-name="Module"></path>
+<path d="M75.0 626.0 L416.0 626.0" fill="none" data-name="Module"></path>
+</g>
+<g transform="translate(75, 549)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Module">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Module">
+<a id="src/module.ts.Module" xlink:href="src/module.ts"><text x="162.5" y="13.5" stroke="none" text-anchor="middle" data-name="Module">Module</text></a>
+
+</g>
+</g>
+<g transform="translate(75, 580)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Module">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Module">
+<text x="0.0" y="13.5" stroke="none" data-name="Module">#typeMap: Map&lt;string, TypeDeclaration&gt;</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Module">+fqn: string</text>
+
+</g>
+</g>
+<g transform="translate(75, 626)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Module">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Module">
+<text x="0.0" y="13.5" stroke="none" data-name="Module">+addType(): void</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Module">+import(): void</text>
+<text x="0.0" y="43.5" stroke="none" data-name="Module">+toString(): string</text>
+
+</g>
+</g>
+</g>
+<g data-name="AliasedModuleImport">
+<g fill="#eee8d5" stroke="#33322E" data-name="AliasedModuleImport">
+<rect x="3416.0" y="564.0" height="108.0" width="270.0" data-name="AliasedModuleImport"></rect>
+<path d="M3416.0 595.0 L3686.0 595.0" fill="none" data-name="AliasedModuleImport"></path>
+<path d="M3416.0 641.0 L3686.0 641.0" fill="none" data-name="AliasedModuleImport"></path>
+</g>
+<g transform="translate(3416, 564)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="AliasedModuleImport">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="AliasedModuleImport">
+<a id=".AliasedModuleImport" xlink:href=""><text x="127.0" y="13.5" stroke="none" text-anchor="middle" data-name="AliasedModuleImport">AliasedModuleImport</text></a>
+
+</g>
+</g>
+<g transform="translate(3416, 595)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AliasedModuleImport">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="AliasedModuleImport">
+<text x="0.0" y="13.5" stroke="none" data-name="AliasedModuleImport">+moduleSource: string</text>
+<text x="0.0" y="28.5" stroke="none" data-name="AliasedModuleImport">+importAlias: string</text>
+
+</g>
+</g>
+<g transform="translate(3416, 641)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AliasedModuleImport">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="AliasedModuleImport">
+<text x="0.0" y="13.5" stroke="none" data-name="AliasedModuleImport">+referenceSymbol(): Expression</text>
+
+</g>
+</g>
+</g>
+<g data-name="ModuleImportProps">
+<g fill="lightblue" stroke="#33322E" data-name="ModuleImportProps">
+<rect x="1233.0" y="132.0" height="70.0" width="277.0" data-name="ModuleImportProps"></rect>
+<path d="M1233.0 163.0 L1510.0 163.0" fill="none" data-name="ModuleImportProps"></path>
+<path d="M1233.0 194.0 L1510.0 194.0" fill="none" data-name="ModuleImportProps"></path>
+</g>
+<g transform="translate(1233, 132)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ModuleImportProps">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="ModuleImportProps">
+<a id="src/module.ts.ModuleImportProps" xlink:href="src/module.ts"><text x="130.5" y="13.5" stroke="none" text-anchor="middle" data-name="ModuleImportProps">ModuleImportProps</text></a>
+
+</g>
+</g>
+<g transform="translate(1233, 163)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ModuleImportProps">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ModuleImportProps">
+<text x="0.0" y="13.5" stroke="none" data-name="ModuleImportProps">+fromLocation: string | undefined</text>
+
+</g>
+</g>
+<g transform="translate(1233, 194)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ModuleImportProps">
+<g transform="translate(8, 8)" fill="#33322E" data-name="ModuleImportProps">
+
+</g>
+</g>
+</g>
+<g data-name="Parameter">
+<g fill="#eee8d5" stroke="#33322E" data-name="Parameter">
+<rect x="3899.0" y="952.0" height="100.0" width="291.0" data-name="Parameter"></rect>
+<path d="M3899.0 983.0 L4190.0 983.0" fill="none" data-name="Parameter"></path>
+<path d="M3899.0 1044.0 L4190.0 1044.0" fill="none" data-name="Parameter"></path>
+</g>
+<g transform="translate(3899, 952)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Parameter">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Parameter">
+<a id="src/parameter.ts.Parameter" xlink:href="src/parameter.ts"><text x="137.5" y="13.5" stroke="none" text-anchor="middle" data-name="Parameter">Parameter</text></a>
+
+</g>
+</g>
+<g transform="translate(3899, 983)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Parameter">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Parameter">
+<text x="0.0" y="13.5" stroke="none" data-name="Parameter">+documentation: string | undefined</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Parameter">+scope: CallableDeclaration</text>
+<text x="0.0" y="43.5" stroke="none" data-name="Parameter">+spec: ParameterSpec</text>
+
+</g>
+</g>
+<g transform="translate(3899, 1044)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Parameter">
+<g transform="translate(8, 8)" fill="#33322E" data-name="Parameter">
+
+</g>
+</g>
+</g>
+<g data-name="ParameterSpec">
+<g fill="lightblue" stroke="#33322E" data-name="ParameterSpec">
+<rect x="1550.0" y="117.0" height="100.0" width="291.0" data-name="ParameterSpec"></rect>
+<path d="M1550.0 148.0 L1841.0 148.0" fill="none" data-name="ParameterSpec"></path>
+<path d="M1550.0 209.0 L1841.0 209.0" fill="none" data-name="ParameterSpec"></path>
+</g>
+<g transform="translate(1550, 117)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ParameterSpec">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="ParameterSpec">
+<a id="src/parameter.ts.ParameterSpec" xlink:href="src/parameter.ts"><text x="137.5" y="13.5" stroke="none" text-anchor="middle" data-name="ParameterSpec">ParameterSpec</text></a>
+
+</g>
+</g>
+<g transform="translate(1550, 148)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ParameterSpec">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ParameterSpec">
+<text x="0.0" y="13.5" stroke="none" data-name="ParameterSpec">+name: string</text>
+<text x="0.0" y="28.5" stroke="none" data-name="ParameterSpec">+type: Type</text>
+<text x="0.0" y="43.5" stroke="none" data-name="ParameterSpec">+documentation: string | undefined</text>
+
+</g>
+</g>
+<g transform="translate(1550, 209)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ParameterSpec">
+<g transform="translate(8, 8)" fill="#33322E" data-name="ParameterSpec">
+
+</g>
+</g>
+</g>
+<g data-name="Property">
+<g fill="#eee8d5" stroke="#33322E" data-name="Property">
+<rect x="2022.0" y="933.0" height="138.0" width="240.0" data-name="Property"></rect>
+<path d="M2022.0 964.0 L2262.0 964.0" fill="none" data-name="Property"></path>
+<path d="M2022.0 1040.0 L2262.0 1040.0" fill="none" data-name="Property"></path>
+</g>
+<g transform="translate(2022, 933)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Property">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Property">
+<a id="src/property.ts.Property" xlink:href="src/property.ts"><text x="112.0" y="13.5" stroke="none" text-anchor="middle" data-name="Property">Property</text></a>
+
+</g>
+</g>
+<g transform="translate(2022, 964)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Property">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Property">
+<text x="0.0" y="13.5" stroke="none" data-name="Property">+kind: MemberKind.Property</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Property">+type: Type</text>
+<text x="0.0" y="43.5" stroke="none" data-name="Property">+scope: MemberType</text>
+<text x="0.0" y="58.5" stroke="none" data-name="Property">+spec: PropertySpec</text>
+
+</g>
+</g>
+<g transform="translate(2022, 1040)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Property">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Property">
+<text x="0.0" y="13.5" stroke="none" data-name="Property">+from(): Expression</text>
+
+</g>
+</g>
+</g>
+<g data-name="PropertySpec">
+<g fill="lightblue" stroke="#33322E" data-name="PropertySpec">
+<rect x="1881.0" y="102.0" height="130.0" width="453.0" data-name="PropertySpec"></rect>
+<path d="M1881.0 133.0 L2334.0 133.0" fill="none" data-name="PropertySpec"></path>
+<path d="M1881.0 224.0 L2334.0 224.0" fill="none" data-name="PropertySpec"></path>
+</g>
+<g transform="translate(1881, 102)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="PropertySpec">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="PropertySpec">
+<a id="src/property.ts.PropertySpec" xlink:href="src/property.ts"><text x="218.5" y="13.5" stroke="none" text-anchor="middle" data-name="PropertySpec">PropertySpec</text></a>
+
+</g>
+</g>
+<g transform="translate(1881, 133)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="PropertySpec">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="PropertySpec">
+<text x="0.0" y="13.5" stroke="none" data-name="PropertySpec">+docs: DocsSpec | undefined</text>
+<text x="0.0" y="28.5" stroke="none" data-name="PropertySpec">+type: Type</text>
+<text x="0.0" y="43.5" stroke="none" data-name="PropertySpec">+initializer: Expression | undefined</text>
+<text x="0.0" y="58.5" stroke="none" data-name="PropertySpec">+getterBody: Block | undefined</text>
+<text x="0.0" y="73.5" stroke="none" data-name="PropertySpec">+setterBody: ((value: Expression) =&gt; Block) | undefined</text>
+
+</g>
+</g>
+<g transform="translate(1881, 224)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="PropertySpec">
+<g transform="translate(8, 8)" fill="#33322E" data-name="PropertySpec">
+
+</g>
+</g>
+</g>
+<g data-name="Scope">
+<g fill="#eee8d5" stroke="#33322E" data-name="Scope">
+<rect x="228.0" y="60.0" height="213.0" width="416.0" data-name="Scope"></rect>
+<path d="M228.0 91.0 L644.0 91.0" fill="none" data-name="Scope"></path>
+<path d="M228.0 167.0 L644.0 167.0" fill="none" data-name="Scope"></path>
+</g>
+<g transform="translate(228, 60)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Scope">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Scope">
+<a id="src/scope.ts.Scope" xlink:href="src/scope.ts"><text x="200.0" y="13.5" stroke="none" text-anchor="middle" data-name="Scope">Scope</text></a>
+
+</g>
+</g>
+<g transform="translate(228, 91)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Scope">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Scope">
+<text x="0.0" y="13.5" stroke="none" data-name="Scope">+fqn: string</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Scope">+name: string</text>
+<text x="0.0" y="43.5" stroke="none" data-name="Scope">#typeMap: ReadonlyMap&lt;string, TypeDeclaration&gt;</text>
+<text x="0.0" y="58.5" stroke="none" data-name="Scope">#importMap: Map&lt;Scope, IImport&gt;</text>
+
+</g>
+</g>
+<g transform="translate(228, 167)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Scope">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Scope">
+<text x="0.0" y="13.5" stroke="none" data-name="Scope">+addType(): void</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Scope">+tryFindType(): TypeDeclaration | undefined</text>
+<text x="0.0" y="43.5" stroke="none" data-name="Scope">+findType(): TypeDeclaration</text>
+<text x="0.0" y="58.5" stroke="none" data-name="Scope">+addImportedScope(): void</text>
+<text x="0.0" y="73.5" stroke="none" data-name="Scope">+findImportFor(): IImport | undefined</text>
+<text x="0.0" y="88.5" stroke="none" data-name="Scope">+toString(): string</text>
+
+</g>
+</g>
+</g>
+<g data-name="AmbientScope">
+<g fill="#eee8d5" stroke="#33322E" data-name="AmbientScope">
+<rect x="456.0" y="557.0" height="123.0" width="341.0" data-name="AmbientScope"></rect>
+<path d="M456.0 588.0 L797.0 588.0" fill="none" data-name="AmbientScope"></path>
+<path d="M456.0 649.0 L797.0 649.0" fill="none" data-name="AmbientScope"></path>
+</g>
+<g transform="translate(456, 557)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="AmbientScope">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="AmbientScope">
+<a id="src/scope.ts.AmbientScope" xlink:href="src/scope.ts"><text x="162.5" y="13.5" stroke="none" text-anchor="middle" data-name="AmbientScope">AmbientScope</text></a>
+
+</g>
+</g>
+<g transform="translate(456, 588)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AmbientScope">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="AmbientScope">
+<text x="0.0" y="13.5" stroke="none" data-name="AmbientScope">+fqn: string</text>
+<text x="0.0" y="28.5" stroke="none" data-name="AmbientScope">+name: string</text>
+<text x="0.0" y="43.5" stroke="none" data-name="AmbientScope">#typeMap: Map&lt;string, TypeDeclaration&gt;</text>
+
+</g>
+</g>
+<g transform="translate(456, 649)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AmbientScope">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="AmbientScope">
+<text x="0.0" y="13.5" stroke="none" data-name="AmbientScope">+addType(): void</text>
+
+</g>
+</g>
+</g>
+<g data-name="IImport">
+<g fill="lightblue" stroke="#33322E" data-name="IImport">
+<rect x="3391.0" y="105.0" height="123.0" width="320.0" data-name="IImport"></rect>
+<path d="M3391.0 136.0 L3711.0 136.0" fill="none" data-name="IImport"></path>
+<path d="M3391.0 197.0 L3711.0 197.0" fill="none" data-name="IImport"></path>
+</g>
+<g transform="translate(3391, 105)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="IImport">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="IImport">
+<a id="src/scope.ts.IImport" xlink:href="src/scope.ts"><text x="152.0" y="13.5" stroke="none" text-anchor="middle" data-name="IImport">IImport</text></a>
+
+</g>
+</g>
+<g transform="translate(3391, 136)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="IImport">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="IImport">
+<text x="0.0" y="13.5" stroke="none" data-name="IImport">+importAlias: string | undefined</text>
+<text x="0.0" y="28.5" stroke="none" data-name="IImport">+importedSymbols: string[] | undefined</text>
+<text x="0.0" y="43.5" stroke="none" data-name="IImport">+moduleSource: string</text>
+
+</g>
+</g>
+<g transform="translate(3391, 197)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="IImport">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="IImport">
+<text x="0.0" y="13.5" stroke="none" data-name="IImport">+referenceSymbol(): Expression</text>
+
+</g>
+</g>
+</g>
+<g data-name="StructType">
+<g fill="#eee8d5" stroke="#33322E" data-name="StructType">
+<rect x="2028.0" y="1171.0" height="123.0" width="213.0" data-name="StructType"></rect>
+<path d="M2028.0 1202.0 L2241.0 1202.0" fill="none" data-name="StructType"></path>
+<path d="M2028.0 1263.0 L2241.0 1263.0" fill="none" data-name="StructType"></path>
+</g>
+<g transform="translate(2028, 1171)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="StructType">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="StructType">
+<a id="src/struct.ts.StructType" xlink:href="src/struct.ts"><text x="98.5" y="13.5" stroke="none" text-anchor="middle" data-name="StructType">StructType</text></a>
+
+</g>
+</g>
+<g transform="translate(2028, 1202)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="StructType">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="StructType">
+<text x="0.0" y="13.5" stroke="none" data-name="StructType">+kind: SymbolKind.Struct</text>
+<text x="0.0" y="28.5" stroke="none" data-name="StructType">+scope: Scope</text>
+<text x="0.0" y="43.5" stroke="none" data-name="StructType">+spec: StructSpec</text>
+
+</g>
+</g>
+<g transform="translate(2028, 1263)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="StructType">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="StructType">
+<text x="0.0" y="13.5" stroke="none" data-name="StructType">+addProperty(): Property</text>
+
+</g>
+</g>
+</g>
+<g data-name="StructSpec">
+<g fill="lightblue" stroke="#33322E" data-name="StructSpec">
+<rect x="3818.0" y="124.0" height="85.0" width="327.0" data-name="StructSpec"></rect>
+<path d="M3818.0 155.0 L4145.0 155.0" fill="none" data-name="StructSpec"></path>
+<path d="M3818.0 201.0 L4145.0 201.0" fill="none" data-name="StructSpec"></path>
+</g>
+<g transform="translate(3818, 124)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="StructSpec">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="StructSpec">
+<a id="src/struct.ts.StructSpec" xlink:href="src/struct.ts"><text x="155.5" y="13.5" stroke="none" text-anchor="middle" data-name="StructSpec">StructSpec</text></a>
+
+</g>
+</g>
+<g transform="translate(3818, 155)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="StructSpec">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="StructSpec">
+<text x="0.0" y="13.5" stroke="none" data-name="StructSpec">+export: boolean | undefined</text>
+<text x="0.0" y="28.5" stroke="none" data-name="StructSpec">+properties: PropertySpec[] | undefined</text>
+
+</g>
+</g>
+<g transform="translate(3818, 201)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="StructSpec">
+<g transform="translate(8, 8)" fill="#33322E" data-name="StructSpec">
+
+</g>
+</g>
+</g>
+<g data-name="ThingSymbol">
+<g fill="#eee8d5" stroke="#33322E" data-name="ThingSymbol">
+<rect x="4185.0" y="105.0" height="123.0" width="255.0" data-name="ThingSymbol"></rect>
+<path d="M4185.0 136.0 L4440.0 136.0" fill="none" data-name="ThingSymbol"></path>
+<path d="M4185.0 182.0 L4440.0 182.0" fill="none" data-name="ThingSymbol"></path>
+</g>
+<g transform="translate(4185, 105)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ThingSymbol">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="ThingSymbol">
+<a id="src/symbol.ts.ThingSymbol" xlink:href="src/symbol.ts"><text x="119.5" y="13.5" stroke="none" text-anchor="middle" data-name="ThingSymbol">ThingSymbol</text></a>
+
+</g>
+</g>
+<g transform="translate(4185, 136)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ThingSymbol">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ThingSymbol">
+<text x="0.0" y="13.5" stroke="none" data-name="ThingSymbol">+name: string</text>
+<text x="0.0" y="28.5" stroke="none" data-name="ThingSymbol">+scope: Scope</text>
+
+</g>
+</g>
+<g transform="translate(4185, 182)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ThingSymbol">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ThingSymbol">
+<text x="0.0" y="13.5" stroke="none" data-name="ThingSymbol">+changeName(): ThingSymbol</text>
+<text x="0.0" y="28.5" stroke="none" data-name="ThingSymbol">+toString(): string</text>
+
+</g>
+</g>
+</g>
+<g data-name="TypeDeclaration">
+<g fill="#eee8d5" stroke="#33322E" data-name="TypeDeclaration">
+<rect x="1095.0" y="542.0" height="153.0" width="194.0" data-name="TypeDeclaration"></rect>
+<path d="M1095.0 573.0 L1289.0 573.0" fill="none" data-name="TypeDeclaration"></path>
+<path d="M1095.0 664.0 L1289.0 664.0" fill="none" data-name="TypeDeclaration"></path>
+</g>
+<g transform="translate(1095, 542)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="TypeDeclaration">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="TypeDeclaration">
+<a id="src/type-declaration.ts.TypeDeclaration" xlink:href="src/type-declaration.ts"><text x="89.0" y="13.5" stroke="none" text-anchor="middle" data-name="TypeDeclaration">TypeDeclaration</text></a>
+
+</g>
+</g>
+<g transform="translate(1095, 573)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TypeDeclaration">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="TypeDeclaration">
+<text x="0.0" y="13.5" stroke="none" data-name="TypeDeclaration">+kind: SymbolKind</text>
+<text x="0.0" y="28.5" stroke="none" data-name="TypeDeclaration">+type: Type</text>
+<text x="0.0" y="43.5" stroke="none" data-name="TypeDeclaration">+symbol: ThingSymbol</text>
+<text x="0.0" y="58.5" stroke="none" data-name="TypeDeclaration">+scope: Scope</text>
+<text x="0.0" y="73.5" stroke="none" data-name="TypeDeclaration">+spec: TypeSpec</text>
+
+</g>
+</g>
+<g transform="translate(1095, 664)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TypeDeclaration">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="TypeDeclaration">
+<text x="0.0" y="13.5" stroke="none" data-name="TypeDeclaration">+toString(): string</text>
+
+</g>
+</g>
+</g>
+<g data-name="TypeSpec">
+<g fill="lightblue" stroke="#33322E" data-name="TypeSpec">
+<rect x="2591.0" y="132.0" height="70.0" width="264.0" data-name="TypeSpec"></rect>
+<path d="M2591.0 163.0 L2855.0 163.0" fill="none" data-name="TypeSpec"></path>
+<path d="M2591.0 194.0 L2855.0 194.0" fill="none" data-name="TypeSpec"></path>
+</g>
+<g transform="translate(2591, 132)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TypeSpec">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="TypeSpec">
+<a id="src/type-declaration.ts.TypeSpec" xlink:href="src/type-declaration.ts"><text x="124.0" y="13.5" stroke="none" text-anchor="middle" data-name="TypeSpec">TypeSpec</text></a>
+
+</g>
+</g>
+<g transform="translate(2591, 163)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TypeSpec">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="TypeSpec">
+<text x="0.0" y="13.5" stroke="none" data-name="TypeSpec">+exported: boolean | undefined</text>
+
+</g>
+</g>
+<g transform="translate(2591, 194)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TypeSpec">
+<g transform="translate(8, 8)" fill="#33322E" data-name="TypeSpec">
+
+</g>
+</g>
+</g>
+<g data-name="TypeMember">
+<g fill="#eee8d5" stroke="#33322E" data-name="TypeMember">
+<rect x="1329.0" y="542.0" height="153.0" width="226.0" data-name="TypeMember"></rect>
+<path d="M1329.0 573.0 L1555.0 573.0" fill="none" data-name="TypeMember"></path>
+<path d="M1329.0 649.0 L1555.0 649.0" fill="none" data-name="TypeMember"></path>
+</g>
+<g transform="translate(1329, 542)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="TypeMember">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="TypeMember">
+<a id="src/type-member.ts.TypeMember" xlink:href="src/type-member.ts"><text x="105.0" y="13.5" stroke="none" text-anchor="middle" data-name="TypeMember">TypeMember</text></a>
+
+</g>
+</g>
+<g transform="translate(1329, 573)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TypeMember">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="TypeMember">
+<text x="0.0" y="13.5" stroke="none" data-name="TypeMember">+kind: MemberKind</text>
+<text x="0.0" y="28.5" stroke="none" data-name="TypeMember">+visibility: MemberVisibility</text>
+<text x="0.0" y="43.5" stroke="none" data-name="TypeMember">+scope: MemberType</text>
+<text x="0.0" y="58.5" stroke="none" data-name="TypeMember">+spec: TypeMemberSpec</text>
+
+</g>
+</g>
+<g transform="translate(1329, 649)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TypeMember">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="TypeMember">
+<text x="0.0" y="13.5" stroke="none" data-name="TypeMember">+toString(): string</text>
+<text x="0.0" y="28.5" stroke="none" data-name="TypeMember">+isProperty(): boolean</text>
+
+</g>
+</g>
+</g>
+<g data-name="Method">
+<g fill="#eee8d5" stroke="#33322E" data-name="Method">
+<rect x="1232.0" y="903.0" height="198.0" width="257.0" data-name="Method"></rect>
+<path d="M1232.0 934.0 L1489.0 934.0" fill="none" data-name="Method"></path>
+<path d="M1232.0 1040.0 L1489.0 1040.0" fill="none" data-name="Method"></path>
+</g>
+<g transform="translate(1232, 903)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Method">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Method">
+<a id="src/type-member.ts.Method" xlink:href="src/type-member.ts"><text x="120.5" y="13.5" stroke="none" text-anchor="middle" data-name="Method">Method</text></a>
+
+</g>
+</g>
+<g transform="translate(1232, 934)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Method">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Method">
+<text x="0.0" y="13.5" stroke="none" data-name="Method">+returnType: Type</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Method">+visibility: MemberVisibility</text>
+<text x="0.0" y="43.5" stroke="none" data-name="Method">+parameters: Parameter[]</text>
+<text x="0.0" y="58.5" stroke="none" data-name="Method">-_body: Block | undefined</text>
+<text x="0.0" y="73.5" stroke="none" data-name="Method">+type: MemberType</text>
+<text x="0.0" y="88.5" stroke="none" data-name="Method">+methodSpec: MethodSpec</text>
+
+</g>
+</g>
+<g transform="translate(1232, 1040)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Method">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Method">
+<text x="0.0" y="13.5" stroke="none" data-name="Method">+bind(): ObjectPropertyAccess</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Method">+addParameter(): Parameter</text>
+<text x="0.0" y="43.5" stroke="none" data-name="Method">+addBody(): void</text>
+
+</g>
+</g>
+</g>
+<g data-name="Initializer">
+<g fill="#eee8d5" stroke="#33322E" data-name="Initializer">
+<rect x="1086.0" y="1190.0" height="85.0" width="257.0" data-name="Initializer"></rect>
+<path d="M1086.0 1221.0 L1343.0 1221.0" fill="none" data-name="Initializer"></path>
+<path d="M1086.0 1267.0 L1343.0 1267.0" fill="none" data-name="Initializer"></path>
+</g>
+<g transform="translate(1086, 1190)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Initializer">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Initializer">
+<a id="src/type-member.ts.Initializer" xlink:href="src/type-member.ts"><text x="120.5" y="13.5" stroke="none" text-anchor="middle" data-name="Initializer">Initializer</text></a>
+
+</g>
+</g>
+<g transform="translate(1086, 1221)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Initializer">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Initializer">
+<text x="0.0" y="13.5" stroke="none" data-name="Initializer">+type: MemberType</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Initializer">+initializerSpec: InitializerSpec</text>
+
+</g>
+</g>
+<g transform="translate(1086, 1267)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Initializer">
+<g transform="translate(8, 8)" fill="#33322E" data-name="Initializer">
+
+</g>
+</g>
+</g>
+<g data-name="TypeMemberSpec">
+<g fill="lightblue" stroke="#33322E" data-name="TypeMemberSpec">
+<rect x="7532.0" y="109.0" height="115.0" width="258.0" data-name="TypeMemberSpec"></rect>
+<path d="M7532.0 140.0 L7790.0 140.0" fill="none" data-name="TypeMemberSpec"></path>
+<path d="M7532.0 216.0 L7790.0 216.0" fill="none" data-name="TypeMemberSpec"></path>
+</g>
+<g transform="translate(7532, 109)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TypeMemberSpec">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="TypeMemberSpec">
+<a id="src/type-member.ts.TypeMemberSpec" xlink:href="src/type-member.ts"><text x="121.0" y="13.5" stroke="none" text-anchor="middle" data-name="TypeMemberSpec">TypeMemberSpec</text></a>
+
+</g>
+</g>
+<g transform="translate(7532, 140)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TypeMemberSpec">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="TypeMemberSpec">
+<text x="0.0" y="13.5" stroke="none" data-name="TypeMemberSpec">+name: string</text>
+<text x="0.0" y="28.5" stroke="none" data-name="TypeMemberSpec">+docs: DocsSpec | undefined</text>
+<text x="0.0" y="43.5" stroke="none" data-name="TypeMemberSpec">+abstract: boolean | undefined</text>
+<text x="0.0" y="58.5" stroke="none" data-name="TypeMemberSpec">+static: boolean | undefined</text>
+
+</g>
+</g>
+<g transform="translate(7532, 216)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TypeMemberSpec">
+<g transform="translate(8, 8)" fill="#33322E" data-name="TypeMemberSpec">
+
+</g>
+</g>
+</g>
+<g data-name="MethodSpec">
+<g fill="lightblue" stroke="#33322E" data-name="MethodSpec">
+<rect x="2306.0" y="967.0" height="70.0" width="320.0" data-name="MethodSpec"></rect>
+<path d="M2306.0 998.0 L2626.0 998.0" fill="none" data-name="MethodSpec"></path>
+<path d="M2306.0 1029.0 L2626.0 1029.0" fill="none" data-name="MethodSpec"></path>
+</g>
+<g transform="translate(2306, 967)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="MethodSpec">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="MethodSpec">
+<a id="src/type-member.ts.MethodSpec" xlink:href="src/type-member.ts"><text x="152.0" y="13.5" stroke="none" text-anchor="middle" data-name="MethodSpec">MethodSpec</text></a>
+
+</g>
+</g>
+<g transform="translate(2306, 998)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="MethodSpec">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="MethodSpec">
+<text x="0.0" y="13.5" stroke="none" data-name="MethodSpec">+visibility: MemberVisibility | undefined</text>
+
+</g>
+</g>
+<g transform="translate(2306, 1029)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="MethodSpec">
+<g transform="translate(8, 8)" fill="#33322E" data-name="MethodSpec">
+
+</g>
+</g>
+</g>
+<g data-name="InitializerSpec">
+<g fill="lightblue" stroke="#33322E" data-name="InitializerSpec">
+<rect x="7830.0" y="143.0" height="47.0" width="127.0" data-name="InitializerSpec"></rect>
+<path d="M7830.0 174.0 L7957.0 174.0" fill="none" data-name="InitializerSpec"></path>
+<path d="M7830.0 182.0 L7957.0 182.0" fill="none" data-name="InitializerSpec"></path>
+</g>
+<g transform="translate(7830, 143)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="InitializerSpec">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="InitializerSpec">
+<a id="src/type-member.ts.InitializerSpec" xlink:href="src/type-member.ts"><text x="55.5" y="13.5" stroke="none" text-anchor="middle" data-name="InitializerSpec">InitializerSpec</text></a>
+
+</g>
+</g>
+<g transform="translate(7830, 174)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="InitializerSpec">
+<g transform="translate(8, 8)" fill="#33322E" data-name="InitializerSpec">
+
+</g>
+</g>
+<g transform="translate(7830, 182)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="InitializerSpec">
+<g transform="translate(8, 8)" fill="#33322E" data-name="InitializerSpec">
+
+</g>
+</g>
+</g>
+<g data-name="Type">
+<g fill="#eee8d5" stroke="#33322E" data-name="Type">
+<rect x="7997.0" y="0.0" height="333.0" width="288.0" data-name="Type"></rect>
+<path d="M7997.0 31.0 L8285.0 31.0" fill="none" data-name="Type"></path>
+<path d="M7997.0 182.0 L8285.0 182.0" fill="none" data-name="Type"></path>
+</g>
+<g transform="translate(7997, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Type">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Type">
+<a id="src/type.ts.Type" xlink:href="src/type.ts"><text x="136.0" y="13.5" stroke="none" text-anchor="middle" data-name="Type">Type</text></a>
+
+</g>
+</g>
+<g transform="translate(7997, 31)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Type">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Type">
+<text x="0.0" y="13.5" stroke="none" data-name="Type">+static ANY: Type</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Type">+static VOID: Type</text>
+<text x="0.0" y="43.5" stroke="none" data-name="Type">+static STRING: Type</text>
+<text x="0.0" y="58.5" stroke="none" data-name="Type">+static NUMBER: Type</text>
+<text x="0.0" y="73.5" stroke="none" data-name="Type">+static BOOLEAN: Type</text>
+<text x="0.0" y="88.5" stroke="none" data-name="Type">+static UNDEFINED: Type</text>
+<text x="0.0" y="103.5" stroke="none" data-name="Type">+spec: TypeReferenceSpec</text>
+<text x="0.0" y="118.5" stroke="none" data-name="Type">+scope: Scope | undefined</text>
+<text x="0.0" y="133.5" stroke="none" data-name="Type">+symbol: ThingSymbol | undefined</text>
+
+</g>
+</g>
+<g transform="translate(7997, 182)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Type">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Type">
+<text x="0.0" y="13.5" stroke="none" data-name="Type">+static fromName(): Type</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Type">+static arrayOf(): Type</text>
+<text x="0.0" y="43.5" stroke="none" data-name="Type">+static mapOf(): Type</text>
+<text x="0.0" y="58.5" stroke="none" data-name="Type">+static unionOf(): Type</text>
+<text x="0.0" y="73.5" stroke="none" data-name="Type">+toString(): string</text>
+<text x="0.0" y="88.5" stroke="none" data-name="Type">+withGenericArguments(): Type</text>
+<text x="0.0" y="103.5" stroke="none" data-name="Type">+newInstance(): NewExpression</text>
+<text x="0.0" y="118.5" stroke="none" data-name="Type">+optional(): Type</text>
+<text x="0.0" y="133.5" stroke="none" data-name="Type">+equals(): boolean</text>
+
+</g>
+</g>
+</g>
+<g data-name="Identifier">
+<g fill="#eee8d5" stroke="#33322E" data-name="Identifier">
+<rect x="3960.0" y="583.0" height="70.0" width="168.0" data-name="Identifier"></rect>
+<path d="M3960.0 614.0 L4128.0 614.0" fill="none" data-name="Identifier"></path>
+<path d="M3960.0 645.0 L4128.0 645.0" fill="none" data-name="Identifier"></path>
+</g>
+<g transform="translate(3960, 583)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Identifier">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Identifier">
+<a id="src/expressions/identifier.ts.Identifier" xlink:href="src/expressions/identifier.ts"><text x="76.0" y="13.5" stroke="none" text-anchor="middle" data-name="Identifier">Identifier</text></a>
+
+</g>
+</g>
+<g transform="translate(3960, 614)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Identifier">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Identifier">
+<text x="0.0" y="13.5" stroke="none" data-name="Identifier">+_identifier_: string</text>
+
+</g>
+</g>
+<g transform="translate(3960, 645)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Identifier">
+<g transform="translate(8, 8)" fill="#33322E" data-name="Identifier">
+
+</g>
+</g>
+</g>
+<g data-name="InvokeCallable">
+<g fill="#eee8d5" stroke="#33322E" data-name="InvokeCallable">
+<rect x="4168.0" y="576.0" height="85.0" width="205.0" data-name="InvokeCallable"></rect>
+<path d="M4168.0 607.0 L4373.0 607.0" fill="none" data-name="InvokeCallable"></path>
+<path d="M4168.0 653.0 L4373.0 653.0" fill="none" data-name="InvokeCallable"></path>
+</g>
+<g transform="translate(4168, 576)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="InvokeCallable">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="InvokeCallable">
+<a id="src/expressions/invoke.ts.InvokeCallable" xlink:href="src/expressions/invoke.ts"><text x="94.5" y="13.5" stroke="none" text-anchor="middle" data-name="InvokeCallable">InvokeCallable</text></a>
+
+</g>
+</g>
+<g transform="translate(4168, 607)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="InvokeCallable">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="InvokeCallable">
+<text x="0.0" y="13.5" stroke="none" data-name="InvokeCallable">+_callable_: Expression</text>
+<text x="0.0" y="28.5" stroke="none" data-name="InvokeCallable">+_args_: Expression[]</text>
+
+</g>
+</g>
+<g transform="translate(4168, 653)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="InvokeCallable">
+<g transform="translate(8, 8)" fill="#33322E" data-name="InvokeCallable">
+
+</g>
+</g>
+</g>
+<g data-name="ObjectPropertyAccess">
+<g fill="#eee8d5" stroke="#33322E" data-name="ObjectPropertyAccess">
+<rect x="4413.0" y="568.0" height="100.0" width="285.0" data-name="ObjectPropertyAccess"></rect>
+<path d="M4413.0 599.0 L4698.0 599.0" fill="none" data-name="ObjectPropertyAccess"></path>
+<path d="M4413.0 660.0 L4698.0 660.0" fill="none" data-name="ObjectPropertyAccess"></path>
+</g>
+<g transform="translate(4413, 568)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ObjectPropertyAccess">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="ObjectPropertyAccess">
+<a id="src/expressions/objects.ts.ObjectPropertyAccess" xlink:href="src/expressions/objects.ts"><text x="134.5" y="13.5" stroke="none" text-anchor="middle" data-name="ObjectPropertyAccess">ObjectPropertyAccess</text></a>
+
+</g>
+</g>
+<g transform="translate(4413, 599)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ObjectPropertyAccess">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ObjectPropertyAccess">
+<text x="0.0" y="13.5" stroke="none" data-name="ObjectPropertyAccess">+_comments_: string[] | undefined</text>
+<text x="0.0" y="28.5" stroke="none" data-name="ObjectPropertyAccess">+_obj_: Expression</text>
+<text x="0.0" y="43.5" stroke="none" data-name="ObjectPropertyAccess">+_property_: string</text>
+
+</g>
+</g>
+<g transform="translate(4413, 660)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ObjectPropertyAccess">
+<g transform="translate(8, 8)" fill="#33322E" data-name="ObjectPropertyAccess">
+
+</g>
+</g>
+</g>
+<g data-name="ObjectMethodInvoke">
+<g fill="#eee8d5" stroke="#33322E" data-name="ObjectMethodInvoke">
+<rect x="4738.0" y="568.0" height="100.0" width="189.0" data-name="ObjectMethodInvoke"></rect>
+<path d="M4738.0 599.0 L4927.0 599.0" fill="none" data-name="ObjectMethodInvoke"></path>
+<path d="M4738.0 660.0 L4927.0 660.0" fill="none" data-name="ObjectMethodInvoke"></path>
+</g>
+<g transform="translate(4738, 568)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ObjectMethodInvoke">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="ObjectMethodInvoke">
+<a id="src/expressions/objects.ts.ObjectMethodInvoke" xlink:href="src/expressions/objects.ts"><text x="86.5" y="13.5" stroke="none" text-anchor="middle" data-name="ObjectMethodInvoke">ObjectMethodInvoke</text></a>
+
+</g>
+</g>
+<g transform="translate(4738, 599)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ObjectMethodInvoke">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ObjectMethodInvoke">
+<text x="0.0" y="13.5" stroke="none" data-name="ObjectMethodInvoke">+_obj_: Expression</text>
+<text x="0.0" y="28.5" stroke="none" data-name="ObjectMethodInvoke">+_method_: string</text>
+<text x="0.0" y="43.5" stroke="none" data-name="ObjectMethodInvoke">+_args_: Expression[]</text>
+
+</g>
+</g>
+<g transform="translate(4738, 660)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ObjectMethodInvoke">
+<g transform="translate(8, 8)" fill="#33322E" data-name="ObjectMethodInvoke">
+
+</g>
+</g>
+</g>
+<g data-name="ObjectLiteral">
+<g fill="#eee8d5" stroke="#33322E" data-name="ObjectLiteral">
+<rect x="4967.0" y="583.0" height="70.0" width="343.0" data-name="ObjectLiteral"></rect>
+<path d="M4967.0 614.0 L5310.0 614.0" fill="none" data-name="ObjectLiteral"></path>
+<path d="M4967.0 645.0 L5310.0 645.0" fill="none" data-name="ObjectLiteral"></path>
+</g>
+<g transform="translate(4967, 583)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ObjectLiteral">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="ObjectLiteral">
+<a id="src/expressions/objects.ts.ObjectLiteral" xlink:href="src/expressions/objects.ts"><text x="163.5" y="13.5" stroke="none" text-anchor="middle" data-name="ObjectLiteral">ObjectLiteral</text></a>
+
+</g>
+</g>
+<g transform="translate(4967, 614)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ObjectLiteral">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ObjectLiteral">
+<text x="0.0" y="13.5" stroke="none" data-name="ObjectLiteral">+_contents_: Record&lt;string, Expression&gt;</text>
+
+</g>
+</g>
+<g transform="translate(4967, 645)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ObjectLiteral">
+<g transform="translate(8, 8)" fill="#33322E" data-name="ObjectLiteral">
+
+</g>
+</g>
+</g>
+<g data-name="NotExpression">
+<g fill="#eee8d5" stroke="#33322E" data-name="NotExpression">
+<rect x="5350.0" y="583.0" height="70.0" width="210.0" data-name="NotExpression"></rect>
+<path d="M5350.0 614.0 L5560.0 614.0" fill="none" data-name="NotExpression"></path>
+<path d="M5350.0 645.0 L5560.0 645.0" fill="none" data-name="NotExpression"></path>
+</g>
+<g transform="translate(5350, 583)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="NotExpression">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="NotExpression">
+<a id="src/expressions/objects.ts.NotExpression" xlink:href="src/expressions/objects.ts"><text x="97.0" y="13.5" stroke="none" text-anchor="middle" data-name="NotExpression">NotExpression</text></a>
+
+</g>
+</g>
+<g transform="translate(5350, 614)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="NotExpression">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="NotExpression">
+<text x="0.0" y="13.5" stroke="none" data-name="NotExpression">+_operand_: Expression</text>
+
+</g>
+</g>
+<g transform="translate(5350, 645)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="NotExpression">
+<g transform="translate(8, 8)" fill="#33322E" data-name="NotExpression">
+
+</g>
+</g>
+</g>
+<g data-name="EqualsExpression">
+<g fill="#eee8d5" stroke="#33322E" data-name="EqualsExpression">
+<rect x="5600.0" y="576.0" height="85.0" width="179.0" data-name="EqualsExpression"></rect>
+<path d="M5600.0 607.0 L5779.0 607.0" fill="none" data-name="EqualsExpression"></path>
+<path d="M5600.0 653.0 L5779.0 653.0" fill="none" data-name="EqualsExpression"></path>
+</g>
+<g transform="translate(5600, 576)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="EqualsExpression">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="EqualsExpression">
+<a id="src/expressions/objects.ts.EqualsExpression" xlink:href="src/expressions/objects.ts"><text x="81.5" y="13.5" stroke="none" text-anchor="middle" data-name="EqualsExpression">EqualsExpression</text></a>
+
+</g>
+</g>
+<g transform="translate(5600, 607)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="EqualsExpression">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="EqualsExpression">
+<text x="0.0" y="13.5" stroke="none" data-name="EqualsExpression">+_left_: Expression</text>
+<text x="0.0" y="28.5" stroke="none" data-name="EqualsExpression">+_right_: Expression</text>
+
+</g>
+</g>
+<g transform="translate(5600, 653)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="EqualsExpression">
+<g transform="translate(8, 8)" fill="#33322E" data-name="EqualsExpression">
+
+</g>
+</g>
+</g>
+<g data-name="JsLiteralExpression">
+<g fill="#eee8d5" stroke="#33322E" data-name="JsLiteralExpression">
+<rect x="5819.0" y="583.0" height="70.0" width="171.0" data-name="JsLiteralExpression"></rect>
+<path d="M5819.0 614.0 L5990.0 614.0" fill="none" data-name="JsLiteralExpression"></path>
+<path d="M5819.0 645.0 L5990.0 645.0" fill="none" data-name="JsLiteralExpression"></path>
+</g>
+<g transform="translate(5819, 583)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="JsLiteralExpression">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="JsLiteralExpression">
+<a id="src/expressions/objects.ts.JsLiteralExpression" xlink:href="src/expressions/objects.ts"><text x="77.5" y="13.5" stroke="none" text-anchor="middle" data-name="JsLiteralExpression">JsLiteralExpression</text></a>
+
+</g>
+</g>
+<g transform="translate(5819, 614)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="JsLiteralExpression">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="JsLiteralExpression">
+<text x="0.0" y="13.5" stroke="none" data-name="JsLiteralExpression">+_value_: any</text>
+
+</g>
+</g>
+<g transform="translate(5819, 645)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="JsLiteralExpression">
+<g transform="translate(8, 8)" fill="#33322E" data-name="JsLiteralExpression">
+
+</g>
+</g>
+</g>
+<g data-name="NewExpression">
+<g fill="#eee8d5" stroke="#33322E" data-name="NewExpression">
+<rect x="6030.0" y="576.0" height="85.0" width="189.0" data-name="NewExpression"></rect>
+<path d="M6030.0 607.0 L6219.0 607.0" fill="none" data-name="NewExpression"></path>
+<path d="M6030.0 653.0 L6219.0 653.0" fill="none" data-name="NewExpression"></path>
+</g>
+<g transform="translate(6030, 576)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="NewExpression">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="NewExpression">
+<a id="src/expressions/objects.ts.NewExpression" xlink:href="src/expressions/objects.ts"><text x="86.5" y="13.5" stroke="none" text-anchor="middle" data-name="NewExpression">NewExpression</text></a>
+
+</g>
+</g>
+<g transform="translate(6030, 607)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="NewExpression">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="NewExpression">
+<text x="0.0" y="13.5" stroke="none" data-name="NewExpression">+_args_: Expression[]</text>
+<text x="0.0" y="28.5" stroke="none" data-name="NewExpression">+_typ_: Type</text>
+
+</g>
+</g>
+<g transform="translate(6030, 653)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="NewExpression">
+<g transform="translate(8, 8)" fill="#33322E" data-name="NewExpression">
+
+</g>
+</g>
+</g>
+<g data-name="TruthyOr">
+<g fill="#eee8d5" stroke="#33322E" data-name="TruthyOr">
+<rect x="6259.0" y="576.0" height="85.0" width="243.0" data-name="TruthyOr"></rect>
+<path d="M6259.0 607.0 L6502.0 607.0" fill="none" data-name="TruthyOr"></path>
+<path d="M6259.0 653.0 L6502.0 653.0" fill="none" data-name="TruthyOr"></path>
+</g>
+<g transform="translate(6259, 576)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="TruthyOr">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="TruthyOr">
+<a id="src/expressions/objects.ts.TruthyOr" xlink:href="src/expressions/objects.ts"><text x="113.5" y="13.5" stroke="none" text-anchor="middle" data-name="TruthyOr">TruthyOr</text></a>
+
+</g>
+</g>
+<g transform="translate(6259, 607)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TruthyOr">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="TruthyOr">
+<text x="0.0" y="13.5" stroke="none" data-name="TruthyOr">+_value_: Expression</text>
+<text x="0.0" y="28.5" stroke="none" data-name="TruthyOr">+_defaultValue_: Expression</text>
+
+</g>
+</g>
+<g transform="translate(6259, 653)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TruthyOr">
+<g transform="translate(8, 8)" fill="#33322E" data-name="TruthyOr">
+
+</g>
+</g>
+</g>
+<g data-name="DestructuringBind">
+<g fill="#eee8d5" stroke="#33322E" data-name="DestructuringBind">
+<rect x="6542.0" y="576.0" height="85.0" width="207.0" data-name="DestructuringBind"></rect>
+<path d="M6542.0 607.0 L6749.0 607.0" fill="none" data-name="DestructuringBind"></path>
+<path d="M6542.0 653.0 L6749.0 653.0" fill="none" data-name="DestructuringBind"></path>
+</g>
+<g transform="translate(6542, 576)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="DestructuringBind">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="DestructuringBind">
+<a id="src/expressions/objects.ts.DestructuringBind" xlink:href="src/expressions/objects.ts"><text x="95.5" y="13.5" stroke="none" text-anchor="middle" data-name="DestructuringBind">DestructuringBind</text></a>
+
+</g>
+</g>
+<g transform="translate(6542, 607)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="DestructuringBind">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="DestructuringBind">
+<text x="0.0" y="13.5" stroke="none" data-name="DestructuringBind">+_structure_: Structure</text>
+<text x="0.0" y="28.5" stroke="none" data-name="DestructuringBind">+_names_: Expression[]</text>
+
+</g>
+</g>
+<g transform="translate(6542, 653)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="DestructuringBind">
+<g transform="translate(8, 8)" fill="#33322E" data-name="DestructuringBind">
+
+</g>
+</g>
+</g>
+<g data-name="Ternary">
+<g fill="#eee8d5" stroke="#33322E" data-name="Ternary">
+<rect x="6789.0" y="549.0" height="138.0" width="361.0" data-name="Ternary"></rect>
+<path d="M6789.0 580.0 L7150.0 580.0" fill="none" data-name="Ternary"></path>
+<path d="M6789.0 641.0 L7150.0 641.0" fill="none" data-name="Ternary"></path>
+</g>
+<g transform="translate(6789, 549)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Ternary">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Ternary">
+<a id="src/expressions/objects.ts.Ternary" xlink:href="src/expressions/objects.ts"><text x="172.5" y="13.5" stroke="none" text-anchor="middle" data-name="Ternary">Ternary</text></a>
+
+</g>
+</g>
+<g transform="translate(6789, 580)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Ternary">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Ternary">
+<text x="0.0" y="13.5" stroke="none" data-name="Ternary">+_condition_: Expression</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Ternary">+_thenExpression_: Expression | undefined</text>
+<text x="0.0" y="43.5" stroke="none" data-name="Ternary">+_elseExpression_: Expression | undefined</text>
+
+</g>
+</g>
+<g transform="translate(6789, 641)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Ternary">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Ternary">
+<text x="0.0" y="13.5" stroke="none" data-name="Ternary">+then(): this</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Ternary">+else(): this</text>
+
+</g>
+</g>
+</g>
+<g data-name="ThisInstance">
+<g fill="#eee8d5" stroke="#33322E" data-name="ThisInstance">
+<rect x="7190.0" y="595.0" height="47.0" width="117.0" data-name="ThisInstance"></rect>
+<path d="M7190.0 626.0 L7307.0 626.0" fill="none" data-name="ThisInstance"></path>
+<path d="M7190.0 634.0 L7307.0 634.0" fill="none" data-name="ThisInstance"></path>
+</g>
+<g transform="translate(7190, 595)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ThisInstance">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="ThisInstance">
+<a id="src/expressions/objects.ts.ThisInstance" xlink:href="src/expressions/objects.ts"><text x="50.5" y="13.5" stroke="none" text-anchor="middle" data-name="ThisInstance">ThisInstance</text></a>
+
+</g>
+</g>
+<g transform="translate(7190, 626)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ThisInstance">
+<g transform="translate(8, 8)" fill="#33322E" data-name="ThisInstance">
+
+</g>
+</g>
+<g transform="translate(7190, 634)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ThisInstance">
+<g transform="translate(8, 8)" fill="#33322E" data-name="ThisInstance">
+
+</g>
+</g>
+</g>
+<g data-name="Null">
+<g fill="#eee8d5" stroke="#33322E" data-name="Null">
+<rect x="7347.0" y="595.0" height="47.0" width="46.0" data-name="Null"></rect>
+<path d="M7347.0 626.0 L7393.0 626.0" fill="none" data-name="Null"></path>
+<path d="M7347.0 634.0 L7393.0 634.0" fill="none" data-name="Null"></path>
+</g>
+<g transform="translate(7347, 595)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Null">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Null">
+<a id="src/expressions/objects.ts.Null" xlink:href="src/expressions/objects.ts"><text x="15.0" y="13.5" stroke="none" text-anchor="middle" data-name="Null">Null</text></a>
+
+</g>
+</g>
+<g transform="translate(7347, 626)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Null">
+<g transform="translate(8, 8)" fill="#33322E" data-name="Null">
+
+</g>
+</g>
+<g transform="translate(7347, 634)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Null">
+<g transform="translate(8, 8)" fill="#33322E" data-name="Null">
+
+</g>
+</g>
+</g>
+<g data-name="Undefined">
+<g fill="#eee8d5" stroke="#33322E" data-name="Undefined">
+<rect x="7433.0" y="595.0" height="47.0" width="97.0" data-name="Undefined"></rect>
+<path d="M7433.0 626.0 L7530.0 626.0" fill="none" data-name="Undefined"></path>
+<path d="M7433.0 634.0 L7530.0 634.0" fill="none" data-name="Undefined"></path>
+</g>
+<g transform="translate(7433, 595)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Undefined">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Undefined">
+<a id="src/expressions/objects.ts.Undefined" xlink:href="src/expressions/objects.ts"><text x="40.5" y="13.5" stroke="none" text-anchor="middle" data-name="Undefined">Undefined</text></a>
+
+</g>
+</g>
+<g transform="translate(7433, 626)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Undefined">
+<g transform="translate(8, 8)" fill="#33322E" data-name="Undefined">
+
+</g>
+</g>
+<g transform="translate(7433, 634)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Undefined">
+<g transform="translate(8, 8)" fill="#33322E" data-name="Undefined">
+
+</g>
+</g>
+</g>
+<g data-name="BinOp">
+<g fill="#eee8d5" stroke="#33322E" data-name="BinOp">
+<rect x="7570.0" y="568.0" height="100.0" width="169.0" data-name="BinOp"></rect>
+<path d="M7570.0 599.0 L7739.0 599.0" fill="none" data-name="BinOp"></path>
+<path d="M7570.0 660.0 L7739.0 660.0" fill="none" data-name="BinOp"></path>
+</g>
+<g transform="translate(7570, 568)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="BinOp">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="BinOp">
+<a id="src/expressions/objects.ts.BinOp" xlink:href="src/expressions/objects.ts"><text x="76.5" y="13.5" stroke="none" text-anchor="middle" data-name="BinOp">BinOp</text></a>
+
+</g>
+</g>
+<g transform="translate(7570, 599)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="BinOp">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="BinOp">
+<text x="0.0" y="13.5" stroke="none" data-name="BinOp">+_lhs_: Expression</text>
+<text x="0.0" y="28.5" stroke="none" data-name="BinOp">+_op_: string</text>
+<text x="0.0" y="43.5" stroke="none" data-name="BinOp">+_rhs_: Expression</text>
+
+</g>
+</g>
+<g transform="translate(7570, 660)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="BinOp">
+<g transform="translate(8, 8)" fill="#33322E" data-name="BinOp">
+
+</g>
+</g>
+</g>
+<g data-name="IsObject">
+<g fill="#eee8d5" stroke="#33322E" data-name="IsObject">
+<rect x="7779.0" y="583.0" height="70.0" width="210.0" data-name="IsObject"></rect>
+<path d="M7779.0 614.0 L7989.0 614.0" fill="none" data-name="IsObject"></path>
+<path d="M7779.0 645.0 L7989.0 645.0" fill="none" data-name="IsObject"></path>
+</g>
+<g transform="translate(7779, 583)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="IsObject">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="IsObject">
+<a id="src/expressions/objects.ts.IsObject" xlink:href="src/expressions/objects.ts"><text x="97.0" y="13.5" stroke="none" text-anchor="middle" data-name="IsObject">IsObject</text></a>
+
+</g>
+</g>
+<g transform="translate(7779, 614)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="IsObject">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="IsObject">
+<text x="0.0" y="13.5" stroke="none" data-name="IsObject">+_operand_: Expression</text>
+
+</g>
+</g>
+<g transform="translate(7779, 645)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="IsObject">
+<g transform="translate(8, 8)" fill="#33322E" data-name="IsObject">
+
+</g>
+</g>
+</g>
+<g data-name="IsNotNullish">
+<g fill="#eee8d5" stroke="#33322E" data-name="IsNotNullish">
+<rect x="8029.0" y="583.0" height="70.0" width="210.0" data-name="IsNotNullish"></rect>
+<path d="M8029.0 614.0 L8239.0 614.0" fill="none" data-name="IsNotNullish"></path>
+<path d="M8029.0 645.0 L8239.0 645.0" fill="none" data-name="IsNotNullish"></path>
+</g>
+<g transform="translate(8029, 583)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="IsNotNullish">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="IsNotNullish">
+<a id="src/expressions/objects.ts.IsNotNullish" xlink:href="src/expressions/objects.ts"><text x="97.0" y="13.5" stroke="none" text-anchor="middle" data-name="IsNotNullish">IsNotNullish</text></a>
+
+</g>
+</g>
+<g transform="translate(8029, 614)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="IsNotNullish">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="IsNotNullish">
+<text x="0.0" y="13.5" stroke="none" data-name="IsNotNullish">+_operand_: Expression</text>
+
+</g>
+</g>
+<g transform="translate(8029, 645)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="IsNotNullish">
+<g transform="translate(8, 8)" fill="#33322E" data-name="IsNotNullish">
+
+</g>
+</g>
+</g>
+<g data-name="StrContact">
+<g fill="#eee8d5" stroke="#33322E" data-name="StrContact">
+<rect x="8279.0" y="583.0" height="70.0" width="229.0" data-name="StrContact"></rect>
+<path d="M8279.0 614.0 L8508.0 614.0" fill="none" data-name="StrContact"></path>
+<path d="M8279.0 645.0 L8508.0 645.0" fill="none" data-name="StrContact"></path>
+</g>
+<g transform="translate(8279, 583)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="StrContact">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="StrContact">
+<a id="src/expressions/objects.ts.StrContact" xlink:href="src/expressions/objects.ts"><text x="106.5" y="13.5" stroke="none" text-anchor="middle" data-name="StrContact">StrContact</text></a>
+
+</g>
+</g>
+<g transform="translate(8279, 614)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="StrContact">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="StrContact">
+<text x="0.0" y="13.5" stroke="none" data-name="StrContact">+_operands_: Expression[]</text>
+
+</g>
+</g>
+<g transform="translate(8279, 645)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="StrContact">
+<g transform="translate(8, 8)" fill="#33322E" data-name="StrContact">
+
+</g>
+</g>
+</g>
+<g data-name="BuiltInFunction">
+<g fill="#eee8d5" stroke="#33322E" data-name="BuiltInFunction">
+<rect x="8548.0" y="576.0" height="85.0" width="207.0" data-name="BuiltInFunction"></rect>
+<path d="M8548.0 607.0 L8755.0 607.0" fill="none" data-name="BuiltInFunction"></path>
+<path d="M8548.0 653.0 L8755.0 653.0" fill="none" data-name="BuiltInFunction"></path>
+</g>
+<g transform="translate(8548, 576)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="BuiltInFunction">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="BuiltInFunction">
+<a id="src/expressions/runtime-builtin.ts.BuiltInFunction" xlink:href="src/expressions/runtime-builtin.ts"><text x="95.5" y="13.5" stroke="none" text-anchor="middle" data-name="BuiltInFunction">BuiltInFunction</text></a>
+
+</g>
+</g>
+<g transform="translate(8548, 607)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="BuiltInFunction">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="BuiltInFunction">
+<text x="0.0" y="13.5" stroke="none" data-name="BuiltInFunction">+_args_: Expression[]</text>
+<text x="0.0" y="28.5" stroke="none" data-name="BuiltInFunction">+_jsBuiltinName_: string</text>
+
+</g>
+</g>
+<g transform="translate(8548, 653)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="BuiltInFunction">
+<g transform="translate(8, 8)" fill="#33322E" data-name="BuiltInFunction">
+
+</g>
+</g>
+</g>
+<g data-name="Renderer">
+<g fill="#eee8d5" stroke="#33322E" data-name="Renderer">
+<rect x="8824.0" y="15.0" height="303.0" width="263.0" data-name="Renderer"></rect>
+<path d="M8824.0 46.0 L9087.0 46.0" fill="none" data-name="Renderer"></path>
+<path d="M8824.0 107.0 L9087.0 107.0" fill="none" data-name="Renderer"></path>
+</g>
+<g transform="translate(8824, 15)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Renderer">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Renderer">
+<a id="src/renderer/base.ts.Renderer" xlink:href="src/renderer/base.ts"><text x="123.5" y="13.5" stroke="none" text-anchor="middle" data-name="Renderer">Renderer</text></a>
+
+</g>
+</g>
+<g transform="translate(8824, 46)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Renderer">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Renderer">
+<text x="0.0" y="13.5" stroke="none" data-name="Renderer">#symbol: string</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Renderer">-emitter: IndentedStringBuilder</text>
+<text x="0.0" y="43.5" stroke="none" data-name="Renderer">-scopeStack: Scope[]</text>
+
+</g>
+</g>
+<g transform="translate(8824, 107)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Renderer">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Renderer">
+<text x="0.0" y="13.5" stroke="none" data-name="Renderer">+render(): string</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Renderer">#renderModule(): void</text>
+<text x="0.0" y="43.5" stroke="none" data-name="Renderer">#renderModuleTypes(): void</text>
+<text x="0.0" y="58.5" stroke="none" data-name="Renderer">#renderStruct(): void</text>
+<text x="0.0" y="73.5" stroke="none" data-name="Renderer">#renderInterface(): void</text>
+<text x="0.0" y="88.5" stroke="none" data-name="Renderer">#renderFunction(): void</text>
+<text x="0.0" y="103.5" stroke="none" data-name="Renderer">#renderClass(): void</text>
+<text x="0.0" y="118.5" stroke="none" data-name="Renderer">#indent(): void</text>
+<text x="0.0" y="133.5" stroke="none" data-name="Renderer">#unindent(): void</text>
+<text x="0.0" y="148.5" stroke="none" data-name="Renderer">#emit(): void</text>
+<text x="0.0" y="163.5" stroke="none" data-name="Renderer">#setIndentationSymbol(): string</text>
+<text x="0.0" y="178.5" stroke="none" data-name="Renderer">#emitList(): void</text>
+<text x="0.0" y="193.5" stroke="none" data-name="Renderer">#withScope(): void</text>
+
+</g>
+</g>
+</g>
+<g data-name="RenderOptions">
+<g fill="lightblue" stroke="#33322E" data-name="RenderOptions">
+<rect x="9167.0" y="132.0" height="70.0" width="337.0" data-name="RenderOptions"></rect>
+<path d="M9167.0 163.0 L9504.0 163.0" fill="none" data-name="RenderOptions"></path>
+<path d="M9167.0 194.0 L9504.0 194.0" fill="none" data-name="RenderOptions"></path>
+</g>
+<g transform="translate(9167, 132)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="RenderOptions">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="RenderOptions">
+<a id="src/renderer/base.ts.RenderOptions" xlink:href="src/renderer/base.ts"><text x="160.5" y="13.5" stroke="none" text-anchor="middle" data-name="RenderOptions">RenderOptions</text></a>
+
+</g>
+</g>
+<g transform="translate(9167, 163)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="RenderOptions">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="RenderOptions">
+<text x="0.0" y="13.5" stroke="none" data-name="RenderOptions">+indentation: string | number | undefined</text>
+
+</g>
+</g>
+<g transform="translate(9167, 194)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="RenderOptions">
+<g transform="translate(8, 8)" fill="#33322E" data-name="RenderOptions">
+
+</g>
+</g>
+</g>
+<g data-name="IndentedStringBuilder">
+<g fill="#eee8d5" stroke="#33322E" data-name="IndentedStringBuilder">
+<rect x="9544.0" y="90.0" height="153.0" width="187.0" data-name="IndentedStringBuilder"></rect>
+<path d="M9544.0 121.0 L9731.0 121.0" fill="none" data-name="IndentedStringBuilder"></path>
+<path d="M9544.0 167.0 L9731.0 167.0" fill="none" data-name="IndentedStringBuilder"></path>
+</g>
+<g transform="translate(9544, 90)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="IndentedStringBuilder">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="IndentedStringBuilder">
+<a id="src/renderer/indented-string-builder.ts.IndentedStringBuilder" xlink:href="src/renderer/indented-string-builder.ts"><text x="85.5" y="13.5" stroke="none" text-anchor="middle" data-name="IndentedStringBuilder">IndentedStringBuilder</text></a>
+
+</g>
+</g>
+<g transform="translate(9544, 121)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="IndentedStringBuilder">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="IndentedStringBuilder">
+<text x="0.0" y="13.5" stroke="none" data-name="IndentedStringBuilder">-indents: string[]</text>
+<text x="0.0" y="28.5" stroke="none" data-name="IndentedStringBuilder">-parts: string[]</text>
+
+</g>
+</g>
+<g transform="translate(9544, 167)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="IndentedStringBuilder">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="IndentedStringBuilder">
+<text x="0.0" y="13.5" stroke="none" data-name="IndentedStringBuilder">+indent(): void</text>
+<text x="0.0" y="28.5" stroke="none" data-name="IndentedStringBuilder">+unindent(): void</text>
+<text x="0.0" y="43.5" stroke="none" data-name="IndentedStringBuilder">+emit(): void</text>
+<text x="0.0" y="58.5" stroke="none" data-name="IndentedStringBuilder">+toString(): string</text>
+
+</g>
+</g>
+</g>
+<g data-name="TypeScriptRenderer">
+<g fill="#eee8d5" stroke="#33322E" data-name="TypeScriptRenderer">
+<rect x="8795.0" y="373.0" height="490.0" width="321.0" data-name="TypeScriptRenderer"></rect>
+<path d="M8795.0 404.0 L9116.0 404.0" fill="none" data-name="TypeScriptRenderer"></path>
+<path d="M8795.0 412.0 L9116.0 412.0" fill="none" data-name="TypeScriptRenderer"></path>
+</g>
+<g transform="translate(8795, 373)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="TypeScriptRenderer">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="TypeScriptRenderer">
+<a id="src/renderer/typescript.ts.TypeScriptRenderer" xlink:href="src/renderer/typescript.ts"><text x="152.5" y="13.5" stroke="none" text-anchor="middle" data-name="TypeScriptRenderer">TypeScriptRenderer</text></a>
+
+</g>
+</g>
+<g transform="translate(8795, 404)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TypeScriptRenderer">
+<g transform="translate(8, 8)" fill="#33322E" data-name="TypeScriptRenderer">
+
+</g>
+</g>
+<g transform="translate(8795, 412)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TypeScriptRenderer">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="TypeScriptRenderer">
+<text x="0.0" y="13.5" stroke="none" data-name="TypeScriptRenderer">#renderModule(): void</text>
+<text x="0.0" y="28.5" stroke="none" data-name="TypeScriptRenderer">#renderImports(): void</text>
+<text x="0.0" y="43.5" stroke="none" data-name="TypeScriptRenderer">#emitBlock(): void</text>
+<text x="0.0" y="58.5" stroke="none" data-name="TypeScriptRenderer">#renderStruct(): void</text>
+<text x="0.0" y="73.5" stroke="none" data-name="TypeScriptRenderer">#renderClass(): void</text>
+<text x="0.0" y="88.5" stroke="none" data-name="TypeScriptRenderer">#renderInterface(): void</text>
+<text x="0.0" y="103.5" stroke="none" data-name="TypeScriptRenderer">#renderProperty(): void</text>
+<text x="0.0" y="118.5" stroke="none" data-name="TypeScriptRenderer">#renderRegularProperty(): void</text>
+<text x="0.0" y="133.5" stroke="none" data-name="TypeScriptRenderer">#renderGetterSetterProperty(): void</text>
+<text x="0.0" y="148.5" stroke="none" data-name="TypeScriptRenderer">#renderMethod(): void</text>
+<text x="0.0" y="163.5" stroke="none" data-name="TypeScriptRenderer">#renderSymbol(): void</text>
+<text x="0.0" y="178.5" stroke="none" data-name="TypeScriptRenderer">#renderType(): void</text>
+<text x="0.0" y="193.5" stroke="none" data-name="TypeScriptRenderer">#expressionFromSymbol(): Expression</text>
+<text x="0.0" y="208.5" stroke="none" data-name="TypeScriptRenderer">#renderFunction(): void</text>
+<text x="0.0" y="223.5" stroke="none" data-name="TypeScriptRenderer">#renderStatement(): void</text>
+<text x="0.0" y="238.5" stroke="none" data-name="TypeScriptRenderer">#renderExpression(): void</text>
+<text x="0.0" y="253.5" stroke="none" data-name="TypeScriptRenderer">#renderIdentifier(): void</text>
+<text x="0.0" y="268.5" stroke="none" data-name="TypeScriptRenderer">#renderObjectMethodInvoke(): void</text>
+<text x="0.0" y="283.5" stroke="none" data-name="TypeScriptRenderer">#renderInvokeCallable(): void</text>
+<text x="0.0" y="298.5" stroke="none" data-name="TypeScriptRenderer">#renderBlock(): void</text>
+<text x="0.0" y="313.5" stroke="none" data-name="TypeScriptRenderer">#renderArgs(): void</text>
+<text x="0.0" y="328.5" stroke="none" data-name="TypeScriptRenderer">#renderObjectLiteral(): void</text>
+<text x="0.0" y="343.5" stroke="none" data-name="TypeScriptRenderer">#renderObjectAccess(): void</text>
+<text x="0.0" y="358.5" stroke="none" data-name="TypeScriptRenderer">#renderReturnStatement(): void</text>
+<text x="0.0" y="373.5" stroke="none" data-name="TypeScriptRenderer">#renderIfThenElse(): void</text>
+<text x="0.0" y="388.5" stroke="none" data-name="TypeScriptRenderer">#renderDocs(): void</text>
+<text x="0.0" y="403.5" stroke="none" data-name="TypeScriptRenderer">-parenthesized(): void</text>
+<text x="0.0" y="418.5" stroke="none" data-name="TypeScriptRenderer">-openParen(): void</text>
+<text x="0.0" y="433.5" stroke="none" data-name="TypeScriptRenderer">-closeParen(): void</text>
+
+</g>
+</g>
+</g>
+<g data-name="DocOptions">
+<g fill="lightblue" stroke="#33322E" data-name="DocOptions">
+<rect x="9771.0" y="132.0" height="70.0" width="280.0" data-name="DocOptions"></rect>
+<path d="M9771.0 163.0 L10051.0 163.0" fill="none" data-name="DocOptions"></path>
+<path d="M9771.0 194.0 L10051.0 194.0" fill="none" data-name="DocOptions"></path>
+</g>
+<g transform="translate(9771, 132)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="DocOptions">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="DocOptions">
+<a id="src/renderer/typescript.ts.DocOptions" xlink:href="src/renderer/typescript.ts"><text x="132.0" y="13.5" stroke="none" text-anchor="middle" data-name="DocOptions">DocOptions</text></a>
+
+</g>
+</g>
+<g transform="translate(9771, 163)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="DocOptions">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="DocOptions">
+<text x="0.0" y="13.5" stroke="none" data-name="DocOptions">+forceStruct: boolean | undefined</text>
+
+</g>
+</g>
+<g transform="translate(9771, 194)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="DocOptions">
+<g transform="translate(8, 8)" fill="#33322E" data-name="DocOptions">
+
+</g>
+</g>
+</g>
+<g data-name="TypeCase&lt;A&gt;">
+<g fill="lightgray" stroke="#33322E" data-name="TypeCase&lt;A&gt;">
+<rect x="10091.0" y="124.0" height="85.0" width="245.0" data-name="TypeCase&lt;A&gt;"></rect>
+<path d="M10091.0 155.0 L10336.0 155.0" fill="none" data-name="TypeCase&lt;A&gt;"></path>
+<path d="M10091.0 201.0 L10336.0 201.0" fill="none" data-name="TypeCase&lt;A&gt;"></path>
+</g>
+<g transform="translate(10091, 124)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TypeCase&lt;A&gt;">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="TypeCase&lt;A&gt;">
+<a id=".TypeCase&lt;A&gt;" xlink:href=""><text x="114.5" y="13.5" stroke="none" text-anchor="middle" data-name="TypeCase&lt;A&gt;">TypeCase&lt;A&gt;</text></a>
+
+</g>
+</g>
+<g transform="translate(10091, 155)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TypeCase&lt;A&gt;">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="TypeCase&lt;A&gt;">
+<text x="0.0" y="13.5" stroke="none" data-name="TypeCase&lt;A&gt;">+ctr: new (...args: any[]) =&gt; A</text>
+<text x="0.0" y="28.5" stroke="none" data-name="TypeCase&lt;A&gt;">+then: (x: A) =&gt; void</text>
+
+</g>
+</g>
+<g transform="translate(10091, 201)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TypeCase&lt;A&gt;">
+<g transform="translate(8, 8)" fill="#33322E" data-name="TypeCase&lt;A&gt;">
+
+</g>
+</g>
+</g>
+<g data-name="Block">
+<g fill="#eee8d5" stroke="#33322E" data-name="Block">
+<rect x="9156.0" y="557.0" height="123.0" width="265.0" data-name="Block"></rect>
+<path d="M9156.0 588.0 L9421.0 588.0" fill="none" data-name="Block"></path>
+<path d="M9156.0 634.0 L9421.0 634.0" fill="none" data-name="Block"></path>
+</g>
+<g transform="translate(9156, 557)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Block">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Block">
+<a id="src/statements/block.ts.Block" xlink:href="src/statements/block.ts"><text x="124.5" y="13.5" stroke="none" text-anchor="middle" data-name="Block">Block</text></a>
+
+</g>
+</g>
+<g transform="translate(9156, 588)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Block">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Block">
+<text x="0.0" y="13.5" stroke="none" data-name="Block">+comments: string[] | undefined</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Block">-_statements: Statement[]</text>
+
+</g>
+</g>
+<g transform="translate(9156, 634)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Block">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Block">
+<text x="0.0" y="13.5" stroke="none" data-name="Block">+static with(): Block</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Block">+add(): void</text>
+
+</g>
+</g>
+</g>
+<g data-name="Statement">
+<g fill="#eee8d5" stroke="#33322E" data-name="Statement">
+<rect x="10495.0" y="124.0" height="85.0" width="265.0" data-name="Statement"></rect>
+<path d="M10495.0 155.0 L10760.0 155.0" fill="none" data-name="Statement"></path>
+<path d="M10495.0 201.0 L10760.0 201.0" fill="none" data-name="Statement"></path>
+</g>
+<g transform="translate(10495, 124)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Statement">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Statement">
+<a id="src/statements/statements.ts.Statement" xlink:href="src/statements/statements.ts"><text x="124.5" y="13.5" stroke="none" text-anchor="middle" data-name="Statement">Statement</text></a>
+
+</g>
+</g>
+<g transform="translate(10495, 155)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Statement">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Statement">
+<text x="0.0" y="13.5" stroke="none" data-name="Statement">+comments: string[] | undefined</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Statement">-isStatement: true</text>
+
+</g>
+</g>
+<g transform="translate(10495, 201)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Statement">
+<g transform="translate(8, 8)" fill="#33322E" data-name="Statement">
+
+</g>
+</g>
+</g>
+<g data-name="ReturnStatement">
+<g fill="#eee8d5" stroke="#33322E" data-name="ReturnStatement">
+<rect x="9461.0" y="576.0" height="85.0" width="305.0" data-name="ReturnStatement"></rect>
+<path d="M9461.0 607.0 L9766.0 607.0" fill="none" data-name="ReturnStatement"></path>
+<path d="M9461.0 653.0 L9766.0 653.0" fill="none" data-name="ReturnStatement"></path>
+</g>
+<g transform="translate(9461, 576)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ReturnStatement">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="ReturnStatement">
+<a id="src/statements/statements.ts.ReturnStatement" xlink:href="src/statements/statements.ts"><text x="144.5" y="13.5" stroke="none" text-anchor="middle" data-name="ReturnStatement">ReturnStatement</text></a>
+
+</g>
+</g>
+<g transform="translate(9461, 607)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ReturnStatement">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ReturnStatement">
+<text x="0.0" y="13.5" stroke="none" data-name="ReturnStatement">+comments: string[] | undefined</text>
+<text x="0.0" y="28.5" stroke="none" data-name="ReturnStatement">+expression: Expression | undefined</text>
+
+</g>
+</g>
+<g transform="translate(9461, 653)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ReturnStatement">
+<g transform="translate(8, 8)" fill="#33322E" data-name="ReturnStatement">
+
+</g>
+</g>
+</g>
+<g data-name="ExpressionStatement">
+<g fill="#eee8d5" stroke="#33322E" data-name="ExpressionStatement">
+<rect x="9806.0" y="576.0" height="85.0" width="265.0" data-name="ExpressionStatement"></rect>
+<path d="M9806.0 607.0 L10071.0 607.0" fill="none" data-name="ExpressionStatement"></path>
+<path d="M9806.0 653.0 L10071.0 653.0" fill="none" data-name="ExpressionStatement"></path>
+</g>
+<g transform="translate(9806, 576)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ExpressionStatement">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="ExpressionStatement">
+<a id="src/statements/statements.ts.ExpressionStatement" xlink:href="src/statements/statements.ts"><text x="124.5" y="13.5" stroke="none" text-anchor="middle" data-name="ExpressionStatement">ExpressionStatement</text></a>
+
+</g>
+</g>
+<g transform="translate(9806, 607)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ExpressionStatement">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ExpressionStatement">
+<text x="0.0" y="13.5" stroke="none" data-name="ExpressionStatement">+comments: string[] | undefined</text>
+<text x="0.0" y="28.5" stroke="none" data-name="ExpressionStatement">+expression: Expression</text>
+
+</g>
+</g>
+<g transform="translate(9806, 653)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ExpressionStatement">
+<g transform="translate(8, 8)" fill="#33322E" data-name="ExpressionStatement">
+
+</g>
+</g>
+</g>
+<g data-name="AssignmentStatement">
+<g fill="#eee8d5" stroke="#33322E" data-name="AssignmentStatement">
+<rect x="10111.0" y="568.0" height="100.0" width="265.0" data-name="AssignmentStatement"></rect>
+<path d="M10111.0 599.0 L10376.0 599.0" fill="none" data-name="AssignmentStatement"></path>
+<path d="M10111.0 660.0 L10376.0 660.0" fill="none" data-name="AssignmentStatement"></path>
+</g>
+<g transform="translate(10111, 568)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="AssignmentStatement">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="AssignmentStatement">
+<a id="src/statements/statements.ts.AssignmentStatement" xlink:href="src/statements/statements.ts"><text x="124.5" y="13.5" stroke="none" text-anchor="middle" data-name="AssignmentStatement">AssignmentStatement</text></a>
+
+</g>
+</g>
+<g transform="translate(10111, 599)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AssignmentStatement">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="AssignmentStatement">
+<text x="0.0" y="13.5" stroke="none" data-name="AssignmentStatement">+comments: string[] | undefined</text>
+<text x="0.0" y="28.5" stroke="none" data-name="AssignmentStatement">+lhs: Expression</text>
+<text x="0.0" y="43.5" stroke="none" data-name="AssignmentStatement">+rhs: Expression</text>
+
+</g>
+</g>
+<g transform="translate(10111, 660)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="AssignmentStatement">
+<g transform="translate(8, 8)" fill="#33322E" data-name="AssignmentStatement">
+
+</g>
+</g>
+</g>
+<g data-name="VariableDeclaration">
+<g fill="#eee8d5" stroke="#33322E" data-name="VariableDeclaration">
+<rect x="10416.0" y="561.0" height="115.0" width="265.0" data-name="VariableDeclaration"></rect>
+<path d="M10416.0 592.0 L10681.0 592.0" fill="none" data-name="VariableDeclaration"></path>
+<path d="M10416.0 668.0 L10681.0 668.0" fill="none" data-name="VariableDeclaration"></path>
+</g>
+<g transform="translate(10416, 561)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="VariableDeclaration">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="VariableDeclaration">
+<a id="src/statements/statements.ts.VariableDeclaration" xlink:href="src/statements/statements.ts"><text x="124.5" y="13.5" stroke="none" text-anchor="middle" data-name="VariableDeclaration">VariableDeclaration</text></a>
+
+</g>
+</g>
+<g transform="translate(10416, 592)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="VariableDeclaration">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="VariableDeclaration">
+<text x="0.0" y="13.5" stroke="none" data-name="VariableDeclaration">+comments: string[] | undefined</text>
+<text x="0.0" y="28.5" stroke="none" data-name="VariableDeclaration">+mut: Mut</text>
+<text x="0.0" y="43.5" stroke="none" data-name="VariableDeclaration">+varName: Expression</text>
+<text x="0.0" y="58.5" stroke="none" data-name="VariableDeclaration">+rhs: Expression</text>
+
+</g>
+</g>
+<g transform="translate(10416, 668)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="VariableDeclaration">
+<g transform="translate(8, 8)" fill="#33322E" data-name="VariableDeclaration">
+
+</g>
+</g>
+</g>
+<g data-name="IfThenElse">
+<g fill="#eee8d5" stroke="#33322E" data-name="IfThenElse">
+<rect x="10721.0" y="542.0" height="153.0" width="325.0" data-name="IfThenElse"></rect>
+<path d="M10721.0 573.0 L11046.0 573.0" fill="none" data-name="IfThenElse"></path>
+<path d="M10721.0 649.0 L11046.0 649.0" fill="none" data-name="IfThenElse"></path>
+</g>
+<g transform="translate(10721, 542)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="IfThenElse">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="IfThenElse">
+<a id="src/statements/statements.ts.IfThenElse" xlink:href="src/statements/statements.ts"><text x="154.5" y="13.5" stroke="none" text-anchor="middle" data-name="IfThenElse">IfThenElse</text></a>
+
+</g>
+</g>
+<g transform="translate(10721, 573)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="IfThenElse">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="IfThenElse">
+<text x="0.0" y="13.5" stroke="none" data-name="IfThenElse">+comments: string[] | undefined</text>
+<text x="0.0" y="28.5" stroke="none" data-name="IfThenElse">+thenStatement: Statement | undefined</text>
+<text x="0.0" y="43.5" stroke="none" data-name="IfThenElse">+elseStatement: Statement | undefined</text>
+<text x="0.0" y="58.5" stroke="none" data-name="IfThenElse">+condition: Expression</text>
+
+</g>
+</g>
+<g transform="translate(10721, 649)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="IfThenElse">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="IfThenElse">
+<text x="0.0" y="13.5" stroke="none" data-name="IfThenElse">+then(): this</text>
+<text x="0.0" y="28.5" stroke="none" data-name="IfThenElse">+else(): this</text>
+
+</g>
+</g>
+</g>
+<g data-name="ForLoop">
+<g fill="#eee8d5" stroke="#33322E" data-name="ForLoop">
+<rect x="11086.0" y="542.0" height="153.0" width="284.0" data-name="ForLoop"></rect>
+<path d="M11086.0 573.0 L11370.0 573.0" fill="none" data-name="ForLoop"></path>
+<path d="M11086.0 649.0 L11370.0 649.0" fill="none" data-name="ForLoop"></path>
+</g>
+<g transform="translate(11086, 542)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ForLoop">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="ForLoop">
+<a id="src/statements/statements.ts.ForLoop" xlink:href="src/statements/statements.ts"><text x="134.0" y="13.5" stroke="none" text-anchor="middle" data-name="ForLoop">ForLoop</text></a>
+
+</g>
+</g>
+<g transform="translate(11086, 573)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ForLoop">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ForLoop">
+<text x="0.0" y="13.5" stroke="none" data-name="ForLoop">+mut: Mut</text>
+<text x="0.0" y="28.5" stroke="none" data-name="ForLoop">+iterator: Expression</text>
+<text x="0.0" y="43.5" stroke="none" data-name="ForLoop">+iterable: Expression | undefined</text>
+<text x="0.0" y="58.5" stroke="none" data-name="ForLoop">+loopBody: Statement | undefined</text>
+
+</g>
+</g>
+<g transform="translate(11086, 649)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="ForLoop">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="ForLoop">
+<text x="0.0" y="13.5" stroke="none" data-name="ForLoop">+in(): this</text>
+<text x="0.0" y="28.5" stroke="none" data-name="ForLoop">+do(): this</text>
+
+</g>
+</g>
+</g>
+<g data-name="SuperInitializer">
+<g fill="#eee8d5" stroke="#33322E" data-name="SuperInitializer">
+<rect x="11410.0" y="583.0" height="70.0" width="169.0" data-name="SuperInitializer"></rect>
+<path d="M11410.0 614.0 L11579.0 614.0" fill="none" data-name="SuperInitializer"></path>
+<path d="M11410.0 645.0 L11579.0 645.0" fill="none" data-name="SuperInitializer"></path>
+</g>
+<g transform="translate(11410, 583)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="SuperInitializer">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="SuperInitializer">
+<a id="src/statements/statements.ts.SuperInitializer" xlink:href="src/statements/statements.ts"><text x="76.5" y="13.5" stroke="none" text-anchor="middle" data-name="SuperInitializer">SuperInitializer</text></a>
+
+</g>
+</g>
+<g transform="translate(11410, 614)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="SuperInitializer">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="SuperInitializer">
+<text x="0.0" y="13.5" stroke="none" data-name="SuperInitializer">+args: Expression[]</text>
+
+</g>
+</g>
+<g transform="translate(11410, 645)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="SuperInitializer">
+<g transform="translate(8, 8)" fill="#33322E" data-name="SuperInitializer">
+
+</g>
+</g>
+</g>
+<g data-name="StatementSeparator">
+<g fill="#eee8d5" stroke="#33322E" data-name="StatementSeparator">
+<rect x="11619.0" y="595.0" height="47.0" width="174.0" data-name="StatementSeparator"></rect>
+<path d="M11619.0 626.0 L11793.0 626.0" fill="none" data-name="StatementSeparator"></path>
+<path d="M11619.0 634.0 L11793.0 634.0" fill="none" data-name="StatementSeparator"></path>
+</g>
+<g transform="translate(11619, 595)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="StatementSeparator">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="StatementSeparator">
+<a id="src/statements/statements.ts.StatementSeparator" xlink:href="src/statements/statements.ts"><text x="79.0" y="13.5" stroke="none" text-anchor="middle" data-name="StatementSeparator">StatementSeparator</text></a>
+
+</g>
+</g>
+<g transform="translate(11619, 626)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="StatementSeparator">
+<g transform="translate(8, 8)" fill="#33322E" data-name="StatementSeparator">
+
+</g>
+</g>
+<g transform="translate(11619, 634)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="StatementSeparator">
+<g transform="translate(8, 8)" fill="#33322E" data-name="StatementSeparator">
+
+</g>
+</g>
+</g>
+<g data-name="SymbolKind">
+<g fill="lightgreen" stroke="#33322E" data-name="SymbolKind">
+<rect x="10800.0" y="106.0" height="122.0" width="109.0" data-name="SymbolKind"></rect>
+<path d="M10800.0 137.0 L10909.0 137.0" fill="none" data-name="SymbolKind"></path>
+</g>
+<g transform="translate(10800, 106)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="SymbolKind">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="SymbolKind">
+<a id="src/symbol.ts.SymbolKind" xlink:href="src/symbol.ts"><text x="46.5" y="13.5" stroke="none" text-anchor="middle" data-name="SymbolKind">SymbolKind</text></a>
+
+</g>
+</g>
+<g transform="translate(10800, 137)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="SymbolKind">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="SymbolKind">
+<text x="0.0" y="13.5" stroke="none" data-name="SymbolKind">Class</text>
+<text x="0.0" y="28.5" stroke="none" data-name="SymbolKind">Enum</text>
+<text x="0.0" y="43.5" stroke="none" data-name="SymbolKind">Struct</text>
+<text x="0.0" y="58.5" stroke="none" data-name="SymbolKind">Interface</text>
+<text x="0.0" y="73.5" stroke="none" data-name="SymbolKind">Function</text>
+
+</g>
+</g>
+</g>
+<g data-name="MemberKind">
+<g fill="lightgreen" stroke="#33322E" data-name="MemberKind">
+<rect x="10949.0" y="121.0" height="92.0" width="115.0" data-name="MemberKind"></rect>
+<path d="M10949.0 152.0 L11064.0 152.0" fill="none" data-name="MemberKind"></path>
+</g>
+<g transform="translate(10949, 121)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="MemberKind">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="MemberKind">
+<a id="src/type-member.ts.MemberKind" xlink:href="src/type-member.ts"><text x="49.5" y="13.5" stroke="none" text-anchor="middle" data-name="MemberKind">MemberKind</text></a>
+
+</g>
+</g>
+<g transform="translate(10949, 152)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="MemberKind">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="MemberKind">
+<a id="src/type-member.ts.Initializer" xlink:href="src/type-member.ts"><text x="0.0" y="13.5" stroke="none" data-name="MemberKind">Initializer</text></a>
+<a id="src/type-member.ts.Method" xlink:href="src/type-member.ts"><text x="0.0" y="28.5" stroke="none" data-name="MemberKind">Method</text></a>
+<a id="src/property.ts.Property" xlink:href="src/property.ts"><text x="0.0" y="43.5" stroke="none" data-name="MemberKind">Property</text></a>
+
+</g>
+</g>
+</g>
+<g data-name="MemberVisibility">
+<g fill="lightgreen" stroke="#33322E" data-name="MemberVisibility">
+<rect x="11104.0" y="121.0" height="92.0" width="144.0" data-name="MemberVisibility"></rect>
+<path d="M11104.0 152.0 L11248.0 152.0" fill="none" data-name="MemberVisibility"></path>
+</g>
+<g transform="translate(11104, 121)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="MemberVisibility">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="MemberVisibility">
+<a id="src/type-member.ts.MemberVisibility" xlink:href="src/type-member.ts"><text x="64.0" y="13.5" stroke="none" text-anchor="middle" data-name="MemberVisibility">MemberVisibility</text></a>
+
+</g>
+</g>
+<g transform="translate(11104, 152)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="MemberVisibility">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="MemberVisibility">
+<text x="0.0" y="13.5" stroke="none" data-name="MemberVisibility">Public</text>
+<text x="0.0" y="28.5" stroke="none" data-name="MemberVisibility">Protected</text>
+<text x="0.0" y="43.5" stroke="none" data-name="MemberVisibility">Private</text>
+
+</g>
+</g>
+</g>
+<g data-name="PrimitiveType">
+<g fill="lightgreen" stroke="#33322E" data-name="PrimitiveType">
+<rect x="11288.0" y="83.0" height="167.0" width="122.0" data-name="PrimitiveType"></rect>
+<path d="M11288.0 114.0 L11410.0 114.0" fill="none" data-name="PrimitiveType"></path>
+</g>
+<g transform="translate(11288, 83)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="PrimitiveType">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="PrimitiveType">
+<a id="src/type.ts.PrimitiveType" xlink:href="src/type.ts"><text x="53.0" y="13.5" stroke="none" text-anchor="middle" data-name="PrimitiveType">PrimitiveType</text></a>
+
+</g>
+</g>
+<g transform="translate(11288, 114)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="PrimitiveType">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="PrimitiveType">
+<text x="0.0" y="13.5" stroke="none" data-name="PrimitiveType">Date</text>
+<text x="0.0" y="28.5" stroke="none" data-name="PrimitiveType">String</text>
+<text x="0.0" y="43.5" stroke="none" data-name="PrimitiveType">Number</text>
+<text x="0.0" y="58.5" stroke="none" data-name="PrimitiveType">Boolean</text>
+<a id="src/expressions/objects.ts.Undefined" xlink:href="src/expressions/objects.ts"><text x="0.0" y="73.5" stroke="none" data-name="PrimitiveType">Undefined</text></a>
+<text x="0.0" y="88.5" stroke="none" data-name="PrimitiveType">Json</text>
+<text x="0.0" y="103.5" stroke="none" data-name="PrimitiveType">Any</text>
+<text x="0.0" y="118.5" stroke="none" data-name="PrimitiveType">Void</text>
+
+</g>
+</g>
+</g>
+<g data-name="Structure">
+<g fill="lightgreen" stroke="#33322E" data-name="Structure">
+<rect x="11450.0" y="128.0" height="77.0" width="88.0" data-name="Structure"></rect>
+<path d="M11450.0 159.0 L11538.0 159.0" fill="none" data-name="Structure"></path>
+</g>
+<g transform="translate(11450, 128)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Structure">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Structure">
+<a id="src/expressions/objects.ts.Structure" xlink:href="src/expressions/objects.ts"><text x="36.0" y="13.5" stroke="none" text-anchor="middle" data-name="Structure">Structure</text></a>
+
+</g>
+</g>
+<g transform="translate(11450, 159)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Structure">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Structure">
+<text x="0.0" y="13.5" stroke="none" data-name="Structure">Array</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Structure">Object</text>
+
+</g>
+</g>
+</g>
+<g data-name="Mut">
+<g fill="lightgreen" stroke="#33322E" data-name="Mut">
+<rect x="11578.0" y="128.0" height="77.0" width="98.0" data-name="Mut"></rect>
+<path d="M11578.0 159.0 L11676.0 159.0" fill="none" data-name="Mut"></path>
+</g>
+<g transform="translate(11578, 128)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Mut">
+<g transform="translate(8, 8)" fill="#33322E" text-align="center" data-name="Mut">
+<a id="src/statements/statements.ts.Mut" xlink:href="src/statements/statements.ts"><text x="41.0" y="13.5" stroke="none" text-anchor="middle" data-name="Mut">Mut</text></a>
+
+</g>
+</g>
+<g transform="translate(11578, 159)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Mut">
+<g transform="translate(8, 8)" fill="#33322E" text-align="left" data-name="Mut">
+<text x="0.0" y="13.5" stroke="none" data-name="Mut">Mutable</text>
+<text x="0.0" y="28.5" stroke="none" data-name="Mut">Immutable</text>
+
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</svg>

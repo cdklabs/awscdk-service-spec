@@ -25,7 +25,7 @@ import {
 } from '../expressions';
 import { InvokeCallable } from '../expressions/invoke';
 import { InterfaceType } from '../interface';
-import { Module } from '../module';
+import { AliasedModuleImport, Module } from '../module';
 import { Property } from '../property';
 import {
   ReturnStatement,
@@ -56,7 +56,7 @@ export class TypeScriptRenderer extends Renderer {
 
   protected renderImports(mod: Module) {
     for (const imp of mod.imports) {
-      if (imp.importAlias) {
+      if (imp instanceof AliasedModuleImport) {
         this.emit(`import * as ${imp.importAlias} from "${imp.moduleSource}";\n`);
       } else {
         this.emit('/* @todo multi import */\n');
@@ -121,6 +121,13 @@ export class TypeScriptRenderer extends Renderer {
         m instanceof Property ? this.renderProperty(m, 'class') : this.renderMethod(m, 'class'),
       );
     });
+
+    // Nested type declarations in TypeScript are done by following the class declaration with a 'namespace' declaration
+    if (classType.nestedDeclarations.length > 0) {
+      this.emitBlock(`${classType.exported ? 'export ' : ''}namespace ${classType.name}`, () => {
+        this.emitList(classType.nestedDeclarations, '\n\n', (t) => this.renderDeclaration(t));
+      });
+    }
   }
 
   protected renderInterface(classType: InterfaceType) {
@@ -313,13 +320,13 @@ export class TypeScriptRenderer extends Renderer {
         return new Identifier(sym.name);
       }
 
-      const imp = scope.findImportFor(sym.scope);
+      const imp = scope.findLink(sym.scope);
       if (imp) {
         return imp.referenceSymbol(sym);
       }
     }
 
-    throw new Error(`Symbol ${sym} not visible from ${this.scopes[0]} (missing import?)`);
+    throw new Error(`Symbol ${sym} (in ${sym.scope}) not visible from ${this.scopes[0]} (missing import?)`);
   }
 
   protected renderFunction(func: CallableDeclaration) {

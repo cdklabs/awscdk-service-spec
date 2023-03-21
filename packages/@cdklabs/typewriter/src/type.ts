@@ -1,6 +1,6 @@
 import { Expression } from './expression';
 import { NewExpression } from './expressions';
-import { Scope } from './scope';
+import { IScope } from './scope';
 import { ThingSymbol } from './symbol';
 import { TypeDeclaration } from './type-declaration';
 
@@ -59,7 +59,7 @@ export class Type {
   public static readonly BOOLEAN = new Type({ primitive: PrimitiveType.Boolean });
   public static readonly UNDEFINED = new Type({ primitive: PrimitiveType.Undefined });
 
-  public static fromName(scope: Scope, name: string, genericArguments?: Type[]) {
+  public static fromName(scope: IScope, name: string, genericArguments?: Type[]) {
     return new Type({ fqn: name, genericArguments }, scope, new ThingSymbol(name, scope));
   }
 
@@ -78,7 +78,7 @@ export class Type {
 
   public readonly spec: TypeReferenceSpec;
 
-  private constructor(spec?: TypeReferenceSpec, public readonly scope?: Scope, public readonly symbol?: ThingSymbol) {
+  private constructor(spec?: TypeReferenceSpec, public readonly scope?: IScope, public readonly symbol?: ThingSymbol) {
     this.spec = spec ?? { primitive: PrimitiveType.Void };
 
     if (isFqnSpec(this.spec) && !scope) {

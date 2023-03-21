@@ -1,6 +1,6 @@
 import * as jsii from '@jsii/spec';
 import { Documented } from './documented';
-import { Scope } from './scope';
+import { IScope } from './scope';
 import { ThingSymbol, SymbolKind } from './symbol';
 import { Type } from './type';
 
@@ -23,7 +23,7 @@ export abstract class TypeDeclaration implements Documented {
    * The fully qualified name of the type (``<assembly>.<namespace>.<name>``)
    */
   public get fqn(): string {
-    return `${this.scope.fqn}.${this.name}`;
+    return this.scope.qualifyName(this.name);
   }
 
   public abstract kind: SymbolKind;
@@ -45,10 +45,10 @@ export abstract class TypeDeclaration implements Documented {
   public readonly type: Type;
   public readonly symbol: ThingSymbol;
 
-  public constructor(public readonly scope: Scope, public readonly spec: TypeSpec) {
+  public constructor(public readonly scope: IScope, public readonly spec: TypeSpec) {
     this.symbol = new ThingSymbol(spec.name, scope);
 
-    scope.addType(this);
+    scope.registerType(this);
     this.type = Type.fromName(scope, this.name);
   }
 

@@ -1,4 +1,4 @@
-import { Scope } from './scope';
+import { IScope } from './scope';
 
 /**
  * Kinds of types.
@@ -21,7 +21,7 @@ export enum SymbolKind {
  * Symbols currently aren't annotated with what they refer to... but they could be.
  */
 export class ThingSymbol {
-  constructor(public readonly name: string, public readonly scope: Scope) {}
+  constructor(public readonly name: string, public readonly scope: IScope) {}
 
   /**
    * Change the name of a symbol while keeping the scope the same
