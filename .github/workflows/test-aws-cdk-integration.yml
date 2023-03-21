@@ -40,7 +40,7 @@ jobs:
         run: yarn install
         working-directory: aws-cdk
       - name: "Fix: aws-cdk attempts to compile awscdk-service-spec code"
-        run: "npx tsc --showConfig | jq '.compilerOptions = .compilerOptions + {\"skipLibCheck\": true}' > tmp && mv tmp tsconfig.json"
+        run: npx tsc --showConfig | jq '.references = []' > tmp && mv tmp tsconfig.json
         working-directory: aws-cdk/packages/aws-cdk
       - name: Build aws/aws-cdk
         run: npx lerna run build --no-bail --concurrency=1 --scope aws-cdk-lib --include-dependencies
