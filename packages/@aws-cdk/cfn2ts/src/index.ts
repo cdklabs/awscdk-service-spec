@@ -19,8 +19,8 @@ export default async function (
     scopes = [scopes];
   }
 
+  console.log(`cfn-resources: ${scopes.join(', ')}`);
   await generate({
-    debug: true,
     filePattern: '%shortname%.generated.ts',
     outputPath: outPath ?? 'lib',
     clearOutput: false,
