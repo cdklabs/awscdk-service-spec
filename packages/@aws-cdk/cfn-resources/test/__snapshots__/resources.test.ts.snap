@@ -190,14 +190,36 @@ export interface S3LocationProperty {
   readonly key?: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`S3LocationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`S3LocationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function S3LocationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("bucket", cdk.validateString)(properties.bucket));
+  errors.collect(cdk.propertyValidator("eTag", cdk.validateString)(properties.eTag));
+  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
+  errors.collect(cdk.propertyValidator("version", cdk.validateString)(properties.version));
+  return errors.wrap("supplied properties not correct for \\"S3LocationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertS3LocationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  S3LocationPropertyValidator(properties).assertSuccess();
   return {
     "Bucket": cdk.stringToCloudFormation(properties.bucket),
     "ETag": cdk.stringToCloudFormation(properties.eTag),
-    "Version": cdk.stringToCloudFormation(properties.version),
-    "Key": cdk.stringToCloudFormation(properties.key)
+    "Key": cdk.stringToCloudFormation(properties.key),
+    "Version": cdk.stringToCloudFormation(properties.version)
   };
 }
 
@@ -208,8 +230,8 @@ function S3LocationPropertyFromCloudFormation(properties: any): cfn_parse.FromCl
   const ret = new cfn_parse.FromCloudFormationPropertyObject<S3LocationProperty>();
   ret.addPropertyResult("bucket", "Bucket", (properties.Bucket != null ? cfn_parse.FromCloudFormation.getString(properties.Bucket) : undefined));
   ret.addPropertyResult("eTag", "ETag", (properties.ETag != null ? cfn_parse.FromCloudFormation.getString(properties.ETag) : undefined));
-  ret.addPropertyResult("version", "Version", (properties.Version != null ? cfn_parse.FromCloudFormation.getString(properties.Version) : undefined));
   ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
+  ret.addPropertyResult("version", "Version", (properties.Version != null ? cfn_parse.FromCloudFormation.getString(properties.Version) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -242,9 +264,29 @@ export interface EndpointConfigurationProperty {
   readonly vpcEndpointIds?: Array<string>;
 }
 
+/**
+ * Determine whether the given properties match those of a \`EndpointConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`EndpointConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function EndpointConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("types", cdk.listValidator(cdk.validateString))(properties.types));
+  errors.collect(cdk.propertyValidator("vpcEndpointIds", cdk.listValidator(cdk.validateString))(properties.vpcEndpointIds));
+  return errors.wrap("supplied properties not correct for \\"EndpointConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertEndpointConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  EndpointConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "Types": cdk.listMapper(cdk.stringToCloudFormation)(properties.types),
     "VpcEndpointIds": cdk.listMapper(cdk.stringToCloudFormation)(properties.vpcEndpointIds)
@@ -262,24 +304,57 @@ function EndpointConfigurationPropertyFromCloudFormation(properties: any): cfn_p
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`CfnRestApiProps\`
+ *
+ * @param properties - the TypeScript properties of a \`CfnRestApiProps\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnRestApiPropsValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("apiKeySourceType", cdk.validateString)(properties.apiKeySourceType));
+  errors.collect(cdk.propertyValidator("binaryMediaTypes", cdk.listValidator(cdk.validateString))(properties.binaryMediaTypes));
+  errors.collect(cdk.propertyValidator("body", cdk.validateObject)(properties.body));
+  errors.collect(cdk.propertyValidator("bodyS3Location", S3LocationPropertyValidator)(properties.bodyS3Location));
+  errors.collect(cdk.propertyValidator("cloneFrom", cdk.validateString)(properties.cloneFrom));
+  errors.collect(cdk.propertyValidator("description", cdk.validateString)(properties.description));
+  errors.collect(cdk.propertyValidator("disableExecuteApiEndpoint", cdk.validateBoolean)(properties.disableExecuteApiEndpoint));
+  errors.collect(cdk.propertyValidator("endpointConfiguration", EndpointConfigurationPropertyValidator)(properties.endpointConfiguration));
+  errors.collect(cdk.propertyValidator("failOnWarnings", cdk.validateBoolean)(properties.failOnWarnings));
+  errors.collect(cdk.propertyValidator("minimumCompressionSize", cdk.validateNumber)(properties.minimumCompressionSize));
+  errors.collect(cdk.propertyValidator("mode", cdk.validateString)(properties.mode));
+  errors.collect(cdk.propertyValidator("name", cdk.validateString)(properties.name));
+  errors.collect(cdk.propertyValidator("parameters", cdk.listValidator(cdk.validateString))(properties.parameters));
+  errors.collect(cdk.propertyValidator("policy", cdk.validateObject)(properties.policy));
+  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
+  return errors.wrap("supplied properties not correct for \\"CfnRestApiProps\\"");
+}
+
 // @ts-ignore TS6133
 function convertCfnRestApiPropsToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  CfnRestApiPropsValidator(properties).assertSuccess();
   return {
     "ApiKeySourceType": cdk.stringToCloudFormation(properties.apiKeySourceType),
     "BinaryMediaTypes": cdk.listMapper(cdk.stringToCloudFormation)(properties.binaryMediaTypes),
     "Body": cdk.objectToCloudFormation(properties.body),
     "BodyS3Location": convertS3LocationPropertyToCloudFormation(properties.bodyS3Location),
     "CloneFrom": cdk.stringToCloudFormation(properties.cloneFrom),
-    "EndpointConfiguration": convertEndpointConfigurationPropertyToCloudFormation(properties.endpointConfiguration),
     "Description": cdk.stringToCloudFormation(properties.description),
     "DisableExecuteApiEndpoint": cdk.booleanToCloudFormation(properties.disableExecuteApiEndpoint),
+    "EndpointConfiguration": convertEndpointConfigurationPropertyToCloudFormation(properties.endpointConfiguration),
     "FailOnWarnings": cdk.booleanToCloudFormation(properties.failOnWarnings),
-    "Name": cdk.stringToCloudFormation(properties.name),
     "MinimumCompressionSize": cdk.numberToCloudFormation(properties.minimumCompressionSize),
     "Mode": cdk.stringToCloudFormation(properties.mode),
-    "Policy": cdk.objectToCloudFormation(properties.policy),
+    "Name": cdk.stringToCloudFormation(properties.name),
     "Parameters": cdk.hashMapper(cdk.stringToCloudFormation)(properties.parameters),
+    "Policy": cdk.objectToCloudFormation(properties.policy),
     "Tags": cdk.listMapper(cdk.numberToCloudFormation)(properties.tags)
   };
 }
@@ -294,15 +369,15 @@ function CfnRestApiPropsFromCloudFormation(properties: any): cfn_parse.FromCloud
   ret.addPropertyResult("body", "Body", (properties.Body != null ? cfn_parse.FromCloudFormation.getAny(properties.Body) : undefined));
   ret.addPropertyResult("bodyS3Location", "BodyS3Location", (properties.BodyS3Location != null ? S3LocationPropertyFromCloudFormation(properties.BodyS3Location) : undefined));
   ret.addPropertyResult("cloneFrom", "CloneFrom", (properties.CloneFrom != null ? cfn_parse.FromCloudFormation.getString(properties.CloneFrom) : undefined));
-  ret.addPropertyResult("endpointConfiguration", "EndpointConfiguration", (properties.EndpointConfiguration != null ? EndpointConfigurationPropertyFromCloudFormation(properties.EndpointConfiguration) : undefined));
   ret.addPropertyResult("description", "Description", (properties.Description != null ? cfn_parse.FromCloudFormation.getString(properties.Description) : undefined));
   ret.addPropertyResult("disableExecuteApiEndpoint", "DisableExecuteApiEndpoint", (properties.DisableExecuteApiEndpoint != null ? cfn_parse.FromCloudFormation.getBoolean(properties.DisableExecuteApiEndpoint) : undefined));
+  ret.addPropertyResult("endpointConfiguration", "EndpointConfiguration", (properties.EndpointConfiguration != null ? EndpointConfigurationPropertyFromCloudFormation(properties.EndpointConfiguration) : undefined));
   ret.addPropertyResult("failOnWarnings", "FailOnWarnings", (properties.FailOnWarnings != null ? cfn_parse.FromCloudFormation.getBoolean(properties.FailOnWarnings) : undefined));
-  ret.addPropertyResult("name", "Name", (properties.Name != null ? cfn_parse.FromCloudFormation.getString(properties.Name) : undefined));
   ret.addPropertyResult("minimumCompressionSize", "MinimumCompressionSize", (properties.MinimumCompressionSize != null ? cfn_parse.FromCloudFormation.getNumber(properties.MinimumCompressionSize) : undefined));
   ret.addPropertyResult("mode", "Mode", (properties.Mode != null ? cfn_parse.FromCloudFormation.getString(properties.Mode) : undefined));
-  ret.addPropertyResult("policy", "Policy", (properties.Policy != null ? cfn_parse.FromCloudFormation.getAny(properties.Policy) : undefined));
+  ret.addPropertyResult("name", "Name", (properties.Name != null ? cfn_parse.FromCloudFormation.getString(properties.Name) : undefined));
   ret.addPropertyResult("parameters", "Parameters", (properties.Parameters != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString)(properties.Parameters) : undefined));
+  ret.addPropertyResult("policy", "Policy", (properties.Policy != null ? cfn_parse.FromCloudFormation.getAny(properties.Policy) : undefined));
   ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
@@ -640,9 +715,31 @@ export interface PolicyProperty {
   readonly policyName: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`PolicyProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`PolicyProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function PolicyPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("policyDocument", cdk.requiredValidator)(properties.policyDocument));
+  errors.collect(cdk.propertyValidator("policyDocument", cdk.validateString)(properties.policyDocument));
+  errors.collect(cdk.propertyValidator("policyName", cdk.requiredValidator)(properties.policyName));
+  errors.collect(cdk.propertyValidator("policyName", cdk.validateString)(properties.policyName));
+  return errors.wrap("supplied properties not correct for \\"PolicyProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertPolicyPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  PolicyPropertyValidator(properties).assertSuccess();
   return {
     "PolicyDocument": cdk.stringToCloudFormation(properties.policyDocument),
     "PolicyName": cdk.stringToCloudFormation(properties.policyName)
@@ -660,9 +757,37 @@ function PolicyPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudF
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`CfnRoleProps\`
+ *
+ * @param properties - the TypeScript properties of a \`CfnRoleProps\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnRolePropsValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("assumeRolePolicyDocument", cdk.requiredValidator)(properties.assumeRolePolicyDocument));
+  errors.collect(cdk.propertyValidator("assumeRolePolicyDocument", cdk.validateObject)(properties.assumeRolePolicyDocument));
+  errors.collect(cdk.propertyValidator("description", cdk.validateString)(properties.description));
+  errors.collect(cdk.propertyValidator("managedPolicyArns", cdk.listValidator(cdk.validateString))(properties.managedPolicyArns));
+  errors.collect(cdk.propertyValidator("maxSessionDuration", cdk.validateNumber)(properties.maxSessionDuration));
+  errors.collect(cdk.propertyValidator("path", cdk.validateString)(properties.path));
+  errors.collect(cdk.propertyValidator("permissionsBoundary", cdk.validateString)(properties.permissionsBoundary));
+  errors.collect(cdk.propertyValidator("policies", cdk.listValidator(PolicyPropertyValidator))(properties.policies));
+  errors.collect(cdk.propertyValidator("roleName", cdk.validateString)(properties.roleName));
+  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
+  return errors.wrap("supplied properties not correct for \\"CfnRoleProps\\"");
+}
+
 // @ts-ignore TS6133
 function convertCfnRolePropsToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  CfnRolePropsValidator(properties).assertSuccess();
   return {
     "AssumeRolePolicyDocument": cdk.objectToCloudFormation(properties.assumeRolePolicyDocument),
     "Description": cdk.stringToCloudFormation(properties.description),
@@ -1070,9 +1195,28 @@ export interface TracingConfigProperty {
   readonly mode?: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`TracingConfigProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`TracingConfigProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function TracingConfigPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("mode", cdk.validateString)(properties.mode));
+  return errors.wrap("supplied properties not correct for \\"TracingConfigProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertTracingConfigPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  TracingConfigPropertyValidator(properties).assertSuccess();
   return {
     "Mode": cdk.stringToCloudFormation(properties.mode)
   };
@@ -1116,9 +1260,29 @@ export interface VpcConfigProperty {
   readonly subnetIds?: Array<string>;
 }
 
+/**
+ * Determine whether the given properties match those of a \`VpcConfigProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`VpcConfigProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function VpcConfigPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("securityGroupIds", cdk.listValidator(cdk.validateString))(properties.securityGroupIds));
+  errors.collect(cdk.propertyValidator("subnetIds", cdk.listValidator(cdk.validateString))(properties.subnetIds));
+  return errors.wrap("supplied properties not correct for \\"VpcConfigProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertVpcConfigPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  VpcConfigPropertyValidator(properties).assertSuccess();
   return {
     "SecurityGroupIds": cdk.listMapper(cdk.stringToCloudFormation)(properties.securityGroupIds),
     "SubnetIds": cdk.listMapper(cdk.stringToCloudFormation)(properties.subnetIds)
@@ -1151,9 +1315,29 @@ export interface SnapStartProperty {
   readonly applyOn: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`SnapStartProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`SnapStartProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function SnapStartPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("applyOn", cdk.requiredValidator)(properties.applyOn));
+  errors.collect(cdk.propertyValidator("applyOn", cdk.validateString)(properties.applyOn));
+  return errors.wrap("supplied properties not correct for \\"SnapStartProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertSnapStartPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  SnapStartPropertyValidator(properties).assertSuccess();
   return {
     "ApplyOn": cdk.stringToCloudFormation(properties.applyOn)
   };
@@ -1191,9 +1375,31 @@ export interface FileSystemConfigProperty {
   readonly localMountPath: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`FileSystemConfigProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`FileSystemConfigProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function FileSystemConfigPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("arn", cdk.requiredValidator)(properties.arn));
+  errors.collect(cdk.propertyValidator("arn", cdk.validateString)(properties.arn));
+  errors.collect(cdk.propertyValidator("localMountPath", cdk.requiredValidator)(properties.localMountPath));
+  errors.collect(cdk.propertyValidator("localMountPath", cdk.validateString)(properties.localMountPath));
+  return errors.wrap("supplied properties not correct for \\"FileSystemConfigProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertFileSystemConfigPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  FileSystemConfigPropertyValidator(properties).assertSuccess();
   return {
     "Arn": cdk.stringToCloudFormation(properties.arn),
     "LocalMountPath": cdk.stringToCloudFormation(properties.localMountPath)
@@ -1248,13 +1454,34 @@ export interface ImageConfigProperty {
   readonly entryPoint?: Array<string>;
 }
 
+/**
+ * Determine whether the given properties match those of a \`ImageConfigProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`ImageConfigProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function ImageConfigPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("command", cdk.listValidator(cdk.validateString))(properties.command));
+  errors.collect(cdk.propertyValidator("entryPoint", cdk.listValidator(cdk.validateString))(properties.entryPoint));
+  errors.collect(cdk.propertyValidator("workingDirectory", cdk.validateString)(properties.workingDirectory));
+  return errors.wrap("supplied properties not correct for \\"ImageConfigProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertImageConfigPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  ImageConfigPropertyValidator(properties).assertSuccess();
   return {
-    "WorkingDirectory": cdk.stringToCloudFormation(properties.workingDirectory),
     "Command": cdk.listMapper(cdk.stringToCloudFormation)(properties.command),
-    "EntryPoint": cdk.listMapper(cdk.stringToCloudFormation)(properties.entryPoint)
+    "EntryPoint": cdk.listMapper(cdk.stringToCloudFormation)(properties.entryPoint),
+    "WorkingDirectory": cdk.stringToCloudFormation(properties.workingDirectory)
   };
 }
 
@@ -1263,9 +1490,9 @@ function ImageConfigPropertyFromCloudFormation(properties: any): cfn_parse.FromC
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<ImageConfigProperty>();
-  ret.addPropertyResult("workingDirectory", "WorkingDirectory", (properties.WorkingDirectory != null ? cfn_parse.FromCloudFormation.getString(properties.WorkingDirectory) : undefined));
   ret.addPropertyResult("command", "Command", (properties.Command != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.Command) : undefined));
   ret.addPropertyResult("entryPoint", "EntryPoint", (properties.EntryPoint != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.EntryPoint) : undefined));
+  ret.addPropertyResult("workingDirectory", "WorkingDirectory", (properties.WorkingDirectory != null ? cfn_parse.FromCloudFormation.getString(properties.WorkingDirectory) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -1285,9 +1512,28 @@ export interface DeadLetterConfigProperty {
   readonly targetArn?: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`DeadLetterConfigProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`DeadLetterConfigProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function DeadLetterConfigPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("targetArn", cdk.validateString)(properties.targetArn));
+  return errors.wrap("supplied properties not correct for \\"DeadLetterConfigProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertDeadLetterConfigPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  DeadLetterConfigPropertyValidator(properties).assertSuccess();
   return {
     "TargetArn": cdk.stringToCloudFormation(properties.targetArn)
   };
@@ -1354,15 +1600,38 @@ export interface CodeProperty {
   readonly imageUri?: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`CodeProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`CodeProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CodePropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("imageUri", cdk.validateString)(properties.imageUri));
+  errors.collect(cdk.propertyValidator("s3Bucket", cdk.validateString)(properties.s3Bucket));
+  errors.collect(cdk.propertyValidator("s3Key", cdk.validateString)(properties.s3Key));
+  errors.collect(cdk.propertyValidator("s3ObjectVersion", cdk.validateString)(properties.s3ObjectVersion));
+  errors.collect(cdk.propertyValidator("zipFile", cdk.validateString)(properties.zipFile));
+  return errors.wrap("supplied properties not correct for \\"CodeProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertCodePropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  CodePropertyValidator(properties).assertSuccess();
   return {
-    "S3ObjectVersion": cdk.stringToCloudFormation(properties.s3ObjectVersion),
+    "ImageUri": cdk.stringToCloudFormation(properties.imageUri),
     "S3Bucket": cdk.stringToCloudFormation(properties.s3Bucket),
-    "ZipFile": cdk.stringToCloudFormation(properties.zipFile),
     "S3Key": cdk.stringToCloudFormation(properties.s3Key),
-    "ImageUri": cdk.stringToCloudFormation(properties.imageUri)
+    "S3ObjectVersion": cdk.stringToCloudFormation(properties.s3ObjectVersion),
+    "ZipFile": cdk.stringToCloudFormation(properties.zipFile)
   };
 }
 
@@ -1371,11 +1640,11 @@ function CodePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFor
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CodeProperty>();
-  ret.addPropertyResult("s3ObjectVersion", "S3ObjectVersion", (properties.S3ObjectVersion != null ? cfn_parse.FromCloudFormation.getString(properties.S3ObjectVersion) : undefined));
-  ret.addPropertyResult("s3Bucket", "S3Bucket", (properties.S3Bucket != null ? cfn_parse.FromCloudFormation.getString(properties.S3Bucket) : undefined));
-  ret.addPropertyResult("zipFile", "ZipFile", (properties.ZipFile != null ? cfn_parse.FromCloudFormation.getString(properties.ZipFile) : undefined));
-  ret.addPropertyResult("s3Key", "S3Key", (properties.S3Key != null ? cfn_parse.FromCloudFormation.getString(properties.S3Key) : undefined));
   ret.addPropertyResult("imageUri", "ImageUri", (properties.ImageUri != null ? cfn_parse.FromCloudFormation.getString(properties.ImageUri) : undefined));
+  ret.addPropertyResult("s3Bucket", "S3Bucket", (properties.S3Bucket != null ? cfn_parse.FromCloudFormation.getString(properties.S3Bucket) : undefined));
+  ret.addPropertyResult("s3Key", "S3Key", (properties.S3Key != null ? cfn_parse.FromCloudFormation.getString(properties.S3Key) : undefined));
+  ret.addPropertyResult("s3ObjectVersion", "S3ObjectVersion", (properties.S3ObjectVersion != null ? cfn_parse.FromCloudFormation.getString(properties.S3ObjectVersion) : undefined));
+  ret.addPropertyResult("zipFile", "ZipFile", (properties.ZipFile != null ? cfn_parse.FromCloudFormation.getString(properties.ZipFile) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -1399,9 +1668,28 @@ export interface EnvironmentProperty {
   readonly variables?: Record<string, string>;
 }
 
+/**
+ * Determine whether the given properties match those of a \`EnvironmentProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`EnvironmentProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function EnvironmentPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("variables", cdk.listValidator(cdk.validateString))(properties.variables));
+  return errors.wrap("supplied properties not correct for \\"EnvironmentProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertEnvironmentPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  EnvironmentPropertyValidator(properties).assertSuccess();
   return {
     "Variables": cdk.hashMapper(cdk.stringToCloudFormation)(properties.variables)
   };
@@ -1434,9 +1722,29 @@ export interface EphemeralStorageProperty {
   readonly size: number;
 }
 
+/**
+ * Determine whether the given properties match those of a \`EphemeralStorageProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`EphemeralStorageProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function EphemeralStoragePropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("size", cdk.requiredValidator)(properties.size));
+  errors.collect(cdk.propertyValidator("size", cdk.validateNumber)(properties.size));
+  return errors.wrap("supplied properties not correct for \\"EphemeralStorageProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertEphemeralStoragePropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  EphemeralStoragePropertyValidator(properties).assertSuccess();
   return {
     "Size": cdk.numberToCloudFormation(properties.size)
   };
@@ -1452,33 +1760,76 @@ function EphemeralStoragePropertyFromCloudFormation(properties: any): cfn_parse.
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`CfnFunctionProps\`
+ *
+ * @param properties - the TypeScript properties of a \`CfnFunctionProps\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnFunctionPropsValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("architectures", cdk.listValidator(cdk.validateString))(properties.architectures));
+  errors.collect(cdk.propertyValidator("code", cdk.requiredValidator)(properties.code));
+  errors.collect(cdk.propertyValidator("code", CodePropertyValidator)(properties.code));
+  errors.collect(cdk.propertyValidator("codeSigningConfigArn", cdk.validateString)(properties.codeSigningConfigArn));
+  errors.collect(cdk.propertyValidator("deadLetterConfig", DeadLetterConfigPropertyValidator)(properties.deadLetterConfig));
+  errors.collect(cdk.propertyValidator("description", cdk.validateString)(properties.description));
+  errors.collect(cdk.propertyValidator("environment", EnvironmentPropertyValidator)(properties.environment));
+  errors.collect(cdk.propertyValidator("ephemeralStorage", EphemeralStoragePropertyValidator)(properties.ephemeralStorage));
+  errors.collect(cdk.propertyValidator("fileSystemConfigs", cdk.listValidator(FileSystemConfigPropertyValidator))(properties.fileSystemConfigs));
+  errors.collect(cdk.propertyValidator("functionName", cdk.validateString)(properties.functionName));
+  errors.collect(cdk.propertyValidator("handler", cdk.validateString)(properties.handler));
+  errors.collect(cdk.propertyValidator("imageConfig", ImageConfigPropertyValidator)(properties.imageConfig));
+  errors.collect(cdk.propertyValidator("kmsKeyArn", cdk.validateString)(properties.kmsKeyArn));
+  errors.collect(cdk.propertyValidator("layers", cdk.listValidator(cdk.validateString))(properties.layers));
+  errors.collect(cdk.propertyValidator("memorySize", cdk.validateNumber)(properties.memorySize));
+  errors.collect(cdk.propertyValidator("packageType", cdk.validateString)(properties.packageType));
+  errors.collect(cdk.propertyValidator("reservedConcurrentExecutions", cdk.validateNumber)(properties.reservedConcurrentExecutions));
+  errors.collect(cdk.propertyValidator("role", cdk.requiredValidator)(properties.role));
+  errors.collect(cdk.propertyValidator("role", cdk.validateString)(properties.role));
+  errors.collect(cdk.propertyValidator("runtime", cdk.validateString)(properties.runtime));
+  errors.collect(cdk.propertyValidator("snapStart", SnapStartPropertyValidator)(properties.snapStart));
+  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
+  errors.collect(cdk.propertyValidator("timeout", cdk.validateNumber)(properties.timeout));
+  errors.collect(cdk.propertyValidator("tracingConfig", TracingConfigPropertyValidator)(properties.tracingConfig));
+  errors.collect(cdk.propertyValidator("vpcConfig", VpcConfigPropertyValidator)(properties.vpcConfig));
+  return errors.wrap("supplied properties not correct for \\"CfnFunctionProps\\"");
+}
+
 // @ts-ignore TS6133
 function convertCfnFunctionPropsToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  CfnFunctionPropsValidator(properties).assertSuccess();
   return {
-    "Description": cdk.stringToCloudFormation(properties.description),
-    "TracingConfig": convertTracingConfigPropertyToCloudFormation(properties.tracingConfig),
-    "VpcConfig": convertVpcConfigPropertyToCloudFormation(properties.vpcConfig),
-    "ReservedConcurrentExecutions": cdk.numberToCloudFormation(properties.reservedConcurrentExecutions),
-    "SnapStart": convertSnapStartPropertyToCloudFormation(properties.snapStart),
-    "FileSystemConfigs": cdk.listMapper(convertFileSystemConfigPropertyToCloudFormation)(properties.fileSystemConfigs),
-    "FunctionName": cdk.stringToCloudFormation(properties.functionName),
-    "Runtime": cdk.stringToCloudFormation(properties.runtime),
-    "KmsKeyArn": cdk.stringToCloudFormation(properties.kmsKeyArn),
-    "PackageType": cdk.stringToCloudFormation(properties.packageType),
-    "CodeSigningConfigArn": cdk.stringToCloudFormation(properties.codeSigningConfigArn),
-    "Layers": cdk.listMapper(cdk.stringToCloudFormation)(properties.layers),
-    "Tags": cdk.listMapper(cdk.numberToCloudFormation)(properties.tags),
-    "ImageConfig": convertImageConfigPropertyToCloudFormation(properties.imageConfig),
-    "MemorySize": cdk.numberToCloudFormation(properties.memorySize),
-    "DeadLetterConfig": convertDeadLetterConfigPropertyToCloudFormation(properties.deadLetterConfig),
-    "Timeout": cdk.numberToCloudFormation(properties.timeout),
-    "Handler": cdk.stringToCloudFormation(properties.handler),
+    "Architectures": cdk.listMapper(cdk.stringToCloudFormation)(properties.architectures),
     "Code": convertCodePropertyToCloudFormation(properties.code),
-    "Role": cdk.stringToCloudFormation(properties.role),
+    "CodeSigningConfigArn": cdk.stringToCloudFormation(properties.codeSigningConfigArn),
+    "DeadLetterConfig": convertDeadLetterConfigPropertyToCloudFormation(properties.deadLetterConfig),
+    "Description": cdk.stringToCloudFormation(properties.description),
     "Environment": convertEnvironmentPropertyToCloudFormation(properties.environment),
     "EphemeralStorage": convertEphemeralStoragePropertyToCloudFormation(properties.ephemeralStorage),
-    "Architectures": cdk.listMapper(cdk.stringToCloudFormation)(properties.architectures)
+    "FileSystemConfigs": cdk.listMapper(convertFileSystemConfigPropertyToCloudFormation)(properties.fileSystemConfigs),
+    "FunctionName": cdk.stringToCloudFormation(properties.functionName),
+    "Handler": cdk.stringToCloudFormation(properties.handler),
+    "ImageConfig": convertImageConfigPropertyToCloudFormation(properties.imageConfig),
+    "KmsKeyArn": cdk.stringToCloudFormation(properties.kmsKeyArn),
+    "Layers": cdk.listMapper(cdk.stringToCloudFormation)(properties.layers),
+    "MemorySize": cdk.numberToCloudFormation(properties.memorySize),
+    "PackageType": cdk.stringToCloudFormation(properties.packageType),
+    "ReservedConcurrentExecutions": cdk.numberToCloudFormation(properties.reservedConcurrentExecutions),
+    "Role": cdk.stringToCloudFormation(properties.role),
+    "Runtime": cdk.stringToCloudFormation(properties.runtime),
+    "SnapStart": convertSnapStartPropertyToCloudFormation(properties.snapStart),
+    "Tags": cdk.listMapper(cdk.numberToCloudFormation)(properties.tags),
+    "Timeout": cdk.numberToCloudFormation(properties.timeout),
+    "TracingConfig": convertTracingConfigPropertyToCloudFormation(properties.tracingConfig),
+    "VpcConfig": convertVpcConfigPropertyToCloudFormation(properties.vpcConfig)
   };
 }
 
@@ -1487,29 +1838,29 @@ function CfnFunctionPropsFromCloudFormation(properties: any): cfn_parse.FromClou
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunctionProps>();
-  ret.addPropertyResult("description", "Description", (properties.Description != null ? cfn_parse.FromCloudFormation.getString(properties.Description) : undefined));
-  ret.addPropertyResult("tracingConfig", "TracingConfig", (properties.TracingConfig != null ? TracingConfigPropertyFromCloudFormation(properties.TracingConfig) : undefined));
-  ret.addPropertyResult("vpcConfig", "VpcConfig", (properties.VpcConfig != null ? VpcConfigPropertyFromCloudFormation(properties.VpcConfig) : undefined));
-  ret.addPropertyResult("reservedConcurrentExecutions", "ReservedConcurrentExecutions", (properties.ReservedConcurrentExecutions != null ? cfn_parse.FromCloudFormation.getNumber(properties.ReservedConcurrentExecutions) : undefined));
-  ret.addPropertyResult("snapStart", "SnapStart", (properties.SnapStart != null ? SnapStartPropertyFromCloudFormation(properties.SnapStart) : undefined));
-  ret.addPropertyResult("fileSystemConfigs", "FileSystemConfigs", (properties.FileSystemConfigs != null ? cfn_parse.FromCloudFormation.getArray(FileSystemConfigPropertyFromCloudFormation)(properties.FileSystemConfigs) : undefined));
-  ret.addPropertyResult("functionName", "FunctionName", (properties.FunctionName != null ? cfn_parse.FromCloudFormation.getString(properties.FunctionName) : undefined));
-  ret.addPropertyResult("runtime", "Runtime", (properties.Runtime != null ? cfn_parse.FromCloudFormation.getString(properties.Runtime) : undefined));
-  ret.addPropertyResult("kmsKeyArn", "KmsKeyArn", (properties.KmsKeyArn != null ? cfn_parse.FromCloudFormation.getString(properties.KmsKeyArn) : undefined));
-  ret.addPropertyResult("packageType", "PackageType", (properties.PackageType != null ? cfn_parse.FromCloudFormation.getString(properties.PackageType) : undefined));
-  ret.addPropertyResult("codeSigningConfigArn", "CodeSigningConfigArn", (properties.CodeSigningConfigArn != null ? cfn_parse.FromCloudFormation.getString(properties.CodeSigningConfigArn) : undefined));
-  ret.addPropertyResult("layers", "Layers", (properties.Layers != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.Layers) : undefined));
-  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
-  ret.addPropertyResult("imageConfig", "ImageConfig", (properties.ImageConfig != null ? ImageConfigPropertyFromCloudFormation(properties.ImageConfig) : undefined));
-  ret.addPropertyResult("memorySize", "MemorySize", (properties.MemorySize != null ? cfn_parse.FromCloudFormation.getNumber(properties.MemorySize) : undefined));
-  ret.addPropertyResult("deadLetterConfig", "DeadLetterConfig", (properties.DeadLetterConfig != null ? DeadLetterConfigPropertyFromCloudFormation(properties.DeadLetterConfig) : undefined));
-  ret.addPropertyResult("timeout", "Timeout", (properties.Timeout != null ? cfn_parse.FromCloudFormation.getNumber(properties.Timeout) : undefined));
-  ret.addPropertyResult("handler", "Handler", (properties.Handler != null ? cfn_parse.FromCloudFormation.getString(properties.Handler) : undefined));
+  ret.addPropertyResult("architectures", "Architectures", (properties.Architectures != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.Architectures) : undefined));
   ret.addPropertyResult("code", "Code", (properties.Code != null ? CodePropertyFromCloudFormation(properties.Code) : undefined));
-  ret.addPropertyResult("role", "Role", (properties.Role != null ? cfn_parse.FromCloudFormation.getString(properties.Role) : undefined));
+  ret.addPropertyResult("codeSigningConfigArn", "CodeSigningConfigArn", (properties.CodeSigningConfigArn != null ? cfn_parse.FromCloudFormation.getString(properties.CodeSigningConfigArn) : undefined));
+  ret.addPropertyResult("deadLetterConfig", "DeadLetterConfig", (properties.DeadLetterConfig != null ? DeadLetterConfigPropertyFromCloudFormation(properties.DeadLetterConfig) : undefined));
+  ret.addPropertyResult("description", "Description", (properties.Description != null ? cfn_parse.FromCloudFormation.getString(properties.Description) : undefined));
   ret.addPropertyResult("environment", "Environment", (properties.Environment != null ? EnvironmentPropertyFromCloudFormation(properties.Environment) : undefined));
   ret.addPropertyResult("ephemeralStorage", "EphemeralStorage", (properties.EphemeralStorage != null ? EphemeralStoragePropertyFromCloudFormation(properties.EphemeralStorage) : undefined));
-  ret.addPropertyResult("architectures", "Architectures", (properties.Architectures != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.Architectures) : undefined));
+  ret.addPropertyResult("fileSystemConfigs", "FileSystemConfigs", (properties.FileSystemConfigs != null ? cfn_parse.FromCloudFormation.getArray(FileSystemConfigPropertyFromCloudFormation)(properties.FileSystemConfigs) : undefined));
+  ret.addPropertyResult("functionName", "FunctionName", (properties.FunctionName != null ? cfn_parse.FromCloudFormation.getString(properties.FunctionName) : undefined));
+  ret.addPropertyResult("handler", "Handler", (properties.Handler != null ? cfn_parse.FromCloudFormation.getString(properties.Handler) : undefined));
+  ret.addPropertyResult("imageConfig", "ImageConfig", (properties.ImageConfig != null ? ImageConfigPropertyFromCloudFormation(properties.ImageConfig) : undefined));
+  ret.addPropertyResult("kmsKeyArn", "KmsKeyArn", (properties.KmsKeyArn != null ? cfn_parse.FromCloudFormation.getString(properties.KmsKeyArn) : undefined));
+  ret.addPropertyResult("layers", "Layers", (properties.Layers != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.Layers) : undefined));
+  ret.addPropertyResult("memorySize", "MemorySize", (properties.MemorySize != null ? cfn_parse.FromCloudFormation.getNumber(properties.MemorySize) : undefined));
+  ret.addPropertyResult("packageType", "PackageType", (properties.PackageType != null ? cfn_parse.FromCloudFormation.getString(properties.PackageType) : undefined));
+  ret.addPropertyResult("reservedConcurrentExecutions", "ReservedConcurrentExecutions", (properties.ReservedConcurrentExecutions != null ? cfn_parse.FromCloudFormation.getNumber(properties.ReservedConcurrentExecutions) : undefined));
+  ret.addPropertyResult("role", "Role", (properties.Role != null ? cfn_parse.FromCloudFormation.getString(properties.Role) : undefined));
+  ret.addPropertyResult("runtime", "Runtime", (properties.Runtime != null ? cfn_parse.FromCloudFormation.getString(properties.Runtime) : undefined));
+  ret.addPropertyResult("snapStart", "SnapStart", (properties.SnapStart != null ? SnapStartPropertyFromCloudFormation(properties.SnapStart) : undefined));
+  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
+  ret.addPropertyResult("timeout", "Timeout", (properties.Timeout != null ? cfn_parse.FromCloudFormation.getNumber(properties.Timeout) : undefined));
+  ret.addPropertyResult("tracingConfig", "TracingConfig", (properties.TracingConfig != null ? TracingConfigPropertyFromCloudFormation(properties.TracingConfig) : undefined));
+  ret.addPropertyResult("vpcConfig", "VpcConfig", (properties.VpcConfig != null ? VpcConfigPropertyFromCloudFormation(properties.VpcConfig) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -1975,9 +2326,29 @@ export interface AccelerateConfigurationProperty {
   readonly accelerationStatus: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`AccelerateConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`AccelerateConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function AccelerateConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("accelerationStatus", cdk.requiredValidator)(properties.accelerationStatus));
+  errors.collect(cdk.propertyValidator("accelerationStatus", cdk.validateString)(properties.accelerationStatus));
+  return errors.wrap("supplied properties not correct for \\"AccelerateConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertAccelerateConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  AccelerateConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "AccelerationStatus": cdk.stringToCloudFormation(properties.accelerationStatus)
   };
@@ -2053,12 +2424,34 @@ export interface TagFilterProperty {
   readonly key: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`TagFilterProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`TagFilterProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function TagFilterPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
+  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
+  errors.collect(cdk.propertyValidator("value", cdk.requiredValidator)(properties.value));
+  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
+  return errors.wrap("supplied properties not correct for \\"TagFilterProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertTagFilterPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  TagFilterPropertyValidator(properties).assertSuccess();
   return {
-    "Value": cdk.stringToCloudFormation(properties.value),
-    "Key": cdk.stringToCloudFormation(properties.key)
+    "Key": cdk.stringToCloudFormation(properties.key),
+    "Value": cdk.stringToCloudFormation(properties.value)
   };
 }
 
@@ -2067,8 +2460,8 @@ function TagFilterPropertyFromCloudFormation(properties: any): cfn_parse.FromClo
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<TagFilterProperty>();
-  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
   ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
+  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -2156,12 +2549,36 @@ export interface DestinationProperty {
   readonly prefix?: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`DestinationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`DestinationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function DestinationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("bucketAccountId", cdk.validateString)(properties.bucketAccountId));
+  errors.collect(cdk.propertyValidator("bucketArn", cdk.requiredValidator)(properties.bucketArn));
+  errors.collect(cdk.propertyValidator("bucketArn", cdk.validateString)(properties.bucketArn));
+  errors.collect(cdk.propertyValidator("format", cdk.requiredValidator)(properties.format));
+  errors.collect(cdk.propertyValidator("format", cdk.validateString)(properties.format));
+  errors.collect(cdk.propertyValidator("prefix", cdk.validateString)(properties.prefix));
+  return errors.wrap("supplied properties not correct for \\"DestinationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertDestinationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  DestinationPropertyValidator(properties).assertSuccess();
   return {
-    "BucketArn": cdk.stringToCloudFormation(properties.bucketArn),
     "BucketAccountId": cdk.stringToCloudFormation(properties.bucketAccountId),
+    "BucketArn": cdk.stringToCloudFormation(properties.bucketArn),
     "Format": cdk.stringToCloudFormation(properties.format),
     "Prefix": cdk.stringToCloudFormation(properties.prefix)
   };
@@ -2172,17 +2589,39 @@ function DestinationPropertyFromCloudFormation(properties: any): cfn_parse.FromC
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<DestinationProperty>();
-  ret.addPropertyResult("bucketArn", "BucketArn", (properties.BucketArn != null ? cfn_parse.FromCloudFormation.getString(properties.BucketArn) : undefined));
   ret.addPropertyResult("bucketAccountId", "BucketAccountId", (properties.BucketAccountId != null ? cfn_parse.FromCloudFormation.getString(properties.BucketAccountId) : undefined));
+  ret.addPropertyResult("bucketArn", "BucketArn", (properties.BucketArn != null ? cfn_parse.FromCloudFormation.getString(properties.BucketArn) : undefined));
   ret.addPropertyResult("format", "Format", (properties.Format != null ? cfn_parse.FromCloudFormation.getString(properties.Format) : undefined));
   ret.addPropertyResult("prefix", "Prefix", (properties.Prefix != null ? cfn_parse.FromCloudFormation.getString(properties.Prefix) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`DataExportProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`DataExportProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function DataExportPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("destination", cdk.requiredValidator)(properties.destination));
+  errors.collect(cdk.propertyValidator("destination", DestinationPropertyValidator)(properties.destination));
+  errors.collect(cdk.propertyValidator("outputSchemaVersion", cdk.requiredValidator)(properties.outputSchemaVersion));
+  errors.collect(cdk.propertyValidator("outputSchemaVersion", cdk.validateString)(properties.outputSchemaVersion));
+  return errors.wrap("supplied properties not correct for \\"DataExportProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertDataExportPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  DataExportPropertyValidator(properties).assertSuccess();
   return {
     "Destination": convertDestinationPropertyToCloudFormation(properties.destination),
     "OutputSchemaVersion": cdk.stringToCloudFormation(properties.outputSchemaVersion)
@@ -2200,9 +2639,28 @@ function DataExportPropertyFromCloudFormation(properties: any): cfn_parse.FromCl
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`StorageClassAnalysisProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`StorageClassAnalysisProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function StorageClassAnalysisPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("dataExport", DataExportPropertyValidator)(properties.dataExport));
+  return errors.wrap("supplied properties not correct for \\"StorageClassAnalysisProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertStorageClassAnalysisPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  StorageClassAnalysisPropertyValidator(properties).assertSuccess();
   return {
     "DataExport": convertDataExportPropertyToCloudFormation(properties.dataExport)
   };
@@ -2218,14 +2676,38 @@ function StorageClassAnalysisPropertyFromCloudFormation(properties: any): cfn_pa
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`AnalyticsConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`AnalyticsConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function AnalyticsConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("id", cdk.requiredValidator)(properties.id));
+  errors.collect(cdk.propertyValidator("id", cdk.validateString)(properties.id));
+  errors.collect(cdk.propertyValidator("prefix", cdk.validateString)(properties.prefix));
+  errors.collect(cdk.propertyValidator("storageClassAnalysis", cdk.requiredValidator)(properties.storageClassAnalysis));
+  errors.collect(cdk.propertyValidator("storageClassAnalysis", StorageClassAnalysisPropertyValidator)(properties.storageClassAnalysis));
+  errors.collect(cdk.propertyValidator("tagFilters", cdk.listValidator(TagFilterPropertyValidator))(properties.tagFilters));
+  return errors.wrap("supplied properties not correct for \\"AnalyticsConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertAnalyticsConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  AnalyticsConfigurationPropertyValidator(properties).assertSuccess();
   return {
-    "TagFilters": cdk.listMapper(convertTagFilterPropertyToCloudFormation)(properties.tagFilters),
-    "StorageClassAnalysis": convertStorageClassAnalysisPropertyToCloudFormation(properties.storageClassAnalysis),
     "Id": cdk.stringToCloudFormation(properties.id),
-    "Prefix": cdk.stringToCloudFormation(properties.prefix)
+    "Prefix": cdk.stringToCloudFormation(properties.prefix),
+    "StorageClassAnalysis": convertStorageClassAnalysisPropertyToCloudFormation(properties.storageClassAnalysis),
+    "TagFilters": cdk.listMapper(convertTagFilterPropertyToCloudFormation)(properties.tagFilters)
   };
 }
 
@@ -2234,10 +2716,10 @@ function AnalyticsConfigurationPropertyFromCloudFormation(properties: any): cfn_
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<AnalyticsConfigurationProperty>();
-  ret.addPropertyResult("tagFilters", "TagFilters", (properties.TagFilters != null ? cfn_parse.FromCloudFormation.getArray(TagFilterPropertyFromCloudFormation)(properties.TagFilters) : undefined));
-  ret.addPropertyResult("storageClassAnalysis", "StorageClassAnalysis", (properties.StorageClassAnalysis != null ? StorageClassAnalysisPropertyFromCloudFormation(properties.StorageClassAnalysis) : undefined));
   ret.addPropertyResult("id", "Id", (properties.Id != null ? cfn_parse.FromCloudFormation.getString(properties.Id) : undefined));
   ret.addPropertyResult("prefix", "Prefix", (properties.Prefix != null ? cfn_parse.FromCloudFormation.getString(properties.Prefix) : undefined));
+  ret.addPropertyResult("storageClassAnalysis", "StorageClassAnalysis", (properties.StorageClassAnalysis != null ? StorageClassAnalysisPropertyFromCloudFormation(properties.StorageClassAnalysis) : undefined));
+  ret.addPropertyResult("tagFilters", "TagFilters", (properties.TagFilters != null ? cfn_parse.FromCloudFormation.getArray(TagFilterPropertyFromCloudFormation)(properties.TagFilters) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -2320,9 +2802,30 @@ export interface ServerSideEncryptionByDefaultProperty {
   readonly sseAlgorithm: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`ServerSideEncryptionByDefaultProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`ServerSideEncryptionByDefaultProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function ServerSideEncryptionByDefaultPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("kmsMasterKeyId", cdk.validateString)(properties.kmsMasterKeyId));
+  errors.collect(cdk.propertyValidator("sseAlgorithm", cdk.requiredValidator)(properties.sseAlgorithm));
+  errors.collect(cdk.propertyValidator("sseAlgorithm", cdk.validateString)(properties.sseAlgorithm));
+  return errors.wrap("supplied properties not correct for \\"ServerSideEncryptionByDefaultProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertServerSideEncryptionByDefaultPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  ServerSideEncryptionByDefaultPropertyValidator(properties).assertSuccess();
   return {
     "KMSMasterKeyID": cdk.stringToCloudFormation(properties.kmsMasterKeyId),
     "SSEAlgorithm": cdk.stringToCloudFormation(properties.sseAlgorithm)
@@ -2340,9 +2843,29 @@ function ServerSideEncryptionByDefaultPropertyFromCloudFormation(properties: any
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`ServerSideEncryptionRuleProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`ServerSideEncryptionRuleProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function ServerSideEncryptionRulePropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("bucketKeyEnabled", cdk.validateBoolean)(properties.bucketKeyEnabled));
+  errors.collect(cdk.propertyValidator("serverSideEncryptionByDefault", ServerSideEncryptionByDefaultPropertyValidator)(properties.serverSideEncryptionByDefault));
+  return errors.wrap("supplied properties not correct for \\"ServerSideEncryptionRuleProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertServerSideEncryptionRulePropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  ServerSideEncryptionRulePropertyValidator(properties).assertSuccess();
   return {
     "BucketKeyEnabled": cdk.booleanToCloudFormation(properties.bucketKeyEnabled),
     "ServerSideEncryptionByDefault": convertServerSideEncryptionByDefaultPropertyToCloudFormation(properties.serverSideEncryptionByDefault)
@@ -2360,9 +2883,29 @@ function ServerSideEncryptionRulePropertyFromCloudFormation(properties: any): cf
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`BucketEncryptionProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`BucketEncryptionProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function BucketEncryptionPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("serverSideEncryptionConfiguration", cdk.requiredValidator)(properties.serverSideEncryptionConfiguration));
+  errors.collect(cdk.propertyValidator("serverSideEncryptionConfiguration", cdk.listValidator(ServerSideEncryptionRulePropertyValidator))(properties.serverSideEncryptionConfiguration));
+  return errors.wrap("supplied properties not correct for \\"BucketEncryptionProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertBucketEncryptionPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  BucketEncryptionPropertyValidator(properties).assertSuccess();
   return {
     "ServerSideEncryptionConfiguration": cdk.listMapper(convertServerSideEncryptionRulePropertyToCloudFormation)(properties.serverSideEncryptionConfiguration)
   };
@@ -2453,9 +2996,35 @@ export interface CorsRuleProperty {
   readonly maxAge?: number;
 }
 
+/**
+ * Determine whether the given properties match those of a \`CorsRuleProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`CorsRuleProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CorsRulePropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("allowedHeaders", cdk.listValidator(cdk.validateString))(properties.allowedHeaders));
+  errors.collect(cdk.propertyValidator("allowedMethods", cdk.requiredValidator)(properties.allowedMethods));
+  errors.collect(cdk.propertyValidator("allowedMethods", cdk.listValidator(cdk.validateString))(properties.allowedMethods));
+  errors.collect(cdk.propertyValidator("allowedOrigins", cdk.requiredValidator)(properties.allowedOrigins));
+  errors.collect(cdk.propertyValidator("allowedOrigins", cdk.listValidator(cdk.validateString))(properties.allowedOrigins));
+  errors.collect(cdk.propertyValidator("exposedHeaders", cdk.listValidator(cdk.validateString))(properties.exposedHeaders));
+  errors.collect(cdk.propertyValidator("id", cdk.validateString)(properties.id));
+  errors.collect(cdk.propertyValidator("maxAge", cdk.validateNumber)(properties.maxAge));
+  return errors.wrap("supplied properties not correct for \\"CorsRuleProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertCorsRulePropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  CorsRulePropertyValidator(properties).assertSuccess();
   return {
     "AllowedHeaders": cdk.listMapper(cdk.stringToCloudFormation)(properties.allowedHeaders),
     "AllowedMethods": cdk.listMapper(cdk.stringToCloudFormation)(properties.allowedMethods),
@@ -2481,9 +3050,29 @@ function CorsRulePropertyFromCloudFormation(properties: any): cfn_parse.FromClou
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`CorsConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`CorsConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CorsConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("corsRules", cdk.requiredValidator)(properties.corsRules));
+  errors.collect(cdk.propertyValidator("corsRules", cdk.listValidator(CorsRulePropertyValidator))(properties.corsRules));
+  return errors.wrap("supplied properties not correct for \\"CorsConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertCorsConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  CorsConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "CorsRules": cdk.listMapper(convertCorsRulePropertyToCloudFormation)(properties.corsRules)
   };
@@ -2574,9 +3163,31 @@ export interface TieringProperty {
   readonly days: number;
 }
 
+/**
+ * Determine whether the given properties match those of a \`TieringProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`TieringProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function TieringPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("accessTier", cdk.requiredValidator)(properties.accessTier));
+  errors.collect(cdk.propertyValidator("accessTier", cdk.validateString)(properties.accessTier));
+  errors.collect(cdk.propertyValidator("days", cdk.requiredValidator)(properties.days));
+  errors.collect(cdk.propertyValidator("days", cdk.validateNumber)(properties.days));
+  return errors.wrap("supplied properties not correct for \\"TieringProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertTieringPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  TieringPropertyValidator(properties).assertSuccess();
   return {
     "AccessTier": cdk.stringToCloudFormation(properties.accessTier),
     "Days": cdk.numberToCloudFormation(properties.days)
@@ -2594,9 +3205,35 @@ function TieringPropertyFromCloudFormation(properties: any): cfn_parse.FromCloud
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`IntelligentTieringConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`IntelligentTieringConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function IntelligentTieringConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("id", cdk.requiredValidator)(properties.id));
+  errors.collect(cdk.propertyValidator("id", cdk.validateString)(properties.id));
+  errors.collect(cdk.propertyValidator("prefix", cdk.validateString)(properties.prefix));
+  errors.collect(cdk.propertyValidator("status", cdk.requiredValidator)(properties.status));
+  errors.collect(cdk.propertyValidator("status", cdk.validateString)(properties.status));
+  errors.collect(cdk.propertyValidator("tagFilters", cdk.listValidator(TagFilterPropertyValidator))(properties.tagFilters));
+  errors.collect(cdk.propertyValidator("tierings", cdk.requiredValidator)(properties.tierings));
+  errors.collect(cdk.propertyValidator("tierings", cdk.listValidator(TieringPropertyValidator))(properties.tierings));
+  return errors.wrap("supplied properties not correct for \\"IntelligentTieringConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertIntelligentTieringConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  IntelligentTieringConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "Id": cdk.stringToCloudFormation(properties.id),
     "Prefix": cdk.stringToCloudFormation(properties.prefix),
@@ -2687,9 +3324,39 @@ export interface InventoryConfigurationProperty {
   readonly scheduleFrequency: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`InventoryConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`InventoryConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function InventoryConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("destination", cdk.requiredValidator)(properties.destination));
+  errors.collect(cdk.propertyValidator("destination", DestinationPropertyValidator)(properties.destination));
+  errors.collect(cdk.propertyValidator("enabled", cdk.requiredValidator)(properties.enabled));
+  errors.collect(cdk.propertyValidator("enabled", cdk.validateBoolean)(properties.enabled));
+  errors.collect(cdk.propertyValidator("id", cdk.requiredValidator)(properties.id));
+  errors.collect(cdk.propertyValidator("id", cdk.validateString)(properties.id));
+  errors.collect(cdk.propertyValidator("includedObjectVersions", cdk.requiredValidator)(properties.includedObjectVersions));
+  errors.collect(cdk.propertyValidator("includedObjectVersions", cdk.validateString)(properties.includedObjectVersions));
+  errors.collect(cdk.propertyValidator("optionalFields", cdk.listValidator(cdk.validateString))(properties.optionalFields));
+  errors.collect(cdk.propertyValidator("prefix", cdk.validateString)(properties.prefix));
+  errors.collect(cdk.propertyValidator("scheduleFrequency", cdk.requiredValidator)(properties.scheduleFrequency));
+  errors.collect(cdk.propertyValidator("scheduleFrequency", cdk.validateString)(properties.scheduleFrequency));
+  return errors.wrap("supplied properties not correct for \\"InventoryConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertInventoryConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  InventoryConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "Destination": convertDestinationPropertyToCloudFormation(properties.destination),
     "Enabled": cdk.booleanToCloudFormation(properties.enabled),
@@ -2897,9 +3564,29 @@ export interface AbortIncompleteMultipartUploadProperty {
   readonly daysAfterInitiation: number;
 }
 
+/**
+ * Determine whether the given properties match those of a \`AbortIncompleteMultipartUploadProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`AbortIncompleteMultipartUploadProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function AbortIncompleteMultipartUploadPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("daysAfterInitiation", cdk.requiredValidator)(properties.daysAfterInitiation));
+  errors.collect(cdk.propertyValidator("daysAfterInitiation", cdk.validateNumber)(properties.daysAfterInitiation));
+  return errors.wrap("supplied properties not correct for \\"AbortIncompleteMultipartUploadProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertAbortIncompleteMultipartUploadPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  AbortIncompleteMultipartUploadPropertyValidator(properties).assertSuccess();
   return {
     "DaysAfterInitiation": cdk.numberToCloudFormation(properties.daysAfterInitiation)
   };
@@ -2943,12 +3630,33 @@ export interface NoncurrentVersionExpirationProperty {
   readonly newerNoncurrentVersions?: number;
 }
 
+/**
+ * Determine whether the given properties match those of a \`NoncurrentVersionExpirationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`NoncurrentVersionExpirationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function NoncurrentVersionExpirationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("newerNoncurrentVersions", cdk.validateNumber)(properties.newerNoncurrentVersions));
+  errors.collect(cdk.propertyValidator("noncurrentDays", cdk.requiredValidator)(properties.noncurrentDays));
+  errors.collect(cdk.propertyValidator("noncurrentDays", cdk.validateNumber)(properties.noncurrentDays));
+  return errors.wrap("supplied properties not correct for \\"NoncurrentVersionExpirationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertNoncurrentVersionExpirationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  NoncurrentVersionExpirationPropertyValidator(properties).assertSuccess();
   return {
-    "NoncurrentDays": cdk.numberToCloudFormation(properties.noncurrentDays),
-    "NewerNoncurrentVersions": cdk.numberToCloudFormation(properties.newerNoncurrentVersions)
+    "NewerNoncurrentVersions": cdk.numberToCloudFormation(properties.newerNoncurrentVersions),
+    "NoncurrentDays": cdk.numberToCloudFormation(properties.noncurrentDays)
   };
 }
 
@@ -2957,8 +3665,8 @@ function NoncurrentVersionExpirationPropertyFromCloudFormation(properties: any):
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<NoncurrentVersionExpirationProperty>();
-  ret.addPropertyResult("noncurrentDays", "NoncurrentDays", (properties.NoncurrentDays != null ? cfn_parse.FromCloudFormation.getNumber(properties.NoncurrentDays) : undefined));
   ret.addPropertyResult("newerNoncurrentVersions", "NewerNoncurrentVersions", (properties.NewerNoncurrentVersions != null ? cfn_parse.FromCloudFormation.getNumber(properties.NewerNoncurrentVersions) : undefined));
+  ret.addPropertyResult("noncurrentDays", "NoncurrentDays", (properties.NoncurrentDays != null ? cfn_parse.FromCloudFormation.getNumber(properties.NoncurrentDays) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -2998,13 +3706,36 @@ export interface NoncurrentVersionTransitionProperty {
   readonly newerNoncurrentVersions?: number;
 }
 
+/**
+ * Determine whether the given properties match those of a \`NoncurrentVersionTransitionProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`NoncurrentVersionTransitionProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function NoncurrentVersionTransitionPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("newerNoncurrentVersions", cdk.validateNumber)(properties.newerNoncurrentVersions));
+  errors.collect(cdk.propertyValidator("storageClass", cdk.requiredValidator)(properties.storageClass));
+  errors.collect(cdk.propertyValidator("storageClass", cdk.validateString)(properties.storageClass));
+  errors.collect(cdk.propertyValidator("transitionInDays", cdk.requiredValidator)(properties.transitionInDays));
+  errors.collect(cdk.propertyValidator("transitionInDays", cdk.validateNumber)(properties.transitionInDays));
+  return errors.wrap("supplied properties not correct for \\"NoncurrentVersionTransitionProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertNoncurrentVersionTransitionPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  NoncurrentVersionTransitionPropertyValidator(properties).assertSuccess();
   return {
+    "NewerNoncurrentVersions": cdk.numberToCloudFormation(properties.newerNoncurrentVersions),
     "StorageClass": cdk.stringToCloudFormation(properties.storageClass),
-    "TransitionInDays": cdk.numberToCloudFormation(properties.transitionInDays),
-    "NewerNoncurrentVersions": cdk.numberToCloudFormation(properties.newerNoncurrentVersions)
+    "TransitionInDays": cdk.numberToCloudFormation(properties.transitionInDays)
   };
 }
 
@@ -3013,9 +3744,9 @@ function NoncurrentVersionTransitionPropertyFromCloudFormation(properties: any):
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<NoncurrentVersionTransitionProperty>();
+  ret.addPropertyResult("newerNoncurrentVersions", "NewerNoncurrentVersions", (properties.NewerNoncurrentVersions != null ? cfn_parse.FromCloudFormation.getNumber(properties.NewerNoncurrentVersions) : undefined));
   ret.addPropertyResult("storageClass", "StorageClass", (properties.StorageClass != null ? cfn_parse.FromCloudFormation.getString(properties.StorageClass) : undefined));
   ret.addPropertyResult("transitionInDays", "TransitionInDays", (properties.TransitionInDays != null ? cfn_parse.FromCloudFormation.getNumber(properties.TransitionInDays) : undefined));
-  ret.addPropertyResult("newerNoncurrentVersions", "NewerNoncurrentVersions", (properties.NewerNoncurrentVersions != null ? cfn_parse.FromCloudFormation.getNumber(properties.NewerNoncurrentVersions) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -3055,9 +3786,31 @@ export interface TransitionProperty {
   readonly transitionInDays?: number;
 }
 
+/**
+ * Determine whether the given properties match those of a \`TransitionProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`TransitionProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function TransitionPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("storageClass", cdk.requiredValidator)(properties.storageClass));
+  errors.collect(cdk.propertyValidator("storageClass", cdk.validateString)(properties.storageClass));
+  errors.collect(cdk.propertyValidator("transitionDate", cdk.validateString)(properties.transitionDate));
+  errors.collect(cdk.propertyValidator("transitionInDays", cdk.validateNumber)(properties.transitionInDays));
+  return errors.wrap("supplied properties not correct for \\"TransitionProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertTransitionPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  TransitionPropertyValidator(properties).assertSuccess();
   return {
     "StorageClass": cdk.stringToCloudFormation(properties.storageClass),
     "TransitionDate": cdk.stringToCloudFormation(properties.transitionDate),
@@ -3077,24 +3830,59 @@ function TransitionPropertyFromCloudFormation(properties: any): cfn_parse.FromCl
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`RuleProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`RuleProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function RulePropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("abortIncompleteMultipartUpload", AbortIncompleteMultipartUploadPropertyValidator)(properties.abortIncompleteMultipartUpload));
+  errors.collect(cdk.propertyValidator("expirationDate", cdk.validateString)(properties.expirationDate));
+  errors.collect(cdk.propertyValidator("expirationInDays", cdk.validateNumber)(properties.expirationInDays));
+  errors.collect(cdk.propertyValidator("expiredObjectDeleteMarker", cdk.validateBoolean)(properties.expiredObjectDeleteMarker));
+  errors.collect(cdk.propertyValidator("id", cdk.validateString)(properties.id));
+  errors.collect(cdk.propertyValidator("noncurrentVersionExpiration", NoncurrentVersionExpirationPropertyValidator)(properties.noncurrentVersionExpiration));
+  errors.collect(cdk.propertyValidator("noncurrentVersionExpirationInDays", cdk.validateNumber)(properties.noncurrentVersionExpirationInDays));
+  errors.collect(cdk.propertyValidator("noncurrentVersionTransition", NoncurrentVersionTransitionPropertyValidator)(properties.noncurrentVersionTransition));
+  errors.collect(cdk.propertyValidator("noncurrentVersionTransitions", cdk.listValidator(NoncurrentVersionTransitionPropertyValidator))(properties.noncurrentVersionTransitions));
+  errors.collect(cdk.propertyValidator("objectSizeGreaterThan", cdk.validateString)(properties.objectSizeGreaterThan));
+  errors.collect(cdk.propertyValidator("objectSizeLessThan", cdk.validateString)(properties.objectSizeLessThan));
+  errors.collect(cdk.propertyValidator("prefix", cdk.validateString)(properties.prefix));
+  errors.collect(cdk.propertyValidator("status", cdk.requiredValidator)(properties.status));
+  errors.collect(cdk.propertyValidator("status", cdk.validateString)(properties.status));
+  errors.collect(cdk.propertyValidator("tagFilters", cdk.listValidator(TagFilterPropertyValidator))(properties.tagFilters));
+  errors.collect(cdk.propertyValidator("transition", TransitionPropertyValidator)(properties.transition));
+  errors.collect(cdk.propertyValidator("transitions", cdk.listValidator(TransitionPropertyValidator))(properties.transitions));
+  return errors.wrap("supplied properties not correct for \\"RuleProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertRulePropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  RulePropertyValidator(properties).assertSuccess();
   return {
     "AbortIncompleteMultipartUpload": convertAbortIncompleteMultipartUploadPropertyToCloudFormation(properties.abortIncompleteMultipartUpload),
     "ExpirationDate": cdk.stringToCloudFormation(properties.expirationDate),
     "ExpirationInDays": cdk.numberToCloudFormation(properties.expirationInDays),
     "ExpiredObjectDeleteMarker": cdk.booleanToCloudFormation(properties.expiredObjectDeleteMarker),
     "Id": cdk.stringToCloudFormation(properties.id),
-    "NoncurrentVersionExpirationInDays": cdk.numberToCloudFormation(properties.noncurrentVersionExpirationInDays),
     "NoncurrentVersionExpiration": convertNoncurrentVersionExpirationPropertyToCloudFormation(properties.noncurrentVersionExpiration),
+    "NoncurrentVersionExpirationInDays": cdk.numberToCloudFormation(properties.noncurrentVersionExpirationInDays),
     "NoncurrentVersionTransition": convertNoncurrentVersionTransitionPropertyToCloudFormation(properties.noncurrentVersionTransition),
     "NoncurrentVersionTransitions": cdk.listMapper(convertNoncurrentVersionTransitionPropertyToCloudFormation)(properties.noncurrentVersionTransitions),
+    "ObjectSizeGreaterThan": cdk.stringToCloudFormation(properties.objectSizeGreaterThan),
+    "ObjectSizeLessThan": cdk.stringToCloudFormation(properties.objectSizeLessThan),
     "Prefix": cdk.stringToCloudFormation(properties.prefix),
     "Status": cdk.stringToCloudFormation(properties.status),
     "TagFilters": cdk.listMapper(convertTagFilterPropertyToCloudFormation)(properties.tagFilters),
-    "ObjectSizeGreaterThan": cdk.stringToCloudFormation(properties.objectSizeGreaterThan),
-    "ObjectSizeLessThan": cdk.stringToCloudFormation(properties.objectSizeLessThan),
     "Transition": convertTransitionPropertyToCloudFormation(properties.transition),
     "Transitions": cdk.listMapper(convertTransitionPropertyToCloudFormation)(properties.transitions)
   };
@@ -3110,24 +3898,44 @@ function RulePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFor
   ret.addPropertyResult("expirationInDays", "ExpirationInDays", (properties.ExpirationInDays != null ? cfn_parse.FromCloudFormation.getNumber(properties.ExpirationInDays) : undefined));
   ret.addPropertyResult("expiredObjectDeleteMarker", "ExpiredObjectDeleteMarker", (properties.ExpiredObjectDeleteMarker != null ? cfn_parse.FromCloudFormation.getBoolean(properties.ExpiredObjectDeleteMarker) : undefined));
   ret.addPropertyResult("id", "Id", (properties.Id != null ? cfn_parse.FromCloudFormation.getString(properties.Id) : undefined));
-  ret.addPropertyResult("noncurrentVersionExpirationInDays", "NoncurrentVersionExpirationInDays", (properties.NoncurrentVersionExpirationInDays != null ? cfn_parse.FromCloudFormation.getNumber(properties.NoncurrentVersionExpirationInDays) : undefined));
   ret.addPropertyResult("noncurrentVersionExpiration", "NoncurrentVersionExpiration", (properties.NoncurrentVersionExpiration != null ? NoncurrentVersionExpirationPropertyFromCloudFormation(properties.NoncurrentVersionExpiration) : undefined));
+  ret.addPropertyResult("noncurrentVersionExpirationInDays", "NoncurrentVersionExpirationInDays", (properties.NoncurrentVersionExpirationInDays != null ? cfn_parse.FromCloudFormation.getNumber(properties.NoncurrentVersionExpirationInDays) : undefined));
   ret.addPropertyResult("noncurrentVersionTransition", "NoncurrentVersionTransition", (properties.NoncurrentVersionTransition != null ? NoncurrentVersionTransitionPropertyFromCloudFormation(properties.NoncurrentVersionTransition) : undefined));
   ret.addPropertyResult("noncurrentVersionTransitions", "NoncurrentVersionTransitions", (properties.NoncurrentVersionTransitions != null ? cfn_parse.FromCloudFormation.getArray(NoncurrentVersionTransitionPropertyFromCloudFormation)(properties.NoncurrentVersionTransitions) : undefined));
+  ret.addPropertyResult("objectSizeGreaterThan", "ObjectSizeGreaterThan", (properties.ObjectSizeGreaterThan != null ? cfn_parse.FromCloudFormation.getString(properties.ObjectSizeGreaterThan) : undefined));
+  ret.addPropertyResult("objectSizeLessThan", "ObjectSizeLessThan", (properties.ObjectSizeLessThan != null ? cfn_parse.FromCloudFormation.getString(properties.ObjectSizeLessThan) : undefined));
   ret.addPropertyResult("prefix", "Prefix", (properties.Prefix != null ? cfn_parse.FromCloudFormation.getString(properties.Prefix) : undefined));
   ret.addPropertyResult("status", "Status", (properties.Status != null ? cfn_parse.FromCloudFormation.getString(properties.Status) : undefined));
   ret.addPropertyResult("tagFilters", "TagFilters", (properties.TagFilters != null ? cfn_parse.FromCloudFormation.getArray(TagFilterPropertyFromCloudFormation)(properties.TagFilters) : undefined));
-  ret.addPropertyResult("objectSizeGreaterThan", "ObjectSizeGreaterThan", (properties.ObjectSizeGreaterThan != null ? cfn_parse.FromCloudFormation.getString(properties.ObjectSizeGreaterThan) : undefined));
-  ret.addPropertyResult("objectSizeLessThan", "ObjectSizeLessThan", (properties.ObjectSizeLessThan != null ? cfn_parse.FromCloudFormation.getString(properties.ObjectSizeLessThan) : undefined));
   ret.addPropertyResult("transition", "Transition", (properties.Transition != null ? TransitionPropertyFromCloudFormation(properties.Transition) : undefined));
   ret.addPropertyResult("transitions", "Transitions", (properties.Transitions != null ? cfn_parse.FromCloudFormation.getArray(TransitionPropertyFromCloudFormation)(properties.Transitions) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`LifecycleConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`LifecycleConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function LifecycleConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("rules", cdk.requiredValidator)(properties.rules));
+  errors.collect(cdk.propertyValidator("rules", cdk.listValidator(RulePropertyValidator))(properties.rules));
+  return errors.wrap("supplied properties not correct for \\"LifecycleConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertLifecycleConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  LifecycleConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "Rules": cdk.listMapper(convertRulePropertyToCloudFormation)(properties.rules)
   };
@@ -3173,9 +3981,29 @@ export interface LoggingConfigurationProperty {
   readonly logFilePrefix?: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`LoggingConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`LoggingConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function LoggingConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("destinationBucketName", cdk.validateString)(properties.destinationBucketName));
+  errors.collect(cdk.propertyValidator("logFilePrefix", cdk.validateString)(properties.logFilePrefix));
+  return errors.wrap("supplied properties not correct for \\"LoggingConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertLoggingConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  LoggingConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "DestinationBucketName": cdk.stringToCloudFormation(properties.destinationBucketName),
     "LogFilePrefix": cdk.stringToCloudFormation(properties.logFilePrefix)
@@ -3237,9 +4065,32 @@ export interface MetricsConfigurationProperty {
   readonly tagFilters?: Array<TagFilterProperty>;
 }
 
+/**
+ * Determine whether the given properties match those of a \`MetricsConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`MetricsConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function MetricsConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("accessPointArn", cdk.validateString)(properties.accessPointArn));
+  errors.collect(cdk.propertyValidator("id", cdk.requiredValidator)(properties.id));
+  errors.collect(cdk.propertyValidator("id", cdk.validateString)(properties.id));
+  errors.collect(cdk.propertyValidator("prefix", cdk.validateString)(properties.prefix));
+  errors.collect(cdk.propertyValidator("tagFilters", cdk.listValidator(TagFilterPropertyValidator))(properties.tagFilters));
+  return errors.wrap("supplied properties not correct for \\"MetricsConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertMetricsConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  MetricsConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "AccessPointArn": cdk.stringToCloudFormation(properties.accessPointArn),
     "Id": cdk.stringToCloudFormation(properties.id),
@@ -3322,9 +4173,29 @@ export interface EventBridgeConfigurationProperty {
   readonly eventBridgeEnabled: boolean;
 }
 
+/**
+ * Determine whether the given properties match those of a \`EventBridgeConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`EventBridgeConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function EventBridgeConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("eventBridgeEnabled", cdk.requiredValidator)(properties.eventBridgeEnabled));
+  errors.collect(cdk.propertyValidator("eventBridgeEnabled", cdk.validateBoolean)(properties.eventBridgeEnabled));
+  return errors.wrap("supplied properties not correct for \\"EventBridgeConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertEventBridgeConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  EventBridgeConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "EventBridgeEnabled": cdk.booleanToCloudFormation(properties.eventBridgeEnabled)
   };
@@ -3433,9 +4304,31 @@ export interface FilterRuleProperty {
   readonly value: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`FilterRuleProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`FilterRuleProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function FilterRulePropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("name", cdk.requiredValidator)(properties.name));
+  errors.collect(cdk.propertyValidator("name", cdk.validateString)(properties.name));
+  errors.collect(cdk.propertyValidator("value", cdk.requiredValidator)(properties.value));
+  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
+  return errors.wrap("supplied properties not correct for \\"FilterRuleProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertFilterRulePropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  FilterRulePropertyValidator(properties).assertSuccess();
   return {
     "Name": cdk.stringToCloudFormation(properties.name),
     "Value": cdk.stringToCloudFormation(properties.value)
@@ -3453,9 +4346,29 @@ function FilterRulePropertyFromCloudFormation(properties: any): cfn_parse.FromCl
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`S3KeyFilterProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`S3KeyFilterProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function S3KeyFilterPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("rules", cdk.requiredValidator)(properties.rules));
+  errors.collect(cdk.propertyValidator("rules", cdk.listValidator(FilterRulePropertyValidator))(properties.rules));
+  return errors.wrap("supplied properties not correct for \\"S3KeyFilterProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertS3KeyFilterPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  S3KeyFilterPropertyValidator(properties).assertSuccess();
   return {
     "Rules": cdk.listMapper(convertFilterRulePropertyToCloudFormation)(properties.rules)
   };
@@ -3471,9 +4384,29 @@ function S3KeyFilterPropertyFromCloudFormation(properties: any): cfn_parse.FromC
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`NotificationFilterProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`NotificationFilterProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function NotificationFilterPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("s3Key", cdk.requiredValidator)(properties.s3Key));
+  errors.collect(cdk.propertyValidator("s3Key", S3KeyFilterPropertyValidator)(properties.s3Key));
+  return errors.wrap("supplied properties not correct for \\"NotificationFilterProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertNotificationFilterPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  NotificationFilterPropertyValidator(properties).assertSuccess();
   return {
     "S3Key": convertS3KeyFilterPropertyToCloudFormation(properties.s3Key)
   };
@@ -3489,9 +4422,32 @@ function NotificationFilterPropertyFromCloudFormation(properties: any): cfn_pars
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`LambdaConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`LambdaConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function LambdaConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("event", cdk.requiredValidator)(properties.event));
+  errors.collect(cdk.propertyValidator("event", cdk.validateString)(properties.event));
+  errors.collect(cdk.propertyValidator("filter", NotificationFilterPropertyValidator)(properties.filter));
+  errors.collect(cdk.propertyValidator("function", cdk.requiredValidator)(properties.function));
+  errors.collect(cdk.propertyValidator("function", cdk.validateString)(properties.function));
+  return errors.wrap("supplied properties not correct for \\"LambdaConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertLambdaConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  LambdaConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "Event": cdk.stringToCloudFormation(properties.event),
     "Filter": convertNotificationFilterPropertyToCloudFormation(properties.filter),
@@ -3546,9 +4502,32 @@ export interface QueueConfigurationProperty {
   readonly queue: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`QueueConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`QueueConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function QueueConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("event", cdk.requiredValidator)(properties.event));
+  errors.collect(cdk.propertyValidator("event", cdk.validateString)(properties.event));
+  errors.collect(cdk.propertyValidator("filter", NotificationFilterPropertyValidator)(properties.filter));
+  errors.collect(cdk.propertyValidator("queue", cdk.requiredValidator)(properties.queue));
+  errors.collect(cdk.propertyValidator("queue", cdk.validateString)(properties.queue));
+  return errors.wrap("supplied properties not correct for \\"QueueConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertQueueConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  QueueConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "Event": cdk.stringToCloudFormation(properties.event),
     "Filter": convertNotificationFilterPropertyToCloudFormation(properties.filter),
@@ -3601,9 +4580,32 @@ export interface TopicConfigurationProperty {
   readonly topic: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`TopicConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`TopicConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function TopicConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("event", cdk.requiredValidator)(properties.event));
+  errors.collect(cdk.propertyValidator("event", cdk.validateString)(properties.event));
+  errors.collect(cdk.propertyValidator("filter", NotificationFilterPropertyValidator)(properties.filter));
+  errors.collect(cdk.propertyValidator("topic", cdk.requiredValidator)(properties.topic));
+  errors.collect(cdk.propertyValidator("topic", cdk.validateString)(properties.topic));
+  return errors.wrap("supplied properties not correct for \\"TopicConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertTopicConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  TopicConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "Event": cdk.stringToCloudFormation(properties.event),
     "Filter": convertNotificationFilterPropertyToCloudFormation(properties.filter),
@@ -3623,9 +4625,31 @@ function TopicConfigurationPropertyFromCloudFormation(properties: any): cfn_pars
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`NotificationConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`NotificationConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function NotificationConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("eventBridgeConfiguration", EventBridgeConfigurationPropertyValidator)(properties.eventBridgeConfiguration));
+  errors.collect(cdk.propertyValidator("lambdaConfigurations", cdk.listValidator(LambdaConfigurationPropertyValidator))(properties.lambdaConfigurations));
+  errors.collect(cdk.propertyValidator("queueConfigurations", cdk.listValidator(QueueConfigurationPropertyValidator))(properties.queueConfigurations));
+  errors.collect(cdk.propertyValidator("topicConfigurations", cdk.listValidator(TopicConfigurationPropertyValidator))(properties.topicConfigurations));
+  return errors.wrap("supplied properties not correct for \\"NotificationConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertNotificationConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  NotificationConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "EventBridgeConfiguration": convertEventBridgeConfigurationPropertyToCloudFormation(properties.eventBridgeConfiguration),
     "LambdaConfigurations": cdk.listMapper(convertLambdaConfigurationPropertyToCloudFormation)(properties.lambdaConfigurations),
@@ -3732,13 +4756,34 @@ export interface DefaultRetentionProperty {
   readonly mode?: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`DefaultRetentionProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`DefaultRetentionProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function DefaultRetentionPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("days", cdk.validateNumber)(properties.days));
+  errors.collect(cdk.propertyValidator("mode", cdk.validateString)(properties.mode));
+  errors.collect(cdk.propertyValidator("years", cdk.validateNumber)(properties.years));
+  return errors.wrap("supplied properties not correct for \\"DefaultRetentionProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertDefaultRetentionPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  DefaultRetentionPropertyValidator(properties).assertSuccess();
   return {
-    "Years": cdk.numberToCloudFormation(properties.years),
     "Days": cdk.numberToCloudFormation(properties.days),
-    "Mode": cdk.stringToCloudFormation(properties.mode)
+    "Mode": cdk.stringToCloudFormation(properties.mode),
+    "Years": cdk.numberToCloudFormation(properties.years)
   };
 }
 
@@ -3747,16 +4792,35 @@ function DefaultRetentionPropertyFromCloudFormation(properties: any): cfn_parse.
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<DefaultRetentionProperty>();
-  ret.addPropertyResult("years", "Years", (properties.Years != null ? cfn_parse.FromCloudFormation.getNumber(properties.Years) : undefined));
   ret.addPropertyResult("days", "Days", (properties.Days != null ? cfn_parse.FromCloudFormation.getNumber(properties.Days) : undefined));
   ret.addPropertyResult("mode", "Mode", (properties.Mode != null ? cfn_parse.FromCloudFormation.getString(properties.Mode) : undefined));
+  ret.addPropertyResult("years", "Years", (properties.Years != null ? cfn_parse.FromCloudFormation.getNumber(properties.Years) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+}
+
+/**
+ * Determine whether the given properties match those of a \`ObjectLockRuleProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`ObjectLockRuleProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function ObjectLockRulePropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("defaultRetention", DefaultRetentionPropertyValidator)(properties.defaultRetention));
+  return errors.wrap("supplied properties not correct for \\"ObjectLockRuleProperty\\"");
 }
 
 // @ts-ignore TS6133
 function convertObjectLockRulePropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  ObjectLockRulePropertyValidator(properties).assertSuccess();
   return {
     "DefaultRetention": convertDefaultRetentionPropertyToCloudFormation(properties.defaultRetention)
   };
@@ -3772,9 +4836,29 @@ function ObjectLockRulePropertyFromCloudFormation(properties: any): cfn_parse.Fr
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`ObjectLockConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`ObjectLockConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function ObjectLockConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("objectLockEnabled", cdk.validateString)(properties.objectLockEnabled));
+  errors.collect(cdk.propertyValidator("rule", ObjectLockRulePropertyValidator)(properties.rule));
+  return errors.wrap("supplied properties not correct for \\"ObjectLockConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertObjectLockConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  ObjectLockConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "ObjectLockEnabled": cdk.stringToCloudFormation(properties.objectLockEnabled),
     "Rule": convertObjectLockRulePropertyToCloudFormation(properties.rule)
@@ -3828,9 +4912,28 @@ export interface OwnershipControlsRuleProperty {
   readonly objectOwnership?: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`OwnershipControlsRuleProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`OwnershipControlsRuleProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function OwnershipControlsRulePropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("objectOwnership", cdk.validateString)(properties.objectOwnership));
+  return errors.wrap("supplied properties not correct for \\"OwnershipControlsRuleProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertOwnershipControlsRulePropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  OwnershipControlsRulePropertyValidator(properties).assertSuccess();
   return {
     "ObjectOwnership": cdk.stringToCloudFormation(properties.objectOwnership)
   };
@@ -3846,9 +4949,29 @@ function OwnershipControlsRulePropertyFromCloudFormation(properties: any): cfn_p
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`OwnershipControlsProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`OwnershipControlsProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function OwnershipControlsPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("rules", cdk.requiredValidator)(properties.rules));
+  errors.collect(cdk.propertyValidator("rules", cdk.listValidator(OwnershipControlsRulePropertyValidator))(properties.rules));
+  return errors.wrap("supplied properties not correct for \\"OwnershipControlsProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertOwnershipControlsPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  OwnershipControlsPropertyValidator(properties).assertSuccess();
   return {
     "Rules": cdk.listMapper(convertOwnershipControlsRulePropertyToCloudFormation)(properties.rules)
   };
@@ -3922,9 +5045,31 @@ export interface PublicAccessBlockConfigurationProperty {
   readonly restrictPublicBuckets?: boolean;
 }
 
+/**
+ * Determine whether the given properties match those of a \`PublicAccessBlockConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`PublicAccessBlockConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function PublicAccessBlockConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("blockPublicAcls", cdk.validateBoolean)(properties.blockPublicAcls));
+  errors.collect(cdk.propertyValidator("blockPublicPolicy", cdk.validateBoolean)(properties.blockPublicPolicy));
+  errors.collect(cdk.propertyValidator("ignorePublicAcls", cdk.validateBoolean)(properties.ignorePublicAcls));
+  errors.collect(cdk.propertyValidator("restrictPublicBuckets", cdk.validateBoolean)(properties.restrictPublicBuckets));
+  return errors.wrap("supplied properties not correct for \\"PublicAccessBlockConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertPublicAccessBlockConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  PublicAccessBlockConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "BlockPublicAcls": cdk.booleanToCloudFormation(properties.blockPublicAcls),
     "BlockPublicPolicy": cdk.booleanToCloudFormation(properties.blockPublicPolicy),
@@ -4083,9 +5228,28 @@ export interface DeleteMarkerReplicationProperty {
   readonly status?: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`DeleteMarkerReplicationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`DeleteMarkerReplicationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function DeleteMarkerReplicationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("status", cdk.validateString)(properties.status));
+  return errors.wrap("supplied properties not correct for \\"DeleteMarkerReplicationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertDeleteMarkerReplicationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  DeleteMarkerReplicationPropertyValidator(properties).assertSuccess();
   return {
     "Status": cdk.stringToCloudFormation(properties.status)
   };
@@ -4189,9 +5353,29 @@ export interface AccessControlTranslationProperty {
   readonly owner: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`AccessControlTranslationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`AccessControlTranslationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function AccessControlTranslationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("owner", cdk.requiredValidator)(properties.owner));
+  errors.collect(cdk.propertyValidator("owner", cdk.validateString)(properties.owner));
+  return errors.wrap("supplied properties not correct for \\"AccessControlTranslationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertAccessControlTranslationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  AccessControlTranslationPropertyValidator(properties).assertSuccess();
   return {
     "Owner": cdk.stringToCloudFormation(properties.owner)
   };
@@ -4224,9 +5408,29 @@ export interface EncryptionConfigurationProperty {
   readonly replicaKmsKeyId: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`EncryptionConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`EncryptionConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function EncryptionConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("replicaKmsKeyId", cdk.requiredValidator)(properties.replicaKmsKeyId));
+  errors.collect(cdk.propertyValidator("replicaKmsKeyId", cdk.validateString)(properties.replicaKmsKeyId));
+  return errors.wrap("supplied properties not correct for \\"EncryptionConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertEncryptionConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  EncryptionConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "ReplicaKmsKeyID": cdk.stringToCloudFormation(properties.replicaKmsKeyId)
   };
@@ -4281,9 +5485,29 @@ export interface ReplicationTimeValueProperty {
   readonly minutes: number;
 }
 
+/**
+ * Determine whether the given properties match those of a \`ReplicationTimeValueProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`ReplicationTimeValueProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function ReplicationTimeValuePropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("minutes", cdk.requiredValidator)(properties.minutes));
+  errors.collect(cdk.propertyValidator("minutes", cdk.validateNumber)(properties.minutes));
+  return errors.wrap("supplied properties not correct for \\"ReplicationTimeValueProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertReplicationTimeValuePropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  ReplicationTimeValuePropertyValidator(properties).assertSuccess();
   return {
     "Minutes": cdk.numberToCloudFormation(properties.minutes)
   };
@@ -4299,9 +5523,30 @@ function ReplicationTimeValuePropertyFromCloudFormation(properties: any): cfn_pa
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`MetricsProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`MetricsProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function MetricsPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("eventThreshold", ReplicationTimeValuePropertyValidator)(properties.eventThreshold));
+  errors.collect(cdk.propertyValidator("status", cdk.requiredValidator)(properties.status));
+  errors.collect(cdk.propertyValidator("status", cdk.validateString)(properties.status));
+  return errors.wrap("supplied properties not correct for \\"MetricsProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertMetricsPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  MetricsPropertyValidator(properties).assertSuccess();
   return {
     "EventThreshold": convertReplicationTimeValuePropertyToCloudFormation(properties.eventThreshold),
     "Status": cdk.stringToCloudFormation(properties.status)
@@ -4343,9 +5588,31 @@ export interface ReplicationTimeProperty {
   readonly time: ReplicationTimeValueProperty;
 }
 
+/**
+ * Determine whether the given properties match those of a \`ReplicationTimeProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`ReplicationTimeProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function ReplicationTimePropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("status", cdk.requiredValidator)(properties.status));
+  errors.collect(cdk.propertyValidator("status", cdk.validateString)(properties.status));
+  errors.collect(cdk.propertyValidator("time", cdk.requiredValidator)(properties.time));
+  errors.collect(cdk.propertyValidator("time", ReplicationTimeValuePropertyValidator)(properties.time));
+  return errors.wrap("supplied properties not correct for \\"ReplicationTimeProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertReplicationTimePropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  ReplicationTimePropertyValidator(properties).assertSuccess();
   return {
     "Status": cdk.stringToCloudFormation(properties.status),
     "Time": convertReplicationTimeValuePropertyToCloudFormation(properties.time)
@@ -4363,9 +5630,35 @@ function ReplicationTimePropertyFromCloudFormation(properties: any): cfn_parse.F
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`ReplicationDestinationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`ReplicationDestinationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function ReplicationDestinationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("accessControlTranslation", AccessControlTranslationPropertyValidator)(properties.accessControlTranslation));
+  errors.collect(cdk.propertyValidator("account", cdk.validateString)(properties.account));
+  errors.collect(cdk.propertyValidator("bucket", cdk.requiredValidator)(properties.bucket));
+  errors.collect(cdk.propertyValidator("bucket", cdk.validateString)(properties.bucket));
+  errors.collect(cdk.propertyValidator("encryptionConfiguration", EncryptionConfigurationPropertyValidator)(properties.encryptionConfiguration));
+  errors.collect(cdk.propertyValidator("metrics", MetricsPropertyValidator)(properties.metrics));
+  errors.collect(cdk.propertyValidator("replicationTime", ReplicationTimePropertyValidator)(properties.replicationTime));
+  errors.collect(cdk.propertyValidator("storageClass", cdk.validateString)(properties.storageClass));
+  return errors.wrap("supplied properties not correct for \\"ReplicationDestinationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertReplicationDestinationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  ReplicationDestinationPropertyValidator(properties).assertSuccess();
   return {
     "AccessControlTranslation": convertAccessControlTranslationPropertyToCloudFormation(properties.accessControlTranslation),
     "Account": cdk.stringToCloudFormation(properties.account),
@@ -4462,9 +5755,29 @@ export interface ReplicationRuleAndOperatorProperty {
   readonly tagFilters?: Array<TagFilterProperty>;
 }
 
+/**
+ * Determine whether the given properties match those of a \`ReplicationRuleAndOperatorProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`ReplicationRuleAndOperatorProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function ReplicationRuleAndOperatorPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("prefix", cdk.validateString)(properties.prefix));
+  errors.collect(cdk.propertyValidator("tagFilters", cdk.listValidator(TagFilterPropertyValidator))(properties.tagFilters));
+  return errors.wrap("supplied properties not correct for \\"ReplicationRuleAndOperatorProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertReplicationRuleAndOperatorPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  ReplicationRuleAndOperatorPropertyValidator(properties).assertSuccess();
   return {
     "Prefix": cdk.stringToCloudFormation(properties.prefix),
     "TagFilters": cdk.listMapper(convertTagFilterPropertyToCloudFormation)(properties.tagFilters)
@@ -4482,9 +5795,30 @@ function ReplicationRuleAndOperatorPropertyFromCloudFormation(properties: any): 
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`ReplicationRuleFilterProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`ReplicationRuleFilterProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function ReplicationRuleFilterPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("and", ReplicationRuleAndOperatorPropertyValidator)(properties.and));
+  errors.collect(cdk.propertyValidator("prefix", cdk.validateString)(properties.prefix));
+  errors.collect(cdk.propertyValidator("tagFilter", TagFilterPropertyValidator)(properties.tagFilter));
+  return errors.wrap("supplied properties not correct for \\"ReplicationRuleFilterProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertReplicationRuleFilterPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  ReplicationRuleFilterPropertyValidator(properties).assertSuccess();
   return {
     "And": convertReplicationRuleAndOperatorPropertyToCloudFormation(properties.and),
     "Prefix": cdk.stringToCloudFormation(properties.prefix),
@@ -4545,9 +5879,29 @@ export interface ReplicaModificationsProperty {
   readonly status: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`ReplicaModificationsProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`ReplicaModificationsProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function ReplicaModificationsPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("status", cdk.requiredValidator)(properties.status));
+  errors.collect(cdk.propertyValidator("status", cdk.validateString)(properties.status));
+  return errors.wrap("supplied properties not correct for \\"ReplicaModificationsProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertReplicaModificationsPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  ReplicaModificationsPropertyValidator(properties).assertSuccess();
   return {
     "Status": cdk.stringToCloudFormation(properties.status)
   };
@@ -4578,9 +5932,29 @@ export interface SseKmsEncryptedObjectsProperty {
   readonly status: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`SseKmsEncryptedObjectsProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`SseKmsEncryptedObjectsProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function SseKmsEncryptedObjectsPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("status", cdk.requiredValidator)(properties.status));
+  errors.collect(cdk.propertyValidator("status", cdk.validateString)(properties.status));
+  return errors.wrap("supplied properties not correct for \\"SseKmsEncryptedObjectsProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertSseKmsEncryptedObjectsPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  SseKmsEncryptedObjectsPropertyValidator(properties).assertSuccess();
   return {
     "Status": cdk.stringToCloudFormation(properties.status)
   };
@@ -4596,9 +5970,29 @@ function SseKmsEncryptedObjectsPropertyFromCloudFormation(properties: any): cfn_
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`SourceSelectionCriteriaProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`SourceSelectionCriteriaProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function SourceSelectionCriteriaPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("replicaModifications", ReplicaModificationsPropertyValidator)(properties.replicaModifications));
+  errors.collect(cdk.propertyValidator("sseKmsEncryptedObjects", SseKmsEncryptedObjectsPropertyValidator)(properties.sseKmsEncryptedObjects));
+  return errors.wrap("supplied properties not correct for \\"SourceSelectionCriteriaProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertSourceSelectionCriteriaPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  SourceSelectionCriteriaPropertyValidator(properties).assertSuccess();
   return {
     "ReplicaModifications": convertReplicaModificationsPropertyToCloudFormation(properties.replicaModifications),
     "SseKmsEncryptedObjects": convertSseKmsEncryptedObjectsPropertyToCloudFormation(properties.sseKmsEncryptedObjects)
@@ -4616,9 +6010,37 @@ function SourceSelectionCriteriaPropertyFromCloudFormation(properties: any): cfn
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`ReplicationRuleProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`ReplicationRuleProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function ReplicationRulePropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("deleteMarkerReplication", DeleteMarkerReplicationPropertyValidator)(properties.deleteMarkerReplication));
+  errors.collect(cdk.propertyValidator("destination", cdk.requiredValidator)(properties.destination));
+  errors.collect(cdk.propertyValidator("destination", ReplicationDestinationPropertyValidator)(properties.destination));
+  errors.collect(cdk.propertyValidator("filter", ReplicationRuleFilterPropertyValidator)(properties.filter));
+  errors.collect(cdk.propertyValidator("id", cdk.validateString)(properties.id));
+  errors.collect(cdk.propertyValidator("prefix", cdk.validateString)(properties.prefix));
+  errors.collect(cdk.propertyValidator("priority", cdk.validateNumber)(properties.priority));
+  errors.collect(cdk.propertyValidator("sourceSelectionCriteria", SourceSelectionCriteriaPropertyValidator)(properties.sourceSelectionCriteria));
+  errors.collect(cdk.propertyValidator("status", cdk.requiredValidator)(properties.status));
+  errors.collect(cdk.propertyValidator("status", cdk.validateString)(properties.status));
+  return errors.wrap("supplied properties not correct for \\"ReplicationRuleProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertReplicationRulePropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  ReplicationRulePropertyValidator(properties).assertSuccess();
   return {
     "DeleteMarkerReplication": convertDeleteMarkerReplicationPropertyToCloudFormation(properties.deleteMarkerReplication),
     "Destination": convertReplicationDestinationPropertyToCloudFormation(properties.destination),
@@ -4648,9 +6070,31 @@ function ReplicationRulePropertyFromCloudFormation(properties: any): cfn_parse.F
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`ReplicationConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`ReplicationConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function ReplicationConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("role", cdk.requiredValidator)(properties.role));
+  errors.collect(cdk.propertyValidator("role", cdk.validateString)(properties.role));
+  errors.collect(cdk.propertyValidator("rules", cdk.requiredValidator)(properties.rules));
+  errors.collect(cdk.propertyValidator("rules", cdk.listValidator(ReplicationRulePropertyValidator))(properties.rules));
+  return errors.wrap("supplied properties not correct for \\"ReplicationConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertReplicationConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  ReplicationConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "Role": cdk.stringToCloudFormation(properties.role),
     "Rules": cdk.listMapper(convertReplicationRulePropertyToCloudFormation)(properties.rules)
@@ -4686,9 +6130,29 @@ export interface VersioningConfigurationProperty {
   readonly status: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`VersioningConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`VersioningConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function VersioningConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("status", cdk.requiredValidator)(properties.status));
+  errors.collect(cdk.propertyValidator("status", cdk.validateString)(properties.status));
+  return errors.wrap("supplied properties not correct for \\"VersioningConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertVersioningConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  VersioningConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "Status": cdk.stringToCloudFormation(properties.status)
   };
@@ -4827,9 +6291,32 @@ export interface RedirectRuleProperty {
   readonly replaceKeyWith?: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`RedirectRuleProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`RedirectRuleProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function RedirectRulePropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("hostName", cdk.validateString)(properties.hostName));
+  errors.collect(cdk.propertyValidator("httpRedirectCode", cdk.validateString)(properties.httpRedirectCode));
+  errors.collect(cdk.propertyValidator("protocol", cdk.validateString)(properties.protocol));
+  errors.collect(cdk.propertyValidator("replaceKeyPrefixWith", cdk.validateString)(properties.replaceKeyPrefixWith));
+  errors.collect(cdk.propertyValidator("replaceKeyWith", cdk.validateString)(properties.replaceKeyWith));
+  return errors.wrap("supplied properties not correct for \\"RedirectRuleProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertRedirectRulePropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  RedirectRulePropertyValidator(properties).assertSuccess();
   return {
     "HostName": cdk.stringToCloudFormation(properties.hostName),
     "HttpRedirectCode": cdk.stringToCloudFormation(properties.httpRedirectCode),
@@ -4885,12 +6372,32 @@ export interface RoutingRuleConditionProperty {
   readonly httpErrorCodeReturnedEquals?: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`RoutingRuleConditionProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`RoutingRuleConditionProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function RoutingRuleConditionPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("httpErrorCodeReturnedEquals", cdk.validateString)(properties.httpErrorCodeReturnedEquals));
+  errors.collect(cdk.propertyValidator("keyPrefixEquals", cdk.validateString)(properties.keyPrefixEquals));
+  return errors.wrap("supplied properties not correct for \\"RoutingRuleConditionProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertRoutingRuleConditionPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  RoutingRuleConditionPropertyValidator(properties).assertSuccess();
   return {
-    "KeyPrefixEquals": cdk.stringToCloudFormation(properties.keyPrefixEquals),
-    "HttpErrorCodeReturnedEquals": cdk.stringToCloudFormation(properties.httpErrorCodeReturnedEquals)
+    "HttpErrorCodeReturnedEquals": cdk.stringToCloudFormation(properties.httpErrorCodeReturnedEquals),
+    "KeyPrefixEquals": cdk.stringToCloudFormation(properties.keyPrefixEquals)
   };
 }
 
@@ -4899,15 +6406,36 @@ function RoutingRuleConditionPropertyFromCloudFormation(properties: any): cfn_pa
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<RoutingRuleConditionProperty>();
-  ret.addPropertyResult("keyPrefixEquals", "KeyPrefixEquals", (properties.KeyPrefixEquals != null ? cfn_parse.FromCloudFormation.getString(properties.KeyPrefixEquals) : undefined));
   ret.addPropertyResult("httpErrorCodeReturnedEquals", "HttpErrorCodeReturnedEquals", (properties.HttpErrorCodeReturnedEquals != null ? cfn_parse.FromCloudFormation.getString(properties.HttpErrorCodeReturnedEquals) : undefined));
+  ret.addPropertyResult("keyPrefixEquals", "KeyPrefixEquals", (properties.KeyPrefixEquals != null ? cfn_parse.FromCloudFormation.getString(properties.KeyPrefixEquals) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+}
+
+/**
+ * Determine whether the given properties match those of a \`RoutingRuleProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`RoutingRuleProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function RoutingRulePropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("redirectRule", cdk.requiredValidator)(properties.redirectRule));
+  errors.collect(cdk.propertyValidator("redirectRule", RedirectRulePropertyValidator)(properties.redirectRule));
+  errors.collect(cdk.propertyValidator("routingRuleCondition", RoutingRuleConditionPropertyValidator)(properties.routingRuleCondition));
+  return errors.wrap("supplied properties not correct for \\"RoutingRuleProperty\\"");
 }
 
 // @ts-ignore TS6133
 function convertRoutingRulePropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  RoutingRulePropertyValidator(properties).assertSuccess();
   return {
     "RedirectRule": convertRedirectRulePropertyToCloudFormation(properties.redirectRule),
     "RoutingRuleCondition": convertRoutingRuleConditionPropertyToCloudFormation(properties.routingRuleCondition)
@@ -4949,9 +6477,30 @@ export interface RedirectAllRequestsToProperty {
   readonly protocol?: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`RedirectAllRequestsToProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`RedirectAllRequestsToProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function RedirectAllRequestsToPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("hostName", cdk.requiredValidator)(properties.hostName));
+  errors.collect(cdk.propertyValidator("hostName", cdk.validateString)(properties.hostName));
+  errors.collect(cdk.propertyValidator("protocol", cdk.validateString)(properties.protocol));
+  return errors.wrap("supplied properties not correct for \\"RedirectAllRequestsToProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertRedirectAllRequestsToPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  RedirectAllRequestsToPropertyValidator(properties).assertSuccess();
   return {
     "HostName": cdk.stringToCloudFormation(properties.hostName),
     "Protocol": cdk.stringToCloudFormation(properties.protocol)
@@ -4969,14 +6518,36 @@ function RedirectAllRequestsToPropertyFromCloudFormation(properties: any): cfn_p
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`WebsiteConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`WebsiteConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function WebsiteConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("errorDocument", cdk.validateString)(properties.errorDocument));
+  errors.collect(cdk.propertyValidator("indexDocument", cdk.validateString)(properties.indexDocument));
+  errors.collect(cdk.propertyValidator("redirectAllRequestsTo", RedirectAllRequestsToPropertyValidator)(properties.redirectAllRequestsTo));
+  errors.collect(cdk.propertyValidator("routingRules", cdk.listValidator(RoutingRulePropertyValidator))(properties.routingRules));
+  return errors.wrap("supplied properties not correct for \\"WebsiteConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertWebsiteConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  WebsiteConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "ErrorDocument": cdk.stringToCloudFormation(properties.errorDocument),
     "IndexDocument": cdk.stringToCloudFormation(properties.indexDocument),
-    "RoutingRules": cdk.listMapper(convertRoutingRulePropertyToCloudFormation)(properties.routingRules),
-    "RedirectAllRequestsTo": convertRedirectAllRequestsToPropertyToCloudFormation(properties.redirectAllRequestsTo)
+    "RedirectAllRequestsTo": convertRedirectAllRequestsToPropertyToCloudFormation(properties.redirectAllRequestsTo),
+    "RoutingRules": cdk.listMapper(convertRoutingRulePropertyToCloudFormation)(properties.routingRules)
   };
 }
 
@@ -4987,15 +6558,53 @@ function WebsiteConfigurationPropertyFromCloudFormation(properties: any): cfn_pa
   const ret = new cfn_parse.FromCloudFormationPropertyObject<WebsiteConfigurationProperty>();
   ret.addPropertyResult("errorDocument", "ErrorDocument", (properties.ErrorDocument != null ? cfn_parse.FromCloudFormation.getString(properties.ErrorDocument) : undefined));
   ret.addPropertyResult("indexDocument", "IndexDocument", (properties.IndexDocument != null ? cfn_parse.FromCloudFormation.getString(properties.IndexDocument) : undefined));
-  ret.addPropertyResult("routingRules", "RoutingRules", (properties.RoutingRules != null ? cfn_parse.FromCloudFormation.getArray(RoutingRulePropertyFromCloudFormation)(properties.RoutingRules) : undefined));
   ret.addPropertyResult("redirectAllRequestsTo", "RedirectAllRequestsTo", (properties.RedirectAllRequestsTo != null ? RedirectAllRequestsToPropertyFromCloudFormation(properties.RedirectAllRequestsTo) : undefined));
+  ret.addPropertyResult("routingRules", "RoutingRules", (properties.RoutingRules != null ? cfn_parse.FromCloudFormation.getArray(RoutingRulePropertyFromCloudFormation)(properties.RoutingRules) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+}
+
+/**
+ * Determine whether the given properties match those of a \`CfnBucketProps\`
+ *
+ * @param properties - the TypeScript properties of a \`CfnBucketProps\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnBucketPropsValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("accelerateConfiguration", AccelerateConfigurationPropertyValidator)(properties.accelerateConfiguration));
+  errors.collect(cdk.propertyValidator("accessControl", cdk.validateString)(properties.accessControl));
+  errors.collect(cdk.propertyValidator("analyticsConfigurations", cdk.listValidator(AnalyticsConfigurationPropertyValidator))(properties.analyticsConfigurations));
+  errors.collect(cdk.propertyValidator("bucketEncryption", BucketEncryptionPropertyValidator)(properties.bucketEncryption));
+  errors.collect(cdk.propertyValidator("bucketName", cdk.validateString)(properties.bucketName));
+  errors.collect(cdk.propertyValidator("corsConfiguration", CorsConfigurationPropertyValidator)(properties.corsConfiguration));
+  errors.collect(cdk.propertyValidator("intelligentTieringConfigurations", cdk.listValidator(IntelligentTieringConfigurationPropertyValidator))(properties.intelligentTieringConfigurations));
+  errors.collect(cdk.propertyValidator("inventoryConfigurations", cdk.listValidator(InventoryConfigurationPropertyValidator))(properties.inventoryConfigurations));
+  errors.collect(cdk.propertyValidator("lifecycleConfiguration", LifecycleConfigurationPropertyValidator)(properties.lifecycleConfiguration));
+  errors.collect(cdk.propertyValidator("loggingConfiguration", LoggingConfigurationPropertyValidator)(properties.loggingConfiguration));
+  errors.collect(cdk.propertyValidator("metricsConfigurations", cdk.listValidator(MetricsConfigurationPropertyValidator))(properties.metricsConfigurations));
+  errors.collect(cdk.propertyValidator("notificationConfiguration", NotificationConfigurationPropertyValidator)(properties.notificationConfiguration));
+  errors.collect(cdk.propertyValidator("objectLockConfiguration", ObjectLockConfigurationPropertyValidator)(properties.objectLockConfiguration));
+  errors.collect(cdk.propertyValidator("objectLockEnabled", cdk.validateBoolean)(properties.objectLockEnabled));
+  errors.collect(cdk.propertyValidator("ownershipControls", OwnershipControlsPropertyValidator)(properties.ownershipControls));
+  errors.collect(cdk.propertyValidator("publicAccessBlockConfiguration", PublicAccessBlockConfigurationPropertyValidator)(properties.publicAccessBlockConfiguration));
+  errors.collect(cdk.propertyValidator("replicationConfiguration", ReplicationConfigurationPropertyValidator)(properties.replicationConfiguration));
+  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
+  errors.collect(cdk.propertyValidator("versioningConfiguration", VersioningConfigurationPropertyValidator)(properties.versioningConfiguration));
+  errors.collect(cdk.propertyValidator("websiteConfiguration", WebsiteConfigurationPropertyValidator)(properties.websiteConfiguration));
+  return errors.wrap("supplied properties not correct for \\"CfnBucketProps\\"");
 }
 
 // @ts-ignore TS6133
 function convertCfnBucketPropsToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  CfnBucketPropsValidator(properties).assertSuccess();
   return {
     "AccelerateConfiguration": convertAccelerateConfigurationPropertyToCloudFormation(properties.accelerateConfiguration),
     "AccessControl": cdk.stringToCloudFormation(properties.accessControl),
@@ -5516,9 +7125,43 @@ export interface CfnQueueProps {
   readonly visibilityTimeout?: number;
 }
 
+/**
+ * Determine whether the given properties match those of a \`CfnQueueProps\`
+ *
+ * @param properties - the TypeScript properties of a \`CfnQueueProps\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnQueuePropsValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("contentBasedDeduplication", cdk.validateBoolean)(properties.contentBasedDeduplication));
+  errors.collect(cdk.propertyValidator("deduplicationScope", cdk.validateString)(properties.deduplicationScope));
+  errors.collect(cdk.propertyValidator("delaySeconds", cdk.validateNumber)(properties.delaySeconds));
+  errors.collect(cdk.propertyValidator("fifoQueue", cdk.validateBoolean)(properties.fifoQueue));
+  errors.collect(cdk.propertyValidator("fifoThroughputLimit", cdk.validateString)(properties.fifoThroughputLimit));
+  errors.collect(cdk.propertyValidator("kmsDataKeyReusePeriodSeconds", cdk.validateNumber)(properties.kmsDataKeyReusePeriodSeconds));
+  errors.collect(cdk.propertyValidator("kmsMasterKeyId", cdk.validateString)(properties.kmsMasterKeyId));
+  errors.collect(cdk.propertyValidator("maximumMessageSize", cdk.validateNumber)(properties.maximumMessageSize));
+  errors.collect(cdk.propertyValidator("messageRetentionPeriod", cdk.validateNumber)(properties.messageRetentionPeriod));
+  errors.collect(cdk.propertyValidator("queueName", cdk.validateString)(properties.queueName));
+  errors.collect(cdk.propertyValidator("receiveMessageWaitTimeSeconds", cdk.validateNumber)(properties.receiveMessageWaitTimeSeconds));
+  errors.collect(cdk.propertyValidator("redriveAllowPolicy", cdk.validateObject)(properties.redriveAllowPolicy));
+  errors.collect(cdk.propertyValidator("redrivePolicy", cdk.validateObject)(properties.redrivePolicy));
+  errors.collect(cdk.propertyValidator("sqsManagedSseEnabled", cdk.validateBoolean)(properties.sqsManagedSseEnabled));
+  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
+  errors.collect(cdk.propertyValidator("visibilityTimeout", cdk.validateNumber)(properties.visibilityTimeout));
+  return errors.wrap("supplied properties not correct for \\"CfnQueueProps\\"");
+}
+
 // @ts-ignore TS6133
 function convertCfnQueuePropsToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  CfnQueuePropsValidator(properties).assertSuccess();
   return {
     "ContentBasedDeduplication": cdk.booleanToCloudFormation(properties.contentBasedDeduplication),
     "DeduplicationScope": cdk.stringToCloudFormation(properties.deduplicationScope),
@@ -5527,13 +7170,13 @@ function convertCfnQueuePropsToCloudFormation(properties: any): any {
     "FifoThroughputLimit": cdk.stringToCloudFormation(properties.fifoThroughputLimit),
     "KmsDataKeyReusePeriodSeconds": cdk.numberToCloudFormation(properties.kmsDataKeyReusePeriodSeconds),
     "KmsMasterKeyId": cdk.stringToCloudFormation(properties.kmsMasterKeyId),
-    "SqsManagedSseEnabled": cdk.booleanToCloudFormation(properties.sqsManagedSseEnabled),
     "MaximumMessageSize": cdk.numberToCloudFormation(properties.maximumMessageSize),
     "MessageRetentionPeriod": cdk.numberToCloudFormation(properties.messageRetentionPeriod),
     "QueueName": cdk.stringToCloudFormation(properties.queueName),
     "ReceiveMessageWaitTimeSeconds": cdk.numberToCloudFormation(properties.receiveMessageWaitTimeSeconds),
     "RedriveAllowPolicy": cdk.objectToCloudFormation(properties.redriveAllowPolicy),
     "RedrivePolicy": cdk.objectToCloudFormation(properties.redrivePolicy),
+    "SqsManagedSseEnabled": cdk.booleanToCloudFormation(properties.sqsManagedSseEnabled),
     "Tags": cdk.listMapper(cdk.numberToCloudFormation)(properties.tags),
     "VisibilityTimeout": cdk.numberToCloudFormation(properties.visibilityTimeout)
   };
@@ -5551,13 +7194,13 @@ function CfnQueuePropsFromCloudFormation(properties: any): cfn_parse.FromCloudFo
   ret.addPropertyResult("fifoThroughputLimit", "FifoThroughputLimit", (properties.FifoThroughputLimit != null ? cfn_parse.FromCloudFormation.getString(properties.FifoThroughputLimit) : undefined));
   ret.addPropertyResult("kmsDataKeyReusePeriodSeconds", "KmsDataKeyReusePeriodSeconds", (properties.KmsDataKeyReusePeriodSeconds != null ? cfn_parse.FromCloudFormation.getNumber(properties.KmsDataKeyReusePeriodSeconds) : undefined));
   ret.addPropertyResult("kmsMasterKeyId", "KmsMasterKeyId", (properties.KmsMasterKeyId != null ? cfn_parse.FromCloudFormation.getString(properties.KmsMasterKeyId) : undefined));
-  ret.addPropertyResult("sqsManagedSseEnabled", "SqsManagedSseEnabled", (properties.SqsManagedSseEnabled != null ? cfn_parse.FromCloudFormation.getBoolean(properties.SqsManagedSseEnabled) : undefined));
   ret.addPropertyResult("maximumMessageSize", "MaximumMessageSize", (properties.MaximumMessageSize != null ? cfn_parse.FromCloudFormation.getNumber(properties.MaximumMessageSize) : undefined));
   ret.addPropertyResult("messageRetentionPeriod", "MessageRetentionPeriod", (properties.MessageRetentionPeriod != null ? cfn_parse.FromCloudFormation.getNumber(properties.MessageRetentionPeriod) : undefined));
   ret.addPropertyResult("queueName", "QueueName", (properties.QueueName != null ? cfn_parse.FromCloudFormation.getString(properties.QueueName) : undefined));
   ret.addPropertyResult("receiveMessageWaitTimeSeconds", "ReceiveMessageWaitTimeSeconds", (properties.ReceiveMessageWaitTimeSeconds != null ? cfn_parse.FromCloudFormation.getNumber(properties.ReceiveMessageWaitTimeSeconds) : undefined));
   ret.addPropertyResult("redriveAllowPolicy", "RedriveAllowPolicy", (properties.RedriveAllowPolicy != null ? cfn_parse.FromCloudFormation.getAny(properties.RedriveAllowPolicy) : undefined));
   ret.addPropertyResult("redrivePolicy", "RedrivePolicy", (properties.RedrivePolicy != null ? cfn_parse.FromCloudFormation.getAny(properties.RedrivePolicy) : undefined));
+  ret.addPropertyResult("sqsManagedSseEnabled", "SqsManagedSseEnabled", (properties.SqsManagedSseEnabled != null ? cfn_parse.FromCloudFormation.getBoolean(properties.SqsManagedSseEnabled) : undefined));
   ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
   ret.addPropertyResult("visibilityTimeout", "VisibilityTimeout", (properties.VisibilityTimeout != null ? cfn_parse.FromCloudFormation.getNumber(properties.VisibilityTimeout) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
@@ -5857,13 +7500,37 @@ export interface AuthenticationConfigurationProperty {
   readonly clientSecret: string;
 }
 
+/**
+ * Determine whether the given properties match those of a \`AuthenticationConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`AuthenticationConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function AuthenticationConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("clientId", cdk.requiredValidator)(properties.clientId));
+  errors.collect(cdk.propertyValidator("clientId", cdk.validateString)(properties.clientId));
+  errors.collect(cdk.propertyValidator("clientSecret", cdk.requiredValidator)(properties.clientSecret));
+  errors.collect(cdk.propertyValidator("clientSecret", cdk.validateString)(properties.clientSecret));
+  errors.collect(cdk.propertyValidator("refreshToken", cdk.requiredValidator)(properties.refreshToken));
+  errors.collect(cdk.propertyValidator("refreshToken", cdk.validateString)(properties.refreshToken));
+  return errors.wrap("supplied properties not correct for \\"AuthenticationConfigurationProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertAuthenticationConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  AuthenticationConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "ClientId": cdk.stringToCloudFormation(properties.clientId),
-    "RefreshToken": cdk.stringToCloudFormation(properties.refreshToken),
-    "ClientSecret": cdk.stringToCloudFormation(properties.clientSecret)
+    "ClientSecret": cdk.stringToCloudFormation(properties.clientSecret),
+    "RefreshToken": cdk.stringToCloudFormation(properties.refreshToken)
   };
 }
 
@@ -5873,8 +7540,8 @@ function AuthenticationConfigurationPropertyFromCloudFormation(properties: any):
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<AuthenticationConfigurationProperty>();
   ret.addPropertyResult("clientId", "ClientId", (properties.ClientId != null ? cfn_parse.FromCloudFormation.getString(properties.ClientId) : undefined));
-  ret.addPropertyResult("refreshToken", "RefreshToken", (properties.RefreshToken != null ? cfn_parse.FromCloudFormation.getString(properties.RefreshToken) : undefined));
   ret.addPropertyResult("clientSecret", "ClientSecret", (properties.ClientSecret != null ? cfn_parse.FromCloudFormation.getString(properties.ClientSecret) : undefined));
+  ret.addPropertyResult("refreshToken", "RefreshToken", (properties.RefreshToken != null ? cfn_parse.FromCloudFormation.getString(properties.RefreshToken) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -5949,9 +7616,28 @@ export interface OverridesProperty {
   readonly manifest?: any;
 }
 
+/**
+ * Determine whether the given properties match those of a \`OverridesProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`OverridesProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function OverridesPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("manifest", cdk.validateObject)(properties.manifest));
+  return errors.wrap("supplied properties not correct for \\"OverridesProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertOverridesPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  OverridesPropertyValidator(properties).assertSuccess();
   return {
     "Manifest": cdk.objectToCloudFormation(properties.manifest)
   };
@@ -5967,15 +7653,40 @@ function OverridesPropertyFromCloudFormation(properties: any): cfn_parse.FromClo
   return ret;
 }
 
+/**
+ * Determine whether the given properties match those of a \`SkillPackageProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`SkillPackageProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function SkillPackagePropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("overrides", OverridesPropertyValidator)(properties.overrides));
+  errors.collect(cdk.propertyValidator("s3Bucket", cdk.requiredValidator)(properties.s3Bucket));
+  errors.collect(cdk.propertyValidator("s3Bucket", cdk.validateString)(properties.s3Bucket));
+  errors.collect(cdk.propertyValidator("s3BucketRole", cdk.validateString)(properties.s3BucketRole));
+  errors.collect(cdk.propertyValidator("s3Key", cdk.requiredValidator)(properties.s3Key));
+  errors.collect(cdk.propertyValidator("s3Key", cdk.validateString)(properties.s3Key));
+  errors.collect(cdk.propertyValidator("s3ObjectVersion", cdk.validateString)(properties.s3ObjectVersion));
+  return errors.wrap("supplied properties not correct for \\"SkillPackageProperty\\"");
+}
+
 // @ts-ignore TS6133
 function convertSkillPackagePropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  SkillPackagePropertyValidator(properties).assertSuccess();
   return {
-    "S3BucketRole": cdk.stringToCloudFormation(properties.s3BucketRole),
     "Overrides": convertOverridesPropertyToCloudFormation(properties.overrides),
-    "S3ObjectVersion": cdk.stringToCloudFormation(properties.s3ObjectVersion),
     "S3Bucket": cdk.stringToCloudFormation(properties.s3Bucket),
-    "S3Key": cdk.stringToCloudFormation(properties.s3Key)
+    "S3BucketRole": cdk.stringToCloudFormation(properties.s3BucketRole),
+    "S3Key": cdk.stringToCloudFormation(properties.s3Key),
+    "S3ObjectVersion": cdk.stringToCloudFormation(properties.s3ObjectVersion)
   };
 }
 
@@ -5984,22 +7695,46 @@ function SkillPackagePropertyFromCloudFormation(properties: any): cfn_parse.From
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<SkillPackageProperty>();
-  ret.addPropertyResult("s3BucketRole", "S3BucketRole", (properties.S3BucketRole != null ? cfn_parse.FromCloudFormation.getString(properties.S3BucketRole) : undefined));
   ret.addPropertyResult("overrides", "Overrides", (properties.Overrides != null ? OverridesPropertyFromCloudFormation(properties.Overrides) : undefined));
-  ret.addPropertyResult("s3ObjectVersion", "S3ObjectVersion", (properties.S3ObjectVersion != null ? cfn_parse.FromCloudFormation.getString(properties.S3ObjectVersion) : undefined));
   ret.addPropertyResult("s3Bucket", "S3Bucket", (properties.S3Bucket != null ? cfn_parse.FromCloudFormation.getString(properties.S3Bucket) : undefined));
+  ret.addPropertyResult("s3BucketRole", "S3BucketRole", (properties.S3BucketRole != null ? cfn_parse.FromCloudFormation.getString(properties.S3BucketRole) : undefined));
   ret.addPropertyResult("s3Key", "S3Key", (properties.S3Key != null ? cfn_parse.FromCloudFormation.getString(properties.S3Key) : undefined));
+  ret.addPropertyResult("s3ObjectVersion", "S3ObjectVersion", (properties.S3ObjectVersion != null ? cfn_parse.FromCloudFormation.getString(properties.S3ObjectVersion) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+}
+
+/**
+ * Determine whether the given properties match those of a \`CfnSkillProps\`
+ *
+ * @param properties - the TypeScript properties of a \`CfnSkillProps\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnSkillPropsValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("authenticationConfiguration", cdk.requiredValidator)(properties.authenticationConfiguration));
+  errors.collect(cdk.propertyValidator("authenticationConfiguration", AuthenticationConfigurationPropertyValidator)(properties.authenticationConfiguration));
+  errors.collect(cdk.propertyValidator("skillPackage", cdk.requiredValidator)(properties.skillPackage));
+  errors.collect(cdk.propertyValidator("skillPackage", SkillPackagePropertyValidator)(properties.skillPackage));
+  errors.collect(cdk.propertyValidator("vendorId", cdk.requiredValidator)(properties.vendorId));
+  errors.collect(cdk.propertyValidator("vendorId", cdk.validateString)(properties.vendorId));
+  return errors.wrap("supplied properties not correct for \\"CfnSkillProps\\"");
 }
 
 // @ts-ignore TS6133
 function convertCfnSkillPropsToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
+  CfnSkillPropsValidator(properties).assertSuccess();
   return {
     "AuthenticationConfiguration": convertAuthenticationConfigurationPropertyToCloudFormation(properties.authenticationConfiguration),
-    "VendorId": cdk.stringToCloudFormation(properties.vendorId),
-    "SkillPackage": convertSkillPackagePropertyToCloudFormation(properties.skillPackage)
+    "SkillPackage": convertSkillPackagePropertyToCloudFormation(properties.skillPackage),
+    "VendorId": cdk.stringToCloudFormation(properties.vendorId)
   };
 }
 
@@ -6009,8 +7744,8 @@ function CfnSkillPropsFromCloudFormation(properties: any): cfn_parse.FromCloudFo
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSkillProps>();
   ret.addPropertyResult("authenticationConfiguration", "AuthenticationConfiguration", (properties.AuthenticationConfiguration != null ? AuthenticationConfigurationPropertyFromCloudFormation(properties.AuthenticationConfiguration) : undefined));
-  ret.addPropertyResult("vendorId", "VendorId", (properties.VendorId != null ? cfn_parse.FromCloudFormation.getString(properties.VendorId) : undefined));
   ret.addPropertyResult("skillPackage", "SkillPackage", (properties.SkillPackage != null ? SkillPackagePropertyFromCloudFormation(properties.SkillPackage) : undefined));
+  ret.addPropertyResult("vendorId", "VendorId", (properties.VendorId != null ? cfn_parse.FromCloudFormation.getString(properties.VendorId) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }

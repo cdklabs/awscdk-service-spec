@@ -1,33 +1,33 @@
-import { expr, Expression, ObjectPropertyAccess, IsNotNullish, Type, UNDEFINED } from '@cdklabs/typewriter';
+import { expr, Expression, ObjectPropertyAccess, IsNotNullish, Type, UNDEFINED, Property } from '@cdklabs/typewriter';
 import { PrimitiveType } from '@jsii/spec';
 import { CDK_CORE } from './cdk/cdk';
-import { cfnParserNameFromType, cfnProducerNameFromType } from './naming/conventions';
+import { cfnParserNameFromType, cfnProducerNameFromType, cfnPropsValidatorNameFromType } from './naming/conventions';
 
 /**
  * Retain a list of properties with their CloudFormation and TypeScript names
  */
 export class PropMapping {
   private readonly cfn2ts: Record<string, string> = {};
-  private readonly cfnTypes: Record<string, Type> = {};
+  private readonly cfn2Prop: Record<string, Property> = {};
 
   constructor() {}
 
-  public add(cfnName: string, tsName: string, type: Type) {
-    this.cfn2ts[cfnName] = tsName;
-    this.cfnTypes[cfnName] = type;
+  public add(cfnName: string, property: Property) {
+    this.cfn2ts[cfnName] = property.name;
+    this.cfn2Prop[cfnName] = property;
   }
 
   public cfnFromTs(): Array<[string, string]> {
-    return Object.entries(this.cfn2ts);
+    return Object.entries(this.cfn2ts).sort(([a], [b]) => a.localeCompare(b));
   }
 
   public cfnProperties(): string[] {
-    return Object.keys(this.cfn2ts);
+    return Object.keys(this.cfn2Prop).sort();
   }
 
   public produceProperty(cfnName: string, struct: Expression): Expression {
     const value = new ObjectPropertyAccess(struct, this.cfn2ts[cfnName]);
-    const type = this.cfnTypes[cfnName];
+    const type = this.cfn2Prop[cfnName].type;
     if (!type) {
       throw new Error(`No type for ${cfnName}`);
     }
@@ -37,12 +37,40 @@ export class PropMapping {
 
   public parseProperty(cfnName: string, propsObj: Expression): Expression {
     const value = new ObjectPropertyAccess(propsObj, cfnName);
-    const type = this.cfnTypes[cfnName];
+    const type = this.cfn2Prop[cfnName].type;
     if (!type) {
       throw new Error(`No type for ${cfnName}`);
     }
 
     return expr.cond(new IsNotNullish(value)).then(this.typeProducer(type).parse.call(value)).else(UNDEFINED);
+  }
+
+  public validateProperty(cfnName: string, propsObj: Expression, errorsObj: Expression): Expression[] {
+    const prop = this.cfn2Prop[cfnName];
+
+    const validations = new Array<Expression>();
+
+    if (!prop.optional) {
+      validations.push(
+        errorsObj.callMethod(
+          'collect',
+          CDK_CORE.propertyValidator
+            .call(expr.lit(prop.name), CDK_CORE.requiredValidator)
+            .call(propsObj.prop(prop.name)),
+        ),
+      );
+    }
+
+    validations.push(
+      errorsObj.callMethod(
+        'collect',
+        CDK_CORE.propertyValidator
+          .call(expr.lit(prop.name), this.typeValidator(prop.type))
+          .call(propsObj.prop(prop.name)),
+      ),
+    );
+
+    return validations;
   }
 
   private typeProducer(type: Type): Mapper {
@@ -111,6 +139,45 @@ export class PropMapping {
       produce: expr.ident(`/* @todo typeMapper(${type}) */`),
       parse: expr.ident(`/* @todo typeMapper(${type}) */`),
     };
+  }
+
+  private typeValidator(type: Type): Expression {
+    if (type.equals(CDK_CORE.CfnTag)) {
+      return CDK_CORE.validateCfnTag;
+    }
+
+    switch (type.primitive) {
+      case PrimitiveType.String:
+        return CDK_CORE.validateString;
+      case PrimitiveType.Date:
+        return CDK_CORE.validateDate;
+      case PrimitiveType.Number:
+        return CDK_CORE.validateNumber;
+      case PrimitiveType.Json:
+        return CDK_CORE.validateObject;
+      case PrimitiveType.Any:
+        return CDK_CORE.validateObject;
+      case PrimitiveType.Boolean:
+        return CDK_CORE.validateBoolean;
+    }
+
+    if (type.arrayOfType) {
+      return CDK_CORE.listValidator.call(this.typeValidator(type.arrayOfType));
+    }
+
+    if (type.mapOfType) {
+      return CDK_CORE.hashValidator.call(this.typeValidator(type.mapOfType));
+    }
+
+    if (type.unionOfTypes) {
+      return CDK_CORE.unionValidator.call(...type.unionOfTypes.map(this.typeValidator));
+    }
+
+    if (type.symbol) {
+      return expr.sym(type.symbol.changeName(cfnPropsValidatorNameFromType));
+    }
+
+    throw `Error: unresolved typeValidator(${type})`;
   }
 }
 

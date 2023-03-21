@@ -37,6 +37,22 @@ export class CdkCore extends ExternalModule {
   public readonly hashMapper = makeCallableExpr(this, 'hashMapper');
   public readonly requireProperty = makeCallableExpr(this, 'requireProperty');
 
+  public readonly ValidationResult = $T(Type.fromName(this, 'ValidationResult'));
+  public readonly VALIDATION_SUCCESS = makeCallableExpr(this, 'VALIDATION_SUCCESS');
+  public readonly ValidationResults = $T(Type.fromName(this, 'ValidationResults'));
+
+  public readonly propertyValidator = makeCallableExpr(this, 'propertyValidator');
+  public readonly requiredValidator = makeCallableExpr(this, 'requiredValidator');
+  public readonly listValidator = makeCallableExpr(this, 'listValidator');
+  public readonly hashValidator = makeCallableExpr(this, 'listValidator');
+  public readonly unionValidator = makeCallableExpr(this, 'listValidator');
+  public readonly validateCfnTag = makeCallableExpr(this, 'validateCfnTag');
+  public readonly validateObject = makeCallableExpr(this, 'validateObject');
+  public readonly validateDate = makeCallableExpr(this, 'validateDate');
+  public readonly validateBoolean = makeCallableExpr(this, 'validateBoolean');
+  public readonly validateNumber = makeCallableExpr(this, 'validateNumber');
+  public readonly validateString = makeCallableExpr(this, 'validateString');
+
   constructor(fqn: string) {
     super(fqn);
   }

@@ -5,7 +5,8 @@ import { ObjectPropertyAccess } from './expressions';
 import { MemberType } from './member-type';
 import { Parameter, ParameterSpec } from './parameter';
 import { Property as PropertyType } from './property';
-import { Block, ExpressionStatement, Statement } from './statements';
+import { Block, Statement } from './statements';
+import { asStmt } from './statements/private';
 import { Type } from './type';
 
 export interface TypeMemberSpec {
@@ -127,7 +128,7 @@ export class Method extends TypeMember implements CallableDeclaration {
     if (!this._body) {
       this._body = new Block();
     }
-    this._body.add(...stmts.map((x) => (x instanceof Statement ? x : new ExpressionStatement(x))));
+    this._body.add(...stmts.map(asStmt));
   }
 }
 

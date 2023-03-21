@@ -16,6 +16,7 @@ import {
   ObjectLiteral,
   ObjectMethodInvoke,
   ObjectPropertyAccess,
+  StrContact,
   Structure,
   Ternary,
   ThisInstance,
@@ -459,6 +460,12 @@ export class TypeScriptRenderer extends Renderer {
       typeCase(IsNotNullish, (x) => {
         this.renderExpression(x._operand_);
         this.emit(' != null');
+      }),
+
+      typeCase(StrContact, (x) => {
+        this.emitList(x._operands_, ' + ', (op) => {
+          this.renderExpression(op);
+        });
       }),
     ]);
 

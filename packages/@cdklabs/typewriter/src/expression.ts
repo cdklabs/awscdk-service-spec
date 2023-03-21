@@ -1,4 +1,5 @@
 import { InvokeCallable, ObjectMethodInvoke, ObjectPropertyAccess } from './expressions';
+import { ExpressionStatement, Statement } from './statements';
 import { ThingSymbol } from './symbol';
 
 export class Expression {
@@ -23,6 +24,10 @@ export class Expression {
 
   public call(...args: Expression[]) {
     return new InvokeCallable(this, args);
+  }
+
+  public asStmt(): Statement {
+    return new ExpressionStatement(this);
   }
 }
 

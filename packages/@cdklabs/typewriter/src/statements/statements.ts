@@ -1,3 +1,4 @@
+import { asStmt } from './private';
 import { Expression } from '../expression';
 
 export class Statement {
@@ -60,13 +61,13 @@ export class IfThenElse extends Statement {
     super();
   }
 
-  public then(then_: Statement) {
-    this.thenStatement = then_;
+  public then(then_: Statement | Expression) {
+    this.thenStatement = asStmt(then_);
     return this;
   }
 
-  public else(else_: Statement) {
-    this.elseStatement = else_;
+  public else(else_: Statement | Expression) {
+    this.elseStatement = asStmt(else_);
     return this;
   }
 }

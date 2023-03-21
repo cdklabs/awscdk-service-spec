@@ -5,10 +5,12 @@ import {
   BinOp,
   DestructuringBind,
   EqualsExpression,
+  IsObject,
   JsLiteralExpression,
   NotExpression,
   Null,
   ObjectLiteral,
+  StrContact,
   Structure,
   Ternary,
   ThisInstance,
@@ -71,4 +73,12 @@ export const NULL = new Null();
 
 export function binOp(lhs: Expression, op: string, rhs: Expression) {
   return new BinOp(lhs, op, rhs);
+}
+
+export function isObject(op: Expression) {
+  return new IsObject(op);
+}
+
+export function strConcat(...ops: Expression[]): Expression {
+  return new StrContact(ops);
 }

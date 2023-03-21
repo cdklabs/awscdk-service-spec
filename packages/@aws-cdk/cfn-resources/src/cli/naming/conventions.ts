@@ -65,6 +65,11 @@ export function cfnParserNameFromType(struct: TypeDeclaration | string) {
   return `${name}FromCloudFormation`;
 }
 
+export function cfnPropsValidatorNameFromType(struct: TypeDeclaration | string) {
+  const name = typeof struct === 'string' ? struct : struct.name;
+  return `${name}Validator`;
+}
+
 export function staticResourceTypeName() {
   return 'CFN_RESOURCE_TYPE_NAME';
 }

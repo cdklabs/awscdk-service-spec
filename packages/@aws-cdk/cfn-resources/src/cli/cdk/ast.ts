@@ -11,6 +11,7 @@ import { Database } from '@cdklabs/tskb';
 import { StructType, expr, stmt, Type, TypeDeclaration, FreeFunction, IsObject, $E, Module } from '@cdklabs/typewriter';
 import { Stability } from '@jsii/spec';
 import { CDK_CORE, CONSTRUCTS, ModuleImportLocations } from './cdk';
+import { PropertyValidator } from './property-validator';
 import { ResourceClass } from './resource-class';
 import {
   classNameFromResource,
@@ -120,6 +121,11 @@ export class AstBuilder<T extends Module> {
    * Make the function that translates code -> CFN
    */
   protected makeCfnProducer(propsInterface: StructType, mapping: PropMapping) {
+    const validator = new PropertyValidator(this.scope, {
+      type: propsInterface,
+      mapping,
+    });
+
     const producer = new FreeFunction(this.scope, {
       name: cfnProducerNameFromType(propsInterface),
       returnType: Type.ANY,
@@ -132,7 +138,7 @@ export class AstBuilder<T extends Module> {
 
     producer.addBody(
       stmt.if_(expr.not(CDK_CORE.canInspect(propsObj))).then(stmt.ret(propsObj)),
-      // FIXME: Validation here
+      validator.fn.call(propsObj).callMethod('assertSuccess'),
       stmt.ret(
         expr.object(mapping.cfnProperties().map((cfn) => [cfn, mapping.produceProperty(cfn, propsObj)] as const)),
       ),
@@ -257,9 +263,7 @@ export class AstBuilder<T extends Module> {
     const name = propertyNameFromCloudFormation(propertyName);
     const type = this.typeFromSpecType(property.type);
 
-    map.add(propertyName, name, type);
-
-    struct.addProperty({
+    const p = struct.addProperty({
       name,
       type,
       optional: !property.required,
@@ -274,6 +278,8 @@ export class AstBuilder<T extends Module> {
         deprecated: deprecationMessage(),
       },
     });
+
+    map.add(propertyName, p);
 
     function deprecationMessage(): string | undefined {
       switch (property.deprecated) {

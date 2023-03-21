@@ -3,8 +3,9 @@ import { Expression } from './expression';
 import { Identifier } from './expressions';
 import { Parameter, ParameterSpec } from './parameter';
 import { Scope } from './scope';
-import { ExpressionStatement, Statement } from './statements';
+import { Statement } from './statements';
 import { Block } from './statements/block';
+import { asStmt } from './statements/private';
 import { SymbolKind } from './symbol';
 import { Type } from './type';
 import { TypeDeclaration, TypeSpec } from './type-declaration';
@@ -62,7 +63,7 @@ export class FreeFunction extends TypeDeclaration implements CallableDeclaration
     if (!this._body) {
       this._body = new Block();
     }
-    this._body.add(...stmts.map((x) => (x instanceof Statement ? x : new ExpressionStatement(x))));
+    this._body.add(...stmts.map(asStmt));
   }
 
   public addParameter(spec: ParameterSpec) {

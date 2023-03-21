@@ -29,16 +29,18 @@ export abstract class MemberType extends TypeDeclaration {
   /**
    * Adds a property to the interface
    */
-  public addProperty(spec: PropertySpec) {
-    this._properties.push(
-      new Property(this, {
-        ...spec,
-        immutable: true,
-      }),
-    );
+  public addProperty(spec: PropertySpec): Property {
+    const prop = new Property(this, {
+      ...spec,
+      immutable: true,
+    });
+
+    this._properties.push(prop);
+
+    return prop;
   }
 
-  public addMethod(spec: MethodSpec) {
+  public addMethod(spec: MethodSpec): Method {
     const m = new Method(this, spec);
     this._methods.push(m);
     return m;
