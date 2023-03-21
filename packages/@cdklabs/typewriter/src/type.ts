@@ -43,6 +43,7 @@ export enum PrimitiveType {
 
 export type TypeReferenceSpec =
   | { readonly fqn: string; readonly genericArguments?: Type[] }
+  | { readonly builtIn: string }
   | { readonly primitive: PrimitiveType }
   | { readonly collection: { readonly kind: 'map' | 'array'; readonly elementType: Type } }
   | { readonly union: Type[] };
@@ -71,7 +72,8 @@ export class Type {
   }
 
   public static unionOf(...types: Type[]) {
-    return new Type({ union: types });
+    // Sort by string representation to get to a stable order
+    return new Type({ union: types.sort((a, b) => a.toString().localeCompare(b.toString())) });
   }
 
   public readonly spec: TypeReferenceSpec;
@@ -113,7 +115,11 @@ export class Type {
   }
 
   public get isVoid(): boolean {
-    return !this.spec;
+    return this.primitive === PrimitiveType.Void;
+  }
+
+  public get builtInType(): string | undefined {
+    return isBuiltInSpec(this.spec) ? this.spec.builtIn : undefined;
   }
 
   public get isAny(): boolean {
@@ -162,6 +168,19 @@ export class Type {
   public optional() {
     return Type.unionOf(this, Type.UNDEFINED);
   }
+
+  public equals(rhs: Type): boolean {
+    return (
+      (this.primitive && this.primitive === rhs.primitive) ||
+      (this.fqn && this.fqn === rhs.fqn) ||
+      (this.builtInType && this.builtInType === rhs.builtInType) ||
+      (this.arrayOfType && this.arrayOfType === rhs.arrayOfType) ||
+      (this.mapOfType && this.mapOfType === rhs.mapOfType) ||
+      (!!this.unionOfTypes &&
+        this.unionOfTypes.length === rhs.unionOfTypes?.length &&
+        zip(this.unionOfTypes, rhs.unionOfTypes ?? []).every(([a, b]) => a.equals(b)))
+    );
+  }
 }
 
 function isFqnSpec(x: TypeReferenceSpec): x is Extract<TypeReferenceSpec, { fqn: string }> {
@@ -172,6 +191,10 @@ function isPrimitiveSpec(x: TypeReferenceSpec): x is Extract<TypeReferenceSpec, 
   return !!(x as any).primitive;
 }
 
+function isBuiltInSpec(x: TypeReferenceSpec): x is Extract<TypeReferenceSpec, { builtIn: string }> {
+  return !!(x as any).builtIn;
+}
+
 function isCollectionSpec(
   x: TypeReferenceSpec,
 ): x is Extract<TypeReferenceSpec, { collection: { kind: 'map' | 'array'; elementType: Type } }> {
@@ -180,4 +203,12 @@ function isCollectionSpec(
 
 function isUnionSpec(x: TypeReferenceSpec): x is Extract<TypeReferenceSpec, { union: Type[] }> {
   return !!(x as any).union;
+}
+
+function zip<A, B>(xs: A[], ys: B[]): Array<[A, B]> {
+  const ret: Array<[A, B]> = [];
+  for (let i = 0; i < xs.length; i++) {
+    ret.push([xs[i], ys[i]]);
+  }
+  return ret;
 }

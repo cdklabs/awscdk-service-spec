@@ -133,6 +133,7 @@ const buildDb = serviceSpecBuild.tasks.addTask('build:db', {
 });
 serviceSpecBuild.postCompileTask.spawn(buildDb);
 serviceSpecBuild.gitignore.addPatterns('db.json');
+serviceSpecBuild.gitignore.addPatterns('db-build-report.txt');
 serviceSpecBuild.synth();
 
 const cfnResources = new yarn.TypeScriptWorkspace({

@@ -34,19 +34,19 @@
             "properties": {
               "allOf": {
                 "items": {
-                  "$ref": "#/definitions/interface-403906428-3293-3639-403906428-0-50501380716174"
+                  "$ref": "#/definitions/interface-403906428-3451-3797-403906428-0-57631380716174"
                 },
                 "type": "array"
               },
               "anyOf": {
                 "items": {
-                  "$ref": "#/definitions/interface-403906428-3293-3639-403906428-0-50501380716174"
+                  "$ref": "#/definitions/interface-403906428-3451-3797-403906428-0-57631380716174"
                 },
                 "type": "array"
               },
               "oneOf": {
                 "items": {
-                  "$ref": "#/definitions/interface-403906428-3293-3639-403906428-0-50501380716174"
+                  "$ref": "#/definitions/interface-403906428-3451-3797-403906428-0-57631380716174"
                 },
                 "type": "array"
               },
@@ -115,19 +115,19 @@
             "properties": {
               "allOf": {
                 "items": {
-                  "$ref": "#/definitions/interface-403906428-3293-3639-403906428-0-50501380716174"
+                  "$ref": "#/definitions/interface-403906428-3451-3797-403906428-0-57631380716174"
                 },
                 "type": "array"
               },
               "anyOf": {
                 "items": {
-                  "$ref": "#/definitions/interface-403906428-3293-3639-403906428-0-50501380716174"
+                  "$ref": "#/definitions/interface-403906428-3451-3797-403906428-0-57631380716174"
                 },
                 "type": "array"
               },
               "oneOf": {
                 "items": {
-                  "$ref": "#/definitions/interface-403906428-3293-3639-403906428-0-50501380716174"
+                  "$ref": "#/definitions/interface-403906428-3451-3797-403906428-0-57631380716174"
                 },
                 "type": "array"
               },
@@ -186,10 +186,14 @@
           "type": "string"
         },
         "taggable": {
+          "default": true,
+          "deprecated": "use 'tagging' instead",
+          "description": "Whether the resource is taggable",
           "type": "boolean"
         },
         "tagging": {
-          "$ref": "#/definitions/ResourceTagging"
+          "$ref": "#/definitions/ResourceTagging",
+          "description": "Extended tagging settings"
         },
         "title": {
           "type": "string"
@@ -279,42 +283,52 @@
       "additionalProperties": false,
       "properties": {
         "cloudFormationSystemTags": {
+          "default": true,
+          "description": "Whether this resource type supports CloudFormation system tags.",
           "type": "boolean"
         },
         "tagOnCreate": {
+          "default": true,
+          "description": "Whether this resource type supports tagging resources upon creation.",
           "type": "boolean"
         },
         "tagProperty": {
+          "default": "/properties/Tags",
+          "description": "A reference to where you have defined the Tags property in this resource type schema.",
           "type": "string"
         },
         "tagUpdatable": {
+          "default": true,
+          "description": "Whether this resource type supports updating tags during resource update operations.",
           "type": "boolean"
         },
         "taggable": {
+          "default": true,
+          "description": "Whether the resource is taggable",
           "type": "boolean"
         }
       },
       "type": "object"
     },
-    "interface-403906428-3293-3639-403906428-0-50501380716174": {
+    "interface-403906428-3451-3797-403906428-0-57631380716174": {
       "additionalProperties": false,
       "description": "Type combinator fields we commonly see at the resource level\n\n(They can be nested)",
       "properties": {
         "allOf": {
           "items": {
-            "$ref": "#/definitions/interface-403906428-3293-3639-403906428-0-50501380716174"
+            "$ref": "#/definitions/interface-403906428-3451-3797-403906428-0-57631380716174"
           },
           "type": "array"
         },
         "anyOf": {
           "items": {
-            "$ref": "#/definitions/interface-403906428-3293-3639-403906428-0-50501380716174"
+            "$ref": "#/definitions/interface-403906428-3451-3797-403906428-0-57631380716174"
           },
           "type": "array"
         },
         "oneOf": {
           "items": {
-            "$ref": "#/definitions/interface-403906428-3293-3639-403906428-0-50501380716174"
+            "$ref": "#/definitions/interface-403906428-3451-3797-403906428-0-57631380716174"
           },
           "type": "array"
         },

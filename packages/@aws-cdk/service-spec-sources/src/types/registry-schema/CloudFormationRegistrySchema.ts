@@ -51,8 +51,19 @@ export interface CloudFormationRegistryResource extends ImplicitJsonSchemaRecord
    */
   readonly definitions?: Record<string, jsonschema.Schema>; // FIXME: Kaizen changed this from ConcreteSchema to fix 1 isue.
   readonly handlers?: Handlers;
-  readonly tagging?: ResourceTagging;
+
+  /**
+   * Whether the resource is taggable
+   *
+   * @deprecated use 'tagging' instead
+   * @default true
+   */
   readonly taggable?: boolean;
+
+  /**
+   * Extended tagging settings
+   */
+  readonly tagging?: ResourceTagging;
 
   /**
    * Not sure what this is
@@ -124,10 +135,38 @@ export interface Handler {
 export type ImplicitJsonSchemaRecord = Omit<jsonschema.RecordLikeObject, 'type'>;
 
 export interface ResourceTagging {
+  /**
+   * Whether the resource is taggable
+   *
+   * @default true
+   */
   readonly taggable?: boolean;
+
+  /**
+   * Whether this resource type supports tagging resources upon creation.
+   *
+   * @default true
+   */
   readonly tagOnCreate?: boolean;
+
+  /**
+   * Whether this resource type supports updating tags during resource update operations.
+   *
+   * @default true
+   */
   readonly tagUpdatable?: boolean;
+
+  /**
+   * Whether this resource type supports CloudFormation system tags.
+   * @default true
+   */
   readonly cloudFormationSystemTags?: boolean;
+
+  /**
+   * A reference to where you have defined the Tags property in this resource type schema.
+   *
+   * @default '/properties/Tags'
+   */
   readonly tagProperty?: string;
 }
 

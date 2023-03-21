@@ -1750,49 +1750,7 @@ export interface CfnScheduleGroupProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-scheduler-schedulegroup.html#cfn-scheduler-schedulegroup-tags
    */
-  readonly tags?: Array<TagProperty>;
-}
-
-/**
- * Tag to associate with the resource.
- *
- * @struct
- * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedulegroup-tag.html
- */
-export interface TagProperty {
-  /**
-   * Key for the tag.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedulegroup-tag.html#cfn-scheduler-schedulegroup-tag-key
-   */
-  readonly key: string;
-
-  /**
-   * Value for the tag.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedulegroup-tag.html#cfn-scheduler-schedulegroup-tag-value
-   */
-  readonly value: string;
-}
-
-// @ts-ignore TS6133
-function convertTagPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  return {
-    "Key": cdk.stringToCloudFormation(properties.key),
-    "Value": cdk.stringToCloudFormation(properties.value)
-  };
-}
-
-// @ts-ignore TS6133
-function TagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<TagProperty> {
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<TagProperty>();
-  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
-  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
+  readonly tags?: Array<cdk.CfnTag>;
 }
 
 // @ts-ignore TS6133
@@ -1800,7 +1758,7 @@ function convertCfnScheduleGroupPropsToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
   return {
     "Name": cdk.stringToCloudFormation(properties.name),
-    "Tags": cdk.listMapper(convertTagPropertyToCloudFormation)(properties.tags)
+    "Tags": cdk.listMapper(cdk.numberToCloudFormation)(properties.tags)
   };
 }
 
@@ -1810,7 +1768,7 @@ function CfnScheduleGroupPropsFromCloudFormation(properties: any): cfn_parse.Fro
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnScheduleGroupProps>();
   ret.addPropertyResult("name", "Name", (properties.Name != null ? cfn_parse.FromCloudFormation.getString(properties.Name) : undefined));
-  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(TagPropertyFromCloudFormation)(properties.Tags) : undefined));
+  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -1821,7 +1779,7 @@ function CfnScheduleGroupPropsFromCloudFormation(properties: any): cfn_parse.Fro
  * @stability external
  * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-scheduler-schedulegroup.html
  */
-export class CfnScheduleGroup extends cdk.CfnResource implements cdk.IInspectable {
+export class CfnScheduleGroup extends cdk.CfnResource implements cdk.IInspectable, cdk.ITaggable {
   /**
    * The CloudFormation resource type name for this resource class.
    */
@@ -1865,7 +1823,7 @@ export class CfnScheduleGroup extends cdk.CfnResource implements cdk.IInspectabl
   /**
    * An array of key-value pairs to apply to this resource.
    */
-  public readonly tags?: Array<TagProperty>;
+  public readonly tags: cdk.TagManager;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -1883,13 +1841,15 @@ export class CfnScheduleGroup extends cdk.CfnResource implements cdk.IInspectabl
     this.attrLastModificationDate = cdk.Token.asString(this.getAtt("LastModificationDate", cdk.ResolutionTypeHint.STRING));
     this.attrState = cdk.Token.asString(this.getAtt("State", cdk.ResolutionTypeHint.STRING));
     this.name = props.name;
-    this.tags = props.tags;
+    this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::Scheduler::ScheduleGroup", props.tags, {
+      "tagPropertyName": "tags"
+    });
   }
 
   protected get cfnProperties(): Record<string, any> {
     return {
       "name": this.name,
-      "tags": this.tags
+      "tags": this.tags.renderTags()
     };
   }
 
@@ -2114,7 +2074,7 @@ export interface CfnQueueProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-tags
    */
-  readonly tags?: Array<TagProperty>;
+  readonly tags?: Array<cdk.CfnTag>;
 
   /**
    * The length of time during which a message will be unavailable after a message is delivered from the queue.
@@ -2128,50 +2088,6 @@ export interface CfnQueueProps {
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-visibilitytimeout
    */
   readonly visibilityTimeout?: number;
-}
-
-/**
- * @struct
- * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-tag.html
- */
-export interface TagProperty {
-  /**
-   * The key name of the tag.
-   *
-   * You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-tag.html#cfn-sqs-queue-tag-key
-   */
-  readonly key: string;
-
-  /**
-   * The value for the tag.
-   *
-   * You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-tag.html#cfn-sqs-queue-tag-value
-   */
-  readonly value: string;
-}
-
-// @ts-ignore TS6133
-function convertTagPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  return {
-    "Key": cdk.stringToCloudFormation(properties.key),
-    "Value": cdk.stringToCloudFormation(properties.value)
-  };
-}
-
-// @ts-ignore TS6133
-function TagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<TagProperty> {
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<TagProperty>();
-  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
-  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
 }
 
 // @ts-ignore TS6133
@@ -2192,7 +2108,7 @@ function convertCfnQueuePropsToCloudFormation(properties: any): any {
     "ReceiveMessageWaitTimeSeconds": cdk.numberToCloudFormation(properties.receiveMessageWaitTimeSeconds),
     "RedriveAllowPolicy": cdk.objectToCloudFormation(properties.redriveAllowPolicy),
     "RedrivePolicy": cdk.objectToCloudFormation(properties.redrivePolicy),
-    "Tags": cdk.listMapper(convertTagPropertyToCloudFormation)(properties.tags),
+    "Tags": cdk.listMapper(cdk.numberToCloudFormation)(properties.tags),
     "VisibilityTimeout": cdk.numberToCloudFormation(properties.visibilityTimeout)
   };
 }
@@ -2216,7 +2132,7 @@ function CfnQueuePropsFromCloudFormation(properties: any): cfn_parse.FromCloudFo
   ret.addPropertyResult("receiveMessageWaitTimeSeconds", "ReceiveMessageWaitTimeSeconds", (properties.ReceiveMessageWaitTimeSeconds != null ? cfn_parse.FromCloudFormation.getNumber(properties.ReceiveMessageWaitTimeSeconds) : undefined));
   ret.addPropertyResult("redriveAllowPolicy", "RedriveAllowPolicy", (properties.RedriveAllowPolicy != null ? cfn_parse.FromCloudFormation.getAny(properties.RedriveAllowPolicy) : undefined));
   ret.addPropertyResult("redrivePolicy", "RedrivePolicy", (properties.RedrivePolicy != null ? cfn_parse.FromCloudFormation.getAny(properties.RedrivePolicy) : undefined));
-  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(TagPropertyFromCloudFormation)(properties.Tags) : undefined));
+  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
   ret.addPropertyResult("visibilityTimeout", "VisibilityTimeout", (properties.VisibilityTimeout != null ? cfn_parse.FromCloudFormation.getNumber(properties.VisibilityTimeout) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
@@ -2239,7 +2155,7 @@ function CfnQueuePropsFromCloudFormation(properties: any): cfn_parse.FromCloudFo
  * @stability external
  * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html
  */
-export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable {
+export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.ITaggable {
   /**
    * The CloudFormation resource type name for this resource class.
    */
@@ -2339,7 +2255,7 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable {
   /**
    * The tags that you attach to this queue.
    */
-  public readonly tags?: Array<TagProperty>;
+  public readonly tags: cdk.TagManager;
 
   /**
    * The length of time during which a message will be unavailable after a message is delivered from the queue.
@@ -2374,7 +2290,9 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable {
     this.receiveMessageWaitTimeSeconds = props.receiveMessageWaitTimeSeconds;
     this.redriveAllowPolicy = props.redriveAllowPolicy;
     this.redrivePolicy = props.redrivePolicy;
-    this.tags = props.tags;
+    this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::SQS::Queue", props.tags, {
+      "tagPropertyName": "tags"
+    });
     this.visibilityTimeout = props.visibilityTimeout;
   }
 
@@ -2394,7 +2312,7 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable {
       "receiveMessageWaitTimeSeconds": this.receiveMessageWaitTimeSeconds,
       "redriveAllowPolicy": this.redriveAllowPolicy,
       "redrivePolicy": this.redrivePolicy,
-      "tags": this.tags,
+      "tags": this.tags.renderTags(),
       "visibilityTimeout": this.visibilityTimeout
     };
   }

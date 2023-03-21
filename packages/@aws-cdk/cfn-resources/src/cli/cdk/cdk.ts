@@ -14,18 +14,24 @@ export interface ModuleImportLocations {
 }
 
 export class CdkCore extends ExternalModule {
+  public readonly helpers = new CdkInternalHelpers(this);
+
   public readonly CfnResource = Type.fromName(this, 'CfnResource');
   public readonly IInspectable = Type.fromName(this, 'IInspectable');
   public readonly TreeInspector = Type.fromName(this, 'TreeInspector');
   public readonly Token = $T(Type.fromName(this, 'Token'));
   public readonly ResolutionTypeHint = Type.fromName(this, 'ResolutionTypeHint');
-  public readonly helpers = new CdkInternalHelpers(this);
+  public readonly CfnTag = Type.fromName(this, 'CfnTag');
+  public readonly TagManager = $T(Type.fromName(this, 'TagManager'));
+  public readonly TagType = $T(Type.fromName(this, 'TagType'));
+  public readonly ITaggable = Type.fromName(this, 'ITaggable');
 
   public readonly objectToCloudFormation = makeCallableExpr(this, 'objectToCloudFormation');
   public readonly stringToCloudFormation = makeCallableExpr(this, 'stringToCloudFormation');
   public readonly dateToCloudFormation = makeCallableExpr(this, 'dateToCloudFormation');
   public readonly booleanToCloudFormation = makeCallableExpr(this, 'booleanToCloudFormation');
   public readonly numberToCloudFormation = makeCallableExpr(this, 'numberToCloudFormation');
+  public readonly cfnTagToCloudFormation = makeCallableExpr(this, 'numberToCloudFormation');
   public readonly canInspect = makeCallableExpr(this, 'canInspect');
   public readonly listMapper = makeCallableExpr(this, 'listMapper');
   public readonly hashMapper = makeCallableExpr(this, 'hashMapper');
