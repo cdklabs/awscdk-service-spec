@@ -1,2 +1,4 @@
 #!/usr/bin/env node
+
+// Drop-in replacement from `awscdk-service-spec`
 require('../lib/cfn2ts.js');

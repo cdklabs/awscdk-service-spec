@@ -79,12 +79,12 @@ export class AwsCdkIntgrationTest extends pj.Component {
           // this fix enables skipLibCheck to prevent the behavior
           name: 'Fix: aws-cdk attempts to compile awscdk-service-spec code',
           workingDirectory: path.join(awsCdkPath, 'packages', 'aws-cdk'),
-          run: `npx tsc --showConfig | jq '.compilerOptions = .compilerOptions + {"skipLibCheck": true}' > tmp && mv tmp tsconfig.json`,
+          run: `npx tsc --showConfig | jq '.references = []' > tmp && mv tmp tsconfig.json`,
         },
         {
           name: `Build ${awsCdkRepo}`,
           workingDirectory: awsCdkPath,
-          run: 'npx lerna run build --no-bail --concurrency=2 --scope aws-cdk-lib --include-dependencies',
+          run: 'npx lerna run build --no-bail --concurrency=1 --scope aws-cdk-lib --include-dependencies',
         },
       ],
     });
