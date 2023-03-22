@@ -546,7 +546,7 @@ function convertCfnRestApiPropsToCloudFormation(properties: any): any {
     "Name": cdk.stringToCloudFormation(properties.name),
     "Parameters": cdk.hashMapper(cdk.stringToCloudFormation)(properties.parameters),
     "Policy": cdk.objectToCloudFormation(properties.policy),
-    "Tags": cdk.listMapper(cdk.numberToCloudFormation)(properties.tags)
+    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags)
   };
 }
 
@@ -954,7 +954,7 @@ function convertCfnRolePropsToCloudFormation(properties: any): any {
     "PermissionsBoundary": cdk.stringToCloudFormation(properties.permissionsBoundary),
     "Policies": cdk.listMapper(convertPolicyPropertyToCloudFormation)(properties.policies),
     "RoleName": cdk.stringToCloudFormation(properties.roleName),
-    "Tags": cdk.listMapper(cdk.numberToCloudFormation)(properties.tags)
+    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags)
   };
 }
 
@@ -2078,7 +2078,7 @@ function convertCfnFunctionPropsToCloudFormation(properties: any): any {
     "Role": cdk.stringToCloudFormation(properties.role),
     "Runtime": cdk.stringToCloudFormation(properties.runtime),
     "SnapStart": convertSnapStartPropertyToCloudFormation(properties.snapStart),
-    "Tags": cdk.listMapper(cdk.numberToCloudFormation)(properties.tags),
+    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags),
     "Timeout": cdk.numberToCloudFormation(properties.timeout),
     "TracingConfig": convertTracingConfigPropertyToCloudFormation(properties.tracingConfig),
     "VpcConfig": convertVpcConfigPropertyToCloudFormation(properties.vpcConfig)
@@ -6889,7 +6889,7 @@ function convertCfnBucketPropsToCloudFormation(properties: any): any {
     "OwnershipControls": convertOwnershipControlsPropertyToCloudFormation(properties.ownershipControls),
     "PublicAccessBlockConfiguration": convertPublicAccessBlockConfigurationPropertyToCloudFormation(properties.publicAccessBlockConfiguration),
     "ReplicationConfiguration": convertReplicationConfigurationPropertyToCloudFormation(properties.replicationConfiguration),
-    "Tags": cdk.listMapper(cdk.numberToCloudFormation)(properties.tags),
+    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags),
     "VersioningConfiguration": convertVersioningConfigurationPropertyToCloudFormation(properties.versioningConfiguration),
     "WebsiteConfiguration": convertWebsiteConfigurationPropertyToCloudFormation(properties.websiteConfiguration)
   };
@@ -7392,7 +7392,7 @@ function convertCfnQueuePropsToCloudFormation(properties: any): any {
     "RedriveAllowPolicy": cdk.objectToCloudFormation(properties.redriveAllowPolicy),
     "RedrivePolicy": cdk.objectToCloudFormation(properties.redrivePolicy),
     "SqsManagedSseEnabled": cdk.booleanToCloudFormation(properties.sqsManagedSseEnabled),
-    "Tags": cdk.listMapper(cdk.numberToCloudFormation)(properties.tags),
+    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags),
     "VisibilityTimeout": cdk.numberToCloudFormation(properties.visibilityTimeout)
   };
 }

@@ -31,7 +31,7 @@ export class CdkCore extends ExternalModule {
   public readonly dateToCloudFormation = makeCallableExpr(this, 'dateToCloudFormation');
   public readonly booleanToCloudFormation = makeCallableExpr(this, 'booleanToCloudFormation');
   public readonly numberToCloudFormation = makeCallableExpr(this, 'numberToCloudFormation');
-  public readonly cfnTagToCloudFormation = makeCallableExpr(this, 'numberToCloudFormation');
+  public readonly cfnTagToCloudFormation = makeCallableExpr(this, 'cfnTagToCloudFormation');
   public readonly canInspect = makeCallableExpr(this, 'canInspect');
   public readonly listMapper = makeCallableExpr(this, 'listMapper');
   public readonly hashMapper = makeCallableExpr(this, 'hashMapper');
