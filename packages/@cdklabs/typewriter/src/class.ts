@@ -1,11 +1,13 @@
 import { Expression } from './expression';
-import { NewExpression } from './expressions';
+import { NewExpression, ObjectPropertyAccess } from './expressions';
+import * as expr from './expressions/builder';
 import { MemberType } from './member-type';
+import { Module } from './module';
 import { PropertySpec } from './property';
-import { Scope } from './scope';
+import { IScope, IScopeLink, ScopeImpl } from './scope';
 import { SymbolKind } from './symbol';
 import { Type } from './type';
-import { TypeSpec } from './type-declaration';
+import { TypeDeclaration, TypeSpec } from './type-declaration';
 import { Initializer, InitializerSpec } from './type-member';
 
 export interface ClassSpec extends TypeSpec {
@@ -16,8 +18,11 @@ export interface ClassSpec extends TypeSpec {
   implements?: Type[];
 }
 
-export class ClassType extends MemberType {
+export class ClassType extends MemberType implements IScope {
   public readonly kind = SymbolKind.Class;
+  private readonly classScope: ScopeImpl;
+
+  public readonly nestedDeclarations: TypeDeclaration[] = [];
 
   /**
    * List the modifiers of the interface
@@ -36,8 +41,11 @@ export class ClassType extends MemberType {
 
   private _initializer?: Initializer;
 
-  public constructor(public scope: Scope, public readonly spec: ClassSpec) {
+  private registeredInParentScope = false;
+
+  public constructor(public scope: IScope, public readonly spec: ClassSpec) {
     super(scope, spec);
+    this.classScope = new ScopeImpl(this.fqn);
   }
 
   public get initializer() {
@@ -62,5 +70,46 @@ export class ClassType extends MemberType {
 
   public newInstance(...args: Expression[]) {
     return new NewExpression(this.type, ...args);
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // IScope
+
+  public get typeMap() {
+    return this.classScope.typeMap;
+  }
+
+  public qualifyName(name: string): string {
+    return this.classScope.qualifyName(name);
+  }
+
+  registerType(type: TypeDeclaration): void {
+    if (type.kind === SymbolKind.Function) {
+      throw new Error(`Cannot create free function ${type} in scope of ${this}. Add a static method instead.`);
+    }
+
+    this.classScope.registerType(type);
+
+    this.nestedDeclarations.push(type);
+
+    // If we have nested types, be sure to register this class' scope in the containing module scope
+    if (!this.registeredInParentScope) {
+      this.registeredInParentScope = true;
+      Module.of(this).linkScope(this, {
+        referenceSymbol: (sym) => new ObjectPropertyAccess(expr.sym(this.symbol), sym.name),
+      });
+    }
+  }
+
+  tryFindType(fqn: string): TypeDeclaration | undefined {
+    return this.classScope.tryFindType(fqn);
+  }
+
+  linkScope(scope: IScope, theImport: IScopeLink): void {
+    return this.classScope.linkScope(scope, theImport);
+  }
+
+  findLink(scope: IScope): IScopeLink | undefined {
+    return this.classScope.findLink(scope);
   }
 }

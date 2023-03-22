@@ -1,6 +1,6 @@
 import { MemberType } from './member-type';
 import { PropertySpec } from './property';
-import { Scope } from './scope';
+import { IScope } from './scope';
 import { SymbolKind } from './symbol';
 import { Type } from './type';
 import { TypeSpec } from './type-declaration';
@@ -26,7 +26,7 @@ export class InterfaceType extends MemberType {
     return modifiers;
   }
 
-  public constructor(public scope: Scope, public readonly spec: InterfaceSpec) {
+  public constructor(public scope: IScope, public readonly spec: InterfaceSpec) {
     super(scope, spec);
   }
 

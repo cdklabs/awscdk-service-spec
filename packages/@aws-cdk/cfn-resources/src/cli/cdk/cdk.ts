@@ -1,4 +1,4 @@
-import { $E, $T, expr, Expression, ExternalModule, Scope, ThingSymbol, Type } from '@cdklabs/typewriter';
+import { $E, $T, expr, Expression, ExternalModule, IScope, ThingSymbol, Type } from '@cdklabs/typewriter';
 
 export interface ModuleImportLocations {
   /**
@@ -92,6 +92,6 @@ export class Constructs extends ExternalModule {
 export const CDK_CORE = new CdkCore('aws-cdk-lib');
 export const CONSTRUCTS = new Constructs();
 
-function makeCallableExpr(scope: Scope, name: string) {
+function makeCallableExpr(scope: IScope, name: string) {
   return $E(expr.sym(new ThingSymbol(name, scope)));
 }

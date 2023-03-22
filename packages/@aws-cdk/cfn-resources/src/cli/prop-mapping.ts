@@ -1,4 +1,14 @@
-import { expr, Expression, ObjectPropertyAccess, IsNotNullish, Type, UNDEFINED, Property } from '@cdklabs/typewriter';
+import {
+  expr,
+  Expression,
+  ObjectPropertyAccess,
+  IsNotNullish,
+  Type,
+  UNDEFINED,
+  Property,
+  ThingSymbol,
+  IScope,
+} from '@cdklabs/typewriter';
 import { PrimitiveType } from '@jsii/spec';
 import { CDK_CORE } from './cdk/cdk';
 import { cfnParserNameFromType, cfnProducerNameFromType, cfnPropsValidatorNameFromType } from './naming/conventions';
@@ -10,7 +20,7 @@ export class PropMapping {
   private readonly cfn2ts: Record<string, string> = {};
   private readonly cfn2Prop: Record<string, Property> = {};
 
-  constructor() {}
+  constructor(private readonly mapperFunctionsScope: IScope) {}
 
   public add(cfnName: string, property: Property) {
     this.cfn2ts[cfnName] = property.name;
@@ -130,8 +140,8 @@ export class PropMapping {
 
     if (type.symbol) {
       return {
-        produce: expr.sym(type.symbol.changeName(cfnProducerNameFromType)),
-        parse: expr.sym(type.symbol.changeName(cfnParserNameFromType)),
+        produce: expr.sym(new ThingSymbol(cfnProducerNameFromType(type.symbol.name), this.mapperFunctionsScope)),
+        parse: expr.sym(new ThingSymbol(cfnParserNameFromType(type.symbol.name), this.mapperFunctionsScope)),
       };
     }
 
@@ -174,7 +184,7 @@ export class PropMapping {
     }
 
     if (type.symbol) {
-      return expr.sym(type.symbol.changeName(cfnPropsValidatorNameFromType));
+      return expr.sym(new ThingSymbol(cfnPropsValidatorNameFromType(type.symbol.name), this.mapperFunctionsScope));
     }
 
     throw `Error: unresolved typeValidator(${type})`;

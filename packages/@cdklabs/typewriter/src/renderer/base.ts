@@ -3,9 +3,10 @@ import { FreeFunction } from '../callable';
 import { ClassType } from '../class';
 import { InterfaceType } from '../interface';
 import { Module } from '../module';
-import { Scope } from '../scope';
+import { IScope } from '../scope';
 import { StructType } from '../struct';
 import { SymbolKind } from '../symbol';
+import { TypeDeclaration } from '../type-declaration';
 
 export interface RenderOptions {
   indentation?: number | string;
@@ -18,7 +19,7 @@ export abstract class Renderer {
   /**
    * Stack of visible scopes during rendering, closest first
    */
-  private scopeStack = new Array<Scope>();
+  private scopeStack = new Array<IScope>();
 
   public constructor(options: RenderOptions = {}) {
     this.symbol = this.setIndentationSymbol(options.indentation);
@@ -42,24 +43,26 @@ export abstract class Renderer {
    * Render types of a module.
    */
   protected renderModuleTypes(mod: Module): void {
-    this.emitList(mod.types, '\n\n', (t) => {
-      switch (t.kind) {
-        case SymbolKind.Struct:
-          this.renderStruct(t as StructType);
-          break;
-        case SymbolKind.Interface:
-          this.renderInterface(t as InterfaceType);
-          break;
-        case SymbolKind.Function:
-          this.renderFunction(t as FreeFunction);
-          break;
-        case SymbolKind.Class:
-          this.renderClass(t as ClassType);
-          break;
-        default:
-          throw `Unknown type: ${t.kind} for ${t.fqn}. Skipping.`;
-      }
-    });
+    this.emitList(mod.types, '\n\n', (t) => this.renderDeclaration(t));
+  }
+
+  protected renderDeclaration(decl: TypeDeclaration) {
+    switch (decl.kind) {
+      case SymbolKind.Struct:
+        this.renderStruct(decl as StructType);
+        break;
+      case SymbolKind.Interface:
+        this.renderInterface(decl as InterfaceType);
+        break;
+      case SymbolKind.Function:
+        this.renderFunction(decl as FreeFunction);
+        break;
+      case SymbolKind.Class:
+        this.renderClass(decl as ClassType);
+        break;
+      default:
+        throw `Unknown type: ${decl.kind} for ${decl.fqn}. Skipping.`;
+    }
   }
 
   /**
@@ -114,7 +117,7 @@ export abstract class Renderer {
     }
   }
 
-  protected withScope(scope: Scope, block: () => void) {
+  protected withScope(scope: IScope, block: () => void) {
     this.scopeStack.unshift(scope);
     try {
       block();
@@ -123,7 +126,7 @@ export abstract class Renderer {
     }
   }
 
-  protected get scopes(): ReadonlyArray<Scope> {
+  protected get scopes(): ReadonlyArray<IScope> {
     return this.scopeStack;
   }
 }

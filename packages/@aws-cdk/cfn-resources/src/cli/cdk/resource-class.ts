@@ -7,7 +7,7 @@ import {
   expr,
   Expression,
   MemberVisibility,
-  Scope,
+  IScope,
   stmt,
   StructType,
   SuperInitializer,
@@ -32,39 +32,50 @@ export interface ITypeHost {
 }
 
 export interface ResourceClassSpec {
-  res: Resource;
   propsType: StructType;
-  typeHost: ITypeHost;
 }
 
 export class ResourceClass extends ClassType {
-  constructor(scope: Scope, private readonly opts: ResourceClassSpec) {
+  private _propsType?: StructType;
+
+  constructor(scope: IScope, private readonly res: Resource) {
     super(scope, {
       export: true,
-      name: classNameFromResource(opts.res),
+      name: classNameFromResource(res),
       docs: {
-        ...splitDocumentation(opts.res.documentation),
+        ...splitDocumentation(res.documentation),
         stability: Stability.External,
         see: cloudFormationDocLink({
-          resourceType: opts.res.cloudFormationType,
+          resourceType: res.cloudFormationType,
         }),
       },
       extends: CDK_CORE.CfnResource,
-      implements: [CDK_CORE.IInspectable, ...(opts.res.tagPropertyName !== undefined ? [CDK_CORE.ITaggable] : [])],
+      implements: [CDK_CORE.IInspectable, ...(res.tagPropertyName !== undefined ? [CDK_CORE.ITaggable] : [])],
     });
+  }
+
+  private get propsType(): StructType {
+    if (!this._propsType) {
+      throw new Error('_propsType must be set before calling this method');
+    }
+    return this._propsType;
+  }
+
+  public buildMembers(propsType: StructType) {
+    this._propsType = propsType;
 
     this.addProperty({
       name: staticResourceTypeName(),
       immutable: true,
       static: true,
       type: Type.STRING,
-      initializer: expr.lit(opts.res.cloudFormationType),
+      initializer: expr.lit(this.res.cloudFormationType),
       docs: {
         summary: 'The CloudFormation resource type name for this resource class.',
       },
     });
 
-    this.addFromCloudFormationFactory(opts.propsType);
+    this.addFromCloudFormationFactory(propsType);
 
     // Attributes
     for (const { attrName, name, type, attr } of this.mappableAttributes()) {
@@ -97,7 +108,7 @@ export class ResourceClass extends ClassType {
     this.makeRenderProperties();
   }
 
-  protected addFromCloudFormationFactory(propsType: StructType) {
+  private addFromCloudFormationFactory(propsType: StructType) {
     const factory = this.addMethod({
       name: '_fromCloudFormation',
       returnType: this.type,
@@ -127,7 +138,6 @@ export class ResourceClass extends ClassType {
     const propsResult = $E(expr.ident('propsResult'));
     const ret = $E(expr.ident('ret'));
 
-    // FIXME: Reverse mapper
     const reverseMapper = expr.ident(cfnParserNameFromType(propsType));
 
     factory.addBody(
@@ -154,7 +164,7 @@ export class ResourceClass extends ClassType {
     // Ctor
     const init = this.addInitializer({
       docs: {
-        summary: `Create a new \`${this.opts.res.cloudFormationType}\`.`,
+        summary: `Create a new \`${this.res.cloudFormationType}\`.`,
       },
     });
     const _scope = init.addParameter({
@@ -169,7 +179,7 @@ export class ResourceClass extends ClassType {
     });
     const props = init.addParameter({
       name: 'props',
-      type: this.opts.propsType.type,
+      type: this.propsType.type,
       documentation: 'Resource properties',
     });
 
@@ -262,14 +272,14 @@ export class ResourceClass extends ClassType {
       name: 'props',
       type: Type.mapOf(Type.ANY),
     });
-    m.addBody(stmt.ret($E(expr.ident(cfnProducerNameFromType(this.opts.propsType)))(props)));
+    m.addBody(stmt.ret($E(expr.ident(cfnProducerNameFromType(this.propsType)))(props)));
   }
 
   private mappableAttributes() {
     const $this = $E(expr.this_());
     const $ResolutionTypeHint = $T(CDK_CORE.ResolutionTypeHint);
 
-    return Object.entries(this.opts.res.attributes).flatMap(([attrName, attr]) => {
+    return Object.entries(this.res.attributes).flatMap(([attrName, attr]) => {
       let type: Type | undefined;
       let tokenizer: Expression = expr.ident('<dummy>');
 
@@ -290,9 +300,9 @@ export class ResourceClass extends ClassType {
 
   private mappableProperties() {
     const $this = $E(expr.this_());
-    return this.opts.propsType.properties.map((prop) => {
+    return this.propsType.properties.map((prop) => {
       // FIXME: Would be nicer to thread this value through
-      const isTagType = prop.name === propertyNameFromCloudFormation(this.opts.res.tagPropertyName ?? '');
+      const isTagType = prop.name === propertyNameFromCloudFormation(this.res.tagPropertyName ?? '');
 
       if (isTagType) {
         return {
@@ -303,8 +313,8 @@ export class ResourceClass extends ClassType {
           memberType: CDK_CORE.TagManager,
           initializer: (props: Expression) =>
             new CDK_CORE.TagManager(
-              translateTagType(this.opts.res.tagType ?? 'standard'),
-              expr.lit(this.opts.res.cloudFormationType),
+              translateTagType(this.res.tagType ?? 'standard'),
+              expr.lit(this.res.cloudFormationType),
               prop.from(props),
               expr.object({ tagPropertyName: expr.lit(prop.name) }),
             ),

@@ -2,82 +2,135 @@ import { Expression } from './expression';
 import { ThingSymbol } from './symbol';
 import { TypeDeclaration } from './type-declaration';
 
-export interface IImport {
-  readonly importAlias?: string;
-  readonly importedSymbols?: string[];
-  readonly moduleSource: string;
+/**
+ * Interface for classes that are scopes/namespaces
+ */
+export interface IScope {
+  /**
+   * The set of type declarations in this scope
+   */
+  readonly typeMap: ReadonlyMap<string, TypeDeclaration>;
 
-  referenceSymbol(sym: ThingSymbol): Expression;
+  /**
+   * Turn a declaration name into a declaration FQN
+   */
+  qualifyName(name: string): string;
+
+  /**
+   * Register a type to the scope
+   */
+  registerType(type: TypeDeclaration): void;
+
+  /**
+   * Try find a type by FQN
+   */
+  tryFindType(fqn: string): TypeDeclaration | undefined;
+
+  /**
+   * Register a visible other scope into this scope
+   */
+  linkScope(scope: IScope, theImport: IScopeLink): void;
+
+  /**
+   * Find the import that makes the given scope visible
+   */
+  findLink(scope: IScope): IScopeLink | undefined;
 }
 
 /**
- * A place that can hold types
+ * An implementation of the IScope methods
+ *
+ * Classes can either inherit from this class to automatically satisfy the `IScope` requirements,
+ * mix this class into themselves, or declare a private member and delegate all methods.
  */
-export abstract class Scope {
-  public declare abstract readonly fqn: string;
-  public declare abstract readonly name: string;
-  protected declare abstract readonly typeMap: ReadonlyMap<string, TypeDeclaration>;
-  protected readonly importMap: Map<Scope, IImport> = new Map<Scope, IImport>();
+export class ScopeImpl implements IScope {
+  private readonly _typeMap = new Map<string, TypeDeclaration>();
+  private readonly linkMap = new Map<IScope, IScopeLink>();
+  public readonly typeMap: ReadonlyMap<string, TypeDeclaration> = this._typeMap;
+
+  constructor(public readonly fqn: string) {}
+
+  public qualifyName(name: string): string {
+    return `${this.fqn}.${name}`;
+  }
 
   /**
    * All direct types in this scope
    */
   public get types(): readonly TypeDeclaration[] {
-    return Array.from(this.typeMap.values());
+    return Array.from(this._typeMap.values());
   }
 
   /**
    * Register a type to the scope
    */
-  public abstract addType(type: TypeDeclaration): void;
+  public registerType(type: TypeDeclaration) {
+    this._typeMap.set(type.fqn, type);
+  }
 
   public tryFindType(fqnOrName: string): TypeDeclaration | undefined {
-    return this.typeMap.get(fqnOrName) || this.typeMap.get(`${this.fqn}.${fqnOrName}`);
+    return this._typeMap.get(fqnOrName);
   }
 
-  /**
-   * Find type by FQN or Name
-   */
-  public findType(fqnOrName: string): TypeDeclaration {
-    const ownType = this.tryFindType(fqnOrName);
-    if (ownType) {
-      return ownType;
-    }
-    throw new Error(`Type '${fqnOrName}' not found in assembly ${this.name}`);
-  }
-
-  /**
-   * All imports in this module
-   */
-  public get imports(): IImport[] {
-    return Array.from(this.importMap.values());
-  }
-
-  public addImportedScope(scope: Scope, theImport: IImport): void {
-    this.importMap.set(scope, theImport);
+  public linkScope(scope: IScope, theImport: IScopeLink): void {
+    this.linkMap.set(scope, theImport);
   }
 
   /**
    * Try to find an import for the given scope
    */
-  public findImportFor(scope: Scope): IImport | undefined {
-    return this.importMap.get(scope);
-  }
-
-  public toString() {
-    return `scope ${this.fqn}`;
+  public findLink(scope: IScope): IScopeLink | undefined {
+    return this.linkMap.get(scope);
   }
 }
 
 /**
- * A global scope for things that are already in the environment
+ * A global scope for things that are already in the target environment
  */
-export class AmbientScope extends Scope {
-  public readonly fqn: string = '<<ambient>>';
-  public readonly name: string = '<<ambient>>';
+export const AMBIENT_SCOPE = new ScopeImpl('<<ambient>>');
 
-  protected typeMap = new Map<string, TypeDeclaration>();
-  public addType(_type: TypeDeclaration): void {}
+/**
+ * Link one scope to another (make symbols from the linked scope visible in the current one)
+ */
+export interface IScopeLink {
+  /**
+   * Return an expression that will reference the given symbol
+   */
+  referenceSymbol(sym: ThingSymbol): Expression;
 }
 
-export const AMBIENT_SCOPE = new AmbientScope();
+/**
+ * All things that have a scope
+ */
+export interface IScoped {
+  readonly scope: IScope;
+}
+
+export function isScoped(x: unknown): x is IScoped {
+  return !!x && typeof x === 'object' && (x as any).scope !== undefined;
+}
+
+/**
+ * Common operations that can be performed on anything that's an IScope
+ */
+export class RichScope {
+  constructor(private readonly scope: IScope) {}
+
+  /**
+   * Find type by FQN, throwing an error if not found
+   */
+  public findType(fqn: string): TypeDeclaration {
+    const ownType = this.scope.tryFindType(fqn);
+    if (ownType) {
+      return ownType;
+    }
+    throw new Error(`Type '${fqn}' not found in ${this}`);
+  }
+
+  /**
+   * Find a type by name in this current scope
+   */
+  public tryFindTypeByName(name: string): TypeDeclaration | undefined {
+    return this.scope.tryFindType(this.scope.qualifyName(name));
+  }
+}

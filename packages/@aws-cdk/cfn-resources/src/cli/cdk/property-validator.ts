@@ -1,4 +1,4 @@
-import { $E, expr, FreeFunction, Scope, stmt, StructType, Type } from '@cdklabs/typewriter';
+import { $E, expr, FreeFunction, IScope, stmt, StructType, Type } from '@cdklabs/typewriter';
 import { CDK_CORE } from './cdk';
 import { cfnPropsValidatorNameFromType } from '../naming/conventions';
 import { PropMapping } from '../prop-mapping';
@@ -9,7 +9,7 @@ export interface PropertyValidatorSpec {
 }
 
 export class PropertyValidator extends FreeFunction {
-  constructor(scope: Scope, options: PropertyValidatorSpec) {
+  constructor(scope: IScope, options: PropertyValidatorSpec) {
     const { type, mapping } = options;
 
     super(scope, {

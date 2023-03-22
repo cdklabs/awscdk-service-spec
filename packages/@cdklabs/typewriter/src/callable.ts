@@ -2,7 +2,7 @@ import { Documented } from './documented';
 import { Expression } from './expression';
 import { Identifier } from './expressions';
 import { Parameter, ParameterSpec } from './parameter';
-import { Scope } from './scope';
+import { IScope } from './scope';
 import { Statement } from './statements';
 import { Block } from './statements/block';
 import { asStmt } from './statements/private';
@@ -38,7 +38,7 @@ export class FreeFunction extends TypeDeclaration implements CallableDeclaration
 
   private _body?: Block;
 
-  constructor(public readonly scope: Scope, public readonly spec: CallableSpec) {
+  constructor(public readonly scope: IScope, public readonly spec: CallableSpec) {
     super(scope, spec);
     this._body = spec.body;
     this.returnType = spec.returnType ?? Type.VOID;

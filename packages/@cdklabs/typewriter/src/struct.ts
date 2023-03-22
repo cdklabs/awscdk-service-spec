@@ -1,7 +1,7 @@
 import * as jsii from '@jsii/spec';
 import { MemberType } from './member-type';
 import { Property, PropertySpec } from './property';
-import { Scope } from './scope';
+import { IScope } from './scope';
 import { SymbolKind } from './symbol';
 
 export interface StructSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' | 'kind' | 'properties'> {
@@ -24,7 +24,7 @@ export class StructType extends MemberType {
     return modifiers;
   }
 
-  public constructor(public scope: Scope, public readonly spec: StructSpec) {
+  public constructor(public scope: IScope, public readonly spec: StructSpec) {
     super(scope, spec);
   }
 
