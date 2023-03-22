@@ -1,10 +1,10 @@
 import { Expression } from './expression';
 import { NewExpression, ObjectPropertyAccess } from './expressions';
+import * as expr from './expressions/builder';
 import { MemberType } from './member-type';
 import { Module } from './module';
 import { PropertySpec } from './property';
 import { IScope, IScopeLink, ScopeImpl } from './scope';
-import * as expr from './expressions/builder';
 import { SymbolKind } from './symbol';
 import { Type } from './type';
 import { TypeDeclaration, TypeSpec } from './type-declaration';
