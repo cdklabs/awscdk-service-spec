@@ -124,6 +124,7 @@ export class TypeScriptRenderer extends Renderer {
 
     // Nested type declarations in TypeScript are done by following the class declaration with a 'namespace' declaration
     if (classType.nestedDeclarations.length > 0) {
+      this.emit('\n\n');
       this.emitBlock(`${classType.exported ? 'export ' : ''}namespace ${classType.name}`, () => {
         this.emitList(classType.nestedDeclarations, '\n\n', (t) => this.renderDeclaration(t));
       });

@@ -195,7 +195,9 @@ export class CfnRestApi extends cdk.CfnResource implements cdk.IInspectable, cdk
   protected renderProperties(props: Record<string, any>): Record<string, any> {
     return convertCfnRestApiPropsToCloudFormation(props);
   }
-}namespace CfnRestApi {
+}
+
+namespace CfnRestApi {
   /**
    * \`S3Location\` is a property of the [AWS::ApiGateway::RestApi](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html) resource that specifies the Amazon S3 location of a OpenAPI (formerly Swagger) file that defines a set of RESTful APIs in JSON or YAML.
    *
@@ -278,7 +280,7 @@ export interface CfnRestApiProps {
    *
    * Valid values are: \`HEADER\` to read the API key from the \`X-API-Key\` header of a request. \`AUTHORIZER\` to read the API key from the \`UsageIdentifierKey\` from a custom authorizer.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-restapi.html#cfn-apigateway-restapi-restapi-apikeysourcetype
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-apikeysourcetype
    */
   readonly apiKeySourceType?: string;
 
@@ -287,7 +289,7 @@ export interface CfnRestApiProps {
    *
    * By default, the RestApi supports only UTF-8-encoded text payloads.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-restapi.html#cfn-apigateway-restapi-restapi-binarymediatypes
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-binarymediatypes
    */
   readonly binaryMediaTypes?: Array<string>;
 
@@ -296,21 +298,21 @@ export interface CfnRestApiProps {
    *
    * For YAML templates, you can also provide the specification in YAML format.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-restapi.html#cfn-apigateway-restapi-restapi-body
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-body
    */
   readonly body?: any;
 
   /**
    * The Amazon Simple Storage Service (Amazon S3) location that points to an OpenAPI file, which defines a set of RESTful APIs in JSON or YAML format.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-restapi.html#cfn-apigateway-restapi-restapi-bodys3location
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-bodys3location
    */
   readonly bodyS3Location?: CfnRestApi.S3LocationProperty;
 
   /**
    * The ID of the RestApi that you want to clone from.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-restapi.html#cfn-apigateway-restapi-restapi-clonefrom
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-clonefrom
    */
   readonly cloneFrom?: string;
 
@@ -319,14 +321,14 @@ export interface CfnRestApiProps {
    *
    * Use this property when creating an API. When importing an existing API, specify the endpoint configuration types using the \`Parameters\` property.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-restapi.html#cfn-apigateway-restapi-restapi-endpointconfiguration
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-endpointconfiguration
    */
   readonly endpointConfiguration?: CfnRestApi.EndpointConfigurationProperty;
 
   /**
    * The description of the RestApi.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-restapi.html#cfn-apigateway-restapi-restapi-description
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-description
    */
   readonly description?: string;
 
@@ -335,7 +337,7 @@ export interface CfnRestApiProps {
    *
    * By default, clients can invoke your API with the default \`https://{api_id}.execute-api.{region}.amazonaws.com\` endpoint. To require that clients use a custom domain name to invoke your API, disable the default endpoint
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-restapi.html#cfn-apigateway-restapi-restapi-disableexecuteapiendpoint
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-disableexecuteapiendpoint
    */
   readonly disableExecuteApiEndpoint?: boolean;
 
@@ -344,14 +346,14 @@ export interface CfnRestApiProps {
    *
    * The default value is \`false\` .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-restapi.html#cfn-apigateway-restapi-restapi-failonwarnings
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-failonwarnings
    */
   readonly failOnWarnings?: boolean;
 
   /**
    * The name of the RestApi.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-restapi.html#cfn-apigateway-restapi-restapi-name
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-name
    */
   readonly name?: string;
 
@@ -360,7 +362,7 @@ export interface CfnRestApiProps {
    *
    * When compression is enabled, compression or decompression is not applied on the payload if the payload size is smaller than this value. Setting it to zero allows compression for any payload size.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-restapi.html#cfn-apigateway-restapi-restapi-minimumcompressionsize
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-minimumcompressionsize
    */
   readonly minimumCompressionSize?: number;
 
@@ -377,7 +379,7 @@ export interface CfnRestApiProps {
    *
    * If you don't specify this property, a default value is chosen. For REST APIs created before March 29, 2021, the default is \`overwrite\` . Otherwise, the default value is \`merge\` .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-restapi.html#cfn-apigateway-restapi-restapi-mode
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-mode
    */
   readonly mode?: string;
 
@@ -386,7 +388,7 @@ export interface CfnRestApiProps {
    *
    * To set the ARN for the policy, use the \`!Join\` intrinsic function with \`""\` as delimiter and values of \`"execute-api:/"\` and \`"*"\` .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-restapi.html#cfn-apigateway-restapi-restapi-policy
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-policy
    */
   readonly policy?: any;
 
@@ -395,7 +397,7 @@ export interface CfnRestApiProps {
    *
    * For example, to exclude DocumentationParts from an imported API, set \`ignore=documentation\` as a \`parameters\` value, as in the AWS CLI command of \`aws apigateway import-rest-api --parameters ignore=documentation --body 'file:///path/to/imported-api-body.json'\` .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-restapi.html#cfn-apigateway-restapi-restapi-parameters
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-parameters
    */
   readonly parameters?: Record<string, string>;
 
@@ -404,7 +406,7 @@ export interface CfnRestApiProps {
    *
    * The valid character set is [a-zA-Z+-=._:/]. The tag key can be up to 128 characters and must not start with \`aws:\` . The tag value can be up to 256 characters.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-restapi.html#cfn-apigateway-restapi-restapi-tags
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-tags
    */
   readonly tags?: Array<cdk.CfnTag>;
 }
@@ -736,7 +738,9 @@ export class CfnRole extends cdk.CfnResource implements cdk.IInspectable, cdk.IT
   protected renderProperties(props: Record<string, any>): Record<string, any> {
     return convertCfnRolePropsToCloudFormation(props);
   }
-}namespace CfnRole {
+}
+
+namespace CfnRole {
   /**
    * Contains information about an attached policy.
    *
@@ -779,14 +783,14 @@ export interface CfnRoleProps {
    *
    * Trust policies define which entities can assume the role. You can associate only one trust policy with a role. For an example of a policy that can be used to assume a role, see [Template Examples](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#aws-resource-iam-role--examples) . For more information about the elements that you can use in an IAM policy, see [IAM Policy Elements Reference](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html) in the *IAM User Guide* .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-role.html#cfn-iam-role-role-assumerolepolicydocument
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-assumerolepolicydocument
    */
   readonly assumeRolePolicyDocument: any;
 
   /**
    * A description of the role that you provide.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-role.html#cfn-iam-role-role-description
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-description
    */
   readonly description?: string;
 
@@ -795,7 +799,7 @@ export interface CfnRoleProps {
    *
    * For more information about ARNs, see [Amazon Resource Names (ARNs) and AWS Service Namespaces](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html) in the *AWS General Reference* .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-role.html#cfn-iam-role-role-managedpolicyarns
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-managedpolicyarns
    */
   readonly managedPolicyArns?: Array<string>;
 
@@ -806,7 +810,7 @@ export interface CfnRoleProps {
    *
    * Anyone who assumes the role from the AWS CLI or API can use the \`DurationSeconds\` API parameter or the \`duration-seconds\` AWS CLI parameter to request a longer session. The \`MaxSessionDuration\` setting determines the maximum duration that can be requested using the \`DurationSeconds\` parameter. If users don't specify a value for the \`DurationSeconds\` parameter, their security credentials are valid for one hour by default. This applies when you use the \`AssumeRole*\` API operations or the \`assume-role*\` AWS CLI operations but does not apply when you use those operations to create a console URL. For more information, see [Using IAM roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use.html) in the *IAM User Guide* .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-role.html#cfn-iam-role-role-maxsessionduration
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-maxsessionduration
    */
   readonly maxSessionDuration?: number;
 
@@ -817,7 +821,7 @@ export interface CfnRoleProps {
    *
    * This parameter allows (through its [regex pattern](https://docs.aws.amazon.com/http://wikipedia.org/wiki/regex) ) a string of characters consisting of either a forward slash (/) by itself or a string that must begin and end with forward slashes. In addition, it can contain any ASCII character from the ! ( \`\\u0021\` ) through the DEL character ( \`\\u007F\` ), including most punctuation characters, digits, and upper and lowercased letters.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-role.html#cfn-iam-role-role-path
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path
    */
   readonly path?: string;
 
@@ -826,7 +830,7 @@ export interface CfnRoleProps {
    *
    * For more information about permissions boundaries, see [Permissions boundaries for IAM identities](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html) in the *IAM User Guide* .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-role.html#cfn-iam-role-role-permissionsboundary
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary
    */
   readonly permissionsBoundary?: string;
 
@@ -841,7 +845,7 @@ export interface CfnRoleProps {
    *
    * > If an external policy (such as \`AWS::IAM::Policy\` or \`AWS::IAM::ManagedPolicy\` ) has a \`Ref\` to a role and if a resource (such as \`AWS::ECS::Service\` ) also has a \`Ref\` to the same role, add a \`DependsOn\` attribute to the resource to make the resource depend on the external policy. This dependency ensures that the role's policy is available throughout the resource's lifecycle. For example, when you delete a stack with an \`AWS::ECS::Service\` resource, the \`DependsOn\` attribute ensures that AWS CloudFormation deletes the \`AWS::ECS::Service\` resource before deleting its role's policy.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-role.html#cfn-iam-role-role-policies
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-policies
    */
   readonly policies?: Array<CfnRole.PolicyProperty>;
 
@@ -858,7 +862,7 @@ export interface CfnRoleProps {
    *
    * > Naming an IAM resource can cause an unrecoverable error if you reuse the same template in multiple Regions. To prevent this, we recommend using \`Fn::Join\` and \`AWS::Region\` to create a Region-specific name, as in the following example: \`{"Fn::Join": ["", [{"Ref": "AWS::Region"}, {"Ref": "MyResourceName"}]]}\` .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-role.html#cfn-iam-role-role-rolename
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-rolename
    */
   readonly roleName?: string;
 
@@ -867,7 +871,7 @@ export interface CfnRoleProps {
    *
    * For more information about tagging, see [Tagging IAM resources](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_tags.html) in the *IAM User Guide* .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-role.html#cfn-iam-role-role-tags
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-tags
    */
   readonly tags?: Array<cdk.CfnTag>;
 }
@@ -1233,7 +1237,9 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
   protected renderProperties(props: Record<string, any>): Record<string, any> {
     return convertCfnFunctionPropsToCloudFormation(props);
   }
-}namespace CfnFunction {
+}
+
+namespace CfnFunction {
   /**
    * The function's [AWS X-Ray](https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html) tracing configuration. To sample and record incoming requests, set \`Mode\` to \`Active\` .
    *
@@ -1465,35 +1471,35 @@ export interface CfnFunctionProps {
   /**
    * A description of the function.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-description
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-description
    */
   readonly description?: string;
 
   /**
    * Set \`Mode\` to \`Active\` to sample and trace a subset of incoming requests with [X-Ray](https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html) .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-tracingconfig
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tracingconfig
    */
   readonly tracingConfig?: CfnFunction.TracingConfigProperty;
 
   /**
    * For network connectivity to AWS resources in a [VPC](https://docs.aws.amazon.com/lambda/latest/dg/configuration-network.html) , specify a list of security groups and subnets in the VPC.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-vpcconfig
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-vpcconfig
    */
   readonly vpcConfig?: CfnFunction.VpcConfigProperty;
 
   /**
    * The number of simultaneous executions to reserve for the function.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-reservedconcurrentexecutions
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-reservedconcurrentexecutions
    */
   readonly reservedConcurrentExecutions?: number;
 
   /**
    * The function's [AWS Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html) setting.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-snapstart
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-snapstart
    */
   readonly snapStart?: CfnFunction.SnapStartProperty;
 
@@ -1504,7 +1510,7 @@ export interface CfnFunctionProps {
    *
    * For more information about using the \`DependsOn\` attribute, see [DependsOn Attribute](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-dependson.html) .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-filesystemconfigs
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-filesystemconfigs
    */
   readonly fileSystemConfigs?: Array<CfnFunction.FileSystemConfigProperty>;
 
@@ -1515,7 +1521,7 @@ export interface CfnFunctionProps {
    *
    * If you specify a name, you cannot perform updates that require replacement of this resource. You can perform updates that require no or some interruption. If you must replace the resource, specify a new name.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-functionname
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-functionname
    */
   readonly functionName?: string;
 
@@ -1524,14 +1530,14 @@ export interface CfnFunctionProps {
    *
    * The following list includes deprecated runtimes. For more information, see [Runtime deprecation policy](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-support-policy) .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-runtime
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime
    */
   readonly runtime?: string;
 
   /**
    * The ARN of the AWS Key Management Service ( AWS KMS ) customer managed key that's used to encrypt your function's [environment variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-encryption) . When [Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart-security.html) is activated, this key is also used to encrypt your function's snapshot. If you don't provide a customer managed key, Lambda uses a default service key.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-kmskeyarn
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-kmskeyarn
    */
   readonly kmsKeyArn?: string;
 
@@ -1540,7 +1546,7 @@ export interface CfnFunctionProps {
    *
    * Set to \`Image\` for container image and set \`Zip\` for .zip file archive.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-packagetype
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-packagetype
    */
   readonly packageType?: string;
 
@@ -1550,21 +1556,21 @@ export interface CfnFunctionProps {
    * A code-signing configuration
    * includes a set of signing profiles, which define the trusted publishers for this function.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-codesigningconfigarn
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-codesigningconfigarn
    */
   readonly codeSigningConfigArn?: string;
 
   /**
    * A list of [function layers](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html) to add to the function's execution environment. Specify each layer by its ARN, including the version.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-layers
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-layers
    */
   readonly layers?: Array<string>;
 
   /**
    * A list of [tags](https://docs.aws.amazon.com/lambda/latest/dg/tagging.html) to apply to the function.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-tags
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tags
    */
   readonly tags?: Array<cdk.CfnTag>;
 
@@ -1573,14 +1579,14 @@ export interface CfnFunctionProps {
    *
    * For more information, see [Container image settings](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-parms) .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-imageconfig
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-imageconfig
    */
   readonly imageConfig?: CfnFunction.ImageConfigProperty;
 
   /**
    * The amount of [memory available to the function](https://docs.aws.amazon.com/lambda/latest/dg/configuration-function-common.html#configuration-memory-console) at runtime. Increasing the function memory also increases its CPU allocation. The default value is 128 MB. The value can be any multiple of 1 MB.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-memorysize
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-memorysize
    */
   readonly memorySize?: number;
 
@@ -1589,7 +1595,7 @@ export interface CfnFunctionProps {
    *
    * For more information, see [Dead-letter queues](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html#invocation-dlq) .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-deadletterconfig
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-deadletterconfig
    */
   readonly deadLetterConfig?: CfnFunction.DeadLetterConfigProperty;
 
@@ -1598,7 +1604,7 @@ export interface CfnFunctionProps {
    *
    * The default is 3 seconds. The maximum allowed value is 900 seconds. For more information, see [Lambda execution environment](https://docs.aws.amazon.com/lambda/latest/dg/runtimes-context.html) .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-timeout
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-timeout
    */
   readonly timeout?: number;
 
@@ -1607,28 +1613,28 @@ export interface CfnFunctionProps {
    *
    * Handler is required if the deployment package is a .zip file archive. The format includes the file name. It can also include namespaces and other qualifiers, depending on the runtime. For more information, see [Lambda programming model](https://docs.aws.amazon.com/lambda/latest/dg/foundation-progmodel.html) .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-handler
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-handler
    */
   readonly handler?: string;
 
   /**
    * The code for the function.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-code
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-code
    */
   readonly code: CfnFunction.CodeProperty;
 
   /**
    * The Amazon Resource Name (ARN) of the function's execution role.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-role
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-role
    */
   readonly role: string;
 
   /**
    * Environment variables that are accessible from function code during execution.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-environment
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-environment
    */
   readonly environment?: CfnFunction.EnvironmentProperty;
 
@@ -1637,7 +1643,7 @@ export interface CfnFunctionProps {
    *
    * The default value is 512, but it can be any whole number between 512 and 10,240 MB.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-ephemeralstorage
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage
    */
   readonly ephemeralStorage?: CfnFunction.EphemeralStorageProperty;
 
@@ -1646,7 +1652,7 @@ export interface CfnFunctionProps {
    *
    * Enter a string array with one of the valid values (arm64 or x86_64). The default value is \`x86_64\` .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-function.html#cfn-lambda-function-function-architectures
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures
    */
   readonly architectures?: Array<string>;
 }
@@ -2388,7 +2394,9 @@ export class CfnBucket extends cdk.CfnResource implements cdk.IInspectable, cdk.
   protected renderProperties(props: Record<string, any>): Record<string, any> {
     return convertCfnBucketPropsToCloudFormation(props);
   }
-}namespace CfnBucket {
+}
+
+namespace CfnBucket {
   /**
    * Configures the transfer acceleration state for an Amazon S3 bucket.
    *
@@ -4238,7 +4246,7 @@ export interface CfnBucketProps {
    *
    * For more information, see [Amazon S3 Transfer Acceleration](https://docs.aws.amazon.com/AmazonS3/latest/dev/transfer-acceleration.html) in the *Amazon S3 User Guide* .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-accelerateconfiguration
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-accelerateconfiguration
    */
   readonly accelerateConfiguration?: CfnBucket.AccelerateConfigurationProperty;
 
@@ -4249,14 +4257,14 @@ export interface CfnBucketProps {
    *
    * Be aware that the syntax for this property differs from the information provided in the *Amazon S3 User Guide* . The AccessControl property is case-sensitive and must be one of the following values: Private, PublicRead, PublicReadWrite, AuthenticatedRead, LogDeliveryWrite, BucketOwnerRead, BucketOwnerFullControl, or AwsExecRead.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-accesscontrol
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-accesscontrol
    */
   readonly accessControl?: string;
 
   /**
    * Specifies the configuration and any analyses for the analytics filter of an Amazon S3 bucket.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-analyticsconfigurations
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-analyticsconfigurations
    */
   readonly analyticsConfigurations?: Array<CfnBucket.AnalyticsConfigurationProperty>;
 
@@ -4265,7 +4273,7 @@ export interface CfnBucketProps {
    *
    * For information about the Amazon S3 default encryption feature, see [Amazon S3 Default Encryption for S3 Buckets](https://docs.aws.amazon.com/AmazonS3/latest/dev/bucket-encryption.html) in the *Amazon S3 User Guide* .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-bucketencryption
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-bucketencryption
    */
   readonly bucketEncryption?: CfnBucket.BucketEncryptionProperty;
 
@@ -4276,7 +4284,7 @@ export interface CfnBucketProps {
    *
    * > If you specify a name, you can't perform updates that require replacement of this resource. You can perform updates that require no or some interruption. If you need to replace the resource, specify a new name.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-bucketname
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-bucketname
    */
   readonly bucketName?: string;
 
@@ -4285,14 +4293,14 @@ export interface CfnBucketProps {
    *
    * For more information, see [Enabling Cross-Origin Resource Sharing](https://docs.aws.amazon.com/AmazonS3/latest/dev/cors.html) in the *Amazon S3 User Guide* .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-corsconfiguration
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-corsconfiguration
    */
   readonly corsConfiguration?: CfnBucket.CorsConfigurationProperty;
 
   /**
    * Defines how Amazon S3 handles Intelligent-Tiering storage.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-intelligenttieringconfigurations
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-intelligenttieringconfigurations
    */
   readonly intelligentTieringConfigurations?: Array<CfnBucket.IntelligentTieringConfigurationProperty>;
 
@@ -4301,7 +4309,7 @@ export interface CfnBucketProps {
    *
    * For more information, see [GET Bucket inventory](https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETInventoryConfig.html) in the *Amazon S3 API Reference* .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-inventoryconfigurations
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-inventoryconfigurations
    */
   readonly inventoryConfigurations?: Array<CfnBucket.InventoryConfigurationProperty>;
 
@@ -4310,14 +4318,14 @@ export interface CfnBucketProps {
    *
    * For more information, see [Object Lifecycle Management](https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lifecycle-mgmt.html) in the *Amazon S3 User Guide* .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-lifecycleconfiguration
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-lifecycleconfiguration
    */
   readonly lifecycleConfiguration?: CfnBucket.LifecycleConfigurationProperty;
 
   /**
    * Settings that define where logs are stored.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-loggingconfiguration
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-loggingconfiguration
    */
   readonly loggingConfiguration?: CfnBucket.LoggingConfigurationProperty;
 
@@ -4326,14 +4334,14 @@ export interface CfnBucketProps {
    *
    * If you're updating an existing metrics configuration, note that this is a full replacement of the existing metrics configuration. If you don't include the elements you want to keep, they are erased. For more information, see [PutBucketMetricsConfiguration](https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTMetricConfiguration.html) .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-metricsconfigurations
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-metricsconfigurations
    */
   readonly metricsConfigurations?: Array<CfnBucket.MetricsConfigurationProperty>;
 
   /**
    * Configuration that defines how Amazon S3 handles bucket notifications.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-notificationconfiguration
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-notificationconfiguration
    */
   readonly notificationConfiguration?: CfnBucket.NotificationConfigurationProperty;
 
@@ -4346,7 +4354,7 @@ export interface CfnBucketProps {
    * > - The \`DefaultRetention\` period can be either \`Days\` or \`Years\` but you must select one. You cannot specify \`Days\` and \`Years\` at the same time.
    * > - You can only enable Object Lock for new buckets. If you want to turn on Object Lock for an existing bucket, contact AWS Support.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-objectlockconfiguration
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-objectlockconfiguration
    */
   readonly objectLockConfiguration?: CfnBucket.ObjectLockConfigurationProperty;
 
@@ -4355,21 +4363,21 @@ export interface CfnBucketProps {
    *
    * Enable \`ObjectLockEnabled\` when you apply \`ObjectLockConfiguration\` to a bucket.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-objectlockenabled
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-objectlockenabled
    */
   readonly objectLockEnabled?: boolean;
 
   /**
    * Configuration that defines how Amazon S3 handles Object Ownership rules.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-ownershipcontrols
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-ownershipcontrols
    */
   readonly ownershipControls?: CfnBucket.OwnershipControlsProperty;
 
   /**
    * Configuration that defines how Amazon S3 handles public access.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-publicaccessblockconfiguration
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-publicaccessblockconfiguration
    */
   readonly publicAccessBlockConfiguration?: CfnBucket.PublicAccessBlockConfigurationProperty;
 
@@ -4380,14 +4388,14 @@ export interface CfnBucketProps {
    *
    * Amazon S3 can store replicated objects in a single destination bucket or multiple destination buckets. The destination bucket or buckets must already exist.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-replicationconfiguration
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-replicationconfiguration
    */
   readonly replicationConfiguration?: CfnBucket.ReplicationConfigurationProperty;
 
   /**
    * An arbitrary set of tags (key-value pairs) for this S3 bucket.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-tags
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-tags
    */
   readonly tags?: Array<cdk.CfnTag>;
 
@@ -4396,7 +4404,7 @@ export interface CfnBucketProps {
    *
    * You might enable versioning to prevent objects from being deleted or overwritten by mistake or to archive objects so that you can retrieve previous versions of them.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-versioningconfiguration
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-versioningconfiguration
    */
   readonly versioningConfiguration?: CfnBucket.VersioningConfigurationProperty;
 
@@ -4405,7 +4413,7 @@ export interface CfnBucketProps {
    *
    * For more information, see [Hosting Websites on Amazon S3](https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteHosting.html) .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-bucket.html#cfn-s3-bucket-bucket-websiteconfiguration
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-websiteconfiguration
    */
   readonly websiteConfiguration?: CfnBucket.WebsiteConfigurationProperty;
 }
@@ -7159,7 +7167,7 @@ export interface CfnQueueProps {
    *
    * During the deduplication interval, Amazon SQS treats messages that are sent with identical content as duplicates and delivers only one copy of the message. For more information, see the \`ContentBasedDeduplication\` attribute for the \`[CreateQueue](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_CreateQueue.html)\` action in the *Amazon SQS API Reference* .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-queue.html#cfn-sqs-queue-queue-contentbaseddeduplication
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-contentbaseddeduplication
    */
   readonly contentBasedDeduplication?: boolean;
 
@@ -7170,7 +7178,7 @@ export interface CfnQueueProps {
    *
    * To enable high throughput for a FIFO queue, set this attribute to \`messageGroup\` *and* set the \`FifoThroughputLimit\` attribute to \`perMessageGroupId\` . If you set these attributes to anything other than these values, normal throughput is in effect and deduplication occurs as specified. For more information, see [High throughput for FIFO queues](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/high-throughput-fifo.html) and [Quotas related to messages](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/quotas-messages.html) in the *Amazon SQS Developer Guide* .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-queue.html#cfn-sqs-queue-queue-deduplicationscope
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-deduplicationscope
    */
   readonly deduplicationScope?: string;
 
@@ -7179,7 +7187,7 @@ export interface CfnQueueProps {
    *
    * You can specify an integer value of \`0\` to \`900\` (15 minutes). The default value is \`0\` .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-queue.html#cfn-sqs-queue-queue-delayseconds
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-delayseconds
    */
   readonly delaySeconds?: number;
 
@@ -7188,7 +7196,7 @@ export interface CfnQueueProps {
    *
    * If you don't specify this property, Amazon SQS creates a standard queue. For more information, see [FIFO queues](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues.html) in the *Amazon SQS Developer Guide* .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-queue.html#cfn-sqs-queue-queue-fifoqueue
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-fifoqueue
    */
   readonly fifoQueue?: boolean;
 
@@ -7199,7 +7207,7 @@ export interface CfnQueueProps {
    *
    * To enable high throughput for a FIFO queue, set this attribute to \`perMessageGroupId\` *and* set the \`DeduplicationScope\` attribute to \`messageGroup\` . If you set these attributes to anything other than these values, normal throughput is in effect and deduplication occurs as specified. For more information, see [High throughput for FIFO queues](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/high-throughput-fifo.html) and [Quotas related to messages](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/quotas-messages.html) in the *Amazon SQS Developer Guide* .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-queue.html#cfn-sqs-queue-queue-fifothroughputlimit
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-fifothroughputlimit
    */
   readonly fifoThroughputLimit?: string;
 
@@ -7210,7 +7218,7 @@ export interface CfnQueueProps {
    *
    * > A shorter time period provides better security, but results in more calls to AWS KMS , which might incur charges after Free Tier. For more information, see [Encryption at rest](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-server-side-encryption.html#sqs-how-does-the-data-key-reuse-period-work) in the *Amazon SQS Developer Guide* .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-queue.html#cfn-sqs-queue-queue-kmsdatakeyreuseperiodseconds
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-kmsdatakeyreuseperiodseconds
    */
   readonly kmsDataKeyReusePeriodSeconds?: number;
 
@@ -7224,7 +7232,7 @@ export interface CfnQueueProps {
    * - [Request Parameters](https://docs.aws.amazon.com/kms/latest/APIReference/API_DescribeKey.html#API_DescribeKey_RequestParameters) in the *AWS Key Management Service API Reference*
    * - The Key Management Service (KMS) section of the [AWS Key Management Service Best Practices](https://docs.aws.amazon.com/https://d0.awsstatic.com/whitepapers/aws-kms-best-practices.pdf) whitepaper
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-queue.html#cfn-sqs-queue-queue-kmsmasterkeyid
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-kmsmasterkeyid
    */
   readonly kmsMasterKeyId?: string;
 
@@ -7233,7 +7241,7 @@ export interface CfnQueueProps {
    *
    * Only one server-side encryption option is supported per queue (for example, [SSE-KMS](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-sse-existing-queue.html) or [SSE-SQS](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-configure-sqs-sse-queue.html) ).
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-queue.html#cfn-sqs-queue-queue-sqsmanagedsseenabled
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-sqsmanagedsseenabled
    */
   readonly sqsManagedSseEnabled?: boolean;
 
@@ -7242,7 +7250,7 @@ export interface CfnQueueProps {
    *
    * You can specify an integer value from \`1,024\` bytes (1 KiB) to \`262,144\` bytes (256 KiB). The default value is \`262,144\` (256 KiB).
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-queue.html#cfn-sqs-queue-queue-maximummessagesize
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-maximummessagesize
    */
   readonly maximumMessageSize?: number;
 
@@ -7251,7 +7259,7 @@ export interface CfnQueueProps {
    *
    * You can specify an integer value from \`60\` seconds (1 minute) to \`1,209,600\` seconds (14 days). The default value is \`345,600\` seconds (4 days).
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-queue.html#cfn-sqs-queue-queue-messageretentionperiod
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-messageretentionperiod
    */
   readonly messageRetentionPeriod?: number;
 
@@ -7264,7 +7272,7 @@ export interface CfnQueueProps {
    *
    * > If you specify a name, you can't perform updates that require replacement of this resource. You can perform updates that require no or some interruption. If you must replace the resource, specify a new name.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-queue.html#cfn-sqs-queue-queue-queuename
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-queuename
    */
   readonly queueName?: string;
 
@@ -7273,7 +7281,7 @@ export interface CfnQueueProps {
    *
    * You can specify an integer from 1 to 20. Short polling is used as the default or when you specify 0 for this property. For more information, see [Consuming messages using long polling](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-short-and-long-polling.html#sqs-long-polling) in the *Amazon SQS Developer Guide* .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-queue.html#cfn-sqs-queue-queue-receivemessagewaittimeseconds
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-receivemessagewaittimeseconds
    */
   readonly receiveMessageWaitTimeSeconds?: number;
 
@@ -7289,7 +7297,7 @@ export interface CfnQueueProps {
    * - \`byQueue\` : Only queues specified by the \`sourceQueueArns\` parameter can specify this queue as the dead-letter queue.
    * - \`sourceQueueArns\` : The Amazon Resource Names (ARN)s of the source queues that can specify this queue as the dead-letter queue and redrive messages. You can specify this parameter only when the \`redrivePermission\` parameter is set to \`byQueue\` . You can specify up to 10 source queue ARNs. To allow more than 10 source queues to specify dead-letter queues, set the \`redrivePermission\` parameter to \`allowAll\` .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-queue.html#cfn-sqs-queue-queue-redriveallowpolicy
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-redriveallowpolicy
    */
   readonly redriveAllowPolicy?: any;
 
@@ -7313,7 +7321,7 @@ export interface CfnQueueProps {
    *
    * \`maxReceiveCount : *Integer*\`
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-queue.html#cfn-sqs-queue-queue-redrivepolicy
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-redrivepolicy
    */
   readonly redrivePolicy?: any;
 
@@ -7322,7 +7330,7 @@ export interface CfnQueueProps {
    *
    * For more information, see [Resource tag](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html) in the *AWS CloudFormation User Guide* .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-queue.html#cfn-sqs-queue-queue-tags
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-tags
    */
   readonly tags?: Array<cdk.CfnTag>;
 
@@ -7335,7 +7343,7 @@ export interface CfnQueueProps {
    *
    * For more information about Amazon SQS queue visibility timeouts, see [Visibility timeout](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html) in the *Amazon SQS Developer Guide* .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-queue.html#cfn-sqs-queue-queue-visibilitytimeout
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-visibilitytimeout
    */
   readonly visibilityTimeout?: number;
 }
@@ -7526,7 +7534,9 @@ export class CfnSkill extends cdk.CfnResource implements cdk.IInspectable {
   protected renderProperties(props: Record<string, any>): Record<string, any> {
     return convertCfnSkillPropsToCloudFormation(props);
   }
-}namespace CfnSkill {
+}
+
+namespace CfnSkill {
   /**
    * The \`AuthenticationConfiguration\` property type specifies the Login with Amazon (LWA) configuration used to authenticate with the Alexa service.
    *
@@ -7646,7 +7656,7 @@ export interface CfnSkillProps {
    *
    * Only Login with Amazon clients created through the  are supported. The client ID, client secret, and refresh token are required.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ask-skill-skill.html#cfn-ask-skill-skill-authenticationconfiguration
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ask-skill.html#cfn-ask-skill-authenticationconfiguration
    */
   readonly authenticationConfiguration: CfnSkill.AuthenticationConfigurationProperty;
 
@@ -7655,7 +7665,7 @@ export interface CfnSkillProps {
    *
    * Details for retrieving the vendor ID are in  . The provided LWA credentials must be linked to the developer account associated with this vendor ID.
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ask-skill-skill.html#cfn-ask-skill-skill-vendorid
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ask-skill.html#cfn-ask-skill-vendorid
    */
   readonly vendorId: string;
 
@@ -7664,7 +7674,7 @@ export interface CfnSkillProps {
    *
    * Skill packages are retrieved from an Amazon S3 bucket and key and used to create and update the skill. For more information about the skill package format, see the  .
    *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ask-skill-skill.html#cfn-ask-skill-skill-skillpackage
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ask-skill.html#cfn-ask-skill-skillpackage
    */
   readonly skillPackage: CfnSkill.SkillPackageProperty;
 }

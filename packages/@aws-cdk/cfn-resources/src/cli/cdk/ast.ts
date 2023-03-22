@@ -89,7 +89,7 @@ export class AstBuilder<T extends Module> {
     });
     const mapping = new PropMapping(this.scope);
     for (const [name, prop] of Object.entries(r.properties)) {
-      converter.addStructProperty(propsInterface, mapping, name, prop, r);
+      converter.addStructProperty(propsInterface, mapping, name, prop);
     }
 
     converter.makeCfnProducer(propsInterface, mapping);
