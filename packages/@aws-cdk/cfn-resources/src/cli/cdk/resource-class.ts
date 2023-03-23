@@ -13,6 +13,10 @@ import {
   SuperInitializer,
   TruthyOr,
   Type,
+  Initializer,
+  IsNotNullish,
+  AnonymousInterfaceImplementation,
+  Lambda,
 } from '@cdklabs/typewriter';
 import { Stability } from '@jsii/spec';
 import { CDK_CORE, CONSTRUCTS } from './cdk';
@@ -212,6 +216,10 @@ export class ResourceClass extends ClassType {
       // Props
       ...this.mappableProperties().map(({ name, initializer }) => stmt.assign($this[name], initializer(props))),
     );
+
+    if (this.res.isStateful) {
+      this.addDeletionPolicyCheck(init);
+    }
   }
 
   private makeInspectMethod() {
@@ -331,6 +339,42 @@ export class ResourceClass extends ClassType {
         valueToRender: $this[prop.name],
       };
     });
+  }
+
+  /**
+   * Add a validation to ensure that this resource has a deletionPolicy
+   *
+   * A deletionPolicy is required (and in normal operation an UpdateReplacePolicy
+   * would also be set if a user doesn't do complicated shenanigans, in which case they probably know what
+   * they're doing.
+   *
+   * Only do this for L1s embedded in L2s (to force L2 authors to add a way to set this policy). If we did it for all L1s:
+   *
+   * - users working at the L1 level would start getting synthesis failures when we add this feature
+   * - the `cloudformation-include` library that loads CFN templates to L1s would start failing when it loads
+   *   templates that don't have DeletionPolicy set.
+   */
+  private addDeletionPolicyCheck(init: Initializer) {
+    const $this = $E(expr.this_());
+
+    const validator = new AnonymousInterfaceImplementation({
+      validate: new Lambda(
+        [],
+        expr.cond(
+          expr.eq($this.cfnOptions.deletionPolicy, expr.UNDEFINED),
+          expr.lit([
+            `'${this.res.cloudFormationType}' is a stateful resource type, and you must specify a Removal Policy for it. Call 'resource.applyRemovalPolicy()'.`,
+          ]),
+          expr.lit([]),
+        ),
+      ),
+    });
+
+    init.addBody(
+      stmt
+        .if_(expr.binOp(new IsNotNullish($this.node.scope), '&&', CDK_CORE.Resource.isResource($this.node.scope)))
+        .then(Block.with($this.node.addValidation(validator))),
+    );
   }
 }
 

@@ -17,6 +17,7 @@ export class CdkCore extends ExternalModule {
   public readonly helpers = new CdkInternalHelpers(this);
 
   public readonly CfnResource = Type.fromName(this, 'CfnResource');
+  public readonly Resource = $T(Type.fromName(this, 'Resource'));
   public readonly IInspectable = Type.fromName(this, 'IInspectable');
   public readonly TreeInspector = Type.fromName(this, 'TreeInspector');
   public readonly Token = $T(Type.fromName(this, 'Token'));

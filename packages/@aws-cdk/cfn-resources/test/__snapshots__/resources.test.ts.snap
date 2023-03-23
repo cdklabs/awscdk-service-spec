@@ -2333,6 +2333,11 @@ export class CfnBucket extends cdk.CfnResource implements cdk.IInspectable, cdk.
     });
     this.versioningConfiguration = props.versioningConfiguration;
     this.websiteConfiguration = props.websiteConfiguration;
+    if ((this.node.scope != null && cdk.Resource.isResource(this.node.scope))) {
+      this.node.addValidation({
+        "validate": () => ((this.cfnOptions.deletionPolicy === undefined) ? ["'AWS::S3::Bucket' is a stateful resource type, and you must specify a Removal Policy for it. Call 'resource.applyRemovalPolicy()'."] : [])
+      });
+    }
   }
 
   protected get cfnProperties(): Record<string, any> {
@@ -7095,6 +7100,11 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
       "tagPropertyName": "tags"
     });
     this.visibilityTimeout = props.visibilityTimeout;
+    if ((this.node.scope != null && cdk.Resource.isResource(this.node.scope))) {
+      this.node.addValidation({
+        "validate": () => ((this.cfnOptions.deletionPolicy === undefined) ? ["'AWS::SQS::Queue' is a stateful resource type, and you must specify a Removal Policy for it. Call 'resource.applyRemovalPolicy()'."] : [])
+      });
+    }
   }
 
   protected get cfnProperties(): Record<string, any> {

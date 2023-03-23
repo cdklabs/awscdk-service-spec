@@ -4,7 +4,6 @@ import {
   ObjectPropertyAccess,
   IsNotNullish,
   Type,
-  UNDEFINED,
   Property,
   ThingSymbol,
   IScope,
@@ -52,7 +51,7 @@ export class PropMapping {
       throw new Error(`No type for ${cfnName}`);
     }
 
-    return expr.cond(new IsNotNullish(value)).then(this.typeProducer(type).parse.call(value)).else(UNDEFINED);
+    return expr.cond(new IsNotNullish(value)).then(this.typeProducer(type).parse.call(value)).else(expr.UNDEFINED);
   }
 
   public validateProperty(cfnName: string, propsObj: Expression, errorsObj: Expression): Expression[] {

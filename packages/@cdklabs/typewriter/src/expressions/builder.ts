@@ -4,7 +4,6 @@ import { Expression, SymbolReference } from '../expression';
 import {
   BinOp,
   DestructuringBind,
-  EqualsExpression,
   IsObject,
   JsLiteralExpression,
   NotExpression,
@@ -14,6 +13,7 @@ import {
   Structure,
   Ternary,
   ThisInstance,
+  Undefined,
 } from '../expressions/objects';
 import { ThingSymbol } from '../symbol';
 import { Type } from '../type';
@@ -35,7 +35,7 @@ export function not(operand: Expression): Expression {
 }
 
 export function eq(left: Expression, right: Expression): Expression {
-  return new EqualsExpression(left, right);
+  return binOp(left, '===', right);
 }
 
 export function lit(value: any): Expression {
@@ -70,6 +70,7 @@ export function cond(condition: Expression, thenExpression?: Expression, elseExp
 }
 
 export const NULL = new Null();
+export const UNDEFINED = new Undefined();
 
 export function binOp(lhs: Expression, op: string, rhs: Expression) {
   return new BinOp(lhs, op, rhs);
