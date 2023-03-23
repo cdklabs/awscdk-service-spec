@@ -45,6 +45,7 @@ import { StructType } from '../struct';
 import { ThingSymbol } from '../symbol';
 import { Type } from '../type';
 import { Initializer, MemberVisibility, Method } from '../type-member';
+import { AMBIENT_SCOPE } from '../scope';
 
 export class TypeScriptRenderer extends Renderer {
   protected renderModule(mod: Module) {
@@ -319,6 +320,11 @@ export class TypeScriptRenderer extends Renderer {
     for (const scope of this.scopes) {
       // Defining scope is visible, so identifiers in it are as well
       if (sym.scope === scope) {
+        return new Identifier(sym.name);
+      }
+
+      // The ambient scope is always visible
+      if (sym.scope === AMBIENT_SCOPE) {
         return new Identifier(sym.name);
       }
 

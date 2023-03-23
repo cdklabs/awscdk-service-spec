@@ -1,6 +1,6 @@
 import { Expression } from './expression';
 import { NewExpression } from './expressions';
-import { IScope } from './scope';
+import { AMBIENT_SCOPE, IScope } from './scope';
 import { ThingSymbol } from './symbol';
 import { TypeDeclaration } from './type-declaration';
 
@@ -73,6 +73,10 @@ export class Type {
   public static unionOf(...types: Type[]) {
     // Sort by string representation to get to a stable order
     return new Type({ union: types.sort((a, b) => a.toString().localeCompare(b.toString())) });
+  }
+
+  public static ambient(name: string) {
+    return Type.fromName(AMBIENT_SCOPE, name);
   }
 
   public readonly spec: TypeReferenceSpec;
