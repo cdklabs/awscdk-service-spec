@@ -17,6 +17,7 @@
     ".projen/files.json",
     ".projen/tasks.json",
     ".vscode/extensions.json",
+    ".vscode/launch.json",
     ".vscode/settings.json",
     "awscdk-service-spec.code-workspace",
     "LICENSE",

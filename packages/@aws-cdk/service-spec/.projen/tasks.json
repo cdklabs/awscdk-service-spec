@@ -49,7 +49,8 @@
       "description": "Only compile",
       "steps": [
         {
-          "exec": "tsc --build"
+          "exec": "tsc --build",
+          "receiveArgs": true
         }
       ]
     },
