@@ -446,6 +446,9 @@ function convertS3LocationPropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function S3LocationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnRestApi.S3LocationProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -457,9 +460,6 @@ function S3LocationPropertyFromCloudFormation(properties: any): cfn_parse.FromCl
   ret.addPropertyResult("version", "Version", (properties.Version != null ? cfn_parse.FromCloudFormation.getString(properties.Version) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -493,6 +493,9 @@ function convertEndpointConfigurationPropertyToCloudFormation(properties: any): 
 
 // @ts-ignore TS6133
 function EndpointConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnRestApi.EndpointConfigurationProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -502,9 +505,6 @@ function EndpointConfigurationPropertyFromCloudFormation(properties: any): cfn_p
   ret.addPropertyResult("vpcEndpointIds", "VpcEndpointIds", (properties.VpcEndpointIds != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.VpcEndpointIds) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -921,6 +921,9 @@ function convertPolicyPropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function PolicyPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnRole.PolicyProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -930,9 +933,6 @@ function PolicyPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudF
   ret.addPropertyResult("policyName", "PolicyName", (properties.PolicyName != null ? cfn_parse.FromCloudFormation.getString(properties.PolicyName) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -1705,6 +1705,9 @@ function convertTracingConfigPropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function TracingConfigPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnFunction.TracingConfigProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -1713,9 +1716,6 @@ function TracingConfigPropertyFromCloudFormation(properties: any): cfn_parse.Fro
   ret.addPropertyResult("mode", "Mode", (properties.Mode != null ? cfn_parse.FromCloudFormation.getString(properties.Mode) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -1749,6 +1749,9 @@ function convertVpcConfigPropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function VpcConfigPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnFunction.VpcConfigProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -1758,9 +1761,6 @@ function VpcConfigPropertyFromCloudFormation(properties: any): cfn_parse.FromClo
   ret.addPropertyResult("subnetIds", "SubnetIds", (properties.SubnetIds != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.SubnetIds) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -1793,6 +1793,9 @@ function convertSnapStartPropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function SnapStartPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnFunction.SnapStartProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -1801,9 +1804,6 @@ function SnapStartPropertyFromCloudFormation(properties: any): cfn_parse.FromClo
   ret.addPropertyResult("applyOn", "ApplyOn", (properties.ApplyOn != null ? cfn_parse.FromCloudFormation.getString(properties.ApplyOn) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -1839,6 +1839,9 @@ function convertFileSystemConfigPropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function FileSystemConfigPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnFunction.FileSystemConfigProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -1848,9 +1851,6 @@ function FileSystemConfigPropertyFromCloudFormation(properties: any): cfn_parse.
   ret.addPropertyResult("localMountPath", "LocalMountPath", (properties.LocalMountPath != null ? cfn_parse.FromCloudFormation.getString(properties.LocalMountPath) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -1886,6 +1886,9 @@ function convertImageConfigPropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function ImageConfigPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnFunction.ImageConfigProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -1896,9 +1899,6 @@ function ImageConfigPropertyFromCloudFormation(properties: any): cfn_parse.FromC
   ret.addPropertyResult("workingDirectory", "WorkingDirectory", (properties.WorkingDirectory != null ? cfn_parse.FromCloudFormation.getString(properties.WorkingDirectory) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -1930,6 +1930,9 @@ function convertDeadLetterConfigPropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function DeadLetterConfigPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnFunction.DeadLetterConfigProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -1938,9 +1941,6 @@ function DeadLetterConfigPropertyFromCloudFormation(properties: any): cfn_parse.
   ret.addPropertyResult("targetArn", "TargetArn", (properties.TargetArn != null ? cfn_parse.FromCloudFormation.getString(properties.TargetArn) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -1980,6 +1980,9 @@ function convertCodePropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function CodePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnFunction.CodeProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -1992,9 +1995,6 @@ function CodePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFor
   ret.addPropertyResult("zipFile", "ZipFile", (properties.ZipFile != null ? cfn_parse.FromCloudFormation.getString(properties.ZipFile) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -2026,6 +2026,9 @@ function convertEnvironmentPropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function EnvironmentPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnFunction.EnvironmentProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -2034,9 +2037,6 @@ function EnvironmentPropertyFromCloudFormation(properties: any): cfn_parse.FromC
   ret.addPropertyResult("variables", "Variables", (properties.Variables != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString)(properties.Variables) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -2069,6 +2069,9 @@ function convertEphemeralStoragePropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function EphemeralStoragePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnFunction.EphemeralStorageProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -2077,9 +2080,6 @@ function EphemeralStoragePropertyFromCloudFormation(properties: any): cfn_parse.
   ret.addPropertyResult("size", "Size", (properties.Size != null ? cfn_parse.FromCloudFormation.getNumber(properties.Size) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -4514,6 +4514,9 @@ function convertAccelerateConfigurationPropertyToCloudFormation(properties: any)
 
 // @ts-ignore TS6133
 function AccelerateConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnBucket.AccelerateConfigurationProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -4522,9 +4525,6 @@ function AccelerateConfigurationPropertyFromCloudFormation(properties: any): cfn
   ret.addPropertyResult("accelerationStatus", "AccelerationStatus", (properties.AccelerationStatus != null ? cfn_parse.FromCloudFormation.getString(properties.AccelerationStatus) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -4560,6 +4560,9 @@ function convertTagFilterPropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function TagFilterPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.TagFilterProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -4569,9 +4572,6 @@ function TagFilterPropertyFromCloudFormation(properties: any): cfn_parse.FromClo
   ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -4611,6 +4611,9 @@ function convertDestinationPropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function DestinationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnBucket.DestinationProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -4622,9 +4625,6 @@ function DestinationPropertyFromCloudFormation(properties: any): cfn_parse.FromC
   ret.addPropertyResult("prefix", "Prefix", (properties.Prefix != null ? cfn_parse.FromCloudFormation.getString(properties.Prefix) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -4660,6 +4660,9 @@ function convertDataExportPropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function DataExportPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnBucket.DataExportProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -4669,9 +4672,6 @@ function DataExportPropertyFromCloudFormation(properties: any): cfn_parse.FromCl
   ret.addPropertyResult("outputSchemaVersion", "OutputSchemaVersion", (properties.OutputSchemaVersion != null ? cfn_parse.FromCloudFormation.getString(properties.OutputSchemaVersion) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -4703,6 +4703,9 @@ function convertStorageClassAnalysisPropertyToCloudFormation(properties: any): a
 
 // @ts-ignore TS6133
 function StorageClassAnalysisPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.StorageClassAnalysisProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -4711,9 +4714,6 @@ function StorageClassAnalysisPropertyFromCloudFormation(properties: any): cfn_pa
   ret.addPropertyResult("dataExport", "DataExport", (properties.DataExport != null ? DataExportPropertyFromCloudFormation(properties.DataExport) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -4753,6 +4753,9 @@ function convertAnalyticsConfigurationPropertyToCloudFormation(properties: any):
 
 // @ts-ignore TS6133
 function AnalyticsConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnBucket.AnalyticsConfigurationProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -4764,9 +4767,6 @@ function AnalyticsConfigurationPropertyFromCloudFormation(properties: any): cfn_
   ret.addPropertyResult("tagFilters", "TagFilters", (properties.TagFilters != null ? cfn_parse.FromCloudFormation.getArray(TagFilterPropertyFromCloudFormation)(properties.TagFilters) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -4801,6 +4801,9 @@ function convertServerSideEncryptionByDefaultPropertyToCloudFormation(properties
 
 // @ts-ignore TS6133
 function ServerSideEncryptionByDefaultPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.ServerSideEncryptionByDefaultProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -4810,9 +4813,6 @@ function ServerSideEncryptionByDefaultPropertyFromCloudFormation(properties: any
   ret.addPropertyResult("sseAlgorithm", "SSEAlgorithm", (properties.SSEAlgorithm != null ? cfn_parse.FromCloudFormation.getString(properties.SSEAlgorithm) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -4846,6 +4846,9 @@ function convertServerSideEncryptionRulePropertyToCloudFormation(properties: any
 
 // @ts-ignore TS6133
 function ServerSideEncryptionRulePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.ServerSideEncryptionRuleProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -4855,9 +4858,6 @@ function ServerSideEncryptionRulePropertyFromCloudFormation(properties: any): cf
   ret.addPropertyResult("serverSideEncryptionByDefault", "ServerSideEncryptionByDefault", (properties.ServerSideEncryptionByDefault != null ? ServerSideEncryptionByDefaultPropertyFromCloudFormation(properties.ServerSideEncryptionByDefault) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -4890,6 +4890,9 @@ function convertBucketEncryptionPropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function BucketEncryptionPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnBucket.BucketEncryptionProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -4898,9 +4901,6 @@ function BucketEncryptionPropertyFromCloudFormation(properties: any): cfn_parse.
   ret.addPropertyResult("serverSideEncryptionConfiguration", "ServerSideEncryptionConfiguration", (properties.ServerSideEncryptionConfiguration != null ? cfn_parse.FromCloudFormation.getArray(ServerSideEncryptionRulePropertyFromCloudFormation)(properties.ServerSideEncryptionConfiguration) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -4944,6 +4944,9 @@ function convertCorsRulePropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function CorsRulePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnBucket.CorsRuleProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -4957,9 +4960,6 @@ function CorsRulePropertyFromCloudFormation(properties: any): cfn_parse.FromClou
   ret.addPropertyResult("maxAge", "MaxAge", (properties.MaxAge != null ? cfn_parse.FromCloudFormation.getNumber(properties.MaxAge) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -4992,6 +4992,9 @@ function convertCorsConfigurationPropertyToCloudFormation(properties: any): any 
 
 // @ts-ignore TS6133
 function CorsConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnBucket.CorsConfigurationProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5000,9 +5003,6 @@ function CorsConfigurationPropertyFromCloudFormation(properties: any): cfn_parse
   ret.addPropertyResult("corsRules", "CorsRules", (properties.CorsRules != null ? cfn_parse.FromCloudFormation.getArray(CorsRulePropertyFromCloudFormation)(properties.CorsRules) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -5038,6 +5038,9 @@ function convertTieringPropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function TieringPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.TieringProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5047,9 +5050,6 @@ function TieringPropertyFromCloudFormation(properties: any): cfn_parse.FromCloud
   ret.addPropertyResult("days", "Days", (properties.Days != null ? cfn_parse.FromCloudFormation.getNumber(properties.Days) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -5092,6 +5092,9 @@ function convertIntelligentTieringConfigurationPropertyToCloudFormation(properti
 
 // @ts-ignore TS6133
 function IntelligentTieringConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnBucket.IntelligentTieringConfigurationProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5104,9 +5107,6 @@ function IntelligentTieringConfigurationPropertyFromCloudFormation(properties: a
   ret.addPropertyResult("tierings", "Tierings", (properties.Tierings != null ? cfn_parse.FromCloudFormation.getArray(TieringPropertyFromCloudFormation)(properties.Tierings) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -5155,6 +5155,9 @@ function convertInventoryConfigurationPropertyToCloudFormation(properties: any):
 
 // @ts-ignore TS6133
 function InventoryConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnBucket.InventoryConfigurationProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5169,9 +5172,6 @@ function InventoryConfigurationPropertyFromCloudFormation(properties: any): cfn_
   ret.addPropertyResult("scheduleFrequency", "ScheduleFrequency", (properties.ScheduleFrequency != null ? cfn_parse.FromCloudFormation.getString(properties.ScheduleFrequency) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -5204,6 +5204,9 @@ function convertAbortIncompleteMultipartUploadPropertyToCloudFormation(propertie
 
 // @ts-ignore TS6133
 function AbortIncompleteMultipartUploadPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnBucket.AbortIncompleteMultipartUploadProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5212,9 +5215,6 @@ function AbortIncompleteMultipartUploadPropertyFromCloudFormation(properties: an
   ret.addPropertyResult("daysAfterInitiation", "DaysAfterInitiation", (properties.DaysAfterInitiation != null ? cfn_parse.FromCloudFormation.getNumber(properties.DaysAfterInitiation) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -5249,6 +5249,9 @@ function convertNoncurrentVersionExpirationPropertyToCloudFormation(properties: 
 
 // @ts-ignore TS6133
 function NoncurrentVersionExpirationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.NoncurrentVersionExpirationProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5258,9 +5261,6 @@ function NoncurrentVersionExpirationPropertyFromCloudFormation(properties: any):
   ret.addPropertyResult("noncurrentDays", "NoncurrentDays", (properties.NoncurrentDays != null ? cfn_parse.FromCloudFormation.getNumber(properties.NoncurrentDays) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -5298,6 +5298,9 @@ function convertNoncurrentVersionTransitionPropertyToCloudFormation(properties: 
 
 // @ts-ignore TS6133
 function NoncurrentVersionTransitionPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.NoncurrentVersionTransitionProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5308,9 +5311,6 @@ function NoncurrentVersionTransitionPropertyFromCloudFormation(properties: any):
   ret.addPropertyResult("transitionInDays", "TransitionInDays", (properties.TransitionInDays != null ? cfn_parse.FromCloudFormation.getNumber(properties.TransitionInDays) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -5347,6 +5347,9 @@ function convertTransitionPropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function TransitionPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.TransitionProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5357,9 +5360,6 @@ function TransitionPropertyFromCloudFormation(properties: any): cfn_parse.FromCl
   ret.addPropertyResult("transitionInDays", "TransitionInDays", (properties.TransitionInDays != null ? cfn_parse.FromCloudFormation.getNumber(properties.TransitionInDays) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -5422,6 +5422,9 @@ function convertRulePropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function RulePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.RuleProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5445,9 +5448,6 @@ function RulePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFor
   ret.addPropertyResult("transitions", "Transitions", (properties.Transitions != null ? cfn_parse.FromCloudFormation.getArray(TransitionPropertyFromCloudFormation)(properties.Transitions) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -5480,6 +5480,9 @@ function convertLifecycleConfigurationPropertyToCloudFormation(properties: any):
 
 // @ts-ignore TS6133
 function LifecycleConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.LifecycleConfigurationProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5488,9 +5491,6 @@ function LifecycleConfigurationPropertyFromCloudFormation(properties: any): cfn_
   ret.addPropertyResult("rules", "Rules", (properties.Rules != null ? cfn_parse.FromCloudFormation.getArray(RulePropertyFromCloudFormation)(properties.Rules) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -5524,6 +5524,9 @@ function convertLoggingConfigurationPropertyToCloudFormation(properties: any): a
 
 // @ts-ignore TS6133
 function LoggingConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.LoggingConfigurationProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5533,9 +5536,6 @@ function LoggingConfigurationPropertyFromCloudFormation(properties: any): cfn_pa
   ret.addPropertyResult("logFilePrefix", "LogFilePrefix", (properties.LogFilePrefix != null ? cfn_parse.FromCloudFormation.getString(properties.LogFilePrefix) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -5574,6 +5574,9 @@ function convertMetricsConfigurationPropertyToCloudFormation(properties: any): a
 
 // @ts-ignore TS6133
 function MetricsConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.MetricsConfigurationProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5585,9 +5588,6 @@ function MetricsConfigurationPropertyFromCloudFormation(properties: any): cfn_pa
   ret.addPropertyResult("tagFilters", "TagFilters", (properties.TagFilters != null ? cfn_parse.FromCloudFormation.getArray(TagFilterPropertyFromCloudFormation)(properties.TagFilters) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -5620,6 +5620,9 @@ function convertEventBridgeConfigurationPropertyToCloudFormation(properties: any
 
 // @ts-ignore TS6133
 function EventBridgeConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnBucket.EventBridgeConfigurationProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5628,9 +5631,6 @@ function EventBridgeConfigurationPropertyFromCloudFormation(properties: any): cf
   ret.addPropertyResult("eventBridgeEnabled", "EventBridgeEnabled", (properties.EventBridgeEnabled != null ? cfn_parse.FromCloudFormation.getBoolean(properties.EventBridgeEnabled) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -5666,6 +5666,9 @@ function convertFilterRulePropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function FilterRulePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnBucket.FilterRuleProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5675,9 +5678,6 @@ function FilterRulePropertyFromCloudFormation(properties: any): cfn_parse.FromCl
   ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -5710,6 +5710,9 @@ function convertS3KeyFilterPropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function S3KeyFilterPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.S3KeyFilterProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5718,9 +5721,6 @@ function S3KeyFilterPropertyFromCloudFormation(properties: any): cfn_parse.FromC
   ret.addPropertyResult("rules", "Rules", (properties.Rules != null ? cfn_parse.FromCloudFormation.getArray(FilterRulePropertyFromCloudFormation)(properties.Rules) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -5753,6 +5753,9 @@ function convertNotificationFilterPropertyToCloudFormation(properties: any): any
 
 // @ts-ignore TS6133
 function NotificationFilterPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.NotificationFilterProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5761,9 +5764,6 @@ function NotificationFilterPropertyFromCloudFormation(properties: any): cfn_pars
   ret.addPropertyResult("s3Key", "S3Key", (properties.S3Key != null ? S3KeyFilterPropertyFromCloudFormation(properties.S3Key) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -5801,6 +5801,9 @@ function convertLambdaConfigurationPropertyToCloudFormation(properties: any): an
 
 // @ts-ignore TS6133
 function LambdaConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.LambdaConfigurationProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5811,9 +5814,6 @@ function LambdaConfigurationPropertyFromCloudFormation(properties: any): cfn_par
   ret.addPropertyResult("function", "Function", (properties.Function != null ? cfn_parse.FromCloudFormation.getString(properties.Function) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -5851,6 +5851,9 @@ function convertQueueConfigurationPropertyToCloudFormation(properties: any): any
 
 // @ts-ignore TS6133
 function QueueConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.QueueConfigurationProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5861,9 +5864,6 @@ function QueueConfigurationPropertyFromCloudFormation(properties: any): cfn_pars
   ret.addPropertyResult("queue", "Queue", (properties.Queue != null ? cfn_parse.FromCloudFormation.getString(properties.Queue) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -5901,6 +5901,9 @@ function convertTopicConfigurationPropertyToCloudFormation(properties: any): any
 
 // @ts-ignore TS6133
 function TopicConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.TopicConfigurationProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5911,9 +5914,6 @@ function TopicConfigurationPropertyFromCloudFormation(properties: any): cfn_pars
   ret.addPropertyResult("topic", "Topic", (properties.Topic != null ? cfn_parse.FromCloudFormation.getString(properties.Topic) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -5951,6 +5951,9 @@ function convertNotificationConfigurationPropertyToCloudFormation(properties: an
 
 // @ts-ignore TS6133
 function NotificationConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.NotificationConfigurationProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -5962,9 +5965,6 @@ function NotificationConfigurationPropertyFromCloudFormation(properties: any): c
   ret.addPropertyResult("topicConfigurations", "TopicConfigurations", (properties.TopicConfigurations != null ? cfn_parse.FromCloudFormation.getArray(TopicConfigurationPropertyFromCloudFormation)(properties.TopicConfigurations) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6000,6 +6000,9 @@ function convertDefaultRetentionPropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function DefaultRetentionPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnBucket.DefaultRetentionProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6010,9 +6013,6 @@ function DefaultRetentionPropertyFromCloudFormation(properties: any): cfn_parse.
   ret.addPropertyResult("years", "Years", (properties.Years != null ? cfn_parse.FromCloudFormation.getNumber(properties.Years) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6044,6 +6044,9 @@ function convertObjectLockRulePropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function ObjectLockRulePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.ObjectLockRuleProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6052,9 +6055,6 @@ function ObjectLockRulePropertyFromCloudFormation(properties: any): cfn_parse.Fr
   ret.addPropertyResult("defaultRetention", "DefaultRetention", (properties.DefaultRetention != null ? DefaultRetentionPropertyFromCloudFormation(properties.DefaultRetention) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6088,6 +6088,9 @@ function convertObjectLockConfigurationPropertyToCloudFormation(properties: any)
 
 // @ts-ignore TS6133
 function ObjectLockConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.ObjectLockConfigurationProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6097,9 +6100,6 @@ function ObjectLockConfigurationPropertyFromCloudFormation(properties: any): cfn
   ret.addPropertyResult("rule", "Rule", (properties.Rule != null ? ObjectLockRulePropertyFromCloudFormation(properties.Rule) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6131,6 +6131,9 @@ function convertOwnershipControlsRulePropertyToCloudFormation(properties: any): 
 
 // @ts-ignore TS6133
 function OwnershipControlsRulePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.OwnershipControlsRuleProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6139,9 +6142,6 @@ function OwnershipControlsRulePropertyFromCloudFormation(properties: any): cfn_p
   ret.addPropertyResult("objectOwnership", "ObjectOwnership", (properties.ObjectOwnership != null ? cfn_parse.FromCloudFormation.getString(properties.ObjectOwnership) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6174,6 +6174,9 @@ function convertOwnershipControlsPropertyToCloudFormation(properties: any): any 
 
 // @ts-ignore TS6133
 function OwnershipControlsPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.OwnershipControlsProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6182,9 +6185,6 @@ function OwnershipControlsPropertyFromCloudFormation(properties: any): cfn_parse
   ret.addPropertyResult("rules", "Rules", (properties.Rules != null ? cfn_parse.FromCloudFormation.getArray(OwnershipControlsRulePropertyFromCloudFormation)(properties.Rules) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6222,6 +6222,9 @@ function convertPublicAccessBlockConfigurationPropertyToCloudFormation(propertie
 
 // @ts-ignore TS6133
 function PublicAccessBlockConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.PublicAccessBlockConfigurationProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6233,9 +6236,6 @@ function PublicAccessBlockConfigurationPropertyFromCloudFormation(properties: an
   ret.addPropertyResult("restrictPublicBuckets", "RestrictPublicBuckets", (properties.RestrictPublicBuckets != null ? cfn_parse.FromCloudFormation.getBoolean(properties.RestrictPublicBuckets) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6267,6 +6267,9 @@ function convertDeleteMarkerReplicationPropertyToCloudFormation(properties: any)
 
 // @ts-ignore TS6133
 function DeleteMarkerReplicationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnBucket.DeleteMarkerReplicationProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6275,9 +6278,6 @@ function DeleteMarkerReplicationPropertyFromCloudFormation(properties: any): cfn
   ret.addPropertyResult("status", "Status", (properties.Status != null ? cfn_parse.FromCloudFormation.getString(properties.Status) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6310,6 +6310,9 @@ function convertAccessControlTranslationPropertyToCloudFormation(properties: any
 
 // @ts-ignore TS6133
 function AccessControlTranslationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnBucket.AccessControlTranslationProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6318,9 +6321,6 @@ function AccessControlTranslationPropertyFromCloudFormation(properties: any): cf
   ret.addPropertyResult("owner", "Owner", (properties.Owner != null ? cfn_parse.FromCloudFormation.getString(properties.Owner) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6353,6 +6353,9 @@ function convertEncryptionConfigurationPropertyToCloudFormation(properties: any)
 
 // @ts-ignore TS6133
 function EncryptionConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnBucket.EncryptionConfigurationProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6361,9 +6364,6 @@ function EncryptionConfigurationPropertyFromCloudFormation(properties: any): cfn
   ret.addPropertyResult("replicaKmsKeyId", "ReplicaKmsKeyID", (properties.ReplicaKmsKeyID != null ? cfn_parse.FromCloudFormation.getString(properties.ReplicaKmsKeyID) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6396,6 +6396,9 @@ function convertReplicationTimeValuePropertyToCloudFormation(properties: any): a
 
 // @ts-ignore TS6133
 function ReplicationTimeValuePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.ReplicationTimeValueProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6404,9 +6407,6 @@ function ReplicationTimeValuePropertyFromCloudFormation(properties: any): cfn_pa
   ret.addPropertyResult("minutes", "Minutes", (properties.Minutes != null ? cfn_parse.FromCloudFormation.getNumber(properties.Minutes) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6441,6 +6441,9 @@ function convertMetricsPropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function MetricsPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.MetricsProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6450,9 +6453,6 @@ function MetricsPropertyFromCloudFormation(properties: any): cfn_parse.FromCloud
   ret.addPropertyResult("status", "Status", (properties.Status != null ? cfn_parse.FromCloudFormation.getString(properties.Status) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6488,6 +6488,9 @@ function convertReplicationTimePropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function ReplicationTimePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.ReplicationTimeProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6497,9 +6500,6 @@ function ReplicationTimePropertyFromCloudFormation(properties: any): cfn_parse.F
   ret.addPropertyResult("time", "Time", (properties.Time != null ? ReplicationTimeValuePropertyFromCloudFormation(properties.Time) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6544,6 +6544,9 @@ function convertReplicationDestinationPropertyToCloudFormation(properties: any):
 
 // @ts-ignore TS6133
 function ReplicationDestinationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.ReplicationDestinationProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6558,9 +6561,6 @@ function ReplicationDestinationPropertyFromCloudFormation(properties: any): cfn_
   ret.addPropertyResult("storageClass", "StorageClass", (properties.StorageClass != null ? cfn_parse.FromCloudFormation.getString(properties.StorageClass) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6594,6 +6594,9 @@ function convertReplicationRuleAndOperatorPropertyToCloudFormation(properties: a
 
 // @ts-ignore TS6133
 function ReplicationRuleAndOperatorPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.ReplicationRuleAndOperatorProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6603,9 +6606,6 @@ function ReplicationRuleAndOperatorPropertyFromCloudFormation(properties: any): 
   ret.addPropertyResult("tagFilters", "TagFilters", (properties.TagFilters != null ? cfn_parse.FromCloudFormation.getArray(TagFilterPropertyFromCloudFormation)(properties.TagFilters) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6641,6 +6641,9 @@ function convertReplicationRuleFilterPropertyToCloudFormation(properties: any): 
 
 // @ts-ignore TS6133
 function ReplicationRuleFilterPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.ReplicationRuleFilterProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6651,9 +6654,6 @@ function ReplicationRuleFilterPropertyFromCloudFormation(properties: any): cfn_p
   ret.addPropertyResult("tagFilter", "TagFilter", (properties.TagFilter != null ? TagFilterPropertyFromCloudFormation(properties.TagFilter) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6686,6 +6686,9 @@ function convertReplicaModificationsPropertyToCloudFormation(properties: any): a
 
 // @ts-ignore TS6133
 function ReplicaModificationsPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.ReplicaModificationsProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6694,9 +6697,6 @@ function ReplicaModificationsPropertyFromCloudFormation(properties: any): cfn_pa
   ret.addPropertyResult("status", "Status", (properties.Status != null ? cfn_parse.FromCloudFormation.getString(properties.Status) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6729,6 +6729,9 @@ function convertSseKmsEncryptedObjectsPropertyToCloudFormation(properties: any):
 
 // @ts-ignore TS6133
 function SseKmsEncryptedObjectsPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.SseKmsEncryptedObjectsProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6737,9 +6740,6 @@ function SseKmsEncryptedObjectsPropertyFromCloudFormation(properties: any): cfn_
   ret.addPropertyResult("status", "Status", (properties.Status != null ? cfn_parse.FromCloudFormation.getString(properties.Status) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6773,6 +6773,9 @@ function convertSourceSelectionCriteriaPropertyToCloudFormation(properties: any)
 
 // @ts-ignore TS6133
 function SourceSelectionCriteriaPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.SourceSelectionCriteriaProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6782,9 +6785,6 @@ function SourceSelectionCriteriaPropertyFromCloudFormation(properties: any): cfn
   ret.addPropertyResult("sseKmsEncryptedObjects", "SseKmsEncryptedObjects", (properties.SseKmsEncryptedObjects != null ? SseKmsEncryptedObjectsPropertyFromCloudFormation(properties.SseKmsEncryptedObjects) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6832,6 +6832,9 @@ function convertReplicationRulePropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function ReplicationRulePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.ReplicationRuleProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6847,9 +6850,6 @@ function ReplicationRulePropertyFromCloudFormation(properties: any): cfn_parse.F
   ret.addPropertyResult("status", "Status", (properties.Status != null ? cfn_parse.FromCloudFormation.getString(properties.Status) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6885,6 +6885,9 @@ function convertReplicationConfigurationPropertyToCloudFormation(properties: any
 
 // @ts-ignore TS6133
 function ReplicationConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.ReplicationConfigurationProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6894,9 +6897,6 @@ function ReplicationConfigurationPropertyFromCloudFormation(properties: any): cf
   ret.addPropertyResult("rules", "Rules", (properties.Rules != null ? cfn_parse.FromCloudFormation.getArray(ReplicationRulePropertyFromCloudFormation)(properties.Rules) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6929,6 +6929,9 @@ function convertVersioningConfigurationPropertyToCloudFormation(properties: any)
 
 // @ts-ignore TS6133
 function VersioningConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.VersioningConfigurationProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6937,9 +6940,6 @@ function VersioningConfigurationPropertyFromCloudFormation(properties: any): cfn
   ret.addPropertyResult("status", "Status", (properties.Status != null ? cfn_parse.FromCloudFormation.getString(properties.Status) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -6979,6 +6979,9 @@ function convertRedirectRulePropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function RedirectRulePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.RedirectRuleProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -6991,9 +6994,6 @@ function RedirectRulePropertyFromCloudFormation(properties: any): cfn_parse.From
   ret.addPropertyResult("replaceKeyWith", "ReplaceKeyWith", (properties.ReplaceKeyWith != null ? cfn_parse.FromCloudFormation.getString(properties.ReplaceKeyWith) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -7027,6 +7027,9 @@ function convertRoutingRuleConditionPropertyToCloudFormation(properties: any): a
 
 // @ts-ignore TS6133
 function RoutingRuleConditionPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.RoutingRuleConditionProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -7036,9 +7039,6 @@ function RoutingRuleConditionPropertyFromCloudFormation(properties: any): cfn_pa
   ret.addPropertyResult("keyPrefixEquals", "KeyPrefixEquals", (properties.KeyPrefixEquals != null ? cfn_parse.FromCloudFormation.getString(properties.KeyPrefixEquals) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -7073,6 +7073,9 @@ function convertRoutingRulePropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function RoutingRulePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.RoutingRuleProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -7082,9 +7085,6 @@ function RoutingRulePropertyFromCloudFormation(properties: any): cfn_parse.FromC
   ret.addPropertyResult("routingRuleCondition", "RoutingRuleCondition", (properties.RoutingRuleCondition != null ? RoutingRuleConditionPropertyFromCloudFormation(properties.RoutingRuleCondition) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -7119,6 +7119,9 @@ function convertRedirectAllRequestsToPropertyToCloudFormation(properties: any): 
 
 // @ts-ignore TS6133
 function RedirectAllRequestsToPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.RedirectAllRequestsToProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -7128,9 +7131,6 @@ function RedirectAllRequestsToPropertyFromCloudFormation(properties: any): cfn_p
   ret.addPropertyResult("protocol", "Protocol", (properties.Protocol != null ? cfn_parse.FromCloudFormation.getString(properties.Protocol) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -7168,6 +7168,9 @@ function convertWebsiteConfigurationPropertyToCloudFormation(properties: any): a
 
 // @ts-ignore TS6133
 function WebsiteConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.WebsiteConfigurationProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -7179,9 +7182,6 @@ function WebsiteConfigurationPropertyFromCloudFormation(properties: any): cfn_pa
   ret.addPropertyResult("routingRules", "RoutingRules", (properties.RoutingRules != null ? cfn_parse.FromCloudFormation.getArray(RoutingRulePropertyFromCloudFormation)(properties.RoutingRules) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -8065,6 +8065,9 @@ function convertAuthenticationConfigurationPropertyToCloudFormation(properties: 
 
 // @ts-ignore TS6133
 function AuthenticationConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSkill.AuthenticationConfigurationProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -8075,9 +8078,6 @@ function AuthenticationConfigurationPropertyFromCloudFormation(properties: any):
   ret.addPropertyResult("refreshToken", "RefreshToken", (properties.RefreshToken != null ? cfn_parse.FromCloudFormation.getString(properties.RefreshToken) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -8109,6 +8109,9 @@ function convertOverridesPropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function OverridesPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnSkill.OverridesProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -8117,9 +8120,6 @@ function OverridesPropertyFromCloudFormation(properties: any): cfn_parse.FromClo
   ret.addPropertyResult("manifest", "Manifest", (properties.Manifest != null ? cfn_parse.FromCloudFormation.getAny(properties.Manifest) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**
@@ -8161,6 +8161,9 @@ function convertSkillPackagePropertyToCloudFormation(properties: any): any {
 
 // @ts-ignore TS6133
 function SkillPackagePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnSkill.SkillPackageProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -8173,9 +8176,6 @@ function SkillPackagePropertyFromCloudFormation(properties: any): cfn_parse.From
   ret.addPropertyResult("s3ObjectVersion", "S3ObjectVersion", (properties.S3ObjectVersion != null ? cfn_parse.FromCloudFormation.getString(properties.S3ObjectVersion) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
 }
 
 /**

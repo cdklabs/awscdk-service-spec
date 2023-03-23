@@ -4,14 +4,12 @@ import {
   $E,
   ClassType,
   expr,
-  Expression,
   FreeFunction,
   IScope,
   IsObject,
   Module,
   PrimitiveType,
   RichScope,
-  Statement,
   stmt,
   StructType,
   Type,
@@ -212,11 +210,9 @@ export class TypeConverter {
       type: Type.ANY,
     });
 
-    const body = new Array<Statement | Expression>();
-
     // Only nested types can return a resolvable
     if (!isResourcePropsType) {
-      body.push(
+      parser.addBody(
         stmt
           .if_(CDK_CORE.isResolvableObject(propsObj))
           .then(stmt.block(stmt.ret(new CDK_CORE.helpers.FromCloudFormationResult(propsObj)))),
@@ -246,7 +242,6 @@ export class TypeConverter {
       stmt.ret($ret),
     );
 
-    parser.addBody(...body);
     return parser;
   }
 
