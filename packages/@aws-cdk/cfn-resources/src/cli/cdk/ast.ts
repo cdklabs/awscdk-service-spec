@@ -93,7 +93,7 @@ export class AstBuilder<T extends Module> {
     }
 
     converter.makeCfnProducer(propsInterface, mapping);
-    converter.makeCfnParser(propsInterface, mapping, true);
+    converter.makeCfnParser(propsInterface, mapping);
     return propsInterface;
   }
 }

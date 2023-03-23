@@ -39,6 +39,7 @@ import {
   SuperInitializer,
   ForLoop,
   StatementSeparator,
+  ThrowStatement,
 } from '../statements';
 import { StructType } from '../struct';
 import { ThingSymbol } from '../symbol';
@@ -400,6 +401,11 @@ export class TypeScriptRenderer extends Renderer {
       }),
       typeCase(StatementSeparator, () => {
         this.emit('');
+      }),
+      typeCase(ThrowStatement, (x) => {
+        this.emit('throw ');
+        this.renderExpression(x.expression);
+        this.emit(';');
       }),
     ]);
 

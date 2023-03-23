@@ -102,7 +102,7 @@ export class TypeConverter {
     });
 
     this.makeCfnProducer(theType, mapping);
-    this.makeCfnParser(theType, mapping, false);
+    this.makeCfnParser(theType, mapping);
 
     return theType;
   }
@@ -192,13 +192,9 @@ export class TypeConverter {
 
   /**
    * Make the function that translates CFN -> code
-   *
-   * @param isResourcePropsType Set to `true` if `propsInterface` is a top-level resource properties types
    */
-  public makeCfnParser(propsInterface: StructType, mapping: PropMapping, isResourcePropsType: boolean) {
-    const parserType = isResourcePropsType
-      ? propsInterface.type
-      : Type.unionOf(propsInterface.type, CDK_CORE.IResolvable); // Only nested types can return a resolvable
+  public makeCfnParser(propsInterface: StructType, mapping: PropMapping) {
+    const parserType = Type.unionOf(propsInterface.type, CDK_CORE.IResolvable);
 
     const parser = new FreeFunction(this.module, {
       name: cfnParserNameFromType(propsInterface),
@@ -210,18 +206,12 @@ export class TypeConverter {
       type: Type.ANY,
     });
 
-    // Only nested types can return a resolvable
-    if (!isResourcePropsType) {
-      parser.addBody(
-        stmt
-          .if_(CDK_CORE.isResolvableObject(propsObj))
-          .then(stmt.block(stmt.ret(new CDK_CORE.helpers.FromCloudFormationResult(propsObj)))),
-      );
-    }
-
     const $ret = $E(expr.ident('ret'));
 
     parser.addBody(
+      stmt
+        .if_(CDK_CORE.isResolvableObject(propsObj))
+        .then(stmt.block(stmt.ret(new CDK_CORE.helpers.FromCloudFormationResult(propsObj)))),
       stmt.assign(propsObj, expr.cond(expr.binOp(propsObj, '==', expr.NULL)).then(expr.lit({})).else(propsObj)),
       stmt
         .if_(expr.not(new IsObject(propsObj)))

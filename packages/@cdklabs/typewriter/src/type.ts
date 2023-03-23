@@ -43,7 +43,6 @@ export enum PrimitiveType {
 
 export type TypeReferenceSpec =
   | { readonly fqn: string; readonly genericArguments?: Type[] }
-  | { readonly builtIn: string }
   | { readonly primitive: PrimitiveType }
   | { readonly collection: { readonly kind: 'map' | 'array'; readonly elementType: Type } }
   | { readonly union: Type[] };
@@ -118,10 +117,6 @@ export class Type {
     return this.primitive === PrimitiveType.Void;
   }
 
-  public get builtInType(): string | undefined {
-    return isBuiltInSpec(this.spec) ? this.spec.builtIn : undefined;
-  }
-
   public get isAny(): boolean {
     return this.primitive === PrimitiveType.Any;
   }
@@ -173,7 +168,6 @@ export class Type {
     return (
       (this.primitive && this.primitive === rhs.primitive) ||
       (this.fqn && this.fqn === rhs.fqn) ||
-      (this.builtInType && this.builtInType === rhs.builtInType) ||
       (this.arrayOfType && this.arrayOfType === rhs.arrayOfType) ||
       (this.mapOfType && this.mapOfType === rhs.mapOfType) ||
       (!!this.unionOfTypes &&
@@ -189,10 +183,6 @@ function isFqnSpec(x: TypeReferenceSpec): x is Extract<TypeReferenceSpec, { fqn:
 
 function isPrimitiveSpec(x: TypeReferenceSpec): x is Extract<TypeReferenceSpec, { primitive: PrimitiveType }> {
   return !!(x as any).primitive;
-}
-
-function isBuiltInSpec(x: TypeReferenceSpec): x is Extract<TypeReferenceSpec, { builtIn: string }> {
-  return !!(x as any).builtIn;
 }
 
 function isCollectionSpec(
