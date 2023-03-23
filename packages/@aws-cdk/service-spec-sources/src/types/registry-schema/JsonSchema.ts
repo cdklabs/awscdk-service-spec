@@ -239,7 +239,10 @@ export namespace jsonschema {
         lastKey = parts.shift()!;
         current = current[lastKey];
       }
-      return { schema: current, referenceName: lastKey };
+
+      // Some funny people have decided to reference a reference, so we might
+      // need to recurse here.
+      return isReference(current) ? resolve(current) : { schema: current, referenceName: lastKey };
     };
     return resolve;
   }
