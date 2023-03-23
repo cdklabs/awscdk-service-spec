@@ -21,6 +21,30 @@ export class CfnSkill extends cdk.CfnResource implements cdk.IInspectable {
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "Alexa::ASK::Skill";
 
   /**
+   * Build a CfnSkill from CloudFormation properties
+   *
+   * A factory method that creates a new instance of this class from an object
+   * containing the CloudFormation properties of this resource.
+   * Used in the @aws-cdk/cloudformation-include module.
+   *
+   * @internal
+   */
+  public static _fromCloudFormation(scope: constructs.Construct, id: string, resourceAttributes: any, options: cfn_parse.FromCloudFormationOptions): CfnSkill {
+    resourceAttributes = resourceAttributes || {};
+    const resourceProperties = options.parser.parseValue(resourceAttributes.Properties);
+    const propsResult = CfnSkillPropsFromCloudFormation(resourceProperties);
+    if (cdk.isResolvableObject(propsResult.value)) {
+      throw new Error("Unexpected IResolvable");
+    }
+    const ret = new CfnSkill(scope, id, propsResult.value);
+    for (const [propKey, propVal] of Object.entries(propsResult.extraProperties)) {
+      ret.addPropertyOverride(propKey, propVal);
+    }
+    options.parser.handleAttributes(ret, resourceAttributes, id);
+    return ret;
+  }
+
+  /**
    * @cloudformationAttribute Id
    */
   public readonly attrId: string;
@@ -67,27 +91,6 @@ export class CfnSkill extends cdk.CfnResource implements cdk.IInspectable {
       "vendorId": this.vendorId,
       "skillPackage": this.skillPackage
     };
-  }
-
-  /**
-   * Build a CfnSkill from CloudFormation properties
-   *
-   * A factory method that creates a new instance of this class from an object
-   * containing the CloudFormation properties of this resource.
-   * Used in the @aws-cdk/cloudformation-include module.
-   *
-   * @internal
-   */
-  public _fromCloudFormation(scope: constructs.Construct, id: string, resourceAttributes: any, options: cfn_parse.FromCloudFormationOptions): CfnSkill {
-    resourceAttributes = resourceAttributes || {};
-    const resourceProperties = options.parser.parseValue(resourceAttributes.Properties);
-    const propsResult = CfnSkillPropsFromCloudFormation(resourceProperties);
-    const ret = new CfnSkill(scope, id, propsResult.value);
-    for (const [propKey, propVal] of Object.entries(propsResult.extraProperties)) {
-      ret.addPropertyOverride(propKey, propVal);
-    }
-    options.parser.handleAttributes(ret, resourceAttributes, id);
-    return ret;
   }
 
   /**
@@ -432,7 +435,10 @@ function convertCfnSkillPropsToCloudFormation(properties: any): any {
 }
 
 // @ts-ignore TS6133
-function CfnSkillPropsFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSkillProps> {
+function CfnSkillPropsFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSkillProps | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -465,6 +471,30 @@ export class CfnSlackChannelConfiguration extends cdk.CfnResource implements cdk
    * The CloudFormation resource type name for this resource class.
    */
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "AWS::Chatbot::SlackChannelConfiguration";
+
+  /**
+   * Build a CfnSlackChannelConfiguration from CloudFormation properties
+   *
+   * A factory method that creates a new instance of this class from an object
+   * containing the CloudFormation properties of this resource.
+   * Used in the @aws-cdk/cloudformation-include module.
+   *
+   * @internal
+   */
+  public static _fromCloudFormation(scope: constructs.Construct, id: string, resourceAttributes: any, options: cfn_parse.FromCloudFormationOptions): CfnSlackChannelConfiguration {
+    resourceAttributes = resourceAttributes || {};
+    const resourceProperties = options.parser.parseValue(resourceAttributes.Properties);
+    const propsResult = CfnSlackChannelConfigurationPropsFromCloudFormation(resourceProperties);
+    if (cdk.isResolvableObject(propsResult.value)) {
+      throw new Error("Unexpected IResolvable");
+    }
+    const ret = new CfnSlackChannelConfiguration(scope, id, propsResult.value);
+    for (const [propKey, propVal] of Object.entries(propsResult.extraProperties)) {
+      ret.addPropertyOverride(propKey, propVal);
+    }
+    options.parser.handleAttributes(ret, resourceAttributes, id);
+    return ret;
+  }
 
   /**
    * Amazon Resource Name (ARN) of the configuration
@@ -551,27 +581,6 @@ export class CfnSlackChannelConfiguration extends cdk.CfnResource implements cdk
       "guardrailPolicies": this.guardrailPolicies,
       "userRoleRequired": this.userRoleRequired
     };
-  }
-
-  /**
-   * Build a CfnSlackChannelConfiguration from CloudFormation properties
-   *
-   * A factory method that creates a new instance of this class from an object
-   * containing the CloudFormation properties of this resource.
-   * Used in the @aws-cdk/cloudformation-include module.
-   *
-   * @internal
-   */
-  public _fromCloudFormation(scope: constructs.Construct, id: string, resourceAttributes: any, options: cfn_parse.FromCloudFormationOptions): CfnSlackChannelConfiguration {
-    resourceAttributes = resourceAttributes || {};
-    const resourceProperties = options.parser.parseValue(resourceAttributes.Properties);
-    const propsResult = CfnSlackChannelConfigurationPropsFromCloudFormation(resourceProperties);
-    const ret = new CfnSlackChannelConfiguration(scope, id, propsResult.value);
-    for (const [propKey, propVal] of Object.entries(propsResult.extraProperties)) {
-      ret.addPropertyOverride(propKey, propVal);
-    }
-    options.parser.handleAttributes(ret, resourceAttributes, id);
-    return ret;
   }
 
   /**
@@ -712,7 +721,10 @@ function convertCfnSlackChannelConfigurationPropsToCloudFormation(properties: an
 }
 
 // @ts-ignore TS6133
-function CfnSlackChannelConfigurationPropsFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSlackChannelConfigurationProps> {
+function CfnSlackChannelConfigurationPropsFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSlackChannelConfigurationProps | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -748,6 +760,30 @@ export class CfnSchedule extends cdk.CfnResource implements cdk.IInspectable {
    * The CloudFormation resource type name for this resource class.
    */
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "AWS::Scheduler::Schedule";
+
+  /**
+   * Build a CfnSchedule from CloudFormation properties
+   *
+   * A factory method that creates a new instance of this class from an object
+   * containing the CloudFormation properties of this resource.
+   * Used in the @aws-cdk/cloudformation-include module.
+   *
+   * @internal
+   */
+  public static _fromCloudFormation(scope: constructs.Construct, id: string, resourceAttributes: any, options: cfn_parse.FromCloudFormationOptions): CfnSchedule {
+    resourceAttributes = resourceAttributes || {};
+    const resourceProperties = options.parser.parseValue(resourceAttributes.Properties);
+    const propsResult = CfnSchedulePropsFromCloudFormation(resourceProperties);
+    if (cdk.isResolvableObject(propsResult.value)) {
+      throw new Error("Unexpected IResolvable");
+    }
+    const ret = new CfnSchedule(scope, id, propsResult.value);
+    for (const [propKey, propVal] of Object.entries(propsResult.extraProperties)) {
+      ret.addPropertyOverride(propKey, propVal);
+    }
+    options.parser.handleAttributes(ret, resourceAttributes, id);
+    return ret;
+  }
 
   /**
    * The Amazon Resource Name (ARN) for the Amazon EventBridge Scheduler schedule.
@@ -854,27 +890,6 @@ export class CfnSchedule extends cdk.CfnResource implements cdk.IInspectable {
       "state": this.state,
       "target": this.target
     };
-  }
-
-  /**
-   * Build a CfnSchedule from CloudFormation properties
-   *
-   * A factory method that creates a new instance of this class from an object
-   * containing the CloudFormation properties of this resource.
-   * Used in the @aws-cdk/cloudformation-include module.
-   *
-   * @internal
-   */
-  public _fromCloudFormation(scope: constructs.Construct, id: string, resourceAttributes: any, options: cfn_parse.FromCloudFormationOptions): CfnSchedule {
-    resourceAttributes = resourceAttributes || {};
-    const resourceProperties = options.parser.parseValue(resourceAttributes.Properties);
-    const propsResult = CfnSchedulePropsFromCloudFormation(resourceProperties);
-    const ret = new CfnSchedule(scope, id, propsResult.value);
-    for (const [propKey, propVal] of Object.entries(propsResult.extraProperties)) {
-      ret.addPropertyOverride(propKey, propVal);
-    }
-    options.parser.handleAttributes(ret, resourceAttributes, id);
-    return ret;
   }
 
   /**
@@ -2289,7 +2304,10 @@ function convertCfnSchedulePropsToCloudFormation(properties: any): any {
 }
 
 // @ts-ignore TS6133
-function CfnSchedulePropsFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnScheduleProps> {
+function CfnSchedulePropsFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnScheduleProps | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -2321,6 +2339,30 @@ export class CfnScheduleGroup extends cdk.CfnResource implements cdk.IInspectabl
    * The CloudFormation resource type name for this resource class.
    */
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "AWS::Scheduler::ScheduleGroup";
+
+  /**
+   * Build a CfnScheduleGroup from CloudFormation properties
+   *
+   * A factory method that creates a new instance of this class from an object
+   * containing the CloudFormation properties of this resource.
+   * Used in the @aws-cdk/cloudformation-include module.
+   *
+   * @internal
+   */
+  public static _fromCloudFormation(scope: constructs.Construct, id: string, resourceAttributes: any, options: cfn_parse.FromCloudFormationOptions): CfnScheduleGroup {
+    resourceAttributes = resourceAttributes || {};
+    const resourceProperties = options.parser.parseValue(resourceAttributes.Properties);
+    const propsResult = CfnScheduleGroupPropsFromCloudFormation(resourceProperties);
+    if (cdk.isResolvableObject(propsResult.value)) {
+      throw new Error("Unexpected IResolvable");
+    }
+    const ret = new CfnScheduleGroup(scope, id, propsResult.value);
+    for (const [propKey, propVal] of Object.entries(propsResult.extraProperties)) {
+      ret.addPropertyOverride(propKey, propVal);
+    }
+    options.parser.handleAttributes(ret, resourceAttributes, id);
+    return ret;
+  }
 
   /**
    * The Amazon Resource Name (ARN) of the schedule group.
@@ -2388,27 +2430,6 @@ export class CfnScheduleGroup extends cdk.CfnResource implements cdk.IInspectabl
       "name": this.name,
       "tags": this.tags.renderTags()
     };
-  }
-
-  /**
-   * Build a CfnScheduleGroup from CloudFormation properties
-   *
-   * A factory method that creates a new instance of this class from an object
-   * containing the CloudFormation properties of this resource.
-   * Used in the @aws-cdk/cloudformation-include module.
-   *
-   * @internal
-   */
-  public _fromCloudFormation(scope: constructs.Construct, id: string, resourceAttributes: any, options: cfn_parse.FromCloudFormationOptions): CfnScheduleGroup {
-    resourceAttributes = resourceAttributes || {};
-    const resourceProperties = options.parser.parseValue(resourceAttributes.Properties);
-    const propsResult = CfnScheduleGroupPropsFromCloudFormation(resourceProperties);
-    const ret = new CfnScheduleGroup(scope, id, propsResult.value);
-    for (const [propKey, propVal] of Object.entries(propsResult.extraProperties)) {
-      ret.addPropertyOverride(propKey, propVal);
-    }
-    options.parser.handleAttributes(ret, resourceAttributes, id);
-    return ret;
   }
 
   /**
@@ -2481,7 +2502,10 @@ function convertCfnScheduleGroupPropsToCloudFormation(properties: any): any {
 }
 
 // @ts-ignore TS6133
-function CfnScheduleGroupPropsFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnScheduleGroupProps> {
+function CfnScheduleGroupPropsFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnScheduleGroupProps | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -2522,6 +2546,30 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
    * The CloudFormation resource type name for this resource class.
    */
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "AWS::SQS::Queue";
+
+  /**
+   * Build a CfnQueue from CloudFormation properties
+   *
+   * A factory method that creates a new instance of this class from an object
+   * containing the CloudFormation properties of this resource.
+   * Used in the @aws-cdk/cloudformation-include module.
+   *
+   * @internal
+   */
+  public static _fromCloudFormation(scope: constructs.Construct, id: string, resourceAttributes: any, options: cfn_parse.FromCloudFormationOptions): CfnQueue {
+    resourceAttributes = resourceAttributes || {};
+    const resourceProperties = options.parser.parseValue(resourceAttributes.Properties);
+    const propsResult = CfnQueuePropsFromCloudFormation(resourceProperties);
+    if (cdk.isResolvableObject(propsResult.value)) {
+      throw new Error("Unexpected IResolvable");
+    }
+    const ret = new CfnQueue(scope, id, propsResult.value);
+    for (const [propKey, propVal] of Object.entries(propsResult.extraProperties)) {
+      ret.addPropertyOverride(propKey, propVal);
+    }
+    options.parser.handleAttributes(ret, resourceAttributes, id);
+    return ret;
+  }
 
   /**
    * Returns the URLs of the queues from the policy.
@@ -2677,27 +2725,6 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
       "tags": this.tags.renderTags(),
       "visibilityTimeout": this.visibilityTimeout
     };
-  }
-
-  /**
-   * Build a CfnQueue from CloudFormation properties
-   *
-   * A factory method that creates a new instance of this class from an object
-   * containing the CloudFormation properties of this resource.
-   * Used in the @aws-cdk/cloudformation-include module.
-   *
-   * @internal
-   */
-  public _fromCloudFormation(scope: constructs.Construct, id: string, resourceAttributes: any, options: cfn_parse.FromCloudFormationOptions): CfnQueue {
-    resourceAttributes = resourceAttributes || {};
-    const resourceProperties = options.parser.parseValue(resourceAttributes.Properties);
-    const propsResult = CfnQueuePropsFromCloudFormation(resourceProperties);
-    const ret = new CfnQueue(scope, id, propsResult.value);
-    for (const [propKey, propVal] of Object.entries(propsResult.extraProperties)) {
-      ret.addPropertyOverride(propKey, propVal);
-    }
-    options.parser.handleAttributes(ret, resourceAttributes, id);
-    return ret;
   }
 
   /**
@@ -2967,7 +2994,10 @@ function convertCfnQueuePropsToCloudFormation(properties: any): any {
 }
 
 // @ts-ignore TS6133
-function CfnQueuePropsFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnQueueProps> {
+function CfnQueuePropsFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnQueueProps | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
@@ -3008,6 +3038,30 @@ export class CfnQueuePolicy extends cdk.CfnResource implements cdk.IInspectable 
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "AWS::SQS::QueuePolicy";
 
   /**
+   * Build a CfnQueuePolicy from CloudFormation properties
+   *
+   * A factory method that creates a new instance of this class from an object
+   * containing the CloudFormation properties of this resource.
+   * Used in the @aws-cdk/cloudformation-include module.
+   *
+   * @internal
+   */
+  public static _fromCloudFormation(scope: constructs.Construct, id: string, resourceAttributes: any, options: cfn_parse.FromCloudFormationOptions): CfnQueuePolicy {
+    resourceAttributes = resourceAttributes || {};
+    const resourceProperties = options.parser.parseValue(resourceAttributes.Properties);
+    const propsResult = CfnQueuePolicyPropsFromCloudFormation(resourceProperties);
+    if (cdk.isResolvableObject(propsResult.value)) {
+      throw new Error("Unexpected IResolvable");
+    }
+    const ret = new CfnQueuePolicy(scope, id, propsResult.value);
+    for (const [propKey, propVal] of Object.entries(propsResult.extraProperties)) {
+      ret.addPropertyOverride(propKey, propVal);
+    }
+    options.parser.handleAttributes(ret, resourceAttributes, id);
+    return ret;
+  }
+
+  /**
    * @cloudformationAttribute Id
    */
   public readonly attrId: string;
@@ -3046,27 +3100,6 @@ export class CfnQueuePolicy extends cdk.CfnResource implements cdk.IInspectable 
       "policyDocument": this.policyDocument,
       "queues": this.queues
     };
-  }
-
-  /**
-   * Build a CfnQueuePolicy from CloudFormation properties
-   *
-   * A factory method that creates a new instance of this class from an object
-   * containing the CloudFormation properties of this resource.
-   * Used in the @aws-cdk/cloudformation-include module.
-   *
-   * @internal
-   */
-  public _fromCloudFormation(scope: constructs.Construct, id: string, resourceAttributes: any, options: cfn_parse.FromCloudFormationOptions): CfnQueuePolicy {
-    resourceAttributes = resourceAttributes || {};
-    const resourceProperties = options.parser.parseValue(resourceAttributes.Properties);
-    const propsResult = CfnQueuePolicyPropsFromCloudFormation(resourceProperties);
-    const ret = new CfnQueuePolicy(scope, id, propsResult.value);
-    for (const [propKey, propVal] of Object.entries(propsResult.extraProperties)) {
-      ret.addPropertyOverride(propKey, propVal);
-    }
-    options.parser.handleAttributes(ret, resourceAttributes, id);
-    return ret;
   }
 
   /**
@@ -3143,7 +3176,10 @@ function convertCfnQueuePolicyPropsToCloudFormation(properties: any): any {
 }
 
 // @ts-ignore TS6133
-function CfnQueuePolicyPropsFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnQueuePolicyProps> {
+function CfnQueuePolicyPropsFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnQueuePolicyProps | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
