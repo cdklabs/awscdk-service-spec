@@ -1,10 +1,7 @@
 import * as pj from 'projen';
-import { yarn } from 'cdklabs-projen-project-types';
-import { AwsCdkIntgrationTest } from './projenrc/aws-cdk-integration-test';
+import { AwsCdkIntgrationTest, TypeScriptWorkspace, YarnMonorepo } from './projenrc';
 
-const lfsPatterns = ['sources/**/*.json'];
-
-const repo = new yarn.CdkLabsMonorepo({
+const repo = new YarnMonorepo({
   name: 'awscdk-service-spec',
   description: "Monorepo for the AWS CDK's service spec",
 
@@ -23,46 +20,18 @@ const repo = new yarn.CdkLabsMonorepo({
 
   gitignore: ['.DS_Store'],
   gitOptions: {
-    lfsPatterns,
+    lfsPatterns: ['sources/**/*.json'],
   },
 });
 
-// Hide generated config files in VSCode
-repo.vscode?.settings.addSettings({
-  'files.exclude': {
-    '**/.projen': true,
-    '**/.eslintrc.js': true,
-    '**/.eslintrc.json': true,
-    '**/.gitattributes': true,
-    '**/.gitignore': true,
-    '**/.npmignore': true,
-    '**/*.tsbuildinfo': true,
-    '**/node_modules': true,
-    '**/coverage': true,
-    '**/dist': true,
-    '**/lib': true,
-    '**/test-reports': true,
-    '.prettierignore': true,
-    '.prettierrc.json': true,
-    '**/tsconfig.json': true,
-    '**/tsconfig.dev.json': true,
-    'awscdk-service-spec.code-workspace': true,
-  },
-});
-
-// Tell GitHub to hide these files from diffs and not count the lines by default
-for (const lfsPattern of lfsPatterns) {
-  repo.gitattributes.addAttributes(lfsPattern, 'linguist-generated=true');
-}
-
-const tsKb = new yarn.TypeScriptWorkspace({
+const tsKb = new TypeScriptWorkspace({
   parent: repo,
   name: '@cdklabs/tskb',
   description: 'Using TypeScript as a knowledge base',
 });
 tsKb.synth();
 
-const typewriter = new yarn.TypeScriptWorkspace({
+const typewriter = new TypeScriptWorkspace({
   parent: repo,
   name: '@cdklabs/typewriter',
   description: 'Write typed code for jsii',
@@ -73,7 +42,7 @@ const typewriter = new yarn.TypeScriptWorkspace({
 });
 typewriter.synth();
 
-const serviceSpecSources = new yarn.TypeScriptWorkspace({
+const serviceSpecSources = new TypeScriptWorkspace({
   parent: repo,
   name: '@aws-cdk/service-spec-sources',
   description: 'Sources for the service spec',
@@ -112,7 +81,7 @@ serviceSpecSources.addTask('validate-specs', {
 serviceSpecSources.compileTask.prependSpawn(serviceSpecSchemaTask);
 serviceSpecSources.synth();
 
-const serviceSpec = new yarn.TypeScriptWorkspace({
+const serviceSpec = new TypeScriptWorkspace({
   parent: repo,
   name: '@aws-cdk/service-spec',
   description: 'AWS CDK Service spec',
@@ -120,7 +89,7 @@ const serviceSpec = new yarn.TypeScriptWorkspace({
 });
 serviceSpec.synth();
 
-const serviceSpecBuild = new yarn.TypeScriptWorkspace({
+const serviceSpecBuild = new TypeScriptWorkspace({
   parent: repo,
   name: '@aws-cdk/service-spec-build',
   description: 'Build the service spec from service-spec-sources to service-spec',
@@ -136,7 +105,7 @@ serviceSpecBuild.gitignore.addPatterns('db.json');
 serviceSpecBuild.gitignore.addPatterns('db-build-report.txt');
 serviceSpecBuild.synth();
 
-const cfnResources = new yarn.TypeScriptWorkspace({
+const cfnResources = new TypeScriptWorkspace({
   parent: repo,
   name: '@aws-cdk/cfn-resources',
   description: 'L1 constructs for all CloudFormation Resources',
@@ -172,7 +141,7 @@ cfnResources.preCompileTask.spawn(
 );
 cfnResources.synth();
 
-const cfn2ts = new yarn.TypeScriptWorkspace({
+const cfn2ts = new TypeScriptWorkspace({
   parent: repo,
   name: '@aws-cdk/cfn2ts',
   description: 'Drop-in replacement for cfn2ts',
