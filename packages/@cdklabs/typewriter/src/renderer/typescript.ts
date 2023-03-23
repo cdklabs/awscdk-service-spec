@@ -26,6 +26,7 @@ import {
 import { InvokeCallable } from '../expressions/invoke';
 import { InterfaceType } from '../interface';
 import { AliasedModuleImport, Module } from '../module';
+import { Parameter } from '../parameter';
 import { Property } from '../property';
 import {
   ReturnStatement,
@@ -44,7 +45,6 @@ import { StructType } from '../struct';
 import { ThingSymbol } from '../symbol';
 import { Type } from '../type';
 import { Initializer, MemberVisibility, Method } from '../type-member';
-import { Parameter } from '../parameter';
 
 export class TypeScriptRenderer extends Renderer {
   protected renderModule(mod: Module) {
