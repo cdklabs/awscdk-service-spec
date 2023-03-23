@@ -148,6 +148,8 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
             return { type: 'null' };
         }
       }
+
+      throw new Error('Unable to produce type');
     });
   }
 

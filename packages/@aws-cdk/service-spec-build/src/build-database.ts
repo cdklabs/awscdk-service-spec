@@ -7,6 +7,7 @@ import {
   readCloudFormationRegistryResource,
   readCloudFormationRegistryServiceFromResource,
 } from './cloudformation-registry';
+import { Scrutinies } from './scrutinies';
 import { readStatefulResources } from './stateful-resources';
 
 export interface BuildDatabaseOptions {
@@ -48,6 +49,8 @@ export async function buildDatabase(options: BuildDatabaseOptions = {}) {
 
   const stateful = loadResult(await sources.loadDefaultStatefulResources());
   readStatefulResources(db, stateful, warnings);
+
+  new Scrutinies(db).annotate();
 
   return { db, warnings, patchesApplied };
 
