@@ -111,6 +111,7 @@ export class ResourceClass extends ClassType {
   private addFromCloudFormationFactory(propsType: StructType) {
     const factory = this.addMethod({
       name: '_fromCloudFormation',
+      static: true,
       returnType: this.type,
       docs: {
         summary: `Build a ${this.name} from CloudFormation properties`,
@@ -144,6 +145,9 @@ export class ResourceClass extends ClassType {
       stmt.assign(resourceAttributes, new TruthyOr(resourceAttributes, expr.lit({}))),
       stmt.constVar(resourceProperties, options.parser.parseValue(resourceAttributes.Properties)),
       stmt.constVar(propsResult, reverseMapper.call(resourceProperties)),
+      stmt
+        .if_(CDK_CORE.isResolvableObject(propsResult.value))
+        .then(stmt.block(stmt.throw_(Type.ambient('Error').newInstance(expr.lit('Unexpected IResolvable'))))),
       stmt.constVar(ret, this.newInstance(scope, id, propsResult.value)),
     );
 

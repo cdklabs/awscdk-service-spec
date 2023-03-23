@@ -9,6 +9,7 @@ import {
   ReturnStatement,
   Statement,
   VariableDeclaration,
+  ThrowStatement,
 } from './statements';
 import { Expression } from '../expression';
 
@@ -46,4 +47,8 @@ export function sep() {
 
 export function block(...stmts: Array<Statement | Expression>) {
   return Block.with(...stmts);
+}
+
+export function throw_(error: Expression) {
+  return new ThrowStatement(error);
 }
