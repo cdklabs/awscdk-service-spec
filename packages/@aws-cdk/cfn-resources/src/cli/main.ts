@@ -22,6 +22,7 @@ async function main(argv: string[]) {
     outputPath,
     filePattern,
     clearOutput: options['clear-output'] as boolean,
+    services: options.service ? [options.service as string] : undefined,
     debug: options.debug as boolean,
   });
 }

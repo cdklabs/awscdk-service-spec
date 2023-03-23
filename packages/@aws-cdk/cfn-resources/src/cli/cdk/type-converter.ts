@@ -4,11 +4,14 @@ import {
   $E,
   ClassType,
   expr,
+  Expression,
   FreeFunction,
   IScope,
   IsObject,
   Module,
+  PrimitiveType,
   RichScope,
+  Statement,
   stmt,
   StructType,
   Type,
@@ -101,7 +104,7 @@ export class TypeConverter {
     });
 
     this.makeCfnProducer(theType, mapping);
-    this.makeCfnParser(theType, mapping);
+    this.makeCfnParser(theType, mapping, false);
 
     return theType;
   }
@@ -124,7 +127,7 @@ export class TypeConverter {
     const name = propertyNameFromCloudFormation(propertyName);
     const type = this.typeFromSpecType(property.type);
 
-    const p = struct.addProperty({
+    const spec = {
       name,
       type,
       optional: !property.required,
@@ -138,9 +141,14 @@ export class TypeConverter {
         }),
         deprecated: deprecationMessage(),
       },
+    };
+
+    struct.addProperty({
+      ...spec,
+      type: this.makeTypeResolvable(type),
     });
 
-    map.add(propertyName, p);
+    map.add(propertyName, spec);
 
     function deprecationMessage(): string | undefined {
       switch (property.deprecated) {
@@ -186,11 +194,17 @@ export class TypeConverter {
 
   /**
    * Make the function that translates CFN -> code
+   *
+   * @param isResourcePropsType Set to `true` if `propsInterface` is a top-level resource properties types
    */
-  public makeCfnParser(propsInterface: StructType, mapping: PropMapping) {
+  public makeCfnParser(propsInterface: StructType, mapping: PropMapping, isResourcePropsType: boolean) {
+    const parserType = isResourcePropsType
+      ? propsInterface.type
+      : Type.unionOf(propsInterface.type, CDK_CORE.IResolvable); // Only nested types can return a resolvable
+
     const parser = new FreeFunction(this.module, {
       name: cfnParserNameFromType(propsInterface),
-      returnType: CDK_CORE.helpers.FromCloudFormationResult.withGenericArguments(propsInterface.type),
+      returnType: CDK_CORE.helpers.FromCloudFormationResult.withGenericArguments(parserType),
     });
 
     const propsObj = parser.addParameter({
@@ -198,13 +212,24 @@ export class TypeConverter {
       type: Type.ANY,
     });
 
+    const body = new Array<Statement | Expression>();
+
+    // Only nested types can return a resolvable
+    if (!isResourcePropsType) {
+      body.push(
+        stmt
+          .if_(CDK_CORE.isResolvableObject(propsObj))
+          .then(stmt.block(stmt.ret(new CDK_CORE.helpers.FromCloudFormationResult(propsObj)))),
+      );
+    }
+
     const $ret = $E(expr.ident('ret'));
 
     parser.addBody(
       stmt.assign(propsObj, expr.cond(expr.binOp(propsObj, '==', expr.NULL)).then(expr.lit({})).else(propsObj)),
       stmt
         .if_(expr.not(new IsObject(propsObj)))
-        .then(stmt.ret(new CDK_CORE.helpers.FromCloudFormationResult(propsObj))),
+        .then(stmt.block(stmt.ret(new CDK_CORE.helpers.FromCloudFormationResult(propsObj)))),
 
       stmt.constVar(
         $ret,
@@ -221,6 +246,55 @@ export class TypeConverter {
       stmt.ret($ret),
     );
 
+    parser.addBody(...body);
     return parser;
   }
+
+  /**
+   * For a given type, returned a resolvable version of the type
+   *
+   * We do this by checking if the type can be represented directly by a Token (e.g. `Token.asList(value))`).
+   * If not we recursively apply a type union with `cdk.IResolvable` to the type.
+   */
+  private makeTypeResolvable(type: Type): Type {
+    if (isTokenizableType(type) || isTagType(type)) {
+      return type;
+    }
+
+    if (type.primitive) {
+      return Type.unionOf(type, CDK_CORE.IResolvable);
+    }
+
+    if (type.arrayOfType) {
+      return Type.unionOf(Type.arrayOf(this.makeTypeResolvable(type.arrayOfType)), CDK_CORE.IResolvable);
+    }
+
+    if (type.mapOfType) {
+      return Type.unionOf(Type.mapOf(this.makeTypeResolvable(type.mapOfType)), CDK_CORE.IResolvable);
+    }
+
+    if (type.unionOfTypes) {
+      return Type.unionOf(...type.unionOfTypes, CDK_CORE.IResolvable);
+    }
+
+    return Type.unionOf(type, CDK_CORE.IResolvable);
+  }
+}
+
+/**
+ * Is the given type a builtin tag
+ */
+function isTagType(type: Type): boolean {
+  return type.fqn === CDK_CORE.CfnTag.fqn || type.arrayOfType?.fqn === CDK_CORE.CfnTag.fqn;
+}
+
+/**
+ * Only string, string[] and number can be represented by a token
+ */
+function isTokenizableType(type: Type): boolean {
+  return (
+    type.primitive === PrimitiveType.String ||
+    type.arrayOfType?.primitive === PrimitiveType.String ||
+    type.primitive === PrimitiveType.Number
+  );
 }
