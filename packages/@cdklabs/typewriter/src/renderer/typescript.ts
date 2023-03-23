@@ -16,7 +16,7 @@ import {
   ObjectLiteral,
   ObjectMethodInvoke,
   ObjectPropertyAccess,
-  StrContact,
+  StrConcat,
   Structure,
   Ternary,
   ThisInstance,
@@ -476,7 +476,7 @@ export class TypeScriptRenderer extends Renderer {
         this.emit(' != null');
       }),
 
-      typeCase(StrContact, (x) => {
+      typeCase(StrConcat, (x) => {
         this.emitList(x._operands_, ' + ', (op) => {
           this.renderExpression(op);
         });
