@@ -28,7 +28,7 @@ export class CfnSkill extends cdk.CfnResource implements cdk.IInspectable {
   /**
    * Login with Amazon (LWA) configuration used to authenticate with the Alexa service.
    */
-  public readonly authenticationConfiguration: CfnSkill.AuthenticationConfigurationProperty;
+  public readonly authenticationConfiguration: CfnSkill.AuthenticationConfigurationProperty | cdk.IResolvable;
 
   /**
    * The vendor ID associated with the Amazon developer account that will host the skill.
@@ -38,7 +38,7 @@ export class CfnSkill extends cdk.CfnResource implements cdk.IInspectable {
   /**
    * Configuration for the skill package that contains the components of the Alexa skill.
    */
-  public readonly skillPackage: CfnSkill.SkillPackageProperty;
+  public readonly skillPackage: cdk.IResolvable | CfnSkill.SkillPackageProperty;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -166,7 +166,7 @@ namespace CfnSkill {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ask-skill-skillpackage.html#cfn-ask-skill-skillpackage-overrides
      */
-    readonly overrides?: CfnSkill.OverridesProperty;
+    readonly overrides?: cdk.IResolvable | CfnSkill.OverridesProperty;
 
     /**
      * If you have S3 versioning enabled, the version ID of the skill package.zip file.
@@ -208,7 +208,7 @@ namespace CfnSkill {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ask-skill-overrides.html#cfn-ask-skill-overrides-manifest
      */
-    readonly manifest?: any;
+    readonly manifest?: any | cdk.IResolvable;
   }
 }
 
@@ -227,7 +227,7 @@ export interface CfnSkillProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ask-skill.html#cfn-ask-skill-authenticationconfiguration
    */
-  readonly authenticationConfiguration: CfnSkill.AuthenticationConfigurationProperty;
+  readonly authenticationConfiguration: CfnSkill.AuthenticationConfigurationProperty | cdk.IResolvable;
 
   /**
    * The vendor ID associated with the Amazon developer account that will host the skill.
@@ -245,7 +245,7 @@ export interface CfnSkillProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ask-skill.html#cfn-ask-skill-skillpackage
    */
-  readonly skillPackage: CfnSkill.SkillPackageProperty;
+  readonly skillPackage: cdk.IResolvable | CfnSkill.SkillPackageProperty;
 }
 
 /**
@@ -283,15 +283,20 @@ function convertAuthenticationConfigurationPropertyToCloudFormation(properties: 
 }
 
 // @ts-ignore TS6133
-function AuthenticationConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSkill.AuthenticationConfigurationProperty> {
+function AuthenticationConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSkill.AuthenticationConfigurationProperty | cdk.IResolvable> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSkill.AuthenticationConfigurationProperty>();
   ret.addPropertyResult("clientId", "ClientId", (properties.ClientId != null ? cfn_parse.FromCloudFormation.getString(properties.ClientId) : undefined));
   ret.addPropertyResult("clientSecret", "ClientSecret", (properties.ClientSecret != null ? cfn_parse.FromCloudFormation.getString(properties.ClientSecret) : undefined));
   ret.addPropertyResult("refreshToken", "RefreshToken", (properties.RefreshToken != null ? cfn_parse.FromCloudFormation.getString(properties.RefreshToken) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
 }
 
 /**
@@ -322,13 +327,18 @@ function convertOverridesPropertyToCloudFormation(properties: any): any {
 }
 
 // @ts-ignore TS6133
-function OverridesPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSkill.OverridesProperty> {
+function OverridesPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnSkill.OverridesProperty> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSkill.OverridesProperty>();
   ret.addPropertyResult("manifest", "Manifest", (properties.Manifest != null ? cfn_parse.FromCloudFormation.getAny(properties.Manifest) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
 }
 
 /**
@@ -369,9 +379,11 @@ function convertSkillPackagePropertyToCloudFormation(properties: any): any {
 }
 
 // @ts-ignore TS6133
-function SkillPackagePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSkill.SkillPackageProperty> {
+function SkillPackagePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnSkill.SkillPackageProperty> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSkill.SkillPackageProperty>();
   ret.addPropertyResult("overrides", "Overrides", (properties.Overrides != null ? OverridesPropertyFromCloudFormation(properties.Overrides) : undefined));
   ret.addPropertyResult("s3Bucket", "S3Bucket", (properties.S3Bucket != null ? cfn_parse.FromCloudFormation.getString(properties.S3Bucket) : undefined));
@@ -380,6 +392,9 @@ function SkillPackagePropertyFromCloudFormation(properties: any): cfn_parse.From
   ret.addPropertyResult("s3ObjectVersion", "S3ObjectVersion", (properties.S3ObjectVersion != null ? cfn_parse.FromCloudFormation.getString(properties.S3ObjectVersion) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
 }
 
 /**
@@ -419,7 +434,9 @@ function convertCfnSkillPropsToCloudFormation(properties: any): any {
 // @ts-ignore TS6133
 function CfnSkillPropsFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSkillProps> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSkillProps>();
   ret.addPropertyResult("authenticationConfiguration", "AuthenticationConfiguration", (properties.AuthenticationConfiguration != null ? AuthenticationConfigurationPropertyFromCloudFormation(properties.AuthenticationConfiguration) : undefined));
   ret.addPropertyResult("skillPackage", "SkillPackage", (properties.SkillPackage != null ? SkillPackagePropertyFromCloudFormation(properties.SkillPackage) : undefined));
@@ -494,7 +511,7 @@ export class CfnSlackChannelConfiguration extends cdk.CfnResource implements cdk
   /**
    * Enables use of a user role requirement in your chat configuration.
    */
-  public readonly userRoleRequired?: boolean;
+  public readonly userRoleRequired?: boolean | cdk.IResolvable;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -646,7 +663,7 @@ export interface CfnSlackChannelConfigurationProps {
    * @default - false
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-chatbot-slackchannelconfiguration.html#cfn-chatbot-slackchannelconfiguration-userrolerequired
    */
-  readonly userRoleRequired?: boolean;
+  readonly userRoleRequired?: boolean | cdk.IResolvable;
 }
 
 /**
@@ -697,7 +714,9 @@ function convertCfnSlackChannelConfigurationPropsToCloudFormation(properties: an
 // @ts-ignore TS6133
 function CfnSlackChannelConfigurationPropsFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSlackChannelConfigurationProps> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSlackChannelConfigurationProps>();
   ret.addPropertyResult("configurationName", "ConfigurationName", (properties.ConfigurationName != null ? cfn_parse.FromCloudFormation.getString(properties.ConfigurationName) : undefined));
   ret.addPropertyResult("guardrailPolicies", "GuardrailPolicies", (properties.GuardrailPolicies != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.GuardrailPolicies) : undefined));
@@ -750,7 +769,7 @@ export class CfnSchedule extends cdk.CfnResource implements cdk.IInspectable {
   /**
    * Allows you to configure a time window during which EventBridge Scheduler invokes the schedule.
    */
-  public readonly flexibleTimeWindow: CfnSchedule.FlexibleTimeWindowProperty;
+  public readonly flexibleTimeWindow: CfnSchedule.FlexibleTimeWindowProperty | cdk.IResolvable;
 
   /**
    * The name of the schedule group associated with this schedule.
@@ -790,7 +809,7 @@ export class CfnSchedule extends cdk.CfnResource implements cdk.IInspectable {
   /**
    * The schedule's target details.
    */
-  public readonly target: CfnSchedule.TargetProperty;
+  public readonly target: cdk.IResolvable | CfnSchedule.TargetProperty;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -926,14 +945,14 @@ namespace CfnSchedule {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-deadletterconfig
      */
-    readonly deadLetterConfig?: CfnSchedule.DeadLetterConfigProperty;
+    readonly deadLetterConfig?: CfnSchedule.DeadLetterConfigProperty | cdk.IResolvable;
 
     /**
      * A \`RetryPolicy\` object that includes information about the retry policy settings, including the maximum age of an event, and the maximum number of times EventBridge Scheduler will try to deliver the event to a target.
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-retrypolicy
      */
-    readonly retryPolicy?: CfnSchedule.RetryPolicyProperty;
+    readonly retryPolicy?: cdk.IResolvable | CfnSchedule.RetryPolicyProperty;
 
     /**
      * The text, or well-formed JSON, passed to the target.
@@ -949,35 +968,35 @@ namespace CfnSchedule {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-ecsparameters
      */
-    readonly ecsParameters?: CfnSchedule.EcsParametersProperty;
+    readonly ecsParameters?: CfnSchedule.EcsParametersProperty | cdk.IResolvable;
 
     /**
      * The templated target type for the EventBridge [\`PutEvents\`](https://docs.aws.amazon.com/eventbridge/latest/APIReference/API_PutEvents.html) API operation.
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-eventbridgeparameters
      */
-    readonly eventBridgeParameters?: CfnSchedule.EventBridgeParametersProperty;
+    readonly eventBridgeParameters?: CfnSchedule.EventBridgeParametersProperty | cdk.IResolvable;
 
     /**
      * The templated target type for the Amazon Kinesis [\`PutRecord\`](https://docs.aws.amazon.com/kinesis/latest/APIReference/API_PutRecord.html) API operation.
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-kinesisparameters
      */
-    readonly kinesisParameters?: CfnSchedule.KinesisParametersProperty;
+    readonly kinesisParameters?: cdk.IResolvable | CfnSchedule.KinesisParametersProperty;
 
     /**
      * The templated target type for the Amazon SageMaker [\`StartPipelineExecution\`](https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_StartPipelineExecution.html) API operation.
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-sagemakerpipelineparameters
      */
-    readonly sageMakerPipelineParameters?: CfnSchedule.SageMakerPipelineParametersProperty;
+    readonly sageMakerPipelineParameters?: cdk.IResolvable | CfnSchedule.SageMakerPipelineParametersProperty;
 
     /**
      * The templated target type for the Amazon SQS [\`SendMessage\`](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html) API operation. Contains the message group ID to use when the target is a FIFO queue. If you specify an Amazon SQS FIFO queue as a target, the queue must have content-based deduplication enabled. For more information, see [Using the Amazon SQS message deduplication ID](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/using-messagededuplicationid-property.html) in the *Amazon SQS Developer Guide* .
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-target.html#cfn-scheduler-schedule-target-sqsparameters
      */
-    readonly sqsParameters?: CfnSchedule.SqsParametersProperty;
+    readonly sqsParameters?: cdk.IResolvable | CfnSchedule.SqsParametersProperty;
   }
 
   /**
@@ -1058,7 +1077,7 @@ namespace CfnSchedule {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-ecsparameters.html#cfn-scheduler-schedule-ecsparameters-networkconfiguration
      */
-    readonly networkConfiguration?: CfnSchedule.NetworkConfigurationProperty;
+    readonly networkConfiguration?: cdk.IResolvable | CfnSchedule.NetworkConfigurationProperty;
 
     /**
      * Specifies the platform version for the task.
@@ -1083,7 +1102,7 @@ namespace CfnSchedule {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-ecsparameters.html#cfn-scheduler-schedule-ecsparameters-capacityproviderstrategy
      */
-    readonly capacityProviderStrategy?: Array<CfnSchedule.CapacityProviderStrategyItemProperty>;
+    readonly capacityProviderStrategy?: Array<CfnSchedule.CapacityProviderStrategyItemProperty | cdk.IResolvable> | cdk.IResolvable;
 
     /**
      * Specifies whether to enable Amazon ECS managed tags for the task.
@@ -1092,7 +1111,7 @@ namespace CfnSchedule {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-ecsparameters.html#cfn-scheduler-schedule-ecsparameters-enableecsmanagedtags
      */
-    readonly enableEcsManagedTags?: boolean;
+    readonly enableEcsManagedTags?: boolean | cdk.IResolvable;
 
     /**
      * Whether or not to enable the execute command functionality for the containers in this task.
@@ -1101,7 +1120,7 @@ namespace CfnSchedule {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-ecsparameters.html#cfn-scheduler-schedule-ecsparameters-enableexecutecommand
      */
-    readonly enableExecuteCommand?: boolean;
+    readonly enableExecuteCommand?: boolean | cdk.IResolvable;
 
     /**
      * An array of placement constraint objects to use for the task.
@@ -1110,14 +1129,14 @@ namespace CfnSchedule {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-ecsparameters.html#cfn-scheduler-schedule-ecsparameters-placementconstraints
      */
-    readonly placementConstraints?: Array<CfnSchedule.PlacementConstraintProperty>;
+    readonly placementConstraints?: Array<cdk.IResolvable | CfnSchedule.PlacementConstraintProperty> | cdk.IResolvable;
 
     /**
      * The task placement strategy for a task or service.
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-ecsparameters.html#cfn-scheduler-schedule-ecsparameters-placementstrategy
      */
-    readonly placementStrategy?: Array<CfnSchedule.PlacementStrategyProperty>;
+    readonly placementStrategy?: Array<cdk.IResolvable | CfnSchedule.PlacementStrategyProperty> | cdk.IResolvable;
 
     /**
      * Specifies whether to propagate the tags from the task definition to the task.
@@ -1142,7 +1161,7 @@ namespace CfnSchedule {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-ecsparameters.html#cfn-scheduler-schedule-ecsparameters-tags
      */
-    readonly tags?: Array<Record<string, string>>;
+    readonly tags?: Array<cdk.IResolvable | Record<string, string>> | cdk.IResolvable;
   }
 
   /**
@@ -1159,7 +1178,7 @@ namespace CfnSchedule {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-networkconfiguration.html#cfn-scheduler-schedule-networkconfiguration-awsvpcconfiguration
      */
-    readonly awsvpcConfiguration?: CfnSchedule.AwsVpcConfigurationProperty;
+    readonly awsvpcConfiguration?: CfnSchedule.AwsVpcConfigurationProperty | cdk.IResolvable;
   }
 
   /**
@@ -1337,7 +1356,7 @@ namespace CfnSchedule {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-sagemakerpipelineparameters.html#cfn-scheduler-schedule-sagemakerpipelineparameters-pipelineparameterlist
      */
-    readonly pipelineParameterList?: Array<CfnSchedule.SageMakerPipelineParameterProperty>;
+    readonly pipelineParameterList?: Array<cdk.IResolvable | CfnSchedule.SageMakerPipelineParameterProperty> | cdk.IResolvable;
   }
 
   /**
@@ -1408,7 +1427,7 @@ export interface CfnScheduleProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-scheduler-schedule.html#cfn-scheduler-schedule-flexibletimewindow
    */
-  readonly flexibleTimeWindow: CfnSchedule.FlexibleTimeWindowProperty;
+  readonly flexibleTimeWindow: CfnSchedule.FlexibleTimeWindowProperty | cdk.IResolvable;
 
   /**
    * The name of the schedule group associated with this schedule.
@@ -1479,7 +1498,7 @@ export interface CfnScheduleProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-scheduler-schedule.html#cfn-scheduler-schedule-target
    */
-  readonly target: CfnSchedule.TargetProperty;
+  readonly target: cdk.IResolvable | CfnSchedule.TargetProperty;
 }
 
 /**
@@ -1513,14 +1532,19 @@ function convertFlexibleTimeWindowPropertyToCloudFormation(properties: any): any
 }
 
 // @ts-ignore TS6133
-function FlexibleTimeWindowPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.FlexibleTimeWindowProperty> {
+function FlexibleTimeWindowPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.FlexibleTimeWindowProperty | cdk.IResolvable> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.FlexibleTimeWindowProperty>();
   ret.addPropertyResult("maximumWindowInMinutes", "MaximumWindowInMinutes", (properties.MaximumWindowInMinutes != null ? cfn_parse.FromCloudFormation.getNumber(properties.MaximumWindowInMinutes) : undefined));
   ret.addPropertyResult("mode", "Mode", (properties.Mode != null ? cfn_parse.FromCloudFormation.getString(properties.Mode) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
 }
 
 /**
@@ -1551,13 +1575,18 @@ function convertDeadLetterConfigPropertyToCloudFormation(properties: any): any {
 }
 
 // @ts-ignore TS6133
-function DeadLetterConfigPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.DeadLetterConfigProperty> {
+function DeadLetterConfigPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.DeadLetterConfigProperty | cdk.IResolvable> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.DeadLetterConfigProperty>();
   ret.addPropertyResult("arn", "Arn", (properties.Arn != null ? cfn_parse.FromCloudFormation.getString(properties.Arn) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
 }
 
 /**
@@ -1590,14 +1619,19 @@ function convertRetryPolicyPropertyToCloudFormation(properties: any): any {
 }
 
 // @ts-ignore TS6133
-function RetryPolicyPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.RetryPolicyProperty> {
+function RetryPolicyPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnSchedule.RetryPolicyProperty> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.RetryPolicyProperty>();
   ret.addPropertyResult("maximumEventAgeInSeconds", "MaximumEventAgeInSeconds", (properties.MaximumEventAgeInSeconds != null ? cfn_parse.FromCloudFormation.getNumber(properties.MaximumEventAgeInSeconds) : undefined));
   ret.addPropertyResult("maximumRetryAttempts", "MaximumRetryAttempts", (properties.MaximumRetryAttempts != null ? cfn_parse.FromCloudFormation.getNumber(properties.MaximumRetryAttempts) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
 }
 
 /**
@@ -1633,15 +1667,20 @@ function convertAwsVpcConfigurationPropertyToCloudFormation(properties: any): an
 }
 
 // @ts-ignore TS6133
-function AwsVpcConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.AwsVpcConfigurationProperty> {
+function AwsVpcConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.AwsVpcConfigurationProperty | cdk.IResolvable> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.AwsVpcConfigurationProperty>();
   ret.addPropertyResult("assignPublicIp", "AssignPublicIp", (properties.AssignPublicIp != null ? cfn_parse.FromCloudFormation.getString(properties.AssignPublicIp) : undefined));
   ret.addPropertyResult("securityGroups", "SecurityGroups", (properties.SecurityGroups != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.SecurityGroups) : undefined));
   ret.addPropertyResult("subnets", "Subnets", (properties.Subnets != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.Subnets) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
 }
 
 /**
@@ -1672,13 +1711,18 @@ function convertNetworkConfigurationPropertyToCloudFormation(properties: any): a
 }
 
 // @ts-ignore TS6133
-function NetworkConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.NetworkConfigurationProperty> {
+function NetworkConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnSchedule.NetworkConfigurationProperty> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.NetworkConfigurationProperty>();
   ret.addPropertyResult("awsvpcConfiguration", "AwsvpcConfiguration", (properties.AwsvpcConfiguration != null ? AwsVpcConfigurationPropertyFromCloudFormation(properties.AwsvpcConfiguration) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
 }
 
 /**
@@ -1714,15 +1758,20 @@ function convertCapacityProviderStrategyItemPropertyToCloudFormation(properties:
 }
 
 // @ts-ignore TS6133
-function CapacityProviderStrategyItemPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.CapacityProviderStrategyItemProperty> {
+function CapacityProviderStrategyItemPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.CapacityProviderStrategyItemProperty | cdk.IResolvable> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.CapacityProviderStrategyItemProperty>();
   ret.addPropertyResult("base", "Base", (properties.Base != null ? cfn_parse.FromCloudFormation.getNumber(properties.Base) : undefined));
   ret.addPropertyResult("capacityProvider", "CapacityProvider", (properties.CapacityProvider != null ? cfn_parse.FromCloudFormation.getString(properties.CapacityProvider) : undefined));
   ret.addPropertyResult("weight", "Weight", (properties.Weight != null ? cfn_parse.FromCloudFormation.getNumber(properties.Weight) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
 }
 
 /**
@@ -1755,14 +1804,19 @@ function convertPlacementConstraintPropertyToCloudFormation(properties: any): an
 }
 
 // @ts-ignore TS6133
-function PlacementConstraintPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.PlacementConstraintProperty> {
+function PlacementConstraintPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnSchedule.PlacementConstraintProperty> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.PlacementConstraintProperty>();
   ret.addPropertyResult("expression", "Expression", (properties.Expression != null ? cfn_parse.FromCloudFormation.getString(properties.Expression) : undefined));
   ret.addPropertyResult("type", "Type", (properties.Type != null ? cfn_parse.FromCloudFormation.getString(properties.Type) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
 }
 
 /**
@@ -1795,14 +1849,19 @@ function convertPlacementStrategyPropertyToCloudFormation(properties: any): any 
 }
 
 // @ts-ignore TS6133
-function PlacementStrategyPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.PlacementStrategyProperty> {
+function PlacementStrategyPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnSchedule.PlacementStrategyProperty> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.PlacementStrategyProperty>();
   ret.addPropertyResult("field", "Field", (properties.Field != null ? cfn_parse.FromCloudFormation.getString(properties.Field) : undefined));
   ret.addPropertyResult("type", "Type", (properties.Type != null ? cfn_parse.FromCloudFormation.getString(properties.Type) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
 }
 
 /**
@@ -1830,7 +1889,7 @@ function EcsParametersPropertyValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("platformVersion", cdk.validateString)(properties.platformVersion));
   errors.collect(cdk.propertyValidator("propagateTags", cdk.validateString)(properties.propagateTags));
   errors.collect(cdk.propertyValidator("referenceId", cdk.validateString)(properties.referenceId));
-  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.listValidator(cdk.validateString)))(properties.tags));
+  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.hashValidator(cdk.validateString)))(properties.tags));
   errors.collect(cdk.propertyValidator("taskCount", cdk.validateNumber)(properties.taskCount));
   errors.collect(cdk.propertyValidator("taskDefinitionArn", cdk.requiredValidator)(properties.taskDefinitionArn));
   errors.collect(cdk.propertyValidator("taskDefinitionArn", cdk.validateString)(properties.taskDefinitionArn));
@@ -1860,9 +1919,11 @@ function convertEcsParametersPropertyToCloudFormation(properties: any): any {
 }
 
 // @ts-ignore TS6133
-function EcsParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.EcsParametersProperty> {
+function EcsParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.EcsParametersProperty | cdk.IResolvable> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.EcsParametersProperty>();
   ret.addPropertyResult("capacityProviderStrategy", "CapacityProviderStrategy", (properties.CapacityProviderStrategy != null ? cfn_parse.FromCloudFormation.getArray(CapacityProviderStrategyItemPropertyFromCloudFormation)(properties.CapacityProviderStrategy) : undefined));
   ret.addPropertyResult("enableEcsManagedTags", "EnableECSManagedTags", (properties.EnableECSManagedTags != null ? cfn_parse.FromCloudFormation.getBoolean(properties.EnableECSManagedTags) : undefined));
@@ -1880,6 +1941,9 @@ function EcsParametersPropertyFromCloudFormation(properties: any): cfn_parse.Fro
   ret.addPropertyResult("taskDefinitionArn", "TaskDefinitionArn", (properties.TaskDefinitionArn != null ? cfn_parse.FromCloudFormation.getString(properties.TaskDefinitionArn) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
 }
 
 /**
@@ -1914,14 +1978,19 @@ function convertEventBridgeParametersPropertyToCloudFormation(properties: any): 
 }
 
 // @ts-ignore TS6133
-function EventBridgeParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.EventBridgeParametersProperty> {
+function EventBridgeParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.EventBridgeParametersProperty | cdk.IResolvable> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.EventBridgeParametersProperty>();
   ret.addPropertyResult("detailType", "DetailType", (properties.DetailType != null ? cfn_parse.FromCloudFormation.getString(properties.DetailType) : undefined));
   ret.addPropertyResult("source", "Source", (properties.Source != null ? cfn_parse.FromCloudFormation.getString(properties.Source) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
 }
 
 /**
@@ -1953,13 +2022,18 @@ function convertKinesisParametersPropertyToCloudFormation(properties: any): any 
 }
 
 // @ts-ignore TS6133
-function KinesisParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.KinesisParametersProperty> {
+function KinesisParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnSchedule.KinesisParametersProperty> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.KinesisParametersProperty>();
   ret.addPropertyResult("partitionKey", "PartitionKey", (properties.PartitionKey != null ? cfn_parse.FromCloudFormation.getString(properties.PartitionKey) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
 }
 
 /**
@@ -1994,14 +2068,19 @@ function convertSageMakerPipelineParameterPropertyToCloudFormation(properties: a
 }
 
 // @ts-ignore TS6133
-function SageMakerPipelineParameterPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.SageMakerPipelineParameterProperty> {
+function SageMakerPipelineParameterPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnSchedule.SageMakerPipelineParameterProperty> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.SageMakerPipelineParameterProperty>();
   ret.addPropertyResult("name", "Name", (properties.Name != null ? cfn_parse.FromCloudFormation.getString(properties.Name) : undefined));
   ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
 }
 
 /**
@@ -2032,13 +2111,18 @@ function convertSageMakerPipelineParametersPropertyToCloudFormation(properties: 
 }
 
 // @ts-ignore TS6133
-function SageMakerPipelineParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.SageMakerPipelineParametersProperty> {
+function SageMakerPipelineParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnSchedule.SageMakerPipelineParametersProperty> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.SageMakerPipelineParametersProperty>();
   ret.addPropertyResult("pipelineParameterList", "PipelineParameterList", (properties.PipelineParameterList != null ? cfn_parse.FromCloudFormation.getArray(SageMakerPipelineParameterPropertyFromCloudFormation)(properties.PipelineParameterList) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
 }
 
 /**
@@ -2069,13 +2153,18 @@ function convertSqsParametersPropertyToCloudFormation(properties: any): any {
 }
 
 // @ts-ignore TS6133
-function SqsParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.SqsParametersProperty> {
+function SqsParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnSchedule.SqsParametersProperty> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.SqsParametersProperty>();
   ret.addPropertyResult("messageGroupId", "MessageGroupId", (properties.MessageGroupId != null ? cfn_parse.FromCloudFormation.getString(properties.MessageGroupId) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
 }
 
 /**
@@ -2126,9 +2215,11 @@ function convertTargetPropertyToCloudFormation(properties: any): any {
 }
 
 // @ts-ignore TS6133
-function TargetPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.TargetProperty> {
+function TargetPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnSchedule.TargetProperty> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.TargetProperty>();
   ret.addPropertyResult("arn", "Arn", (properties.Arn != null ? cfn_parse.FromCloudFormation.getString(properties.Arn) : undefined));
   ret.addPropertyResult("deadLetterConfig", "DeadLetterConfig", (properties.DeadLetterConfig != null ? DeadLetterConfigPropertyFromCloudFormation(properties.DeadLetterConfig) : undefined));
@@ -2142,6 +2233,9 @@ function TargetPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudF
   ret.addPropertyResult("sqsParameters", "SqsParameters", (properties.SqsParameters != null ? SqsParametersPropertyFromCloudFormation(properties.SqsParameters) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
 }
 
 /**
@@ -2197,7 +2291,9 @@ function convertCfnSchedulePropsToCloudFormation(properties: any): any {
 // @ts-ignore TS6133
 function CfnSchedulePropsFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnScheduleProps> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnScheduleProps>();
   ret.addPropertyResult("description", "Description", (properties.Description != null ? cfn_parse.FromCloudFormation.getString(properties.Description) : undefined));
   ret.addPropertyResult("endDate", "EndDate", (properties.EndDate != null ? cfn_parse.FromCloudFormation.getString(properties.EndDate) : undefined));
@@ -2387,7 +2483,9 @@ function convertCfnScheduleGroupPropsToCloudFormation(properties: any): any {
 // @ts-ignore TS6133
 function CfnScheduleGroupPropsFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnScheduleGroupProps> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnScheduleGroupProps>();
   ret.addPropertyResult("name", "Name", (properties.Name != null ? cfn_parse.FromCloudFormation.getString(properties.Name) : undefined));
   ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
@@ -2449,7 +2547,7 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
   /**
    * For first-in-first-out (FIFO) queues, specifies whether to enable content-based deduplication.
    */
-  public readonly contentBasedDeduplication?: boolean;
+  public readonly contentBasedDeduplication?: boolean | cdk.IResolvable;
 
   /**
    * For high throughput for FIFO queues, specifies whether message deduplication occurs at the message group or queue level.
@@ -2464,7 +2562,7 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
   /**
    * If set to true, creates a FIFO queue.
    */
-  public readonly fifoQueue?: boolean;
+  public readonly fifoQueue?: boolean | cdk.IResolvable;
 
   /**
    * For high throughput for FIFO queues, specifies whether the FIFO queue throughput quota applies to the entire queue or per message group.
@@ -2484,7 +2582,7 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
   /**
    * Enables server-side queue encryption using SQS owned encryption keys.
    */
-  public readonly sqsManagedSseEnabled?: boolean;
+  public readonly sqsManagedSseEnabled?: boolean | cdk.IResolvable;
 
   /**
    * The limit of how many bytes that a message can contain before Amazon SQS rejects it.
@@ -2509,12 +2607,12 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
   /**
    * The string that includes the parameters for the permissions for the dead-letter queue redrive permission and which source queues can specify dead-letter queues as a JSON object.
    */
-  public readonly redriveAllowPolicy?: any;
+  public readonly redriveAllowPolicy?: any | cdk.IResolvable;
 
   /**
    * The string that includes the parameters for the dead-letter queue functionality of the source queue as a JSON object.
    */
-  public readonly redrivePolicy?: any;
+  public readonly redrivePolicy?: any | cdk.IResolvable;
 
   /**
    * The tags that you attach to this queue.
@@ -2632,7 +2730,7 @@ export interface CfnQueueProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-contentbaseddeduplication
    */
-  readonly contentBasedDeduplication?: boolean;
+  readonly contentBasedDeduplication?: boolean | cdk.IResolvable;
 
   /**
    * For high throughput for FIFO queues, specifies whether message deduplication occurs at the message group or queue level.
@@ -2661,7 +2759,7 @@ export interface CfnQueueProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-fifoqueue
    */
-  readonly fifoQueue?: boolean;
+  readonly fifoQueue?: boolean | cdk.IResolvable;
 
   /**
    * For high throughput for FIFO queues, specifies whether the FIFO queue throughput quota applies to the entire queue or per message group.
@@ -2706,7 +2804,7 @@ export interface CfnQueueProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-sqsmanagedsseenabled
    */
-  readonly sqsManagedSseEnabled?: boolean;
+  readonly sqsManagedSseEnabled?: boolean | cdk.IResolvable;
 
   /**
    * The limit of how many bytes that a message can contain before Amazon SQS rejects it.
@@ -2762,7 +2860,7 @@ export interface CfnQueueProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-redriveallowpolicy
    */
-  readonly redriveAllowPolicy?: any;
+  readonly redriveAllowPolicy?: any | cdk.IResolvable;
 
   /**
    * The string that includes the parameters for the dead-letter queue functionality of the source queue as a JSON object.
@@ -2786,7 +2884,7 @@ export interface CfnQueueProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-redrivepolicy
    */
-  readonly redrivePolicy?: any;
+  readonly redrivePolicy?: any | cdk.IResolvable;
 
   /**
    * The tags that you attach to this queue.
@@ -2871,7 +2969,9 @@ function convertCfnQueuePropsToCloudFormation(properties: any): any {
 // @ts-ignore TS6133
 function CfnQueuePropsFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnQueueProps> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnQueueProps>();
   ret.addPropertyResult("contentBasedDeduplication", "ContentBasedDeduplication", (properties.ContentBasedDeduplication != null ? cfn_parse.FromCloudFormation.getBoolean(properties.ContentBasedDeduplication) : undefined));
   ret.addPropertyResult("deduplicationScope", "DeduplicationScope", (properties.DeduplicationScope != null ? cfn_parse.FromCloudFormation.getString(properties.DeduplicationScope) : undefined));
@@ -2915,7 +3015,7 @@ export class CfnQueuePolicy extends cdk.CfnResource implements cdk.IInspectable 
   /**
    * A policy document that contains the permissions for the specified Amazon SQS queues.
    */
-  public readonly policyDocument: any;
+  public readonly policyDocument: any | cdk.IResolvable;
 
   /**
    * The URLs of the queues to which you want to add the policy.
@@ -2999,7 +3099,7 @@ export interface CfnQueuePolicyProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queuepolicy.html#cfn-sqs-queuepolicy-policydocument
    */
-  readonly policyDocument: any;
+  readonly policyDocument: any | cdk.IResolvable;
 
   /**
    * The URLs of the queues to which you want to add the policy.
@@ -3045,7 +3145,9 @@ function convertCfnQueuePolicyPropsToCloudFormation(properties: any): any {
 // @ts-ignore TS6133
 function CfnQueuePolicyPropsFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnQueuePolicyProps> {
   properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnQueuePolicyProps>();
   ret.addPropertyResult("policyDocument", "PolicyDocument", (properties.PolicyDocument != null ? cfn_parse.FromCloudFormation.getAny(properties.PolicyDocument) : undefined));
   ret.addPropertyResult("queues", "Queues", (properties.Queues != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.Queues) : undefined));
