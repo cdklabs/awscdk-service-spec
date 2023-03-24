@@ -3,6 +3,7 @@ import * as sources from '@aws-cdk/service-spec-sources';
 import { LoadResult, PatchReport } from '@aws-cdk/service-spec-sources';
 import { assertSuccess, Failures, Result } from '@cdklabs/tskb';
 import { Augmentations } from './augmentations';
+import { readCannedMetrics } from './canned-metrics';
 import { readCloudFormationDocumentation } from './cloudformation-docs';
 import {
   readCloudFormationRegistryResource,
@@ -50,6 +51,9 @@ export async function buildDatabase(options: BuildDatabaseOptions = {}) {
 
   const stateful = loadResult(await sources.loadDefaultStatefulResources());
   readStatefulResources(db, stateful, warnings);
+
+  const cloudWatchServiceDirectory = loadResult(await sources.loadDefaultCloudWatchConsoleServiceDirectory());
+  readCannedMetrics(db, cloudWatchServiceDirectory);
 
   new Scrutinies(db).annotate();
   new Augmentations(db).insert();
