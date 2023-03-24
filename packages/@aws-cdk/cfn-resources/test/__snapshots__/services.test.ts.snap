@@ -256,7 +256,7 @@ export interface CfnSkillProps {
  * @returns the result of the validation.
  */
 // @ts-ignore TS6133
-function AuthenticationConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+function CfnSkillAuthenticationConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
   if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
   const errors = new cdk.ValidationResults();
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
@@ -272,9 +272,9 @@ function AuthenticationConfigurationPropertyValidator(properties: any): cdk.Vali
 }
 
 // @ts-ignore TS6133
-function convertAuthenticationConfigurationPropertyToCloudFormation(properties: any): any {
+function convertCfnSkillAuthenticationConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
-  AuthenticationConfigurationPropertyValidator(properties).assertSuccess();
+  CfnSkillAuthenticationConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "ClientId": cdk.stringToCloudFormation(properties.clientId),
     "ClientSecret": cdk.stringToCloudFormation(properties.clientSecret),
@@ -283,7 +283,7 @@ function convertAuthenticationConfigurationPropertyToCloudFormation(properties: 
 }
 
 // @ts-ignore TS6133
-function AuthenticationConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSkill.AuthenticationConfigurationProperty> {
+function CfnSkillAuthenticationConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSkill.AuthenticationConfigurationProperty> {
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSkill.AuthenticationConfigurationProperty>();
@@ -302,7 +302,7 @@ function AuthenticationConfigurationPropertyFromCloudFormation(properties: any):
  * @returns the result of the validation.
  */
 // @ts-ignore TS6133
-function OverridesPropertyValidator(properties: any): cdk.ValidationResult {
+function CfnSkillOverridesPropertyValidator(properties: any): cdk.ValidationResult {
   if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
   const errors = new cdk.ValidationResults();
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
@@ -313,16 +313,16 @@ function OverridesPropertyValidator(properties: any): cdk.ValidationResult {
 }
 
 // @ts-ignore TS6133
-function convertOverridesPropertyToCloudFormation(properties: any): any {
+function convertCfnSkillOverridesPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
-  OverridesPropertyValidator(properties).assertSuccess();
+  CfnSkillOverridesPropertyValidator(properties).assertSuccess();
   return {
     "Manifest": cdk.objectToCloudFormation(properties.manifest)
   };
 }
 
 // @ts-ignore TS6133
-function OverridesPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSkill.OverridesProperty> {
+function CfnSkillOverridesPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSkill.OverridesProperty> {
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSkill.OverridesProperty>();
@@ -339,13 +339,13 @@ function OverridesPropertyFromCloudFormation(properties: any): cfn_parse.FromClo
  * @returns the result of the validation.
  */
 // @ts-ignore TS6133
-function SkillPackagePropertyValidator(properties: any): cdk.ValidationResult {
+function CfnSkillSkillPackagePropertyValidator(properties: any): cdk.ValidationResult {
   if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
   const errors = new cdk.ValidationResults();
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
-  errors.collect(cdk.propertyValidator("overrides", OverridesPropertyValidator)(properties.overrides));
+  errors.collect(cdk.propertyValidator("overrides", CfnSkillOverridesPropertyValidator)(properties.overrides));
   errors.collect(cdk.propertyValidator("s3Bucket", cdk.requiredValidator)(properties.s3Bucket));
   errors.collect(cdk.propertyValidator("s3Bucket", cdk.validateString)(properties.s3Bucket));
   errors.collect(cdk.propertyValidator("s3BucketRole", cdk.validateString)(properties.s3BucketRole));
@@ -356,11 +356,11 @@ function SkillPackagePropertyValidator(properties: any): cdk.ValidationResult {
 }
 
 // @ts-ignore TS6133
-function convertSkillPackagePropertyToCloudFormation(properties: any): any {
+function convertCfnSkillSkillPackagePropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
-  SkillPackagePropertyValidator(properties).assertSuccess();
+  CfnSkillSkillPackagePropertyValidator(properties).assertSuccess();
   return {
-    "Overrides": convertOverridesPropertyToCloudFormation(properties.overrides),
+    "Overrides": convertCfnSkillOverridesPropertyToCloudFormation(properties.overrides),
     "S3Bucket": cdk.stringToCloudFormation(properties.s3Bucket),
     "S3BucketRole": cdk.stringToCloudFormation(properties.s3BucketRole),
     "S3Key": cdk.stringToCloudFormation(properties.s3Key),
@@ -369,11 +369,11 @@ function convertSkillPackagePropertyToCloudFormation(properties: any): any {
 }
 
 // @ts-ignore TS6133
-function SkillPackagePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSkill.SkillPackageProperty> {
+function CfnSkillSkillPackagePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSkill.SkillPackageProperty> {
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSkill.SkillPackageProperty>();
-  ret.addPropertyResult("overrides", "Overrides", (properties.Overrides != null ? OverridesPropertyFromCloudFormation(properties.Overrides) : undefined));
+  ret.addPropertyResult("overrides", "Overrides", (properties.Overrides != null ? CfnSkillOverridesPropertyFromCloudFormation(properties.Overrides) : undefined));
   ret.addPropertyResult("s3Bucket", "S3Bucket", (properties.S3Bucket != null ? cfn_parse.FromCloudFormation.getString(properties.S3Bucket) : undefined));
   ret.addPropertyResult("s3BucketRole", "S3BucketRole", (properties.S3BucketRole != null ? cfn_parse.FromCloudFormation.getString(properties.S3BucketRole) : undefined));
   ret.addPropertyResult("s3Key", "S3Key", (properties.S3Key != null ? cfn_parse.FromCloudFormation.getString(properties.S3Key) : undefined));
@@ -397,9 +397,9 @@ function CfnSkillPropsValidator(properties: any): cdk.ValidationResult {
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
   errors.collect(cdk.propertyValidator("authenticationConfiguration", cdk.requiredValidator)(properties.authenticationConfiguration));
-  errors.collect(cdk.propertyValidator("authenticationConfiguration", AuthenticationConfigurationPropertyValidator)(properties.authenticationConfiguration));
+  errors.collect(cdk.propertyValidator("authenticationConfiguration", CfnSkillAuthenticationConfigurationPropertyValidator)(properties.authenticationConfiguration));
   errors.collect(cdk.propertyValidator("skillPackage", cdk.requiredValidator)(properties.skillPackage));
-  errors.collect(cdk.propertyValidator("skillPackage", SkillPackagePropertyValidator)(properties.skillPackage));
+  errors.collect(cdk.propertyValidator("skillPackage", CfnSkillSkillPackagePropertyValidator)(properties.skillPackage));
   errors.collect(cdk.propertyValidator("vendorId", cdk.requiredValidator)(properties.vendorId));
   errors.collect(cdk.propertyValidator("vendorId", cdk.validateString)(properties.vendorId));
   return errors.wrap("supplied properties not correct for \\"CfnSkillProps\\"");
@@ -410,8 +410,8 @@ function convertCfnSkillPropsToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
   CfnSkillPropsValidator(properties).assertSuccess();
   return {
-    "AuthenticationConfiguration": convertAuthenticationConfigurationPropertyToCloudFormation(properties.authenticationConfiguration),
-    "SkillPackage": convertSkillPackagePropertyToCloudFormation(properties.skillPackage),
+    "AuthenticationConfiguration": convertCfnSkillAuthenticationConfigurationPropertyToCloudFormation(properties.authenticationConfiguration),
+    "SkillPackage": convertCfnSkillSkillPackagePropertyToCloudFormation(properties.skillPackage),
     "VendorId": cdk.stringToCloudFormation(properties.vendorId)
   };
 }
@@ -421,8 +421,8 @@ function CfnSkillPropsFromCloudFormation(properties: any): cfn_parse.FromCloudFo
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSkillProps>();
-  ret.addPropertyResult("authenticationConfiguration", "AuthenticationConfiguration", (properties.AuthenticationConfiguration != null ? AuthenticationConfigurationPropertyFromCloudFormation(properties.AuthenticationConfiguration) : undefined));
-  ret.addPropertyResult("skillPackage", "SkillPackage", (properties.SkillPackage != null ? SkillPackagePropertyFromCloudFormation(properties.SkillPackage) : undefined));
+  ret.addPropertyResult("authenticationConfiguration", "AuthenticationConfiguration", (properties.AuthenticationConfiguration != null ? CfnSkillAuthenticationConfigurationPropertyFromCloudFormation(properties.AuthenticationConfiguration) : undefined));
+  ret.addPropertyResult("skillPackage", "SkillPackage", (properties.SkillPackage != null ? CfnSkillSkillPackagePropertyFromCloudFormation(properties.SkillPackage) : undefined));
   ret.addPropertyResult("vendorId", "VendorId", (properties.VendorId != null ? cfn_parse.FromCloudFormation.getString(properties.VendorId) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
@@ -1490,7 +1490,7 @@ export interface CfnScheduleProps {
  * @returns the result of the validation.
  */
 // @ts-ignore TS6133
-function FlexibleTimeWindowPropertyValidator(properties: any): cdk.ValidationResult {
+function CfnScheduleFlexibleTimeWindowPropertyValidator(properties: any): cdk.ValidationResult {
   if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
   const errors = new cdk.ValidationResults();
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
@@ -1503,9 +1503,9 @@ function FlexibleTimeWindowPropertyValidator(properties: any): cdk.ValidationRes
 }
 
 // @ts-ignore TS6133
-function convertFlexibleTimeWindowPropertyToCloudFormation(properties: any): any {
+function convertCfnScheduleFlexibleTimeWindowPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
-  FlexibleTimeWindowPropertyValidator(properties).assertSuccess();
+  CfnScheduleFlexibleTimeWindowPropertyValidator(properties).assertSuccess();
   return {
     "MaximumWindowInMinutes": cdk.numberToCloudFormation(properties.maximumWindowInMinutes),
     "Mode": cdk.stringToCloudFormation(properties.mode)
@@ -1513,7 +1513,7 @@ function convertFlexibleTimeWindowPropertyToCloudFormation(properties: any): any
 }
 
 // @ts-ignore TS6133
-function FlexibleTimeWindowPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.FlexibleTimeWindowProperty> {
+function CfnScheduleFlexibleTimeWindowPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.FlexibleTimeWindowProperty> {
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.FlexibleTimeWindowProperty>();
@@ -1531,7 +1531,7 @@ function FlexibleTimeWindowPropertyFromCloudFormation(properties: any): cfn_pars
  * @returns the result of the validation.
  */
 // @ts-ignore TS6133
-function DeadLetterConfigPropertyValidator(properties: any): cdk.ValidationResult {
+function CfnScheduleDeadLetterConfigPropertyValidator(properties: any): cdk.ValidationResult {
   if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
   const errors = new cdk.ValidationResults();
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
@@ -1542,16 +1542,16 @@ function DeadLetterConfigPropertyValidator(properties: any): cdk.ValidationResul
 }
 
 // @ts-ignore TS6133
-function convertDeadLetterConfigPropertyToCloudFormation(properties: any): any {
+function convertCfnScheduleDeadLetterConfigPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
-  DeadLetterConfigPropertyValidator(properties).assertSuccess();
+  CfnScheduleDeadLetterConfigPropertyValidator(properties).assertSuccess();
   return {
     "Arn": cdk.stringToCloudFormation(properties.arn)
   };
 }
 
 // @ts-ignore TS6133
-function DeadLetterConfigPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.DeadLetterConfigProperty> {
+function CfnScheduleDeadLetterConfigPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.DeadLetterConfigProperty> {
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.DeadLetterConfigProperty>();
@@ -1568,7 +1568,7 @@ function DeadLetterConfigPropertyFromCloudFormation(properties: any): cfn_parse.
  * @returns the result of the validation.
  */
 // @ts-ignore TS6133
-function RetryPolicyPropertyValidator(properties: any): cdk.ValidationResult {
+function CfnScheduleRetryPolicyPropertyValidator(properties: any): cdk.ValidationResult {
   if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
   const errors = new cdk.ValidationResults();
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
@@ -1580,9 +1580,9 @@ function RetryPolicyPropertyValidator(properties: any): cdk.ValidationResult {
 }
 
 // @ts-ignore TS6133
-function convertRetryPolicyPropertyToCloudFormation(properties: any): any {
+function convertCfnScheduleRetryPolicyPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
-  RetryPolicyPropertyValidator(properties).assertSuccess();
+  CfnScheduleRetryPolicyPropertyValidator(properties).assertSuccess();
   return {
     "MaximumEventAgeInSeconds": cdk.numberToCloudFormation(properties.maximumEventAgeInSeconds),
     "MaximumRetryAttempts": cdk.numberToCloudFormation(properties.maximumRetryAttempts)
@@ -1590,7 +1590,7 @@ function convertRetryPolicyPropertyToCloudFormation(properties: any): any {
 }
 
 // @ts-ignore TS6133
-function RetryPolicyPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.RetryPolicyProperty> {
+function CfnScheduleRetryPolicyPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.RetryPolicyProperty> {
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.RetryPolicyProperty>();
@@ -1608,7 +1608,7 @@ function RetryPolicyPropertyFromCloudFormation(properties: any): cfn_parse.FromC
  * @returns the result of the validation.
  */
 // @ts-ignore TS6133
-function AwsVpcConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+function CfnScheduleAwsVpcConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
   if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
   const errors = new cdk.ValidationResults();
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
@@ -1622,9 +1622,9 @@ function AwsVpcConfigurationPropertyValidator(properties: any): cdk.ValidationRe
 }
 
 // @ts-ignore TS6133
-function convertAwsVpcConfigurationPropertyToCloudFormation(properties: any): any {
+function convertCfnScheduleAwsVpcConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
-  AwsVpcConfigurationPropertyValidator(properties).assertSuccess();
+  CfnScheduleAwsVpcConfigurationPropertyValidator(properties).assertSuccess();
   return {
     "AssignPublicIp": cdk.stringToCloudFormation(properties.assignPublicIp),
     "SecurityGroups": cdk.listMapper(cdk.stringToCloudFormation)(properties.securityGroups),
@@ -1633,7 +1633,7 @@ function convertAwsVpcConfigurationPropertyToCloudFormation(properties: any): an
 }
 
 // @ts-ignore TS6133
-function AwsVpcConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.AwsVpcConfigurationProperty> {
+function CfnScheduleAwsVpcConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.AwsVpcConfigurationProperty> {
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.AwsVpcConfigurationProperty>();
@@ -1652,31 +1652,31 @@ function AwsVpcConfigurationPropertyFromCloudFormation(properties: any): cfn_par
  * @returns the result of the validation.
  */
 // @ts-ignore TS6133
-function NetworkConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+function CfnScheduleNetworkConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
   if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
   const errors = new cdk.ValidationResults();
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
-  errors.collect(cdk.propertyValidator("awsvpcConfiguration", AwsVpcConfigurationPropertyValidator)(properties.awsvpcConfiguration));
+  errors.collect(cdk.propertyValidator("awsvpcConfiguration", CfnScheduleAwsVpcConfigurationPropertyValidator)(properties.awsvpcConfiguration));
   return errors.wrap("supplied properties not correct for \\"NetworkConfigurationProperty\\"");
 }
 
 // @ts-ignore TS6133
-function convertNetworkConfigurationPropertyToCloudFormation(properties: any): any {
+function convertCfnScheduleNetworkConfigurationPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
-  NetworkConfigurationPropertyValidator(properties).assertSuccess();
+  CfnScheduleNetworkConfigurationPropertyValidator(properties).assertSuccess();
   return {
-    "AwsvpcConfiguration": convertAwsVpcConfigurationPropertyToCloudFormation(properties.awsvpcConfiguration)
+    "AwsvpcConfiguration": convertCfnScheduleAwsVpcConfigurationPropertyToCloudFormation(properties.awsvpcConfiguration)
   };
 }
 
 // @ts-ignore TS6133
-function NetworkConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.NetworkConfigurationProperty> {
+function CfnScheduleNetworkConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.NetworkConfigurationProperty> {
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.NetworkConfigurationProperty>();
-  ret.addPropertyResult("awsvpcConfiguration", "AwsvpcConfiguration", (properties.AwsvpcConfiguration != null ? AwsVpcConfigurationPropertyFromCloudFormation(properties.AwsvpcConfiguration) : undefined));
+  ret.addPropertyResult("awsvpcConfiguration", "AwsvpcConfiguration", (properties.AwsvpcConfiguration != null ? CfnScheduleAwsVpcConfigurationPropertyFromCloudFormation(properties.AwsvpcConfiguration) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -1689,7 +1689,7 @@ function NetworkConfigurationPropertyFromCloudFormation(properties: any): cfn_pa
  * @returns the result of the validation.
  */
 // @ts-ignore TS6133
-function CapacityProviderStrategyItemPropertyValidator(properties: any): cdk.ValidationResult {
+function CfnScheduleCapacityProviderStrategyItemPropertyValidator(properties: any): cdk.ValidationResult {
   if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
   const errors = new cdk.ValidationResults();
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
@@ -1703,9 +1703,9 @@ function CapacityProviderStrategyItemPropertyValidator(properties: any): cdk.Val
 }
 
 // @ts-ignore TS6133
-function convertCapacityProviderStrategyItemPropertyToCloudFormation(properties: any): any {
+function convertCfnScheduleCapacityProviderStrategyItemPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
-  CapacityProviderStrategyItemPropertyValidator(properties).assertSuccess();
+  CfnScheduleCapacityProviderStrategyItemPropertyValidator(properties).assertSuccess();
   return {
     "Base": cdk.numberToCloudFormation(properties.base),
     "CapacityProvider": cdk.stringToCloudFormation(properties.capacityProvider),
@@ -1714,7 +1714,7 @@ function convertCapacityProviderStrategyItemPropertyToCloudFormation(properties:
 }
 
 // @ts-ignore TS6133
-function CapacityProviderStrategyItemPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.CapacityProviderStrategyItemProperty> {
+function CfnScheduleCapacityProviderStrategyItemPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.CapacityProviderStrategyItemProperty> {
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.CapacityProviderStrategyItemProperty>();
@@ -1733,7 +1733,7 @@ function CapacityProviderStrategyItemPropertyFromCloudFormation(properties: any)
  * @returns the result of the validation.
  */
 // @ts-ignore TS6133
-function PlacementConstraintPropertyValidator(properties: any): cdk.ValidationResult {
+function CfnSchedulePlacementConstraintPropertyValidator(properties: any): cdk.ValidationResult {
   if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
   const errors = new cdk.ValidationResults();
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
@@ -1745,9 +1745,9 @@ function PlacementConstraintPropertyValidator(properties: any): cdk.ValidationRe
 }
 
 // @ts-ignore TS6133
-function convertPlacementConstraintPropertyToCloudFormation(properties: any): any {
+function convertCfnSchedulePlacementConstraintPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
-  PlacementConstraintPropertyValidator(properties).assertSuccess();
+  CfnSchedulePlacementConstraintPropertyValidator(properties).assertSuccess();
   return {
     "Expression": cdk.stringToCloudFormation(properties.expression),
     "Type": cdk.stringToCloudFormation(properties.type)
@@ -1755,7 +1755,7 @@ function convertPlacementConstraintPropertyToCloudFormation(properties: any): an
 }
 
 // @ts-ignore TS6133
-function PlacementConstraintPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.PlacementConstraintProperty> {
+function CfnSchedulePlacementConstraintPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.PlacementConstraintProperty> {
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.PlacementConstraintProperty>();
@@ -1773,7 +1773,7 @@ function PlacementConstraintPropertyFromCloudFormation(properties: any): cfn_par
  * @returns the result of the validation.
  */
 // @ts-ignore TS6133
-function PlacementStrategyPropertyValidator(properties: any): cdk.ValidationResult {
+function CfnSchedulePlacementStrategyPropertyValidator(properties: any): cdk.ValidationResult {
   if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
   const errors = new cdk.ValidationResults();
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
@@ -1785,9 +1785,9 @@ function PlacementStrategyPropertyValidator(properties: any): cdk.ValidationResu
 }
 
 // @ts-ignore TS6133
-function convertPlacementStrategyPropertyToCloudFormation(properties: any): any {
+function convertCfnSchedulePlacementStrategyPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
-  PlacementStrategyPropertyValidator(properties).assertSuccess();
+  CfnSchedulePlacementStrategyPropertyValidator(properties).assertSuccess();
   return {
     "Field": cdk.stringToCloudFormation(properties.field),
     "Type": cdk.stringToCloudFormation(properties.type)
@@ -1795,7 +1795,7 @@ function convertPlacementStrategyPropertyToCloudFormation(properties: any): any 
 }
 
 // @ts-ignore TS6133
-function PlacementStrategyPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.PlacementStrategyProperty> {
+function CfnSchedulePlacementStrategyPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.PlacementStrategyProperty> {
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.PlacementStrategyProperty>();
@@ -1813,20 +1813,20 @@ function PlacementStrategyPropertyFromCloudFormation(properties: any): cfn_parse
  * @returns the result of the validation.
  */
 // @ts-ignore TS6133
-function EcsParametersPropertyValidator(properties: any): cdk.ValidationResult {
+function CfnScheduleEcsParametersPropertyValidator(properties: any): cdk.ValidationResult {
   if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
   const errors = new cdk.ValidationResults();
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
-  errors.collect(cdk.propertyValidator("capacityProviderStrategy", cdk.listValidator(CapacityProviderStrategyItemPropertyValidator))(properties.capacityProviderStrategy));
+  errors.collect(cdk.propertyValidator("capacityProviderStrategy", cdk.listValidator(CfnScheduleCapacityProviderStrategyItemPropertyValidator))(properties.capacityProviderStrategy));
   errors.collect(cdk.propertyValidator("enableEcsManagedTags", cdk.validateBoolean)(properties.enableEcsManagedTags));
   errors.collect(cdk.propertyValidator("enableExecuteCommand", cdk.validateBoolean)(properties.enableExecuteCommand));
   errors.collect(cdk.propertyValidator("group", cdk.validateString)(properties.group));
   errors.collect(cdk.propertyValidator("launchType", cdk.validateString)(properties.launchType));
-  errors.collect(cdk.propertyValidator("networkConfiguration", NetworkConfigurationPropertyValidator)(properties.networkConfiguration));
-  errors.collect(cdk.propertyValidator("placementConstraints", cdk.listValidator(PlacementConstraintPropertyValidator))(properties.placementConstraints));
-  errors.collect(cdk.propertyValidator("placementStrategy", cdk.listValidator(PlacementStrategyPropertyValidator))(properties.placementStrategy));
+  errors.collect(cdk.propertyValidator("networkConfiguration", CfnScheduleNetworkConfigurationPropertyValidator)(properties.networkConfiguration));
+  errors.collect(cdk.propertyValidator("placementConstraints", cdk.listValidator(CfnSchedulePlacementConstraintPropertyValidator))(properties.placementConstraints));
+  errors.collect(cdk.propertyValidator("placementStrategy", cdk.listValidator(CfnSchedulePlacementStrategyPropertyValidator))(properties.placementStrategy));
   errors.collect(cdk.propertyValidator("platformVersion", cdk.validateString)(properties.platformVersion));
   errors.collect(cdk.propertyValidator("propagateTags", cdk.validateString)(properties.propagateTags));
   errors.collect(cdk.propertyValidator("referenceId", cdk.validateString)(properties.referenceId));
@@ -1838,18 +1838,18 @@ function EcsParametersPropertyValidator(properties: any): cdk.ValidationResult {
 }
 
 // @ts-ignore TS6133
-function convertEcsParametersPropertyToCloudFormation(properties: any): any {
+function convertCfnScheduleEcsParametersPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
-  EcsParametersPropertyValidator(properties).assertSuccess();
+  CfnScheduleEcsParametersPropertyValidator(properties).assertSuccess();
   return {
-    "CapacityProviderStrategy": cdk.listMapper(convertCapacityProviderStrategyItemPropertyToCloudFormation)(properties.capacityProviderStrategy),
+    "CapacityProviderStrategy": cdk.listMapper(convertCfnScheduleCapacityProviderStrategyItemPropertyToCloudFormation)(properties.capacityProviderStrategy),
     "EnableECSManagedTags": cdk.booleanToCloudFormation(properties.enableEcsManagedTags),
     "EnableExecuteCommand": cdk.booleanToCloudFormation(properties.enableExecuteCommand),
     "Group": cdk.stringToCloudFormation(properties.group),
     "LaunchType": cdk.stringToCloudFormation(properties.launchType),
-    "NetworkConfiguration": convertNetworkConfigurationPropertyToCloudFormation(properties.networkConfiguration),
-    "PlacementConstraints": cdk.listMapper(convertPlacementConstraintPropertyToCloudFormation)(properties.placementConstraints),
-    "PlacementStrategy": cdk.listMapper(convertPlacementStrategyPropertyToCloudFormation)(properties.placementStrategy),
+    "NetworkConfiguration": convertCfnScheduleNetworkConfigurationPropertyToCloudFormation(properties.networkConfiguration),
+    "PlacementConstraints": cdk.listMapper(convertCfnSchedulePlacementConstraintPropertyToCloudFormation)(properties.placementConstraints),
+    "PlacementStrategy": cdk.listMapper(convertCfnSchedulePlacementStrategyPropertyToCloudFormation)(properties.placementStrategy),
     "PlatformVersion": cdk.stringToCloudFormation(properties.platformVersion),
     "PropagateTags": cdk.stringToCloudFormation(properties.propagateTags),
     "ReferenceId": cdk.stringToCloudFormation(properties.referenceId),
@@ -1860,18 +1860,18 @@ function convertEcsParametersPropertyToCloudFormation(properties: any): any {
 }
 
 // @ts-ignore TS6133
-function EcsParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.EcsParametersProperty> {
+function CfnScheduleEcsParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.EcsParametersProperty> {
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.EcsParametersProperty>();
-  ret.addPropertyResult("capacityProviderStrategy", "CapacityProviderStrategy", (properties.CapacityProviderStrategy != null ? cfn_parse.FromCloudFormation.getArray(CapacityProviderStrategyItemPropertyFromCloudFormation)(properties.CapacityProviderStrategy) : undefined));
+  ret.addPropertyResult("capacityProviderStrategy", "CapacityProviderStrategy", (properties.CapacityProviderStrategy != null ? cfn_parse.FromCloudFormation.getArray(CfnScheduleCapacityProviderStrategyItemPropertyFromCloudFormation)(properties.CapacityProviderStrategy) : undefined));
   ret.addPropertyResult("enableEcsManagedTags", "EnableECSManagedTags", (properties.EnableECSManagedTags != null ? cfn_parse.FromCloudFormation.getBoolean(properties.EnableECSManagedTags) : undefined));
   ret.addPropertyResult("enableExecuteCommand", "EnableExecuteCommand", (properties.EnableExecuteCommand != null ? cfn_parse.FromCloudFormation.getBoolean(properties.EnableExecuteCommand) : undefined));
   ret.addPropertyResult("group", "Group", (properties.Group != null ? cfn_parse.FromCloudFormation.getString(properties.Group) : undefined));
   ret.addPropertyResult("launchType", "LaunchType", (properties.LaunchType != null ? cfn_parse.FromCloudFormation.getString(properties.LaunchType) : undefined));
-  ret.addPropertyResult("networkConfiguration", "NetworkConfiguration", (properties.NetworkConfiguration != null ? NetworkConfigurationPropertyFromCloudFormation(properties.NetworkConfiguration) : undefined));
-  ret.addPropertyResult("placementConstraints", "PlacementConstraints", (properties.PlacementConstraints != null ? cfn_parse.FromCloudFormation.getArray(PlacementConstraintPropertyFromCloudFormation)(properties.PlacementConstraints) : undefined));
-  ret.addPropertyResult("placementStrategy", "PlacementStrategy", (properties.PlacementStrategy != null ? cfn_parse.FromCloudFormation.getArray(PlacementStrategyPropertyFromCloudFormation)(properties.PlacementStrategy) : undefined));
+  ret.addPropertyResult("networkConfiguration", "NetworkConfiguration", (properties.NetworkConfiguration != null ? CfnScheduleNetworkConfigurationPropertyFromCloudFormation(properties.NetworkConfiguration) : undefined));
+  ret.addPropertyResult("placementConstraints", "PlacementConstraints", (properties.PlacementConstraints != null ? cfn_parse.FromCloudFormation.getArray(CfnSchedulePlacementConstraintPropertyFromCloudFormation)(properties.PlacementConstraints) : undefined));
+  ret.addPropertyResult("placementStrategy", "PlacementStrategy", (properties.PlacementStrategy != null ? cfn_parse.FromCloudFormation.getArray(CfnSchedulePlacementStrategyPropertyFromCloudFormation)(properties.PlacementStrategy) : undefined));
   ret.addPropertyResult("platformVersion", "PlatformVersion", (properties.PlatformVersion != null ? cfn_parse.FromCloudFormation.getString(properties.PlatformVersion) : undefined));
   ret.addPropertyResult("propagateTags", "PropagateTags", (properties.PropagateTags != null ? cfn_parse.FromCloudFormation.getString(properties.PropagateTags) : undefined));
   ret.addPropertyResult("referenceId", "ReferenceId", (properties.ReferenceId != null ? cfn_parse.FromCloudFormation.getString(properties.ReferenceId) : undefined));
@@ -1890,7 +1890,7 @@ function EcsParametersPropertyFromCloudFormation(properties: any): cfn_parse.Fro
  * @returns the result of the validation.
  */
 // @ts-ignore TS6133
-function EventBridgeParametersPropertyValidator(properties: any): cdk.ValidationResult {
+function CfnScheduleEventBridgeParametersPropertyValidator(properties: any): cdk.ValidationResult {
   if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
   const errors = new cdk.ValidationResults();
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
@@ -1904,9 +1904,9 @@ function EventBridgeParametersPropertyValidator(properties: any): cdk.Validation
 }
 
 // @ts-ignore TS6133
-function convertEventBridgeParametersPropertyToCloudFormation(properties: any): any {
+function convertCfnScheduleEventBridgeParametersPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
-  EventBridgeParametersPropertyValidator(properties).assertSuccess();
+  CfnScheduleEventBridgeParametersPropertyValidator(properties).assertSuccess();
   return {
     "DetailType": cdk.stringToCloudFormation(properties.detailType),
     "Source": cdk.stringToCloudFormation(properties.source)
@@ -1914,7 +1914,7 @@ function convertEventBridgeParametersPropertyToCloudFormation(properties: any): 
 }
 
 // @ts-ignore TS6133
-function EventBridgeParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.EventBridgeParametersProperty> {
+function CfnScheduleEventBridgeParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.EventBridgeParametersProperty> {
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.EventBridgeParametersProperty>();
@@ -1932,7 +1932,7 @@ function EventBridgeParametersPropertyFromCloudFormation(properties: any): cfn_p
  * @returns the result of the validation.
  */
 // @ts-ignore TS6133
-function KinesisParametersPropertyValidator(properties: any): cdk.ValidationResult {
+function CfnScheduleKinesisParametersPropertyValidator(properties: any): cdk.ValidationResult {
   if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
   const errors = new cdk.ValidationResults();
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
@@ -1944,16 +1944,16 @@ function KinesisParametersPropertyValidator(properties: any): cdk.ValidationResu
 }
 
 // @ts-ignore TS6133
-function convertKinesisParametersPropertyToCloudFormation(properties: any): any {
+function convertCfnScheduleKinesisParametersPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
-  KinesisParametersPropertyValidator(properties).assertSuccess();
+  CfnScheduleKinesisParametersPropertyValidator(properties).assertSuccess();
   return {
     "PartitionKey": cdk.stringToCloudFormation(properties.partitionKey)
   };
 }
 
 // @ts-ignore TS6133
-function KinesisParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.KinesisParametersProperty> {
+function CfnScheduleKinesisParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.KinesisParametersProperty> {
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.KinesisParametersProperty>();
@@ -1970,7 +1970,7 @@ function KinesisParametersPropertyFromCloudFormation(properties: any): cfn_parse
  * @returns the result of the validation.
  */
 // @ts-ignore TS6133
-function SageMakerPipelineParameterPropertyValidator(properties: any): cdk.ValidationResult {
+function CfnScheduleSageMakerPipelineParameterPropertyValidator(properties: any): cdk.ValidationResult {
   if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
   const errors = new cdk.ValidationResults();
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
@@ -1984,9 +1984,9 @@ function SageMakerPipelineParameterPropertyValidator(properties: any): cdk.Valid
 }
 
 // @ts-ignore TS6133
-function convertSageMakerPipelineParameterPropertyToCloudFormation(properties: any): any {
+function convertCfnScheduleSageMakerPipelineParameterPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
-  SageMakerPipelineParameterPropertyValidator(properties).assertSuccess();
+  CfnScheduleSageMakerPipelineParameterPropertyValidator(properties).assertSuccess();
   return {
     "Name": cdk.stringToCloudFormation(properties.name),
     "Value": cdk.stringToCloudFormation(properties.value)
@@ -1994,7 +1994,7 @@ function convertSageMakerPipelineParameterPropertyToCloudFormation(properties: a
 }
 
 // @ts-ignore TS6133
-function SageMakerPipelineParameterPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.SageMakerPipelineParameterProperty> {
+function CfnScheduleSageMakerPipelineParameterPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.SageMakerPipelineParameterProperty> {
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.SageMakerPipelineParameterProperty>();
@@ -2012,31 +2012,31 @@ function SageMakerPipelineParameterPropertyFromCloudFormation(properties: any): 
  * @returns the result of the validation.
  */
 // @ts-ignore TS6133
-function SageMakerPipelineParametersPropertyValidator(properties: any): cdk.ValidationResult {
+function CfnScheduleSageMakerPipelineParametersPropertyValidator(properties: any): cdk.ValidationResult {
   if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
   const errors = new cdk.ValidationResults();
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
-  errors.collect(cdk.propertyValidator("pipelineParameterList", cdk.listValidator(SageMakerPipelineParameterPropertyValidator))(properties.pipelineParameterList));
+  errors.collect(cdk.propertyValidator("pipelineParameterList", cdk.listValidator(CfnScheduleSageMakerPipelineParameterPropertyValidator))(properties.pipelineParameterList));
   return errors.wrap("supplied properties not correct for \\"SageMakerPipelineParametersProperty\\"");
 }
 
 // @ts-ignore TS6133
-function convertSageMakerPipelineParametersPropertyToCloudFormation(properties: any): any {
+function convertCfnScheduleSageMakerPipelineParametersPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
-  SageMakerPipelineParametersPropertyValidator(properties).assertSuccess();
+  CfnScheduleSageMakerPipelineParametersPropertyValidator(properties).assertSuccess();
   return {
-    "PipelineParameterList": cdk.listMapper(convertSageMakerPipelineParameterPropertyToCloudFormation)(properties.pipelineParameterList)
+    "PipelineParameterList": cdk.listMapper(convertCfnScheduleSageMakerPipelineParameterPropertyToCloudFormation)(properties.pipelineParameterList)
   };
 }
 
 // @ts-ignore TS6133
-function SageMakerPipelineParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.SageMakerPipelineParametersProperty> {
+function CfnScheduleSageMakerPipelineParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.SageMakerPipelineParametersProperty> {
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.SageMakerPipelineParametersProperty>();
-  ret.addPropertyResult("pipelineParameterList", "PipelineParameterList", (properties.PipelineParameterList != null ? cfn_parse.FromCloudFormation.getArray(SageMakerPipelineParameterPropertyFromCloudFormation)(properties.PipelineParameterList) : undefined));
+  ret.addPropertyResult("pipelineParameterList", "PipelineParameterList", (properties.PipelineParameterList != null ? cfn_parse.FromCloudFormation.getArray(CfnScheduleSageMakerPipelineParameterPropertyFromCloudFormation)(properties.PipelineParameterList) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -2049,7 +2049,7 @@ function SageMakerPipelineParametersPropertyFromCloudFormation(properties: any):
  * @returns the result of the validation.
  */
 // @ts-ignore TS6133
-function SqsParametersPropertyValidator(properties: any): cdk.ValidationResult {
+function CfnScheduleSqsParametersPropertyValidator(properties: any): cdk.ValidationResult {
   if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
   const errors = new cdk.ValidationResults();
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
@@ -2060,16 +2060,16 @@ function SqsParametersPropertyValidator(properties: any): cdk.ValidationResult {
 }
 
 // @ts-ignore TS6133
-function convertSqsParametersPropertyToCloudFormation(properties: any): any {
+function convertCfnScheduleSqsParametersPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
-  SqsParametersPropertyValidator(properties).assertSuccess();
+  CfnScheduleSqsParametersPropertyValidator(properties).assertSuccess();
   return {
     "MessageGroupId": cdk.stringToCloudFormation(properties.messageGroupId)
   };
 }
 
 // @ts-ignore TS6133
-function SqsParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.SqsParametersProperty> {
+function CfnScheduleSqsParametersPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.SqsParametersProperty> {
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.SqsParametersProperty>();
@@ -2086,7 +2086,7 @@ function SqsParametersPropertyFromCloudFormation(properties: any): cfn_parse.Fro
  * @returns the result of the validation.
  */
 // @ts-ignore TS6133
-function TargetPropertyValidator(properties: any): cdk.ValidationResult {
+function CfnScheduleTargetPropertyValidator(properties: any): cdk.ValidationResult {
   if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
   const errors = new cdk.ValidationResults();
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
@@ -2094,52 +2094,52 @@ function TargetPropertyValidator(properties: any): cdk.ValidationResult {
   }
   errors.collect(cdk.propertyValidator("arn", cdk.requiredValidator)(properties.arn));
   errors.collect(cdk.propertyValidator("arn", cdk.validateString)(properties.arn));
-  errors.collect(cdk.propertyValidator("deadLetterConfig", DeadLetterConfigPropertyValidator)(properties.deadLetterConfig));
-  errors.collect(cdk.propertyValidator("ecsParameters", EcsParametersPropertyValidator)(properties.ecsParameters));
-  errors.collect(cdk.propertyValidator("eventBridgeParameters", EventBridgeParametersPropertyValidator)(properties.eventBridgeParameters));
+  errors.collect(cdk.propertyValidator("deadLetterConfig", CfnScheduleDeadLetterConfigPropertyValidator)(properties.deadLetterConfig));
+  errors.collect(cdk.propertyValidator("ecsParameters", CfnScheduleEcsParametersPropertyValidator)(properties.ecsParameters));
+  errors.collect(cdk.propertyValidator("eventBridgeParameters", CfnScheduleEventBridgeParametersPropertyValidator)(properties.eventBridgeParameters));
   errors.collect(cdk.propertyValidator("input", cdk.validateString)(properties.input));
-  errors.collect(cdk.propertyValidator("kinesisParameters", KinesisParametersPropertyValidator)(properties.kinesisParameters));
-  errors.collect(cdk.propertyValidator("retryPolicy", RetryPolicyPropertyValidator)(properties.retryPolicy));
+  errors.collect(cdk.propertyValidator("kinesisParameters", CfnScheduleKinesisParametersPropertyValidator)(properties.kinesisParameters));
+  errors.collect(cdk.propertyValidator("retryPolicy", CfnScheduleRetryPolicyPropertyValidator)(properties.retryPolicy));
   errors.collect(cdk.propertyValidator("roleArn", cdk.requiredValidator)(properties.roleArn));
   errors.collect(cdk.propertyValidator("roleArn", cdk.validateString)(properties.roleArn));
-  errors.collect(cdk.propertyValidator("sageMakerPipelineParameters", SageMakerPipelineParametersPropertyValidator)(properties.sageMakerPipelineParameters));
-  errors.collect(cdk.propertyValidator("sqsParameters", SqsParametersPropertyValidator)(properties.sqsParameters));
+  errors.collect(cdk.propertyValidator("sageMakerPipelineParameters", CfnScheduleSageMakerPipelineParametersPropertyValidator)(properties.sageMakerPipelineParameters));
+  errors.collect(cdk.propertyValidator("sqsParameters", CfnScheduleSqsParametersPropertyValidator)(properties.sqsParameters));
   return errors.wrap("supplied properties not correct for \\"TargetProperty\\"");
 }
 
 // @ts-ignore TS6133
-function convertTargetPropertyToCloudFormation(properties: any): any {
+function convertCfnScheduleTargetPropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
-  TargetPropertyValidator(properties).assertSuccess();
+  CfnScheduleTargetPropertyValidator(properties).assertSuccess();
   return {
     "Arn": cdk.stringToCloudFormation(properties.arn),
-    "DeadLetterConfig": convertDeadLetterConfigPropertyToCloudFormation(properties.deadLetterConfig),
-    "EcsParameters": convertEcsParametersPropertyToCloudFormation(properties.ecsParameters),
-    "EventBridgeParameters": convertEventBridgeParametersPropertyToCloudFormation(properties.eventBridgeParameters),
+    "DeadLetterConfig": convertCfnScheduleDeadLetterConfigPropertyToCloudFormation(properties.deadLetterConfig),
+    "EcsParameters": convertCfnScheduleEcsParametersPropertyToCloudFormation(properties.ecsParameters),
+    "EventBridgeParameters": convertCfnScheduleEventBridgeParametersPropertyToCloudFormation(properties.eventBridgeParameters),
     "Input": cdk.stringToCloudFormation(properties.input),
-    "KinesisParameters": convertKinesisParametersPropertyToCloudFormation(properties.kinesisParameters),
-    "RetryPolicy": convertRetryPolicyPropertyToCloudFormation(properties.retryPolicy),
+    "KinesisParameters": convertCfnScheduleKinesisParametersPropertyToCloudFormation(properties.kinesisParameters),
+    "RetryPolicy": convertCfnScheduleRetryPolicyPropertyToCloudFormation(properties.retryPolicy),
     "RoleArn": cdk.stringToCloudFormation(properties.roleArn),
-    "SageMakerPipelineParameters": convertSageMakerPipelineParametersPropertyToCloudFormation(properties.sageMakerPipelineParameters),
-    "SqsParameters": convertSqsParametersPropertyToCloudFormation(properties.sqsParameters)
+    "SageMakerPipelineParameters": convertCfnScheduleSageMakerPipelineParametersPropertyToCloudFormation(properties.sageMakerPipelineParameters),
+    "SqsParameters": convertCfnScheduleSqsParametersPropertyToCloudFormation(properties.sqsParameters)
   };
 }
 
 // @ts-ignore TS6133
-function TargetPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.TargetProperty> {
+function CfnScheduleTargetPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnSchedule.TargetProperty> {
   properties = ((properties == null) ? {} : properties);
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) return new cfn_parse.FromCloudFormationResult(properties);
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSchedule.TargetProperty>();
   ret.addPropertyResult("arn", "Arn", (properties.Arn != null ? cfn_parse.FromCloudFormation.getString(properties.Arn) : undefined));
-  ret.addPropertyResult("deadLetterConfig", "DeadLetterConfig", (properties.DeadLetterConfig != null ? DeadLetterConfigPropertyFromCloudFormation(properties.DeadLetterConfig) : undefined));
-  ret.addPropertyResult("ecsParameters", "EcsParameters", (properties.EcsParameters != null ? EcsParametersPropertyFromCloudFormation(properties.EcsParameters) : undefined));
-  ret.addPropertyResult("eventBridgeParameters", "EventBridgeParameters", (properties.EventBridgeParameters != null ? EventBridgeParametersPropertyFromCloudFormation(properties.EventBridgeParameters) : undefined));
+  ret.addPropertyResult("deadLetterConfig", "DeadLetterConfig", (properties.DeadLetterConfig != null ? CfnScheduleDeadLetterConfigPropertyFromCloudFormation(properties.DeadLetterConfig) : undefined));
+  ret.addPropertyResult("ecsParameters", "EcsParameters", (properties.EcsParameters != null ? CfnScheduleEcsParametersPropertyFromCloudFormation(properties.EcsParameters) : undefined));
+  ret.addPropertyResult("eventBridgeParameters", "EventBridgeParameters", (properties.EventBridgeParameters != null ? CfnScheduleEventBridgeParametersPropertyFromCloudFormation(properties.EventBridgeParameters) : undefined));
   ret.addPropertyResult("input", "Input", (properties.Input != null ? cfn_parse.FromCloudFormation.getString(properties.Input) : undefined));
-  ret.addPropertyResult("kinesisParameters", "KinesisParameters", (properties.KinesisParameters != null ? KinesisParametersPropertyFromCloudFormation(properties.KinesisParameters) : undefined));
-  ret.addPropertyResult("retryPolicy", "RetryPolicy", (properties.RetryPolicy != null ? RetryPolicyPropertyFromCloudFormation(properties.RetryPolicy) : undefined));
+  ret.addPropertyResult("kinesisParameters", "KinesisParameters", (properties.KinesisParameters != null ? CfnScheduleKinesisParametersPropertyFromCloudFormation(properties.KinesisParameters) : undefined));
+  ret.addPropertyResult("retryPolicy", "RetryPolicy", (properties.RetryPolicy != null ? CfnScheduleRetryPolicyPropertyFromCloudFormation(properties.RetryPolicy) : undefined));
   ret.addPropertyResult("roleArn", "RoleArn", (properties.RoleArn != null ? cfn_parse.FromCloudFormation.getString(properties.RoleArn) : undefined));
-  ret.addPropertyResult("sageMakerPipelineParameters", "SageMakerPipelineParameters", (properties.SageMakerPipelineParameters != null ? SageMakerPipelineParametersPropertyFromCloudFormation(properties.SageMakerPipelineParameters) : undefined));
-  ret.addPropertyResult("sqsParameters", "SqsParameters", (properties.SqsParameters != null ? SqsParametersPropertyFromCloudFormation(properties.SqsParameters) : undefined));
+  ret.addPropertyResult("sageMakerPipelineParameters", "SageMakerPipelineParameters", (properties.SageMakerPipelineParameters != null ? CfnScheduleSageMakerPipelineParametersPropertyFromCloudFormation(properties.SageMakerPipelineParameters) : undefined));
+  ret.addPropertyResult("sqsParameters", "SqsParameters", (properties.SqsParameters != null ? CfnScheduleSqsParametersPropertyFromCloudFormation(properties.SqsParameters) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -2161,7 +2161,7 @@ function CfnSchedulePropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("description", cdk.validateString)(properties.description));
   errors.collect(cdk.propertyValidator("endDate", cdk.validateString)(properties.endDate));
   errors.collect(cdk.propertyValidator("flexibleTimeWindow", cdk.requiredValidator)(properties.flexibleTimeWindow));
-  errors.collect(cdk.propertyValidator("flexibleTimeWindow", FlexibleTimeWindowPropertyValidator)(properties.flexibleTimeWindow));
+  errors.collect(cdk.propertyValidator("flexibleTimeWindow", CfnScheduleFlexibleTimeWindowPropertyValidator)(properties.flexibleTimeWindow));
   errors.collect(cdk.propertyValidator("groupName", cdk.validateString)(properties.groupName));
   errors.collect(cdk.propertyValidator("kmsKeyArn", cdk.validateString)(properties.kmsKeyArn));
   errors.collect(cdk.propertyValidator("name", cdk.validateString)(properties.name));
@@ -2171,7 +2171,7 @@ function CfnSchedulePropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("startDate", cdk.validateString)(properties.startDate));
   errors.collect(cdk.propertyValidator("state", cdk.validateString)(properties.state));
   errors.collect(cdk.propertyValidator("target", cdk.requiredValidator)(properties.target));
-  errors.collect(cdk.propertyValidator("target", TargetPropertyValidator)(properties.target));
+  errors.collect(cdk.propertyValidator("target", CfnScheduleTargetPropertyValidator)(properties.target));
   return errors.wrap("supplied properties not correct for \\"CfnScheduleProps\\"");
 }
 
@@ -2182,7 +2182,7 @@ function convertCfnSchedulePropsToCloudFormation(properties: any): any {
   return {
     "Description": cdk.stringToCloudFormation(properties.description),
     "EndDate": cdk.stringToCloudFormation(properties.endDate),
-    "FlexibleTimeWindow": convertFlexibleTimeWindowPropertyToCloudFormation(properties.flexibleTimeWindow),
+    "FlexibleTimeWindow": convertCfnScheduleFlexibleTimeWindowPropertyToCloudFormation(properties.flexibleTimeWindow),
     "GroupName": cdk.stringToCloudFormation(properties.groupName),
     "KmsKeyArn": cdk.stringToCloudFormation(properties.kmsKeyArn),
     "Name": cdk.stringToCloudFormation(properties.name),
@@ -2190,7 +2190,7 @@ function convertCfnSchedulePropsToCloudFormation(properties: any): any {
     "ScheduleExpressionTimezone": cdk.stringToCloudFormation(properties.scheduleExpressionTimezone),
     "StartDate": cdk.stringToCloudFormation(properties.startDate),
     "State": cdk.stringToCloudFormation(properties.state),
-    "Target": convertTargetPropertyToCloudFormation(properties.target)
+    "Target": convertCfnScheduleTargetPropertyToCloudFormation(properties.target)
   };
 }
 
@@ -2201,7 +2201,7 @@ function CfnSchedulePropsFromCloudFormation(properties: any): cfn_parse.FromClou
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnScheduleProps>();
   ret.addPropertyResult("description", "Description", (properties.Description != null ? cfn_parse.FromCloudFormation.getString(properties.Description) : undefined));
   ret.addPropertyResult("endDate", "EndDate", (properties.EndDate != null ? cfn_parse.FromCloudFormation.getString(properties.EndDate) : undefined));
-  ret.addPropertyResult("flexibleTimeWindow", "FlexibleTimeWindow", (properties.FlexibleTimeWindow != null ? FlexibleTimeWindowPropertyFromCloudFormation(properties.FlexibleTimeWindow) : undefined));
+  ret.addPropertyResult("flexibleTimeWindow", "FlexibleTimeWindow", (properties.FlexibleTimeWindow != null ? CfnScheduleFlexibleTimeWindowPropertyFromCloudFormation(properties.FlexibleTimeWindow) : undefined));
   ret.addPropertyResult("groupName", "GroupName", (properties.GroupName != null ? cfn_parse.FromCloudFormation.getString(properties.GroupName) : undefined));
   ret.addPropertyResult("kmsKeyArn", "KmsKeyArn", (properties.KmsKeyArn != null ? cfn_parse.FromCloudFormation.getString(properties.KmsKeyArn) : undefined));
   ret.addPropertyResult("name", "Name", (properties.Name != null ? cfn_parse.FromCloudFormation.getString(properties.Name) : undefined));
@@ -2209,7 +2209,7 @@ function CfnSchedulePropsFromCloudFormation(properties: any): cfn_parse.FromClou
   ret.addPropertyResult("scheduleExpressionTimezone", "ScheduleExpressionTimezone", (properties.ScheduleExpressionTimezone != null ? cfn_parse.FromCloudFormation.getString(properties.ScheduleExpressionTimezone) : undefined));
   ret.addPropertyResult("startDate", "StartDate", (properties.StartDate != null ? cfn_parse.FromCloudFormation.getString(properties.StartDate) : undefined));
   ret.addPropertyResult("state", "State", (properties.State != null ? cfn_parse.FromCloudFormation.getString(properties.State) : undefined));
-  ret.addPropertyResult("target", "Target", (properties.Target != null ? TargetPropertyFromCloudFormation(properties.Target) : undefined));
+  ret.addPropertyResult("target", "Target", (properties.Target != null ? CfnScheduleTargetPropertyFromCloudFormation(properties.Target) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }

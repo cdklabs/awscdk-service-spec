@@ -1,4 +1,4 @@
-import { IScope } from './scope';
+import { IScope, RichScope } from './scope';
 
 /**
  * Kinds of types.
@@ -32,6 +32,13 @@ export class ThingSymbol {
     } else {
       return new ThingSymbol(newName(this.name), this.scope);
     }
+  }
+
+  /**
+   * Find the declaration that this symbol references
+   */
+  public findDeclaration() {
+    return new RichScope(this.scope).findType(this.scope.qualifyName(this.name));
   }
 
   public toString() {

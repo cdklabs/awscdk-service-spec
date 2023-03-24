@@ -65,6 +65,9 @@ export class ScopeImpl implements IScope {
    * Register a type to the scope
    */
   public registerType(type: TypeDeclaration) {
+    if (this._typeMap.has(type.fqn)) {
+      throw new Error(`There is already a declaration named ${type.fqn} in ${this}`);
+    }
     this._typeMap.set(type.fqn, type);
   }
 
