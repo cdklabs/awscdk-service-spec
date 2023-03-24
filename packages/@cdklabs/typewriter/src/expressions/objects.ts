@@ -38,12 +38,6 @@ export class NotExpression extends Expression {
   }
 }
 
-export class EqualsExpression extends Expression {
-  constructor(public readonly _left_: Expression, public readonly _right_: Expression) {
-    super();
-  }
-}
-
 export class JsLiteralExpression extends Expression {
   constructor(public readonly _value_: any) {
     super();
@@ -100,11 +94,7 @@ export class ThisInstance extends Expression {}
 
 export class Null extends Expression {}
 
-export const NULL = new Null();
-
 export class Undefined extends Expression {}
-
-export const UNDEFINED = new Undefined();
 
 export class BinOp extends Expression {
   constructor(public readonly _lhs_: Expression, public readonly _op_: string, public readonly _rhs_: Expression) {
@@ -124,7 +114,7 @@ export class IsNotNullish extends Expression {
   }
 }
 
-export class StrContact extends Expression {
+export class StrConcat extends Expression {
   constructor(public readonly _operands_: Expression[]) {
     super();
   }

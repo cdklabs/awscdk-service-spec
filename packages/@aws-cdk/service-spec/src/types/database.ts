@@ -16,6 +16,7 @@ import {
   RegionHasService,
   TypeDefinition,
   UsesType,
+  PropertyType,
 } from './resource';
 
 export interface DatabaseSchema {
@@ -48,3 +49,24 @@ export function emptyDatabase() {
 }
 
 export type SpecDatabase = ReturnType<typeof emptyDatabase>;
+
+/**
+ * Helpers for working with a SpecDatabase
+ */
+export class RichSpecDatabase {
+  constructor(private readonly db: SpecDatabase) {}
+
+  /**
+   * Find all resources of a given type
+   */
+  public resourcesByType(cfnType: string): Resource[] {
+    return this.db.lookup('resource', 'cloudFormationType', 'equals', cfnType);
+  }
+
+  /**
+   * Find a type definition from a given property type
+   */
+  public tryFindDef(type: PropertyType): TypeDefinition | undefined {
+    return type.type === 'ref' ? this.db.get('typeDefinition', type.reference.$ref) : undefined;
+  }
+}

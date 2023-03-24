@@ -2,7 +2,7 @@ import { Renderer } from './base';
 import { CallableDeclaration, isCallableDeclaration } from '../callable';
 import { ClassType } from '../class';
 import { Documented } from '../documented';
-import { Expression, SymbolReference } from '../expression';
+import { AnonymousInterfaceImplementation, Expression, Lambda, SymbolReference } from '../expression';
 import {
   BinOp,
   DestructuringBind,
@@ -16,7 +16,7 @@ import {
   ObjectLiteral,
   ObjectMethodInvoke,
   ObjectPropertyAccess,
-  StrContact,
+  StrConcat,
   Structure,
   Ternary,
   ThisInstance,
@@ -26,7 +26,9 @@ import {
 import { InvokeCallable } from '../expressions/invoke';
 import { InterfaceType } from '../interface';
 import { AliasedModuleImport, Module } from '../module';
+import { Parameter } from '../parameter';
 import { Property } from '../property';
+import { AMBIENT_SCOPE } from '../scope';
 import {
   ReturnStatement,
   Statement,
@@ -39,6 +41,7 @@ import {
   SuperInitializer,
   ForLoop,
   StatementSeparator,
+  ThrowStatement,
 } from '../statements';
 import { StructType } from '../struct';
 import { ThingSymbol } from '../symbol';
@@ -249,13 +252,7 @@ export class TypeScriptRenderer extends Renderer {
       this.emit('abstract ');
     }
     this.emit(method.name);
-    this.emit('(');
-    this.emitList(method.parameters, ', ', (p) => {
-      this.emit(p._identifier_);
-      this.emit(': ');
-      this.renderType(p.type);
-    });
-    this.emit(')');
+    this.renderParameters(method.parameters);
 
     if (!(method instanceof Initializer)) {
       this.emit(': ');
@@ -268,6 +265,16 @@ export class TypeScriptRenderer extends Renderer {
     } else {
       this.emit(';');
     }
+  }
+
+  protected renderParameters(parameters: Parameter[]) {
+    this.emit('(');
+    this.emitList(parameters, ', ', (p) => {
+      this.emit(p._identifier_);
+      this.emit(': ');
+      this.renderType(p.type);
+    });
+    this.emit(')');
   }
 
   protected renderSymbol(sym: ThingSymbol) {
@@ -321,6 +328,11 @@ export class TypeScriptRenderer extends Renderer {
         return new Identifier(sym.name);
       }
 
+      // The ambient scope is always visible
+      if (sym.scope === AMBIENT_SCOPE) {
+        return new Identifier(sym.name);
+      }
+
       const imp = scope.findLink(sym.scope);
       if (imp) {
         return imp.referenceSymbol(sym);
@@ -334,12 +346,8 @@ export class TypeScriptRenderer extends Renderer {
     this.renderDocs(func);
     this.emit(`// @ts-ignore TS6133\n`);
 
-    this.emit(`function ${func.name}(`);
-    this.emitList(func.parameters, ', ', (p) => {
-      this.emit(`${p._identifier_}: `);
-      this.renderType(p.type);
-    });
-    this.emit(')');
+    this.emit(`function ${func.name}`);
+    this.renderParameters(func.parameters);
     if (func.returnType) {
       this.emit(': ');
       this.renderType(func.returnType);
@@ -400,6 +408,11 @@ export class TypeScriptRenderer extends Renderer {
       }),
       typeCase(StatementSeparator, () => {
         this.emit('');
+      }),
+      typeCase(ThrowStatement, (x) => {
+        this.emit('throw ');
+        this.renderExpression(x.expression);
+        this.emit(';');
       }),
     ]);
 
@@ -470,10 +483,29 @@ export class TypeScriptRenderer extends Renderer {
         this.emit(' != null');
       }),
 
-      typeCase(StrContact, (x) => {
+      typeCase(StrConcat, (x) => {
         this.emitList(x._operands_, ' + ', (op) => {
           this.renderExpression(op);
         });
+      }),
+
+      typeCase(AnonymousInterfaceImplementation, (x) =>
+        this.emitBlock('', () =>
+          this.emitList(Object.entries(x.members), ',\n', ([key, val]) => {
+            this.emit(`${JSON.stringify(key)}: `);
+            this.renderExpression(val);
+          }),
+        ),
+      ),
+
+      typeCase(Lambda, (x) => {
+        this.renderParameters(x.params);
+        this.emit(' => ');
+        if (x.body instanceof Statement) {
+          this.renderStatement(x.body);
+        } else {
+          this.renderExpression(x.body);
+        }
       }),
     ]);
 

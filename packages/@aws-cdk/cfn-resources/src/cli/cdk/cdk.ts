@@ -17,6 +17,7 @@ export class CdkCore extends ExternalModule {
   public readonly helpers = new CdkInternalHelpers(this);
 
   public readonly CfnResource = Type.fromName(this, 'CfnResource');
+  public readonly Resource = $T(Type.fromName(this, 'Resource'));
   public readonly IInspectable = Type.fromName(this, 'IInspectable');
   public readonly TreeInspector = Type.fromName(this, 'TreeInspector');
   public readonly Token = $T(Type.fromName(this, 'Token'));
@@ -25,6 +26,7 @@ export class CdkCore extends ExternalModule {
   public readonly TagManager = $T(Type.fromName(this, 'TagManager'));
   public readonly TagType = $T(Type.fromName(this, 'TagType'));
   public readonly ITaggable = Type.fromName(this, 'ITaggable');
+  public readonly IResolvable = Type.fromName(this, 'IResolvable');
 
   public readonly objectToCloudFormation = makeCallableExpr(this, 'objectToCloudFormation');
   public readonly stringToCloudFormation = makeCallableExpr(this, 'stringToCloudFormation');
@@ -36,6 +38,7 @@ export class CdkCore extends ExternalModule {
   public readonly listMapper = makeCallableExpr(this, 'listMapper');
   public readonly hashMapper = makeCallableExpr(this, 'hashMapper');
   public readonly requireProperty = makeCallableExpr(this, 'requireProperty');
+  public readonly isResolvableObject = makeCallableExpr(this, 'isResolvableObject');
 
   public readonly ValidationResult = $T(Type.fromName(this, 'ValidationResult'));
   public readonly VALIDATION_SUCCESS = makeCallableExpr(this, 'VALIDATION_SUCCESS');
@@ -44,8 +47,8 @@ export class CdkCore extends ExternalModule {
   public readonly propertyValidator = makeCallableExpr(this, 'propertyValidator');
   public readonly requiredValidator = makeCallableExpr(this, 'requiredValidator');
   public readonly listValidator = makeCallableExpr(this, 'listValidator');
-  public readonly hashValidator = makeCallableExpr(this, 'listValidator');
-  public readonly unionValidator = makeCallableExpr(this, 'listValidator');
+  public readonly hashValidator = makeCallableExpr(this, 'hashValidator');
+  public readonly unionValidator = makeCallableExpr(this, 'unionValidator');
   public readonly validateCfnTag = makeCallableExpr(this, 'validateCfnTag');
   public readonly validateObject = makeCallableExpr(this, 'validateObject');
   public readonly validateDate = makeCallableExpr(this, 'validateDate');

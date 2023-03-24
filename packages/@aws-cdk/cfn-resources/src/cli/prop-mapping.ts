@@ -4,8 +4,7 @@ import {
   ObjectPropertyAccess,
   IsNotNullish,
   Type,
-  UNDEFINED,
-  Property,
+  PropertySpec,
   ThingSymbol,
   IScope,
   StructType,
@@ -19,11 +18,11 @@ import { cfnParserNameFromType, cfnProducerNameFromType, cfnPropsValidatorNameFr
  */
 export class PropMapping {
   private readonly cfn2ts: Record<string, string> = {};
-  private readonly cfn2Prop: Record<string, Property> = {};
+  private readonly cfn2Prop: Record<string, PropertySpec> = {};
 
   constructor(private readonly mapperFunctionsScope: IScope) {}
 
-  public add(cfnName: string, property: Property) {
+  public add(cfnName: string, property: PropertySpec) {
     this.cfn2ts[cfnName] = property.name;
     this.cfn2Prop[cfnName] = property;
   }
@@ -53,7 +52,7 @@ export class PropMapping {
       throw new Error(`No type for ${cfnName}`);
     }
 
-    return expr.cond(new IsNotNullish(value)).then(this.typeProducer(type).parse.call(value)).else(UNDEFINED);
+    return expr.cond(new IsNotNullish(value)).then(this.typeProducer(type).parse.call(value)).else(expr.UNDEFINED);
   }
 
   public validateProperty(cfnName: string, propsObj: Expression, errorsObj: Expression): Expression[] {
@@ -182,7 +181,7 @@ export class PropMapping {
     }
 
     if (type.unionOfTypes) {
-      return CDK_CORE.unionValidator.call(...type.unionOfTypes.map(this.typeValidator));
+      return CDK_CORE.unionValidator.call(...type.unionOfTypes.map((t) => this.typeValidator(t)));
     }
 
     if (type.symbol) {

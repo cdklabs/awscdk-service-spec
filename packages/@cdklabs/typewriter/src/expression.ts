@@ -1,5 +1,6 @@
 import { InvokeCallable, ObjectMethodInvoke, ObjectPropertyAccess } from './expressions';
-import { ExpressionStatement, Statement } from './statements';
+import { Parameter } from './parameter';
+import { Block, ExpressionStatement, Statement } from './statements';
 import { ThingSymbol } from './symbol';
 
 export class Expression {
@@ -34,5 +35,30 @@ export class Expression {
 export class SymbolReference extends Expression {
   constructor(public readonly symbol: ThingSymbol) {
     super();
+  }
+}
+
+/**
+ * An anonymous implementation of an interface.
+ *
+ * In JavaScript, an object literal with a couple of methods/properties on it.
+ *
+ * (Not currently tracking the implemented type)
+ */
+export class AnonymousInterfaceImplementation extends Expression {
+  constructor(public readonly members: Record<string, Expression>) {
+    super();
+  }
+}
+
+/**
+ * A Lambda function
+ */
+export class Lambda extends Expression {
+  public readonly body: Block | Expression;
+
+  constructor(public readonly params: Parameter[], body: Statement | Expression) {
+    super();
+    this.body = body instanceof Expression ? body : body instanceof Block ? body : Block.with(body);
   }
 }

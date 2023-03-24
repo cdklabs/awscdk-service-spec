@@ -103,3 +103,9 @@ export class SuperInitializer extends Statement {
 }
 
 export class StatementSeparator extends Statement {}
+
+export class ThrowStatement extends Statement {
+  constructor(public readonly expression: Expression) {
+    super();
+  }
+}

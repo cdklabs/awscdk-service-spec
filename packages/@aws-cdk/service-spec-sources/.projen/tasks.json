@@ -52,7 +52,8 @@
           "spawn": "gen-schemas"
         },
         {
-          "exec": "tsc --build"
+          "exec": "tsc --build",
+          "receiveArgs": true
         }
       ]
     },
