@@ -3,10 +3,9 @@ import { MemberType } from './member-type';
 import { Property, PropertySpec } from './property';
 import { IScope } from './scope';
 import { SymbolKind } from './symbol';
-import { TypeDeclaration } from './type-declaration';
+import { Exportable, TypeDeclaration } from './type-declaration';
 
-export interface StructSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' | 'kind' | 'properties'> {
-  export?: boolean;
+export interface StructSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' | 'kind' | 'properties'>, Exportable {
   properties?: PropertySpec[];
 }
 

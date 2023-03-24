@@ -6,7 +6,6 @@ import { Type } from './type';
 import { TypeSpec } from './type-declaration';
 
 export interface InterfaceSpec extends TypeSpec {
-  export?: boolean;
   properties?: PropertySpec[];
   extends?: Type[];
 }
