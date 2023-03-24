@@ -1,6 +1,6 @@
 import { Expression } from './expression';
 import { NewExpression } from './expressions';
-import { IScope } from './scope';
+import { AMBIENT_SCOPE, IScope } from './scope';
 import { ThingSymbol } from './symbol';
 import { TypeDeclaration } from './type-declaration';
 
@@ -43,7 +43,6 @@ export enum PrimitiveType {
 
 export type TypeReferenceSpec =
   | { readonly fqn: string; readonly genericArguments?: Type[] }
-  | { readonly builtIn: string }
   | { readonly primitive: PrimitiveType }
   | { readonly collection: { readonly kind: 'map' | 'array'; readonly elementType: Type } }
   | { readonly union: Type[] };
@@ -74,6 +73,10 @@ export class Type {
   public static unionOf(...types: Type[]) {
     // Sort by string representation to get to a stable order
     return new Type({ union: types.sort((a, b) => a.toString().localeCompare(b.toString())) });
+  }
+
+  public static ambient(name: string) {
+    return Type.fromName(AMBIENT_SCOPE, name);
   }
 
   public readonly spec: TypeReferenceSpec;
@@ -116,10 +119,6 @@ export class Type {
 
   public get isVoid(): boolean {
     return this.primitive === PrimitiveType.Void;
-  }
-
-  public get builtInType(): string | undefined {
-    return isBuiltInSpec(this.spec) ? this.spec.builtIn : undefined;
   }
 
   public get isAny(): boolean {
@@ -173,7 +172,6 @@ export class Type {
     return (
       (this.primitive && this.primitive === rhs.primitive) ||
       (this.fqn && this.fqn === rhs.fqn) ||
-      (this.builtInType && this.builtInType === rhs.builtInType) ||
       (this.arrayOfType && this.arrayOfType === rhs.arrayOfType) ||
       (this.mapOfType && this.mapOfType === rhs.mapOfType) ||
       (!!this.unionOfTypes &&
@@ -189,10 +187,6 @@ function isFqnSpec(x: TypeReferenceSpec): x is Extract<TypeReferenceSpec, { fqn:
 
 function isPrimitiveSpec(x: TypeReferenceSpec): x is Extract<TypeReferenceSpec, { primitive: PrimitiveType }> {
   return !!(x as any).primitive;
-}
-
-function isBuiltInSpec(x: TypeReferenceSpec): x is Extract<TypeReferenceSpec, { builtIn: string }> {
-  return !!(x as any).builtIn;
 }
 
 function isCollectionSpec(

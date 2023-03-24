@@ -16,7 +16,7 @@ import {
   ObjectLiteral,
   ObjectMethodInvoke,
   ObjectPropertyAccess,
-  StrContact,
+  StrConcat,
   Structure,
   Ternary,
   ThisInstance,
@@ -28,6 +28,7 @@ import { InterfaceType } from '../interface';
 import { AliasedModuleImport, Module } from '../module';
 import { Parameter } from '../parameter';
 import { Property } from '../property';
+import { AMBIENT_SCOPE } from '../scope';
 import {
   ReturnStatement,
   Statement,
@@ -40,6 +41,7 @@ import {
   SuperInitializer,
   ForLoop,
   StatementSeparator,
+  ThrowStatement,
 } from '../statements';
 import { StructType } from '../struct';
 import { ThingSymbol } from '../symbol';
@@ -326,6 +328,11 @@ export class TypeScriptRenderer extends Renderer {
         return new Identifier(sym.name);
       }
 
+      // The ambient scope is always visible
+      if (sym.scope === AMBIENT_SCOPE) {
+        return new Identifier(sym.name);
+      }
+
       const imp = scope.findLink(sym.scope);
       if (imp) {
         return imp.referenceSymbol(sym);
@@ -402,6 +409,11 @@ export class TypeScriptRenderer extends Renderer {
       typeCase(StatementSeparator, () => {
         this.emit('');
       }),
+      typeCase(ThrowStatement, (x) => {
+        this.emit('throw ');
+        this.renderExpression(x.expression);
+        this.emit(';');
+      }),
     ]);
 
     if (!success) {
@@ -471,7 +483,7 @@ export class TypeScriptRenderer extends Renderer {
         this.emit(' != null');
       }),
 
-      typeCase(StrContact, (x) => {
+      typeCase(StrConcat, (x) => {
         this.emitList(x._operands_, ' + ', (op) => {
           this.renderExpression(op);
         });

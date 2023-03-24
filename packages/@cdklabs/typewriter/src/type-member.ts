@@ -84,6 +84,7 @@ export abstract class TypeMember implements Documented {
 
 export interface MethodSpec extends CallableSpec {
   visibility?: MemberVisibility;
+  static?: boolean;
 }
 
 export class Method extends TypeMember implements CallableDeclaration {

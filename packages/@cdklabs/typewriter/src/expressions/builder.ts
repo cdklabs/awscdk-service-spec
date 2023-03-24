@@ -9,7 +9,7 @@ import {
   NotExpression,
   Null,
   ObjectLiteral,
-  StrContact,
+  StrConcat,
   Structure,
   Ternary,
   ThisInstance,
@@ -81,5 +81,5 @@ export function isObject(op: Expression) {
 }
 
 export function strConcat(...ops: Expression[]): Expression {
-  return new StrContact(ops);
+  return new StrConcat(ops);
 }

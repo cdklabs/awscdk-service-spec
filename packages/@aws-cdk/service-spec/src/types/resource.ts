@@ -43,6 +43,13 @@ export interface Resource extends Entity {
    * What type of tags
    */
   tagType?: TagType;
+
+  /**
+   * Whether changes to this resource need to be scrutinized
+   *
+   * @default ResourceScrutinyType.NONE
+   */
+  scrutinizable?: ResourceScrutinyType;
 }
 
 export type TagType = 'standard' | 'asg' | 'map';
@@ -60,8 +67,30 @@ export interface Property {
   required?: boolean;
   type: PropertyType;
   wasOnceJson?: boolean;
+
+  /**
+   * A string representation the default value of this property
+   *
+   * This value is not directly functional; it describes how the underlying resource
+   * will behave if the value is not specified.
+   *
+   * @default - Default unknown
+   */
   defaultValue?: string;
+
+  /**
+   * Whether this property is deprecated
+   *
+   * @default - Not deprecated
+   */
   deprecated?: Deprecation;
+
+  /**
+   * Whether changes to this property needs to be scrutinized specially
+   *
+   * @default PropertyScrutinyType.NONE
+   */
+  scrutinizable?: PropertyScrutinyType;
 }
 
 export interface Attribute {
@@ -162,4 +191,82 @@ export type UsesType = Relationship<Resource, TypeDefinition>;
 export interface ResourceIdentifier extends Entity {
   readonly arnTemplate?: string;
   readonly primaryIdentifier?: string[];
+}
+
+/**
+ * Mark a resource as a resource that needs additional scrutiy when added, removed or changed
+ *
+ * Used to mark resources that represent security policies.
+ */
+export enum ResourceScrutinyType {
+  /**
+   * No additional scrutiny
+   */
+  None = 'None',
+
+  /**
+   * An externally attached policy document to a resource
+   *
+   * (Common for SQS, SNS, S3, ...)
+   */
+  ResourcePolicyResource = 'ResourcePolicyResource',
+
+  /**
+   * This is an IAM policy on an identity resource
+   *
+   * (Basically saying: this is AWS::IAM::Policy)
+   */
+  IdentityPolicyResource = 'IdentityPolicyResource',
+
+  /**
+   * This is a Lambda Permission policy
+   */
+  LambdaPermission = 'LambdaPermission',
+
+  /**
+   * An ingress rule object
+   */
+  IngressRuleResource = 'IngressRuleResource',
+
+  /**
+   * A set of egress rules
+   */
+  EgressRuleResource = 'EgressRuleResource',
+}
+
+/**
+ * Mark a property as a property that needs additional scrutiny when it changes
+ *
+ * Used to mark sensitive properties that have security-related implications.
+ */
+export enum PropertyScrutinyType {
+  /**
+   * No additional scrutiny
+   */
+  None = 'None',
+
+  /**
+   * This is an IAM policy directly on a resource
+   */
+  InlineResourcePolicy = 'InlineResourcePolicy',
+
+  /**
+   * Either an AssumeRolePolicyDocument or a dictionary of policy documents
+   */
+  InlineIdentityPolicies = 'InlineIdentityPolicies',
+
+  /**
+   * A list of managed policies (on an identity resource)
+   */
+  ManagedPolicies = 'ManagedPolicies',
+
+  /**
+   * A set of ingress rules (on a security group)
+   */
+  IngressRules = 'IngressRules',
+
+  /**
+   * A set of egress rules (on a security group)
+   */
+  EgressRules = 'EgressRules',
 }
