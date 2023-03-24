@@ -3,6 +3,7 @@ import { MemberType } from './member-type';
 import { Property, PropertySpec } from './property';
 import { IScope } from './scope';
 import { SymbolKind } from './symbol';
+import { TypeDeclaration } from './type-declaration';
 
 export interface StructSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' | 'kind' | 'properties'> {
   export?: boolean;
@@ -10,6 +11,16 @@ export interface StructSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' 
 }
 
 export class StructType extends MemberType {
+  /**
+   * Assert that something is a struct, failing otherwise
+   */
+  public static assertStruct(x: TypeDeclaration): StructType {
+    if (!(x instanceof StructType)) {
+      throw new Error(`Expect ${x} to refer to a struct`);
+    }
+    return x;
+  }
+
   public readonly kind = SymbolKind.Struct;
 
   /**

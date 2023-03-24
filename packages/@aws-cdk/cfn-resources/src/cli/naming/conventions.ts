@@ -1,5 +1,5 @@
 import { Resource, TypeDefinition } from '@aws-cdk/service-spec';
-import { TypeDeclaration } from '@cdklabs/typewriter';
+import { ClassType, TypeDeclaration } from '@cdklabs/typewriter';
 import camelcase from 'camelcase';
 
 /**
@@ -55,19 +55,16 @@ export function propStructNameFromResource(res: Resource) {
   return `${classNameFromResource(res)}Props`;
 }
 
-export function cfnProducerNameFromType(struct: TypeDeclaration | string) {
-  const name = typeof struct === 'string' ? struct : struct.name;
-  return `convert${name}ToCloudFormation`;
+export function cfnProducerNameFromType(struct: TypeDeclaration) {
+  return `convert${qualifiedName(struct)}ToCloudFormation`;
 }
 
-export function cfnParserNameFromType(struct: TypeDeclaration | string) {
-  const name = typeof struct === 'string' ? struct : struct.name;
-  return `${name}FromCloudFormation`;
+export function cfnParserNameFromType(struct: TypeDeclaration) {
+  return `${qualifiedName(struct)}FromCloudFormation`;
 }
 
-export function cfnPropsValidatorNameFromType(struct: TypeDeclaration | string) {
-  const name = typeof struct === 'string' ? struct : struct.name;
-  return `${name}Validator`;
+export function cfnPropsValidatorNameFromType(struct: TypeDeclaration) {
+  return `${qualifiedName(struct)}Validator`;
 }
 
 export function staticResourceTypeName() {
@@ -76,4 +73,16 @@ export function staticResourceTypeName() {
 
 export function attributePropertyName(attrName: string) {
   return `attr${attrName.replace(/[^a-zA-Z0-9]/g, '')}`;
+}
+
+/**
+ * Generate a name for the given declaration so that we can generate helper symbols for it that won't class
+ *
+ * We assume that the helpers get generated at module level, so we add in the names of the
+ * containing type if found.
+ *
+ * (Doesn't handle all cases generically, just the ones we care about right now).
+ */
+function qualifiedName(type: TypeDeclaration) {
+  return [type.scope instanceof ClassType ? type.scope.name : '', type.name].join('');
 }

@@ -54,8 +54,15 @@ export function emptyRelationship<F extends string, T extends string>(
       backward.set(toId, b);
     }
 
-    f.push({ $id: toId, ...attrs });
-    b.push({ $id: fromId, ...attrs });
+    // Behaves like a set, only add new relationship if it is structurally distinct
+    const forwardRel = { $id: toId, ...attrs };
+    const forwardRelStr = JSON.stringify(forwardRel);
+    const existingRelationship = f.find((x) => JSON.stringify(x) === forwardRelStr);
+
+    if (!existingRelationship) {
+      f.push(forwardRel);
+      b.push({ $id: fromId, ...attrs });
+    }
   }
 
   return {

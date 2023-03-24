@@ -7,6 +7,7 @@ import {
   PropertySpec,
   ThingSymbol,
   IScope,
+  StructType,
 } from '@cdklabs/typewriter';
 import { PrimitiveType } from '@jsii/spec';
 import { CDK_CORE } from './cdk/cdk';
@@ -138,9 +139,10 @@ export class PropMapping {
     }
 
     if (type.symbol) {
+      const struct = StructType.assertStruct(type.symbol.findDeclaration());
       return {
-        produce: expr.sym(new ThingSymbol(cfnProducerNameFromType(type.symbol.name), this.mapperFunctionsScope)),
-        parse: expr.sym(new ThingSymbol(cfnParserNameFromType(type.symbol.name), this.mapperFunctionsScope)),
+        produce: expr.sym(new ThingSymbol(cfnProducerNameFromType(struct), this.mapperFunctionsScope)),
+        parse: expr.sym(new ThingSymbol(cfnParserNameFromType(struct), this.mapperFunctionsScope)),
       };
     }
 
@@ -183,7 +185,8 @@ export class PropMapping {
     }
 
     if (type.symbol) {
-      return expr.sym(new ThingSymbol(cfnPropsValidatorNameFromType(type.symbol.name), this.mapperFunctionsScope));
+      const struct = StructType.assertStruct(type.symbol.findDeclaration());
+      return expr.sym(new ThingSymbol(cfnPropsValidatorNameFromType(struct), this.mapperFunctionsScope));
     }
 
     throw `Error: unresolved typeValidator(${type})`;
