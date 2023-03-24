@@ -11,6 +11,13 @@ export interface ModuleImportLocations {
    * @default 'aws-cdk-lib/core/lib/helpers-internal'
    */
   readonly coreHelpers?: string;
+
+  /**
+   * The import name used to import the CloudWatch module
+   *
+   * @default 'aws-cdk-lib/aws-cloudwatch'
+   */
+  readonly cloudwatch?: string;
 }
 
 export class CdkCore extends ExternalModule {
@@ -86,13 +93,20 @@ export class CdkInternalHelpers extends ExternalModule {
 
 export class Constructs extends ExternalModule {
   public readonly Construct = Type.fromName(this, 'Construct');
+  public readonly IConstruct = Type.fromName(this, 'IConstruct');
 
   constructor() {
     super('constructs');
   }
 }
 
+export class CdkCloudWatch extends ExternalModule {
+  public readonly Metric = $T(Type.fromName(this, 'Metric'));
+  public readonly MetricOptions = Type.fromName(this, 'MetricOptions');
+}
+
 export const CDK_CORE = new CdkCore('aws-cdk-lib');
+export const CDK_CLOUDWATCH = new CdkCloudWatch('aws-cdk-lib/aws-cloudwatch');
 export const CONSTRUCTS = new Constructs();
 
 function makeCallableExpr(scope: IScope, name: string) {

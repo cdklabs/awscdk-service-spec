@@ -23,5 +23,5 @@ test.each([
 
   const ast = AstBuilder.forResource(resource, { db });
 
-  expect(renderer.render(ast.scope)).toMatchSnapshot();
+  expect(renderer.render(ast.module)).toMatchSnapshot();
 });

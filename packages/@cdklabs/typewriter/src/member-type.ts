@@ -1,13 +1,12 @@
 import { Property, PropertySpec } from './property';
-import { SymbolKind } from './symbol';
-import { TypeDeclaration } from './type-declaration';
+import { DeclarationKind, TypeDeclaration } from './type-declaration';
 import { Method, MethodSpec } from './type-member';
 
 /**
  * A type that has members
  */
 export abstract class MemberType extends TypeDeclaration {
-  public abstract readonly kind: SymbolKind;
+  public abstract readonly kind: DeclarationKind;
 
   private readonly _properties = new Array<Property>();
   private readonly _methods = new Array<Method>();

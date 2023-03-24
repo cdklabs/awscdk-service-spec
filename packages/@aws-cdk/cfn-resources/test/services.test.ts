@@ -16,5 +16,5 @@ test.each(['alexa-ask', 'aws-chatbot', 'aws-scheduler', 'aws-sqs'])('%s', (servi
 
   const ast = AstBuilder.forService(service, { db });
 
-  expect(renderer.render(ast.scope)).toMatchSnapshot();
+  expect(renderer.render(ast.module)).toMatchSnapshot();
 });

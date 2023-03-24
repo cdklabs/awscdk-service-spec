@@ -5,9 +5,9 @@ import { MemberType } from './member-type';
 import { Module } from './module';
 import { PropertySpec } from './property';
 import { IScope, IScopeLink, ScopeImpl } from './scope';
-import { SymbolKind } from './symbol';
+import { ThingSymbol } from './symbol';
 import { Type } from './type';
-import { TypeDeclaration, TypeSpec } from './type-declaration';
+import { DeclarationKind, TypeDeclaration, TypeSpec } from './type-declaration';
 import { Initializer, InitializerSpec } from './type-member';
 
 export interface ClassSpec extends TypeSpec {
@@ -19,7 +19,7 @@ export interface ClassSpec extends TypeSpec {
 }
 
 export class ClassType extends MemberType implements IScope {
-  public readonly kind = SymbolKind.Class;
+  public readonly kind = DeclarationKind.Class;
   private readonly classScope: ScopeImpl;
 
   public readonly nestedDeclarations: TypeDeclaration[] = [];
@@ -84,7 +84,7 @@ export class ClassType extends MemberType implements IScope {
   }
 
   registerType(type: TypeDeclaration): void {
-    if (type.kind === SymbolKind.Function) {
+    if (type.kind === DeclarationKind.Function) {
       throw new Error(`Cannot create free function ${type} in scope of ${this}. Add a static method instead.`);
     }
 
@@ -109,7 +109,11 @@ export class ClassType extends MemberType implements IScope {
     return this.classScope.linkScope(scope, theImport);
   }
 
-  findLink(scope: IScope): IScopeLink | undefined {
-    return this.classScope.findLink(scope);
+  linkSymbol(sym: ThingSymbol, exp: Expression): void {
+    return this.classScope.linkSymbol(sym, exp);
+  }
+
+  symbolToExpression(symbol: ThingSymbol): Expression | undefined {
+    return this.classScope.symbolToExpression(symbol);
   }
 }

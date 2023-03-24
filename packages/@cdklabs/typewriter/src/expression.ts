@@ -62,3 +62,12 @@ export class Lambda extends Expression {
     this.body = body instanceof Expression ? body : body instanceof Block ? body : Block.with(body);
   }
 }
+
+/**
+ * Splat expression (...xyz)
+ */
+export class Splat extends Expression {
+  constructor(public readonly _operand_: Expression) {
+    super();
+  }
+}

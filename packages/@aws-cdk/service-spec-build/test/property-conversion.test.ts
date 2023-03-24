@@ -116,5 +116,5 @@ test('reference types are correctly named', () => {
   const types = db.follow('usesType', resource);
 
   expect(types.length).toBe(1);
-  expect(types[0].to.name).toBe('Property');
+  expect(types[0].entity.name).toBe('Property');
 });

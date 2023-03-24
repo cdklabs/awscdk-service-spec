@@ -1,4 +1,5 @@
 import { Expression } from './expression';
+import { Identifier } from './expressions';
 import { ThingSymbol } from './symbol';
 import { TypeDeclaration } from './type-declaration';
 
@@ -6,6 +7,8 @@ import { TypeDeclaration } from './type-declaration';
  * Interface for classes that are scopes/namespaces
  */
 export interface IScope {
+  readonly fqn: string;
+
   /**
    * The set of type declarations in this scope
    */
@@ -32,9 +35,14 @@ export interface IScope {
   linkScope(scope: IScope, theImport: IScopeLink): void;
 
   /**
-   * Find the import that makes the given scope visible
+   * Register a visible symbol in this scope
    */
-  findLink(scope: IScope): IScopeLink | undefined;
+  linkSymbol(sym: ThingSymbol, alias: Expression): void;
+
+  /**
+   * Turn a symbol into an expression that can be used to reference the symbol in this scope
+   */
+  symbolToExpression(symbol: ThingSymbol): Expression | undefined;
 }
 
 /**
@@ -45,7 +53,8 @@ export interface IScope {
  */
 export class ScopeImpl implements IScope {
   private readonly _typeMap = new Map<string, TypeDeclaration>();
-  private readonly linkMap = new Map<IScope, IScopeLink>();
+  private readonly linkMap = new Map<string, IScopeLink>();
+  private readonly symbolMap = new Map<string, Map<string, Expression>>();
   public readonly typeMap: ReadonlyMap<string, TypeDeclaration> = this._typeMap;
 
   constructor(public readonly fqn: string) {}
@@ -76,14 +85,38 @@ export class ScopeImpl implements IScope {
   }
 
   public linkScope(scope: IScope, theImport: IScopeLink): void {
-    this.linkMap.set(scope, theImport);
+    this.linkMap.set(scope.fqn, theImport);
+  }
+
+  public linkSymbol(sym: ThingSymbol, alias: Expression): void {
+    let map = this.symbolMap.get(sym.scope.fqn);
+    if (!map) {
+      map = new Map();
+      this.symbolMap.set(sym.scope.fqn, map);
+    }
+    map.set(sym.name, alias);
   }
 
   /**
-   * Try to find an import for the given scope
+   * Try to resolve this symbol here
    */
-  public findLink(scope: IScope): IScopeLink | undefined {
-    return this.linkMap.get(scope);
+  public symbolToExpression(sym: ThingSymbol): Expression | undefined {
+    // Defining scope is visible, so identifiers in it are as well
+    if (sym.scope === this) {
+      return new Identifier(sym.name);
+    }
+
+    const expr = this.symbolMap.get(sym.scope.fqn)?.get(sym.name);
+    if (expr) {
+      return expr;
+    }
+
+    const imp = this.linkMap.get(sym.scope.fqn);
+    if (imp) {
+      return imp.referenceSymbol(sym);
+    }
+
+    return undefined;
   }
 }
 

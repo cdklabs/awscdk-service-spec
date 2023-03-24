@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`AWS::ApiGateway::RestApi 1`] = `
-"/* eslint-disable prettier/prettier */
+"/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
 import * as constructs from "constructs";
 import * as cfn_parse from "aws-cdk-lib/core/lib/helpers-internal";
@@ -596,7 +596,7 @@ function CfnRestApiPropsFromCloudFormation(properties: any): cfn_parse.FromCloud
 `;
 
 exports[`AWS::IAM::Role 1`] = `
-"/* eslint-disable prettier/prettier */
+"/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
 import * as constructs from "constructs";
 import * as cfn_parse from "aws-cdk-lib/core/lib/helpers-internal";
@@ -1013,7 +1013,7 @@ function CfnRolePropsFromCloudFormation(properties: any): cfn_parse.FromCloudFor
 `;
 
 exports[`AWS::Lambda::Function 1`] = `
-"/* eslint-disable prettier/prettier */
+"/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
 import * as constructs from "constructs";
 import * as cfn_parse from "aws-cdk-lib/core/lib/helpers-internal";
@@ -2209,7 +2209,7 @@ function CfnFunctionPropsFromCloudFormation(properties: any): cfn_parse.FromClou
 `;
 
 exports[`AWS::S3::Bucket 1`] = `
-"/* eslint-disable prettier/prettier */
+"/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
 import * as constructs from "constructs";
 import * as cfn_parse from "aws-cdk-lib/core/lib/helpers-internal";
@@ -7311,7 +7311,7 @@ function CfnBucketPropsFromCloudFormation(properties: any): cfn_parse.FromCloudF
 `;
 
 exports[`AWS::SQS::Queue 1`] = `
-"/* eslint-disable prettier/prettier */
+"/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
 import * as constructs from "constructs";
 import * as cfn_parse from "aws-cdk-lib/core/lib/helpers-internal";
@@ -7822,7 +7822,7 @@ function CfnQueuePropsFromCloudFormation(properties: any): cfn_parse.FromCloudFo
 `;
 
 exports[`Alexa::ASK::Skill 1`] = `
-"/* eslint-disable prettier/prettier */
+"/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
 import * as constructs from "constructs";
 import * as cfn_parse from "aws-cdk-lib/core/lib/helpers-internal";

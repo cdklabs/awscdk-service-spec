@@ -1,9 +1,12 @@
 import { Expression } from './expression';
 import { ObjectPropertyAccess } from './expressions';
+import * as expr from './expressions/builder';
 import { Identifier } from './expressions/identifier';
 import { IScope, IScoped, isScoped, ScopeImpl } from './scope';
+import { Statement } from './statements';
 import { StructType } from './struct';
 import { ThingSymbol } from './symbol';
+import { Type } from './type';
 
 /**
  * A module
@@ -31,6 +34,10 @@ export class Module extends ScopeImpl {
 
   private readonly _imports = new Array<ModuleImport>();
   public readonly imports: ReadonlyArray<ModuleImport> = this._imports;
+  private readonly _initialization = new Array<Statement>();
+
+  public readonly documentation = new Array<string>();
+  public readonly initialization: ReadonlyArray<Statement> = this._initialization;
 
   public get name(): string {
     return this.fqn;
@@ -38,6 +45,10 @@ export class Module extends ScopeImpl {
 
   public constructor(fqn: string) {
     super(fqn);
+  }
+
+  public get importName() {
+    return this.fqn;
   }
 
   /**
@@ -59,7 +70,34 @@ export class Module extends ScopeImpl {
    * Import the current module into the target module
    */
   public import(intoModule: Module, as: string, props: ModuleImportProps = {}) {
-    intoModule.addImport(new AliasedModuleImport(this, props.fromLocation ?? this.fqn, as));
+    intoModule.addImport(new AliasedModuleImport(this, props.fromLocation ?? this.importName, as));
+  }
+
+  /**
+   * Import the current module into the target module
+   */
+  public importSelective(intoModule: Module, names: string[], props: ModuleImportProps = {}) {
+    const imp = new SelectiveModuleImport(this, props.fromLocation ?? this.importName, names);
+    intoModule.addImport(imp);
+    return imp;
+  }
+
+  /**
+   * Add initialization statements
+   *
+   * These will be executed when the module loads
+   */
+  public addInitialization(...statements: Statement[]) {
+    this._initialization.push(...statements);
+  }
+
+  /**
+   * Return a reference to a type in this module
+   *
+   * The presence of the type is not checked.
+   */
+  public type(name: string): Type {
+    return Type.fromName(this, name);
   }
 
   public toString() {
@@ -93,6 +131,42 @@ export class AliasedModuleImport extends ModuleImport {
         return new ObjectPropertyAccess(new Identifier(this.importAlias), sym.name);
       },
     });
+  }
+}
+
+/**
+ * A selective import statement
+ *
+ * Import statements get rendered into the source module, and also count as scope linkage.
+ */
+export class SelectiveModuleImport extends ModuleImport {
+  public readonly importedNames: string[] = [];
+  private targetScope?: IScope;
+
+  constructor(module: Module, moduleSource: string, importedNames: string[] = []) {
+    super(module, moduleSource);
+
+    for (const name of importedNames) {
+      this.addImportedName(name);
+    }
+  }
+
+  public addImportedName(name: string) {
+    this.importedNames.push(name);
+    if (this.targetScope) {
+      this.linkSymbol(name, this.module);
+    }
+  }
+
+  public linkInto(scope: IScope): void {
+    for (const name of this.importedNames) {
+      this.linkSymbol(name, scope);
+    }
+    this.targetScope = scope;
+  }
+
+  private linkSymbol(name: string, scope: IScope) {
+    scope.linkSymbol(new ThingSymbol(name, this.module), expr.ident(name));
   }
 }
 

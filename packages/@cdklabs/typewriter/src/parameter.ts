@@ -6,6 +6,7 @@ export interface ParameterSpec {
   name: string;
   type: Type;
   documentation?: string;
+  optional?: boolean;
 }
 
 /**
@@ -17,6 +18,10 @@ export class Parameter extends Identifier {
   public constructor(public readonly scope: CallableDeclaration, public readonly spec: ParameterSpec) {
     super(spec.name);
     this.documentation = spec.documentation;
+  }
+
+  public get optional(): boolean {
+    return this.spec.optional ?? false;
   }
 
   public get type(): Type {

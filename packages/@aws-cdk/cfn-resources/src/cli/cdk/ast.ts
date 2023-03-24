@@ -2,6 +2,7 @@ import { DatabaseSchema, Resource, Service } from '@aws-cdk/service-spec';
 import { Database } from '@cdklabs/tskb';
 import { StructType, Module } from '@cdklabs/typewriter';
 import { Stability } from '@jsii/spec';
+import { AugmentationsModule } from './augmentation-generator';
 import { CDK_CORE, CONSTRUCTS, ModuleImportLocations } from './cdk';
 import { ResourceClass } from './resource-class';
 import { TypeConverter } from './type-converter';
@@ -36,47 +37,63 @@ export interface AstBuilderProps {
 }
 
 export class AstBuilder<T extends Module> {
+  /**
+   * Build a module for all resources in a service
+   */
   public static forService(service: Service, props: AstBuilderProps): AstBuilder<ServiceModule> {
     const scope = new ServiceModule(service.name, service.shortName);
-    const ast = new AstBuilder(scope, props);
+    const aug = new AugmentationsModule(props.db, service.name, props.importLocations?.cloudwatch);
+
+    const ast = new AstBuilder(scope, props, aug);
 
     const resources = props.db.follow('hasResource', service);
     for (const link of resources) {
-      ast.addResource(link.to);
+      ast.addResource(link.entity);
     }
 
     return ast;
   }
 
+  /**
+   * Build an module for a single resource
+   */
   public static forResource(resource: Resource, props: AstBuilderProps): AstBuilder<ResourceModule> {
     const parts = resource.cloudFormationType.toLowerCase().split('::');
     const scope = new ResourceModule(parts[1], parts[2]);
+    const aug = new AugmentationsModule(props.db, parts[1], props.importLocations?.cloudwatch);
 
-    const ast = new AstBuilder(scope, props);
+    const ast = new AstBuilder(scope, props, aug);
     ast.addResource(resource);
 
     return ast;
   }
+
   public readonly db: Database<DatabaseSchema>;
 
-  protected constructor(public readonly scope: T, props: AstBuilderProps) {
+  protected constructor(
+    public readonly module: T,
+    props: AstBuilderProps,
+    public readonly augmentations?: AugmentationsModule,
+  ) {
     this.db = props.db;
 
-    CDK_CORE.import(scope, 'cdk', { fromLocation: props.importLocations?.core });
-    CONSTRUCTS.import(scope, 'constructs');
-    CDK_CORE.helpers.import(scope, 'cfn_parse', { fromLocation: props.importLocations?.coreHelpers });
+    CDK_CORE.import(module, 'cdk', { fromLocation: props.importLocations?.core });
+    CONSTRUCTS.import(module, 'constructs');
+    CDK_CORE.helpers.import(module, 'cfn_parse', { fromLocation: props.importLocations?.coreHelpers });
   }
 
   public addResource(resource: Resource) {
-    const resourceClass = new ResourceClass(this.scope, resource);
+    const resourceClass = new ResourceClass(this.module, resource);
 
     const converter = new TypeConverter({ db: this.db, resource, resourceClass });
     const propsType = this.addResourcePropsType(resource, converter);
     resourceClass.buildMembers(propsType);
+
+    this.augmentations?.augmentResource(resource, resourceClass);
   }
 
   protected addResourcePropsType(r: Resource, converter: TypeConverter) {
-    const propsInterface = new StructType(this.scope, {
+    const propsInterface = new StructType(this.module, {
       export: true,
       name: propStructNameFromResource(r),
       docs: {
@@ -87,7 +104,7 @@ export class AstBuilder<T extends Module> {
         }),
       },
     });
-    const mapping = new PropMapping(this.scope);
+    const mapping = new PropMapping(this.module);
     for (const [name, prop] of Object.entries(r.properties)) {
       converter.addStructProperty(propsInterface, mapping, name, prop);
     }

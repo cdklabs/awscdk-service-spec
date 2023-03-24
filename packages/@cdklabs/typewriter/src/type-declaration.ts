@@ -1,8 +1,20 @@
 import * as jsii from '@jsii/spec';
 import { Documented } from './documented';
 import { IScope } from './scope';
-import { ThingSymbol, SymbolKind } from './symbol';
+import { ThingSymbol } from './symbol';
 import { Type } from './type';
+
+/**
+ * Kinds of declaration.
+ */
+export enum DeclarationKind {
+  Class = 'class',
+  Enum = 'enum',
+  Struct = 'struct',
+  Interface = 'interface',
+  Function = 'function',
+  MonkeyPatch = 'monkey-patch',
+}
 
 export interface TypeSpec extends Omit<jsii.TypeBase, 'assembly' | 'fqn' | 'kind'> {
   exported?: boolean;
@@ -26,7 +38,7 @@ export abstract class TypeDeclaration implements Documented {
     return this.scope.qualifyName(this.name);
   }
 
-  public abstract kind: SymbolKind;
+  public abstract kind: DeclarationKind;
 
   /**
    * Documentation for this type

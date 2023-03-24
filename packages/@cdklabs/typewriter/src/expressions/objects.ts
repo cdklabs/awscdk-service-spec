@@ -1,5 +1,12 @@
-import { Expression } from '../expression';
+import { Expression, Splat } from '../expression';
 import { Type } from '../type';
+
+export class DirectCode extends Expression {
+  readonly _comments_?: string[];
+  public constructor(public readonly _code_: string) {
+    super();
+  }
+}
 
 export class ObjectPropertyAccess extends Expression {
   readonly _comments_?: string[];
@@ -19,10 +26,11 @@ export class ObjectMethodInvoke extends Expression {
 }
 
 export class ObjectLiteral extends Expression {
-  public constructor(public readonly _contents_: Record<string, Expression> = {}) {
+  public constructor(public readonly _contents_: Array<readonly [string, Expression] | Splat>) {
     super();
   }
 
+  /*
   public get keys(): string[] {
     return Object.keys(this._contents_);
   }
@@ -30,6 +38,7 @@ export class ObjectLiteral extends Expression {
   public get entries(): Array<[string, Expression]> {
     return Object.entries(this._contents_);
   }
+  */
 }
 
 export class NotExpression extends Expression {
