@@ -20,7 +20,14 @@ export interface Exportable {
   export?: boolean;
 }
 
-export interface TypeSpec extends Omit<jsii.TypeBase, 'assembly' | 'fqn' | 'kind'>, Exportable {}
+export interface TypeParameter {
+  readonly name: string;
+  readonly extends?: Type;
+}
+
+export interface TypeSpec extends Omit<jsii.TypeBase, 'assembly' | 'fqn' | 'kind'>, Exportable {
+  readonly typeParameters?: TypeParameter[];
+}
 
 /**
  * An abstract jsii type
@@ -54,6 +61,13 @@ export abstract class TypeDeclaration implements Documented {
    */
   public get exported() {
     return !!this.spec.export;
+  }
+
+  /**
+   * The generic type parameters of the type
+   */
+  public get typeParameters(): ReadonlyArray<TypeParameter> | undefined {
+    return this.spec.typeParameters;
   }
 
   public readonly type: Type;

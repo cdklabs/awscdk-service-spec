@@ -29,7 +29,7 @@ import { InterfaceType } from '../interface';
 import { AliasedModuleImport, Module, SelectiveModuleImport } from '../module';
 import { MonkeyPatchedType } from '../monkey-patched-type';
 import { Parameter } from '../parameter';
-import { Property } from '../property';
+import { IProperty, Property } from '../property';
 import { AMBIENT_SCOPE } from '../scope';
 import {
   ReturnStatement,
@@ -49,6 +49,7 @@ import {
 import { StructType } from '../struct';
 import { ThingSymbol } from '../symbol';
 import { Type } from '../type';
+import { TypeParameter } from '../type-declaration';
 import { Initializer, MemberVisibility, Method } from '../type-member';
 
 export class TypeScriptRenderer extends Renderer {
@@ -96,7 +97,9 @@ export class TypeScriptRenderer extends Renderer {
     const modifiers = structType.modifiers.length ? structType.modifiers.join(' ') + ' ' : '';
 
     this.renderDocs(structType, { forceStruct: true });
-    this.emitBlock(`${modifiers}interface ${structType.name}`, () => {
+    this.emit(`${modifiers}interface ${structType.name}`);
+    this.renderTypeParameters(structType.typeParameters);
+    this.emitBlock(' ', () => {
       const props = Array.from(structType.properties.values()).filter((p) => p.visibility === MemberVisibility.Public);
 
       this.emitList(props, '\n\n', (p) => this.renderProperty(p, 'interface'));
@@ -108,6 +111,7 @@ export class TypeScriptRenderer extends Renderer {
 
     this.renderDocs(classType);
     this.emit(`${modifiers}class ${classType.name}`);
+    this.renderTypeParameters(classType.typeParameters);
 
     if (classType.extends) {
       this.emit(' extends ');
@@ -142,19 +146,20 @@ export class TypeScriptRenderer extends Renderer {
     }
   }
 
-  protected renderInterface(classType: InterfaceType) {
-    const modifiers = classType.modifiers.length ? classType.modifiers.join(' ') + ' ' : '';
+  protected renderInterface(interfaceType: InterfaceType) {
+    const modifiers = interfaceType.modifiers.length ? interfaceType.modifiers.join(' ') + ' ' : '';
 
-    this.renderDocs(classType);
-    this.emit(`${modifiers}interface ${classType.name}`);
+    this.renderDocs(interfaceType);
+    this.emit(`${modifiers}interface ${interfaceType.name}`);
+    this.renderTypeParameters(interfaceType.typeParameters);
 
-    if (classType.extends.length > 0) {
+    if (interfaceType.extends.length > 0) {
       this.emit(' extends ');
-      this.emitList(classType.extends, ', ', (t) => this.renderType(t));
+      this.emitList(interfaceType.extends, ', ', (t) => this.renderType(t));
     }
 
     this.emitBlock(' ', () => {
-      const members = [...classType.properties, ...classType.methods];
+      const members = [...interfaceType.properties, ...interfaceType.methods];
 
       this.emitList(members, '\n\n', (m) =>
         m instanceof Property ? this.renderProperty(m, 'interface') : this.renderMethod(m, 'interface'),
@@ -187,7 +192,7 @@ export class TypeScriptRenderer extends Renderer {
     }
   }
 
-  protected renderRegularProperty(property: Property, parent: 'interface' | 'class') {
+  protected renderRegularProperty(property: IProperty, parent: 'interface' | 'class') {
     this.renderDocs(property);
     if (property.abstract) {
       this.emit('abstract ');
@@ -206,7 +211,7 @@ export class TypeScriptRenderer extends Renderer {
     if (property.immutable) {
       this.emit('readonly ');
     }
-    this.emit(property.name);
+    this.renderPropertyName(property.name);
     if (property.optional) {
       this.emit('?');
     }
@@ -219,6 +224,10 @@ export class TypeScriptRenderer extends Renderer {
     }
 
     this.emit(';');
+  }
+
+  protected renderPropertyName(name: string) {
+    return this.emit(name.match(/[^a-zA-Z0-9_]/) ? JSON.stringify(name) : name);
   }
 
   protected renderGetterSetterProperty(property: Property) {
@@ -309,6 +318,22 @@ export class TypeScriptRenderer extends Renderer {
     return this.renderExpression(this.expressionFromSymbol(sym));
   }
 
+  protected renderTypeParameters(params?: ReadonlyArray<TypeParameter>) {
+    const renderParam = (p: TypeParameter) => {
+      this.emit(p.name);
+      if (p.extends) {
+        this.emit(' extends ');
+        this.renderType(p.extends);
+      }
+    };
+
+    if (params && params.length > 0) {
+      this.emit('<');
+      this.emitList(params, ', ', renderParam);
+      this.emit('>');
+    }
+  }
+
   protected renderType(ref: Type): void {
     if (ref.isVoid) {
       return this.emit('void');
@@ -341,6 +366,13 @@ export class TypeScriptRenderer extends Renderer {
     }
     if (ref.unionOfTypes) {
       return this.emitList(ref.unionOfTypes, ' | ', (x) => this.renderType(x));
+    }
+    if (ref.object) {
+      this.emit('{ ');
+      const props = Array.from(ref.object || []).filter((p) => p.visibility === MemberVisibility.Public);
+      this.emitList(props, ' ', (p) => this.renderRegularProperty(p, 'interface'));
+      this.emit(' }');
+      return;
     }
 
     this.emit('any');

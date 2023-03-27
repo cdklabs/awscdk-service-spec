@@ -26,6 +26,7 @@ export class InterfaceType extends MemberType {
 
   public constructor(public scope: IScope, public readonly spec: InterfaceSpec) {
     super(scope, spec);
+    spec.properties?.forEach((p) => this.addProperty(p));
   }
 
   public get extends() {
