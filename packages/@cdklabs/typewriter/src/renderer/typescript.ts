@@ -173,7 +173,10 @@ export class TypeScriptRenderer extends Renderer {
       });
     });
 
-    this.emitList(monkey.monkeyPatchStatements, '\n', (x) => this.renderStatement(x));
+    if (monkey.monkeyPatchStatements) {
+      this.emit('\n\n');
+      this.emitList(monkey.monkeyPatchStatements, '\n', (x) => this.renderStatement(x));
+    }
   }
 
   protected renderProperty(property: Property, parent: 'interface' | 'class') {

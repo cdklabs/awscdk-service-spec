@@ -2606,6 +2606,8 @@ declare module "./queue-base" {
   }
 }
 
+
+
 declare module "./queue-base" {
   interface QueueBase {
     /**
@@ -2676,7 +2678,9 @@ declare module "./queue-base" {
      */
     metricSentMessageSize(props?: cw.MetricOptions): cw.Metric;
   }
-}QueueBase.prototype.metric = function(metricName: string, props?: cw.MetricOptions) {
+}
+
+QueueBase.prototype.metric = function(metricName: string, props?: cw.MetricOptions) {
   return new cw.Metric({
     "namespace": "AWS/SQS",
     "metricName": metricName,
