@@ -108,7 +108,7 @@ export class CfnSkill extends cdk.CfnResource implements cdk.IInspectable {
   }
 }
 
-namespace CfnSkill {
+export namespace CfnSkill {
   /**
    * The \`AuthenticationConfiguration\` property type specifies the Login with Amazon (LWA) configuration used to authenticate with the Alexa service.
    *
@@ -907,7 +907,7 @@ export class CfnSchedule extends cdk.CfnResource implements cdk.IInspectable {
   }
 }
 
-namespace CfnSchedule {
+export namespace CfnSchedule {
   /**
    * Allows you to configure a time window during which EventBridge Scheduler invokes the schedule.
    *

@@ -11,7 +11,6 @@ import { DeclarationKind, TypeDeclaration, TypeSpec } from './type-declaration';
 import { Initializer, InitializerSpec } from './type-member';
 
 export interface ClassSpec extends TypeSpec {
-  export?: boolean;
   properties?: PropertySpec[];
   abstract?: boolean;
   extends?: Type;

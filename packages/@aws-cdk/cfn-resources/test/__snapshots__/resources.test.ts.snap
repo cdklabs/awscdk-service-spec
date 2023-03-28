@@ -200,7 +200,7 @@ export class CfnRestApi extends cdk.CfnResource implements cdk.IInspectable, cdk
   }
 }
 
-namespace CfnRestApi {
+export namespace CfnRestApi {
   /**
    * \`S3Location\` is a property of the [AWS::ApiGateway::RestApi](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html) resource that specifies the Amazon S3 location of a OpenAPI (formerly Swagger) file that defines a set of RESTful APIs in JSON or YAML.
    *
@@ -761,7 +761,7 @@ export class CfnRole extends cdk.CfnResource implements cdk.IInspectable, cdk.IT
   }
 }
 
-namespace CfnRole {
+export namespace CfnRole {
   /**
    * Contains information about an attached policy.
    *
@@ -1273,7 +1273,7 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
   }
 }
 
-namespace CfnFunction {
+export namespace CfnFunction {
   /**
    * The function's [AWS X-Ray](https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html) tracing configuration. To sample and record incoming requests, set \`Mode\` to \`Active\` .
    *
@@ -2488,7 +2488,7 @@ export class CfnBucket extends cdk.CfnResource implements cdk.IInspectable, cdk.
   }
 }
 
-namespace CfnBucket {
+export namespace CfnBucket {
   /**
    * Configures the transfer acceleration state for an Amazon S3 bucket.
    *
@@ -7929,7 +7929,7 @@ export class CfnSkill extends cdk.CfnResource implements cdk.IInspectable {
   }
 }
 
-namespace CfnSkill {
+export namespace CfnSkill {
   /**
    * The \`AuthenticationConfiguration\` property type specifies the Login with Amazon (LWA) configuration used to authenticate with the Alexa service.
    *

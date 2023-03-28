@@ -16,9 +16,11 @@ export enum DeclarationKind {
   MonkeyPatch = 'monkey-patch',
 }
 
-export interface TypeSpec extends Omit<jsii.TypeBase, 'assembly' | 'fqn' | 'kind'> {
-  exported?: boolean;
+export interface Exportable {
+  export?: boolean;
 }
+
+export interface TypeSpec extends Omit<jsii.TypeBase, 'assembly' | 'fqn' | 'kind'>, Exportable {}
 
 /**
  * An abstract jsii type
@@ -51,7 +53,7 @@ export abstract class TypeDeclaration implements Documented {
    * Whether this type is being exported from its scope
    */
   public get exported() {
-    return !!this.spec.exported;
+    return !!this.spec.export;
   }
 
   public readonly type: Type;

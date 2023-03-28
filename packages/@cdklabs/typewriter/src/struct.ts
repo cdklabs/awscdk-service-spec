@@ -2,10 +2,9 @@ import * as jsii from '@jsii/spec';
 import { MemberType } from './member-type';
 import { Property, PropertySpec } from './property';
 import { IScope } from './scope';
-import { DeclarationKind, TypeDeclaration } from './type-declaration';
+import { DeclarationKind, Exportable, TypeDeclaration } from './type-declaration';
 
-export interface StructSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' | 'kind' | 'properties'> {
-  export?: boolean;
+export interface StructSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' | 'kind' | 'properties'>, Exportable {
   properties?: PropertySpec[];
 }
 
