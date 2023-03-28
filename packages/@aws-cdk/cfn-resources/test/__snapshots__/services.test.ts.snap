@@ -2529,7 +2529,8 @@ function CfnScheduleGroupPropsFromCloudFormation(properties: any): cfn_parse.Fro
 
 exports[`aws-sqs 1`] = `
 {
-  "augmentations": "// Copyright 2012-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved./* eslint-disable prettier/prettier,max-len */
+  "augmentations": "// Copyright 2012-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+/* eslint-disable prettier/prettier,max-len */
 import * as cw from "aws-cdk-lib/aws-cloudwatch";
 import { QueueBase } from "./queue-base";
 

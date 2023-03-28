@@ -55,7 +55,7 @@ export class TypeScriptRenderer extends Renderer {
   protected renderModule(mod: Module) {
     this.withScope(mod, () => {
       for (const doc of mod.documentation) {
-        this.emit(`// ${doc}`);
+        this.emit(`// ${doc}\n`);
       }
       this.emit('/* eslint-disable prettier/prettier,max-len */\n');
       this.renderImports(mod);
