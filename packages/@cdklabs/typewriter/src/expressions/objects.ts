@@ -29,16 +29,6 @@ export class ObjectLiteral extends Expression {
   public constructor(public readonly _contents_: Array<readonly [string, Expression] | Splat>) {
     super();
   }
-
-  /*
-  public get keys(): string[] {
-    return Object.keys(this._contents_);
-  }
-
-  public get entries(): Array<[string, Expression]> {
-    return Object.entries(this._contents_);
-  }
-  */
 }
 
 export class NotExpression extends Expression {

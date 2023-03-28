@@ -15,9 +15,10 @@ export class MonkeyPatchedType extends MemberType {
   public readonly isClass: boolean;
 
   constructor(declarationScope: IScope, public readonly targetType: MemberType) {
-    // FIXME: targetType is now a MemberType, which implies it is a Declaration.
-    // However, we usually won't have the Declaration, so we need to make a fake one, which
-    // is a bit silly.
+    // targetType is a MemberType, which implies it is a Declaration.  However,
+    // we usually won't have the Declaration, so we need to make a fake one,
+    // which is a bit silly. On the other hand, it works out nicely if we need to
+    // generate that class as well (for testing purposes perhaps).
     super(declarationScope, {
       // We need a fake name to register ourselves into our target declaration scope,
       // we're never directly referencing it anyway

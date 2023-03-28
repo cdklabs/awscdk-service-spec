@@ -21,7 +21,8 @@ export default async function (
 
   console.log(`cfn-resources: ${scopes.join(', ')}`);
   await generate({
-    resourceFilePattern: '%shortname%.generated.ts',
+    resourceFilePattern: ({ shortname }) => `${shortname}.generated.ts`,
+    augmentationsFilePattern: ({ shortname }) => `${shortname}-augmentations.generated.ts`,
     outputPath: outPath ?? 'lib',
     clearOutput: false,
     services: scopes.map((s) => s.replace('::', '-').toLowerCase()),
