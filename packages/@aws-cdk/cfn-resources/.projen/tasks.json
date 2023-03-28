@@ -76,7 +76,7 @@
       "name": "generate",
       "steps": [
         {
-          "exec": "ts-node --project tsconfig.dev.json src/cli/main.ts",
+          "exec": "ts-node --project tsconfig.dev.json src/cli/main.ts --augmentations-support",
           "receiveArgs": true
         }
       ]

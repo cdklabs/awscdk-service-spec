@@ -3,10 +3,10 @@ import { FreeFunction } from '../callable';
 import { ClassType } from '../class';
 import { InterfaceType } from '../interface';
 import { Module } from '../module';
+import { MonkeyPatchedType } from '../monkey-patched-type';
 import { IScope } from '../scope';
 import { StructType } from '../struct';
-import { SymbolKind } from '../symbol';
-import { TypeDeclaration } from '../type-declaration';
+import { DeclarationKind, TypeDeclaration } from '../type-declaration';
 
 export interface RenderOptions {
   indentation?: number | string;
@@ -48,17 +48,20 @@ export abstract class Renderer {
 
   protected renderDeclaration(decl: TypeDeclaration) {
     switch (decl.kind) {
-      case SymbolKind.Struct:
+      case DeclarationKind.Struct:
         this.renderStruct(decl as StructType);
         break;
-      case SymbolKind.Interface:
+      case DeclarationKind.Interface:
         this.renderInterface(decl as InterfaceType);
         break;
-      case SymbolKind.Function:
+      case DeclarationKind.Function:
         this.renderFunction(decl as FreeFunction);
         break;
-      case SymbolKind.Class:
+      case DeclarationKind.Class:
         this.renderClass(decl as ClassType);
+        break;
+      case DeclarationKind.MonkeyPatch:
+        this.renderMonkeyPatch(decl as MonkeyPatchedType);
         break;
       default:
         throw `Unknown type: ${decl.kind} for ${decl.fqn}. Skipping.`;
@@ -84,6 +87,11 @@ export abstract class Renderer {
    * Render a class.
    */
   protected abstract renderClass(cls: ClassType): void;
+
+  protected renderMonkeyPatch(mod: MonkeyPatchedType) {
+    void mod;
+    throw new Error(`${this} does not support monkey patches`);
+  }
 
   protected indent() {
     this.emitter.indent(this.symbol);
@@ -128,5 +136,9 @@ export abstract class Renderer {
 
   protected get scopes(): ReadonlyArray<IScope> {
     return this.scopeStack;
+  }
+
+  public toString() {
+    return `${this.constructor.name} renderer`;
   }
 }

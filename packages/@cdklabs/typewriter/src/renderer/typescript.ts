@@ -2,10 +2,11 @@ import { Renderer } from './base';
 import { CallableDeclaration, isCallableDeclaration } from '../callable';
 import { ClassType } from '../class';
 import { Documented } from '../documented';
-import { AnonymousInterfaceImplementation, Expression, Lambda, SymbolReference } from '../expression';
+import { AnonymousInterfaceImplementation, Expression, Lambda, Splat, SymbolReference } from '../expression';
 import {
   BinOp,
   DestructuringBind,
+  DirectCode,
   Identifier,
   IsNotNullish,
   IsObject,
@@ -25,7 +26,8 @@ import {
 } from '../expressions';
 import { InvokeCallable } from '../expressions/invoke';
 import { InterfaceType } from '../interface';
-import { AliasedModuleImport, Module } from '../module';
+import { AliasedModuleImport, Module, SelectiveModuleImport } from '../module';
+import { MonkeyPatchedType } from '../monkey-patched-type';
 import { Parameter } from '../parameter';
 import { Property } from '../property';
 import { AMBIENT_SCOPE } from '../scope';
@@ -42,6 +44,7 @@ import {
   ForLoop,
   StatementSeparator,
   ThrowStatement,
+  MonkeyPatchMethod,
 } from '../statements';
 import { StructType } from '../struct';
 import { ThingSymbol } from '../symbol';
@@ -51,9 +54,14 @@ import { Initializer, MemberVisibility, Method } from '../type-member';
 export class TypeScriptRenderer extends Renderer {
   protected renderModule(mod: Module) {
     this.withScope(mod, () => {
-      this.emit('/* eslint-disable prettier/prettier */\n');
+      for (const doc of mod.documentation) {
+        this.emit(`// ${doc}\n`);
+      }
+      this.emit('/* eslint-disable prettier/prettier,max-len */\n');
       this.renderImports(mod);
       this.renderModuleTypes(mod);
+
+      this.emitList(mod.initialization, '\n', (s) => this.renderStatement(s));
     });
   }
 
@@ -61,8 +69,8 @@ export class TypeScriptRenderer extends Renderer {
     for (const imp of mod.imports) {
       if (imp instanceof AliasedModuleImport) {
         this.emit(`import * as ${imp.importAlias} from "${imp.moduleSource}";\n`);
-      } else {
-        this.emit('/* @todo multi import */\n');
+      } else if (imp instanceof SelectiveModuleImport) {
+        this.emit(`import { ${imp.importedNames.join(', ')} } from "${imp.moduleSource}";\n`);
       }
     }
 
@@ -152,6 +160,23 @@ export class TypeScriptRenderer extends Renderer {
         m instanceof Property ? this.renderProperty(m, 'interface') : this.renderMethod(m, 'interface'),
       );
     });
+  }
+
+  protected renderMonkeyPatch(monkey: MonkeyPatchedType) {
+    this.emitBlock(`declare module "${monkey.targetModule.importName}"`, () => {
+      this.emitBlock(`interface ${monkey.targetType.name}`, () => {
+        const members = [...monkey.properties, ...monkey.methods];
+
+        this.emitList(members, '\n\n', (m) =>
+          m instanceof Property ? this.renderProperty(m, 'interface') : this.renderMethod(m, 'interface'),
+        );
+      });
+    });
+
+    if (monkey.monkeyPatchStatements) {
+      this.emit('\n\n');
+      this.emitList(monkey.monkeyPatchStatements, '\n', (x) => this.renderStatement(x));
+    }
   }
 
   protected renderProperty(property: Property, parent: 'interface' | 'class') {
@@ -259,7 +284,7 @@ export class TypeScriptRenderer extends Renderer {
       this.renderType(method.returnType);
     }
 
-    if (method.body) {
+    if (method.body && parent === 'class') {
       this.emit(' ');
       this.renderBlock(method.body);
     } else {
@@ -271,6 +296,9 @@ export class TypeScriptRenderer extends Renderer {
     this.emit('(');
     this.emitList(parameters, ', ', (p) => {
       this.emit(p._identifier_);
+      if (p.optional) {
+        this.emit('?');
+      }
       this.emit(': ');
       this.renderType(p.type);
     });
@@ -322,20 +350,19 @@ export class TypeScriptRenderer extends Renderer {
    * Look up a symbol and turn it into an expression
    */
   protected expressionFromSymbol(sym: ThingSymbol) {
+    // the ambient scope is always visible
+    if (sym.scope === AMBIENT_SCOPE) {
+      return new Identifier(sym.name);
+    }
+
+    if (sym.name === 'VpnConnectionBase') {
+      debugger;
+    }
+
     for (const scope of this.scopes) {
-      // Defining scope is visible, so identifiers in it are as well
-      if (sym.scope === scope) {
-        return new Identifier(sym.name);
-      }
-
-      // The ambient scope is always visible
-      if (sym.scope === AMBIENT_SCOPE) {
-        return new Identifier(sym.name);
-      }
-
-      const imp = scope.findLink(sym.scope);
-      if (imp) {
-        return imp.referenceSymbol(sym);
+      const expr = scope.symbolToExpression(sym);
+      if (expr) {
+        return expr;
       }
     }
 
@@ -414,6 +441,19 @@ export class TypeScriptRenderer extends Renderer {
         this.renderExpression(x.expression);
         this.emit(';');
       }),
+      typeCase(MonkeyPatchMethod, (x) => {
+        // Monkey patching in JavaScript:
+        // <class>.prototype.<name> = function(<parameters>) { <body> }
+        this.renderExpression(x.targetClass);
+        this.emit('.prototype.');
+        this.emit(x.method);
+        // Must use function, not fat-arrow, because 'this' must remain floating
+        this.emit(' = function');
+        this.renderParameters(x.parameters);
+        this.emit(' ');
+        this.renderBlock(x.body);
+        this.emit(';');
+      }),
     ]);
 
     if (!success) {
@@ -423,6 +463,7 @@ export class TypeScriptRenderer extends Renderer {
 
   protected renderExpression(expr: Expression): void {
     const success = dispatchType(expr, [
+      typeCase(DirectCode, (x) => this.emit(x._code_)),
       typeCase(ObjectLiteral, (x) => this.renderObjectLiteral(x)),
       typeCase(ObjectPropertyAccess, (x) => this.renderObjectAccess(x)),
       typeCase(ObjectMethodInvoke, (x) => this.renderObjectMethodInvoke(x)),
@@ -507,6 +548,11 @@ export class TypeScriptRenderer extends Renderer {
           this.renderExpression(x.body);
         }
       }),
+
+      typeCase(Splat, (x) => {
+        this.emit('...');
+        this.renderExpression(x._operand_);
+      }),
     ]);
 
     if (!success) {
@@ -543,9 +589,14 @@ export class TypeScriptRenderer extends Renderer {
 
   protected renderObjectLiteral(obj: ObjectLiteral) {
     this.emitBlock('', () => {
-      this.emitList(obj.entries, ',\n', ([key, val]) => {
-        this.emit(`${JSON.stringify(key)}: `);
-        this.renderExpression(val);
+      this.emitList(obj._contents_, ',\n', (what) => {
+        if (what instanceof Splat) {
+          this.renderExpression(what);
+        } else {
+          const [key, val] = what;
+          this.emit(`${JSON.stringify(key)}: `);
+          this.renderExpression(val);
+        }
       });
     });
   }

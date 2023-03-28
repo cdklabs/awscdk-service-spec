@@ -1,17 +1,6 @@
 import { IScope, RichScope } from './scope';
 
 /**
- * Kinds of types.
- */
-export enum SymbolKind {
-  Class = 'class',
-  Enum = 'enum',
-  Struct = 'struct',
-  Interface = 'interface',
-  Function = 'function',
-}
-
-/**
  * A symbol is a name for a thing that lives in a scope.
  *
  * It is not renderable by itself, but it can be converted into to an

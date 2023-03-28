@@ -6,9 +6,8 @@ import { IScope } from './scope';
 import { Statement } from './statements';
 import { Block } from './statements/block';
 import { asStmt } from './statements/private';
-import { SymbolKind } from './symbol';
 import { Type } from './type';
-import { TypeDeclaration, TypeSpec } from './type-declaration';
+import { DeclarationKind, TypeDeclaration, TypeSpec } from './type-declaration';
 
 export interface CallableSpec extends TypeSpec {
   name: string;
@@ -33,7 +32,7 @@ export interface CallableExpr {
  */
 export class FreeFunction extends TypeDeclaration implements CallableDeclaration {
   public readonly returnType: Type;
-  public readonly kind = SymbolKind.Function;
+  public readonly kind = DeclarationKind.Function;
   public readonly parameters = new Array<Parameter>();
 
   private _body?: Block;

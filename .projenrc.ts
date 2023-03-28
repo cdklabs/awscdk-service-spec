@@ -135,7 +135,7 @@ cfnResources.addGitIgnore('src/services/**');
 cfnResources.tsconfigDev.file.addOverride('ts-node.swc', true);
 cfnResources.preCompileTask.spawn(
   cfnResources.tasks.addTask('generate', {
-    exec: 'ts-node --project tsconfig.dev.json src/cli/main.ts',
+    exec: 'ts-node --project tsconfig.dev.json src/cli/main.ts --augmentations-support',
     receiveArgs: true,
   }),
 );

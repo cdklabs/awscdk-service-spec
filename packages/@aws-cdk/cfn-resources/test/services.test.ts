@@ -16,5 +16,10 @@ test.each(['alexa-ask', 'aws-chatbot', 'aws-scheduler', 'aws-sqs'])('%s', (servi
 
   const ast = AstBuilder.forService(service, { db });
 
-  expect(renderer.render(ast.scope)).toMatchSnapshot();
+  const rendered = {
+    module: renderer.render(ast.module),
+    augmentations: ast.augmentations?.hasAugmentations ? renderer.render(ast.augmentations) : undefined,
+  };
+
+  expect(rendered).toMatchSnapshot();
 });

@@ -1,5 +1,7 @@
+import { Block } from './block';
 import { asStmt } from './private';
 import { Expression } from '../expression';
+import { Parameter } from '../parameter';
 
 export class Statement {
   readonly comments?: string[];
@@ -106,6 +108,22 @@ export class StatementSeparator extends Statement {}
 
 export class ThrowStatement extends Statement {
   constructor(public readonly expression: Expression) {
+    super();
+  }
+}
+
+/**
+ * A monkey patching statement
+ *
+ * Adds/overwrites a method on a particular class. Only available in certain languages.
+ */
+export class MonkeyPatchMethod extends Statement {
+  constructor(
+    public readonly targetClass: Expression,
+    public readonly method: string,
+    public readonly parameters: Parameter[],
+    public readonly body: Block,
+  ) {
     super();
   }
 }

@@ -55,7 +55,7 @@ export type ExpressionProxy<E> = E & {
 export type TypeExpressionProxy<T> = T & {
   (...args: Expression[]): ExpressionProxy<Expression>;
   [key: string]: ExpressionProxy<Expression>;
-  new (...args: Expression[]): Expression;
+  new (...args: Expression[]): ExpressionProxy<Expression>;
 };
 
 /**
@@ -86,7 +86,7 @@ const TYPE_HANDLERS: ProxyHandler<Type> = {
     return key in type ? (type as any)[key] : $E(expr.type(type).prop(String(key)));
   },
   construct: (type, args) => {
-    return new NewExpression(type, ...args);
+    return $E(new NewExpression(type, ...args));
   },
   set: () => false,
   has: () => true,

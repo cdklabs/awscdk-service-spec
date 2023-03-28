@@ -2,8 +2,7 @@ import * as jsii from '@jsii/spec';
 import { MemberType } from './member-type';
 import { Property, PropertySpec } from './property';
 import { IScope } from './scope';
-import { SymbolKind } from './symbol';
-import { Exportable, TypeDeclaration } from './type-declaration';
+import { DeclarationKind, Exportable, TypeDeclaration } from './type-declaration';
 
 export interface StructSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' | 'kind' | 'properties'>, Exportable {
   properties?: PropertySpec[];
@@ -20,7 +19,7 @@ export class StructType extends MemberType {
     return x;
   }
 
-  public readonly kind = SymbolKind.Struct;
+  public readonly kind = DeclarationKind.Struct;
 
   /**
    * List the modifiers of the interface

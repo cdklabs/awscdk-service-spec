@@ -28,8 +28,8 @@ export function readCloudFormationDocumentation(db: SpecDatabase, docs: CloudFor
   function readPropertyTypeDocs(resourceName: string, propertyTypeName: string, typeDocs: cfndocs.TypeDocumentation) {
     const propertyTypes = db
       .lookup('resource', 'cloudFormationType', 'equals', resourceName)
-      .flatMap((res) => db.follow('usesType', res).filter((t) => t.to.name === propertyTypeName))
-      .map((t) => t.to);
+      .flatMap((res) => db.follow('usesType', res).filter((t) => t.entity.name === propertyTypeName))
+      .map((t) => t.entity);
 
     for (const propertyType of propertyTypes) {
       if (typeDocs.description) {

@@ -7,6 +7,7 @@ import {
   RelationshipCollection,
   stringCmp,
 } from '@cdklabs/tskb';
+import { IsAugmentedResource, ResourceAugmentation } from './augmentations';
 import {
   Resource,
   Service,
@@ -24,10 +25,13 @@ export interface DatabaseSchema {
   readonly region: EntityCollection<Region>;
   readonly resource: EntityCollection<Resource, 'cloudFormationType'>;
   readonly typeDefinition: EntityCollection<TypeDefinition>;
+  readonly augmentations: EntityCollection<ResourceAugmentation>;
+
   readonly hasResource: RelationshipCollection<HasResource, DatabaseSchema, 'service', 'resource'>;
   readonly regionHasResource: RelationshipCollection<RegionHasResource, DatabaseSchema, 'region', 'resource'>;
   readonly regionHasService: RelationshipCollection<RegionHasService, DatabaseSchema, 'region', 'service'>;
   readonly usesType: RelationshipCollection<UsesType, DatabaseSchema, 'resource', 'typeDefinition'>;
+  readonly isAugmented: RelationshipCollection<IsAugmentedResource, DatabaseSchema, 'resource', 'augmentations'>;
 }
 
 export function emptyDatabase() {
@@ -40,11 +44,13 @@ export function emptyDatabase() {
       name: emptyIndex('name', stringCmp),
     }),
     typeDefinition: emptyCollection({}),
+    augmentations: emptyCollection({}),
 
     hasResource: emptyRelationship('service', 'resource'),
     regionHasResource: emptyRelationship('region', 'resource'),
     regionHasService: emptyRelationship('region', 'service'),
     usesType: emptyRelationship('resource', 'typeDefinition'),
+    isAugmented: emptyRelationship('resource', 'augmentations'),
   });
 }
 
@@ -59,7 +65,7 @@ export class RichSpecDatabase {
   /**
    * Find all resources of a given type
    */
-  public resourcesByType(cfnType: string): Resource[] {
+  public resourcesByType(cfnType: string): readonly Resource[] {
     return this.db.lookup('resource', 'cloudFormationType', 'equals', cfnType);
   }
 

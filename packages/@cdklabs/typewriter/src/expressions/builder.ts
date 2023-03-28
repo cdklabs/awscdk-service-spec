@@ -1,9 +1,10 @@
 import { Identifier } from './identifier';
 import { InvokeCallable } from './invoke';
-import { Expression, SymbolReference } from '../expression';
+import { Expression, Splat, SymbolReference } from '../expression';
 import {
   BinOp,
   DestructuringBind,
+  DirectCode,
   IsObject,
   JsLiteralExpression,
   NotExpression,
@@ -18,6 +19,13 @@ import {
 import { ThingSymbol } from '../symbol';
 import { Type } from '../type';
 
+/**
+ * Insert direct code, bypassing all translation
+ */
+export function directCode(code: string): Expression {
+  return new DirectCode(code);
+}
+
 export function ident(identifier: string): Identifier {
   return new Identifier(identifier);
 }
@@ -26,8 +34,15 @@ export function sym(symb: ThingSymbol): Expression {
   return new SymbolReference(symb);
 }
 
-export function object(data?: Record<string, Expression> | Array<readonly [string, Expression]>): Expression {
-  return new ObjectLiteral(Array.isArray(data) ? Object.fromEntries(data) : data ?? {});
+export function object(
+  ...parts: Array<Record<string, Expression> | Array<readonly [string, Expression]> | Splat>
+): Expression {
+  return new ObjectLiteral(
+    parts.flatMap(
+      (part): Array<Splat | readonly [string, Expression]> =>
+        part instanceof Splat ? [part] : Array.isArray(part) ? part : Object.entries(part),
+    ),
+  );
 }
 
 export function not(operand: Expression): Expression {

@@ -1,9 +1,8 @@
 import { MemberType } from './member-type';
 import { PropertySpec } from './property';
 import { IScope } from './scope';
-import { SymbolKind } from './symbol';
 import { Type } from './type';
-import { TypeSpec } from './type-declaration';
+import { DeclarationKind, TypeSpec } from './type-declaration';
 
 export interface InterfaceSpec extends TypeSpec {
   properties?: PropertySpec[];
@@ -11,7 +10,7 @@ export interface InterfaceSpec extends TypeSpec {
 }
 
 export class InterfaceType extends MemberType {
-  public readonly kind = SymbolKind.Interface;
+  public readonly kind = DeclarationKind.Interface;
 
   /**
    * List the modifiers of the interface

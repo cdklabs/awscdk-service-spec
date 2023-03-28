@@ -1,4 +1,4 @@
-import { Entity, EntityCollection, isEntityCollection, Plain } from './entity';
+import { Entity, EntityCollection, isEntityCollection, Plain, Reference } from './entity';
 import {
   AnyRelationshipCollection,
   isRelationshipCollection,
@@ -39,9 +39,9 @@ export class Database<S extends object> {
   /**
    * Get an entity by key
    */
-  public get<K extends EntityKeys<S>>(key: K, id: string): EntityType<S[K]> {
+  public get<K extends EntityKeys<S>>(key: K, id: string | Reference<EntityType<S[K]>>): EntityType<S[K]> {
     const coll: EntityCollection<any> = this.schema[key] as any;
-    const ret = coll.entities.get(id);
+    const ret = coll.entities.get(typeof id === 'string' ? id : id.$ref);
     if (!ret) {
       throw new Error(`No such ${String(key)}: ${id}`);
     }
@@ -64,10 +64,13 @@ export class Database<S extends object> {
     index: I,
     lookup: LookupsOf<S[K], I>,
     value: EntityType<S[K]>[I],
-  ): EntityType<S[K]>[] {
+  ): RichReadonlyArray<EntityType<S[K]>> {
     const coll: EntityCollection<any> = this.schema[key] as any;
     const ids = (coll.indexes as any)[index].lookups[lookup](value);
-    return ids.map((id: string) => coll.entities.get(id));
+    return addOnlyMethod(
+      ids.map((id: string) => coll.entities.get(id)),
+      `${String(key)} with ${String(index)} ${String(lookup)} ${JSON.stringify(value)}`,
+    );
   }
 
   /**
@@ -98,10 +101,10 @@ export class Database<S extends object> {
   public follow<K extends RelKeys<S>>(
     key: K,
     from: RelFrom<RelType<S[K]>>,
-  ): Edges<ToLink<RelTo<RelType<S[K]>>, RelAttr<RelType<S[K]>>>> {
+  ): RichReadonlyArray<Link<RelTo<RelType<S[K]>>, RelAttr<RelType<S[K]>>>> {
     const col: AnyRelationshipCollection = this.schema[key] as any;
     const toLinks = col.forward.get(from.$id) ?? [];
-    const ret = toLinks.map((i) => ({ to: this.get(col.toColl, i.$id), ...removeId(i) } as any));
+    const ret = toLinks.map((i) => ({ entity: this.get(col.toColl, i.$id), ...removeId(i) } as any));
 
     return addOnlyMethod(ret, `${String(key)} from ${from}`);
   }
@@ -112,10 +115,10 @@ export class Database<S extends object> {
   public incoming<K extends RelKeys<S>>(
     key: K,
     to: RelTo<RelType<S[K]>>,
-  ): Edges<FromLink<RelFrom<RelType<S[K]>>, RelAttr<RelType<S[K]>>>> {
+  ): RichReadonlyArray<Link<RelFrom<RelType<S[K]>>, RelAttr<RelType<S[K]>>>> {
     const col: AnyRelationshipCollection = this.schema[key] as any;
     const fromIds = col.backward.get(to.$id) ?? [];
-    const ret = fromIds.map((i) => ({ from: this.get(col.fromColl, i.$id), ...removeId(i) } as any));
+    const ret = fromIds.map((i) => ({ entity: this.get(col.fromColl, i.$id), ...removeId(i) } as any));
 
     return addOnlyMethod(ret, `${String(key)} to ${to}`);
   }
@@ -187,8 +190,7 @@ function removeId<A extends object>(x: A): Omit<A, '$id'> {
   return ret;
 }
 
-export type ToLink<E, A> = { readonly to: E } & A;
-export type FromLink<E, A> = { readonly from: E } & A;
+export type Link<E, A> = { readonly entity: E } & A;
 
 type EntityKeys<S> = { [K in keyof S]: S[K] extends EntityCollection<any> ? K : never }[keyof S];
 type RelKeys<S> = { [K in keyof S]: S[K] extends AnyRelationshipCollection ? K : never }[keyof S];
@@ -205,14 +207,14 @@ type LookupsOf<A, I extends IndexesOf<A>> = A extends EntityCollection<any, any>
   ? keyof A['indexes'][I]['lookups']
   : never;
 
-export interface Edges<A> extends ReadonlyArray<A> {
+export interface RichReadonlyArray<A> extends ReadonlyArray<A> {
   /**
    * Return the first and only element, throwing if there are != 1 elements
    */
   only(): A;
 }
 
-function addOnlyMethod<A>(xs: A[], description: string): Edges<A> {
+function addOnlyMethod<A>(xs: A[], description: string): RichReadonlyArray<A> {
   return Object.defineProperties(xs, {
     only: {
       enumerable: false,

@@ -72,11 +72,11 @@ describe.each([false, true])('database with some entities (saveAndLoad: %p)', (s
     const a = mustFind('thing', (x) => x.name === 'A');
     expect(db.follow('hasWidget', a)).toEqual([
       {
-        to: expect.objectContaining({ color: 'green' }),
+        entity: expect.objectContaining({ color: 'green' }),
         count: 1,
       },
       {
-        to: expect.objectContaining({ color: 'blue' }),
+        entity: expect.objectContaining({ color: 'blue' }),
         count: 2,
       },
     ]);
@@ -87,7 +87,7 @@ describe.each([false, true])('database with some entities (saveAndLoad: %p)', (s
       const b = mustFind('thing', (x) => x.name === 'B');
       expect(db.follow('hasWidget', b).only()).toEqual(
         expect.objectContaining({
-          to: expect.objectContaining({ color: 'purple' }),
+          entity: expect.objectContaining({ color: 'purple' }),
         }),
       );
     });
@@ -107,7 +107,7 @@ describe.each([false, true])('database with some entities (saveAndLoad: %p)', (s
     const purpleWidget = mustFind('widget', (w) => w.color === 'purple');
     expect(db.incoming('hasWidget', purpleWidget)).toEqual([
       {
-        from: expect.objectContaining({ name: 'B' }),
+        entity: expect.objectContaining({ name: 'B' }),
         count: 5,
       },
     ]);
