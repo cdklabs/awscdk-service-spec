@@ -3,6 +3,7 @@ import { Database } from '@cdklabs/tskb';
 import { StructType, Module } from '@cdklabs/typewriter';
 import { Stability } from '@jsii/spec';
 import { AugmentationsModule } from './augmentation-generator';
+import { CannedMetricsModule } from './canned-metrics';
 import { CDK_CORE, CONSTRUCTS, ModuleImportLocations } from './cdk';
 import { ResourceClass } from './resource-class';
 import { TypeConverter } from './type-converter';
@@ -43,10 +44,12 @@ export class AstBuilder<T extends Module> {
   public static forService(service: Service, props: AstBuilderProps): AstBuilder<ServiceModule> {
     const scope = new ServiceModule(service.name, service.shortName);
     const aug = new AugmentationsModule(props.db, service.name, props.importLocations?.cloudwatch);
+    const metrics = CannedMetricsModule.forService(props.db, service);
 
-    const ast = new AstBuilder(scope, props, aug);
+    const ast = new AstBuilder(scope, props, aug, metrics);
 
     const resources = props.db.follow('hasResource', service);
+
     for (const link of resources) {
       ast.addResource(link.entity);
     }
@@ -61,8 +64,9 @@ export class AstBuilder<T extends Module> {
     const parts = resource.cloudFormationType.toLowerCase().split('::');
     const scope = new ResourceModule(parts[1], parts[2]);
     const aug = new AugmentationsModule(props.db, parts[1], props.importLocations?.cloudwatch);
+    const metrics = CannedMetricsModule.forResource(props.db, resource);
 
-    const ast = new AstBuilder(scope, props, aug);
+    const ast = new AstBuilder(scope, props, aug, metrics);
     ast.addResource(resource);
 
     return ast;
@@ -74,6 +78,7 @@ export class AstBuilder<T extends Module> {
     public readonly module: T,
     props: AstBuilderProps,
     public readonly augmentations?: AugmentationsModule,
+    public readonly cannedMetrics?: CannedMetricsModule,
   ) {
     this.db = props.db;
 

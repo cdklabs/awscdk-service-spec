@@ -1,4 +1,4 @@
-import { Resource, TypeDefinition } from '@aws-cdk/service-spec';
+import { Metric, Resource, Service, TypeDefinition } from '@aws-cdk/service-spec';
 import { ClassType, TypeDeclaration } from '@cdklabs/typewriter';
 import camelcase from 'camelcase';
 
@@ -67,6 +67,16 @@ export function cfnPropsValidatorNameFromType(struct: TypeDeclaration) {
   return `${qualifiedName(struct)}Validator`;
 }
 
+export function metricsClassNameFromService(service: Service) {
+  return camelcase(`${service.shortName}Metrics`, {
+    pascalCase: true,
+  });
+}
+
+export function metricFunctionName(metric: Metric) {
+  return makeIdentifier(camelcase(`${metric.name}${metric.statistic}`));
+}
+
 export function staticResourceTypeName() {
   return 'CFN_RESOURCE_TYPE_NAME';
 }
@@ -85,4 +95,16 @@ export function attributePropertyName(attrName: string) {
  */
 function qualifiedName(type: TypeDeclaration) {
   return [type.scope instanceof ClassType ? type.scope.name : '', type.name].join('');
+}
+
+/**
+ * Not all characters are allowed in identifiers.
+ * E.g. if it doesn't start with an allowed character, prefix with a '_'
+ */
+function makeIdentifier(s: string) {
+  // Strip invalid characters from identifier
+  s = s.replace(/([^a-zA-Z0-9_])/g, '');
+  // If it doesn't start with an alpha char, prefix with _
+  s = s.replace(/^([^a-zA-Z_])/, '_$1');
+  return s;
 }
