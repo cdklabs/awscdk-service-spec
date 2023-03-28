@@ -452,6 +452,7 @@ export class TypeScriptRenderer extends Renderer {
         this.renderParameters(x.parameters);
         this.emit(' ');
         this.renderBlock(x.body);
+        this.emit(';');
       }),
     ]);
 
