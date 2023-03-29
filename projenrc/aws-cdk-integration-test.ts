@@ -23,7 +23,7 @@ export class AwsCdkIntgrationTest extends pj.Component {
     const awsCdkPath = 'aws-cdk';
 
     workflow.addJob('test-with-new-codegen', {
-      runsOn: ['ubuntu-latest'],
+      runsOn: ['aws-cdk_ubuntu-latest_16-core'],
       env: {
         CI: '1',
       },

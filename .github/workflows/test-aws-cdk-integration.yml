@@ -6,7 +6,7 @@ on:
   pull_request: {}
 jobs:
   test-with-new-codegen:
-    runs-on: ubuntu-latest
+    runs-on: aws-cdk_ubuntu-latest_16-core
     permissions:
       contents: read
     env:
