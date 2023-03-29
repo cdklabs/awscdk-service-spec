@@ -1,5 +1,4 @@
-import { DatabaseSchema, Deprecation, Property, PropertyType, Resource, TypeDefinition } from '@aws-cdk/service-spec';
-import { Database } from '@cdklabs/tskb';
+import { SpecDatabase, Deprecation, Property, PropertyType, Resource, TypeDefinition } from '@aws-cdk/service-spec';
 import {
   $E,
   ClassType,
@@ -28,7 +27,7 @@ import { PropMapping } from '../prop-mapping';
 import { splitDocumentation } from '../split-summary';
 
 export interface TypeConverterOptions {
-  readonly db: Database<DatabaseSchema>;
+  readonly db: SpecDatabase;
   readonly resourceClass: ClassType;
   readonly resource: Resource;
 }
@@ -37,7 +36,7 @@ export interface TypeConverterOptions {
  * Convert types from the resource model to the code generator model
  */
 export class TypeConverter {
-  private readonly db: Database<DatabaseSchema>;
+  private readonly db: SpecDatabase;
   private readonly module: Module;
   private readonly resourceClass: ClassType;
   private readonly resource: Resource;

@@ -1,6 +1,5 @@
 import path from 'path';
-import { DatabaseSchema } from '@aws-cdk/service-spec';
-import { Database } from '@cdklabs/tskb';
+import { SpecDatabase } from '@aws-cdk/service-spec';
 import { Module, TypeScriptRenderer } from '@cdklabs/typewriter';
 import * as fs from 'fs-extra';
 import { AstBuilder } from './cdk/ast';
@@ -120,7 +119,7 @@ class ServiceFileWriter {
   }
 }
 
-function getServices(db: Database<DatabaseSchema>, services?: string[]) {
+function getServices(db: SpecDatabase, services?: string[]) {
   if (!services) {
     return db.all('service');
   }

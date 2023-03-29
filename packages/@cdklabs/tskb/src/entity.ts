@@ -6,42 +6,70 @@ export interface Entity {
 
 export type Plain<E extends Entity> = Omit<E, '$id'>;
 
-export interface EntityCollection<A extends Entity, Indexes extends keyof A = never> {
+type Indexes<A extends Entity> = { [K in PropertyKey]: EntityIndex<A, any> };
+
+export interface EntityCollection<A extends Entity, I extends Indexes<Entity> = {}> {
   readonly type: 'entities';
   readonly entities: Map<string, A>;
-  readonly indexes: { [K in Indexes]: EntityIndex<A, K> };
+  readonly indexes: I;
 
   add(x: A): void;
   dehydrate(): any;
   hydrateFrom(x: any): void;
+
+  /**
+   * Add indexes to this collection
+   *
+   * Creating an indexed collection is a two-step operation so that we can specify the
+   * Entity type, but infer the index types (TypeScript does not allow both specifying AND
+   * inferring generic arguments in a single call).
+   */
+  index<II extends Indexes<A>>(indexes: II): EntityCollection<A, II>;
 }
 
-export interface EntityIndex<A extends Entity, P extends keyof A> {
-  readonly lookups: IndexLookups<A[P]>;
-  readonly index: SortedMultiMap<A[P], string>;
+/**
+ * Interface for index objects
+ */
+export interface EntityIndex<A extends Entity, IndexType> {
+  /**
+   * The lookups that the indexed field type affords
+   *
+   * For example, 'equals', 'lessThan', 'prefix', etc.
+   */
+  readonly lookups: IndexLookups<IndexType>;
 
+  /**
+   * The index data store
+   */
+  readonly index: SortedMultiMap<IndexType, string>;
+
+  /**
+   * Add an entity to the index
+   */
   add(x: A): void;
 }
 
+/**
+ * Map a type the types of lookups we can do on that type
+ */
 export type IndexLookups<P> = P extends string ? StringIndexLookups : {};
 
+/**
+ * All the lookups on 'string' types
+ *
+ * We currently only have 'equals' but we could have more :)
+ */
 export interface StringIndexLookups {
   equals(x: string): string[];
 }
 
-export function emptyCollection<A extends Entity, I extends keyof A>(): EntityCollection<A, never>;
-export function emptyCollection<A extends Entity, I extends keyof A, Ix extends { [K in I]: EntityIndex<A, K> }>(
-  indexes: Ix,
-): EntityCollection<A, I>;
-export function emptyCollection<A extends Entity, I extends keyof A, Ix extends { [K in I]: EntityIndex<A, K> }>(
-  ixes?: Ix,
-): EntityCollection<A, I> {
+export function entityCollection<A extends Entity>(): EntityCollection<A, {}> {
   const entities = new Map<string, A>();
-  const indexes = ixes ?? {};
+  const _indexes = {};
 
   function add(x: A) {
     entities.set(x.$id, x);
-    for (const index of Object.values(indexes)) {
+    for (const index of Object.values(_indexes)) {
       // FIXME: why can't we type this?
       (index as any).add(x);
     }
@@ -50,7 +78,7 @@ export function emptyCollection<A extends Entity, I extends keyof A, Ix extends 
   return {
     type: 'entities',
     entities,
-    indexes: indexes as any,
+    indexes: _indexes as any,
     add,
     dehydrate: () => ({
       type: 'entities',
@@ -62,18 +90,41 @@ export function emptyCollection<A extends Entity, I extends keyof A, Ix extends 
         add(e as any);
       }
     },
+    index(indexes) {
+      // This limitation exists purely because I couldn't type it otherwise.
+      // Declaring a return type of `EntityCollection<A, I | II>` would make a lot
+      // of our other type inspection code stop working (the union is hard to pick
+      // apart). Since adding indexes in multiple goes is not really a use case,
+      // the simpler solution is just to type it as if we replaced all indexes
+      // and add a runtime check to make sure the types aren't lying.
+      if (Object.keys(_indexes).length > 0) {
+        throw new Error('You may only call .index() once on a new collection');
+      }
+      Object.assign(_indexes, indexes);
+      return this as any;
+    },
   };
 }
 
-export function emptyIndex<A extends Entity, P extends keyof A>(
+/**
+ * An index that uses the value of an entity's field
+ */
+export function fieldIndex<A extends Entity, P extends keyof A>(
   propName: P,
   comparator: sortedMap.Comparator<A[P]>,
-): EntityIndex<A, P> {
-  const index: SortedMultiMap<A[P], string> = [];
+): EntityIndex<A, A[P]> {
+  return calculatedIndex((x) => x[propName], comparator);
+}
+
+/**
+ * An index that is calculated based on a function applied to an entity
+ */
+export function calculatedIndex<A extends Entity, B>(fn: (x: A) => B, comparator: sortedMap.Comparator<B>) {
+  const index: SortedMultiMap<B, string> = [];
   return {
-    add: (x) => sortedMap.add(index, comparator, x[propName], x.$id),
+    add: (x: A) => sortedMap.add(index, comparator, fn(x), x.$id),
     lookups: {
-      equals: (value: A[P]) => sortedMap.findAll(index, comparator, value),
+      equals: (value: B) => sortedMap.findAll(index, comparator, value),
     } as any,
     index,
   };

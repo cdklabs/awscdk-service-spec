@@ -6,39 +6,33 @@ export interface Relationship<From extends Entity, To extends Entity, Attributes
   readonly attr: Attributes;
 }
 
-export interface RelationshipCollection<
-  R extends Relationship<any, any>,
-  S extends object,
-  F extends KeyForEntityCollection<S, RelFrom<R>>,
-  T extends KeyForEntityCollection<S, RelTo<R>>,
-> {
-  readonly type: 'rel';
-  readonly fromColl: F;
-  readonly toColl: T;
-  readonly forward: Map<string, Rel<RelAttr<R>>[]>;
-  readonly backward: Map<string, Rel<RelAttr<R>>[]>;
+type FromGetter<R extends Relationship<any, any, any>> = (id: string) => R['from'];
+type ToGetter<R extends Relationship<any, any, any>> = (id: string) => R['to'];
 
-  add(from: RelFrom<R>, to: RelTo<R>, attributes: RelAttr<R>): void;
+export interface RelationshipCollection<R extends Relationship<any, any, any>> {
+  readonly type: 'rel';
+  readonly fromColl: FromGetter<R>;
+  readonly toColl: ToGetter<R>;
+  readonly forward: Map<string, Rel<R['attr']>[]>;
+  readonly backward: Map<string, Rel<R['attr']>[]>;
+
+  add(from: R['from'], to: R['to'], attributes: R['attr']): void;
   dehydrate(): any;
   hydrateFrom(x: any): void;
 }
 
 export type Rel<Attributes> = { readonly $id: string } & Attributes;
 
-export type RelFrom<R> = R extends Relationship<infer F, any> ? F : never;
-export type RelTo<R> = R extends Relationship<any, infer T> ? T : never;
-export type RelAttr<R> = R extends Relationship<any, any, infer A> ? A : never;
-
 export type KeyForEntityCollection<S, E extends Entity> = {
   [K in keyof S]: S[K] extends EntityCollection<E> ? K : never;
 }[keyof S];
 
-export type AnyRelationshipCollection = RelationshipCollection<any, any, any, any>;
+export const NO_RELATIONSHIPS = () => ({});
 
-export function emptyRelationship<F extends string, T extends string>(
-  fromField: F,
-  toField: T,
-): RelationshipCollection<any, any, F, T> {
+export function relationshipCollection<R extends Relationship<any, any, any>>(
+  fromField: FromGetter<R>,
+  toField: ToGetter<R>,
+): RelationshipCollection<R> {
   const forward = new Map<string, Array<Rel<any>>>();
   const backward = new Map<string, Array<Rel<any>>>();
 
@@ -93,7 +87,7 @@ export function emptyRelationship<F extends string, T extends string>(
   };
 }
 
-export function isRelationshipCollection(x: unknown): x is AnyRelationshipCollection {
+export function isRelationshipCollection(x: unknown): x is RelationshipCollection<any> {
   return typeof x === 'object' && !!x && (x as any).type === 'rel';
 }
 
