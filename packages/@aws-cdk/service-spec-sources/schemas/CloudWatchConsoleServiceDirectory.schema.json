@@ -1,0 +1,536 @@
+{
+  "$ref": "#/definitions/CloudWatchConsoleServiceDirectory",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "AlarmPattern": {
+      "additionalProperties": false,
+      "properties": {
+        "dimensions": {
+          "items": {
+            "$ref": "#/definitions/Dimension"
+          },
+          "type": "array"
+        },
+        "namespace": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "namespace",
+        "dimensions"
+      ],
+      "type": "object"
+    },
+    "Axis": {
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "max": {
+          "type": "number"
+        },
+        "min": {
+          "type": "number"
+        },
+        "showUnits": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "CloudWatchConsoleServiceDirectory": {
+      "description": "CloudWatchConsoleServiceDirectory\n\nThis source of AWS metrics is kindly provided to us by the CloudWatch Explorer team (and used in their console).\n\n!! While this file contains types for the full source spec, !! only `metricTemplates` data is currently used.",
+      "items": {
+        "$ref": "#/definitions/ServiceDirectoryEntry"
+      },
+      "type": "array"
+    },
+    "Control": {
+      "additionalProperties": false,
+      "properties": {
+        "labelField": {
+          "type": "string"
+        },
+        "resourceDashboard": {
+          "type": "string"
+        },
+        "resourceType": {
+          "type": "string"
+        },
+        "serviceDashboard": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "valueField": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "resourceType",
+        "labelField",
+        "valueField"
+      ],
+      "type": "object"
+    },
+    "Dashboard": {
+      "additionalProperties": false,
+      "properties": {
+        "controls": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "dependencies": {
+          "items": {
+            "$ref": "#/definitions/Dependency"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/definitions/Row"
+          },
+          "type": "array"
+        },
+        "tables": {
+          "items": {
+            "$ref": "#/definitions/Table"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "Dependency": {
+      "additionalProperties": false,
+      "properties": {
+        "namespace": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "namespace"
+      ],
+      "type": "object"
+    },
+    "Dimension": {
+      "additionalProperties": false,
+      "description": "Dimension for this set of metric templates",
+      "properties": {
+        "dimensionName": {
+          "description": "Name of the dimension",
+          "type": "string"
+        },
+        "dimensionValue": {
+          "description": "A potential fixed value for this dimension\n\n(Currently unused by the spec reader, but could be used)",
+          "type": "string"
+        },
+        "labelName": {
+          "description": "Label for this dimension",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dimensionName"
+      ],
+      "type": "object"
+    },
+    "ForeignKey": {
+      "additionalProperties": false,
+      "properties": {
+        "fields": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "resourceType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "resourceType",
+        "fields"
+      ],
+      "type": "object"
+    },
+    "Metric": {
+      "additionalProperties": false,
+      "description": "A description of an available metric",
+      "properties": {
+        "defaultPeriod": {
+          "description": "Default (suggested) period for this metric",
+          "type": "number"
+        },
+        "defaultStat": {
+          "description": "Default (suggested) statistic for this metric",
+          "type": "string"
+        },
+        "id": {
+          "description": "Id of the metric",
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the metric",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "defaultStat"
+      ],
+      "type": "object"
+    },
+    "MetricTemplate": {
+      "additionalProperties": false,
+      "description": "A single metric template for a resource",
+      "properties": {
+        "defaultPeriod": {
+          "description": "The recommended default period for this set of metrics",
+          "type": "number"
+        },
+        "dimensions": {
+          "description": "Set of dimensions for this set of metrics",
+          "items": {
+            "$ref": "#/definitions/Dimension"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "metrics": {
+          "description": "Set of metrics these dimensions apply to",
+          "items": {
+            "$ref": "#/definitions/Metric"
+          },
+          "type": "array"
+        },
+        "namespace": {
+          "description": "Metric namespace",
+          "type": "string"
+        },
+        "resourceType": {
+          "description": "CloudFormation resource name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "resourceType",
+        "namespace",
+        "dimensions",
+        "metrics"
+      ],
+      "type": "object"
+    },
+    "ResourceType": {
+      "additionalProperties": false,
+      "description": "!! Here be dragons !! The following types and associated data are not currently used",
+      "properties": {
+        "alarmPatterns": {
+          "items": {
+            "$ref": "#/definitions/AlarmPattern"
+          },
+          "type": "array"
+        },
+        "arnRegex": {
+          "type": "string"
+        },
+        "consoleLink": {
+          "type": "string"
+        },
+        "dashboard": {
+          "type": "string"
+        },
+        "describe": {
+          "type": "string"
+        },
+        "drawerDashboard": {
+          "type": "string"
+        },
+        "entityType": {
+          "type": "string"
+        },
+        "foreignKeys": {
+          "items": {
+            "$ref": "#/definitions/ForeignKey"
+          },
+          "type": "array"
+        },
+        "identifyingLabels": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "isResourceNode": {
+          "type": "boolean"
+        },
+        "keyMetric": {
+          "type": "string"
+        },
+        "list": {
+          "type": "string"
+        },
+        "metricTransformer": {
+          "type": "string"
+        },
+        "nodeNameRegex": {
+          "type": "string"
+        },
+        "resourceDecorator": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "keyMetric"
+      ],
+      "type": "object"
+    },
+    "Row": {
+      "additionalProperties": false,
+      "properties": {
+        "widgets": {
+          "items": {
+            "$ref": "#/definitions/Widget"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "widgets"
+      ],
+      "type": "object"
+    },
+    "ServiceDirectoryEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "controls": {
+          "additionalProperties": {
+            "$ref": "#/definitions/Control"
+          },
+          "type": "object"
+        },
+        "crossServiceDashboard": {
+          "type": "string"
+        },
+        "dashboard": {
+          "type": "string"
+        },
+        "dashboards": {
+          "items": {
+            "$ref": "#/definitions/Dashboard"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "metricTemplates": {
+          "items": {
+            "$ref": "#/definitions/MetricTemplate"
+          },
+          "type": "array"
+        },
+        "resourceTypes": {
+          "items": {
+            "$ref": "#/definitions/ResourceType"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "Table": {
+      "additionalProperties": false,
+      "properties": {
+        "columns": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "resourceType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "resourceType",
+        "columns"
+      ],
+      "type": "object"
+    },
+    "Widget": {
+      "additionalProperties": false,
+      "properties": {
+        "height": {
+          "type": "number"
+        },
+        "metrics": {
+          "items": {
+            "$ref": "#/definitions/WidgetMetric"
+          },
+          "type": "array"
+        },
+        "properties": {
+          "$ref": "#/definitions/WidgetProperties"
+        },
+        "source": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "width": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "WidgetLegend": {
+      "additionalProperties": false,
+      "properties": {
+        "position": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "position"
+      ],
+      "type": "object"
+    },
+    "WidgetMetric": {
+      "additionalProperties": false,
+      "properties": {
+        "metricExpression": {
+          "type": "string"
+        },
+        "metricOptions": {
+          "$ref": "#/definitions/WidgetMetricOptions"
+        },
+        "metricTemplate": {
+          "type": "string"
+        },
+        "resourceType": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "const": false,
+              "type": "boolean"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "WidgetMetricOptions": {
+      "additionalProperties": false,
+      "properties": {
+        "color": {
+          "type": "string"
+        },
+        "expression": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "period": {
+          "type": "number"
+        },
+        "stat": {
+          "type": "string"
+        },
+        "visible": {
+          "type": "boolean"
+        },
+        "yAxis": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "WidgetProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "legend": {
+          "$ref": "#/definitions/WidgetLegend"
+        },
+        "markdown": {
+          "type": "string"
+        },
+        "metrics": {
+          "items": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/definitions/WidgetMetricOptions"
+                }
+              ]
+            },
+            "type": "array"
+          },
+          "type": "array"
+        },
+        "stat": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "view": {
+          "type": "string"
+        },
+        "yAxis": {
+          "$ref": "#/definitions/WidgetYAxis"
+        }
+      },
+      "type": "object"
+    },
+    "WidgetYAxis": {
+      "additionalProperties": false,
+      "properties": {
+        "left": {
+          "$ref": "#/definitions/Axis"
+        },
+        "right": {
+          "$ref": "#/definitions/Axis"
+        }
+      },
+      "type": "object"
+    }
+  }
+}

@@ -24,10 +24,16 @@ async function main(argv: string[]) {
     pss,
   );
 
+  const cannedMetricsFilePattern = parsePattern(
+    stringOr(options.metrics, path.join('%package%', '%shortname%-canned-metrics.generated.ts')),
+    pss,
+  );
+
   await generate({
     outputPath,
     resourceFilePattern,
     augmentationsFilePattern,
+    cannedMetricsFilePattern,
     clearOutput: !!options['clear-output'],
     augmentationsSupport: !!options['augmentations-support'],
     services: options.service ? [options.service as string] : undefined,
