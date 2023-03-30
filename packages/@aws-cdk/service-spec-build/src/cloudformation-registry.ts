@@ -280,7 +280,8 @@ export function readCloudFormationRegistryServiceFromResource(
   const parts = resource.typeName.split(resourceTypeNameSeparator);
 
   const name = `${parts[0]}-${parts[1]}`.toLowerCase();
-  const shortName = parts[1].toLowerCase();
+  const capitalized = parts[1];
+  const shortName = capitalized.toLowerCase();
 
   const existing = db.lookup('service', 'name', 'equals', name);
 
@@ -291,6 +292,7 @@ export function readCloudFormationRegistryServiceFromResource(
   const service = db.allocate('service', {
     name,
     shortName,
+    capitalized,
   });
 
   return service;

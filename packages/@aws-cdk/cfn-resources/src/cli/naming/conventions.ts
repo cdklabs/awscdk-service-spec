@@ -68,8 +68,9 @@ export function cfnPropsValidatorNameFromType(struct: TypeDeclaration) {
 }
 
 export function metricsClassNameFromService(service: Service) {
-  return camelcase(`${service.shortName}Metrics`, {
+  return camelcase(`${service.capitalized}Metrics`, {
     pascalCase: true,
+    preserveConsecutiveUppercase: true,
   });
 }
 
