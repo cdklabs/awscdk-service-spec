@@ -95,12 +95,12 @@ export class Database<ES extends object, RS extends object> {
   /**
    * Allocate an ID and store if the entity does not yet exist
    */
-  public findOrAllocate<K extends EntityKeys<S>, I extends keyof Plain<EntityType<S[K]>> & IndexesOf<S[K]>>(
+  public findOrAllocate<K extends keyof ES, I extends keyof Plain<EntityType<ES[K]>> & IndexNamesOf<ES[K]>>(
     key: K,
     index: I,
-    lookup: LookupsOf<S[K], I>,
-    entity: Plain<EntityType<S[K]>>,
-  ): EntityType<S[K]> {
+    lookup: IndexOf<ES[K], I>['lookups'],
+    entity: Plain<EntityType<ES[K]>>,
+  ): EntityType<ES[K]> {
     const res = this.lookup(key, index, lookup, entity[index]);
     if (res.length) {
       return res.only();
