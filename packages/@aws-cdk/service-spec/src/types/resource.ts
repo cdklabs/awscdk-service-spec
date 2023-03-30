@@ -25,6 +25,14 @@ export interface Service extends Entity {
    * @example dynamodb
    */
   readonly shortName: string;
+  /**
+   * The shortname of the service in capitalized form
+   *
+   * E.g. `AWS::DynamoDB` -> `DynamoDB`
+   *
+   * @example dynamodb
+   */
+  readonly capitalized: string;
 }
 
 export interface Region extends Entity {

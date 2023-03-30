@@ -4,7 +4,7 @@ exports[`AWS::ApiGateway::RestApi 1`] = `
 {
   "augmentations": undefined,
   "metrics": "/* eslint-disable prettier/prettier,max-len */
-export class ApigatewayMetrics {
+export class ApiGatewayMetrics {
   public static _4XxErrorSum(dimensions: { ApiName: string; Stage: string; }): MetricWithDims<{ ApiName: string; Stage: string; }>;
 
   public static _4XxErrorSum(dimensions: { ApiName: string; }): MetricWithDims<{ ApiName: string; }>;
@@ -8056,7 +8056,7 @@ QueueBase.prototype.metricSentMessageSize = function(props?: cw.MetricOptions) {
   });
 };",
   "metrics": "/* eslint-disable prettier/prettier,max-len */
-export class SqsMetrics {
+export class SQSMetrics {
   public static numberOfMessagesSentAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }>;
 
   public static numberOfMessagesSentAverage(dimensions: any): MetricWithDims<any> {

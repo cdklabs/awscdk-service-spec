@@ -2748,7 +2748,7 @@ QueueBase.prototype.metricSentMessageSize = function(props?: cw.MetricOptions) {
   });
 };",
   "metrics": "/* eslint-disable prettier/prettier,max-len */
-export class SqsMetrics {
+export class SQSMetrics {
   public static numberOfMessagesSentAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }>;
 
   public static numberOfMessagesSentAverage(dimensions: any): MetricWithDims<any> {
