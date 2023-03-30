@@ -20,7 +20,26 @@ export interface Exportable {
   export?: boolean;
 }
 
-export interface TypeSpec extends Omit<jsii.TypeBase, 'assembly' | 'fqn' | 'kind'>, Exportable {}
+export interface TypeParameterSpec {
+  readonly name: string;
+  readonly extendsType?: Type;
+}
+
+export class TypeParameter implements TypeParameterSpec {
+  public constructor(
+    public readonly scope: TypeDeclaration,
+    public readonly name: string,
+    public readonly extendsType?: Type,
+  ) {}
+
+  public asType(): Type {
+    return Type.ambient(this.name);
+  }
+}
+
+export interface TypeSpec extends Omit<jsii.TypeBase, 'assembly' | 'fqn' | 'kind'>, Exportable {
+  typeParameters?: TypeParameterSpec[];
+}
 
 /**
  * An abstract jsii type
@@ -56,6 +75,13 @@ export abstract class TypeDeclaration implements Documented {
     return !!this.spec.export;
   }
 
+  /**
+   * The generic type parameters of the type
+   */
+  public get typeParameters(): ReadonlyArray<TypeParameter> | undefined {
+    return this.spec.typeParameters?.map((p) => new TypeParameter(this, p.name, p.extendsType));
+  }
+
   public readonly type: Type;
   public readonly symbol: ThingSymbol;
 
@@ -64,6 +90,16 @@ export abstract class TypeDeclaration implements Documented {
 
     scope.registerType(this);
     this.type = Type.fromName(scope, this.name);
+  }
+
+  /**
+   * Add a type parameter
+   */
+  public addTypeParameter(p: TypeParameterSpec): TypeParameter {
+    this.spec.typeParameters ??= [];
+    this.spec.typeParameters.push(p);
+
+    return new TypeParameter(this, p.name, p.extendsType);
   }
 
   /**

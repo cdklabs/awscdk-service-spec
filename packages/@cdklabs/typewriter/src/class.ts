@@ -8,10 +8,11 @@ import { IScope, IScopeLink, ScopeImpl } from './scope';
 import { ThingSymbol } from './symbol';
 import { Type } from './type';
 import { DeclarationKind, TypeDeclaration, TypeSpec } from './type-declaration';
-import { Initializer, InitializerSpec } from './type-member';
+import { Initializer, InitializerSpec, MethodSpec } from './type-member';
 
 export interface ClassSpec extends TypeSpec {
   properties?: PropertySpec[];
+  methods?: MethodSpec[];
   abstract?: boolean;
   extends?: Type;
   implements?: Type[];
@@ -45,6 +46,8 @@ export class ClassType extends MemberType implements IScope {
   public constructor(public scope: IScope, public readonly spec: ClassSpec) {
     super(scope, spec);
     this.classScope = new ScopeImpl(this.fqn);
+    spec.properties?.forEach((p) => this.addProperty(p));
+    spec.methods?.forEach((m) => this.addMethod(m));
   }
 
   public get initializer() {

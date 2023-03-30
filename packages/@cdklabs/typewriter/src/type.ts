@@ -1,8 +1,10 @@
 import { Expression } from './expression';
 import { NewExpression } from './expressions';
+import { IProperty, PropertySpec } from './property';
 import { AMBIENT_SCOPE, IScope } from './scope';
 import { ThingSymbol } from './symbol';
 import { TypeDeclaration } from './type-declaration';
+import { MemberVisibility } from './type-member';
 
 export enum PrimitiveType {
   /**
@@ -45,6 +47,7 @@ export type TypeReferenceSpec =
   | { readonly fqn: string; readonly genericArguments?: Type[] }
   | { readonly primitive: PrimitiveType }
   | { readonly collection: { readonly kind: 'map' | 'array'; readonly elementType: Type } }
+  | { readonly object: PropertySpec[] }
   | { readonly union: Type[] };
 
 /**
@@ -77,6 +80,13 @@ export class Type {
 
   public static ambient(name: string) {
     return Type.fromName(AMBIENT_SCOPE, name);
+  }
+
+  /**
+   * @see https://www.typescriptlang.org/docs/handbook/2/objects.html
+   */
+  public static anonymousInterface(props: PropertySpec[]) {
+    return new Type({ object: props });
   }
 
   public readonly spec: TypeReferenceSpec;
@@ -149,6 +159,20 @@ export class Type {
     return isUnionSpec(this.spec) ? this.spec.union : undefined;
   }
 
+  public get object(): IProperty[] | undefined {
+    return isObjectSpec(this.spec)
+      ? this.spec.object.map((p) => ({
+          name: p.name,
+          abstract: false,
+          immutable: !!p.immutable,
+          optional: !!p.optional,
+          type: p.type,
+          visibility: MemberVisibility.Public,
+          static: false,
+        }))
+      : undefined;
+  }
+
   public get genericArguments(): Type[] | undefined {
     return isFqnSpec(this.spec) ? this.spec.genericArguments ?? [] : [];
   }
@@ -197,6 +221,10 @@ function isCollectionSpec(
 
 function isUnionSpec(x: TypeReferenceSpec): x is Extract<TypeReferenceSpec, { union: Type[] }> {
   return !!(x as any).union;
+}
+
+function isObjectSpec(x: TypeReferenceSpec): x is Extract<TypeReferenceSpec, { object: PropertySpec[] }> {
+  return !!(x as any).object;
 }
 
 function zip<A, B>(xs: A[], ys: B[]): Array<[A, B]> {

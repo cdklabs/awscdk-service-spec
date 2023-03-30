@@ -1,5 +1,5 @@
 import * as jsii from '@jsii/spec';
-import { DocsSpec } from './documented';
+import { DocsSpec, Documented } from './documented';
 import { Expression } from './expression';
 import { ObjectPropertyAccess } from './expressions';
 import { MemberType } from './member-type';
@@ -15,7 +15,18 @@ export interface PropertySpec extends Omit<jsii.Property, 'assembly' | 'fqn' | '
   setterBody?: (value: Expression) => Block;
 }
 
-export class Property extends TypeMember {
+export interface IProperty extends Documented {
+  readonly name: string;
+  readonly abstract: boolean;
+  readonly immutable: boolean;
+  readonly optional: boolean;
+  readonly type: Type;
+  readonly initializer?: Expression;
+  readonly visibility: MemberVisibility;
+  readonly static: boolean;
+}
+
+export class Property extends TypeMember implements IProperty {
   public readonly kind = MemberKind.Property;
 
   /**

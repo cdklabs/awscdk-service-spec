@@ -22,5 +22,11 @@ test.each([
 
   const ast = AstBuilder.forResource(resource, { db });
 
-  expect(renderer.render(ast.module)).toMatchSnapshot();
+  const rendered = {
+    module: renderer.render(ast.module),
+    augmentations: ast.augmentations?.hasAugmentations ? renderer.render(ast.augmentations) : undefined,
+    metrics: ast.cannedMetrics?.hasCannedMetrics ? renderer.render(ast.cannedMetrics) : undefined,
+  };
+
+  expect(rendered).toMatchSnapshot();
 });

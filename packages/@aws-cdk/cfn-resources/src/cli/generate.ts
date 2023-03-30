@@ -31,6 +31,11 @@ export interface GenerateOptions {
   readonly augmentationsFilePattern: PatternedString<PatternKeys>;
 
   /**
+   * The pattern used to name canned metrics.
+   */
+  readonly cannedMetricsFilePattern: PatternedString<PatternKeys>;
+
+  /**
    * Output debug messages
    * @default false
    */
@@ -96,6 +101,10 @@ export async function generate(options: GenerateOptions) {
           writer.write(supportMod, path.resolve(augDir, `${supportMod.importName}.ts`));
         }
       }
+    }
+
+    if (s.cannedMetrics?.hasCannedMetrics) {
+      writer.writePattern(s.cannedMetrics, options.cannedMetricsFilePattern);
     }
   }
 }

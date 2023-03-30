@@ -1,12 +1,10 @@
-import * as jsii from '@jsii/spec';
+import { InterfaceSpec } from './interface';
 import { MemberType } from './member-type';
 import { Property, PropertySpec } from './property';
 import { IScope } from './scope';
-import { DeclarationKind, Exportable, TypeDeclaration } from './type-declaration';
+import { DeclarationKind, TypeDeclaration } from './type-declaration';
 
-export interface StructSpec extends Omit<jsii.InterfaceType, 'assembly' | 'fqn' | 'kind' | 'properties'>, Exportable {
-  properties?: PropertySpec[];
-}
+export interface StructSpec extends InterfaceSpec {}
 
 export class StructType extends MemberType {
   /**
@@ -35,6 +33,7 @@ export class StructType extends MemberType {
 
   public constructor(public scope: IScope, public readonly spec: StructSpec) {
     super(scope, spec);
+    spec.properties?.forEach((p) => this.addProperty(p));
   }
 
   /**

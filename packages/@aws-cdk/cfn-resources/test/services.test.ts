@@ -18,6 +18,7 @@ test.each(['alexa-ask', 'aws-chatbot', 'aws-scheduler', 'aws-sqs'])('%s', (servi
   const rendered = {
     module: renderer.render(ast.module),
     augmentations: ast.augmentations?.hasAugmentations ? renderer.render(ast.augmentations) : undefined,
+    metrics: ast.cannedMetrics?.hasCannedMetrics ? renderer.render(ast.cannedMetrics) : undefined,
   };
 
   expect(rendered).toMatchSnapshot();

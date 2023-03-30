@@ -1,0 +1,101 @@
+{
+  "$ref": "#/definitions/CannedMetrics",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "CannedMetrics": {
+      "items": {
+        "$ref": "#/definitions/MetricInfoGroup"
+      },
+      "type": "array"
+    },
+    "Dimension": {
+      "additionalProperties": false,
+      "description": "Dimension for this set of metric templates",
+      "properties": {
+        "dimensionName": {
+          "description": "Name of the dimension",
+          "type": "string"
+        },
+        "dimensionValue": {
+          "description": "A potential fixed value for this dimension\n\n(Currently unused by the spec reader, but could be used)",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dimensionName"
+      ],
+      "type": "object"
+    },
+    "Metric": {
+      "additionalProperties": false,
+      "description": "A description of an available metric",
+      "properties": {
+        "defaultStat": {
+          "description": "Default (suggested) statistic for this metric",
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the metric",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "defaultStat"
+      ],
+      "type": "object"
+    },
+    "MetricInfoGroup": {
+      "additionalProperties": false,
+      "description": "A group of metric information",
+      "properties": {
+        "metricTemplates": {
+          "description": "List of metric templates",
+          "items": {
+            "$ref": "#/definitions/MetricTemplate"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "metricTemplates"
+      ],
+      "type": "object"
+    },
+    "MetricTemplate": {
+      "additionalProperties": false,
+      "description": "A single metric template for a resource",
+      "properties": {
+        "dimensions": {
+          "description": "Set of dimensions for this set of metrics",
+          "items": {
+            "$ref": "#/definitions/Dimension"
+          },
+          "type": "array"
+        },
+        "metrics": {
+          "description": "Set of metrics these dimensions apply to",
+          "items": {
+            "$ref": "#/definitions/Metric"
+          },
+          "type": "array"
+        },
+        "namespace": {
+          "description": "Metric namespace",
+          "type": "string"
+        },
+        "resourceType": {
+          "description": "CloudFormation resource name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "resourceType",
+        "namespace",
+        "dimensions",
+        "metrics"
+      ],
+      "type": "object"
+    }
+  }
+}

@@ -93,6 +93,22 @@ export class Database<ES extends object, RS extends object> {
   }
 
   /**
+   * Allocate an ID and store if the entity does not yet exist
+   */
+  public findOrAllocate<K extends EntityKeys<S>, I extends keyof Plain<EntityType<S[K]>> & IndexesOf<S[K]>>(
+    key: K,
+    index: I,
+    lookup: LookupsOf<S[K], I>,
+    entity: Plain<EntityType<S[K]>>,
+  ): EntityType<S[K]> {
+    const res = this.lookup(key, index, lookup, entity[index]);
+    if (res.length) {
+      return res.only();
+    }
+    return this.allocate(key, entity);
+  }
+
+  /**
    * Record a relationship between two entities
    *
    * Overload to account for whether we have attributes or not.
