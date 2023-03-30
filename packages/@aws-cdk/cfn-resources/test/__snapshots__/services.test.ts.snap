@@ -2749,9 +2749,7 @@ QueueBase.prototype.metricSentMessageSize = function(props?: cw.MetricOptions) {
 };",
   "metrics": "/* eslint-disable prettier/prettier,max-len */
 export class SQSMetrics {
-  public static numberOfMessagesSentAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }>;
-
-  public static numberOfMessagesSentAverage(dimensions: any): MetricWithDims<any> {
+  public static numberOfMessagesSentAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
     return {
       "namespace": "AWS/SQS",
       "metricName": "NumberOfMessagesSent",
@@ -2760,9 +2758,7 @@ export class SQSMetrics {
     };
   }
 
-  public static approximateNumberOfMessagesDelayedAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }>;
-
-  public static approximateNumberOfMessagesDelayedAverage(dimensions: any): MetricWithDims<any> {
+  public static approximateNumberOfMessagesDelayedAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
     return {
       "namespace": "AWS/SQS",
       "metricName": "ApproximateNumberOfMessagesDelayed",
@@ -2771,9 +2767,7 @@ export class SQSMetrics {
     };
   }
 
-  public static numberOfMessagesReceivedAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }>;
-
-  public static numberOfMessagesReceivedAverage(dimensions: any): MetricWithDims<any> {
+  public static numberOfMessagesReceivedAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
     return {
       "namespace": "AWS/SQS",
       "metricName": "NumberOfMessagesReceived",
@@ -2782,9 +2776,7 @@ export class SQSMetrics {
     };
   }
 
-  public static numberOfMessagesDeletedAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }>;
-
-  public static numberOfMessagesDeletedAverage(dimensions: any): MetricWithDims<any> {
+  public static numberOfMessagesDeletedAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
     return {
       "namespace": "AWS/SQS",
       "metricName": "NumberOfMessagesDeleted",
@@ -2793,9 +2785,7 @@ export class SQSMetrics {
     };
   }
 
-  public static approximateNumberOfMessagesNotVisibleAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }>;
-
-  public static approximateNumberOfMessagesNotVisibleAverage(dimensions: any): MetricWithDims<any> {
+  public static approximateNumberOfMessagesNotVisibleAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
     return {
       "namespace": "AWS/SQS",
       "metricName": "ApproximateNumberOfMessagesNotVisible",
@@ -2804,9 +2794,7 @@ export class SQSMetrics {
     };
   }
 
-  public static approximateNumberOfMessagesVisibleAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }>;
-
-  public static approximateNumberOfMessagesVisibleAverage(dimensions: any): MetricWithDims<any> {
+  public static approximateNumberOfMessagesVisibleAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
     return {
       "namespace": "AWS/SQS",
       "metricName": "ApproximateNumberOfMessagesVisible",
@@ -2815,9 +2803,7 @@ export class SQSMetrics {
     };
   }
 
-  public static approximateAgeOfOldestMessageAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }>;
-
-  public static approximateAgeOfOldestMessageAverage(dimensions: any): MetricWithDims<any> {
+  public static approximateAgeOfOldestMessageAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
     return {
       "namespace": "AWS/SQS",
       "metricName": "ApproximateAgeOfOldestMessage",
@@ -2826,9 +2812,7 @@ export class SQSMetrics {
     };
   }
 
-  public static numberOfEmptyReceivesAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }>;
-
-  public static numberOfEmptyReceivesAverage(dimensions: any): MetricWithDims<any> {
+  public static numberOfEmptyReceivesAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
     return {
       "namespace": "AWS/SQS",
       "metricName": "NumberOfEmptyReceives",
@@ -2837,9 +2821,7 @@ export class SQSMetrics {
     };
   }
 
-  public static sentMessageSizeAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }>;
-
-  public static sentMessageSizeAverage(dimensions: any): MetricWithDims<any> {
+  public static sentMessageSizeAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
     return {
       "namespace": "AWS/SQS",
       "metricName": "SentMessageSize",
@@ -2849,8 +2831,8 @@ export class SQSMetrics {
   }
 }
 
-interface MetricWithDims<D> {
-  readonly namespace?: string;
+export interface MetricWithDims<D> {
+  readonly namespace: string;
 
   readonly metricName: string;
 
