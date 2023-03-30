@@ -12,6 +12,7 @@ beforeEach(() => {
   const s = db.allocate('service', {
     name: 'aws-some',
     shortName: 'some',
+    capitalized: 'AweSome',
   });
   const r = db.allocate('resource', {
     cloudFormationType: 'AWS::Some::Type',
