@@ -49,7 +49,7 @@ import {
 import { StructType } from '../struct';
 import { ThingSymbol } from '../symbol';
 import { Type } from '../type';
-import { TypeParameter } from '../type-declaration';
+import { TypeParameterSpec } from '../type-declaration';
 import { Initializer, MemberVisibility, Method } from '../type-member';
 
 export class TypeScriptRenderer extends Renderer {
@@ -318,12 +318,12 @@ export class TypeScriptRenderer extends Renderer {
     return this.renderExpression(this.expressionFromSymbol(sym));
   }
 
-  protected renderTypeParameters(params?: ReadonlyArray<TypeParameter>) {
-    const renderParam = (p: TypeParameter) => {
+  protected renderTypeParameters(params?: ReadonlyArray<TypeParameterSpec>) {
+    const renderParam = (p: TypeParameterSpec) => {
       this.emit(p.name);
-      if (p.extends) {
+      if (p.extendsType) {
         this.emit(' extends ');
-        this.renderType(p.extends);
+        this.renderType(p.extendsType);
       }
     };
 

@@ -59,7 +59,6 @@ export class MetricsClass extends ClassType {
 
     this.returnType = new InterfaceType(this.scope, {
       name: 'MetricWithDims',
-      typeParameters: [{ name: 'D' }],
       properties: [
         {
           name: 'namespace',
@@ -77,12 +76,15 @@ export class MetricsClass extends ClassType {
           type: Type.STRING,
           immutable: true,
         },
-        {
-          name: 'dimensionsMap',
-          type: Type.ambient('D'),
-          immutable: true,
-        },
       ],
+    });
+
+    const dimensionTypeParam = this.returnType.addTypeParameter({ name: 'D' });
+
+    this.returnType.addProperty({
+      name: 'dimensionsMap',
+      type: dimensionTypeParam.asType(),
+      immutable: true,
     });
   }
 
