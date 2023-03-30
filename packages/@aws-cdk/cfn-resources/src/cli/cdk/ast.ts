@@ -1,5 +1,4 @@
-import { DatabaseSchema, Resource, Service } from '@aws-cdk/service-spec';
-import { Database } from '@cdklabs/tskb';
+import { SpecDatabase, Resource, Service } from '@aws-cdk/service-spec';
 import { StructType, Module } from '@cdklabs/typewriter';
 import { Stability } from '@jsii/spec';
 import { AugmentationsModule } from './augmentation-generator';
@@ -30,7 +29,7 @@ export class ServiceModule extends Module {
 }
 
 export interface AstBuilderProps {
-  readonly db: Database<DatabaseSchema>;
+  readonly db: SpecDatabase;
   /**
    * Override the locations modules are imported from
    */
@@ -72,7 +71,7 @@ export class AstBuilder<T extends Module> {
     return ast;
   }
 
-  public readonly db: Database<DatabaseSchema>;
+  public readonly db: SpecDatabase;
 
   protected constructor(
     public readonly module: T,

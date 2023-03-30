@@ -1,19 +1,38 @@
-import { Entity, EntityCollection, isEntityCollection, Plain, Reference } from './entity';
+import { Entity, EntityCollection, EntityIndex, isEntityCollection, Plain, Reference } from './entity';
 import {
-  AnyRelationshipCollection,
   isRelationshipCollection,
+  NO_RELATIONSHIPS,
+  Relationship,
+  relationshipCollection,
   RelationshipCollection,
-  RelAttr,
-  RelFrom,
-  RelTo,
 } from './relationship';
 
-export class Database<S extends object> {
-  private readonly schema: S;
+export interface RelationshipsBuilder<ES extends object> {
+  relationship<R extends Relationship<any, any, any>>(
+    fromKey: KeysFor<ES, EntityCollection<R['from'], any>>,
+    toKey: KeysFor<ES, EntityCollection<R['to'], any>>,
+  ): RelationshipCollection<R>;
+}
+
+export class Database<ES extends object, RS extends object> {
+  public static entitiesOnly<ES extends object>(entities: ES): Database<ES, {}> {
+    return new Database(entities, NO_RELATIONSHIPS);
+  }
+
+  private readonly schema: ES & RS;
   private idCtr = 0;
 
-  constructor(initial: S) {
-    this.schema = { ...initial };
+  constructor(entities: ES, relationships: (x: RelationshipsBuilder<ES>) => RS) {
+    this.schema = {
+      ...entities,
+      ...relationships({
+        relationship: (fromKey, toKey) =>
+          relationshipCollection(
+            (id) => this.get(fromKey, id),
+            (id) => this.get(toKey, id),
+          ),
+      }),
+    };
   }
 
   public id() {
@@ -23,14 +42,14 @@ export class Database<S extends object> {
   /**
    * Allocate an ID and store
    */
-  public allocate<K extends EntityKeys<S>>(key: K, entity: Plain<EntityType<S[K]>>): EntityType<S[K]> {
+  public allocate<K extends keyof ES>(key: K, entity: Plain<EntityType<ES[K]>>): EntityType<ES[K]> {
     return this.store(key, this.e(entity));
   }
 
   /**
    * Store with a preallocated ID
    */
-  public store<K extends EntityKeys<S>>(key: K, entity: EntityType<S[K]>): EntityType<S[K]> {
+  public store<K extends keyof ES>(key: K, entity: EntityType<ES[K]>): EntityType<ES[K]> {
     const coll: EntityCollection<any> = this.schema[key] as any;
     coll.add(entity);
     return entity as any;
@@ -39,7 +58,7 @@ export class Database<S extends object> {
   /**
    * Get an entity by key
    */
-  public get<K extends EntityKeys<S>>(key: K, id: string | Reference<EntityType<S[K]>>): EntityType<S[K]> {
+  public get<K extends keyof ES>(key: K, id: string | Reference<EntityType<ES[K]>>): EntityType<ES[K]> {
     const coll: EntityCollection<any> = this.schema[key] as any;
     const ret = coll.entities.get(typeof id === 'string' ? id : id.$ref);
     if (!ret) {
@@ -51,7 +70,7 @@ export class Database<S extends object> {
   /**
    * All entities of a given type
    */
-  public all<K extends EntityKeys<S>>(key: K): Array<EntityType<S[K]>> {
+  public all<K extends keyof ES>(key: K): Array<EntityType<ES[K]>> {
     const coll: EntityCollection<any> = this.schema[key] as any;
     return Array.from(coll.entities.values());
   }
@@ -59,12 +78,12 @@ export class Database<S extends object> {
   /**
    * Lookup an entity by index
    */
-  public lookup<K extends EntityKeys<S>, I extends keyof EntityType<S[K]> & IndexesOf<S[K]>>(
+  public lookup<K extends keyof ES, I extends IndexNamesOf<ES[K]>>(
     key: K,
     index: I,
-    lookup: LookupsOf<S[K], I>,
-    value: EntityType<S[K]>[I],
-  ): RichReadonlyArray<EntityType<S[K]>> {
+    lookup: IndexOf<ES[K], I>['lookups'],
+    value: IndexOf<ES[K], I>['valueType'],
+  ): RichReadonlyArray<EntityType<ES[K]>> {
     const coll: EntityCollection<any> = this.schema[key] as any;
     const ids = (coll.indexes as any)[index].lookups[lookup](value);
     return addOnlyMethod(
@@ -76,12 +95,12 @@ export class Database<S extends object> {
   /**
    * Allocate an ID and store if the entity does not yet exist
    */
-  public findOrAllocate<K extends EntityKeys<S>, I extends keyof Plain<EntityType<S[K]>> & IndexesOf<S[K]>>(
+  public findOrAllocate<K extends keyof ES, I extends keyof Plain<EntityType<ES[K]>> & IndexNamesOf<ES[K]>>(
     key: K,
     index: I,
-    lookup: LookupsOf<S[K], I>,
-    entity: Plain<EntityType<S[K]>>,
-  ): EntityType<S[K]> {
+    lookup: IndexOf<ES[K], I>['lookups'],
+    entity: Plain<EntityType<ES[K]>>,
+  ): EntityType<ES[K]> {
     const res = this.lookup(key, index, lookup, entity[index]);
     if (res.length) {
       return res.only();
@@ -94,33 +113,33 @@ export class Database<S extends object> {
    *
    * Overload to account for whether we have attributes or not.
    */
-  public link<K extends RelWAttrs<S>>(
+  public link<K extends RelWAttrs<RS>>(
     key: K,
-    from: RelFrom<RelType<S[K]>>,
-    to: RelTo<RelType<S[K]>>,
-    attributes: RelAttr<RelType<S[K]>>,
+    from: RelType<RS[K]>['from'],
+    to: RelType<RS[K]>['to'],
+    attributes: RelType<RS[K]>['attr'],
   ): void;
-  public link<K extends RelWoAttrs<S>>(key: K, from: RelFrom<RelType<S[K]>>, to: RelTo<RelType<S[K]>>): void;
-  public link<K extends RelKeys<S>>(
+  public link<K extends RelWoAttrs<RS>>(key: K, from: RelType<RS[K]>['from'], to: RelType<RS[K]>['to']): void;
+  public link<K extends keyof RS>(
     key: K,
-    from: RelFrom<RelType<S[K]>>,
-    to: RelTo<RelType<S[K]>>,
-    attributes?: RelAttr<RelType<S[K]>>,
+    from: RelType<RS[K]>['from'],
+    to: RelType<RS[K]>['to'],
+    attributes?: RelType<RS[K]>['attr'],
   ) {
-    const col: AnyRelationshipCollection = this.schema[key] as any;
+    const col: RelationshipCollection<any> = this.schema[key] as any;
     col.add(from, to, attributes);
   }
 
   /**
    * Follow a link
    */
-  public follow<K extends RelKeys<S>>(
+  public follow<K extends keyof RS>(
     key: K,
-    from: RelFrom<RelType<S[K]>>,
-  ): RichReadonlyArray<Link<RelTo<RelType<S[K]>>, RelAttr<RelType<S[K]>>>> {
-    const col: AnyRelationshipCollection = this.schema[key] as any;
+    from: RelType<RS[K]>['from'],
+  ): RichReadonlyArray<Link<RelType<RS[K]>['to'], RelType<RS[K]>['attr']>> {
+    const col: RelationshipCollection<any> = this.schema[key] as any;
     const toLinks = col.forward.get(from.$id) ?? [];
-    const ret = toLinks.map((i) => ({ entity: this.get(col.toColl, i.$id), ...removeId(i) } as any));
+    const ret = toLinks.map((i) => ({ entity: col.toColl(i.$id), ...removeId(i) } as any));
 
     return addOnlyMethod(ret, `${String(key)} from ${from}`);
   }
@@ -128,13 +147,13 @@ export class Database<S extends object> {
   /**
    * Follow incoming links backwards
    */
-  public incoming<K extends RelKeys<S>>(
+  public incoming<K extends keyof RS>(
     key: K,
-    to: RelTo<RelType<S[K]>>,
-  ): RichReadonlyArray<Link<RelFrom<RelType<S[K]>>, RelAttr<RelType<S[K]>>>> {
-    const col: AnyRelationshipCollection = this.schema[key] as any;
+    to: RelType<RS[K]>['to'],
+  ): RichReadonlyArray<Link<RelType<RS[K]>['from'], RelType<RS[K]>['attr']>> {
+    const col: RelationshipCollection<any> = this.schema[key] as any;
     const fromIds = col.backward.get(to.$id) ?? [];
-    const ret = fromIds.map((i) => ({ entity: this.get(col.fromColl, i.$id), ...removeId(i) } as any));
+    const ret = fromIds.map((i) => ({ entity: col.fromColl(i.$id), ...removeId(i) } as any));
 
     return addOnlyMethod(ret, `${String(key)} to ${to}`);
   }
@@ -208,20 +227,32 @@ function removeId<A extends object>(x: A): Omit<A, '$id'> {
 
 export type Link<E, A> = { readonly entity: E } & A;
 
-type EntityKeys<S> = { [K in keyof S]: S[K] extends EntityCollection<any> ? K : never }[keyof S];
-type RelKeys<S> = { [K in keyof S]: S[K] extends AnyRelationshipCollection ? K : never }[keyof S];
-type RelWAttrs<S> = { [K in RelKeys<S>]: {} extends RelAttr<RelType<S[K]>> ? never : K }[RelKeys<S>];
-type RelWoAttrs<S> = { [K in RelKeys<S>]: {} extends RelAttr<RelType<S[K]>> ? K : never }[RelKeys<S>];
+type RelWAttrs<RS> = { [K in keyof RS]: {} extends RelType<RS[K]>['attr'] ? never : K }[keyof RS];
+type RelWoAttrs<RS> = { [K in keyof RS]: {} extends RelType<RS[K]>['attr'] ? K : never }[keyof RS];
+
+// Necessary because this type might be a union
+type IndexNamesOf<A> = A extends EntityCollection<any> ? KeysOfUnion<A['indexes']> : never;
+
+// eslint-disable-next-line prettier/prettier
+type IndexOf<EC, I extends IndexNamesOf<EC>> =
+  EC extends EntityCollection<any>
+  ? EC['indexes'][I] extends EntityIndex<any, infer IndexType>
+    ? {
+        valueType: IndexType;
+        lookups: keyof EC['indexes'][I]['lookups'];
+      }
+    : never
+  : never;
 
 type EntityType<A> = A extends EntityCollection<infer B> ? B : never;
 
-type RelType<A> = A extends RelationshipCollection<infer B, any, any, any> ? B : never;
+type RelType<A> = A extends RelationshipCollection<infer R> ? R : never;
 
-type IndexesOf<A> = A extends EntityCollection<any, any> ? keyof A['indexes'] : never;
+type ResolveUnion<T> = T extends T ? T : never;
 
-type LookupsOf<A, I extends IndexesOf<A>> = A extends EntityCollection<any, any>
-  ? keyof A['indexes'][I]['lookups']
-  : never;
+type KeysOfUnion<T> = keyof ResolveUnion<T>;
+
+export type EntitiesOf<DB> = DB extends Database<infer ES, any> ? { [k in keyof ES]: EntityType<ES[k]> } : {};
 
 export interface RichReadonlyArray<A> extends ReadonlyArray<A> {
   /**
@@ -243,3 +274,8 @@ function addOnlyMethod<A>(xs: A[], description: string): RichReadonlyArray<A> {
     },
   }) as any;
 }
+
+/**
+ * Return the keys of an object that map to a particular type
+ */
+type KeysFor<O extends object, T> = { [k in keyof O]: O[k] extends T ? k : never }[keyof O];

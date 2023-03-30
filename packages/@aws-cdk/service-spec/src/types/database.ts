@@ -1,12 +1,4 @@
-import {
-  Database,
-  emptyCollection,
-  emptyIndex,
-  emptyRelationship,
-  EntityCollection,
-  RelationshipCollection,
-  stringCmp,
-} from '@cdklabs/tskb';
+import { Database, entityCollection, fieldIndex, stringCmp } from '@cdklabs/tskb';
 import { IsAugmentedResource, ResourceAugmentation } from './augmentations';
 import {
   DimensionSet,
@@ -20,77 +12,49 @@ import {
 import {
   Resource,
   Service,
-  HasResource,
+  TypeDefinition,
+  PropertyType,
   Region,
+  HasResource,
   RegionHasResource,
   RegionHasService,
-  TypeDefinition,
   UsesType,
-  PropertyType,
 } from './resource';
 
-export interface DatabaseSchema {
-  readonly service: EntityCollection<Service, 'name'>;
-  readonly region: EntityCollection<Region>;
-  readonly resource: EntityCollection<Resource, 'cloudFormationType'>;
-  readonly typeDefinition: EntityCollection<TypeDefinition>;
-  readonly augmentations: EntityCollection<ResourceAugmentation>;
-  readonly metric: EntityCollection<Metric, 'name' | 'namespace' | 'dedupKey'>;
-  readonly dimensionSet: EntityCollection<DimensionSet, 'dedupKey'>;
-
-  readonly hasResource: RelationshipCollection<HasResource, DatabaseSchema, 'service', 'resource'>;
-  readonly regionHasResource: RelationshipCollection<RegionHasResource, DatabaseSchema, 'region', 'resource'>;
-  readonly regionHasService: RelationshipCollection<RegionHasService, DatabaseSchema, 'region', 'service'>;
-  readonly usesType: RelationshipCollection<UsesType, DatabaseSchema, 'resource', 'typeDefinition'>;
-  readonly isAugmented: RelationshipCollection<IsAugmentedResource, DatabaseSchema, 'resource', 'augmentations'>;
-  readonly usesDimensionSet: RelationshipCollection<UsesDimensionSet, DatabaseSchema, 'metric', 'dimensionSet'>;
-  readonly resourceHasMetric: RelationshipCollection<ResourceHasMetric, DatabaseSchema, 'resource', 'metric'>;
-  readonly serviceHasMetric: RelationshipCollection<ServiceHasMetric, DatabaseSchema, 'service', 'metric'>;
-
-  readonly resourceHasDimensionSet: RelationshipCollection<
-    ResourceHasDimensionSet,
-    DatabaseSchema,
-    'resource',
-    'dimensionSet'
-  >;
-  readonly serviceHasDimensionSet: RelationshipCollection<
-    ServiceHasDimensionSet,
-    DatabaseSchema,
-    'service',
-    'dimensionSet'
-  >;
-}
-
 export function emptyDatabase() {
-  return new Database<DatabaseSchema>({
-    resource: emptyCollection({
-      cloudFormationType: emptyIndex('cloudFormationType', stringCmp),
+  return new Database(
+    {
+      resource: entityCollection<Resource>().index({
+        cloudFormationType: fieldIndex('cloudFormationType', stringCmp),
+      }),
+      region: entityCollection<Region>(),
+      service: entityCollection<Service>().index({
+        name: fieldIndex('name', stringCmp),
+      }),
+      typeDefinition: entityCollection<TypeDefinition>(),
+      augmentations: entityCollection<ResourceAugmentation>(),
+      metric: entityCollection<Metric>().index({
+        name: fieldIndex('name', stringCmp),
+        namespace: fieldIndex('namespace', stringCmp),
+        dedupKey: fieldIndex('dedupKey', stringCmp),
+      }),
+      dimensionSet: entityCollection<DimensionSet>().index({
+        dedupKey: fieldIndex('dedupKey', stringCmp),
+      }),
+    },
+    (r) => ({
+      hasResource: r.relationship<HasResource>('service', 'resource'),
+      regionHasResource: r.relationship<RegionHasResource>('region', 'resource'),
+      regionHasService: r.relationship<RegionHasService>('region', 'service'),
+      usesType: r.relationship<UsesType>('resource', 'typeDefinition'),
+      isAugmented: r.relationship<IsAugmentedResource>('resource', 'augmentations'),
+      usesDimensionSet: r.relationship<UsesDimensionSet>('metric', 'dimensionSet'),
+      resourceHasMetric: r.relationship<ResourceHasMetric>('resource', 'metric'),
+      serviceHasMetric: r.relationship<ServiceHasMetric>('service', 'metric'),
+      resourceHasDimensionSet: r.relationship<ResourceHasDimensionSet>('resource', 'dimensionSet'),
+      serviceHasDimensionSet: r.relationship<ServiceHasDimensionSet>('service', 'dimensionSet'),
     }),
-    region: emptyCollection({}),
-    service: emptyCollection({
-      name: emptyIndex('name', stringCmp),
-    }),
-    typeDefinition: emptyCollection({}),
-    augmentations: emptyCollection({}),
-    metric: emptyCollection({
-      name: emptyIndex('name', stringCmp),
-      namespace: emptyIndex('namespace', stringCmp),
-      dedupKey: emptyIndex('dedupKey', stringCmp),
-    }),
-    dimensionSet: emptyCollection({
-      dedupKey: emptyIndex('dedupKey', stringCmp),
-    }),
-    hasResource: emptyRelationship('service', 'resource'),
-    regionHasResource: emptyRelationship('region', 'resource'),
-    regionHasService: emptyRelationship('region', 'service'),
-    usesType: emptyRelationship('resource', 'typeDefinition'),
-    isAugmented: emptyRelationship('resource', 'augmentations'),
-    usesDimensionSet: emptyRelationship('metric', 'dimensionSet'),
-    resourceHasMetric: emptyRelationship('resource', 'metric'),
-    serviceHasMetric: emptyRelationship('service', 'metric'),
-    resourceHasDimensionSet: emptyRelationship('resource', 'dimensionSet'),
-    serviceHasDimensionSet: emptyRelationship('service', 'dimensionSet'),
-  });
+  );
 }
 
 export type SpecDatabase = ReturnType<typeof emptyDatabase>;

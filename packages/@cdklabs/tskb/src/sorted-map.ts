@@ -1,5 +1,11 @@
 export type SortedMultiMap<A, B> = Array<[A, B]>;
 
+/**
+ * A sorted map that may contain the same key multiple times
+ *
+ * Stored as a sorted array of [key, value] pairs, using binary search to locate
+ * entries.
+ */
 export namespace sortedMap {
   export type Comparator<A> = (a: A, b: A) => number;
 

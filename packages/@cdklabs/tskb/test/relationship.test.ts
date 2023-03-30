@@ -1,12 +1,4 @@
-import {
-  Database,
-  emptyCollection,
-  emptyRelationship,
-  Entity,
-  EntityCollection,
-  Relationship,
-  RelationshipCollection,
-} from '../src';
+import { Database, entityCollection, Entity, Relationship, EntitiesOf } from '../src';
 
 interface Thing extends Entity {
   readonly name: string;
@@ -19,20 +11,18 @@ interface Widget extends Entity {
 
 type HasWidget = Relationship<Thing, Widget, { count: number }>;
 
-interface DbSchema {
-  readonly thing: EntityCollection<Thing>;
-  readonly widget: EntityCollection<Widget>;
-  readonly hasWidget: RelationshipCollection<HasWidget, DbSchema, 'thing', 'widget'>;
-}
+let db: ReturnType<typeof emptyDatabase>;
 
-let db: Database<DbSchema>;
-
-function emptyDatabase(): Database<DbSchema> {
-  return new Database({
-    thing: emptyCollection(),
-    widget: emptyCollection(),
-    hasWidget: emptyRelationship('thing', 'widget'),
-  });
+function emptyDatabase() {
+  return new Database(
+    {
+      thing: entityCollection<Thing>(),
+      widget: entityCollection<Widget>(),
+    },
+    (r) => ({
+      hasWidget: r.relationship<HasWidget>('thing', 'widget'),
+    }),
+  );
 }
 
 beforeEach(() => {
@@ -112,17 +102,18 @@ describe.each([false, true])('database with some entities (saveAndLoad: %p)', (s
       },
     ]);
   });
+
+  test('check that entities found via relationships are typed appropriately', () => {
+    const purpleWidget = mustFind('widget', (w) => w.color === 'purple');
+    const shouldBeAThing: Thing = db.incoming('hasWidget', purpleWidget).only().entity;
+    void shouldBeAThing;
+  });
 });
 
-function mustFind<K extends Parameters<Database<DbSchema>['all']>[0]>(
-  key: K,
-  pred: (x: EntityType<DbSchema[K]>) => boolean,
-) {
-  const x = db.all(key).find(pred);
+function mustFind<K extends keyof EntitiesOf<typeof db>>(key: K, pred: (x: EntitiesOf<typeof db>[K]) => boolean) {
+  const x = db.all(key).find(pred as any);
   if (!x) {
     throw new Error(`Could not find ${key} with ${pred}`);
   }
   return x;
 }
-
-type EntityType<A> = A extends EntityCollection<infer B> ? B : never;

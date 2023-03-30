@@ -1,11 +1,10 @@
-import { DatabaseSchema } from '@aws-cdk/service-spec';
-import { Database } from '@cdklabs/tskb';
+import { SpecDatabase } from '@aws-cdk/service-spec';
 import { TypeScriptRenderer } from '@cdklabs/typewriter';
 import { AstBuilder } from '../src/cli/cdk/ast';
 import { loadDatabase } from '../src/cli/db';
 
 const renderer = new TypeScriptRenderer();
-let db: Database<DatabaseSchema>;
+let db: SpecDatabase;
 
 beforeAll(async () => {
   db = await loadDatabase();
