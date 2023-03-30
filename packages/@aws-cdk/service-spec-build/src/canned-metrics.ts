@@ -1,7 +1,7 @@
 import { createHash } from 'crypto';
 import { SpecDatabase } from '@aws-cdk/service-spec';
 import { CloudWatchConsoleServiceDirectory } from '@aws-cdk/service-spec-sources';
-import { Entity, Plain } from '@cdklabs/tskb';
+import { Entity, failure, Failures, Plain } from '@cdklabs/tskb';
 
 /**
  * Returns a deduplicatable entity
@@ -15,9 +15,11 @@ function dedup<T extends Plain<Entity>, K extends keyof T>(
   fields?: K[],
   extra: string = '',
 ): T & { dedupKey: string } {
-  const hash = createHash('md5');
+  const hash = createHash('sha256');
   hash.update(extra);
-  for (const k of fields || (Object.keys(entity) as K[])) {
+  const selectedFields = fields || (Object.keys(entity) as K[]);
+  for (const k of selectedFields.sort()) {
+    hash.update(k.toString());
     hash.update(JSON.stringify(entity[k]));
   }
 
@@ -27,7 +29,13 @@ function dedup<T extends Plain<Entity>, K extends keyof T>(
   };
 }
 
-export function readCannedMetrics(db: SpecDatabase, serviceDirectoryEntries: CloudWatchConsoleServiceDirectory) {
+export function readCannedMetrics(
+  db: SpecDatabase,
+  serviceDirectoryEntries: CloudWatchConsoleServiceDirectory,
+  fails: Failures,
+) {
+  const skippedResources = new Set<string>();
+
   for (const { metricTemplates: groups = [] } of serviceDirectoryEntries) {
     for (const group of groups) {
       try {
@@ -59,7 +67,13 @@ export function readCannedMetrics(db: SpecDatabase, serviceDirectoryEntries: Clo
           db.link('resourceHasMetric', resource, metric);
           db.link('serviceHasMetric', service, metric);
         }
-      } catch (unused: any) {}
+      } catch (unused: any) {
+        skippedResources.add(group.resourceType);
+      }
     }
+  }
+
+  for (const r of Array.from(skippedResources).sort()) {
+    fails.push(failure.in('CloudWatchConsoleServiceDirectory').in(r)('skipping resource type not in db'));
   }
 }

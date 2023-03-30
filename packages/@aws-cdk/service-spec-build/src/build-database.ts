@@ -53,7 +53,7 @@ export async function buildDatabase(options: BuildDatabaseOptions = {}) {
   readStatefulResources(db, stateful, warnings);
 
   const cloudWatchServiceDirectory = loadResult(await sources.loadDefaultCloudWatchConsoleServiceDirectory());
-  readCannedMetrics(db, cloudWatchServiceDirectory);
+  readCannedMetrics(db, cloudWatchServiceDirectory, warnings);
 
   new Scrutinies(db).annotate();
   new Augmentations(db).insert();

@@ -1,7 +1,9 @@
 import { emptyDatabase } from '@aws-cdk/service-spec';
+import { Failures } from '@cdklabs/tskb';
 import { readCannedMetrics } from '../src/canned-metrics';
 
 let db: ReturnType<typeof emptyDatabase>;
+const warnings: Failures = [];
 
 beforeEach(() => {
   db = emptyDatabase();
@@ -26,30 +28,38 @@ beforeEach(() => {
 
 test('adds corresponding metrics to the database', () => {
   // WHEN
-  readCannedMetrics(db, [
-    {
-      id: 'AWS::Some',
-      metricTemplates: [
-        {
-          resourceType: 'AWS::Some::Type',
-          namespace: 'AWS/Some',
-          dimensions: [{ dimensionName: 'Asgard' }, { dimensionName: 'Astral Plane' }, { dimensionName: 'Microverse' }],
-          metrics: [
-            {
-              id: 'AWS::Some::Type:4XXError',
-              name: '4XXError',
-              defaultStat: 'Sum',
-            },
-            {
-              id: 'AWS::Some::Type:4XXError',
-              name: '5XXError',
-              defaultStat: 'Max',
-            },
-          ],
-        },
-      ],
-    },
-  ]);
+  readCannedMetrics(
+    db,
+    [
+      {
+        id: 'AWS::Some',
+        metricTemplates: [
+          {
+            resourceType: 'AWS::Some::Type',
+            namespace: 'AWS/Some',
+            dimensions: [
+              { dimensionName: 'Asgard' },
+              { dimensionName: 'Astral Plane' },
+              { dimensionName: 'Microverse' },
+            ],
+            metrics: [
+              {
+                id: 'AWS::Some::Type:4XXError',
+                name: '4XXError',
+                defaultStat: 'Sum',
+              },
+              {
+                id: 'AWS::Some::Type:4XXError',
+                name: '5XXError',
+                defaultStat: 'Max',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    warnings,
+  );
 
   // THEN
   const res = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0];
@@ -76,30 +86,38 @@ test('adds corresponding metrics to the database', () => {
 
 test('does not add metrics for unknown resources', () => {
   // WHEN
-  readCannedMetrics(db, [
-    {
-      id: 'AWS::Some',
-      metricTemplates: [
-        {
-          resourceType: 'AWS::Some::Unknown',
-          namespace: 'AWS/Some',
-          dimensions: [{ dimensionName: 'Asgard' }, { dimensionName: 'Astral Plane' }, { dimensionName: 'Microverse' }],
-          metrics: [
-            {
-              id: 'AWS::Some::Unknown:4XXError',
-              name: '4XXError',
-              defaultStat: 'Sum',
-            },
-            {
-              id: 'AWS::Some::Unknown:5XXError',
-              name: '5XXError',
-              defaultStat: 'Sum',
-            },
-          ],
-        },
-      ],
-    },
-  ]);
+  readCannedMetrics(
+    db,
+    [
+      {
+        id: 'AWS::Some',
+        metricTemplates: [
+          {
+            resourceType: 'AWS::Some::Unknown',
+            namespace: 'AWS/Some',
+            dimensions: [
+              { dimensionName: 'Asgard' },
+              { dimensionName: 'Astral Plane' },
+              { dimensionName: 'Microverse' },
+            ],
+            metrics: [
+              {
+                id: 'AWS::Some::Unknown:4XXError',
+                name: '4XXError',
+                defaultStat: 'Sum',
+              },
+              {
+                id: 'AWS::Some::Unknown:5XXError',
+                name: '5XXError',
+                defaultStat: 'Sum',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    warnings,
+  );
 
   // THEN
   const res = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0];

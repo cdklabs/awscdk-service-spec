@@ -85,7 +85,7 @@ export class Type {
   /**
    * @see https://www.typescriptlang.org/docs/handbook/2/objects.html
    */
-  public static object(props: PropertySpec[]) {
+  public static anonymousInterface(props: PropertySpec[]) {
     return new Type({ object: props });
   }
 

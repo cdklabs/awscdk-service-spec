@@ -129,5 +129,5 @@ export class MetricsClass extends ClassType {
 }
 
 function dimensionSetType(set: DimensionSet): Type {
-  return Type.object(set.dimensions.map(({ name }) => ({ name, type: Type.STRING })));
+  return Type.anonymousInterface(set.dimensions.map(({ name }) => ({ name, type: Type.STRING })));
 }
