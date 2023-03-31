@@ -282,6 +282,7 @@ export function readCloudFormationRegistryServiceFromResource(
   const name = `${parts[0]}-${parts[1]}`.toLowerCase();
   const capitalized = parts[1];
   const shortName = capitalized.toLowerCase();
+  const cloudFormationNamespace = `${parts[0]}${resourceTypeNameSeparator}${parts[1]}`;
 
   const existing = db.lookup('service', 'name', 'equals', name);
 
@@ -293,6 +294,7 @@ export function readCloudFormationRegistryServiceFromResource(
     name,
     shortName,
     capitalized,
+    cloudFormationNamespace,
   });
 
   return service;

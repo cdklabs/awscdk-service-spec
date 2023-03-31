@@ -37,9 +37,6 @@
   ],
   "references": [
     {
-      "path": "../../@cdklabs/typewriter"
-    },
-    {
       "path": "../service-spec"
     },
     {
@@ -47,6 +44,9 @@
     },
     {
       "path": "../../@cdklabs/tskb"
+    },
+    {
+      "path": "../../@cdklabs/typewriter"
     }
   ],
   "ts-node": {

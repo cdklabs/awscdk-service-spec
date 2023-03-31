@@ -33,6 +33,14 @@ export interface Service extends Entity {
    * @example dynamodb
    */
   readonly capitalized: string;
+  /**
+   * The complete cloudformation style namespace of the service
+   *
+   * E.g. `AWS::DynamoDB`
+   *
+   * @example dynamodb
+   */
+  readonly cloudFormationNamespace: string;
 }
 
 export interface Region extends Entity {
