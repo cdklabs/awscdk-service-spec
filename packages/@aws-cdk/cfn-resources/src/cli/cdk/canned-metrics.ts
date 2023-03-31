@@ -59,12 +59,12 @@ export class MetricsClass extends ClassType {
 
     this.returnType = new InterfaceType(this.scope, {
       name: 'MetricWithDims',
+      export: true,
       properties: [
         {
           name: 'namespace',
           type: Type.STRING,
           immutable: true,
-          optional: true,
         },
         {
           name: 'metricName',
@@ -98,7 +98,7 @@ export class MetricsClass extends ClassType {
     }
 
     // If we have more than one dimension set, add a generic declaration
-    if (dimensionSets.length >= 1) {
+    if (dimensionSets.length > 1) {
       this.addMetricMethodDeclaration(name, Type.ANY);
     }
 
