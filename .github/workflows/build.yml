@@ -9,7 +9,7 @@ on:
       - main
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: awscdk-service-spec_ubuntu-latest_32-core
     permissions:
       contents: write
     outputs:
@@ -46,7 +46,7 @@ jobs:
           exit 1
   self-mutation:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: awscdk-service-spec_ubuntu-latest_32-core
     permissions:
       contents: write
     if: always() && needs.build.outputs.self_mutation_happened && !(github.event.pull_request.head.repo.full_name != github.repository)
