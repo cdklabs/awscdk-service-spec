@@ -23,7 +23,7 @@ export class AwsCdkIntgrationTest extends pj.Component {
     const awsCdkPath = 'aws-cdk';
 
     workflow.addJob('test-with-new-codegen', {
-      runsOn: ['ubuntu-latest'],
+      runsOn: ['awscdk-service-spec_ubuntu-latest_32-core'],
       env: {
         CI: '1',
       },
@@ -84,7 +84,7 @@ export class AwsCdkIntgrationTest extends pj.Component {
         {
           name: `Build ${awsCdkRepo}`,
           workingDirectory: awsCdkPath,
-          run: 'npx lerna run build --no-bail --concurrency=1 --scope aws-cdk-lib --include-dependencies',
+          run: 'npx lerna run build --no-bail --scope aws-cdk-lib --include-dependencies',
         },
       ],
     });

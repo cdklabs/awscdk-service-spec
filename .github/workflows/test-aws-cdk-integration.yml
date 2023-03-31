@@ -6,7 +6,7 @@ on:
   pull_request: {}
 jobs:
   test-with-new-codegen:
-    runs-on: ubuntu-latest
+    runs-on: awscdk-service-spec_ubuntu-latest_32-core
     permissions:
       contents: read
     env:
@@ -43,5 +43,5 @@ jobs:
         run: npx tsc --showConfig | jq '.references = []' > tmp && mv tmp tsconfig.json
         working-directory: aws-cdk/packages/aws-cdk
       - name: Build aws/aws-cdk
-        run: npx lerna run build --no-bail --concurrency=1 --scope aws-cdk-lib --include-dependencies
+        run: npx lerna run build --no-bail --scope aws-cdk-lib --include-dependencies
         working-directory: aws-cdk
