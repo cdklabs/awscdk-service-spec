@@ -23,3 +23,18 @@ test.each(['alexa-ask', 'aws-chatbot', 'aws-scheduler', 'aws-sqs'])('%s', (servi
 
   expect(rendered).toMatchSnapshot();
 });
+
+test('can codegen service with arbitrary suffix', () => {
+  const service = db.lookup('service', 'name', 'equals', 'aws-kinesisanalyticsv2').only();
+
+  const ast = AstBuilder.forService(service, { db, nameSuffix: 'V2' });
+
+  const rendered = renderer.render(ast.module);
+
+  expect(rendered).toMatchSnapshot();
+  expect(rendered).toContain('class CfnApplicationV2');
+  expect(rendered).toContain('namespace CfnApplicationV2');
+  expect(rendered).toContain('interface CfnApplicationV2Props');
+  expect(rendered).toContain('function convertCfnApplicationV2PropsToCloudFormation');
+  expect(rendered).toContain('function CfnApplicationV2ApplicationCodeConfigurationPropertyValidator');
+});

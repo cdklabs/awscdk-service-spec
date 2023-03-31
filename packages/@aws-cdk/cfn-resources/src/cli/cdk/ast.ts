@@ -34,6 +34,11 @@ export interface AstBuilderProps {
    * Override the locations modules are imported from
    */
   readonly importLocations?: ModuleImportLocations;
+
+  /**
+   * Append a suffix at the end of generated names.
+   */
+  readonly nameSuffix?: string;
 }
 
 export class AstBuilder<T extends Module> {
@@ -72,6 +77,7 @@ export class AstBuilder<T extends Module> {
   }
 
   public readonly db: SpecDatabase;
+  private nameSuffix?: string;
 
   protected constructor(
     public readonly module: T,
@@ -80,6 +86,7 @@ export class AstBuilder<T extends Module> {
     public readonly cannedMetrics?: CannedMetricsModule,
   ) {
     this.db = props.db;
+    this.nameSuffix = props.nameSuffix;
 
     CDK_CORE.import(module, 'cdk', { fromLocation: props.importLocations?.core });
     CONSTRUCTS.import(module, 'constructs');
@@ -87,7 +94,7 @@ export class AstBuilder<T extends Module> {
   }
 
   public addResource(resource: Resource) {
-    const resourceClass = new ResourceClass(this.module, resource);
+    const resourceClass = new ResourceClass(this.module, resource, this.nameSuffix);
 
     const converter = new TypeConverter({ db: this.db, resource, resourceClass });
     const propsType = this.addResourcePropsType(resource, converter);
@@ -99,7 +106,7 @@ export class AstBuilder<T extends Module> {
   protected addResourcePropsType(r: Resource, converter: TypeConverter) {
     const propsInterface = new StructType(this.module, {
       export: true,
-      name: propStructNameFromResource(r),
+      name: propStructNameFromResource(r, this.nameSuffix),
       docs: {
         summary: `Properties for defining a \`${classNameFromResource(r)}\``,
         stability: Stability.External,

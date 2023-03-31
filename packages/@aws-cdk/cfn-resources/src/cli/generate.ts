@@ -24,17 +24,14 @@ export interface GenerateOptions {
    * The pattern used to name files.
    */
   readonly resourceFilePattern: PatternedString<PatternKeys>;
-
   /**
    * The pattern used to name augmentations.
    */
   readonly augmentationsFilePattern: PatternedString<PatternKeys>;
-
   /**
    * The pattern used to name canned metrics.
    */
   readonly cannedMetricsFilePattern: PatternedString<PatternKeys>;
-
   /**
    * Output debug messages
    * @default false
@@ -45,10 +42,13 @@ export interface GenerateOptions {
    */
   readonly services?: string[];
   /**
+   * The services to generate files for.
+   */
+  readonly serviceSuffixes?: Record<string, string>;
+  /**
    * Override the locations modules are imported from
    */
   readonly importLocations?: ModuleImportLocations;
-
   /**
    * Generate L2 support files for augmentations (only for testing)
    *
@@ -70,7 +70,7 @@ export async function generate(options: GenerateOptions) {
   let resourceCount = 0;
   const services = getServices(db, options.services).map((s) => {
     debug(s.name, 'ast');
-    const ast = AstBuilder.forService(s, { db, importLocations });
+    const ast = AstBuilder.forService(s, { db, importLocations, nameSuffix: options.serviceSuffixes?.[s.name] });
     resourceCount += db.follow('hasResource', s).length;
     return ast;
   });
