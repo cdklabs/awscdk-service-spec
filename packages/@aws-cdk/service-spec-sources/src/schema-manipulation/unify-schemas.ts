@@ -19,6 +19,10 @@ export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result
     return a;
   }
 
+  if (jsonschema.isAnyType(a) || jsonschema.isAnyType(b)) {
+    return true;
+  }
+
   if (jsonschema.isOneOf(a) || jsonschema.isAnyOf(a) || jsonschema.isAllOf(a)) {
     // FIXME: not implemented yet
     return a;
@@ -62,7 +66,7 @@ export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result
         return failure(`${a.type} != ${b.type}`);
       }
 
-      return using(locateFailure('array.items')(unifySchemas(a.items, b.items)), (items) => ({
+      return using(locateFailure('array.items')(unifySchemas(a.items ?? true, b.items ?? true)), (items) => ({
         type: 'array',
         ...meta,
         items,
@@ -101,16 +105,16 @@ export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result
         return failure(`${a.type} != ${b.type}`);
       }
 
-      const aIsRecord = jsonschema.isRecordLikeObject(a);
-      const bIsRecord = jsonschema.isRecordLikeObject(b);
-      if (aIsRecord !== bIsRecord) {
-        return failure(`record type: ${aIsRecord} != record type: ${bIsRecord}`);
-      }
-
-      if (aIsRecord && bIsRecord) {
+      if (jsonschema.isRecordLikeObject(a) && jsonschema.isRecordLikeObject(b)) {
         return unifyRecordTypes(meta, a, b);
       }
-      return unifyMapTypes(meta, a, b);
+      if (jsonschema.isMapLikeObject(a) && jsonschema.isMapLikeObject(b)) {
+        return unifyMapTypes(meta, a, b);
+      }
+
+      return failure(
+        `record type: ${jsonschema.isRecordLikeObject(a)} != record type: ${jsonschema.isRecordLikeObject(b)}`,
+      );
 
     case 'null':
       // Optionality will be recorded somewhere else
@@ -173,25 +177,14 @@ function unifyMapTypes(
   a: jsonschema.MapLikeObject,
   b: jsonschema.MapLikeObject,
 ): Result<jsonschema.MapLikeObject> {
-  // Most difficult decisions are here
   const aPats = { ...a.patternProperties };
+  const aAddl = a.additionalProperties ?? true;
   const bPats = { ...b.patternProperties };
+  const bAddl = b.additionalProperties ?? true;
 
-  if (a.additionalProperties || b.additionalProperties) {
-    const unified = unifyAllSchemas([
-      ...(a.additionalProperties ? [a.additionalProperties] : []),
-      ...(b.additionalProperties ? [b.additionalProperties] : []),
-      ...Object.values(aPats),
-      ...Object.values(bPats),
-    ]);
-    if (isFailure(unified)) {
-      return locateFailure('map type')(unified);
-    }
-    return {
-      type: 'object',
-      ...meta,
-      additionalProperties: unified,
-    };
+  const additionalProperties = aAddl && bAddl ? unifyAllSchemas([aAddl, bAddl]) : aAddl ? aAddl : bAddl;
+  if (isFailure(additionalProperties)) {
+    return locateFailure('additionalProperties')(additionalProperties);
   }
 
   for (const key in bPats) {
@@ -209,6 +202,7 @@ function unifyMapTypes(
   return {
     type: 'object',
     ...meta,
+    additionalProperties,
     patternProperties: aPats,
   };
 }

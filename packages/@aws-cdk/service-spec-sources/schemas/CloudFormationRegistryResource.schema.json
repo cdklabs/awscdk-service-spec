@@ -344,30 +344,6 @@
       },
       "type": "object"
     },
-    "jsonschema.AllOf<ConcreteSchema>": {
-      "additionalProperties": false,
-      "properties": {
-        "$comment": {
-          "type": "string"
-        },
-        "allOf": {
-          "items": {
-            "$ref": "#/definitions/jsonschema.ConcreteSchema"
-          },
-          "type": "array"
-        },
-        "description": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "allOf"
-      ],
-      "type": "object"
-    },
     "jsonschema.AllOf<Schema>": {
       "additionalProperties": false,
       "properties": {
@@ -389,30 +365,6 @@
       },
       "required": [
         "allOf"
-      ],
-      "type": "object"
-    },
-    "jsonschema.AnyOf<ConcreteSchema>": {
-      "additionalProperties": false,
-      "properties": {
-        "$comment": {
-          "type": "string"
-        },
-        "anyOf": {
-          "items": {
-            "$ref": "#/definitions/jsonschema.ConcreteSchema"
-          },
-          "type": "array"
-        },
-        "description": {
-          "type": "string"
-        },
-        "title": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "anyOf"
       ],
       "type": "object"
     },
@@ -440,6 +392,10 @@
       ],
       "type": "object"
     },
+    "jsonschema.AnyType": {
+      "const": true,
+      "type": "boolean"
+    },
     "jsonschema.Boolean": {
       "additionalProperties": false,
       "properties": {
@@ -465,19 +421,10 @@
       ],
       "type": "object"
     },
-    "jsonschema.ConcreteSchema": {
+    "jsonschema.ConcreteSingletonSchema": {
       "anyOf": [
         {
           "$ref": "#/definitions/jsonschema.Object"
-        },
-        {
-          "$ref": "#/definitions/jsonschema.OneOf%3CConcreteSchema%3E"
-        },
-        {
-          "$ref": "#/definitions/jsonschema.AnyOf%3CConcreteSchema%3E"
-        },
-        {
-          "$ref": "#/definitions/jsonschema.AllOf%3CConcreteSchema%3E"
         },
         {
           "$ref": "#/definitions/jsonschema.String"
@@ -493,6 +440,9 @@
         },
         {
           "$ref": "#/definitions/jsonschema.Null"
+        },
+        {
+          "$ref": "#/definitions/jsonschema.AnyType"
         }
       ]
     },
@@ -512,7 +462,8 @@
               "$ref": "#/definitions/jsonschema.Schema"
             }
           ],
-          "description": "Simplification:\n\n{ additionalProperties: X }       <===> { patternProperties: { \".*\": X }}"
+          "default": true,
+          "description": "additionalProperties validates all keys that aren't otherwise validated by properties or patternProperties"
         },
         "description": {
           "type": "string"
@@ -528,6 +479,13 @@
             "$ref": "#/definitions/jsonschema.Schema"
           },
           "type": "object"
+        },
+        "required": {
+          "description": "Required keys in a map\n\nDoesn't really make a whole lot of sense, but this is used to support mixed map/record types.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         },
         "title": {
           "type": "string"
@@ -628,30 +586,6 @@
       "additionalProperties": {
         "$ref": "#/definitions/jsonschema.Schema"
       },
-      "type": "object"
-    },
-    "jsonschema.OneOf<ConcreteSchema>": {
-      "additionalProperties": false,
-      "properties": {
-        "$comment": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "oneOf": {
-          "items": {
-            "$ref": "#/definitions/jsonschema.ConcreteSchema"
-          },
-          "type": "array"
-        },
-        "title": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "oneOf"
-      ],
       "type": "object"
     },
     "jsonschema.OneOf<Schema>": {
@@ -758,7 +692,7 @@
           "$ref": "#/definitions/jsonschema.AllOf%3CSchema%3E"
         },
         {
-          "$ref": "#/definitions/jsonschema.ConcreteSchema"
+          "$ref": "#/definitions/jsonschema.ConcreteSingletonSchema"
         }
       ]
     },
@@ -812,8 +746,7 @@
         }
       },
       "required": [
-        "type",
-        "items"
+        "type"
       ],
       "type": "object"
     },
@@ -821,6 +754,9 @@
       "additionalProperties": false,
       "properties": {
         "$comment": {
+          "type": "string"
+        },
+        "const": {
           "type": "string"
         },
         "default": {

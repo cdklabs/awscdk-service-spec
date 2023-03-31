@@ -10,7 +10,7 @@ beforeAll(async () => {
   db = await loadDatabase();
 });
 
-test.each(['alexa-ask', 'aws-chatbot', 'aws-scheduler', 'aws-sqs'])('%s', (serviceName) => {
+test.each(['alexa-ask', 'aws-chatbot', 'aws-scheduler', 'aws-sqs', 'aws-sam'])('%s', (serviceName) => {
   const service = db.lookup('service', 'name', 'equals', serviceName)[0];
 
   const ast = AstBuilder.forService(service, { db });

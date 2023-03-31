@@ -107,11 +107,15 @@ export class Loader<A> {
 }
 
 function failureFromErrors(errors: Ajv.ErrorObject[] | null | undefined): Failure {
-  return failure((errors?.map((x) => util.inspect(x, { depth: 3 })) ?? []).join('\n'));
+  return failure(
+    groupAndFormatAjvErrors(errors)
+      .map(([p, e]) => header(p, e))
+      .join('\n'),
+  );
 }
 
 function failuresFromErrors(errors: Ajv.ErrorObject[] | null | undefined): Failure[] {
-  return (errors ?? []).map((x) => failure(util.inspect(x, { depth: 3 })));
+  return groupAndFormatAjvErrors(errors).map(([p, e]) => failure(header(p, e)));
 }
 
 /**
@@ -157,4 +161,48 @@ export function combineLoadResults<A>(xs: Result<LoadResult<A>>[]): LoadResult<A
     }
     return rs;
   }, ret);
+}
+
+/**
+ * Group AJV errors by dataPath and format them in a way that it's clear which validations
+ * we tried to apply to every object and why they failed.
+ */
+function groupAndFormatAjvErrors(errors: Ajv.ErrorObject[] | null | undefined): Array<[string, string]> {
+  if (!errors) {
+    return [];
+  }
+
+  const paths = Array.from(new Set(errors.map((e) => e.dataPath)));
+  paths.sort().reverse(); // Reverse to make deepest paths appear first (= most likely error at the top)
+  return paths.map((p) => [p, formatErrors(errorsAtPath(p))]);
+
+  function errorsAtPath(p: string) {
+    return errors?.filter((e) => e.dataPath === p) ?? [];
+  }
+
+  function formatErrors(es: Ajv.ErrorObject[]): string {
+    const ret = new Array<string>();
+    ret.push(util.inspect(es[0].data, { depth: 3 }));
+
+    for (const error of es) {
+      ret.push(
+        `${error.keyword}: ${error.message} (${util.inspect(error.params)})`,
+        indent('  |  ', util.inspect(error.parentSchema, { depth: 3 })),
+      );
+    }
+
+    return ret.join('\n');
+  }
+}
+
+function header(caption: string, contents: string) {
+  return caption + '\n' + indent(4, contents);
+}
+
+function indent(n: number | string, x: string): string {
+  const prefix = typeof n === 'string' ? n : ' '.repeat(n);
+  return x
+    .split('\n')
+    .map((line) => prefix + line)
+    .join('\n');
 }

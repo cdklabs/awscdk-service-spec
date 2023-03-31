@@ -6,9 +6,10 @@ import { Augmentations } from './augmentations';
 import { readCannedMetrics } from './canned-metrics';
 import { readCloudFormationDocumentation } from './cloudformation-docs';
 import {
-  readCloudFormationRegistryResource,
+  importCloudFormationRegistryResource,
   readCloudFormationRegistryServiceFromResource,
 } from './cloudformation-registry';
+import { SamResources } from './import-sam';
 import { Scrutinies } from './scrutinies';
 import { readStatefulResources } from './stateful-resources';
 
@@ -29,7 +30,7 @@ export async function buildDatabase(options: BuildDatabaseOptions = {}) {
     });
 
     for (const resource of resources.resources) {
-      const res = readCloudFormationRegistryResource({
+      const res = importCloudFormationRegistryResource({
         db,
         resource,
         fails: warnings,
@@ -45,6 +46,9 @@ export async function buildDatabase(options: BuildDatabaseOptions = {}) {
       db.link('hasResource', service, res);
     }
   }
+
+  const samSchema = loadResult(await sources.loadSamResourceSpec());
+  new SamResources({ db, samSchema, fails: warnings }).import();
 
   const docs = loadResult(await sources.loadDefaultCloudFormationDocs());
   readCloudFormationDocumentation(db, docs, warnings);

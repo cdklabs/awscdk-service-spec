@@ -1,0 +1,145 @@
+{
+  "$ref": "#/definitions/CloudFormationResourceSpecification",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "CloudFormationResourceSpecification": {
+      "additionalProperties": false,
+      "description": "CloudFormation Resource specification",
+      "properties": {
+        "PropertyTypes": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/resourcespec.PropertyType"
+              },
+              {
+                "$ref": "#/definitions/resourcespec.Property"
+              }
+            ]
+          },
+          "description": "Not really valid for this to be a plain property, but it happens in practice anyway",
+          "type": "object"
+        },
+        "ResourceSpecificationVersion": {
+          "type": "string"
+        },
+        "ResourceTypes": {
+          "additionalProperties": {
+            "$ref": "#/definitions/resourcespec.ResourceType"
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "ResourceSpecificationVersion",
+        "ResourceTypes",
+        "PropertyTypes"
+      ],
+      "type": "object"
+    },
+    "resourcespec.Attribute": {
+      "additionalProperties": false,
+      "properties": {
+        "Documentation": {
+          "type": "string"
+        },
+        "DuplicatesAllowed": {
+          "type": "boolean"
+        },
+        "ItemType": {
+          "type": "string"
+        },
+        "PrimitiveItemType": {
+          "type": "string"
+        },
+        "PrimitiveType": {
+          "type": "string"
+        },
+        "Required": {
+          "type": "boolean"
+        },
+        "Type": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "resourcespec.Property": {
+      "additionalProperties": false,
+      "properties": {
+        "Documentation": {
+          "type": "string"
+        },
+        "DuplicatesAllowed": {
+          "type": "boolean"
+        },
+        "ItemType": {
+          "type": "string"
+        },
+        "PrimitiveItemType": {
+          "type": "string"
+        },
+        "PrimitiveType": {
+          "type": "string"
+        },
+        "Required": {
+          "type": "boolean"
+        },
+        "Type": {
+          "type": "string"
+        },
+        "UpdateType": {
+          "enum": [
+            "Mutable",
+            "Immutable",
+            "Conditional"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "UpdateType"
+      ],
+      "type": "object"
+    },
+    "resourcespec.PropertyType": {
+      "additionalProperties": false,
+      "properties": {
+        "Documentation": {
+          "type": "string"
+        },
+        "Properties": {
+          "additionalProperties": {
+            "$ref": "#/definitions/resourcespec.Property"
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "resourcespec.ResourceType": {
+      "additionalProperties": false,
+      "properties": {
+        "AdditionalProperties": {
+          "type": "boolean"
+        },
+        "Attributes": {
+          "additionalProperties": {
+            "$ref": "#/definitions/resourcespec.Attribute"
+          },
+          "type": "object"
+        },
+        "Documentation": {
+          "type": "string"
+        },
+        "Properties": {
+          "additionalProperties": {
+            "$ref": "#/definitions/resourcespec.Property"
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    }
+  }
+}

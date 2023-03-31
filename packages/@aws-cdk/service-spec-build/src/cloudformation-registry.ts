@@ -15,7 +15,7 @@ import {
   resourcespec,
   unifyAllSchemas,
 } from '@aws-cdk/service-spec-sources';
-import { Fail, failure, Failures, isFailure, Result, tryCatch, using, ref } from '@cdklabs/tskb';
+import { locateFailure, Fail, failure, Failures, isFailure, Result, tryCatch, using, ref } from '@cdklabs/tskb';
 
 export interface LoadCloudFormationRegistryResourceOptions {
   readonly db: SpecDatabase;
@@ -29,12 +29,12 @@ export interface LoadCloudFormationRegistryServiceFromResourceOptions {
   readonly resourceTypeNameSeparator?: string;
 }
 
-export function readCloudFormationRegistryResource(options: LoadCloudFormationRegistryResourceOptions) {
+export function importCloudFormationRegistryResource(options: LoadCloudFormationRegistryResourceOptions) {
   const { db, resource, fails } = options;
 
   const typeDefinitions = new Map<jsonschema.Object, TypeDefinition>();
 
-  const resolve = jsonschema.resolveReference(resource);
+  const resolve = jsonschema.makeResolver(resource);
 
   const existing = db.lookup('resource', 'cloudFormationType', 'equals', resource.typeName);
 
@@ -47,6 +47,8 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
   return allocateNewResource();
 
   function allocateNewResource() {
+    const resourceFailure = failure.in(resource.typeName);
+
     res = db.allocate('resource', {
       cloudFormationType: resource.typeName,
       documentation: resource.description,
@@ -55,7 +57,7 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
       properties: {},
     });
 
-    recurseProperties(resource, res.properties, failure.in(resource.typeName));
+    recurseProperties(resource, res.properties, resourceFailure);
     // Every property that's a "readonly" property, remove it again from the `properties` collection.
     for (const propPtr of resource.readOnlyProperties ?? []) {
       const propName = simplePropNameFromJsonPtr(propPtr);
@@ -67,9 +69,9 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
       (res.properties[propName] ?? {}).deprecated = Deprecation.WARN;
     }
 
-    copyAttributes(resource, res.attributes, failure.in(resource.typeName));
+    copyAttributes(resource, res.attributes, resourceFailure.in('attributes'));
 
-    handleTags(failure.in(resource.typeName));
+    handleFailure(handleTags(resourceFailure));
 
     return res;
   }
@@ -85,7 +87,7 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
       withResult(schemaTypeToModelType(name, resolved, fail.in(`property ${name}`)), (type) => {
         target[name] = {
           type,
-          documentation: resolved.schema.description,
+          documentation: descriptionOf(resolved.schema),
           required: ifTrue((source.required ?? []).includes(name)),
           defaultValue: describeDefault(resolved.schema),
         };
@@ -99,9 +101,11 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
     fail: Fail,
   ): Result<PropertyType> {
     return tryCatch(fail, (): Result<PropertyType> => {
-      const nameHint = resolved.referenceName ?? propertyName;
+      const nameHint = lastWord(resolved.referenceName) ?? propertyName;
 
-      if (jsonschema.isOneOf(resolved.schema)) {
+      if (jsonschema.isAnyType(resolved.schema)) {
+        return { type: 'json' };
+      } else if (jsonschema.isOneOf(resolved.schema)) {
         // FIXME: Do a proper thing here
         const firstResolved: jsonschema.ResolvedSchema = {
           schema: resolved.schema.oneOf[0],
@@ -129,7 +133,7 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
 
           case 'array':
             // FIXME: insertionOrder, uniqueItems
-            return using(schemaTypeToModelType(nameHint, resolve(resolved.schema.items), fail), (element) => ({
+            return using(schemaTypeToModelType(nameHint, resolve(resolved.schema.items ?? true), fail), (element) => ({
               type: 'array',
               element,
             }));
@@ -155,22 +159,24 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
 
   function schemaObjectToModelType(nameHint: string, schema: jsonschema.Object, fail: Fail): Result<PropertyType> {
     if (jsonschema.isMapLikeObject(schema)) {
-      // Map type
-      if (schema.additionalProperties && schema.patternProperties) {
-        throw new Error('Map types should have only additionalProperties or patternProperties');
-      }
+      // Map type -- if we have 'additionalProperties', we will use that as the type of everything
+      // (and assume it subsumes patterned types).
       if (schema.additionalProperties) {
         return using(schemaTypeToModelType(nameHint, resolve(schema.additionalProperties), fail), (element) => ({
           type: 'map',
           element,
         }));
       } else if (schema.patternProperties) {
-        return using(unifyAllSchemas(Object.values(schema.patternProperties)), (unifiedType) =>
+        const unifiedPatternProps = fail.locate(
+          locateFailure('patternProperties')(unifyAllSchemas(Object.values(schema.patternProperties))),
+        );
+
+        return using(unifiedPatternProps, (unifiedType) =>
           using(schemaTypeToModelType(nameHint, resolve(unifiedType), fail), (element) => ({ type: 'map', element })),
         );
       } else {
         // Fully untyped map
-        // FIXME: is 'json' really a primitive type, or do we mean `Map<unknown>` ?
+        // FIXME: is 'json' really a primitive type, or do we mean `Map<unknown>` or `Map<any>` ?
         return { type: 'json' };
       }
     }
@@ -193,7 +199,12 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
   }
 
   function describeDefault(schema: jsonschema.ConcreteSchema): string | undefined {
-    if (jsonschema.isAllOf(schema) || jsonschema.isAnyOf(schema) || jsonschema.isOneOf(schema)) {
+    if (
+      jsonschema.isAnyType(schema) ||
+      jsonschema.isAllOf(schema) ||
+      jsonschema.isAnyOf(schema) ||
+      jsonschema.isOneOf(schema)
+    ) {
       return undefined;
     }
 
@@ -227,7 +238,7 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
 
     for (const name of attributeNames) {
       if (!source.properties[name]) {
-        fails.push(fail(`no property definition for: ${name}`));
+        fails.push(fail(`no definition for: ${name}`));
         continue;
       }
       const resolved = resolve(source.properties[name]);
@@ -235,7 +246,7 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
       withResult(schemaTypeToModelType(name, resolved, fail.in(`attribute ${name}`)), (type) => {
         target[name] = {
           type,
-          documentation: resolved.schema.description,
+          documentation: descriptionOf(resolved.schema),
           required: ifTrue((source.required ?? []).includes(name)),
         };
       });
@@ -243,25 +254,27 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
   }
 
   function handleTags(fail: Fail) {
-    const taggable = resource?.tagging?.taggable ?? resource.taggable ?? true;
-    if (taggable) {
-      const tagProp = simplePropNameFromJsonPtr(resource.tagging?.tagProperty ?? '/properties/Tags');
-      const tagType = resource.properties[tagProp];
-      if (!tagType) {
-        fails.push(fail(`marked as taggable, but tagProperty does not exist: ${tagProp}`));
-      } else {
-        const resolvedType = resolve(tagType).schema;
-        res.tagPropertyName = tagProp;
-        if (res.cloudFormationType === 'AWS::AutoScaling::AutoScalingGroup') {
-          res.tagType = 'asg';
-        } else if (jsonschema.isObject(resolvedType) && jsonschema.isMapLikeObject(resolvedType)) {
-          res.tagType = 'map';
+    return tryCatch(fail, () => {
+      const taggable = resource?.tagging?.taggable ?? resource.taggable ?? true;
+      if (taggable) {
+        const tagProp = simplePropNameFromJsonPtr(resource.tagging?.tagProperty ?? '/properties/Tags');
+        const tagType = resource.properties[tagProp];
+        if (!tagType) {
+          fails.push(fail(`marked as taggable, but tagProperty does not exist: ${tagProp}`));
         } else {
-          res.tagType = 'standard';
+          const resolvedType = resolve(tagType).schema;
+          res.tagPropertyName = tagProp;
+          if (res.cloudFormationType === 'AWS::AutoScaling::AutoScalingGroup') {
+            res.tagType = 'asg';
+          } else if (jsonschema.isObject(resolvedType) && jsonschema.isMapLikeObject(resolvedType)) {
+            res.tagType = 'map';
+          } else {
+            res.tagType = 'standard';
+          }
+          res.properties[tagProp].type = { type: 'array', element: { type: 'builtIn', builtInType: 'tag' } };
         }
-        res.properties[tagProp].type = { type: 'array', element: { type: 'builtIn', builtInType: 'tag' } };
       }
-    }
+    });
   }
 
   function withResult<A>(x: Result<A>, cb: (x: A) => void): void {
@@ -269,6 +282,12 @@ export function readCloudFormationRegistryResource(options: LoadCloudFormationRe
       fails.push(x);
     } else {
       cb(x);
+    }
+  }
+
+  function handleFailure(x: Result<void>) {
+    if (isFailure(x)) {
+      fails.push(x);
     }
   }
 }
@@ -304,4 +323,16 @@ function last<A>(xs: A[]): A {
 
 function ifTrue(x: boolean | undefined) {
   return x ? x : undefined;
+}
+
+function descriptionOf(x: jsonschema.ConcreteSchema) {
+  return jsonschema.isAnyType(x) ? undefined : x.description;
+}
+
+function lastWord(x?: string): string | undefined {
+  if (!x) {
+    return undefined;
+  }
+
+  return x.match(/([a-zA-Z0-9]+)$/)?.[1];
 }

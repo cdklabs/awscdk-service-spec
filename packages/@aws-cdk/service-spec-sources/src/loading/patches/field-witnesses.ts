@@ -20,6 +20,7 @@ export const STRING_KEY_WITNESS: TypeKeyWitness<jsonschema.String> = {
   minLength: true,
   pattern: true,
   title: true,
+  const: true,
 };
 
 export const NUMBER_KEY_WITNESS: TypeKeyWitness<jsonschema.Number> = {
@@ -80,4 +81,25 @@ export const NULL_KEY_WITNESS: TypeKeyWitness<jsonschema.Null> = {
 
 export function retainRelevantKeywords<A extends object>(x: object, witness: TypeKeyWitness<A>): A {
   return Object.fromEntries(Object.entries(x).flatMap(([k, v]) => ((witness as any)[k] ? [[k, v]] : []))) as any;
+}
+
+export function witnessForType(type: string): TypeKeyWitness<any> {
+  switch (type) {
+    case 'string':
+      return STRING_KEY_WITNESS;
+    case 'object':
+      return OBJECT_KEY_WITNESS;
+    case 'boolean':
+      return BOOLEAN_KEY_WITNESS;
+    case 'number':
+    case 'integer':
+      return NUMBER_KEY_WITNESS;
+    case 'array':
+      return ARRAY_KEY_WITNESS;
+    case 'null':
+      return NULL_KEY_WITNESS;
+
+    default:
+      throw new Error(`Don't recognize type: ${type}`);
+  }
 }
