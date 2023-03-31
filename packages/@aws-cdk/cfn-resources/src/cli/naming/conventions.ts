@@ -47,12 +47,12 @@ export function structNameFromTypeDefinition(def: TypeDefinition) {
   return `${def.name}Property`;
 }
 
-export function classNameFromResource(res: Resource) {
-  return `Cfn${res.name}`;
+export function classNameFromResource(res: Resource, suffix?: string) {
+  return `Cfn${res.name}${suffix ?? ''}`;
 }
 
-export function propStructNameFromResource(res: Resource) {
-  return `${classNameFromResource(res)}Props`;
+export function propStructNameFromResource(res: Resource, suffix?: string) {
+  return `${classNameFromResource(res, suffix)}Props`;
 }
 
 export function cfnProducerNameFromType(struct: TypeDeclaration) {

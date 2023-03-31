@@ -42,10 +42,10 @@ export interface ResourceClassSpec {
 export class ResourceClass extends ClassType {
   private _propsType?: StructType;
 
-  constructor(scope: IScope, private readonly res: Resource) {
+  constructor(scope: IScope, private readonly res: Resource, suffix?: string) {
     super(scope, {
       export: true,
-      name: classNameFromResource(res),
+      name: classNameFromResource(res, suffix),
       docs: {
         ...splitDocumentation(res.documentation),
         stability: Stability.External,
