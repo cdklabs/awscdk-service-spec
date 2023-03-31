@@ -1,6 +1,5 @@
 import path from 'path';
-import { DatabaseSchema } from '@aws-cdk/service-spec';
-import { Database } from '@cdklabs/tskb';
+import { SpecDatabase } from '@aws-cdk/service-spec';
 import { Module, TypeScriptRenderer } from '@cdklabs/typewriter';
 import * as fs from 'fs-extra';
 import { AstBuilder } from './cdk/ast';
@@ -30,6 +29,11 @@ export interface GenerateOptions {
    * The pattern used to name augmentations.
    */
   readonly augmentationsFilePattern: PatternedString<PatternKeys>;
+
+  /**
+   * The pattern used to name canned metrics.
+   */
+  readonly cannedMetricsFilePattern: PatternedString<PatternKeys>;
 
   /**
    * Output debug messages
@@ -98,6 +102,10 @@ export async function generate(options: GenerateOptions) {
         }
       }
     }
+
+    if (s.cannedMetrics?.hasCannedMetrics) {
+      writer.writePattern(s.cannedMetrics, options.cannedMetricsFilePattern);
+    }
   }
 }
 
@@ -120,7 +128,7 @@ class ServiceFileWriter {
   }
 }
 
-function getServices(db: Database<DatabaseSchema>, services?: string[]) {
+function getServices(db: SpecDatabase, services?: string[]) {
   if (!services) {
     return db.all('service');
   }

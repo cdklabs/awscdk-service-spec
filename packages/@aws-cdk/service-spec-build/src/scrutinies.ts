@@ -1,12 +1,11 @@
 import {
-  DatabaseSchema,
   Property,
   PropertyScrutinyType,
   Resource,
   ResourceScrutinyType,
   RichSpecDatabase,
+  SpecDatabase,
 } from '@aws-cdk/service-spec';
-import { Database } from '@cdklabs/tskb';
 
 /**
  * Auto-detect common properties to apply scrutiny to by using heuristics
@@ -19,7 +18,7 @@ import { Database } from '@cdklabs/tskb';
  * fixed using schema patches.
  */
 export class Scrutinies {
-  constructor(private readonly db: Database<DatabaseSchema>) {}
+  constructor(private readonly db: SpecDatabase) {}
 
   public annotate() {
     for (const res of this.db.all('resource')) {

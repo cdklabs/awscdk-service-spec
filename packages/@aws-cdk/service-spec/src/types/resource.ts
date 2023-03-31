@@ -9,8 +9,30 @@ export interface Partition extends Entity {
 export type HasRegion = Relationship<Partition, Region, { isPrimary?: boolean }>;
 
 export interface Service extends Entity {
-  readonly shortName: string;
+  /**
+   * The full name of the service including the group prefix, lowercased and hyphenated.
+   *
+   * E.g. `AWS::DynamoDB` -> `aws-dynamodb`
+   *
+   * @example aws-dynamodb
+   */
   readonly name: string;
+  /**
+   * Only the service part of the name, lowercased.
+   *
+   * E.g. `AWS::DynamoDB` -> `dynamodb`
+   *
+   * @example dynamodb
+   */
+  readonly shortName: string;
+  /**
+   * The shortname of the service in capitalized form
+   *
+   * E.g. `AWS::DynamoDB` -> `DynamoDB`
+   *
+   * @example dynamodb
+   */
+  readonly capitalized: string;
 }
 
 export interface Region extends Entity {

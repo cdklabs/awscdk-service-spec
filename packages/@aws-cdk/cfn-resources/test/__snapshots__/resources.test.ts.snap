@@ -1,7 +1,126 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`AWS::ApiGateway::RestApi 1`] = `
-"/* eslint-disable prettier/prettier,max-len */
+{
+  "augmentations": undefined,
+  "metrics": "/* eslint-disable prettier/prettier,max-len */
+export class ApiGatewayMetrics {
+  public static _4XxErrorSum(dimensions: { ApiName: string; Stage: string; }): MetricWithDims<{ ApiName: string; Stage: string; }>;
+
+  public static _4XxErrorSum(dimensions: { ApiName: string; }): MetricWithDims<{ ApiName: string; }>;
+
+  public static _4XxErrorSum(dimensions: { ApiName: string; Method: string; Resource: string; Stage: string; }): MetricWithDims<{ ApiName: string; Method: string; Resource: string; Stage: string; }>;
+
+  public static _4XxErrorSum(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/ApiGateway",
+      "metricName": "4XXError",
+      "dimensionsMap": dimensions,
+      "statistic": "Sum"
+    };
+  }
+
+  public static _5XxErrorSum(dimensions: { ApiName: string; Stage: string; }): MetricWithDims<{ ApiName: string; Stage: string; }>;
+
+  public static _5XxErrorSum(dimensions: { ApiName: string; }): MetricWithDims<{ ApiName: string; }>;
+
+  public static _5XxErrorSum(dimensions: { ApiName: string; Method: string; Resource: string; Stage: string; }): MetricWithDims<{ ApiName: string; Method: string; Resource: string; Stage: string; }>;
+
+  public static _5XxErrorSum(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/ApiGateway",
+      "metricName": "5XXError",
+      "dimensionsMap": dimensions,
+      "statistic": "Sum"
+    };
+  }
+
+  public static cacheHitCountSum(dimensions: { ApiName: string; Stage: string; }): MetricWithDims<{ ApiName: string; Stage: string; }>;
+
+  public static cacheHitCountSum(dimensions: { ApiName: string; }): MetricWithDims<{ ApiName: string; }>;
+
+  public static cacheHitCountSum(dimensions: { ApiName: string; Method: string; Resource: string; Stage: string; }): MetricWithDims<{ ApiName: string; Method: string; Resource: string; Stage: string; }>;
+
+  public static cacheHitCountSum(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/ApiGateway",
+      "metricName": "CacheHitCount",
+      "dimensionsMap": dimensions,
+      "statistic": "Sum"
+    };
+  }
+
+  public static cacheMissCountSum(dimensions: { ApiName: string; Stage: string; }): MetricWithDims<{ ApiName: string; Stage: string; }>;
+
+  public static cacheMissCountSum(dimensions: { ApiName: string; }): MetricWithDims<{ ApiName: string; }>;
+
+  public static cacheMissCountSum(dimensions: { ApiName: string; Method: string; Resource: string; Stage: string; }): MetricWithDims<{ ApiName: string; Method: string; Resource: string; Stage: string; }>;
+
+  public static cacheMissCountSum(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/ApiGateway",
+      "metricName": "CacheMissCount",
+      "dimensionsMap": dimensions,
+      "statistic": "Sum"
+    };
+  }
+
+  public static countSum(dimensions: { ApiName: string; Stage: string; }): MetricWithDims<{ ApiName: string; Stage: string; }>;
+
+  public static countSum(dimensions: { ApiName: string; }): MetricWithDims<{ ApiName: string; }>;
+
+  public static countSum(dimensions: { ApiName: string; Method: string; Resource: string; Stage: string; }): MetricWithDims<{ ApiName: string; Method: string; Resource: string; Stage: string; }>;
+
+  public static countSum(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/ApiGateway",
+      "metricName": "Count",
+      "dimensionsMap": dimensions,
+      "statistic": "Sum"
+    };
+  }
+
+  public static integrationLatencyAverage(dimensions: { ApiName: string; Stage: string; }): MetricWithDims<{ ApiName: string; Stage: string; }>;
+
+  public static integrationLatencyAverage(dimensions: { ApiName: string; }): MetricWithDims<{ ApiName: string; }>;
+
+  public static integrationLatencyAverage(dimensions: { ApiName: string; Method: string; Resource: string; Stage: string; }): MetricWithDims<{ ApiName: string; Method: string; Resource: string; Stage: string; }>;
+
+  public static integrationLatencyAverage(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/ApiGateway",
+      "metricName": "IntegrationLatency",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static latencyAverage(dimensions: { ApiName: string; Stage: string; }): MetricWithDims<{ ApiName: string; Stage: string; }>;
+
+  public static latencyAverage(dimensions: { ApiName: string; }): MetricWithDims<{ ApiName: string; }>;
+
+  public static latencyAverage(dimensions: { ApiName: string; Method: string; Resource: string; Stage: string; }): MetricWithDims<{ ApiName: string; Method: string; Resource: string; Stage: string; }>;
+
+  public static latencyAverage(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/ApiGateway",
+      "metricName": "Latency",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+}
+
+export interface MetricWithDims<D> {
+  readonly namespace: string;
+
+  readonly metricName: string;
+
+  readonly statistic: string;
+
+  readonly dimensionsMap: D;
+}",
+  "module": "/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
 import * as constructs from "constructs";
 import * as cfn_parse from "aws-cdk-lib/core/lib/helpers-internal";
@@ -592,11 +711,15 @@ function CfnRestApiPropsFromCloudFormation(properties: any): cfn_parse.FromCloud
   ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-}"
+}",
+}
 `;
 
 exports[`AWS::IAM::Role 1`] = `
-"/* eslint-disable prettier/prettier,max-len */
+{
+  "augmentations": undefined,
+  "metrics": undefined,
+  "module": "/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
 import * as constructs from "constructs";
 import * as cfn_parse from "aws-cdk-lib/core/lib/helpers-internal";
@@ -1009,11 +1132,378 @@ function CfnRolePropsFromCloudFormation(properties: any): cfn_parse.FromCloudFor
   ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-}"
+}",
+}
 `;
 
 exports[`AWS::Lambda::Function 1`] = `
-"/* eslint-disable prettier/prettier,max-len */
+{
+  "augmentations": "// Copyright 2012-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+/* eslint-disable prettier/prettier,max-len */
+import * as cw from "aws-cdk-lib/aws-cloudwatch";
+import { FunctionBase } from "./function-base";
+
+declare module "./function-base" {
+  interface IFunction {
+    /**
+     * Return the given named metric for this Function
+     */
+    metric(metricName: string, props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * How often this Lambda is throttled
+     *
+     * Sum over 5 minutes
+     */
+    metricThrottles(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * How often this Lambda is invoked
+     *
+     * Sum over 5 minutes
+     */
+    metricInvocations(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * How many invocations of this Lambda fail
+     *
+     * Sum over 5 minutes
+     */
+    metricErrors(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * How long execution of this Lambda takes
+     *
+     * Average over 5 minutes
+     */
+    metricDuration(props?: cw.MetricOptions): cw.Metric;
+  }
+}
+
+
+
+declare module "./function-base" {
+  interface FunctionBase {
+    /**
+     * Return the given named metric for this Function
+     */
+    metric(metricName: string, props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * How often this Lambda is throttled
+     *
+     * Sum over 5 minutes
+     */
+    metricThrottles(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * How often this Lambda is invoked
+     *
+     * Sum over 5 minutes
+     */
+    metricInvocations(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * How many invocations of this Lambda fail
+     *
+     * Sum over 5 minutes
+     */
+    metricErrors(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * How long execution of this Lambda takes
+     *
+     * Average over 5 minutes
+     */
+    metricDuration(props?: cw.MetricOptions): cw.Metric;
+  }
+}
+
+FunctionBase.prototype.metric = function(metricName: string, props?: cw.MetricOptions) {
+  return new cw.Metric({
+    "namespace": "AWS/Lambda",
+    "metricName": metricName,
+    "dimensionsMap": {
+      "FunctionName": this.functionName
+    },
+    ...props
+  }).attachTo(this);
+};
+FunctionBase.prototype.metricThrottles = function(props?: cw.MetricOptions) {
+  return this.metric("Throttles", {
+    "statistic": "Sum",
+    ...props
+  });
+};
+FunctionBase.prototype.metricInvocations = function(props?: cw.MetricOptions) {
+  return this.metric("Invocations", {
+    "statistic": "Sum",
+    ...props
+  });
+};
+FunctionBase.prototype.metricErrors = function(props?: cw.MetricOptions) {
+  return this.metric("Errors", {
+    "statistic": "Sum",
+    ...props
+  });
+};
+FunctionBase.prototype.metricDuration = function(props?: cw.MetricOptions) {
+  return this.metric("Duration", {
+    "statistic": "Average",
+    ...props
+  });
+};",
+  "metrics": "/* eslint-disable prettier/prettier,max-len */
+export class LambdaMetrics {
+  public static concurrentExecutionsMaximum(dimensions: { FunctionName: string; }): MetricWithDims<{ FunctionName: string; }>;
+
+  public static concurrentExecutionsMaximum(dimensions: { FunctionName: string; Resource: string; }): MetricWithDims<{ FunctionName: string; Resource: string; }>;
+
+  public static concurrentExecutionsMaximum(dimensions: { ExecutedVersion: string; FunctionName: string; Resource: string; }): MetricWithDims<{ ExecutedVersion: string; FunctionName: string; Resource: string; }>;
+
+  public static concurrentExecutionsMaximum(dimensions: {  }): MetricWithDims<{  }>;
+
+  public static concurrentExecutionsMaximum(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/Lambda",
+      "metricName": "ConcurrentExecutions",
+      "dimensionsMap": dimensions,
+      "statistic": "Maximum"
+    };
+  }
+
+  public static deadLetterErrorsSum(dimensions: { FunctionName: string; }): MetricWithDims<{ FunctionName: string; }>;
+
+  public static deadLetterErrorsSum(dimensions: { FunctionName: string; Resource: string; }): MetricWithDims<{ FunctionName: string; Resource: string; }>;
+
+  public static deadLetterErrorsSum(dimensions: { ExecutedVersion: string; FunctionName: string; Resource: string; }): MetricWithDims<{ ExecutedVersion: string; FunctionName: string; Resource: string; }>;
+
+  public static deadLetterErrorsSum(dimensions: {  }): MetricWithDims<{  }>;
+
+  public static deadLetterErrorsSum(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/Lambda",
+      "metricName": "DeadLetterErrors",
+      "dimensionsMap": dimensions,
+      "statistic": "Sum"
+    };
+  }
+
+  public static destinationDeliveryFailuresSum(dimensions: { FunctionName: string; }): MetricWithDims<{ FunctionName: string; }>;
+
+  public static destinationDeliveryFailuresSum(dimensions: { FunctionName: string; Resource: string; }): MetricWithDims<{ FunctionName: string; Resource: string; }>;
+
+  public static destinationDeliveryFailuresSum(dimensions: { ExecutedVersion: string; FunctionName: string; Resource: string; }): MetricWithDims<{ ExecutedVersion: string; FunctionName: string; Resource: string; }>;
+
+  public static destinationDeliveryFailuresSum(dimensions: {  }): MetricWithDims<{  }>;
+
+  public static destinationDeliveryFailuresSum(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/Lambda",
+      "metricName": "DestinationDeliveryFailures",
+      "dimensionsMap": dimensions,
+      "statistic": "Sum"
+    };
+  }
+
+  public static durationAverage(dimensions: { FunctionName: string; }): MetricWithDims<{ FunctionName: string; }>;
+
+  public static durationAverage(dimensions: { FunctionName: string; Resource: string; }): MetricWithDims<{ FunctionName: string; Resource: string; }>;
+
+  public static durationAverage(dimensions: { ExecutedVersion: string; FunctionName: string; Resource: string; }): MetricWithDims<{ ExecutedVersion: string; FunctionName: string; Resource: string; }>;
+
+  public static durationAverage(dimensions: {  }): MetricWithDims<{  }>;
+
+  public static durationAverage(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/Lambda",
+      "metricName": "Duration",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static errorsSum(dimensions: { FunctionName: string; }): MetricWithDims<{ FunctionName: string; }>;
+
+  public static errorsSum(dimensions: { FunctionName: string; Resource: string; }): MetricWithDims<{ FunctionName: string; Resource: string; }>;
+
+  public static errorsSum(dimensions: { ExecutedVersion: string; FunctionName: string; Resource: string; }): MetricWithDims<{ ExecutedVersion: string; FunctionName: string; Resource: string; }>;
+
+  public static errorsSum(dimensions: {  }): MetricWithDims<{  }>;
+
+  public static errorsSum(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/Lambda",
+      "metricName": "Errors",
+      "dimensionsMap": dimensions,
+      "statistic": "Sum"
+    };
+  }
+
+  public static invocationsSum(dimensions: { FunctionName: string; }): MetricWithDims<{ FunctionName: string; }>;
+
+  public static invocationsSum(dimensions: { FunctionName: string; Resource: string; }): MetricWithDims<{ FunctionName: string; Resource: string; }>;
+
+  public static invocationsSum(dimensions: { ExecutedVersion: string; FunctionName: string; Resource: string; }): MetricWithDims<{ ExecutedVersion: string; FunctionName: string; Resource: string; }>;
+
+  public static invocationsSum(dimensions: {  }): MetricWithDims<{  }>;
+
+  public static invocationsSum(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/Lambda",
+      "metricName": "Invocations",
+      "dimensionsMap": dimensions,
+      "statistic": "Sum"
+    };
+  }
+
+  public static iteratorAgeAverage(dimensions: { FunctionName: string; }): MetricWithDims<{ FunctionName: string; }>;
+
+  public static iteratorAgeAverage(dimensions: { FunctionName: string; Resource: string; }): MetricWithDims<{ FunctionName: string; Resource: string; }>;
+
+  public static iteratorAgeAverage(dimensions: { ExecutedVersion: string; FunctionName: string; Resource: string; }): MetricWithDims<{ ExecutedVersion: string; FunctionName: string; Resource: string; }>;
+
+  public static iteratorAgeAverage(dimensions: {  }): MetricWithDims<{  }>;
+
+  public static iteratorAgeAverage(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/Lambda",
+      "metricName": "IteratorAge",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static postRuntimeExtensionsDurationAverage(dimensions: { FunctionName: string; }): MetricWithDims<{ FunctionName: string; }>;
+
+  public static postRuntimeExtensionsDurationAverage(dimensions: { FunctionName: string; Resource: string; }): MetricWithDims<{ FunctionName: string; Resource: string; }>;
+
+  public static postRuntimeExtensionsDurationAverage(dimensions: { ExecutedVersion: string; FunctionName: string; Resource: string; }): MetricWithDims<{ ExecutedVersion: string; FunctionName: string; Resource: string; }>;
+
+  public static postRuntimeExtensionsDurationAverage(dimensions: {  }): MetricWithDims<{  }>;
+
+  public static postRuntimeExtensionsDurationAverage(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/Lambda",
+      "metricName": "PostRuntimeExtensionsDuration",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static provisionedConcurrencyInvocationsSum(dimensions: { FunctionName: string; }): MetricWithDims<{ FunctionName: string; }>;
+
+  public static provisionedConcurrencyInvocationsSum(dimensions: { FunctionName: string; Resource: string; }): MetricWithDims<{ FunctionName: string; Resource: string; }>;
+
+  public static provisionedConcurrencyInvocationsSum(dimensions: { ExecutedVersion: string; FunctionName: string; Resource: string; }): MetricWithDims<{ ExecutedVersion: string; FunctionName: string; Resource: string; }>;
+
+  public static provisionedConcurrencyInvocationsSum(dimensions: {  }): MetricWithDims<{  }>;
+
+  public static provisionedConcurrencyInvocationsSum(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/Lambda",
+      "metricName": "ProvisionedConcurrencyInvocations",
+      "dimensionsMap": dimensions,
+      "statistic": "Sum"
+    };
+  }
+
+  public static provisionedConcurrencySpilloverInvocationsSum(dimensions: { FunctionName: string; }): MetricWithDims<{ FunctionName: string; }>;
+
+  public static provisionedConcurrencySpilloverInvocationsSum(dimensions: { FunctionName: string; Resource: string; }): MetricWithDims<{ FunctionName: string; Resource: string; }>;
+
+  public static provisionedConcurrencySpilloverInvocationsSum(dimensions: { ExecutedVersion: string; FunctionName: string; Resource: string; }): MetricWithDims<{ ExecutedVersion: string; FunctionName: string; Resource: string; }>;
+
+  public static provisionedConcurrencySpilloverInvocationsSum(dimensions: {  }): MetricWithDims<{  }>;
+
+  public static provisionedConcurrencySpilloverInvocationsSum(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/Lambda",
+      "metricName": "ProvisionedConcurrencySpilloverInvocations",
+      "dimensionsMap": dimensions,
+      "statistic": "Sum"
+    };
+  }
+
+  public static provisionedConcurrencyUtilizationMaximum(dimensions: { FunctionName: string; }): MetricWithDims<{ FunctionName: string; }>;
+
+  public static provisionedConcurrencyUtilizationMaximum(dimensions: { FunctionName: string; Resource: string; }): MetricWithDims<{ FunctionName: string; Resource: string; }>;
+
+  public static provisionedConcurrencyUtilizationMaximum(dimensions: { ExecutedVersion: string; FunctionName: string; Resource: string; }): MetricWithDims<{ ExecutedVersion: string; FunctionName: string; Resource: string; }>;
+
+  public static provisionedConcurrencyUtilizationMaximum(dimensions: {  }): MetricWithDims<{  }>;
+
+  public static provisionedConcurrencyUtilizationMaximum(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/Lambda",
+      "metricName": "ProvisionedConcurrencyUtilization",
+      "dimensionsMap": dimensions,
+      "statistic": "Maximum"
+    };
+  }
+
+  public static provisionedConcurrentExecutionsMaximum(dimensions: { FunctionName: string; }): MetricWithDims<{ FunctionName: string; }>;
+
+  public static provisionedConcurrentExecutionsMaximum(dimensions: { FunctionName: string; Resource: string; }): MetricWithDims<{ FunctionName: string; Resource: string; }>;
+
+  public static provisionedConcurrentExecutionsMaximum(dimensions: { ExecutedVersion: string; FunctionName: string; Resource: string; }): MetricWithDims<{ ExecutedVersion: string; FunctionName: string; Resource: string; }>;
+
+  public static provisionedConcurrentExecutionsMaximum(dimensions: {  }): MetricWithDims<{  }>;
+
+  public static provisionedConcurrentExecutionsMaximum(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/Lambda",
+      "metricName": "ProvisionedConcurrentExecutions",
+      "dimensionsMap": dimensions,
+      "statistic": "Maximum"
+    };
+  }
+
+  public static throttlesSum(dimensions: { FunctionName: string; }): MetricWithDims<{ FunctionName: string; }>;
+
+  public static throttlesSum(dimensions: { FunctionName: string; Resource: string; }): MetricWithDims<{ FunctionName: string; Resource: string; }>;
+
+  public static throttlesSum(dimensions: { ExecutedVersion: string; FunctionName: string; Resource: string; }): MetricWithDims<{ ExecutedVersion: string; FunctionName: string; Resource: string; }>;
+
+  public static throttlesSum(dimensions: {  }): MetricWithDims<{  }>;
+
+  public static throttlesSum(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/Lambda",
+      "metricName": "Throttles",
+      "dimensionsMap": dimensions,
+      "statistic": "Sum"
+    };
+  }
+
+  public static unreservedConcurrentExecutionsMaximum(dimensions: { FunctionName: string; }): MetricWithDims<{ FunctionName: string; }>;
+
+  public static unreservedConcurrentExecutionsMaximum(dimensions: { FunctionName: string; Resource: string; }): MetricWithDims<{ FunctionName: string; Resource: string; }>;
+
+  public static unreservedConcurrentExecutionsMaximum(dimensions: { ExecutedVersion: string; FunctionName: string; Resource: string; }): MetricWithDims<{ ExecutedVersion: string; FunctionName: string; Resource: string; }>;
+
+  public static unreservedConcurrentExecutionsMaximum(dimensions: {  }): MetricWithDims<{  }>;
+
+  public static unreservedConcurrentExecutionsMaximum(dimensions: any): MetricWithDims<any> {
+    return {
+      "namespace": "AWS/Lambda",
+      "metricName": "UnreservedConcurrentExecutions",
+      "dimensionsMap": dimensions,
+      "statistic": "Maximum"
+    };
+  }
+}
+
+export interface MetricWithDims<D> {
+  readonly namespace: string;
+
+  readonly metricName: string;
+
+  readonly statistic: string;
+
+  readonly dimensionsMap: D;
+}",
+  "module": "/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
 import * as constructs from "constructs";
 import * as cfn_parse from "aws-cdk-lib/core/lib/helpers-internal";
@@ -2205,11 +2695,44 @@ function CfnFunctionPropsFromCloudFormation(properties: any): cfn_parse.FromClou
   ret.addPropertyResult("vpcConfig", "VpcConfig", (properties.VpcConfig != null ? CfnFunctionVpcConfigPropertyFromCloudFormation(properties.VpcConfig) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-}"
+}",
+}
 `;
 
 exports[`AWS::S3::Bucket 1`] = `
-"/* eslint-disable prettier/prettier,max-len */
+{
+  "augmentations": undefined,
+  "metrics": "/* eslint-disable prettier/prettier,max-len */
+export class S3Metrics {
+  public static bucketSizeBytesAverage(dimensions: { BucketName: string; StorageType: string; }): MetricWithDims<{ BucketName: string; StorageType: string; }> {
+    return {
+      "namespace": "AWS/S3",
+      "metricName": "BucketSizeBytes",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static numberOfObjectsAverage(dimensions: { BucketName: string; StorageType: string; }): MetricWithDims<{ BucketName: string; StorageType: string; }> {
+    return {
+      "namespace": "AWS/S3",
+      "metricName": "NumberOfObjects",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+}
+
+export interface MetricWithDims<D> {
+  readonly namespace: string;
+
+  readonly metricName: string;
+
+  readonly statistic: string;
+
+  readonly dimensionsMap: D;
+}",
+  "module": "/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
 import * as constructs from "constructs";
 import * as cfn_parse from "aws-cdk-lib/core/lib/helpers-internal";
@@ -7307,11 +7830,321 @@ function CfnBucketPropsFromCloudFormation(properties: any): cfn_parse.FromCloudF
   ret.addPropertyResult("websiteConfiguration", "WebsiteConfiguration", (properties.WebsiteConfiguration != null ? CfnBucketWebsiteConfigurationPropertyFromCloudFormation(properties.WebsiteConfiguration) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-}"
+}",
+}
 `;
 
 exports[`AWS::SQS::Queue 1`] = `
-"/* eslint-disable prettier/prettier,max-len */
+{
+  "augmentations": "// Copyright 2012-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+/* eslint-disable prettier/prettier,max-len */
+import * as cw from "aws-cdk-lib/aws-cloudwatch";
+import { QueueBase } from "./queue-base";
+
+declare module "./queue-base" {
+  interface IQueue {
+    /**
+     * Return the given named metric for this Queue
+     */
+    metric(metricName: string, props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * The approximate age of the oldest non-deleted message in the queue.
+     *
+     * Maximum over 5 minutes
+     */
+    metricApproximateAgeOfOldestMessage(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * The number of messages in the queue that are delayed and not available for reading immediately.
+     *
+     * Maximum over 5 minutes
+     */
+    metricApproximateNumberOfMessagesDelayed(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * The number of messages that are in flight.
+     *
+     * Maximum over 5 minutes
+     */
+    metricApproximateNumberOfMessagesNotVisible(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * The number of messages available for retrieval from the queue.
+     *
+     * Maximum over 5 minutes
+     */
+    metricApproximateNumberOfMessagesVisible(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * The number of ReceiveMessage API calls that did not return a message.
+     *
+     * Sum over 5 minutes
+     */
+    metricNumberOfEmptyReceives(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * The number of messages deleted from the queue.
+     *
+     * Sum over 5 minutes
+     */
+    metricNumberOfMessagesDeleted(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * The number of messages returned by calls to the ReceiveMessage action.
+     *
+     * Sum over 5 minutes
+     */
+    metricNumberOfMessagesReceived(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * The number of messages added to a queue.
+     *
+     * Sum over 5 minutes
+     */
+    metricNumberOfMessagesSent(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * The size of messages added to a queue.
+     *
+     * Average over 5 minutes
+     */
+    metricSentMessageSize(props?: cw.MetricOptions): cw.Metric;
+  }
+}
+
+
+
+declare module "./queue-base" {
+  interface QueueBase {
+    /**
+     * Return the given named metric for this Queue
+     */
+    metric(metricName: string, props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * The approximate age of the oldest non-deleted message in the queue.
+     *
+     * Maximum over 5 minutes
+     */
+    metricApproximateAgeOfOldestMessage(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * The number of messages in the queue that are delayed and not available for reading immediately.
+     *
+     * Maximum over 5 minutes
+     */
+    metricApproximateNumberOfMessagesDelayed(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * The number of messages that are in flight.
+     *
+     * Maximum over 5 minutes
+     */
+    metricApproximateNumberOfMessagesNotVisible(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * The number of messages available for retrieval from the queue.
+     *
+     * Maximum over 5 minutes
+     */
+    metricApproximateNumberOfMessagesVisible(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * The number of ReceiveMessage API calls that did not return a message.
+     *
+     * Sum over 5 minutes
+     */
+    metricNumberOfEmptyReceives(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * The number of messages deleted from the queue.
+     *
+     * Sum over 5 minutes
+     */
+    metricNumberOfMessagesDeleted(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * The number of messages returned by calls to the ReceiveMessage action.
+     *
+     * Sum over 5 minutes
+     */
+    metricNumberOfMessagesReceived(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * The number of messages added to a queue.
+     *
+     * Sum over 5 minutes
+     */
+    metricNumberOfMessagesSent(props?: cw.MetricOptions): cw.Metric;
+
+    /**
+     * The size of messages added to a queue.
+     *
+     * Average over 5 minutes
+     */
+    metricSentMessageSize(props?: cw.MetricOptions): cw.Metric;
+  }
+}
+
+QueueBase.prototype.metric = function(metricName: string, props?: cw.MetricOptions) {
+  return new cw.Metric({
+    "namespace": "AWS/SQS",
+    "metricName": metricName,
+    "dimensionsMap": {
+      "QueueName": this.queueName
+    },
+    ...props
+  }).attachTo(this);
+};
+QueueBase.prototype.metricApproximateAgeOfOldestMessage = function(props?: cw.MetricOptions) {
+  return this.metric("ApproximateAgeOfOldestMessage", {
+    "statistic": "Maximum",
+    ...props
+  });
+};
+QueueBase.prototype.metricApproximateNumberOfMessagesDelayed = function(props?: cw.MetricOptions) {
+  return this.metric("ApproximateNumberOfMessagesDelayed", {
+    "statistic": "Maximum",
+    ...props
+  });
+};
+QueueBase.prototype.metricApproximateNumberOfMessagesNotVisible = function(props?: cw.MetricOptions) {
+  return this.metric("ApproximateNumberOfMessagesNotVisible", {
+    "statistic": "Maximum",
+    ...props
+  });
+};
+QueueBase.prototype.metricApproximateNumberOfMessagesVisible = function(props?: cw.MetricOptions) {
+  return this.metric("ApproximateNumberOfMessagesVisible", {
+    "statistic": "Maximum",
+    ...props
+  });
+};
+QueueBase.prototype.metricNumberOfEmptyReceives = function(props?: cw.MetricOptions) {
+  return this.metric("NumberOfEmptyReceives", {
+    "statistic": "Sum",
+    ...props
+  });
+};
+QueueBase.prototype.metricNumberOfMessagesDeleted = function(props?: cw.MetricOptions) {
+  return this.metric("NumberOfMessagesDeleted", {
+    "statistic": "Sum",
+    ...props
+  });
+};
+QueueBase.prototype.metricNumberOfMessagesReceived = function(props?: cw.MetricOptions) {
+  return this.metric("NumberOfMessagesReceived", {
+    "statistic": "Sum",
+    ...props
+  });
+};
+QueueBase.prototype.metricNumberOfMessagesSent = function(props?: cw.MetricOptions) {
+  return this.metric("NumberOfMessagesSent", {
+    "statistic": "Sum",
+    ...props
+  });
+};
+QueueBase.prototype.metricSentMessageSize = function(props?: cw.MetricOptions) {
+  return this.metric("SentMessageSize", {
+    "statistic": "Average",
+    ...props
+  });
+};",
+  "metrics": "/* eslint-disable prettier/prettier,max-len */
+export class SQSMetrics {
+  public static numberOfMessagesSentAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
+    return {
+      "namespace": "AWS/SQS",
+      "metricName": "NumberOfMessagesSent",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static approximateNumberOfMessagesDelayedAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
+    return {
+      "namespace": "AWS/SQS",
+      "metricName": "ApproximateNumberOfMessagesDelayed",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static numberOfMessagesReceivedAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
+    return {
+      "namespace": "AWS/SQS",
+      "metricName": "NumberOfMessagesReceived",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static numberOfMessagesDeletedAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
+    return {
+      "namespace": "AWS/SQS",
+      "metricName": "NumberOfMessagesDeleted",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static approximateNumberOfMessagesNotVisibleAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
+    return {
+      "namespace": "AWS/SQS",
+      "metricName": "ApproximateNumberOfMessagesNotVisible",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static approximateNumberOfMessagesVisibleAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
+    return {
+      "namespace": "AWS/SQS",
+      "metricName": "ApproximateNumberOfMessagesVisible",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static approximateAgeOfOldestMessageAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
+    return {
+      "namespace": "AWS/SQS",
+      "metricName": "ApproximateAgeOfOldestMessage",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static numberOfEmptyReceivesAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
+    return {
+      "namespace": "AWS/SQS",
+      "metricName": "NumberOfEmptyReceives",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static sentMessageSizeAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
+    return {
+      "namespace": "AWS/SQS",
+      "metricName": "SentMessageSize",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+}
+
+export interface MetricWithDims<D> {
+  readonly namespace: string;
+
+  readonly metricName: string;
+
+  readonly statistic: string;
+
+  readonly dimensionsMap: D;
+}",
+  "module": "/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
 import * as constructs from "constructs";
 import * as cfn_parse from "aws-cdk-lib/core/lib/helpers-internal";
@@ -7818,11 +8651,15 @@ function CfnQueuePropsFromCloudFormation(properties: any): cfn_parse.FromCloudFo
   ret.addPropertyResult("visibilityTimeout", "VisibilityTimeout", (properties.VisibilityTimeout != null ? cfn_parse.FromCloudFormation.getNumber(properties.VisibilityTimeout) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-}"
+}",
+}
 `;
 
 exports[`Alexa::ASK::Skill 1`] = `
-"/* eslint-disable prettier/prettier,max-len */
+{
+  "augmentations": undefined,
+  "metrics": undefined,
+  "module": "/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
 import * as constructs from "constructs";
 import * as cfn_parse from "aws-cdk-lib/core/lib/helpers-internal";
@@ -8270,5 +9107,6 @@ function CfnSkillPropsFromCloudFormation(properties: any): cfn_parse.FromCloudFo
   ret.addPropertyResult("vendorId", "VendorId", (properties.VendorId != null ? cfn_parse.FromCloudFormation.getString(properties.VendorId) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
-}"
+}",
+}
 `;

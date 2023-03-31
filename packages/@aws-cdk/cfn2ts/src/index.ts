@@ -23,6 +23,7 @@ export default async function (
   await generate({
     resourceFilePattern: ({ shortname }) => `${shortname}.generated.ts`,
     augmentationsFilePattern: ({ shortname }) => `${shortname}-augmentations.generated.ts`,
+    cannedMetricsFilePattern: ({ shortname }) => `${shortname}-canned-metrics.generated.ts`,
     outputPath: outPath ?? 'lib',
     clearOutput: false,
     services: scopes.map((s) => s.replace('::', '-').toLowerCase()),

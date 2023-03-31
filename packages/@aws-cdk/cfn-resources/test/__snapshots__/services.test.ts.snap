@@ -3,6 +3,7 @@
 exports[`alexa-ask 1`] = `
 {
   "augmentations": undefined,
+  "metrics": undefined,
   "module": "/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
 import * as constructs from "constructs";
@@ -458,6 +459,7 @@ function CfnSkillPropsFromCloudFormation(properties: any): cfn_parse.FromCloudFo
 exports[`aws-chatbot 1`] = `
 {
   "augmentations": undefined,
+  "metrics": undefined,
   "module": "/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
 import * as constructs from "constructs";
@@ -752,6 +754,7 @@ function CfnSlackChannelConfigurationPropsFromCloudFormation(properties: any): c
 exports[`aws-scheduler 1`] = `
 {
   "augmentations": undefined,
+  "metrics": undefined,
   "module": "/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
 import * as constructs from "constructs";
@@ -2744,6 +2747,99 @@ QueueBase.prototype.metricSentMessageSize = function(props?: cw.MetricOptions) {
     ...props
   });
 };",
+  "metrics": "/* eslint-disable prettier/prettier,max-len */
+export class SQSMetrics {
+  public static numberOfMessagesSentAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
+    return {
+      "namespace": "AWS/SQS",
+      "metricName": "NumberOfMessagesSent",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static approximateNumberOfMessagesDelayedAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
+    return {
+      "namespace": "AWS/SQS",
+      "metricName": "ApproximateNumberOfMessagesDelayed",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static numberOfMessagesReceivedAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
+    return {
+      "namespace": "AWS/SQS",
+      "metricName": "NumberOfMessagesReceived",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static numberOfMessagesDeletedAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
+    return {
+      "namespace": "AWS/SQS",
+      "metricName": "NumberOfMessagesDeleted",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static approximateNumberOfMessagesNotVisibleAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
+    return {
+      "namespace": "AWS/SQS",
+      "metricName": "ApproximateNumberOfMessagesNotVisible",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static approximateNumberOfMessagesVisibleAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
+    return {
+      "namespace": "AWS/SQS",
+      "metricName": "ApproximateNumberOfMessagesVisible",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static approximateAgeOfOldestMessageAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
+    return {
+      "namespace": "AWS/SQS",
+      "metricName": "ApproximateAgeOfOldestMessage",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static numberOfEmptyReceivesAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
+    return {
+      "namespace": "AWS/SQS",
+      "metricName": "NumberOfEmptyReceives",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+
+  public static sentMessageSizeAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
+    return {
+      "namespace": "AWS/SQS",
+      "metricName": "SentMessageSize",
+      "dimensionsMap": dimensions,
+      "statistic": "Average"
+    };
+  }
+}
+
+export interface MetricWithDims<D> {
+  readonly namespace: string;
+
+  readonly metricName: string;
+
+  readonly statistic: string;
+
+  readonly dimensionsMap: D;
+}",
   "module": "/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
 import * as constructs from "constructs";

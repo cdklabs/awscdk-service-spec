@@ -60,6 +60,7 @@ const serviceSpecSchemaTask = serviceSpecSources.addTask('gen-schemas', {
     'ResourceSpecification',
     'CloudFormationDocumentation',
     'StatefulResources',
+    'CloudWatchConsoleServiceDirectory',
   ].map((typeName: string) => ({
     exec: [
       'ts-json-schema-generator',
