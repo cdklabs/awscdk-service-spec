@@ -1,6 +1,6 @@
 import { emptyDatabase } from '@aws-cdk/service-spec';
 import { Failures } from '@cdklabs/tskb';
-import { importCloudFormationRegistryResource } from '../src/cloudformation-registry';
+import { importCloudFormationRegistryResource } from '../src/import-cloudformation-registry';
 
 let db: ReturnType<typeof emptyDatabase>;
 let fails: Failures;

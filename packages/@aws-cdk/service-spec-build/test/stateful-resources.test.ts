@@ -1,6 +1,6 @@
 import { emptyDatabase } from '@aws-cdk/service-spec';
 import { Failures } from '@cdklabs/tskb';
-import { readStatefulResources } from '../src/stateful-resources';
+import { importStatefulResources } from '../src/import-stateful-resources';
 
 let db: ReturnType<typeof emptyDatabase>;
 let fails: Failures;
@@ -23,7 +23,7 @@ beforeEach(() => {
 
 test('mark resource types as stateful', () => {
   // WHEN
-  readStatefulResources(
+  importStatefulResources(
     db,
     {
       ResourceTypes: {

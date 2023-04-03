@@ -1,6 +1,6 @@
 import { emptyDatabase, Resource } from '@aws-cdk/service-spec';
 import { Failures } from '@cdklabs/tskb';
-import { readCloudFormationDocumentation } from '../src/cloudformation-docs';
+import { importCloudFormationDocumentation } from '../src/import-cloudformation-docs';
 
 let db: ReturnType<typeof emptyDatabase>;
 let fails: Failures;
@@ -24,7 +24,7 @@ beforeEach(() => {
 
 test('add documentation to resources in database', () => {
   // WHEN
-  readCloudFormationDocumentation(
+  importCloudFormationDocumentation(
     db,
     {
       Types: {
@@ -62,7 +62,7 @@ test('add documentation to property types in database', () => {
   db.link('usesType', resource, typeDef);
 
   // WHEN
-  readCloudFormationDocumentation(
+  importCloudFormationDocumentation(
     db,
     {
       Types: {

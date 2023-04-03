@@ -1,6 +1,6 @@
 import { emptyDatabase } from '@aws-cdk/service-spec';
 import { Failures } from '@cdklabs/tskb';
-import { readCannedMetrics } from '../src/canned-metrics';
+import { importCannedMetrics } from '../src/import-canned-metrics';
 
 let db: ReturnType<typeof emptyDatabase>;
 const warnings: Failures = [];
@@ -29,7 +29,7 @@ beforeEach(() => {
 
 test('adds corresponding metrics to the database', () => {
   // WHEN
-  readCannedMetrics(
+  importCannedMetrics(
     db,
     [
       {
@@ -87,7 +87,7 @@ test('adds corresponding metrics to the database', () => {
 
 test('does not add metrics for unknown resources', () => {
   // WHEN
-  readCannedMetrics(
+  importCannedMetrics(
     db,
     [
       {
