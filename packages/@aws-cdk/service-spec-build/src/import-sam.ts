@@ -59,7 +59,7 @@ export class SamResources {
     const ret = this.db.allocate('service', {
       name: 'aws-sam',
       shortName: 'sam',
-      capitalized: 'SAM'
+      capitalized: 'SAM',
     });
 
     for (const region of this.regions) {

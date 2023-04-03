@@ -152,7 +152,8 @@ export type PropertyType =
   | BuiltInType
   | DefinitionReference
   | ArrayType<PropertyType>
-  | MapType<PropertyType>;
+  | MapType<PropertyType>
+  | TypeUnion<PropertyType>;
 
 export type PrimitiveType = StringType | NumberType | BooleanType | JsonType | NullType;
 
@@ -198,6 +199,11 @@ export interface ArrayType<E> {
 export interface MapType<E> {
   readonly type: 'map';
   readonly element: E;
+}
+
+export interface TypeUnion<E> {
+  readonly type: 'union';
+  readonly types: E[];
 }
 
 export type HasResource = Relationship<Service, Resource>;

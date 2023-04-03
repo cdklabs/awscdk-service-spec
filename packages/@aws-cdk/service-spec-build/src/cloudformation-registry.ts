@@ -13,9 +13,20 @@ import {
   jsonschema,
   simplePropNameFromJsonPtr,
   resourcespec,
-  unifyAllSchemas,
+  unionSchemas,
 } from '@aws-cdk/service-spec-sources';
-import { locateFailure, Fail, failure, Failures, isFailure, Result, tryCatch, using, ref } from '@cdklabs/tskb';
+import {
+  locateFailure,
+  Fail,
+  failure,
+  Failures,
+  isFailure,
+  Result,
+  tryCatch,
+  using,
+  ref,
+  isSuccess,
+} from '@cdklabs/tskb';
 
 export interface LoadCloudFormationRegistryResourceOptions {
   readonly db: SpecDatabase;
@@ -105,26 +116,15 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
       if (jsonschema.isAnyType(resolved.schema)) {
         return { type: 'json' };
-      } else if (jsonschema.isOneOf(resolved.schema)) {
-        // FIXME: Do a proper thing here
-        const firstResolved: jsonschema.ResolvedSchema = {
-          schema: resolved.schema.oneOf[0],
-          referenceName: resolved.referenceName,
-        };
-        return schemaTypeToModelType(propertyName, firstResolved, fail);
-      } else if (jsonschema.isAnyOf(resolved.schema)) {
-        // FIME: Do a proper thing here
-        const firstResolved: jsonschema.ResolvedSchema = {
-          schema: resolved.schema.anyOf[0],
-          referenceName: resolved.referenceName,
-        };
-        return schemaTypeToModelType(propertyName, firstResolved, fail);
+      } else if (jsonschema.isOneOf(resolved.schema) || jsonschema.isAnyOf(resolved.schema)) {
+        const types = jsonschema
+          .innerSchemas(resolved.schema)
+          .map((t) => schemaTypeToModelType(propertyName, fakeResolved(t), fail));
+        fails.push(...types.filter(isFailure));
+        return { type: 'union', types: types.filter(isSuccess) };
       } else if (jsonschema.isAllOf(resolved.schema)) {
         // FIME: Do a proper thing here
-        const firstResolved: jsonschema.ResolvedSchema = {
-          schema: resolved.schema.allOf[0],
-          referenceName: resolved.referenceName,
-        };
+        const firstResolved = fakeResolved(resolved.schema.allOf[0], resolved.referenceName);
         return schemaTypeToModelType(propertyName, firstResolved, fail);
       } else {
         switch (resolved.schema.type) {
@@ -168,7 +168,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         }));
       } else if (schema.patternProperties) {
         const unifiedPatternProps = fail.locate(
-          locateFailure('patternProperties')(unifyAllSchemas(Object.values(schema.patternProperties))),
+          locateFailure('patternProperties')(unionSchemas(...Object.values(schema.patternProperties))),
         );
 
         return using(unifiedPatternProps, (unifiedType) =>
@@ -335,4 +335,8 @@ function lastWord(x?: string): string | undefined {
   }
 
   return x.match(/([a-zA-Z0-9]+)$/)?.[1];
+}
+
+function fakeResolved(schema: jsonschema.ConcreteSchema, referenceName?: string): jsonschema.ResolvedSchema {
+  return { schema, referenceName };
 }

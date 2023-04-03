@@ -1,5 +1,17 @@
-import { failure, isFailure, liftResult, locateFailure, Result, using } from '@cdklabs/tskb';
+import { failure, isFailure, isSuccess, liftResult, locateFailure, Result, using } from '@cdklabs/tskb';
 import { jsonschema } from '../types';
+
+/**
+ * Unify an arbitrary number of schemas
+ *
+ * Do this by doing pairwise unification.
+ */
+export function unionSchemas(...xs: jsonschema.Schema[]): Result<jsonschema.Schema> {
+  if (xs.length === 0) {
+    return failure('unionSchemas: empty array');
+  }
+  return simplifyUnion({ anyOf: xs });
+}
 
 /**
  * Merge two schemas, returning a new schema that will satisfy both input schemas
@@ -13,7 +25,10 @@ import { jsonschema } from '../types';
  *
  * Will not unify "through" references. If referenced types are not the same, unification will fail.
  */
-export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result<jsonschema.Schema> {
+function simplifyPair(
+  a: jsonschema.SingletonSchema,
+  b: jsonschema.SingletonSchema,
+): Result<jsonschema.SingletonSchema> {
   // A little shortcut that will save us a bunch of recursion
   if (a === b) {
     return a;
@@ -21,16 +36,6 @@ export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result
 
   if (jsonschema.isAnyType(a) || jsonschema.isAnyType(b)) {
     return true;
-  }
-
-  if (jsonschema.isOneOf(a) || jsonschema.isAnyOf(a) || jsonschema.isAllOf(a)) {
-    // FIXME: not implemented yet
-    return a;
-  }
-
-  if (jsonschema.isOneOf(b) || jsonschema.isAnyOf(b) || jsonschema.isAllOf(b)) {
-    // FIXME: not implemented yet
-    return a;
   }
 
   if (jsonschema.isReference(a) || jsonschema.isReference(b)) {
@@ -66,7 +71,7 @@ export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result
         return failure(`${a.type} != ${b.type}`);
       }
 
-      return using(locateFailure('array.items')(unifySchemas(a.items ?? true, b.items ?? true)), (items) => ({
+      return using(locateFailure('array.items')(unionSchemas(a.items ?? true, b.items ?? true)), (items) => ({
         type: 'array',
         ...meta,
         items,
@@ -123,24 +128,44 @@ export function unifySchemas(a: jsonschema.Schema, b: jsonschema.Schema): Result
 }
 
 /**
- * Unify an arbitrary number of schemas
- *
- * Do this by doing pairwise unification.
+ * Simplify a union type as much as possible
  */
-export function unifyAllSchemas(xs: jsonschema.Schema[]): Result<jsonschema.Schema> {
-  if (xs.length === 0) {
-    return failure('unifyAllSchemas: empty array');
+function simplifyUnion(x: SchemaUnion): jsonschema.Schema {
+  // Expand inner unions
+  const schemas = jsonschema.innerSchemas(x).flatMap((y) => (isSchemaUnion(y) ? jsonschema.innerSchemas(y) : [y]));
+  for (let i = 0; i < schemas.length; ) {
+    const lhs = schemas[i];
+    if (isSingleton(lhs)) {
+      const target = firstThat(schemas, i + 1, (other) =>
+        isSingleton(other) ? simplifyPair(lhs, other) : failure(''),
+      );
+
+      if (isSuccess(target)) {
+        // Replace 'i' with the unified type, remove 'j' (i < j)
+        const [combination, j] = target;
+        schemas.splice(j, 1);
+        schemas.splice(i, 1, combination);
+        continue;
+      }
+    }
+
+    i += 1;
   }
 
-  const schemas = [...xs];
-  while (schemas.length > 1) {
-    const uni = unifySchemas(schemas[0], schemas[1]);
-    if (isFailure(uni)) {
-      return uni;
+  return schemas.length === 1 ? schemas[0] : { anyOf: schemas };
+}
+
+/**
+ * Return the result and the index of the first success result returned by a function
+ */
+function firstThat<A, B>(xs: A[], start: number, fn: (x: A) => Result<B>): Result<[B, number]> {
+  for (let i = start; i < xs.length; i++) {
+    const r = fn(xs[i]);
+    if (isSuccess(r)) {
+      return [r, i];
     }
-    schemas.splice(0, 2, uni);
   }
-  return schemas[0];
+  return failure('Nothing matched');
 }
 
 function unifyRecordTypes(
@@ -155,7 +180,7 @@ function unifyRecordTypes(
   const properties = locateFailure('object.properties')(
     liftResult(
       Object.fromEntries(
-        keys.map((key) => [key, locateFailure(`[${key}]`)(unifySchemas(a.properties[key], b.properties[key]))]),
+        keys.map((key) => [key, locateFailure(`[${key}]`)(unionSchemas(a.properties[key], b.properties[key]))]),
       ),
     ),
   );
@@ -182,14 +207,14 @@ function unifyMapTypes(
   const bPats = { ...b.patternProperties };
   const bAddl = b.additionalProperties ?? true;
 
-  const additionalProperties = aAddl && bAddl ? unifyAllSchemas([aAddl, bAddl]) : aAddl ? aAddl : bAddl;
+  const additionalProperties = aAddl && bAddl ? unionSchemas(aAddl, bAddl) : aAddl ? aAddl : bAddl;
   if (isFailure(additionalProperties)) {
     return locateFailure('additionalProperties')(additionalProperties);
   }
 
   for (const key in bPats) {
     if (aPats[key]) {
-      const pat = unifySchemas(aPats[key], bPats[key]);
+      const pat = unionSchemas(aPats[key], bPats[key]);
       if (isFailure(pat)) {
         return locateFailure(key)(pat);
       }
@@ -226,4 +251,14 @@ function union<A>(xs: Iterable<A>, ys: Iterable<A>): A[] {
 function intersect<A>(xs: A[], ys: A[]): A[] {
   const xss = new Set(xs);
   return ys.filter((y) => xss.has(y));
+}
+
+type SchemaUnion = jsonschema.AnyOf<jsonschema.Schema> | jsonschema.OneOf<jsonschema.Schema>;
+
+function isSchemaUnion(x: jsonschema.Schema): x is SchemaUnion {
+  return jsonschema.isAnyOf(x) || jsonschema.isOneOf(x);
+}
+
+function isSingleton(x: jsonschema.Schema): x is jsonschema.SingletonSchema {
+  return !jsonschema.isOneOf(x) && !jsonschema.isAnyOf(x) && !jsonschema.isAllOf(x);
 }

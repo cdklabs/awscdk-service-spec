@@ -342,7 +342,7 @@
     "jsonschema.Schema": {
       "anyOf": [
         {
-          "$ref": "#/definitions/jsonschema.Reference"
+          "$ref": "#/definitions/jsonschema.SingletonSchema"
         },
         {
           "$ref": "#/definitions/jsonschema.OneOf%3CSchema%3E"
@@ -352,9 +352,6 @@
         },
         {
           "$ref": "#/definitions/jsonschema.AllOf%3CSchema%3E"
-        },
-        {
-          "$ref": "#/definitions/jsonschema.ConcreteSingletonSchema"
         }
       ]
     },
@@ -465,6 +462,16 @@
         "type"
       ],
       "type": "object"
+    },
+    "jsonschema.SingletonSchema": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/jsonschema.Reference"
+        },
+        {
+          "$ref": "#/definitions/jsonschema.ConcreteSingletonSchema"
+        }
+      ]
     },
     "jsonschema.String": {
       "additionalProperties": false,

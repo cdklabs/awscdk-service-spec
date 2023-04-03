@@ -1,5 +1,7 @@
 export namespace jsonschema {
-  export type Schema = Reference | OneOf<Schema> | AnyOf<Schema> | AllOf<Schema> | ConcreteSingletonSchema;
+  export type Schema = SingletonSchema | OneOf<Schema> | AnyOf<Schema> | AllOf<Schema>;
+
+  export type SingletonSchema = Reference | ConcreteSingletonSchema;
 
   export type ConcreteSchema =
     | ConcreteSingletonSchema
@@ -53,6 +55,16 @@ export namespace jsonschema {
 
   export interface OneOf<S> extends Annotatable {
     readonly oneOf: Array<S>;
+  }
+
+  export function innerSchemas<E extends Schema>(x: CombiningSchema<E>): E[] {
+    if (isOneOf(x)) {
+      return x.oneOf;
+    } else if (isAnyOf(x)) {
+      return x.anyOf;
+    } else {
+      return x.allOf;
+    }
   }
 
   export function isOneOf(x: Schema): x is OneOf<any> {
