@@ -172,12 +172,8 @@ export class PropMapping {
       };
     }
 
-    const oops = expr.ident(`/* @todo typeHandlers(${type}) */`);
-    return {
-      produce: oops,
-      parse: oops,
-      validate: oops,
-    };
+    const todo = expr.ident(`/* @todo typeHandlers(${type}) */`);
+    return { produce: todo, parse: todo, validate: todo };
   }
 }
 

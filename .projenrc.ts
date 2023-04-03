@@ -61,7 +61,6 @@ const serviceSpecSchemaTask = serviceSpecSources.addTask('gen-schemas', {
     'CloudFormationDocumentation',
     'StatefulResources',
     'SamTemplateSchema',
-    'SamResourceSpecification',
     'CloudWatchConsoleServiceDirectory',
   ].map((typeName: string) => ({
     exec: [
