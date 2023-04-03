@@ -272,6 +272,9 @@ export namespace jsonschema {
         lastKey = parts.shift()!;
         current = current[lastKey];
       }
+      if (current === undefined) {
+        throw new Error(`Invalid $ref: ${path}`);
+      }
 
       // Some funny people have decided to reference a reference, so we might
       // need to recurse here.
@@ -286,6 +289,9 @@ export namespace jsonschema {
   export type Resolver = ReturnType<typeof makeResolver>;
 
   export function isReference(x: Schema): x is Reference {
+    if (x === undefined) {
+      debugger;
+    }
     return !isAnyType(x) && '$ref' in x;
   }
 

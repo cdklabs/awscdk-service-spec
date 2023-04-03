@@ -107,7 +107,8 @@ export class SamResources {
   private resourceDefinitionToRegistrySchema(def: jsonschema.RecordLikeObject): CloudFormationRegistryResource {
     const typeName = this.resourceType(def) ?? '<dummy>';
 
-    const { schema: propertiesSchema } = this.resolve(def.properties.Properties);
+    const emptyObject: jsonschema.RecordLikeObject = { type: 'object', additionalProperties: false, properties: {} };
+    const { schema: propertiesSchema } = this.resolve(def.properties.Properties ?? emptyObject);
 
     const properties =
       jsonschema.isObject(propertiesSchema) && jsonschema.isRecordLikeObject(propertiesSchema)
