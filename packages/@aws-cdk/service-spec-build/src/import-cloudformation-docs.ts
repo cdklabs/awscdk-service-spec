@@ -2,7 +2,11 @@ import { SpecDatabase } from '@aws-cdk/service-spec';
 import { cfndocs, CloudFormationDocumentation } from '@aws-cdk/service-spec-sources';
 import { Failures } from '@cdklabs/tskb';
 
-export function readCloudFormationDocumentation(db: SpecDatabase, docs: CloudFormationDocumentation, fails: Failures) {
+export function importCloudFormationDocumentation(
+  db: SpecDatabase,
+  docs: CloudFormationDocumentation,
+  fails: Failures,
+) {
   Array.isArray(fails);
 
   for (const [typeName, typeDocs] of Object.entries(docs.Types)) {

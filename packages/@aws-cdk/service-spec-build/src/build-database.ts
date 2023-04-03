@@ -2,16 +2,16 @@ import { emptyDatabase } from '@aws-cdk/service-spec';
 import * as sources from '@aws-cdk/service-spec-sources';
 import { LoadResult, PatchReport } from '@aws-cdk/service-spec-sources';
 import { assertSuccess, Failures, Result } from '@cdklabs/tskb';
-import { Augmentations } from './augmentations';
-import { readCannedMetrics } from './canned-metrics';
-import { readCloudFormationDocumentation } from './cloudformation-docs';
+import { Augmentations } from './import-augmentations';
+import { importCannedMetrics } from './import-canned-metrics';
+import { importCloudFormationDocumentation } from './import-cloudformation-docs';
 import {
   importCloudFormationRegistryResource,
   readCloudFormationRegistryServiceFromResource,
-} from './cloudformation-registry';
+} from './import-cloudformation-registry';
 import { SamResources } from './import-sam';
-import { Scrutinies } from './scrutinies';
-import { readStatefulResources } from './stateful-resources';
+import { Scrutinies } from './import-scrutinies';
+import { importStatefulResources } from './import-stateful-resources';
 
 export interface BuildDatabaseOptions {
   readonly mustValidate?: boolean;
@@ -51,16 +51,16 @@ export async function buildDatabase(options: BuildDatabaseOptions = {}) {
   new SamResources({ db, samSchema, fails: warnings }).import();
 
   const docs = loadResult(await sources.loadDefaultCloudFormationDocs());
-  readCloudFormationDocumentation(db, docs, warnings);
+  importCloudFormationDocumentation(db, docs, warnings);
 
   const stateful = loadResult(await sources.loadDefaultStatefulResources());
-  readStatefulResources(db, stateful, warnings);
+  importStatefulResources(db, stateful, warnings);
 
   const cloudWatchServiceDirectory = loadResult(await sources.loadDefaultCloudWatchConsoleServiceDirectory());
-  readCannedMetrics(db, cloudWatchServiceDirectory, warnings);
+  importCannedMetrics(db, cloudWatchServiceDirectory, warnings);
 
-  new Scrutinies(db).annotate();
-  new Augmentations(db).insert();
+  new Scrutinies(db).import();
+  new Augmentations(db).import();
 
   return { db, warnings, patchesApplied };
 

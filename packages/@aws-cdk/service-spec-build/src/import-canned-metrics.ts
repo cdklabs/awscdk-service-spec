@@ -29,7 +29,7 @@ function dedup<T extends Plain<Entity>, K extends keyof T>(
   };
 }
 
-export function readCannedMetrics(
+export function importCannedMetrics(
   db: SpecDatabase,
   serviceDirectoryEntries: CloudWatchConsoleServiceDirectory,
   fails: Failures,
