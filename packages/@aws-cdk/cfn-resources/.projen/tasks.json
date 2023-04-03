@@ -28,19 +28,19 @@
       },
       "steps": [
         {
-          "exec": "npm-check-updates --dep dev --upgrade --target=minor --reject='constructs,@cdklabs/typewriter,@aws-cdk/service-spec,@aws-cdk/service-spec-build,@cdklabs/tskb'"
+          "exec": "npm-check-updates --dep dev --upgrade --target=minor --reject='@aws-cdk/service-spec,@aws-cdk/service-spec-build,@cdklabs/tskb,@cdklabs/typewriter'"
         },
         {
-          "exec": "npm-check-updates --dep optional --upgrade --target=minor --reject='constructs,@cdklabs/typewriter,@aws-cdk/service-spec,@aws-cdk/service-spec-build,@cdklabs/tskb'"
+          "exec": "npm-check-updates --dep optional --upgrade --target=minor --reject='@aws-cdk/service-spec,@aws-cdk/service-spec-build,@cdklabs/tskb,@cdklabs/typewriter'"
         },
         {
-          "exec": "npm-check-updates --dep peer --upgrade --target=minor --reject='constructs,@cdklabs/typewriter,@aws-cdk/service-spec,@aws-cdk/service-spec-build,@cdklabs/tskb'"
+          "exec": "npm-check-updates --dep peer --upgrade --target=minor --reject='@aws-cdk/service-spec,@aws-cdk/service-spec-build,@cdklabs/tskb,@cdklabs/typewriter'"
         },
         {
-          "exec": "npm-check-updates --dep prod --upgrade --target=minor --reject='constructs,@cdklabs/typewriter,@aws-cdk/service-spec,@aws-cdk/service-spec-build,@cdklabs/tskb'"
+          "exec": "npm-check-updates --dep prod --upgrade --target=minor --reject='@aws-cdk/service-spec,@aws-cdk/service-spec-build,@cdklabs/tskb,@cdklabs/typewriter'"
         },
         {
-          "exec": "npm-check-updates --dep bundle --upgrade --target=minor --reject='constructs,@cdklabs/typewriter,@aws-cdk/service-spec,@aws-cdk/service-spec-build,@cdklabs/tskb'"
+          "exec": "npm-check-updates --dep bundle --upgrade --target=minor --reject='@aws-cdk/service-spec,@aws-cdk/service-spec-build,@cdklabs/tskb,@cdklabs/typewriter'"
         }
       ]
     },

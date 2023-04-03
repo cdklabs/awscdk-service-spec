@@ -111,20 +111,24 @@ const cfnResources = new TypeScriptWorkspace({
   parent: repo,
   name: '@aws-cdk/cfn-resources',
   description: 'L1 constructs for all CloudFormation Resources',
-  deps: ['aws-cdk-lib@^2'],
-  peerDeps: ['constructs@^10.0.0'],
+  deps: [],
+  peerDeps: ['aws-cdk-lib@^2', 'constructs@^10.0.0'],
+  peerDependencyOptions: {
+    pinnedDevDependency: false,
+  },
   devDeps: [
-    typewriter,
     serviceSpec,
     serviceSpecBuild,
     tsKb,
-    'camelcase',
-    'ts-node',
+    typewriter,
     '@jsii/spec',
-    'fs-extra',
-    '@types/fs-extra@^9',
     '@swc/core',
+    '@types/fs-extra@^9',
     'aws-cdk-lib',
+    'camelcase',
+    'constructs',
+    'fs-extra',
+    'ts-node',
   ],
 });
 cfnResources.eslint?.addOverride({
@@ -148,7 +152,7 @@ const cfn2ts = new TypeScriptWorkspace({
   name: '@aws-cdk/cfn2ts',
   description: 'Drop-in replacement for cfn2ts',
   private: true,
-  deps: [cfnResources, 'yargs', 'fs-extra'],
+  deps: [cfnResources, serviceSpec, 'yargs', 'fs-extra'],
 });
 cfn2ts.synth();
 

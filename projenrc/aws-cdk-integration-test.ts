@@ -75,13 +75,6 @@ export class AwsCdkIntgrationTest extends pj.Component {
           run: 'yarn install',
         },
         {
-          // aws-cdk attempts to run ts3.9 on awscdk-service-spec which fails
-          // this fix enables skipLibCheck to prevent the behavior
-          name: 'Fix: aws-cdk attempts to compile awscdk-service-spec code',
-          workingDirectory: path.join(awsCdkPath, 'packages', 'aws-cdk'),
-          run: `npx tsc --showConfig | jq '.references = []' > tmp && mv tmp tsconfig.json`,
-        },
-        {
           name: `Build ${awsCdkRepo}`,
           workingDirectory: awsCdkPath,
           run: 'npx lerna run build --no-bail --scope aws-cdk-lib --include-dependencies',
