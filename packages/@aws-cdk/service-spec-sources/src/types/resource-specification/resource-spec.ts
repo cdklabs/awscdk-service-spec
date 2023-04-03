@@ -1,7 +1,4 @@
-/**
- * CloudFormation Resource specification
- */
-export interface CloudFormationResourceSpecification {
+export interface ResourceSpecification {
   readonly ResourceSpecificationVersion: string;
   readonly ResourceTypes: Record<string, resourcespec.ResourceType>;
 
@@ -15,16 +12,16 @@ export interface CloudFormationResourceSpecification {
  * We don't have the tightest possible typing on this, since we only need a couple of fields.
  */
 export namespace resourcespec {
-  export interface ResourceType<P extends Property = Property, A extends Attribute = Attribute> {
+  export interface ResourceType {
     readonly AdditionalProperties?: boolean;
     readonly Documentation?: string;
-    readonly Properties?: Record<string, P>;
-    readonly Attributes?: Record<string, A>;
+    readonly Properties?: Record<string, Property>;
+    readonly Attributes?: Record<string, Attribute>;
   }
 
-  export interface PropertyType<P extends Property = Property> {
+  export interface PropertyType {
     readonly Documentation?: string;
-    readonly Properties?: Record<string, P>;
+    readonly Properties?: Record<string, Property>;
   }
 
   export interface Property {
