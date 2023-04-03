@@ -77,6 +77,7 @@ export class AstBuilder<T extends Module> {
   }
 
   public readonly db: SpecDatabase;
+  public readonly resources: Record<string, string> = {};
   private nameSuffix?: string;
 
   protected constructor(
@@ -95,6 +96,7 @@ export class AstBuilder<T extends Module> {
 
   public addResource(resource: Resource) {
     const resourceClass = new ResourceClass(this.module, resource, this.nameSuffix);
+    this.resources[resource.cloudFormationType] = resourceClass.spec.name;
 
     const converter = new TypeConverter({ db: this.db, resource, resourceClass });
     const propsType = this.addResourcePropsType(resource, converter);

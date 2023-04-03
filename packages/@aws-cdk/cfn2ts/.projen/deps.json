@@ -79,6 +79,10 @@
       "type": "runtime"
     },
     {
+      "name": "@aws-cdk/service-spec",
+      "type": "runtime"
+    },
+    {
       "name": "fs-extra",
       "type": "runtime"
     },

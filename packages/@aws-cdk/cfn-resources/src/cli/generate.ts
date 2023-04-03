@@ -67,20 +67,25 @@ export async function generate(options: GenerateOptions) {
   const db = await loadDatabase();
   const renderer = new TypeScriptRenderer();
 
-  let resourceCount = 0;
+  let resources: Record<string, string> = {};
   const services = getServices(db, options.services).map((s) => {
     debug(s.name, 'ast');
     const ast = AstBuilder.forService(s, { db, importLocations, nameSuffix: options.serviceSuffixes?.[s.name] });
-    resourceCount += db.follow('hasResource', s).length;
+
+    resources = {
+      ...resources,
+      ...ast.resources,
+    };
     return ast;
   });
 
-  console.log('Generating %i Resources for %i Services', resourceCount, services.length);
+  console.log('Generating %i Resources for %i Services', Object.keys(resources).length, services.length);
 
   if (clearOutput) {
     fs.removeSync(outputPath);
   }
 
+  const outputFiles = new Array<string>();
   for (const s of services) {
     debug(`${s.module.service}`, 'render');
 
@@ -106,10 +111,19 @@ export async function generate(options: GenerateOptions) {
     if (s.cannedMetrics?.hasCannedMetrics) {
       writer.writePattern(s.cannedMetrics, options.cannedMetricsFilePattern);
     }
+
+    outputFiles.push(...writer.outputFiles);
   }
+
+  return {
+    resources,
+    outputFiles,
+  };
 }
 
 class ServiceFileWriter {
+  public outputFiles = new Array<string>();
+
   constructor(
     private readonly outputPath: string,
     private readonly renderer: TypeScriptRenderer,
@@ -119,11 +133,13 @@ class ServiceFileWriter {
   public writePattern(module: Module, fileNamePattern: PatternedString<PatternKeys>) {
     const filePath = path.join(this.outputPath, fileNamePattern(this.values));
     fs.outputFileSync(filePath, this.renderer.render(module));
+    this.outputFiles.push(filePath);
     return filePath;
   }
 
   public write(module: Module, filePath: string) {
     fs.outputFileSync(filePath, this.renderer.render(module));
+    this.outputFiles.push(filePath);
     return filePath;
   }
 }

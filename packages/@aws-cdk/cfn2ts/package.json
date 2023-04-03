@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "@aws-cdk/cfn-resources": "^0.0.0",
+    "@aws-cdk/service-spec": "^0.0.0",
     "fs-extra": "^9.1.0",
     "yargs": "^16.2.0"
   },
