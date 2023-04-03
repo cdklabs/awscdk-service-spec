@@ -39,7 +39,8 @@ export function importCannedMetrics(
   for (const { metricTemplates: groups = [] } of serviceDirectoryEntries) {
     for (const group of groups) {
       try {
-        const resource = db.lookup('resource', 'cloudFormationType', 'equals', group.resourceType).only();
+        const resourceType = group.resourceType.split('/', 1).at(0)!; // some resource types in this dataset have a custom suffix
+        const resource = db.lookup('resource', 'cloudFormationType', 'equals', resourceType).only();
         const service = db.incoming('hasResource', resource).only().entity;
 
         // Allocate new dimension set, connect to resource & service and fill with dimensions

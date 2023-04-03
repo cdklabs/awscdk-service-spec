@@ -7984,6 +7984,16 @@ QueueBase.prototype.metricSentMessageSize = function(props?: cw.MetricOptions) {
   });
 };",
   "metrics": "/* eslint-disable prettier/prettier,max-len */
+export interface MetricWithDims<D> {
+  readonly namespace: string;
+
+  readonly metricName: string;
+
+  readonly statistic: string;
+
+  readonly dimensionsMap: D;
+}
+
 export class SQSMetrics {
   public static numberOfMessagesSentAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
     return {
@@ -8065,16 +8075,6 @@ export class SQSMetrics {
       "statistic": "Average"
     };
   }
-}
-
-export interface MetricWithDims<D> {
-  readonly namespace: string;
-
-  readonly metricName: string;
-
-  readonly statistic: string;
-
-  readonly dimensionsMap: D;
 }",
   "module": "/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";

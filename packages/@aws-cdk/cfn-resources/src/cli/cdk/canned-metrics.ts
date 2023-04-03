@@ -1,15 +1,20 @@
 import { DimensionSet, Metric, Resource, Service, SpecDatabase } from '@aws-cdk/service-spec';
 import { ClassType, expr, InterfaceType, IScope, Method, Module, stmt, Type } from '@cdklabs/typewriter';
-import { metricFunctionName, metricsClassNameFromService } from '../naming/conventions';
+import {
+  metricFunctionName,
+  metricsClassNameFromService as metricsClassNameFromNamespace,
+} from '../naming/conventions';
 
 /**
  * Generate Canned Metrics
  */
 export class CannedMetricsModule extends Module {
   public static forService(db: SpecDatabase, service: Service): CannedMetricsModule {
-    const cm = new CannedMetricsModule(db, service);
+    const metrics = db.follow('serviceHasMetric', service);
+    const namespaces = Array.from(new Set(metrics.map((r) => r.entity.namespace)));
+    const cm = new CannedMetricsModule(db, service, namespaces);
 
-    for (const r of db.follow('serviceHasMetric', service)) {
+    for (const r of metrics) {
       cm.addMetricWithDimensions(r.entity);
     }
 
@@ -18,21 +23,28 @@ export class CannedMetricsModule extends Module {
 
   public static forResource(db: SpecDatabase, resource: Resource): CannedMetricsModule {
     const service = db.incoming('hasResource', resource).only().entity;
-    const cm = new CannedMetricsModule(db, service);
+    const metrics = db.follow('resourceHasMetric', resource);
+    const namespaces = Array.from(new Set(metrics.map((r) => r.entity.namespace)));
+    const cm = new CannedMetricsModule(db, service, namespaces);
 
-    for (const r of db.follow('resourceHasMetric', resource)) {
+    for (const r of metrics) {
       cm.addMetricWithDimensions(r.entity);
     }
 
     return cm;
   }
 
-  private metrics: MetricsClass;
+  private metrics: Record<string, MetricsClass> = {};
   private _hasCannedMetrics: boolean = false;
 
-  private constructor(private readonly db: SpecDatabase, service: Service) {
+  private constructor(private readonly db: SpecDatabase, service: Service, namespaces: string[]) {
     super(`${service.name}.canned-metrics`);
-    this.metrics = new MetricsClass(this, service);
+
+    const returnType = new MetricsReturnType(this);
+
+    for (const namespace of namespaces) {
+      this.metrics[namespace] = new MetricsClass(this, namespace, returnType);
+    }
   }
 
   public get hasCannedMetrics() {
@@ -45,19 +57,13 @@ export class CannedMetricsModule extends Module {
   public addMetricWithDimensions(metric: Metric) {
     this._hasCannedMetrics = true;
     const dimensions = this.db.follow('usesDimensionSet', metric).map((m) => m.entity);
-    this.metrics.addMetricWithDimensions(metric, dimensions);
+    this.metrics[metric.namespace].addMetricWithDimensions(metric, dimensions);
   }
 }
 
-export class MetricsClass extends ClassType {
-  private returnType: InterfaceType;
-  constructor(scope: IScope, service: Service) {
+export class MetricsReturnType extends InterfaceType {
+  public constructor(scope: IScope) {
     super(scope, {
-      export: true,
-      name: metricsClassNameFromService(service),
-    });
-
-    this.returnType = new InterfaceType(this.scope, {
       name: 'MetricWithDims',
       export: true,
       properties: [
@@ -79,12 +85,21 @@ export class MetricsClass extends ClassType {
       ],
     });
 
-    const dimensionTypeParam = this.returnType.addTypeParameter({ name: 'D' });
+    const D = this.addTypeParameter({ name: 'D' });
 
-    this.returnType.addProperty({
+    this.addProperty({
       name: 'dimensionsMap',
-      type: dimensionTypeParam.asType(),
+      type: D.asType(),
       immutable: true,
+    });
+  }
+}
+
+export class MetricsClass extends ClassType {
+  constructor(scope: IScope, namespace: string, private returnType: MetricsReturnType) {
+    super(scope, {
+      export: true,
+      name: metricsClassNameFromNamespace(namespace),
     });
   }
 
