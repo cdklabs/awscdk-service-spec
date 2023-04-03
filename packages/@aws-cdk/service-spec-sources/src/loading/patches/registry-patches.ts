@@ -1,3 +1,8 @@
+/**
+ * Patches that apply to the CloudFormation Registry documents we have found in the wild.
+ *
+ * These find and remove handwritten JSON Schema schemas that don't make any sense.
+ */
 import canonicalize from 'canonicalize';
 import {
   TypeKeyWitness,
@@ -6,10 +11,10 @@ import {
   ARRAY_KEY_WITNESS,
   BOOLEAN_KEY_WITNESS,
   NUMBER_KEY_WITNESS,
-  retainRelevantKeywords,
   NULL_KEY_WITNESS,
 } from './field-witnesses';
-import { JsonLens, JsonObjectLens, NO_MISTAKE } from './json-lens';
+import { JsonObjectLens, isRoot } from './json-lens';
+import { normalizeJsonSchema } from './json-schema-patches';
 import { makeCompositePatcher, onlyObjects } from './patching';
 
 /**
@@ -17,21 +22,16 @@ import { makeCompositePatcher, onlyObjects } from './patching';
  */
 export const patchCloudFormationRegistry = onlyObjects(
   makeCompositePatcher(
+    normalizeJsonSchema,
     replaceArrayLengthProps,
     removeBooleanPatterns,
-    explodeTypeArray,
-    canonicalizeTypeOperators('oneOf'),
-    canonicalizeTypeOperators('anyOf'),
-    canonicalizeTypeOperators('allOf'),
     canonicalizeDefaultOnBoolean,
     patchMinLengthOnInteger,
     canonicalizeRegexInFormat,
     markAsNonTaggable,
     incorrectTagPropertyFormat,
-    removeEmptyRequiredArray,
     noIncorrectDefaultType,
     removeSuspiciousPatterns,
-    missingTypeField,
     dropRedundantTypeOperatorsInMetricStream,
     minMaxItemsOnObject,
     makeKeywordDropper(),
@@ -79,91 +79,6 @@ export function removeSuspiciousPatterns(lens: JsonObjectLens) {
   if (lens.value?.pattern === 'string') {
     lens.removeProperty('you probably did not mean the literal string "string"', 'pattern');
   }
-}
-
-/**
- * If `type` is an array, either type is fine, and whatever keywords are on the type
- * that apply to any of the types in the array apply to that type.
- */
-export function explodeTypeArray(lens: JsonObjectLens) {
-  if (Array.isArray(lens.value.type)) {
-    const oneOf = lens.value.type.map((v) => {
-      return {
-        ...retainRelevantKeywords(lens.value, witnessForType(v)),
-        type: v,
-      };
-    });
-
-    // Get a list of keys that were in the original but aren't in any of the more specific types
-    const allKeys = new Set(Object.keys(lens.value));
-    for (const usedKey of oneOf.flatMap((x) => Object.keys(x))) {
-      allKeys.delete(usedKey);
-    }
-
-    for (const unusedKey of allKeys) {
-      lens.removeProperty(`'${unusedKey}' not applicable to any of ${JSON.stringify(lens.value.type)}`, unusedKey);
-    }
-
-    lens.replaceValue(NO_MISTAKE, { oneOf });
-  }
-}
-
-/**
- * Some type operators (oneOf/anyOf) are embedded in type objects.
- *
- * We lift them out to make the schema more regular to work with.
- *
- * Example:
- *
- * ```
- * {
- *   type: 'object',
- *   properties: { ... },
- *   oneOf: [
- *     { required: ['a'] },
- *     { required: ['b'] },
- *   ]
- * }
- * ```
- *
- * Turns into:
- *
- * ```
- * {
- *   oneOf: [
- *     { type: 'object', properties: { ... }, required: ['a'] },
- *     { type: 'object', properties: { ... }, required: ['b'] },
- *   ]
- * }
- * ```
- *
- */
-export function canonicalizeTypeOperators(op: 'oneOf' | 'anyOf' | 'allOf') {
-  return (lens: JsonObjectLens) => {
-    // Only normalize 'oneOf' if we're not at the root. We make an exception for these.
-    // Don't do anything if 'oneOf' appears in the position of a property name, that's valid without
-    // invoking its special powers.
-    if (isRoot(lens) || !isInSchemaPosition(lens)) {
-      return;
-    }
-
-    const branches = lens.value[op];
-    if (!Array.isArray(branches)) {
-      return;
-    }
-
-    const newBranches = deepDedupe(
-      branches.map((branch) => {
-        return deepMerge(branch, restOfObjectWithout(lens.value, [op]));
-      }),
-    );
-
-    const replacement = { [op]: newBranches };
-    // Prevent infinite recursion that would be a no-op
-    if (!deepEqual(lens.value, replacement)) {
-      lens.replaceValue(NO_MISTAKE, replacement);
-    }
-  };
 }
 
 export function dropRedundantTypeOperatorsInMetricStream(lens: JsonObjectLens) {
@@ -278,15 +193,6 @@ export function incorrectTagPropertyFormat(lens: JsonObjectLens) {
 }
 
 /**
- * Some map objects have `required: []`. It's not wrong, but our types don't enjoy it, so remove 'em.
- */
-export function removeEmptyRequiredArray(lens: JsonObjectLens) {
-  if (lens.value.type === 'object' && Array.isArray(lens.value.required) && lens.value.required.length === 0) {
-    lens.removeProperty('no-mistake', 'required');
-  }
-}
-
-/**
  * We're seeing `type: string` with `default: <boolean>`.
  */
 export function noIncorrectDefaultType(lens: JsonObjectLens) {
@@ -331,77 +237,6 @@ export function minMaxItemsOnObject(lens: JsonObjectLens) {
       }
     }
   }
-}
-
-/**
- * If it looks like we're trying to validate an object or a map but we forgot the 'type' keyword...
- */
-export function missingTypeField(lens: JsonObjectLens) {
-  if (!isRoot(lens) && isInSchemaPosition(lens) && lens.value.type === undefined) {
-    if (
-      lens.value.properties !== undefined ||
-      lens.value.additionalProperties !== undefined ||
-      lens.value.patternProperties !== undefined
-    ) {
-      lens.addProperty('forgot type: object', 'type', 'object');
-    }
-  }
-}
-
-function restOfObjectWithout(obj: any, values: string[]) {
-  const returnObj = { ...obj };
-  for (const val of values) {
-    delete returnObj[val];
-  }
-  return returnObj;
-}
-
-/**
- * Do a deep dedupe of the given objects
- */
-function deepDedupe<A>(xs: A[]): A[] {
-  const ret = new Array<A>();
-  const seen = new Set<string>();
-  for (const x of xs) {
-    const json = canonicalize(x);
-    if (!seen.has(json)) {
-      ret.push(x);
-      seen.add(json);
-    }
-  }
-  return ret;
-}
-
-function deepMerge(x: any, y: any): any {
-  const returnObj = JSON.parse(JSON.stringify(x));
-  for (const [k, v] of Object.entries(y)) {
-    if (Array.isArray(v) && Array.isArray(returnObj[k])) {
-      returnObj[k].push(...v);
-    } else if (typeof v === 'object' && typeof returnObj[k] === 'object') {
-      deepMerge(returnObj[k], v);
-    } else {
-      returnObj[k] = v;
-    }
-  }
-  return returnObj;
-}
-
-function deepEqual(x: any, y: any) {
-  return canonicalize(x) === canonicalize(y);
-}
-
-/**
- * Whether the current object is in a position where a schema is expected
- *
- * This is usually true, UNLESS we're in the 'properties' array, in which case
- * all names are literal.
- */
-function isInSchemaPosition(lens: JsonLens) {
-  return !lens.jsonPath.endsWith('/properties');
-}
-
-function isRoot(lens: JsonLens) {
-  return lens.rootPath.length === 1;
 }
 
 export function makeKeywordDropper() {
@@ -452,27 +287,6 @@ function dropIrrelevantKeywords(lens: JsonObjectLens, typeDescription: string, w
     if (!witness[key] && !protectedKeys.includes(key)) {
       lens.removeProperty(`${key} does not apply to ${typeDescription}`, key);
     }
-  }
-}
-
-function witnessForType(type: string): TypeKeyWitness<any> {
-  switch (type) {
-    case 'string':
-      return STRING_KEY_WITNESS;
-    case 'object':
-      return OBJECT_KEY_WITNESS;
-    case 'boolean':
-      return BOOLEAN_KEY_WITNESS;
-    case 'number':
-    case 'integer':
-      return NUMBER_KEY_WITNESS;
-    case 'array':
-      return ARRAY_KEY_WITNESS;
-    case 'null':
-      return NULL_KEY_WITNESS;
-
-    default:
-      throw new Error(`Don't recognize type: ${type}`);
   }
 }
 

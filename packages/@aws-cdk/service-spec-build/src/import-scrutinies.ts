@@ -20,7 +20,7 @@ import {
 export class Scrutinies {
   constructor(private readonly db: SpecDatabase) {}
 
-  public annotate() {
+  public import() {
     for (const res of this.db.all('resource')) {
       res.scrutinizable = this.autoResourceScrutiny(res);
 

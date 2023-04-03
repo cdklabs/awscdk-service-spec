@@ -1,12 +1,12 @@
 import * as path from 'path';
 import { assertSuccess } from '@cdklabs/tskb';
 import { Loader, LoadResult } from './loader';
-import { ResourceSpecification } from '../types';
+import { CloudFormationResourceSpecification } from '../types';
 
 export async function loadDefaultResourceSpecification(
   mustValidate = true,
-): Promise<LoadResult<ResourceSpecification>> {
-  const loader = await Loader.fromSchemaFile<ResourceSpecification>('ResourceSpecification.schema.json', {
+): Promise<LoadResult<CloudFormationResourceSpecification>> {
+  const loader = await Loader.fromSchemaFile<CloudFormationResourceSpecification>('ResourceSpecification.schema.json', {
     mustValidate,
   });
 

@@ -44,6 +44,7 @@ export class CdkCore extends ExternalModule {
   public readonly canInspect = makeCallableExpr(this, 'canInspect');
   public readonly listMapper = makeCallableExpr(this, 'listMapper');
   public readonly hashMapper = makeCallableExpr(this, 'hashMapper');
+  public readonly unionMapper = makeCallableExpr(this, 'unionMapper');
   public readonly requireProperty = makeCallableExpr(this, 'requireProperty');
   public readonly isResolvableObject = makeCallableExpr(this, 'isResolvableObject');
 

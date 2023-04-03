@@ -82,13 +82,16 @@
           "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudFormationRegistryResource --out schemas/CloudFormationRegistryResource.schema.json"
         },
         {
-          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type ResourceSpecification --out schemas/ResourceSpecification.schema.json"
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudFormationResourceSpecification --out schemas/CloudFormationResourceSpecification.schema.json"
         },
         {
           "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudFormationDocumentation --out schemas/CloudFormationDocumentation.schema.json"
         },
         {
           "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type StatefulResources --out schemas/StatefulResources.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type SamTemplateSchema --out schemas/SamTemplateSchema.schema.json"
         },
         {
           "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudWatchConsoleServiceDirectory --out schemas/CloudWatchConsoleServiceDirectory.schema.json"

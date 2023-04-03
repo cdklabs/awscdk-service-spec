@@ -7,6 +7,7 @@ import {
   DirectCode,
   IsObject,
   JsLiteralExpression,
+  ListLiteral,
   NotExpression,
   Null,
   ObjectLiteral,
@@ -32,6 +33,10 @@ export function ident(identifier: string): Identifier {
 
 export function sym(symb: ThingSymbol): Expression {
   return new SymbolReference(symb);
+}
+
+export function list(es: Expression[]): Expression {
+  return new ListLiteral(es);
 }
 
 export function object(

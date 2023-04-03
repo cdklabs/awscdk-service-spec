@@ -31,6 +31,12 @@ export class ObjectLiteral extends Expression {
   }
 }
 
+export class ListLiteral extends Expression {
+  public constructor(public readonly _elements_: Expression[]) {
+    super();
+  }
+}
+
 export class NotExpression extends Expression {
   constructor(public readonly _operand_: Expression) {
     super();

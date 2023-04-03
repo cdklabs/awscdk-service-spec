@@ -4,7 +4,7 @@ import { ResourceMetric, ResourceMetricAugmentations } from '@aws-cdk/service-sp
 export class Augmentations {
   constructor(private readonly db: SpecDatabase) {}
 
-  public insert() {
+  public import() {
     this.insertQueue();
     this.insertTopic();
     this.insertRdsInstance();

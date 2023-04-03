@@ -57,9 +57,10 @@ for (const tsconfig of [serviceSpecSources.tsconfig, serviceSpecSources.tsconfig
 const serviceSpecSchemaTask = serviceSpecSources.addTask('gen-schemas', {
   steps: [
     'CloudFormationRegistryResource',
-    'ResourceSpecification',
+    'CloudFormationResourceSpecification',
     'CloudFormationDocumentation',
     'StatefulResources',
+    'SamTemplateSchema',
     'CloudWatchConsoleServiceDirectory',
   ].map((typeName: string) => ({
     exec: [

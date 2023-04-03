@@ -1,16 +1,17 @@
 export namespace jsonschema {
-  export type Schema = Reference | OneOf<Schema> | AnyOf<Schema> | AllOf<Schema> | ConcreteSchema;
+  export type Schema = SingletonSchema | OneOf<Schema> | AnyOf<Schema> | AllOf<Schema>;
+
+  export type SingletonSchema = Reference | ConcreteSingletonSchema;
 
   export type ConcreteSchema =
-    | Object
+    | ConcreteSingletonSchema
     | OneOf<ConcreteSchema>
     | AnyOf<ConcreteSchema>
-    | AllOf<ConcreteSchema>
-    | String
-    | SchemaArray
-    | Boolean
-    | Number
-    | Null;
+    | AllOf<ConcreteSchema>;
+
+  export type ConcreteSingletonSchema = Object | String | SchemaArray | Boolean | Number | Null | AnyType;
+
+  export type AnyType = true;
 
   export interface Annotatable {
     readonly $comment?: string;
@@ -24,18 +25,30 @@ export namespace jsonschema {
     [k: string]: unknown;
   }
 
-  export type CombiningSchema<X> = OneOf<X> | AnyOf<X> | AllOf<X>;
+  export function isAnyType(x: Schema): x is AnyType {
+    return x === true;
+  }
+
+  export type CombiningSchema<X> = UnionSchema<X> | AllOf<X>;
+
+  export type UnionSchema<X> = AnyOf<X> | OneOf<X>;
+
+  export function isUnionSchema(x: jsonschema.Schema): x is UnionSchema<jsonschema.Schema>;
+  export function isUnionSchema(x: jsonschema.ConcreteSchema): x is UnionSchema<jsonschema.ConcreteSchema>;
+  export function isUnionSchema(x: jsonschema.Schema): x is UnionSchema<jsonschema.Schema> {
+    return jsonschema.isAnyOf(x) || jsonschema.isOneOf(x);
+  }
 
   export function isCombining(x: ConcreteSchema): x is CombiningSchema<ConcreteSchema> {
     return isOneOf(x) || isAnyOf(x) || isAllOf(x);
   }
 
-  export function isSingleton(x: ConcreteSchema): x is Exclude<ConcreteSchema, CombiningSchema<ConcreteSchema>> {
+  export function isConcreteSingleton(x: ConcreteSchema): x is ConcreteSingletonSchema {
     return !isCombining(x);
   }
 
   export function isObject(x: ConcreteSchema): x is Object {
-    return isSingleton(x) && x.type === 'object';
+    return isConcreteSingleton(x) && !isAnyType(x) && x.type === 'object';
   }
 
   export type Object = MapLikeObject | RecordLikeObject;
@@ -45,15 +58,25 @@ export namespace jsonschema {
   }
 
   export function isAnyOf(x: Schema): x is AnyOf<any> {
-    return 'anyOf' in x;
+    return !isAnyType(x) && 'anyOf' in x;
   }
 
   export interface OneOf<S> extends Annotatable {
     readonly oneOf: Array<S>;
   }
 
+  export function innerSchemas<E extends Schema>(x: CombiningSchema<E>): E[] {
+    if (isOneOf(x)) {
+      return x.oneOf;
+    } else if (isAnyOf(x)) {
+      return x.anyOf;
+    } else {
+      return x.allOf;
+    }
+  }
+
   export function isOneOf(x: Schema): x is OneOf<any> {
-    return 'oneOf' in x;
+    return !isAnyType(x) && 'oneOf' in x;
   }
 
   export interface AllOf<S> extends Annotatable {
@@ -61,22 +84,27 @@ export namespace jsonschema {
   }
 
   export function isAllOf(x: Schema): x is AllOf<any> {
-    return 'allOf' in x;
+    return !isAnyType(x) && 'allOf' in x;
   }
 
   export interface MapLikeObject extends Annotatable {
     readonly type: 'object';
     /**
-     * Simplification:
+     * additionalProperties validates all keys that aren't otherwise validated by properties or patternProperties
      *
-     * { additionalProperties: X }
-     *       <===>
-     * { patternProperties: { ".*": X }}
+     * @default true
      */
     readonly additionalProperties?: false | Schema;
     readonly patternProperties?: Record<string, Schema>;
     readonly minProperties?: number;
     readonly maxProperties?: number;
+
+    /**
+     * Required keys in a map
+     *
+     * Doesn't really make a whole lot of sense, but this is used to support mixed map/record types.
+     */
+    readonly required?: string[];
   }
 
   export interface Null extends Annotatable {
@@ -124,9 +152,14 @@ export namespace jsonschema {
     readonly minLength?: number;
     readonly maxLength?: number;
     readonly pattern?: string;
+    readonly const?: string;
     readonly enum?: string[];
     readonly format?: 'date-time' | 'uri' | 'timestamp';
     readonly examples?: string[];
+  }
+
+  export function isString(x: ConcreteSchema): x is String {
+    return isConcreteSingleton(x) && !isAnyType(x) && x.type === 'string';
   }
 
   export interface Number extends Annotatable {
@@ -141,7 +174,7 @@ export namespace jsonschema {
 
   export interface SchemaArray extends Annotatable {
     readonly type: 'array';
-    readonly items: Schema;
+    readonly items?: Schema;
     readonly uniqueItems?: boolean;
 
     /**
@@ -197,7 +230,7 @@ export namespace jsonschema {
   /**
    * Make a resolver function that will resolve `$ref` entries with respect to the given document root.
    */
-  export function resolveReference(root: any) {
+  export function makeResolver(root: any) {
     const resolve = (ref: Schema): ResolvedSchema => {
       if (!isReference(ref)) {
         // If this is a oneOf or anyOf, make sure the types inside the oneOf or anyOf get resolved
@@ -239,6 +272,9 @@ export namespace jsonschema {
         lastKey = parts.shift()!;
         current = current[lastKey];
       }
+      if (current === undefined) {
+        throw new Error(`Invalid $ref: ${path}`);
+      }
 
       // Some funny people have decided to reference a reference, so we might
       // need to recurse here.
@@ -250,9 +286,23 @@ export namespace jsonschema {
   /**
    * The type of a resolver function
    */
-  export type Resolver = ReturnType<typeof resolveReference>;
+  export type Resolver = ReturnType<typeof makeResolver>;
 
   export function isReference(x: Schema): x is Reference {
-    return '$ref' in x;
+    if (x === undefined) {
+      debugger;
+    }
+    return !isAnyType(x) && '$ref' in x;
   }
+
+  export interface TopLevelFields {
+    readonly $id?: string;
+
+    /**
+     * Reusable schema type definitions used in this schema.
+     */
+    readonly definitions?: Record<string, jsonschema.Schema>; // FIXME: Kaizen changed this from ConcreteSchema to fix 1 isue.
+  }
+
+  export type SchemaFile = jsonschema.RecordLikeObject & jsonschema.TopLevelFields;
 }

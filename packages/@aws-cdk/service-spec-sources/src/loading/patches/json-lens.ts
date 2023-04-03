@@ -42,7 +42,7 @@ export interface JsonObjectLens extends JsonLens {
   replaceProperty(reason: string, name: string, value: any): void;
 
   /** Recurse through the object field. */
-  descendObjectField(key: string, value: any): JsonLens;
+  descendObjectField(key: string): JsonLens;
 }
 
 export interface JsonArrayLens extends JsonLens {
@@ -50,4 +50,8 @@ export interface JsonArrayLens extends JsonLens {
 
   /** Recurse through the object field. */
   descendArrayElement(index: number): JsonLens;
+}
+
+export function isRoot(lens: JsonLens) {
+  return lens.rootPath.length === 1;
 }

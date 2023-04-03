@@ -3,16 +3,13 @@ import { applyPatcher, Patcher } from '../../src/loading/patches/patching';
 import {
   canonicalizeDefaultOnBoolean,
   canonicalizeRegexInFormat,
-  canonicalizeTypeOperators,
   dropRedundantTypeOperatorsInMetricStream,
-  explodeTypeArray,
   makeKeywordDropper,
   minMaxItemsOnObject,
-  missingTypeField,
   noIncorrectDefaultType,
+  patchCloudFormationRegistry,
   patchMinLengthOnInteger,
   removeBooleanPatterns,
-  removeEmptyRequiredArray,
   removeSuspiciousPatterns,
   replaceArrayLengthProps,
 } from '../../src/loading/patches/registry-patches';
@@ -74,191 +71,6 @@ describe('patches', () => {
       expect(patchedObj).toEqual({
         type: 'boolean',
       });
-    });
-  });
-
-  describe(explodeTypeArray, () => {
-    test('works in the base case', () => {
-      const obj = {
-        type: ['string', 'object'],
-      };
-
-      const patchedObj = patchObject(obj, explodeTypeArray);
-
-      expect(patchedObj).toEqual({
-        oneOf: [
-          {
-            type: 'string',
-          },
-          {
-            type: 'object',
-          },
-        ],
-      });
-    });
-
-    test('works when object has other properties', () => {
-      const obj = {
-        type: ['string', 'object'],
-        additionalProperties: false,
-        minLength: 0,
-      };
-
-      const patchedObj = patchObject(obj, explodeTypeArray);
-
-      expect(patchedObj).toEqual({
-        oneOf: [
-          {
-            type: 'string',
-            minLength: 0,
-          },
-          {
-            type: 'object',
-            additionalProperties: false,
-          },
-        ],
-      });
-    });
-  });
-
-  describe(canonicalizeTypeOperators, () => {
-    test('type operator is expanded to include all community properties - oneOf', () => {
-      const obj = {
-        properties: {
-          Prop: {
-            description: 'my description',
-            type: 'object',
-            properties: {
-              Name: {
-                type: 'string',
-              },
-              Attribute: {
-                type: 'string',
-              },
-              RequiredAttribute: {
-                type: 'string',
-              },
-            },
-            required: ['RequiredAttribute'],
-            oneOf: [
-              {
-                required: ['Name'],
-              },
-              {
-                required: ['Attribute'],
-              },
-            ],
-          },
-        },
-      };
-
-      const patchedObj = patchObject(obj, canonicalizeTypeOperators('oneOf'));
-
-      expect(patchedObj).toEqual({
-        properties: {
-          Prop: {
-            oneOf: [
-              {
-                description: 'my description',
-                type: 'object',
-                properties: {
-                  Name: {
-                    type: 'string',
-                  },
-                  Attribute: {
-                    type: 'string',
-                  },
-                  RequiredAttribute: {
-                    type: 'string',
-                  },
-                },
-                required: ['Name', 'RequiredAttribute'],
-              },
-              {
-                description: 'my description',
-                type: 'object',
-                properties: {
-                  Name: {
-                    type: 'string',
-                  },
-                  Attribute: {
-                    type: 'string',
-                  },
-                  RequiredAttribute: {
-                    type: 'string',
-                  },
-                },
-                required: ['Attribute', 'RequiredAttribute'],
-              },
-            ],
-          },
-        },
-      });
-    });
-
-    test('type operator expanded to include all community properties - anyOf', () => {
-      const obj = {
-        properties: {
-          CreationDate: {
-            description: 'my description',
-            type: 'string',
-            anyOf: [
-              {
-                format: 'date-time',
-              },
-              {
-                format: 'timestamp',
-              },
-            ],
-          },
-        },
-      };
-
-      const patchedObj = patchObject(obj, canonicalizeTypeOperators('anyOf'));
-
-      expect(patchedObj).toEqual({
-        properties: {
-          CreationDate: {
-            anyOf: [
-              {
-                description: 'my description',
-                type: 'string',
-                format: 'date-time',
-              },
-              {
-                description: 'my description',
-                type: 'string',
-                format: 'timestamp',
-              },
-            ],
-          },
-        },
-      });
-    });
-
-    test('type operators are unchanged when in canonical format', () => {
-      const obj = {
-        properties: {
-          CreationDate: {
-            anyOf: [
-              {
-                description: 'my description',
-                type: 'string',
-                format: 'date-time',
-              },
-              {
-                description: 'my description',
-                type: 'string',
-                format: 'timestamp',
-              },
-            ],
-          },
-        },
-      };
-
-      const patchedObj = patchObject(obj, canonicalizeTypeOperators('anyOf'));
-
-      expect(patchedObj).toEqual(obj);
     });
   });
 
@@ -329,19 +141,6 @@ describe('patches', () => {
     });
   });
 
-  describe(removeEmptyRequiredArray, () => {
-    test('removes empty required', () => {
-      const obj = {
-        type: 'object',
-        required: [],
-      };
-
-      const patchedObj = patchObject(obj, removeEmptyRequiredArray);
-
-      expect(patchedObj).toEqual({ type: 'object' });
-    });
-  });
-
   describe(noIncorrectDefaultType, () => {
     test('removes incorrect default types', () => {
       const obj = {
@@ -376,33 +175,6 @@ describe('patches', () => {
       const patchedObj = patchObject(obj, removeSuspiciousPatterns);
 
       expect(patchedObj).toEqual({ type: 'string' });
-    });
-  });
-
-  describe(missingTypeField, () => {
-    test('if properties are defined without type, add type object', () => {
-      const obj = {
-        root: {
-          properties: {
-            Prop: {
-              val: 'val',
-            },
-          },
-        },
-      };
-
-      const patchedObj = patchObject(obj, missingTypeField);
-
-      expect(patchedObj).toEqual({
-        root: {
-          type: 'object',
-          properties: {
-            Prop: {
-              val: 'val',
-            },
-          },
-        },
-      });
     });
   });
 
@@ -522,6 +294,42 @@ describe('patches', () => {
       });
     });
   });
+});
+
+test('simplify unnecessary oneOf away', () => {
+  const resource = {
+    properties: {
+      SourceConfiguration: {
+        type: 'object',
+        properties: {
+          AppIntegrations: { type: 'string' },
+        },
+        oneOf: [
+          {
+            required: ['AppIntegrations'],
+          },
+        ],
+        additionalProperties: false,
+      },
+    },
+  };
+
+  const patchedObj = patchObject(resource, patchCloudFormationRegistry);
+
+  expect(patchedObj).toEqual(
+    expect.objectContaining({
+      properties: {
+        SourceConfiguration: {
+          type: 'object',
+          properties: {
+            AppIntegrations: { type: 'string' },
+          },
+          required: ['AppIntegrations'],
+          additionalProperties: false,
+        },
+      },
+    }),
+  );
 });
 
 function patchObject(obj: any, fn: Patcher<JsonObjectLens>): any {

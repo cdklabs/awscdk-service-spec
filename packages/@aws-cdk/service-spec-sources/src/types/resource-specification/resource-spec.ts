@@ -1,4 +1,4 @@
-export interface ResourceSpecification {
+export interface CloudFormationResourceSpecification {
   readonly ResourceSpecificationVersion: string;
   readonly ResourceTypes: Record<string, resourcespec.ResourceType>;
 
