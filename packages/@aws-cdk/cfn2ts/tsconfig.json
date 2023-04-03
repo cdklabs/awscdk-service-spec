@@ -35,6 +35,9 @@
   "references": [
     {
       "path": "../cfn-resources"
+    },
+    {
+      "path": "../service-spec"
     }
   ]
 }

@@ -151,7 +151,7 @@ const cfn2ts = new TypeScriptWorkspace({
   name: '@aws-cdk/cfn2ts',
   description: 'Drop-in replacement for cfn2ts',
   private: true,
-  deps: [cfnResources, 'yargs', 'fs-extra'],
+  deps: [cfnResources, serviceSpec, 'yargs', 'fs-extra'],
 });
 cfn2ts.synth();
 
