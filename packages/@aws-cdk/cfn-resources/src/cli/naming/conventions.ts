@@ -1,4 +1,4 @@
-import { Metric, Resource, Service, TypeDefinition } from '@aws-cdk/service-spec';
+import { Metric, Resource, TypeDefinition } from '@aws-cdk/service-spec';
 import { ClassType, TypeDeclaration } from '@cdklabs/typewriter';
 import camelcase from 'camelcase';
 
@@ -67,11 +67,8 @@ export function cfnPropsValidatorNameFromType(struct: TypeDeclaration) {
   return `${qualifiedName(struct)}Validator`;
 }
 
-export function metricsClassNameFromService(service: Service) {
-  return camelcase(`${service.capitalized}Metrics`, {
-    pascalCase: true,
-    preserveConsecutiveUppercase: true,
-  });
+export function metricsClassNameFromService(namespace: string) {
+  return `${namespace.replace(/^AWS\//, '').replace('/', '')}Metrics`;
 }
 
 export function metricFunctionName(metric: Metric) {
