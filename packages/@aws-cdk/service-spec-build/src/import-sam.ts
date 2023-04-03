@@ -60,6 +60,7 @@ export class SamResources {
       name: 'aws-sam',
       shortName: 'sam',
       capitalized: 'SAM',
+      cloudFormationNamespace: 'AWS::Serverless',
     });
 
     for (const region of this.regions) {
