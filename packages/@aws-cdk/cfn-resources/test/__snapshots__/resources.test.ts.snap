@@ -4,6 +4,16 @@ exports[`AWS::ApiGateway::RestApi 1`] = `
 {
   "augmentations": undefined,
   "metrics": "/* eslint-disable prettier/prettier,max-len */
+export interface MetricWithDims<D> {
+  readonly namespace: string;
+
+  readonly metricName: string;
+
+  readonly statistic: string;
+
+  readonly dimensionsMap: D;
+}
+
 export class ApiGatewayMetrics {
   public static _4XxErrorSum(dimensions: { ApiName: string; Stage: string; }): MetricWithDims<{ ApiName: string; Stage: string; }>;
 
@@ -109,16 +119,6 @@ export class ApiGatewayMetrics {
       "statistic": "Average"
     };
   }
-}
-
-export interface MetricWithDims<D> {
-  readonly namespace: string;
-
-  readonly metricName: string;
-
-  readonly statistic: string;
-
-  readonly dimensionsMap: D;
 }",
   "module": "/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
@@ -1254,6 +1254,16 @@ FunctionBase.prototype.metricDuration = function(props?: cw.MetricOptions) {
   });
 };",
   "metrics": "/* eslint-disable prettier/prettier,max-len */
+export interface MetricWithDims<D> {
+  readonly namespace: string;
+
+  readonly metricName: string;
+
+  readonly statistic: string;
+
+  readonly dimensionsMap: D;
+}
+
 export class LambdaMetrics {
   public static concurrentExecutionsMaximum(dimensions: { FunctionName: string; }): MetricWithDims<{ FunctionName: string; }>;
 
@@ -1492,16 +1502,6 @@ export class LambdaMetrics {
       "statistic": "Maximum"
     };
   }
-}
-
-export interface MetricWithDims<D> {
-  readonly namespace: string;
-
-  readonly metricName: string;
-
-  readonly statistic: string;
-
-  readonly dimensionsMap: D;
 }",
   "module": "/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
@@ -2703,6 +2703,16 @@ exports[`AWS::S3::Bucket 1`] = `
 {
   "augmentations": undefined,
   "metrics": "/* eslint-disable prettier/prettier,max-len */
+export interface MetricWithDims<D> {
+  readonly namespace: string;
+
+  readonly metricName: string;
+
+  readonly statistic: string;
+
+  readonly dimensionsMap: D;
+}
+
 export class S3Metrics {
   public static bucketSizeBytesAverage(dimensions: { BucketName: string; StorageType: string; }): MetricWithDims<{ BucketName: string; StorageType: string; }> {
     return {
@@ -2721,16 +2731,6 @@ export class S3Metrics {
       "statistic": "Average"
     };
   }
-}
-
-export interface MetricWithDims<D> {
-  readonly namespace: string;
-
-  readonly metricName: string;
-
-  readonly statistic: string;
-
-  readonly dimensionsMap: D;
 }",
   "module": "/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
@@ -8052,6 +8052,16 @@ QueueBase.prototype.metricSentMessageSize = function(props?: cw.MetricOptions) {
   });
 };",
   "metrics": "/* eslint-disable prettier/prettier,max-len */
+export interface MetricWithDims<D> {
+  readonly namespace: string;
+
+  readonly metricName: string;
+
+  readonly statistic: string;
+
+  readonly dimensionsMap: D;
+}
+
 export class SQSMetrics {
   public static numberOfMessagesSentAverage(dimensions: { QueueName: string; }): MetricWithDims<{ QueueName: string; }> {
     return {
@@ -8133,16 +8143,6 @@ export class SQSMetrics {
       "statistic": "Average"
     };
   }
-}
-
-export interface MetricWithDims<D> {
-  readonly namespace: string;
-
-  readonly metricName: string;
-
-  readonly statistic: string;
-
-  readonly dimensionsMap: D;
 }",
   "module": "/* eslint-disable prettier/prettier,max-len */
 import * as cdk from "aws-cdk-lib";
