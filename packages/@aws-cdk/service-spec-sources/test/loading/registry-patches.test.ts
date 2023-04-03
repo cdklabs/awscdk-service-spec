@@ -7,6 +7,7 @@ import {
   makeKeywordDropper,
   minMaxItemsOnObject,
   noIncorrectDefaultType,
+  patchCloudFormationRegistry,
   patchMinLengthOnInteger,
   removeBooleanPatterns,
   removeSuspiciousPatterns,
@@ -293,6 +294,42 @@ describe('patches', () => {
       });
     });
   });
+});
+
+test('simplify unnecessary oneOf away', () => {
+  const resource = {
+    properties: {
+      SourceConfiguration: {
+        type: 'object',
+        properties: {
+          AppIntegrations: { type: 'string' },
+        },
+        oneOf: [
+          {
+            required: ['AppIntegrations'],
+          },
+        ],
+        additionalProperties: false,
+      },
+    },
+  };
+
+  const patchedObj = patchObject(resource, patchCloudFormationRegistry);
+
+  expect(patchedObj).toEqual(
+    expect.objectContaining({
+      properties: {
+        SourceConfiguration: {
+          type: 'object',
+          properties: {
+            AppIntegrations: { type: 'string' },
+          },
+          required: ['AppIntegrations'],
+          additionalProperties: false,
+        },
+      },
+    }),
+  );
 });
 
 function patchObject(obj: any, fn: Patcher<JsonObjectLens>): any {

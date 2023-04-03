@@ -29,7 +29,15 @@ export namespace jsonschema {
     return x === true;
   }
 
-  export type CombiningSchema<X> = OneOf<X> | AnyOf<X> | AllOf<X>;
+  export type CombiningSchema<X> = UnionSchema<X> | AllOf<X>;
+
+  export type UnionSchema<X> = AnyOf<X> | OneOf<X>;
+
+  export function isUnionSchema(x: jsonschema.Schema): x is UnionSchema<jsonschema.Schema>;
+  export function isUnionSchema(x: jsonschema.ConcreteSchema): x is UnionSchema<jsonschema.ConcreteSchema>;
+  export function isUnionSchema(x: jsonschema.Schema): x is UnionSchema<jsonschema.Schema> {
+    return jsonschema.isAnyOf(x) || jsonschema.isOneOf(x);
+  }
 
   export function isCombining(x: ConcreteSchema): x is CombiningSchema<ConcreteSchema> {
     return isOneOf(x) || isAnyOf(x) || isAllOf(x);

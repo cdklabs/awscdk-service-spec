@@ -68,6 +68,8 @@ export class TypeConverter {
           case 'tag':
             return CDK_CORE.CfnTag;
         }
+      case 'union':
+        return Type.unionOf(...type.types.map((t) => this.typeFromSpecType(t)));
       case 'json':
       default:
         return Type.ANY;

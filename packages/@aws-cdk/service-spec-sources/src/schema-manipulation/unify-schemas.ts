@@ -130,9 +130,11 @@ function simplifyPair(
 /**
  * Simplify a union type as much as possible
  */
-function simplifyUnion(x: SchemaUnion): jsonschema.Schema {
+function simplifyUnion(x: jsonschema.UnionSchema<jsonschema.Schema>): jsonschema.Schema {
   // Expand inner unions
-  const schemas = jsonschema.innerSchemas(x).flatMap((y) => (isSchemaUnion(y) ? jsonschema.innerSchemas(y) : [y]));
+  const schemas = jsonschema
+    .innerSchemas(x)
+    .flatMap((y) => (jsonschema.isUnionSchema(y) ? jsonschema.innerSchemas(y) : [y]));
   for (let i = 0; i < schemas.length; ) {
     const lhs = schemas[i];
     if (isSingleton(lhs)) {
@@ -251,12 +253,6 @@ function union<A>(xs: Iterable<A>, ys: Iterable<A>): A[] {
 function intersect<A>(xs: A[], ys: A[]): A[] {
   const xss = new Set(xs);
   return ys.filter((y) => xss.has(y));
-}
-
-type SchemaUnion = jsonschema.AnyOf<jsonschema.Schema> | jsonschema.OneOf<jsonschema.Schema>;
-
-function isSchemaUnion(x: jsonschema.Schema): x is SchemaUnion {
-  return jsonschema.isAnyOf(x) || jsonschema.isOneOf(x);
 }
 
 function isSingleton(x: jsonschema.Schema): x is jsonschema.SingletonSchema {

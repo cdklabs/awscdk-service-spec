@@ -11,6 +11,7 @@ import {
   IsNotNullish,
   IsObject,
   JsLiteralExpression,
+  ListLiteral,
   NewExpression,
   NotExpression,
   Null,
@@ -497,6 +498,11 @@ export class TypeScriptRenderer extends Renderer {
     const success = dispatchType(expr, [
       typeCase(DirectCode, (x) => this.emit(x._code_)),
       typeCase(ObjectLiteral, (x) => this.renderObjectLiteral(x)),
+      typeCase(ListLiteral, (x) => {
+        this.emit('[');
+        this.emitList(x._elements_, ', ', (e) => this.renderExpression(e));
+        this.emit(']');
+      }),
       typeCase(ObjectPropertyAccess, (x) => this.renderObjectAccess(x)),
       typeCase(ObjectMethodInvoke, (x) => this.renderObjectMethodInvoke(x)),
       typeCase(InvokeCallable, (x) => this.renderInvokeCallable(x)),

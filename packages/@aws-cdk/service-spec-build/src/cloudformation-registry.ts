@@ -106,6 +106,9 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     }
   }
 
+  /**
+   * Convert a JSON schema type to a type in the database model
+   */
   function schemaTypeToModelType(
     propertyName: string,
     resolved: jsonschema.ResolvedSchema,
@@ -123,7 +126,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         fails.push(...types.filter(isFailure));
         return { type: 'union', types: types.filter(isSuccess) };
       } else if (jsonschema.isAllOf(resolved.schema)) {
-        // FIME: Do a proper thing here
+        // FIXME: Do a proper thing here
         const firstResolved = fakeResolved(resolved.schema.allOf[0], resolved.referenceName);
         return schemaTypeToModelType(propertyName, firstResolved, fail);
       } else {

@@ -42,7 +42,7 @@ export class PropMapping {
       throw new Error(`No type for ${cfnName}`);
     }
 
-    return this.typeProducer(type).produce.call(value);
+    return this.typeHandlers(type).produce.call(value);
   }
 
   public parseProperty(cfnName: string, propsObj: Expression): Expression {
@@ -52,7 +52,7 @@ export class PropMapping {
       throw new Error(`No type for ${cfnName}`);
     }
 
-    return expr.cond(new IsNotNullish(value)).then(this.typeProducer(type).parse.call(value)).else(expr.UNDEFINED);
+    return expr.cond(new IsNotNullish(value)).then(this.typeHandlers(type).parse.call(value)).else(expr.UNDEFINED);
   }
 
   public validateProperty(cfnName: string, propsObj: Expression, errorsObj: Expression): Expression[] {
@@ -75,7 +75,7 @@ export class PropMapping {
       errorsObj.callMethod(
         'collect',
         CDK_CORE.propertyValidator
-          .call(expr.lit(prop.name), this.typeValidator(prop.type))
+          .call(expr.lit(prop.name), this.typeHandlers(prop.type).validate)
           .call(propsObj.prop(prop.name)),
       ),
     );
@@ -83,11 +83,12 @@ export class PropMapping {
     return validations;
   }
 
-  private typeProducer(type: Type): Mapper {
+  private typeHandlers(type: Type): TypeHandlers {
     if (type.equals(CDK_CORE.CfnTag)) {
       return {
         produce: CDK_CORE.cfnTagToCloudFormation,
         parse: CDK_CORE.helpers.FromCloudFormation.getCfnTag,
+        validate: CDK_CORE.validateCfnTag,
       };
     }
 
@@ -96,45 +97,55 @@ export class PropMapping {
         return {
           produce: CDK_CORE.stringToCloudFormation,
           parse: CDK_CORE.helpers.FromCloudFormation.getString,
+          validate: CDK_CORE.validateString,
         };
       case PrimitiveType.Date:
         return {
           produce: CDK_CORE.dateToCloudFormation,
           parse: CDK_CORE.helpers.FromCloudFormation.getDate,
+          validate: CDK_CORE.validateDate,
         };
       case PrimitiveType.Number:
         return {
           produce: CDK_CORE.numberToCloudFormation,
           parse: CDK_CORE.helpers.FromCloudFormation.getNumber,
+          validate: CDK_CORE.validateNumber,
         };
       case PrimitiveType.Json:
         return {
           produce: CDK_CORE.objectToCloudFormation,
           parse: CDK_CORE.helpers.FromCloudFormation.getAny,
+          validate: CDK_CORE.validateObject,
         };
       case PrimitiveType.Any:
         return {
           produce: CDK_CORE.objectToCloudFormation,
           parse: CDK_CORE.helpers.FromCloudFormation.getAny,
+          validate: CDK_CORE.validateObject,
         };
       case PrimitiveType.Boolean:
         return {
           produce: CDK_CORE.booleanToCloudFormation,
           parse: CDK_CORE.helpers.FromCloudFormation.getBoolean,
+          validate: CDK_CORE.validateBoolean,
         };
     }
 
     if (type.arrayOfType) {
+      const innerHandler = this.typeHandlers(type.arrayOfType);
       return {
-        produce: CDK_CORE.listMapper(this.typeProducer(type.arrayOfType).produce),
-        parse: CDK_CORE.helpers.FromCloudFormation.getArray(this.typeProducer(type.arrayOfType).parse),
+        produce: CDK_CORE.listMapper(innerHandler.produce),
+        parse: CDK_CORE.helpers.FromCloudFormation.getArray(innerHandler.parse),
+        validate: CDK_CORE.listValidator.call(innerHandler.validate),
       };
     }
 
     if (type.mapOfType) {
+      const innerHandler = this.typeHandlers(type.mapOfType);
       return {
-        produce: CDK_CORE.hashMapper(this.typeProducer(type.mapOfType).produce),
-        parse: CDK_CORE.helpers.FromCloudFormation.getMap(this.typeProducer(type.mapOfType).parse),
+        produce: CDK_CORE.hashMapper(innerHandler.produce),
+        parse: CDK_CORE.helpers.FromCloudFormation.getMap(innerHandler.parse),
+        validate: CDK_CORE.hashValidator.call(innerHandler.validate),
       };
     }
 
@@ -143,57 +154,35 @@ export class PropMapping {
       return {
         produce: expr.sym(new ThingSymbol(cfnProducerNameFromType(struct), this.mapperFunctionsScope)),
         parse: expr.sym(new ThingSymbol(cfnParserNameFromType(struct), this.mapperFunctionsScope)),
+        validate: expr.sym(new ThingSymbol(cfnPropsValidatorNameFromType(struct), this.mapperFunctionsScope)),
       };
     }
 
-    return {
-      produce: expr.ident(`/* @todo typeMapper(${type}) */`),
-      parse: expr.ident(`/* @todo typeMapper(${type}) */`),
-    };
-  }
-
-  private typeValidator(type: Type): Expression {
-    if (type.equals(CDK_CORE.CfnTag)) {
-      return CDK_CORE.validateCfnTag;
-    }
-
-    switch (type.primitive) {
-      case PrimitiveType.String:
-        return CDK_CORE.validateString;
-      case PrimitiveType.Date:
-        return CDK_CORE.validateDate;
-      case PrimitiveType.Number:
-        return CDK_CORE.validateNumber;
-      case PrimitiveType.Json:
-        return CDK_CORE.validateObject;
-      case PrimitiveType.Any:
-        return CDK_CORE.validateObject;
-      case PrimitiveType.Boolean:
-        return CDK_CORE.validateBoolean;
-    }
-
-    if (type.arrayOfType) {
-      return CDK_CORE.listValidator.call(this.typeValidator(type.arrayOfType));
-    }
-
-    if (type.mapOfType) {
-      return CDK_CORE.hashValidator.call(this.typeValidator(type.mapOfType));
-    }
-
     if (type.unionOfTypes) {
-      return CDK_CORE.unionValidator.call(...type.unionOfTypes.map((t) => this.typeValidator(t)));
+      const innerProducers = type.unionOfTypes.map((t) => this.typeHandlers(t));
+      const validators = innerProducers.map((p) => p.validate);
+
+      return {
+        produce: CDK_CORE.unionMapper(expr.list(validators), expr.list(innerProducers.map((p) => p.produce))),
+        parse: CDK_CORE.helpers.FromCloudFormation.getTypeUnion(
+          expr.list(validators),
+          expr.list(innerProducers.map((p) => p.parse)),
+        ),
+        validate: CDK_CORE.unionValidator.call(...validators),
+      };
     }
 
-    if (type.symbol) {
-      const struct = StructType.assertStruct(type.symbol.findDeclaration());
-      return expr.sym(new ThingSymbol(cfnPropsValidatorNameFromType(struct), this.mapperFunctionsScope));
-    }
-
-    throw `Error: unresolved typeValidator(${type})`;
+    const oops = expr.ident(`/* @todo typeHandlers(${type}) */`);
+    return {
+      produce: oops,
+      parse: oops,
+      validate: oops,
+    };
   }
 }
 
-interface Mapper {
+interface TypeHandlers {
   readonly produce: Expression;
   readonly parse: Expression;
+  readonly validate: Expression;
 }

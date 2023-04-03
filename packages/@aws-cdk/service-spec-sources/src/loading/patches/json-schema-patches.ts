@@ -93,6 +93,10 @@ export function canonicalizeTypeOperators(op: 'oneOf' | 'anyOf' | 'allOf') {
     if (!Array.isArray(branches)) {
       return;
     }
+    if (branches.length === 1) {
+      const merged = deepMerge(branches[0], restOfObjectWithout(lens.value, [op]));
+      return lens.replaceValue(NO_MISTAKE, merged);
+    }
 
     const newBranches = deepDedupe(
       branches.map((branch) => {
