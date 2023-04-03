@@ -1,7 +1,7 @@
 import { emptyDatabase } from '@aws-cdk/service-spec';
+import { SamTemplateSchema } from '@aws-cdk/service-spec-sources';
 import { Failures } from '@cdklabs/tskb';
 import { SamResources } from '../src/import-sam';
-import { SamTemplateSchema } from '@aws-cdk/service-spec-sources';
 
 const standardCfnProperties = {
   Condition: {
