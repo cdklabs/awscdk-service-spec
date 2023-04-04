@@ -3,7 +3,7 @@
  *
  * @see https://nodejs.org/api/documentation.html#documentation_stability_index.
  */
-export declare enum Stability {
+export enum Stability {
   /**
    * The API may emit warnings. Backward compatibility is not guaranteed.
    *
