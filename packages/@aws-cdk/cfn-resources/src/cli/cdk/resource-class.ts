@@ -17,8 +17,8 @@ import {
   IsNotNullish,
   AnonymousInterfaceImplementation,
   Lambda,
+  Stability,
 } from '@cdklabs/typewriter';
-import { Stability } from '@jsii/spec';
 import { CDK_CORE, CONSTRUCTS } from './cdk';
 import {
   attributePropertyName,

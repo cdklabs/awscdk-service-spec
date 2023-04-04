@@ -36,7 +36,6 @@ const typewriter = new TypeScriptWorkspace({
   name: '@cdklabs/typewriter',
   description: 'Write typed code for jsii',
   deps: [
-    '@jsii/spec',
     'camelcase@^6', // camelcase 7 uses ESM
   ],
 });
@@ -121,7 +120,6 @@ const cfnResources = new TypeScriptWorkspace({
     serviceSpecBuild,
     tsKb,
     typewriter,
-    '@jsii/spec',
     '@swc/core',
     '@types/fs-extra@^9',
     'aws-cdk-lib',

@@ -75,10 +75,6 @@
       "type": "build"
     },
     {
-      "name": "@jsii/spec",
-      "type": "runtime"
-    },
-    {
       "name": "camelcase",
       "version": "^6",
       "type": "runtime"
