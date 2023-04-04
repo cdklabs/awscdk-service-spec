@@ -121,6 +121,72 @@
         }
       ]
     },
+    "update-source:cfn-schema": {
+      "name": "update-source:cfn-schema",
+      "steps": [
+        {
+          "exec": "node ./scripts/download.task.js https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip sources/CloudFormationSchema/us-east-1 --extract"
+        },
+        {
+          "exec": "node ./scripts/download.task.js https://schema.cloudformation.us-east-2.amazonaws.com/CloudformationSchema.zip sources/CloudFormationSchema/us-east-2 --extract"
+        },
+        {
+          "exec": "node ./scripts/download.task.js https://schema.cloudformation.us-west-2.amazonaws.com/CloudformationSchema.zip sources/CloudFormationSchema/us-west-2 --extract"
+        }
+      ]
+    },
+    "update-source:documentation": {
+      "name": "update-source:documentation",
+      "steps": [
+        {
+          "exec": "aws s3 cp s3://230541556993-cfn-docs/cfn-docs.json sources/CloudFormationDocumentation/CloudFormationDocumentation.json"
+        }
+      ]
+    },
+    "update-source:resource-spec": {
+      "name": "update-source:resource-spec",
+      "steps": [
+        {
+          "exec": "node ./scripts/download.task.js https://d1uauaxba7bl26.cloudfront.net/latest/gzip/CloudFormationResourceSpecification.json sources/CloudFormationResourceSpecification/us-east-1/CloudFormationResourceSpecification.json"
+        }
+      ]
+    },
+    "update-source:sam": {
+      "name": "update-source:sam",
+      "steps": [
+        {
+          "exec": "node ./scripts/download.task.js https://raw.githubusercontent.com/awslabs/goformation/master/schema/sam.schema.json sources/SAMSpec/sam.schema.json"
+        }
+      ]
+    },
+    "update-source:stateful-resources": {
+      "name": "update-source:stateful-resources",
+      "steps": [
+        {
+          "exec": "node ./scripts/download.task.js https://raw.githubusercontent.com/aws-cloudformation/cfn-lint/main/src/cfnlint/data/AdditionalSpecs/StatefulResources.json sources/StatefulResources/StatefulResources.json"
+        }
+      ]
+    },
+    "update-sources:all": {
+      "name": "update-sources:all",
+      "steps": [
+        {
+          "spawn": "update-source:documentation"
+        },
+        {
+          "spawn": "update-source:resource-spec"
+        },
+        {
+          "spawn": "update-source:cfn-schema"
+        },
+        {
+          "spawn": "update-source:sam"
+        },
+        {
+          "spawn": "update-source:stateful-resources"
+        }
+      ]
+    },
     "upgrade": {
       "name": "upgrade",
       "description": "Upgrade dependencies in all workspaces",

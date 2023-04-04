@@ -1,12 +1,13 @@
 import * as pj from 'projen';
-import { AwsCdkIntgrationTest, TypeScriptWorkspace, YarnMonorepo } from './projenrc';
+import { AwsCdkIntegrationTest, TypeScriptWorkspace, YarnMonorepo } from './projenrc';
+import { RegionalSource, SingleSource, SourceProcessing } from './projenrc/update-sources';
 
 const repo = new YarnMonorepo({
   name: 'awscdk-service-spec',
   description: "Monorepo for the AWS CDK's service spec",
 
   defaultReleaseBranch: 'main',
-  devDeps: ['cdklabs-projen-project-types'],
+  devDeps: ['cdklabs-projen-project-types', 'node-fetch@^2'],
   vscodeWorkspace: true,
 
   prettier: true,
@@ -155,6 +156,42 @@ const cfn2ts = new TypeScriptWorkspace({
 cfn2ts.synth();
 
 // Add integration test with aws-cdk
-new AwsCdkIntgrationTest(cfn2ts);
+new AwsCdkIntegrationTest(cfn2ts);
+
+// Update sources
+new SingleSource(repo, {
+  name: 'documentation',
+  dir: 'sources/CloudFormationDocumentation',
+  fileName: 'CloudFormationDocumentation.json',
+  source: 's3://230541556993-cfn-docs/cfn-docs.json',
+});
+new RegionalSource(repo, {
+  name: 'resource-spec',
+  dir: 'sources/CloudFormationResourceSpecification',
+  sources: {
+    'us-east-1': 'https://d1uauaxba7bl26.cloudfront.net/latest/gzip/CloudFormationResourceSpecification.json',
+  },
+});
+new RegionalSource(repo, {
+  name: 'cfn-schema',
+  dir: 'sources/CloudFormationSchema',
+  postProcessing: SourceProcessing.EXTRACT,
+  sources: {
+    'us-east-1': 'https://schema.cloudformation.us-east-1.amazonaws.com/CloudformationSchema.zip',
+    'us-east-2': 'https://schema.cloudformation.us-east-2.amazonaws.com/CloudformationSchema.zip',
+    'us-west-2': 'https://schema.cloudformation.us-west-2.amazonaws.com/CloudformationSchema.zip',
+  },
+});
+new SingleSource(repo, {
+  name: 'sam',
+  dir: 'sources/SAMSpec',
+  source: 'https://raw.githubusercontent.com/awslabs/goformation/master/schema/sam.schema.json',
+});
+new SingleSource(repo, {
+  name: 'stateful-resources',
+  dir: 'sources/StatefulResources',
+  source:
+    'https://raw.githubusercontent.com/aws-cloudformation/cfn-lint/main/src/cfnlint/data/AdditionalSpecs/StatefulResources.json',
+});
 
 repo.synth();
