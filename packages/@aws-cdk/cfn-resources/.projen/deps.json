@@ -17,10 +17,6 @@
       "type": "build"
     },
     {
-      "name": "@jsii/spec",
-      "type": "build"
-    },
-    {
       "name": "@swc/core",
       "type": "build"
     },

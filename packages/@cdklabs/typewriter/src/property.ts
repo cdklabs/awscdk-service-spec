@@ -1,4 +1,3 @@
-import * as jsii from '@jsii/spec';
 import { DocsSpec, Documented } from './documented';
 import { Expression } from './expression';
 import { ObjectPropertyAccess } from './expressions';
@@ -7,11 +6,72 @@ import { Block } from './statements/block';
 import { Type } from './type';
 import { MemberKind, MemberVisibility, TypeMember } from './type-member';
 
-export interface PropertySpec extends Omit<jsii.Property, 'assembly' | 'fqn' | 'docs' | 'type' | 'kind'> {
+export interface PropertySpec {
+  /**
+   * The name of the property.
+   *
+   * @minLength 1
+   */
+  name: string;
+  /**
+   * Indicates if this property only has a getter (immutable).
+   *
+   * @default false
+   */
+  immutable?: boolean;
+  /**
+   * Indicates if this property is protected (otherwise it is public)
+   *
+   * @default false
+   */
+  protected?: boolean;
+  /**
+   * Indicates if this property is abstract
+   *
+   * @default false
+   */
+  abstract?: boolean;
+  /**
+   * Indicates if this is a static property.
+   *
+   * @default false
+   */
+  static?: boolean;
+  /**
+   * A hint that indicates that this static, immutable property is initialized
+   * during startup. This allows emitting "const" idioms in different target
+   * languages. Implies `static` and `immutable`.
+   *
+   * @default false
+   */
+  const?: boolean;
+  /**
+   * Documentation for this entity.
+   *
+   * @default none
+   */
   docs?: DocsSpec;
+  /**
+   * Determines whether the value is, indeed, optional.
+   *
+   * @default false
+   */
+  optional?: boolean;
+  /**
+   * The declared type of the value, when it's present.
+   */
   type: Type;
+  /**
+   * The initial assignment of the property.
+   */
   initializer?: Expression;
+  /**
+   * Body of the getter implementation
+   */
   getterBody?: Block;
+  /**
+   * Signature and body of the setter implementation
+   */
   setterBody?: (value: Expression) => Block;
 }
 

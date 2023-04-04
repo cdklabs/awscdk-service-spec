@@ -1,4 +1,3 @@
-import * as jsii from '@jsii/spec';
 import { Documented } from './documented';
 import { IScope } from './scope';
 import { ThingSymbol } from './symbol';
@@ -37,7 +36,16 @@ export class TypeParameter implements TypeParameterSpec {
   }
 }
 
-export interface TypeSpec extends Omit<jsii.TypeBase, 'assembly' | 'fqn' | 'kind'>, Exportable {
+export interface TypeSpec extends Documented, Exportable {
+  /**
+   * The simple name of the type (MyClass).
+   *
+   * @minLength 1
+   */
+  name: string;
+  /**
+   * The generic type parameters of the type.
+   */
   typeParameters?: TypeParameterSpec[];
 }
 

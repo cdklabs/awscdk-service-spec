@@ -8,8 +8,8 @@ import {
   ThingSymbol,
   IScope,
   StructType,
+  PrimitiveType,
 } from '@cdklabs/typewriter';
-import { PrimitiveType } from '@jsii/spec';
 import { CDK_CORE } from './cdk/cdk';
 import { cfnParserNameFromType, cfnProducerNameFromType, cfnPropsValidatorNameFromType } from './naming/conventions';
 

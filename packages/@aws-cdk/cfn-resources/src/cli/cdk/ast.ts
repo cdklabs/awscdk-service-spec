@@ -1,6 +1,5 @@
 import { SpecDatabase, Resource, Service } from '@aws-cdk/service-spec';
-import { StructType, Module } from '@cdklabs/typewriter';
-import { Stability } from '@jsii/spec';
+import { StructType, Module, Stability } from '@cdklabs/typewriter';
 import { AugmentationsModule } from './augmentation-generator';
 import { CannedMetricsModule } from './canned-metrics';
 import { CDK_CORE, CONSTRUCTS, ModuleImportLocations } from './cdk';
