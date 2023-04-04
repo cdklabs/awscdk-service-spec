@@ -4,6 +4,7 @@
  * These find and remove handwritten JSON Schema schemas that don't make any sense.
  */
 import canonicalize from 'canonicalize';
+import { normalizeJsonSchema } from './json-schema-patches';
 import {
   TypeKeyWitness,
   STRING_KEY_WITNESS,
@@ -12,10 +13,11 @@ import {
   BOOLEAN_KEY_WITNESS,
   NUMBER_KEY_WITNESS,
   NULL_KEY_WITNESS,
-} from './field-witnesses';
-import { JsonObjectLens, isRoot } from './json-lens';
-import { normalizeJsonSchema } from './json-schema-patches';
-import { makeCompositePatcher, onlyObjects } from './patching';
+  isRoot,
+  JsonObjectLens,
+  makeCompositePatcher,
+  onlyObjects,
+} from '../loading/patching';
 
 /**
  * Patchers that apply to the CloudFormation Registry source files

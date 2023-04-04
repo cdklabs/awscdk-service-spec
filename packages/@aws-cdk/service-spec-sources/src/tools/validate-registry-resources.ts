@@ -4,8 +4,8 @@
 import * as path from 'path';
 import { errorMessage } from '@cdklabs/tskb';
 import { loadDefaultCloudFormationRegistryResources } from '../loading/load-cloudformation-registry';
-import { formatPatchReport } from '../loading/patches/format-patch-report';
-import { PatchReport } from '../loading/patches/patching';
+import { formatPatchReport } from '../loading/patching/format-patch-report';
+import { PatchReport } from '../loading/patching/patching';
 
 async function main() {
   const allResources = await loadDefaultCloudFormationRegistryResources(false);

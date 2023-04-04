@@ -4,9 +4,9 @@
  * We simplify some JSON schema representations to make them easier to work with.
  */
 import canonicalize from 'canonicalize';
-import { retainRelevantKeywords, witnessForType } from './field-witnesses';
-import { JsonLens, JsonObjectLens, NO_MISTAKE, isRoot } from './json-lens';
-import { makeCompositePatcher, onlyObjects } from './patching';
+import { retainRelevantKeywords, witnessForType } from '../loading/patching/field-witnesses';
+import { JsonLens, JsonObjectLens, NO_MISTAKE, isRoot } from '../loading/patching/json-lens';
+import { makeCompositePatcher, onlyObjects } from '../loading/patching/patching';
 
 /**
  * Normalize JSON schema data

@@ -1,11 +1,10 @@
-import { JsonLens, JsonObjectLens } from '../../src/loading/patches/json-lens';
+import { Patcher, applyPatcher, JsonLens, JsonObjectLens } from '../../src/loading/patching';
 import {
   canonicalizeTypeOperators,
   explodeTypeArray,
   missingTypeObject,
   removeEmptyRequiredArray,
-} from '../../src/loading/patches/json-schema-patches';
-import { Patcher, applyPatcher } from '../../src/loading/patches/patching';
+} from '../../src/patches/json-schema-patches';
 
 describe(explodeTypeArray, () => {
   test('works in the base case', () => {
