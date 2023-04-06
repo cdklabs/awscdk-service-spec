@@ -5997,7 +5997,13 @@ import * as constructs from "constructs";
 import * as cfn_parse from "aws-cdk-lib/core/lib/helpers-internal";
 
 /**
- * Creates the specified schedule.
+ * A *schedule* is the main resource you create, configure, and manage using Amazon EventBridge Scheduler.
+ *
+ * Every schedule has a *schedule expression* that determines when, and with what frequency, the schedule runs. EventBridge Scheduler supports three types of schedules: rate, cron, and one-time schedules. For more information about different schedule types, see [Schedule types](https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html) in the *EventBridge Scheduler User Guide* .
+ *
+ * When you create a schedule, you configure a target for the schedule to invoke. A target is an API operation that EventBridge Scheduler calls on your behalf every time your schedule runs. EventBridge Scheduler supports two types of targets: *templated* targets invoke common API operations across a core groups of services, and customizeable *universal* targets that you can use to call more than 6,000 operations across over 270 services. For more information about configuring targets, see [Managing targets](https://docs.aws.amazon.com/scheduler/latest/UserGuide/managing-targets.html) in the *EventBridge Scheduler User Guide* .
+ *
+ * For more information about managing schedules, changing the schedule state, setting up flexible time windows, and configuring a dead-letter queue for a schedule, see [Managing a schedule](https://docs.aws.amazon.com/scheduler/latest/UserGuide/managing-schedule.html) in the *EventBridge Scheduler User Guide* .
  *
  * @stability external
  * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-scheduler-schedule.html
@@ -6165,12 +6171,18 @@ export namespace CfnSchedule {
     /**
      * Determines whether the schedule is invoked within a flexible time window.
      *
+     * *Allowed Values* : \`OFF\` | \`FLEXIBLE\`
+     *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-flexibletimewindow.html#cfn-scheduler-schedule-flexibletimewindow-mode
      */
     readonly mode: string;
 
     /**
      * The maximum time window during which a schedule can be invoked.
+     *
+     * *Minimum* : \`1\`
+     *
+     * *Maximum* : \`1440\`
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-flexibletimewindow.html#cfn-scheduler-schedule-flexibletimewindow-maximumwindowinminutes
      */
@@ -6750,6 +6762,8 @@ export interface CfnScheduleProps {
 
   /**
    * Specifies whether the schedule is enabled or disabled.
+   *
+   * *Allowed Values* : \`ENABLED\` | \`DISABLED\`
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-scheduler-schedule.html#cfn-scheduler-schedule-state
    */
@@ -7576,7 +7590,11 @@ function CfnSchedulePropsFromCloudFormation(properties: any): cfn_parse.FromClou
 }
 
 /**
- * Creates the specified schedule group.
+ * A *schedule group* is an Amazon EventBridge Scheduler resource you use to organize your schedules.
+ *
+ * Your AWS account comes with a \`default\` scheduler group. You associate a new schedule with the \`default\` group or with schedule groups that you create and manage. You can create up to [500 schedule groups](https://docs.aws.amazon.com/scheduler/latest/UserGuide/scheduler-quotas.html) in your AWS account. With EventBridge Scheduler, you apply [tags](https://docs.aws.amazon.com/general/latest/gr/aws_tagging.html) to schedule groups, not to individual schedules to organize your resources.
+ *
+ * For more information about managing schedule groups, see [Managing a schedule group](https://docs.aws.amazon.com/scheduler/latest/UserGuide/managing-schedule-group.html) in the *EventBridge Scheduler User Guide* .
  *
  * @stability external
  * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-scheduler-schedulegroup.html
@@ -7635,7 +7653,7 @@ export class CfnScheduleGroup extends cdk.CfnResource implements cdk.IInspectabl
   /**
    * Specifies the state of the schedule group.
    *
-   * Valid values are \`ACTIVE\` and \`DELETING\` .
+   * *Allowed Values* : \`ACTIVE\` | \`DELETING\`
    *
    * @cloudformationAttribute State
    */
