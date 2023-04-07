@@ -10,13 +10,30 @@ interface DataSource {
   isZip?: boolean;
 }
 
+export class Role {
+  public static fromGitHubSecret(secret: string): string {
+    return `\${{ secrets.${secret} }}`;
+  }
+}
+
+export interface AwsAuthentication {
+  region: string;
+  roleToAssume: string;
+  roleSessionName: string;
+  roleDurationSeconds?: number;
+}
+
 export interface SourceUpdateOptions {
   readonly name: string;
   readonly sources: DataSource[];
   readonly schedule?: string;
+  readonly awsAuth?: AwsAuthentication;
 }
 
 abstract class SourceUpdate extends Component {
+  public readonly task: Task;
+  public readonly workflow: github.TaskWorkflow;
+
   public constructor(project: javascript.NodeProject, options: SourceUpdateOptions) {
     if (!project.github) {
       throw new Error('Can only add SourceUpdate to a root project');
@@ -32,7 +49,11 @@ abstract class SourceUpdate extends Component {
     const workflowName = `update-source-${options.name}`;
     const needsS3Access = options.sources.some((s) => s.url.startsWith('s3://'));
 
-    const updateTask = project.addTask(taskName, {
+    if (needsS3Access && !options.awsAuth) {
+      throw new Error('S3 source detected. Must provide `awsAuth` option.');
+    }
+
+    this.task = project.addTask(taskName, {
       steps: options.sources.map((s) => {
         if (s.url.startsWith('s3://')) {
           return {
@@ -42,28 +63,28 @@ abstract class SourceUpdate extends Component {
         return new DownloadScript(s.url, s.target, s.isZip);
       }),
     });
-    this.updateAllTask.spawn(updateTask);
+    this.updateAllTask.spawn(this.task);
 
-    const updateWorkflow = new github.TaskWorkflow(project.github, {
+    this.workflow = new github.TaskWorkflow(project.github, {
       jobId: UPDATE_JOB_ID,
       name: workflowName,
       permissions: {
         contents: github.workflows.JobPermission.READ,
         idToken: needsS3Access ? github.workflows.JobPermission.WRITE : github.workflows.JobPermission.NONE,
       },
-      task: updateTask,
+      task: this.task,
       preBuildSteps: [
         ...project.renderWorkflowSetup(),
-        ...(needsS3Access
+        ...(needsS3Access && options.awsAuth
           ? [
               {
                 name: 'Federate into AWS',
                 uses: 'aws-actions/configure-aws-credentials@v2',
                 with: {
-                  'aws-region': 'us-east-1',
-                  'role-to-assume': '${{ secrets.AWS_ROLE_TO_ASSUME }}',
-                  'role-session-name': 'awscdk-service-spec',
-                  'role-duration-seconds': 900,
+                  'aws-region': options.awsAuth.region,
+                  'role-to-assume': options.awsAuth.roleToAssume,
+                  'role-session-name': options.awsAuth.roleSessionName,
+                  'role-duration-seconds': options.awsAuth.roleDurationSeconds,
                 },
               },
             ]
@@ -81,7 +102,7 @@ abstract class SourceUpdate extends Component {
       ],
     });
 
-    updateWorkflow.on({
+    this.workflow.on({
       workflowDispatch: {},
       schedule: [{ cron: options.schedule ?? '11 3 * * 1' }],
     });
@@ -128,7 +149,12 @@ interface BaseSourceOptions {
    * Should any postprocessing be done on the source file.
    * @default SourceProcessing.NONE
    */
-  postProcessing?: SourceProcessing;
+  readonly postProcessing?: SourceProcessing;
+  /**
+   * AWS Authentication config.
+   * Required with S3 sources.
+   */
+  readonly awsAuth?: AwsAuthentication;
 }
 
 export interface RegionalSourceOptions extends BaseSourceOptions {

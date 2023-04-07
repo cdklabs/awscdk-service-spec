@@ -1,6 +1,6 @@
 import * as pj from 'projen';
 import { AwsCdkIntegrationTest, TypeScriptWorkspace, YarnMonorepo } from './projenrc';
-import { RegionalSource, SingleSource, SourceProcessing } from './projenrc/update-sources';
+import { RegionalSource, Role, SingleSource, SourceProcessing } from './projenrc/update-sources';
 
 const repo = new YarnMonorepo({
   name: 'awscdk-service-spec',
@@ -164,6 +164,12 @@ new SingleSource(repo, {
   dir: 'sources/CloudFormationDocumentation',
   fileName: 'CloudFormationDocumentation.json',
   source: 's3://230541556993-cfn-docs/cfn-docs.json',
+  awsAuth: {
+    region: 'us-east-1',
+    roleToAssume: Role.fromGitHubSecret('AWS_ROLE_TO_ASSUME'),
+    roleSessionName: 'awscdk-service-spec',
+    roleDurationSeconds: 900,
+  },
 });
 new RegionalSource(repo, {
   name: 'resource-spec',
