@@ -1,6 +1,12 @@
-This directory contains an entire JSON schema for a CloudFormation template, obtained from:
+# SAM Specification
 
-https://github.com/awslabs/goformation/blob/master/schema/sam.schema.json
+This directory contains an entire JSON schema for a CloudFormation template, including SAM Serverless resources.
+
+## Source
+
+<https://raw.githubusercontent.com/awslabs/goformation/master/schema/sam.schema.json>
+
+## Instructions
 
 We have our own source of truth for the non-SAM resources, so we ignore everything except the
 resources with the `AWS::Serverless:*` types.

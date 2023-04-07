@@ -2,7 +2,7 @@ import * as pj from 'projen';
 import { yarn } from 'cdklabs-projen-project-types';
 import path from 'path';
 
-export class AwsCdkIntgrationTest extends pj.Component {
+export class AwsCdkIntegrationTest extends pj.Component {
   public constructor(project: yarn.TypeScriptWorkspace) {
     super(project);
 
