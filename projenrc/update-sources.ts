@@ -95,6 +95,7 @@ abstract class SourceUpdate extends Component {
           pullRequestTitle: `feat(sources): update ${options.name}`,
           pullRequestDescription: `Updates the ${options.name} source from upstream`,
           workflowName,
+          credentials: project.github.projenCredentials,
           labels: ['auto-approve'],
           baseBranch: 'main',
           branchName: `update-source/${options.name}`,
