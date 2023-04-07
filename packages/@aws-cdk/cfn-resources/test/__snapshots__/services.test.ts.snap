@@ -466,7 +466,9 @@ import * as constructs from "constructs";
 import * as cfn_parse from "aws-cdk-lib/core/lib/helpers-internal";
 
 /**
- * Resource schema for AWS::Chatbot::MicrosoftTeamsChannelConfiguration.
+ * The \`AWS::Chatbot::MicrosoftTeamsChannelConfiguration\` resource configures a Microsoft Teams channel to allow users to use AWS Chatbot with AWS CloudFormation templates.
+ *
+ * This resource requires some setup to be done in the AWS Chatbot console. To provide the required Microsoft Teams team and tenant IDs, you must perform the initial authorization flow with Microsoft Teams in the AWS Chatbot console, then copy and paste the IDs from the console. For more details, see steps 1-4 in [Setting Up AWS Chatbot with Microsoft Teams](https://docs.aws.amazon.com/chatbot/latest/adminguide/teams-setup.html#teams-client-setup) in the *AWS Chatbot Administrator Guide* .
  *
  * @stability external
  * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-chatbot-microsoftteamschannelconfiguration.html
@@ -509,17 +511,17 @@ export class CfnMicrosoftTeamsChannelConfiguration extends cdk.CfnResource imple
   public readonly attrArn: string;
 
   /**
-   * The id of the Microsoft Teams team.
+   * The ID of the Microsoft Team authorized with AWS Chatbot .
    */
   public readonly teamId: string;
 
   /**
-   * The id of the Microsoft Teams channel.
+   * The ID of the Microsoft Teams channel.
    */
   public readonly teamsChannelId: string;
 
   /**
-   * The id of the Microsoft Teams tenant.
+   * The ID of the Microsoft Teams tenant.
    */
   public readonly teamsTenantId: string;
 
@@ -529,17 +531,17 @@ export class CfnMicrosoftTeamsChannelConfiguration extends cdk.CfnResource imple
   public readonly configurationName: string;
 
   /**
-   * The ARN of the IAM role that defines the permissions for AWS Chatbot.
+   * The ARN of the IAM role that defines the permissions for AWS Chatbot .
    */
   public readonly iamRoleArn: string;
 
   /**
-   * ARNs of SNS topics which delivers notifications to AWS Chatbot, for example CloudWatch alarm notifications.
+   * The ARNs of the SNS topics that deliver notifications to AWS Chatbot .
    */
   public readonly snsTopicArns?: Array<string>;
 
   /**
-   * Specifies the logging level for this configuration:ERROR,INFO or NONE.
+   * Specifies the logging level for this configuration. This property affects the log entries pushed to Amazon CloudWatch Logs.
    */
   public readonly loggingLevel?: string;
 
@@ -620,21 +622,27 @@ export class CfnMicrosoftTeamsChannelConfiguration extends cdk.CfnResource imple
  */
 export interface CfnMicrosoftTeamsChannelConfigurationProps {
   /**
-   * The id of the Microsoft Teams team.
+   * The ID of the Microsoft Team authorized with AWS Chatbot .
+   *
+   * To get the team ID, you must perform the initial authorization flow with Microsoft Teams in the AWS Chatbot console. Then you can copy and paste the team ID from the console. For more details, see steps 1-4 in [Get started with Microsoft Teams](https://docs.aws.amazon.com/chatbot/latest/adminguide/teams-setup.html#teams-client-setup) in the *AWS Chatbot Administrator Guide* .
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-chatbot-microsoftteamschannelconfiguration.html#cfn-chatbot-microsoftteamschannelconfiguration-teamid
    */
   readonly teamId: string;
 
   /**
-   * The id of the Microsoft Teams channel.
+   * The ID of the Microsoft Teams channel.
+   *
+   * To get the channel ID, open Microsoft Teams, right click on the channel name in the left pane, then choose Copy. An example of the channel ID syntax is: \`19%3ab6ef35dc342d56ba5654e6fc6d25a071%40thread.tacv2\` .
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-chatbot-microsoftteamschannelconfiguration.html#cfn-chatbot-microsoftteamschannelconfiguration-teamschannelid
    */
   readonly teamsChannelId: string;
 
   /**
-   * The id of the Microsoft Teams tenant.
+   * The ID of the Microsoft Teams tenant.
+   *
+   * To get the tenant ID, you must perform the initial authorization flow with Microsoft Teams in the AWS Chatbot console. Then you can copy and paste the tenant ID from the console. For more details, see steps 1-4 in [Get started with Microsoft Teams](https://docs.aws.amazon.com/chatbot/latest/adminguide/teams-setup.html#teams-client-setup) in the *AWS Chatbot Administrator Guide* .
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-chatbot-microsoftteamschannelconfiguration.html#cfn-chatbot-microsoftteamschannelconfiguration-teamstenantid
    */
@@ -648,23 +656,25 @@ export interface CfnMicrosoftTeamsChannelConfigurationProps {
   readonly configurationName: string;
 
   /**
-   * The ARN of the IAM role that defines the permissions for AWS Chatbot.
+   * The ARN of the IAM role that defines the permissions for AWS Chatbot .
+   *
+   * This is a user-defined role that AWS Chatbot will assume. This is not the service-linked role. For more information, see [IAM Policies for AWS Chatbot](https://docs.aws.amazon.com/chatbot/latest/adminguide/chatbot-iam-policies.html) .
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-chatbot-microsoftteamschannelconfiguration.html#cfn-chatbot-microsoftteamschannelconfiguration-iamrolearn
    */
   readonly iamRoleArn: string;
 
   /**
-   * ARNs of SNS topics which delivers notifications to AWS Chatbot, for example CloudWatch alarm notifications.
+   * The ARNs of the SNS topics that deliver notifications to AWS Chatbot .
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-chatbot-microsoftteamschannelconfiguration.html#cfn-chatbot-microsoftteamschannelconfiguration-snstopicarns
    */
   readonly snsTopicArns?: Array<string>;
 
   /**
-   * Specifies the logging level for this configuration:ERROR,INFO or NONE.
+   * Specifies the logging level for this configuration. This property affects the log entries pushed to Amazon CloudWatch Logs.
    *
-   * This property affects the log entries pushed to Amazon CloudWatch logs
+   * Logging levels include \`ERROR\` , \`INFO\` , or \`NONE\` .
    *
    * @default - "NONE"
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-chatbot-microsoftteamschannelconfiguration.html#cfn-chatbot-microsoftteamschannelconfiguration-logginglevel
