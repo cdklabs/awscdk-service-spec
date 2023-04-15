@@ -29,7 +29,7 @@
     "@typescript-eslint/parser": "^5",
     "aws-cdk-lib": "^2.74.0",
     "camelcase": "^6.3.0",
-    "constructs": "^10.1.309",
+    "constructs": "^10.1.311",
     "eslint": "^8",
     "eslint-config-prettier": "^8.8.0",
     "eslint-import-resolver-node": "^0.3.7",
