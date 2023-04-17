@@ -1,63 +1,38 @@
-import { Reason, addDefinitions, forResource, registerServicePatch, replaceResourceProperty } from './core';
+import { Reason, addDefinitions, forResource, registerServicePatch, replaceDefinitionProperty } from './core';
 
 /**
  * We enhance the types for IoT project
  */
 registerServicePatch(
-  forResource('AWS::Cognito::IdentityPoolRoleAttachment', (lens) => {
-    replaceResourceProperty(
-      'RoleMappings',
+  forResource('AWS::IoT1Click::Project', (lens) => {
+    const reason = Reason.other(
+      'Set type of AWS::IoT1Click::Project.PlacementTemplate.DeviceTemplates to Map<String, AWS::IoT1Click::Project.DeviceTemplate>',
+    );
+
+    replaceDefinitionProperty(
+      'PlacementTemplate',
+      'DeviceTemplates',
       {
         type: 'object',
-        additionalProperties: { $ref: '#/definitions/RoleMapping' },
+        $ref: '#/definitions/DeviceTemplate',
       },
-      Reason.other('Make the use of RoleMappings more type safe'),
+      reason,
     )(lens);
 
     addDefinitions(
       {
-        RoleMapping: {
+        DeviceTemplate: {
           type: 'object',
           additionalProperties: false,
-          AmbiguousRoleResolution: {
+          DeviceType: {
             type: 'string',
           },
-          IdentityProvider: {
-            type: 'string',
+          CallbackOverrides: {
+            type: 'object',
           },
-          RulesConfiguration: {
-            type: { $ref: '#/definitions/RulesConfigurationType' },
-          },
-          Type: {
-            type: 'string',
-          },
-          required: ['Type'],
-        },
-        RulesConfigurationType: {
-          type: 'object',
-          additionalProperties: false,
-          properties: {
-            Rules: {
-              type: 'array',
-              items: { $ref: '#/definitions/MappingRule' },
-            },
-          },
-          required: ['Rules'],
-        },
-        MappingRule: {
-          type: 'object',
-          additionalProperties: false,
-          properties: {
-            Claim: { type: 'string' },
-            MatchType: { type: 'string' },
-            RoleARN: { type: 'string' },
-            Value: { type: 'string' },
-          },
-          required: ['Claim', 'MatchType', 'RoleARN', 'Value'],
         },
       },
-
-      Reason.other('Make the use of RoleMappings more type safe'),
+      reason,
     )(lens);
   }),
 );
