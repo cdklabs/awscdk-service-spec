@@ -144,6 +144,8 @@ export type Patcher<L extends JsonLens> = (lens: L) => void;
 
 export type JsonLensPatcher = Patcher<JsonLens>;
 
+export type JsonObjectPatcher = Patcher<JsonObjectLens>;
+
 export function makeCompositePatcher<L extends JsonLens>(...patchers: Patcher<L>[]): Patcher<L> {
   return (lens) => {
     for (const patcher of patchers) {
