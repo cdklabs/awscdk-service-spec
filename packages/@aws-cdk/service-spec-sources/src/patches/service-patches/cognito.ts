@@ -26,17 +26,19 @@ registerServicePatch(
         RoleMapping: {
           type: 'object',
           additionalProperties: false,
-          AmbiguousRoleResolution: {
-            type: 'string',
-          },
-          IdentityProvider: {
-            type: 'string',
-          },
-          RulesConfiguration: {
-            type: { $ref: '#/definitions/RulesConfigurationType' },
-          },
-          Type: {
-            type: 'string',
+          properties: {
+            AmbiguousRoleResolution: {
+              type: 'string',
+            },
+            IdentityProvider: {
+              type: 'string',
+            },
+            RulesConfiguration: {
+              $ref: '#/definitions/RulesConfigurationType',
+            },
+            Type: {
+              type: 'string',
+            },
           },
           required: ['Type'],
         },

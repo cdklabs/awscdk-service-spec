@@ -1,9 +1,9 @@
 import { emptyDatabase } from '@aws-cdk/service-spec';
-import { SamTemplateSchema } from '@aws-cdk/service-spec-sources';
+import { SamTemplateSchema, jsonschema } from '@aws-cdk/service-spec-sources';
 import { Failures } from '@cdklabs/tskb';
 import { SamResources } from '../src/import-sam';
 
-const standardCfnProperties = {
+const standardCfnProperties: jsonschema.ObjectProperties = {
   Condition: {
     type: 'string',
   },

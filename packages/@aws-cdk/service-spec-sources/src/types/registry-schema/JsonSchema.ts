@@ -13,6 +13,10 @@ export namespace jsonschema {
 
   export type AnyType = true;
 
+  export function isAnyType(x: Schema): x is AnyType {
+    return x === true;
+  }
+
   export interface Annotatable {
     readonly $comment?: string;
     readonly description?: string;
@@ -21,12 +25,23 @@ export namespace jsonschema {
 
   export interface Reference extends Annotatable {
     readonly $ref: string;
-    // A ref may have any number of other fields (I think they are supposed to combine with the referencee)
-    [k: string]: unknown;
-  }
 
-  export function isAnyType(x: Schema): x is AnyType {
-    return x === true;
+    /**
+     * From json-schema.org:
+     * ---------------------------
+     * In Draft 4-7, $ref behaves a differently to the latest spec.
+     * When an object contains a $ref property, the object is considered a reference, not a schema.
+     * Therefore, any other properties you put in that object will not be treated as JSON Schema keywords and will be ignored by the validator.
+     * $ref can only be used where a schema is expected.
+     * ---------------------------
+     *
+     * In this project we are dealing with Draft 7.
+     * Therefor $ref SHOULD NOT have any other properties.
+     * If it does, they should be patched out.
+     *
+     * Either way, we MUST NOT but a generic map type here (like `[k: string]: unknown;).
+     * This would break all useful type-checking and lead to mistakes.
+     */
   }
 
   export type CombiningSchema<X> = UnionSchema<X> | AllOf<X>;
