@@ -4,9 +4,9 @@
  * We simplify some JSON schema representations to make them easier to work with.
  */
 import canonicalize from 'canonicalize';
-import { retainRelevantKeywords, witnessForType } from './field-witnesses';
-import { JsonLens, JsonObjectLens, NO_MISTAKE, isRoot } from './json-lens';
-import { makeCompositePatcher, onlyObjects } from './patching';
+import { retainRelevantKeywords, witnessForType } from '../loading/patching/field-witnesses';
+import { JsonLens, JsonObjectLens, NO_MISTAKE, isRoot } from '../loading/patching/json-lens';
+import { makeCompositePatcher, onlyObjects } from '../loading/patching/patching';
 
 /**
  * Normalize JSON schema data
@@ -179,7 +179,7 @@ export function normalizeMixedMapRecord(lens: JsonObjectLens) {
  * all names are literal.
  */
 export function isInSchemaPosition(lens: JsonLens) {
-  return !lens.jsonPath.endsWith('/properties');
+  return !lens.jsonPointer.endsWith('/properties');
 }
 
 /**

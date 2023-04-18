@@ -4,6 +4,8 @@
  * These find and remove handwritten JSON Schema schemas that don't make any sense.
  */
 import canonicalize from 'canonicalize';
+import { normalizeJsonSchema } from './json-schema-patches';
+import { EXCEPTIONS_PATCHERS } from './service-patches';
 import {
   TypeKeyWitness,
   STRING_KEY_WITNESS,
@@ -12,10 +14,11 @@ import {
   BOOLEAN_KEY_WITNESS,
   NUMBER_KEY_WITNESS,
   NULL_KEY_WITNESS,
-} from './field-witnesses';
-import { JsonObjectLens, isRoot } from './json-lens';
-import { normalizeJsonSchema } from './json-schema-patches';
-import { makeCompositePatcher, onlyObjects } from './patching';
+  isRoot,
+  JsonObjectLens,
+  makeCompositePatcher,
+  onlyObjects,
+} from '../loading/patching';
 
 /**
  * Patchers that apply to the CloudFormation Registry source files
@@ -35,6 +38,7 @@ export const patchCloudFormationRegistry = onlyObjects(
     dropRedundantTypeOperatorsInMetricStream,
     minMaxItemsOnObject,
     makeKeywordDropper(),
+    ...EXCEPTIONS_PATCHERS,
   ),
 );
 
@@ -180,7 +184,7 @@ export function markAsNonTaggable(lens: JsonObjectLens) {
  */
 export function incorrectTagPropertyFormat(lens: JsonObjectLens) {
   if (
-    lens.jsonPath === '/tagging' &&
+    lens.jsonPointer === '/tagging' &&
     typeof lens.value.tagProperty === 'string' &&
     lens.value.tagProperty.startsWith('#/')
   ) {
