@@ -5,6 +5,7 @@
  */
 import canonicalize from 'canonicalize';
 import { normalizeJsonSchema } from './json-schema-patches';
+import { EXCEPTIONS_PATCHERS } from './service-patches';
 import {
   TypeKeyWitness,
   STRING_KEY_WITNESS,
@@ -37,6 +38,7 @@ export const patchCloudFormationRegistry = onlyObjects(
     dropRedundantTypeOperatorsInMetricStream,
     minMaxItemsOnObject,
     makeKeywordDropper(),
+    ...EXCEPTIONS_PATCHERS,
   ),
 );
 
@@ -182,7 +184,7 @@ export function markAsNonTaggable(lens: JsonObjectLens) {
  */
 export function incorrectTagPropertyFormat(lens: JsonObjectLens) {
   if (
-    lens.jsonPath === '/tagging' &&
+    lens.jsonPointer === '/tagging' &&
     typeof lens.value.tagProperty === 'string' &&
     lens.value.tagProperty.startsWith('#/')
   ) {

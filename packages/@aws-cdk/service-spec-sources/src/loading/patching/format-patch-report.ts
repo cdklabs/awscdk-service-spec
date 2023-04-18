@@ -1,5 +1,5 @@
+import { Operation } from 'fast-json-patch';
 import { JsonLens } from './json-lens';
-import { JsonPatch } from './json-patch';
 import { PatchReport } from './patching';
 
 /**
@@ -32,14 +32,14 @@ export function formatPatchReport(report: PatchReport): string {
 
       if (grampy.isJsonObject()) {
         emit('{\n');
-        const key = lastPart(lens.jsonPath);
+        const key = lastPart(lens.jsonPointer);
         emit(`"${key}": `);
         block();
         indents.pop();
         emit('\n}');
       } else if (grampy.isJsonArray()) {
         emit('[\n');
-        const ix = parseInt(lastPart(lens.jsonPath), 10);
+        const ix = parseInt(lastPart(lens.jsonPointer), 10);
         for (let i = 0; i < ix; i++) {
           emit('...,\n');
         }
@@ -50,34 +50,34 @@ export function formatPatchReport(report: PatchReport): string {
     });
   }
 
-  function emitPatch(lens: JsonLens, patch: JsonPatch) {
+  function emitPatch(lens: JsonLens, patch: Operation) {
     if (lens.isJsonObject()) {
       indents.push('  ');
       emit('{\n');
 
-      const modifiedKey = lastPart(patch.operation.op === 'move' ? patch.operation.from : patch.operation.path);
+      const modifiedKey = lastPart(patch.op === 'move' ? patch.from : patch.path);
 
       emitPropertiesUntil(lens.value, modifiedKey, () => {
-        switch (patch.operation.op) {
+        switch (patch.op) {
           case 'add':
-            emit(`<<[+]>>"${modifiedKey}": ${JSON.stringify(patch.operation.value)},`);
+            emit(`<<[+]>>"${modifiedKey}": ${JSON.stringify(patch.value)},`);
             break;
           case 'copy':
-            emit(`<<[+]>>"${modifiedKey}": ${JSON.stringify(lens.value[patch.operation.from])},`);
+            emit(`<<[+]>>"${modifiedKey}": ${JSON.stringify(lens.value[patch.from])},`);
             break;
           case 'move':
-            const movedValue = lens.value[lastPart(patch.operation.from)];
+            const movedValue = lens.value[lastPart(patch.from)];
             emit(`<<[-]>>"${modifiedKey}": ${JSON.stringify(movedValue)},\n`);
-            emit(`<<[+]>>"${lastPart(patch.operation.path)}": ${JSON.stringify(movedValue)},`);
+            emit(`<<[+]>>"${lastPart(patch.path)}": ${JSON.stringify(movedValue)},`);
             break;
           case 'remove':
-            const removedValue = lens.value[lastPart(patch.operation.path)];
+            const removedValue = lens.value[lastPart(patch.path)];
             emit(`<<[-]>>"${modifiedKey}": ${JSON.stringify(removedValue)},`);
             break;
           case 'replace':
-            const oldValue = lens.value[lastPart(patch.operation.path)];
+            const oldValue = lens.value[lastPart(patch.path)];
             emit(`<<[-]>>"${modifiedKey}": ${JSON.stringify(oldValue)},\n`);
-            emit(`<<[+]>>"${modifiedKey}": ${JSON.stringify(patch.operation.value)},`);
+            emit(`<<[+]>>"${modifiedKey}": ${JSON.stringify(patch.value)},`);
             break;
         }
       });

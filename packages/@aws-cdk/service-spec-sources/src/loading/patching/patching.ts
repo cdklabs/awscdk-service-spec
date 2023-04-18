@@ -1,13 +1,13 @@
+import * as jsonpatch from 'fast-json-patch';
 import { JsonArrayLens, JsonLens, JsonObjectLens, NO_MISTAKE } from './json-lens';
-import { JsonPatch } from './json-patch';
 
 interface SchemaLensOptions {
   readonly rootPath?: JsonLens[];
-  readonly jsonPath?: string;
+  readonly jsonPointer?: string;
   readonly fileName: string;
 
   readonly reportInto?: PatchReport[];
-  readonly patchInto?: JsonPatch[];
+  readonly patchInto?: jsonpatch.Operation[];
 }
 
 /**
@@ -17,7 +17,7 @@ export interface PatchReport {
   readonly subject: SchemaLens;
   readonly fileName: string;
   readonly path: string;
-  readonly patch: JsonPatch;
+  readonly patch: jsonpatch.Operation;
   readonly reason: string;
 }
 
@@ -25,8 +25,8 @@ export class SchemaLens implements JsonLens, JsonObjectLens, JsonArrayLens {
   /** Filename of the file */
   readonly fileName: string;
 
-  /** JSON Path to the current value (ex. `/foo/bar/3`) */
-  readonly jsonPath: string;
+  /** JSON Pointer (RFC 6901) to the current value (ex. `/foo/bar/3`) */
+  readonly jsonPointer: string;
 
   /** The path of the lenses to the current value, current lens is always in this list. */
   readonly rootPath: JsonLens[];
@@ -36,14 +36,14 @@ export class SchemaLens implements JsonLens, JsonObjectLens, JsonArrayLens {
 
   readonly reports: PatchReport[];
 
-  readonly patches: JsonPatch[];
+  readonly patches: jsonpatch.Operation[];
 
   readonly removedKeys: string[] = [];
 
   constructor(value: any, options: SchemaLensOptions) {
     this.value = value;
     this.rootPath = options.rootPath ? [...options.rootPath, this] : [this];
-    this.jsonPath = options.jsonPath ?? '';
+    this.jsonPointer = options.jsonPointer ?? '';
     this.fileName = options.fileName;
     this.reports = options.reportInto ?? [];
     this.patches = options.patchInto ?? [];
@@ -68,13 +68,13 @@ export class SchemaLens implements JsonLens, JsonObjectLens, JsonArrayLens {
 
   /** Fully replace the current value with a different one. */
   replaceValue(reason: string, newValue: any): void {
-    this.recordPatch(reason, JsonPatch.replace(this.jsonPath, newValue));
+    this.recordPatch(reason, { op: 'replace', path: this.jsonPointer, value: newValue });
   }
 
   /** Remove the property with the given name on the current object. The property will not be recursed into. */
   removeProperty(reason: string, name: string): void {
     if (this.isJsonObject()) {
-      this.recordPatch(reason, JsonPatch.remove(`${this.jsonPath}/${name}`));
+      this.recordPatch(reason, { op: 'remove', path: `${this.jsonPointer}/${name}` });
       this.removedKeys.push(name);
     }
   }
@@ -84,10 +84,14 @@ export class SchemaLens implements JsonLens, JsonObjectLens, JsonArrayLens {
     if (this.isJsonObject()) {
       if (fx) {
         // patch to remove oldName must be added first in case oldName === newName
-        this.recordPatch(reason, JsonPatch.remove(`${this.jsonPath}/${oldName}`));
-        this.recordPatch(reason, JsonPatch.add(`${this.jsonPath}/${newName}`, fx(this.value[oldName])));
+        this.recordPatch(reason, { op: 'remove', path: `${this.jsonPointer}/${oldName}` });
+        this.recordPatch(reason, { op: 'add', path: `${this.jsonPointer}/${newName}`, value: fx(this.value[oldName]) });
       } else {
-        this.recordPatch(reason, JsonPatch.move(`${this.jsonPath}/${oldName}`, `${this.jsonPath}/${newName}`));
+        this.recordPatch(reason, {
+          op: 'move',
+          from: `${this.jsonPointer}/${oldName}`,
+          path: `${this.jsonPointer}/${newName}`,
+        });
       }
     }
   }
@@ -95,14 +99,14 @@ export class SchemaLens implements JsonLens, JsonObjectLens, JsonArrayLens {
   /** Add a property */
   addProperty(reason: string, name: string, value: any): void {
     if (this.isJsonObject()) {
-      this.recordPatch(reason, JsonPatch.add(`${this.jsonPath}/${name}`, value));
+      this.recordPatch(reason, { op: 'add', path: `${this.jsonPointer}/${name}`, value });
     }
   }
 
   /** Replace a property */
   replaceProperty(reason: string, name: string, value: any): void {
     if (this.isJsonObject()) {
-      this.recordPatch(reason, JsonPatch.replace(`${this.jsonPath}/${name}`, value));
+      this.recordPatch(reason, { op: 'replace', path: `${this.jsonPointer}/${name}`, value });
     }
   }
 
@@ -110,7 +114,7 @@ export class SchemaLens implements JsonLens, JsonObjectLens, JsonArrayLens {
   descendObjectField(key: string): SchemaLens {
     return new SchemaLens(this.value[key], {
       fileName: this.fileName,
-      jsonPath: `${this.jsonPath}/${key}`,
+      jsonPointer: `${this.jsonPointer}/${key}`,
       rootPath: this.rootPath,
       reportInto: this.reports,
       patchInto: this.patches,
@@ -121,18 +125,18 @@ export class SchemaLens implements JsonLens, JsonObjectLens, JsonArrayLens {
   descendArrayElement(index: number): SchemaLens {
     return new SchemaLens(this.value[index], {
       fileName: this.fileName,
-      jsonPath: `${this.jsonPath}/${index}`,
+      jsonPointer: `${this.jsonPointer}/${index}`,
       rootPath: this.rootPath,
       reportInto: this.reports,
       patchInto: this.patches,
     });
   }
 
-  private recordPatch(reason: string, patch: JsonPatch) {
+  private recordPatch(reason: string, patch: jsonpatch.Operation) {
     this.patches.push(patch);
     this.reports.push({
       fileName: this.fileName,
-      path: this.jsonPath,
+      path: this.jsonPointer,
       patch,
       reason,
       subject: this,
@@ -172,11 +176,19 @@ export function applyPatcher(root: any, patcher: JsonLensPatcher) {
 
   while (maxIterations) {
     const schema = new SchemaLens(root, { fileName: '' });
-    recurse(schema);
+    collectPatches(schema);
+
     if (!schema.hasPatches) {
       break;
     }
+
+    const newDocument = tryApplyPatch(root, schema.patches);
+    const changes = jsonpatch.compare(root, newDocument, false);
     patchSets.push(schema.reports);
+
+    if (changes.length === 0) {
+      break;
+    }
 
     if (--maxIterations === 0) {
       throw new Error(
@@ -186,7 +198,7 @@ export function applyPatcher(root: any, patcher: JsonLensPatcher) {
             patchSets.slice(-2).map((ps) =>
               ps.map((p) => ({
                 reason: p.reason,
-                patch: p.patch.operation,
+                patch: p.patch,
                 subject: p.subject.value,
                 path: p.path,
               })),
@@ -197,7 +209,8 @@ export function applyPatcher(root: any, patcher: JsonLensPatcher) {
         ].join('\n'),
       );
     }
-    root = bestEffortApplyPatches(root, schema.patches);
+
+    root = newDocument;
   }
 
   // Only report the first iteration's patch set, it's the only one whose changes relate to the input
@@ -205,19 +218,19 @@ export function applyPatcher(root: any, patcher: JsonLensPatcher) {
   const firstPatchSet: PatchReport[] = patchSets[0] ?? [];
   return { root, patches: firstPatchSet.filter((p) => p.reason !== NO_MISTAKE) };
 
-  function recurse(lens: SchemaLens) {
+  function collectPatches(lens: SchemaLens) {
     patcher(lens);
 
     if (Array.isArray(lens.value)) {
       lens.value.forEach((_, i) => {
-        recurse(lens.descendArrayElement(i));
+        collectPatches(lens.descendArrayElement(i));
       });
     }
 
     if (lens.isJsonObject()) {
       for (const k of Object.keys(lens.value)) {
         if (!lens.wasRemoved(k)) {
-          recurse(lens.descendObjectField(k));
+          collectPatches(lens.descendObjectField(k));
         }
       }
     }
@@ -226,15 +239,15 @@ export function applyPatcher(root: any, patcher: JsonLensPatcher) {
   /**
    * Apply patches in order, skipping patches that don't apply due to errors
    */
-  function bestEffortApplyPatches(x: any, patches: JsonPatch[]) {
-    for (const patch of patches) {
+  function tryApplyPatch(document: any, patch: jsonpatch.Operation[]) {
+    for (const p of patch) {
       try {
-        x = JsonPatch.applyClone(x, patch);
+        document = jsonpatch.applyOperation(document, p, false, false).newDocument;
       } catch (e) {
         // We may have produced patches that no longer cleanly apply depending on what other patches have done.
         // Catch those occurrences and give it another go on the next round.
       }
     }
-    return x;
+    return document;
   }
 }

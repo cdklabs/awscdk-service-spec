@@ -8,7 +8,7 @@ export interface JsonLens {
   readonly fileName: string;
 
   /**
-   * JSON Path to the current value
+   * JSON Pointer (RFC 6901) to the current value
    *
    * Likes like:
    *
@@ -17,7 +17,7 @@ export interface JsonLens {
    * - '/obj/subproperty'
    * - '/array/5'
    */
-  readonly jsonPath: string;
+  readonly jsonPointer: string;
 
   /** The path of the lenses to the current value, current lens is always in this list. */
   readonly rootPath: JsonLens[];

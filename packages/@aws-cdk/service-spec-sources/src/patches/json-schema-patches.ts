@@ -179,7 +179,7 @@ export function normalizeMixedMapRecord(lens: JsonObjectLens) {
  * all names are literal.
  */
 export function isInSchemaPosition(lens: JsonLens) {
-  return !lens.jsonPath.endsWith('/properties');
+  return !lens.jsonPointer.endsWith('/properties');
 }
 
 /**

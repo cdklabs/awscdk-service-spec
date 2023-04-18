@@ -35,7 +35,7 @@ export function replaceResourceProperty(
   reason: Reason,
 ): JsonObjectPatcher {
   return (lens) => {
-    if (lens.jsonPath === `/properties/${propertyName}`) {
+    if (lens.jsonPointer === `/properties/${propertyName}`) {
       lens.replaceValue(reason.reason, newSchema);
     }
   };
@@ -53,7 +53,7 @@ export function replaceDefinitionProperty(
   reason: Reason,
 ): JsonObjectPatcher {
   return (lens) => {
-    if (lens.jsonPath === `/definitions/${definitionName}/properties/${propertyName}`) {
+    if (lens.jsonPointer === `/definitions/${definitionName}/properties/${propertyName}`) {
       lens.replaceValue(reason.reason, newSchema);
     }
   };
@@ -69,7 +69,7 @@ export function addDefinitions(definitions: Record<string, jsonschema.Schema>, r
     if (isRoot(lens) && lens.value.definitions === undefined) {
       // No '/definitions' in this type
       lens.addProperty(reason.reason, 'definitions', definitions);
-    } else if (lens.jsonPath === '/definitions') {
+    } else if (lens.jsonPointer === '/definitions') {
       for (const [definitionName, newSchema] of Object.entries(definitions)) {
         if (lens.value[definitionName] === undefined) {
           lens.addProperty(reason.reason, definitionName, newSchema);
