@@ -27,6 +27,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "node-fetch": "^2",
     "npm-check-updates": "^16",
+    "nx": "^15.9.2",
     "prettier": "^2.8.7",
     "projen": "^0.71.16",
     "ts-node": "^10.9.1",

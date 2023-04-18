@@ -50,6 +50,7 @@ jspm_packages/
 !/awscdk-service-spec.code-workspace
 !/.github/workflows/auto-merge.yml
 !/.vscode/launch.json
+!/nx.json
 !/.github/workflows/test-aws-cdk-integration.yml
 !/.github/workflows/update-source-documentation.yml
 !/.github/workflows/update-source-resource-spec.yml
