@@ -1,4 +1,5 @@
 import { yarn } from 'cdklabs-projen-project-types';
+import { Nx } from './nx';
 
 export class YarnMonorepo extends yarn.CdkLabsMonorepo {
   public constructor(options: yarn.CdkLabsMonorepoOptions) {
@@ -43,5 +44,10 @@ export class YarnMonorepo extends yarn.CdkLabsMonorepo {
       runtimeArgs: ['projen', 'default'],
       outFiles: ['${workspaceFolder}/**/*'],
     } as any);
+
+    // nx
+    new Nx(this, {
+      defaultBase: options.defaultReleaseBranch,
+    });
   }
 }
