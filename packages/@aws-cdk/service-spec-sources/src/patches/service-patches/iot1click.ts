@@ -14,7 +14,7 @@ registerServicePatch(
       'DeviceTemplates',
       {
         type: 'object',
-        $ref: '#/definitions/DeviceTemplate',
+        additionalProperties: { $ref: '#/definitions/DeviceTemplate' },
       },
       reason,
     )(lens);
@@ -24,11 +24,13 @@ registerServicePatch(
         DeviceTemplate: {
           type: 'object',
           additionalProperties: false,
-          DeviceType: {
-            type: 'string',
-          },
-          CallbackOverrides: {
-            type: 'object',
+          properties: {
+            DeviceType: {
+              type: 'string',
+            },
+            CallbackOverrides: {
+              type: 'object',
+            },
           },
         },
       },

@@ -319,7 +319,7 @@
       "type": "object"
     },
     "jsonschema.Reference": {
-      "additionalProperties": {},
+      "additionalProperties": false,
       "properties": {
         "$comment": {
           "type": "string"
