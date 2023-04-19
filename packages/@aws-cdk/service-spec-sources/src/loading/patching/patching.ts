@@ -1,23 +1,30 @@
 import * as jsonpatch from 'fast-json-patch';
 import { JsonArrayLens, JsonLens, JsonObjectLens, NO_MISTAKE } from './json-lens';
 
+export type PatchOperation =
+  | jsonpatch.AddOperation<any>
+  | jsonpatch.RemoveOperation
+  | jsonpatch.ReplaceOperation<any>
+  | jsonpatch.MoveOperation
+  | jsonpatch.CopyOperation;
+
 interface SchemaLensOptions {
   readonly rootPath?: JsonLens[];
   readonly jsonPointer?: string;
   readonly fileName: string;
 
   readonly reportInto?: PatchReport[];
-  readonly patchInto?: jsonpatch.Operation[];
+  readonly patchInto?: PatchOperation[];
 }
 
 /**
  * A patch that indicates a mistake by upstream users
  */
 export interface PatchReport {
-  readonly subject: SchemaLens;
+  readonly subject: any;
   readonly fileName: string;
   readonly path: string;
-  readonly patch: jsonpatch.Operation;
+  readonly patch: PatchOperation;
   readonly reason: string;
 }
 
@@ -36,7 +43,7 @@ export class SchemaLens implements JsonLens, JsonObjectLens, JsonArrayLens {
 
   readonly reports: PatchReport[];
 
-  readonly patches: jsonpatch.Operation[];
+  readonly patches: PatchOperation[];
 
   readonly removedKeys: string[] = [];
 
@@ -132,14 +139,14 @@ export class SchemaLens implements JsonLens, JsonObjectLens, JsonArrayLens {
     });
   }
 
-  private recordPatch(reason: string, patch: jsonpatch.Operation) {
+  private recordPatch(reason: string, patch: PatchOperation) {
     this.patches.push(patch);
     this.reports.push({
       fileName: this.fileName,
       path: this.jsonPointer,
       patch,
       reason,
-      subject: this,
+      subject: this.rootPath[0].value,
     });
   }
 }
@@ -239,7 +246,7 @@ export function applyPatcher(root: any, patcher: JsonLensPatcher) {
   /**
    * Apply patches in order, skipping patches that don't apply due to errors
    */
-  function tryApplyPatch(document: any, patch: jsonpatch.Operation[]) {
+  function tryApplyPatch(document: any, patch: PatchOperation[]) {
     for (const p of patch) {
       try {
         document = jsonpatch.applyOperation(document, p, false, false).newDocument;

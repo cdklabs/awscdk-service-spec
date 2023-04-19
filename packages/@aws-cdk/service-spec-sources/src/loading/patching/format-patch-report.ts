@@ -1,5 +1,4 @@
-import { Operation } from 'fast-json-patch';
-import { JsonLens } from './json-lens';
+import { getValueByPointer } from 'fast-json-patch';
 import { PatchReport } from './patching';
 
 /**
@@ -15,72 +14,30 @@ export function formatPatchReport(report: PatchReport): string {
   indents.push('    '); // To put the [-], [+] markers into later
   emit(indents[0]);
 
-  emitParentThen(report.subject, () => {
-    emitPatch(report.subject, report.patch);
-  });
+  const modifiedPath = report.patch.op === 'move' ? report.patch.from : report.patch.path;
+  emitPatch(pointerHierarchy(modifiedPath));
 
   return moveMarkersToFront(parts.join('').trimEnd());
 
-  function emitParentThen(lens: JsonLens, block: () => void) {
-    if (lens.rootPath.length === 1) {
-      return block();
-    }
-
-    const grampy = lens.rootPath[lens.rootPath.length - 2];
-    emitParentThen(grampy, () => {
+  /**
+   * Emit a diff-like output for a given patch
+   */
+  function emitPatch(pointerStack: string[]): void {
+    if (isJsonObject(report.subject)) {
       indents.push('  ');
 
-      if (grampy.isJsonObject()) {
-        emit('{\n');
-        const key = lastPart(lens.jsonPointer);
-        emit(`"${key}": `);
-        block();
-        indents.pop();
-        emit('\n}');
-      } else if (grampy.isJsonArray()) {
-        emit('[\n');
-        const ix = parseInt(lastPart(lens.jsonPointer), 10);
-        for (let i = 0; i < ix; i++) {
-          emit('...,\n');
-        }
-        block();
-        indents.pop();
-        emit('\n]');
+      const currentProperty = lastPart(pointerStack[0]);
+      if (currentProperty) {
+        emit(`"${currentProperty}": `);
       }
-    });
-  }
+      emit(`{\n`);
 
-  function emitPatch(lens: JsonLens, patch: Operation) {
-    if (lens.isJsonObject()) {
-      indents.push('  ');
-      emit('{\n');
-
-      const modifiedKey = lastPart(patch.op === 'move' ? patch.from : patch.path);
-
-      emitPropertiesUntil(lens.value, modifiedKey, () => {
-        switch (patch.op) {
-          case 'add':
-            emit(`<<[+]>>"${modifiedKey}": ${JSON.stringify(patch.value)},`);
-            break;
-          case 'copy':
-            emit(`<<[+]>>"${modifiedKey}": ${JSON.stringify(lens.value[patch.from])},`);
-            break;
-          case 'move':
-            const movedValue = lens.value[lastPart(patch.from)];
-            emit(`<<[-]>>"${modifiedKey}": ${JSON.stringify(movedValue)},\n`);
-            emit(`<<[+]>>"${lastPart(patch.path)}": ${JSON.stringify(movedValue)},`);
-            break;
-          case 'remove':
-            const removedValue = lens.value[lastPart(patch.path)];
-            emit(`<<[-]>>"${modifiedKey}": ${JSON.stringify(removedValue)},`);
-            break;
-          case 'replace':
-            const oldValue = lens.value[lastPart(patch.path)];
-            emit(`<<[-]>>"${modifiedKey}": ${JSON.stringify(oldValue)},\n`);
-            emit(`<<[+]>>"${modifiedKey}": ${JSON.stringify(patch.value)},`);
-            break;
-        }
-      });
+      // We render the change within sibling context
+      if (pointerStack.length === 2) {
+        emitChangeInContext(pointerStack[0]);
+      } else {
+        emitPatch(pointerStack.splice(1));
+      }
 
       indents.pop();
       emit('\n}');
@@ -90,51 +47,84 @@ export function formatPatchReport(report: PatchReport): string {
   }
 
   /**
-   * Emit properties of the given object until we get to the given property
+   * Emit a change in the context of its siblings
    */
-  function emitPropertiesUntil(x: Record<string, unknown>, when: string, block: () => void) {
-    let first = true;
-    let invoked = false;
-    for (const [key, value] of Object.entries(x)) {
-      if (!first) {
-        emit('\n');
-      }
-      first = false;
+  function emitChangeInContext(at: string) {
+    const modifiedKey = lastPart(modifiedPath);
+    const parent = getValueByPointer(report.subject, at);
+    const contextKeys = new Set(Object.keys(parent));
+    contextKeys.add(modifiedKey);
 
-      if (key === when) {
-        block();
-        invoked = true;
+    let remainingElements = contextKeys.size;
+    for (const key of contextKeys) {
+      if (key === modifiedKey) {
+        emitChange(modifiedKey);
       } else {
-        emit(`"${key}": `);
-        emitAbridged(value);
+        emitAbridgedProperty(key, parent[key]);
       }
-    }
 
-    if (!invoked) {
-      if (!first) {
+      // On all but the last element
+      if (--remainingElements !== 0) {
         emit('\n');
       }
-      block();
     }
+  }
+
+  /**
+   * Emit the actual change
+   */
+  function emitChange(modifiedKey: string) {
+    switch (report.patch.op) {
+      case 'add':
+        emit(`<<[+]>>"${modifiedKey}": ${JSON.stringify(report.patch.value)}`);
+        break;
+      case 'copy':
+        const copiedValue = getValueByPointer(report.subject, report.patch.from);
+        emit(`<<[+]>>"${modifiedKey}": ${JSON.stringify(copiedValue)}`);
+        break;
+      case 'move':
+        const movedValue = getValueByPointer(report.subject, report.patch.from);
+        emit(`<<[-]>>"${modifiedKey}": ${JSON.stringify(movedValue)}\n`);
+        emit(`<<[+]>>"${lastPart(report.patch.path)}": ${JSON.stringify(movedValue)}`);
+        break;
+      case 'remove':
+        const removedValue = getValueByPointer(report.subject, report.patch.path);
+        emit(`<<[-]>>"${modifiedKey}": ${JSON.stringify(removedValue)}`);
+        break;
+      case 'replace':
+        const oldValue = getValueByPointer(report.subject, report.patch.path);
+        emit(`<<[-]>>"${modifiedKey}": ${JSON.stringify(oldValue)}\n`);
+        emit(`<<[+]>>"${modifiedKey}": ${JSON.stringify(report.patch.value)}`);
+        break;
+    }
+  }
+
+  /**
+   * Emit an abridged representation of a property
+   */
+  function emitAbridgedProperty(key: string, value: unknown) {
+    emit(`"${key}": `);
+    emitAbridgedValue(value);
   }
 
   /**
    * Emit an abridged representation of this value
    */
-  function emitAbridged(x: unknown) {
+  function emitAbridgedValue(x: unknown) {
     if (Array.isArray(x)) {
-      return emit(`[ ... ]`);
+      emit(`[ ... ]`);
+    } else if (isJsonObject(x)) {
+      emit(`{ ... }`);
+    } else {
+      emit(JSON.stringify(x));
     }
-    if (x && typeof x === 'object') {
-      return emit(`{ ... }`);
-    }
-    return emit(JSON.stringify(x));
   }
 
+  /**
+   * Emits a value into the buffer.
+   * Converts newlines into indented newlines.
+   */
   function emit(x: string): void {
-    if (x === undefined) {
-      debugger;
-    }
     parts.push(x.replace(/\n/g, `\n${indents.join('')}`));
   }
 
@@ -147,7 +137,31 @@ export function formatPatchReport(report: PatchReport): string {
   }
 }
 
+/**
+ * Get the last part of a JSON Pointer
+ */
 function lastPart(x: string) {
   const parts = x.split('/');
   return parts[parts.length - 1];
+}
+
+/**
+ * Is this thing an object
+ */
+function isJsonObject(value: any): value is Record<string, unknown> {
+  return typeof value === 'object' && value && !Array.isArray(value);
+}
+
+/**
+ * Turns a JSON Pointer into a list of all ancestor paths:
+ * /foo/bar/baz => ["", "/foo", "/foo/bar", "/foo/bar/baz"]
+ */
+function pointerHierarchy(path: string): string[] {
+  return [
+    '',
+    ...path
+      .split('/')
+      .splice(1)
+      .reduce((stack: string[], currentPart: string) => [...stack, `${stack.at(-1) ?? ''}/${currentPart}`], []),
+  ];
 }
