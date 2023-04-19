@@ -3,7 +3,7 @@
  *
  * We simplify some JSON schema representations to make them easier to work with.
  */
-import canonicalize from 'canonicalize';
+import { default as canonicalize } from 'canonicalize';
 import { retainRelevantKeywords, witnessForType } from '../loading/patching/field-witnesses';
 import { JsonLens, JsonObjectLens, NO_MISTAKE, isRoot } from '../loading/patching/json-lens';
 import { makeCompositePatcher, onlyObjects } from '../loading/patching/patching';
@@ -190,7 +190,7 @@ function deepDedupe<A>(xs: A[]): A[] {
   const seen = new Set<string>();
   for (const x of xs) {
     const json = canonicalize(x);
-    if (!seen.has(json)) {
+    if (json && !seen.has(json)) {
       ret.push(x);
       seen.add(json);
     }
