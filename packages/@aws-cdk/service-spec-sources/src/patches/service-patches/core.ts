@@ -60,6 +60,19 @@ export function replaceDefinitionProperty(
 }
 
 /**
+ * Rename the a type definition, only if the definition actually exists.
+ *
+ * NOTE: returns a new patcher. Still needs to be applied to a lens.
+ */
+export function renameDefinition(oldName: string, newName: string, reason: Reason): JsonObjectPatcher {
+  return (lens) => {
+    if (lens.jsonPointer === `/definitions`) {
+      lens.renameProperty(reason.reason, oldName, newName);
+    }
+  };
+}
+
+/**
  * Add a definition, only if the definition doesn't yet exist
  *
  * NOTE: returns a new patcher. Still needs to be applied to a lens.

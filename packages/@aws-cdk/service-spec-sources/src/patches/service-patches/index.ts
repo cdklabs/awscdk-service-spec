@@ -14,3 +14,4 @@ export { SERVICE_PATCHERS as EXCEPTIONS_PATCHERS } from './core';
 import './cognito';
 import './iot1click';
 import './legacy-untyped';
+import './wafv2';
