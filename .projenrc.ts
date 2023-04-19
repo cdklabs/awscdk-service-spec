@@ -30,7 +30,6 @@ const tsKb = new TypeScriptWorkspace({
   name: '@cdklabs/tskb',
   description: 'Using TypeScript as a knowledge base',
 });
-tsKb.synth();
 
 const typewriter = new TypeScriptWorkspace({
   parent: repo,
@@ -40,7 +39,6 @@ const typewriter = new TypeScriptWorkspace({
     'camelcase@^6', // camelcase 7 uses ESM
   ],
 });
-typewriter.synth();
 
 const serviceSpecSources = new TypeScriptWorkspace({
   parent: repo,
@@ -81,7 +79,6 @@ serviceSpecSources.addTask('validate-specs', {
 });
 
 serviceSpecSources.compileTask.prependSpawn(serviceSpecSchemaTask);
-serviceSpecSources.synth();
 
 const serviceSpec = new TypeScriptWorkspace({
   parent: repo,
@@ -89,7 +86,6 @@ const serviceSpec = new TypeScriptWorkspace({
   description: 'AWS CDK Service spec',
   deps: [tsKb],
 });
-serviceSpec.synth();
 
 const serviceSpecBuild = new TypeScriptWorkspace({
   parent: repo,
@@ -105,7 +101,6 @@ const buildDb = serviceSpecBuild.tasks.addTask('build:db', {
 serviceSpecBuild.postCompileTask.spawn(buildDb);
 serviceSpecBuild.gitignore.addPatterns('db.json');
 serviceSpecBuild.gitignore.addPatterns('db-build-report.txt');
-serviceSpecBuild.synth();
 
 const cfnResources = new TypeScriptWorkspace({
   parent: repo,
@@ -144,7 +139,6 @@ cfnResources.preCompileTask.spawn(
     receiveArgs: true,
   }),
 );
-cfnResources.synth();
 
 const cfn2ts = new TypeScriptWorkspace({
   parent: repo,
@@ -153,7 +147,6 @@ const cfn2ts = new TypeScriptWorkspace({
   private: true,
   deps: [cfnResources, serviceSpec, 'yargs', 'fs-extra'],
 });
-cfn2ts.synth();
 
 // Add integration test with aws-cdk
 new AwsCdkIntegrationTest(cfn2ts);
