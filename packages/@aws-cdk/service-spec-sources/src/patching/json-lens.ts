@@ -1,4 +1,15 @@
+import * as jsonpatch from 'fast-json-patch';
+
+/** Reason constants */
 export const NO_MISTAKE = 'no-mistake';
+
+/** We only support these patch operations */
+export type PatchOperation =
+  | jsonpatch.AddOperation<any>
+  | jsonpatch.RemoveOperation
+  | jsonpatch.ReplaceOperation<any>
+  | jsonpatch.MoveOperation
+  | jsonpatch.CopyOperation;
 
 /**
  * A lens that points to a location in a JSON data structure
@@ -33,6 +44,9 @@ export interface JsonLens {
 
   /** Fully replace the current value with a different one. */
   replaceValue(reason: string, newValue: any): void;
+
+  /** Record a raw patch operation. */
+  recordPatch(reason: string, patch: PatchOperation): void;
 }
 
 export interface JsonObjectLens extends JsonLens {

@@ -18,28 +18,31 @@ import {
   JsonObjectLens,
   makeCompositePatcher,
   onlyObjects,
-} from '../loading/patching';
+} from '../patching';
 
 /**
  * Patchers that apply to the CloudFormation Registry source files
  */
-export const patchCloudFormationRegistry = onlyObjects(
-  makeCompositePatcher(
-    normalizeJsonSchema,
-    replaceArrayLengthProps,
-    removeBooleanPatterns,
-    canonicalizeDefaultOnBoolean,
-    patchMinLengthOnInteger,
-    canonicalizeRegexInFormat,
-    markAsNonTaggable,
-    incorrectTagPropertyFormat,
-    noIncorrectDefaultType,
-    removeSuspiciousPatterns,
-    dropRedundantTypeOperatorsInMetricStream,
-    minMaxItemsOnObject,
-    makeKeywordDropper(),
-    ...EXCEPTIONS_PATCHERS,
+export const patchCloudFormationRegistry = makeCompositePatcher(
+  onlyObjects(
+    makeCompositePatcher(
+      normalizeJsonSchema,
+      replaceArrayLengthProps,
+      removeBooleanPatterns,
+      canonicalizeDefaultOnBoolean,
+      patchMinLengthOnInteger,
+      canonicalizeRegexInFormat,
+      markAsNonTaggable,
+      incorrectTagPropertyFormat,
+      noIncorrectDefaultType,
+      removeSuspiciousPatterns,
+      dropRedundantTypeOperatorsInMetricStream,
+      minMaxItemsOnObject,
+      makeKeywordDropper(),
+    ),
   ),
+  // Service patches might have to change arrays
+  ...EXCEPTIONS_PATCHERS,
 );
 
 /**

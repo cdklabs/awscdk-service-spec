@@ -1,4 +1,3 @@
-import { applyPatcher, Patcher, JsonLens, JsonObjectLens } from '../../src/loading/patching';
 import {
   canonicalizeDefaultOnBoolean,
   canonicalizeRegexInFormat,
@@ -12,6 +11,7 @@ import {
   removeSuspiciousPatterns,
   replaceArrayLengthProps,
 } from '../../src/patches/registry-patches';
+import { applyPatcher, Patcher, JsonLens, JsonObjectLens } from '../../src/patching';
 
 describe('patches', () => {
   describe(replaceArrayLengthProps, () => {

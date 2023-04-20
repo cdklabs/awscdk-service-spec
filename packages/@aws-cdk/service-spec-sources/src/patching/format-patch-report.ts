@@ -5,16 +5,15 @@ import { PatchReport } from './patching';
  * Format a patch report in a print friendly way
  */
 export function formatPatchReport(report: PatchReport): string {
+  const modifiedPath = report.patch.op === 'move' ? report.patch.from : report.patch.path;
   const parts = new Array<string>();
   const indents = new Array<string>();
   emit(`${report.fileName.trimEnd()}\n`);
   emit(`--------------------------------\n`);
-  emit(`${report.path || '/'}: ${report.reason}\n`);
+  emit(`${report.path || modifiedPath || '/'}: ${report.reason}\n`);
 
   indents.push('    '); // To put the [-], [+] markers into later
   emit(indents[0]);
-
-  const modifiedPath = report.patch.op === 'move' ? report.patch.from : report.patch.path;
   emitPatch(pointerHierarchy(modifiedPath));
 
   return moveMarkersToFront(parts.join('').trimEnd());

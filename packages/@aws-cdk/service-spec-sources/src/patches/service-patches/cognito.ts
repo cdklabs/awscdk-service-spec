@@ -1,4 +1,5 @@
-import { Reason, addDefinitions, forResource, registerServicePatch, replaceResourceProperty } from './core';
+import { addDefinitions, forResource, registerServicePatch, replaceResourceProperty } from './core';
+import { Reason } from '../../patching';
 
 /**
  * Make the use of the AWS::Cognito::IdentityPoolRoleAttachment.RoleMapings property safer
