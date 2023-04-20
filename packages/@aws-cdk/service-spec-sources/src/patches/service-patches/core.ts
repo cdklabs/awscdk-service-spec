@@ -1,12 +1,12 @@
-import { JsonObjectPatcher, isRoot } from '../../loading/patching';
+import { JsonLens, JsonLensPatcher, JsonObjectPatcher, Patcher, Reason, fp as fun, isRoot } from '../../patching';
 import { CloudFormationRegistryResource, jsonschema } from '../../types';
 
-export const SERVICE_PATCHERS: Array<JsonObjectPatcher> = [];
+export const SERVICE_PATCHERS: Array<JsonLensPatcher> = [];
 
 /**
  * Register an unnamed exception patcher
  */
-export function registerServicePatch(patcher: JsonObjectPatcher) {
+export function registerServicePatch(patcher: JsonLensPatcher) {
   SERVICE_PATCHERS.push(patcher);
 }
 
@@ -15,10 +15,14 @@ export function registerServicePatch(patcher: JsonObjectPatcher) {
  *
  * It will still be invoked at every JSON node in that document.
  */
-export function forResource(resource: string, patcher: JsonObjectPatcher): JsonObjectPatcher {
+export function forResource(resource: string, patcher: JsonObjectPatcher): JsonLensPatcher {
   return (lens) => {
     const root = lens.rootPath[0];
-    if (root.isJsonObject() && (root.value as unknown as CloudFormationRegistryResource).typeName === resource) {
+    if (
+      lens.isJsonObject() &&
+      root.isJsonObject() &&
+      (root.value as unknown as CloudFormationRegistryResource).typeName === resource
+    ) {
       patcher(lens);
     }
   };
@@ -60,6 +64,19 @@ export function replaceDefinitionProperty(
 }
 
 /**
+ * Rename the a type definition, only if the definition actually exists.
+ *
+ * NOTE: returns a new patcher. Still needs to be applied to a lens.
+ */
+export function renameDefinition(oldName: string, newName: string, reason: Reason): JsonObjectPatcher {
+  return (lens) => {
+    if (lens.jsonPointer === `/definitions`) {
+      lens.renameProperty(reason.reason, oldName, newName);
+    }
+  };
+}
+
+/**
  * Add a definition, only if the definition doesn't yet exist
  *
  * NOTE: returns a new patcher. Still needs to be applied to a lens.
@@ -79,14 +96,37 @@ export function addDefinitions(definitions: Record<string, jsonschema.Schema>, r
   };
 }
 
-export class Reason {
-  public static backwardsCompat() {
-    return new Reason('Backwards compatibility');
+/**
+ * Functional Programming Interfaces
+ * For when declarative is not enough
+ */
+export namespace fp {
+  /**
+   * Patch a resource at a JSON Pointer location
+   */
+  export function patchResourceAt<Tree, TypeName extends string = string>(
+    resource: TypeName,
+    pointer: string,
+    reason: Reason,
+    patch: fun.Patch<Tree>,
+  ): Patcher<JsonLens> {
+    return (lens) => {
+      const root = lens.rootPath[0];
+      if ((root.value as unknown as CloudFormationRegistryResource).typeName === resource) {
+        fun.patchAt(pointer, reason, patch)(lens);
+      }
+    };
   }
 
-  public static other(reason: string) {
-    return new Reason(reason);
+  /**
+   * Patch a resource at the root
+   */
+  export function patchResource<
+    Tree extends CloudFormationRegistryResource & {
+      typeName: TypeName;
+    },
+    TypeName extends string = string,
+  >(resource: TypeName, reason: Reason, patch: fun.Patch<Tree>): Patcher<JsonLens> {
+    return patchResourceAt(resource, '', reason, patch);
   }
-
-  private constructor(public readonly reason: string) {}
 }

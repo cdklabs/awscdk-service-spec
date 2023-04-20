@@ -3,9 +3,8 @@
 // Not a lot of thought given to where this needs to live yet.
 import * as path from 'path';
 import { errorMessage } from '@cdklabs/tskb';
-import { loadDefaultCloudFormationRegistryResources } from '../loading/load-cloudformation-registry';
-import { formatPatchReport } from '../loading/patching/format-patch-report';
-import { PatchReport } from '../loading/patching/patching';
+import { loadDefaultCloudFormationRegistryResources } from '../loading';
+import { formatPatchReport, PatchReport } from '../patching';
 
 async function main() {
   const allResources = await loadDefaultCloudFormationRegistryResources(false);

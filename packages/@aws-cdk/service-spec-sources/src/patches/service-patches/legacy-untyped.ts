@@ -8,7 +8,8 @@
  * for these types of progressively typed properties.
  */
 
-import { Reason, forResource, registerServicePatch, replaceDefinitionProperty, replaceResourceProperty } from './core';
+import { forResource, registerServicePatch, replaceDefinitionProperty, replaceResourceProperty } from './core';
+import { Reason } from '../../patching';
 
 const LEGACY_UNTYPED_PROPERTIES = {
   'AWS::ImageBuilder::DistributionConfiguration.Distribution': [

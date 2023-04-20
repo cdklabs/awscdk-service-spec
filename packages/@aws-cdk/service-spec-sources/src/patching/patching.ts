@@ -1,12 +1,5 @@
 import * as jsonpatch from 'fast-json-patch';
-import { JsonArrayLens, JsonLens, JsonObjectLens, NO_MISTAKE } from './json-lens';
-
-export type PatchOperation =
-  | jsonpatch.AddOperation<any>
-  | jsonpatch.RemoveOperation
-  | jsonpatch.ReplaceOperation<any>
-  | jsonpatch.MoveOperation
-  | jsonpatch.CopyOperation;
+import { JsonArrayLens, JsonLens, JsonObjectLens, NO_MISTAKE, PatchOperation } from './json-lens';
 
 interface SchemaLensOptions {
   readonly rootPath?: JsonLens[];
@@ -139,7 +132,7 @@ export class SchemaLens implements JsonLens, JsonObjectLens, JsonArrayLens {
     });
   }
 
-  private recordPatch(reason: string, patch: PatchOperation) {
+  recordPatch(reason: string, patch: PatchOperation) {
     this.patches.push(patch);
     this.reports.push({
       fileName: this.fileName,

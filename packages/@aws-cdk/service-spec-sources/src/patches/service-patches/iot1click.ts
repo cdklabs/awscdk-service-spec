@@ -1,4 +1,5 @@
-import { Reason, addDefinitions, forResource, registerServicePatch, replaceDefinitionProperty } from './core';
+import { addDefinitions, forResource, registerServicePatch, replaceDefinitionProperty } from './core';
+import { Reason } from '../../patching';
 
 /**
  * We enhance the types for IoT project

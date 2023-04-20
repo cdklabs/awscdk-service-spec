@@ -7,7 +7,7 @@ import * as util from 'util';
 import { failure, Failure, isFailure, isSuccess, locateFailure, Result } from '@cdklabs/tskb';
 import Ajv from 'ajv';
 import * as _glob from 'glob';
-import { applyPatcher, JsonLensPatcher, PatchReport } from './patching/patching';
+import { applyPatcher, JsonLensPatcher, PatchReport } from '../patching';
 
 export interface LoadOptions {
   /**

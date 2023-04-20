@@ -1,4 +1,4 @@
-import { jsonschema } from '../../types';
+import { jsonschema } from '../types';
 
 /**
  * A type that requires it to contain all keys from another type

@@ -1,4 +1,4 @@
-import { PatchReport, formatPatchReport } from '../../src/loading/patching/';
+import { PatchReport, formatPatchReport } from '../../src/patching/';
 
 const subject = {
   typeName: 'AWS::Some::Resource',
