@@ -12,6 +12,7 @@ import {
   replaceArrayLengthProps,
 } from '../../src/patches/registry-patches';
 import { applyPatcher, Patcher, JsonLens, JsonObjectLens } from '../../src/patching';
+import { patchObject } from '../utils';
 
 describe('patches', () => {
   describe(replaceArrayLengthProps, () => {
@@ -330,8 +331,3 @@ test('simplify unnecessary oneOf away', () => {
     }),
   );
 });
-
-function patchObject(obj: any, fn: Patcher<JsonObjectLens>): any {
-  const { root: patchedObj } = applyPatcher(obj, fn as Patcher<JsonLens>);
-  return patchedObj;
-}

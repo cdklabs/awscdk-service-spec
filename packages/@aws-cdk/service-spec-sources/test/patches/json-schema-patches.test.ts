@@ -5,6 +5,7 @@ import {
   removeEmptyRequiredArray,
 } from '../../src/patches/json-schema-patches';
 import { Patcher, applyPatcher, JsonLens, JsonObjectLens } from '../../src/patching';
+import { patchObject } from '../utils';
 
 describe(explodeTypeArray, () => {
   test('works in the base case', () => {
@@ -230,8 +231,3 @@ describe(missingTypeObject, () => {
     });
   });
 });
-
-function patchObject(obj: any, fn: Patcher<JsonObjectLens>): any {
-  const { root: patchedObj } = applyPatcher(obj, fn as Patcher<JsonLens>);
-  return patchedObj;
-}
