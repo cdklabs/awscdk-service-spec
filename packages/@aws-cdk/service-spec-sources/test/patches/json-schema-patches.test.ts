@@ -4,7 +4,6 @@ import {
   missingTypeObject,
   removeEmptyRequiredArray,
 } from '../../src/patches/json-schema-patches';
-import { Patcher, applyPatcher, JsonLens, JsonObjectLens } from '../../src/patching';
 import { patchObject } from '../utils';
 
 describe(explodeTypeArray, () => {

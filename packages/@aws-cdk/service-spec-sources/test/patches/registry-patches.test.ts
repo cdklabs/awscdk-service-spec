@@ -11,7 +11,6 @@ import {
   removeSuspiciousPatterns,
   replaceArrayLengthProps,
 } from '../../src/patches/registry-patches';
-import { applyPatcher, Patcher, JsonLens, JsonObjectLens } from '../../src/patching';
 import { patchObject } from '../utils';
 
 describe('patches', () => {
