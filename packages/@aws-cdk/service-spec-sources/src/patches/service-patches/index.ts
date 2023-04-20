@@ -15,3 +15,4 @@ import './cognito';
 import './iot1click';
 import './legacy-untyped';
 import './wafv2';
+import './elasticsearch';
