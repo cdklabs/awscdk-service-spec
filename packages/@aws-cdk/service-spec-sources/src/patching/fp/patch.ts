@@ -3,11 +3,6 @@ import { JsonLens, PatchOperation } from '../json-lens';
 import { Patcher } from '../patching';
 import { Reason } from '../reason';
 
-/**
- * Functional Programming Interfaces
- * For when declarative is not enough
- */
-
 export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 export type Patch<Tree extends any> = (doc: Mutable<Tree>) => Tree;
 

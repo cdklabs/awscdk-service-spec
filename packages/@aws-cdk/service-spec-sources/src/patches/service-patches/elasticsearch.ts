@@ -11,7 +11,9 @@ registerServicePatch(
     ),
     (readOnlyProperties) => {
       const idx = readOnlyProperties?.indexOf('/properties/DomainArn');
-      idx && delete readOnlyProperties?.[idx];
+      if (idx !== undefined && idx >= 0) {
+        delete readOnlyProperties?.[idx];
+      }
       return readOnlyProperties;
     },
   ),

@@ -1,9 +1,6 @@
 import { forResource, registerServicePatch, renameDefinition } from './core';
 import { Reason } from '../../patching';
 
-/**
- * We enhance the types for IoT project
- */
 registerServicePatch(
   forResource('AWS::WAFv2::RuleGroup', (lens) => {
     const reason = Reason.other(
