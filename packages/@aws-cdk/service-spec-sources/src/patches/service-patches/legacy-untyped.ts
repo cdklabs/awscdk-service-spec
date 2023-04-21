@@ -58,6 +58,7 @@ const LEGACY_UNTYPED_PROPERTIES = {
   'AWS::S3ObjectLambda::AccessPoint.TransformationConfiguration': ['ContentTransformation'],
   'AWS::S3Outposts::Bucket.Rule': ['Filter'],
   'AWS::SageMaker::ModelPackage.ModelPackageContainerDefinition': ['ModelInput'],
+  'AWS::Timestream::Table': ['MagneticStoreWriteProperties', 'RetentionProperties'],
   'AWS::Transfer::Workflow.WorkflowStep': [
     'CopyStepDetails',
     'CustomStepDetails',
