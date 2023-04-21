@@ -12,10 +12,6 @@ import { forResource, registerServicePatches, replaceDefinitionProperty, replace
 import { Reason } from '../../patching';
 
 const LEGACY_UNTYPED_PROPERTIES = {
-  'AWS::ImageBuilder::DistributionConfiguration.Distribution': [
-    'AmiDistributionConfiguration',
-    'ContainerDistributionConfiguration',
-  ],
   'AWS::Backup::ReportPlan': ['ReportDeliveryChannel', 'ReportSetting'],
   'AWS::CloudFormation::StackSet': ['ManagedExecution'],
   'AWS::CodeGuruProfiler::ProfilingGroup': ['AgentPermissions'],
@@ -29,6 +25,10 @@ const LEGACY_UNTYPED_PROPERTIES = {
   'AWS::ECR::PublicRepository': ['RepositoryCatalogData'],
   'AWS::ElastiCache::User': ['AuthenticationMode'],
   'AWS::Forecast::Dataset': ['EncryptionConfig', 'Schema'],
+  'AWS::ImageBuilder::DistributionConfiguration.Distribution': [
+    'AmiDistributionConfiguration',
+    'ContainerDistributionConfiguration',
+  ],
   'AWS::IoT::JobTemplate': ['AbortConfig', 'JobExecutionsRolloutConfig', 'PresignedUrlConfig', 'TimeoutConfig'],
   'AWS::IoTCoreDeviceAdvisor::SuiteDefinition': ['SuiteDefinitionConfiguration'],
   'AWS::IoTSiteWise::Portal': ['Alarms'],
@@ -68,6 +68,8 @@ const LEGACY_UNTYPED_PROPERTIES = {
   'AWS::WAFv2::RuleGroup.FieldToMatch': ['SingleQueryArgument', 'SingleHeader'],
   'AWS::WAFv2::RuleGroup.RuleAction': ['Allow', 'Block', 'Captcha', 'Challenge', 'Count'],
   'AWS::WAFv2::WebACL.FieldToMatch': ['SingleQueryArgument', 'SingleHeader'],
+  'AWS::XRay::Group': ['Tags'],
+  'AWS::XRay::SamplingRule': ['Tags'],
 };
 
 for (const [key, propertyNames] of Object.entries(LEGACY_UNTYPED_PROPERTIES)) {
