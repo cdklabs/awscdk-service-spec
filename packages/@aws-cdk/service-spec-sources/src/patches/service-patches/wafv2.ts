@@ -1,7 +1,7 @@
-import { forResource, registerServicePatch, renameDefinition } from './core';
+import { forResource, registerServicePatches, renameDefinition } from './core';
 import { Reason } from '../../patching';
 
-registerServicePatch(
+registerServicePatches(
   forResource('AWS::WAFv2::RuleGroup', (lens) => {
     const reason = Reason.other(
       'Reverting property type names from FooAction to Foo, which were introduced as part of this PR: https://github.com/aws/aws-cdk/pull/23984',

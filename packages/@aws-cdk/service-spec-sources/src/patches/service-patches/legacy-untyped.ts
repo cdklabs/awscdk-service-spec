@@ -8,7 +8,7 @@
  * for these types of progressively typed properties.
  */
 
-import { forResource, registerServicePatch, replaceDefinitionProperty, replaceResourceProperty } from './core';
+import { forResource, registerServicePatches, replaceDefinitionProperty, replaceResourceProperty } from './core';
 import { Reason } from '../../patching';
 
 const LEGACY_UNTYPED_PROPERTIES = {
@@ -72,7 +72,7 @@ const LEGACY_UNTYPED_PROPERTIES = {
 
 for (const [key, propertyNames] of Object.entries(LEGACY_UNTYPED_PROPERTIES)) {
   const parts = key.split('.');
-  registerServicePatch(
+  registerServicePatches(
     forResource(parts[0], (lens) => {
       for (const propertyName of propertyNames) {
         if (parts.length === 2) {

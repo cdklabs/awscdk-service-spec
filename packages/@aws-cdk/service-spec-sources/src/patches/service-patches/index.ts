@@ -11,8 +11,12 @@
 
 export { SERVICE_PATCHERS as EXCEPTIONS_PATCHERS } from './core';
 
-import './cognito';
-import './iot1click';
+// Convert typed -> Json for some legacy types
 import './legacy-untyped';
-import './wafv2';
+
+// Services
+import './autoscaling';
+import './cognito';
 import './elasticsearch';
+import './iot1click';
+import './wafv2';

@@ -1,10 +1,10 @@
-import { addDefinitions, forResource, registerServicePatch, replaceDefinitionProperty } from './core';
+import { addDefinitions, forResource, registerServicePatches, replaceDefinitionProperty } from './core';
 import { Reason } from '../../patching';
 
 /**
  * We enhance the types for IoT project
  */
-registerServicePatch(
+registerServicePatches(
   forResource('AWS::IoT1Click::Project', (lens) => {
     const reason = Reason.other(
       'Set type of AWS::IoT1Click::Project.PlacementTemplate.DeviceTemplates to Map<String, AWS::IoT1Click::Project.DeviceTemplate>',

@@ -1,8 +1,8 @@
-import { fp, registerServicePatch } from './core';
+import { fp, registerServicePatches } from './core';
 import { Reason } from '../../patching';
 import { CloudFormationRegistryResource } from '../../types';
 
-registerServicePatch(
+registerServicePatches(
   fp.patchResourceAt<CloudFormationRegistryResource['readOnlyProperties']>(
     'AWS::Elasticsearch::Domain',
     '/readOnlyProperties',
