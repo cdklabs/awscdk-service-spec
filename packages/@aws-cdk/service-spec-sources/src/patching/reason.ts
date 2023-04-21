@@ -7,5 +7,9 @@ export class Reason {
     return new Reason(reason);
   }
 
+  public static sourceIssue(description: string) {
+    return new Reason('[Suspected Data Source Problem] ' + description);
+  }
+
   private constructor(public readonly reason: string) {}
 }

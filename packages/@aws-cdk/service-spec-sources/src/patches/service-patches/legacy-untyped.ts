@@ -8,14 +8,10 @@
  * for these types of progressively typed properties.
  */
 
-import { forResource, registerServicePatch, replaceDefinitionProperty, replaceResourceProperty } from './core';
+import { forResource, registerServicePatches, replaceDefinitionProperty, replaceResourceProperty } from './core';
 import { Reason } from '../../patching';
 
 const LEGACY_UNTYPED_PROPERTIES = {
-  'AWS::ImageBuilder::DistributionConfiguration.Distribution': [
-    'AmiDistributionConfiguration',
-    'ContainerDistributionConfiguration',
-  ],
   'AWS::Backup::ReportPlan': ['ReportDeliveryChannel', 'ReportSetting'],
   'AWS::CloudFormation::StackSet': ['ManagedExecution'],
   'AWS::CodeGuruProfiler::ProfilingGroup': ['AgentPermissions'],
@@ -29,6 +25,10 @@ const LEGACY_UNTYPED_PROPERTIES = {
   'AWS::ECR::PublicRepository': ['RepositoryCatalogData'],
   'AWS::ElastiCache::User': ['AuthenticationMode'],
   'AWS::Forecast::Dataset': ['EncryptionConfig', 'Schema'],
+  'AWS::ImageBuilder::DistributionConfiguration.Distribution': [
+    'AmiDistributionConfiguration',
+    'ContainerDistributionConfiguration',
+  ],
   'AWS::IoT::JobTemplate': ['AbortConfig', 'JobExecutionsRolloutConfig', 'PresignedUrlConfig', 'TimeoutConfig'],
   'AWS::IoTCoreDeviceAdvisor::SuiteDefinition': ['SuiteDefinitionConfiguration'],
   'AWS::IoTSiteWise::Portal': ['Alarms'],
@@ -58,6 +58,7 @@ const LEGACY_UNTYPED_PROPERTIES = {
   'AWS::S3ObjectLambda::AccessPoint.TransformationConfiguration': ['ContentTransformation'],
   'AWS::S3Outposts::Bucket.Rule': ['Filter'],
   'AWS::SageMaker::ModelPackage.ModelPackageContainerDefinition': ['ModelInput'],
+  'AWS::Timestream::Table': ['MagneticStoreWriteProperties', 'RetentionProperties'],
   'AWS::Transfer::Workflow.WorkflowStep': [
     'CopyStepDetails',
     'CustomStepDetails',
@@ -68,11 +69,13 @@ const LEGACY_UNTYPED_PROPERTIES = {
   'AWS::WAFv2::RuleGroup.FieldToMatch': ['SingleQueryArgument', 'SingleHeader'],
   'AWS::WAFv2::RuleGroup.RuleAction': ['Allow', 'Block', 'Captcha', 'Challenge', 'Count'],
   'AWS::WAFv2::WebACL.FieldToMatch': ['SingleQueryArgument', 'SingleHeader'],
+  'AWS::XRay::Group': ['Tags'],
+  'AWS::XRay::SamplingRule': ['Tags'],
 };
 
 for (const [key, propertyNames] of Object.entries(LEGACY_UNTYPED_PROPERTIES)) {
   const parts = key.split('.');
-  registerServicePatch(
+  registerServicePatches(
     forResource(parts[0], (lens) => {
       for (const propertyName of propertyNames) {
         if (parts.length === 2) {

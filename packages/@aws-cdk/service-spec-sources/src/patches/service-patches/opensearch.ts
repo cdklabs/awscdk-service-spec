@@ -3,10 +3,10 @@ import { Reason } from '../../patching';
 
 registerServicePatches(
   fp.removeFromReadOnlyProperties(
-    'AWS::Elasticsearch::Domain',
+    'AWS::OpenSearchService::Domain',
     ['DomainArn'],
     Reason.other(
-      'Remove the deprecated attribute DomainArn, as the new preferred attribute Arn maps to the same name in the generated code',
+      'Remove the DomainArn attribute of AWS::OpenSearchService::Domain resources, as it is unsupported by CloudFormation',
     ),
   ),
 );

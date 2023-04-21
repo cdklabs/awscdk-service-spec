@@ -1,4 +1,4 @@
-import { addDefinitions, forResource, registerServicePatch, replaceResourceProperty } from './core';
+import { addDefinitions, forResource, registerServicePatches, replaceResourceProperty } from './core';
 import { Reason } from '../../patching';
 
 /**
@@ -11,7 +11,7 @@ import { Reason } from '../../patching';
  *
  * This patch was never necessary, but it was done with the best of intentions.
  */
-registerServicePatch(
+registerServicePatches(
   forResource('AWS::Cognito::IdentityPoolRoleAttachment', (lens) => {
     replaceResourceProperty(
       'RoleMappings',
