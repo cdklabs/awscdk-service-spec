@@ -1578,7 +1578,7 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
   public readonly tracingConfig?: cdk.IResolvable | CfnFunction.TracingConfigProperty;
 
   /**
-   * For network connectivity to AWS resources in a [VPC](https://docs.aws.amazon.com/lambda/latest/dg/configuration-network.html) , specify a list of security groups and subnets in the VPC.
+   * For network connectivity to AWS resources in a VPC, specify a list of security groups and subnets in the VPC.
    */
   public readonly vpcConfig?: cdk.IResolvable | CfnFunction.VpcConfigProperty;
 
@@ -2050,7 +2050,9 @@ export interface CfnFunctionProps {
   readonly tracingConfig?: cdk.IResolvable | CfnFunction.TracingConfigProperty;
 
   /**
-   * For network connectivity to AWS resources in a [VPC](https://docs.aws.amazon.com/lambda/latest/dg/configuration-network.html) , specify a list of security groups and subnets in the VPC.
+   * For network connectivity to AWS resources in a VPC, specify a list of security groups and subnets in the VPC.
+   *
+   * When you connect a function to a VPC, it can access resources and the internet only through that VPC. For more information, see [Configuring a Lambda function to access resources in a VPC](https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html) .
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-vpcconfig
    */
