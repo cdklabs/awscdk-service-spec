@@ -70,7 +70,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
     recurseProperties(resource, res.properties, resourceFailure);
     // Every property that's a "readonly" property, remove it again from the `properties` collection.
-    for (const propPtr of resource.readOnlyProperties ?? []) {
+    for (const propPtr of findAttributes(resource)) {
       const propName = simplePropNameFromJsonPtr(propPtr);
       delete res.properties[propName];
     }
@@ -228,7 +228,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
     const attributeNames = Array.from(
       new Set([
-        ...(source.readOnlyProperties ?? []).map(simplePropNameFromJsonPtr),
+        ...findAttributes(resource).map(simplePropNameFromJsonPtr),
         ...Object.keys(options.specResource?.Attributes ?? {}),
       ]),
     )
@@ -344,4 +344,11 @@ function lastWord(x?: string): string | undefined {
 
 function fakeResolved(schema: jsonschema.ConcreteSchema, referenceName?: string): jsonschema.ResolvedSchema {
   return { schema, referenceName };
+}
+
+function findAttributes(resource: CloudFormationRegistryResource): string[] {
+  const candidates = new Set(resource.readOnlyProperties ?? []);
+  const exclusions = resource.createOnlyProperties ?? [];
+
+  return Array.from(new Set([...candidates].filter((a) => !exclusions.includes(a))));
 }

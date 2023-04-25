@@ -30,6 +30,29 @@ test('exclude readOnlyProperties from properties', () => {
   expect(propNames).toEqual(['Property']);
 });
 
+test("don't exclude readOnlyProperties from properties that are also createOnlyProperties", () => {
+  importCloudFormationRegistryResource({
+    db,
+    fails,
+    resource: {
+      description: 'Test resource',
+      typeName: 'AWS::Some::Type',
+      properties: {
+        Id: { type: 'string' },
+        ReplacementProperty: { type: 'string' },
+      },
+      readOnlyProperties: ['/properties/Id', '/properties/ReplacementProperty'],
+      createOnlyProperties: ['/properties/ReplacementProperty'],
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0];
+  const propNames = Object.keys(resource?.properties);
+  const attrNames = Object.keys(resource?.attributes);
+  expect(propNames).toEqual(['ReplacementProperty']);
+  expect(attrNames).toEqual(['Id']);
+});
+
 test('include readOnlyProperties in attributes', () => {
   importCloudFormationRegistryResource({
     db,
