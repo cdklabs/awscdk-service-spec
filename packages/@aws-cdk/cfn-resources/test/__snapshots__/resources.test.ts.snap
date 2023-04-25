@@ -2927,7 +2927,7 @@ export class CfnBucket extends cdk.CfnResource implements cdk.IInspectable, cdk.
    *
    * @cloudformationAttribute WebsiteURL
    */
-  public readonly attrWebsiteURL: string;
+  public readonly attrWebsiteUrl: string;
 
   /**
    * Configures the transfer acceleration state for an Amazon S3 bucket.
@@ -3044,7 +3044,7 @@ export class CfnBucket extends cdk.CfnResource implements cdk.IInspectable, cdk.
     this.attrDomainName = cdk.Token.asString(this.getAtt("DomainName", cdk.ResolutionTypeHint.STRING));
     this.attrDualStackDomainName = cdk.Token.asString(this.getAtt("DualStackDomainName", cdk.ResolutionTypeHint.STRING));
     this.attrRegionalDomainName = cdk.Token.asString(this.getAtt("RegionalDomainName", cdk.ResolutionTypeHint.STRING));
-    this.attrWebsiteURL = cdk.Token.asString(this.getAtt("WebsiteURL", cdk.ResolutionTypeHint.STRING));
+    this.attrWebsiteUrl = cdk.Token.asString(this.getAtt("WebsiteURL", cdk.ResolutionTypeHint.STRING));
     this.accelerateConfiguration = props.accelerateConfiguration;
     this.accessControl = props.accessControl;
     this.analyticsConfigurations = props.analyticsConfigurations;

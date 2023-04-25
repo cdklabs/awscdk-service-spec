@@ -95,14 +95,14 @@ export class ResourceClass extends ClassType {
     }
 
     // Copy properties onto class properties
-    for (const { name, prop, memberOptional, memberType, memberImmutable } of this.mappableProperties()) {
+    for (const { name, memberOptional, memberType, memberImmutable, docsSummary } of this.mappableProperties()) {
       this.addProperty({
         name: name,
         type: memberType,
         optional: memberOptional,
         immutable: memberImmutable,
         docs: {
-          summary: prop.docs?.summary,
+          summary: docsSummary,
         },
       });
     }
@@ -208,7 +208,7 @@ export class ResourceClass extends ClassType {
 
       // Validate required properties
       ...this.mappableProperties()
-        .filter(({ prop }) => !prop.optional)
+        .filter(({ validateRequired }) => validateRequired)
         .map(({ name }) => CDK_CORE.requireProperty(props, expr.lit(name), $this)),
 
       stmt.sep(),
@@ -311,7 +311,16 @@ export class ResourceClass extends ClassType {
     });
   }
 
-  private mappableProperties() {
+  private mappableProperties(): Array<{
+    name: string;
+    memberOptional: boolean;
+    validateRequired: boolean;
+    memberImmutable: boolean;
+    memberType: Type;
+    initializer: (props: Expression) => Expression;
+    valueToRender: Expression;
+    docsSummary?: string;
+  }> {
     const $this = $E(expr.this_());
     return this.propsType.properties.map((prop) => {
       // FIXME: Would be nicer to thread this value through
@@ -321,8 +330,8 @@ export class ResourceClass extends ClassType {
         return {
           // The property must be called 'tags' for the resource to count as ITaggable
           name: 'tags',
-          prop,
           memberOptional: false,
+          validateRequired: false,
           memberImmutable: true,
           memberType: CDK_CORE.TagManager,
           initializer: (props: Expression) =>
@@ -333,17 +342,19 @@ export class ResourceClass extends ClassType {
               expr.object({ tagPropertyName: expr.lit(prop.name) }),
             ),
           valueToRender: $this.tags.renderTags(),
+          docsSummary: prop.docs?.summary,
         };
       }
 
       return {
         name: prop.name,
-        prop,
         memberOptional: prop.optional,
+        validateRequired: !prop.optional,
         memberImmutable: false,
         memberType: prop.type,
         initializer: (props: Expression) => prop.from(props),
         valueToRender: $this[prop.name],
+        docsSummary: prop.docs?.summary,
       };
     });
   }
