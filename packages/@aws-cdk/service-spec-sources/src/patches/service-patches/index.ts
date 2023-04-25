@@ -20,4 +20,5 @@ import './cognito';
 import './elasticsearch';
 import './iot1click';
 import './opensearch';
+import './rds';
 import './wafv2';

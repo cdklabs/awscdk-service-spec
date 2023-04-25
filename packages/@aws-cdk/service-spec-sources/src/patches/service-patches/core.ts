@@ -167,4 +167,29 @@ export namespace fp {
       },
     );
   }
+
+  /**
+   * Add properties to readOnlyProperties
+   * A patch will only be created if to property does not exist yet
+   */
+  export function addReadOnlyProperties<TypeName extends string = string>(
+    resource: TypeName,
+    additional: string[],
+    reason: Reason,
+  ): Patcher<JsonLens> {
+    return patchResourceAt<CloudFormationRegistryResource['readOnlyProperties']>(
+      resource,
+      '/readOnlyProperties',
+      reason,
+      (readOnlyProperties) => {
+        for (const prop of additional) {
+          const propPtr = `/properties/${prop}`;
+          if (!readOnlyProperties?.includes(propPtr)) {
+            readOnlyProperties?.push(`/properties/${prop}`);
+          }
+        }
+        return readOnlyProperties;
+      },
+    );
+  }
 }
