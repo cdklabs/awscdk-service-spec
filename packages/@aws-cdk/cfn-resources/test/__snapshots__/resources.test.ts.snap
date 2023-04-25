@@ -182,77 +182,77 @@ export class CfnRestApi extends cdk.CfnResource implements cdk.IInspectable, cdk
   /**
    * The source of the API key for metering requests according to a usage plan.
    */
-  public readonly apiKeySourceType?: string;
+  public apiKeySourceType?: string;
 
   /**
    * The list of binary media types supported by the RestApi.
    */
-  public readonly binaryMediaTypes?: Array<string>;
+  public binaryMediaTypes?: Array<string>;
 
   /**
    * An OpenAPI specification that defines a set of RESTful APIs in JSON format.
    */
-  public readonly body?: any | cdk.IResolvable | string;
+  public body?: any | cdk.IResolvable | string;
 
   /**
    * The Amazon Simple Storage Service (Amazon S3) location that points to an OpenAPI file, which defines a set of RESTful APIs in JSON or YAML format.
    */
-  public readonly bodyS3Location?: cdk.IResolvable | CfnRestApi.S3LocationProperty;
+  public bodyS3Location?: cdk.IResolvable | CfnRestApi.S3LocationProperty;
 
   /**
    * The ID of the RestApi that you want to clone from.
    */
-  public readonly cloneFrom?: string;
+  public cloneFrom?: string;
 
   /**
    * A list of the endpoint types of the API.
    */
-  public readonly endpointConfiguration?: CfnRestApi.EndpointConfigurationProperty | cdk.IResolvable;
+  public endpointConfiguration?: CfnRestApi.EndpointConfigurationProperty | cdk.IResolvable;
 
   /**
    * The description of the RestApi.
    */
-  public readonly description?: string;
+  public description?: string;
 
   /**
    * Specifies whether clients can invoke your API by using the default \`execute-api\` endpoint.
    */
-  public readonly disableExecuteApiEndpoint?: boolean | cdk.IResolvable;
+  public disableExecuteApiEndpoint?: boolean | cdk.IResolvable;
 
   /**
    * A query parameter to indicate whether to rollback the API update ( \`true\` ) or not ( \`false\` ) when a warning is encountered.
    */
-  public readonly failOnWarnings?: boolean | cdk.IResolvable;
+  public failOnWarnings?: boolean | cdk.IResolvable;
 
   /**
    * The name of the RestApi.
    */
-  public readonly name?: string;
+  public name?: string;
 
   /**
    * A nullable integer that is used to enable compression (with non-negative between 0 and 10485760 (10M) bytes, inclusive) or disable compression (with a null value) on an API.
    */
-  public readonly minimumCompressionSize?: number;
+  public minimumCompressionSize?: number;
 
   /**
    * This property applies only when you use OpenAPI to define your REST API.
    */
-  public readonly mode?: string;
+  public mode?: string;
 
   /**
    * A policy document that contains the permissions for the \`RestApi\` resource.
    */
-  public readonly policy?: any | cdk.IResolvable | string;
+  public policy?: any | cdk.IResolvable | string;
 
   /**
    * Custom header parameters as part of the request.
    */
-  public readonly parameters?: cdk.IResolvable | Record<string, string> | string;
+  public parameters?: cdk.IResolvable | Record<string, string> | string;
 
   /**
    * The key-value map of strings.
    */
-  public readonly tags: cdk.TagManager;
+  public tags: cdk.TagManager;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -789,47 +789,47 @@ export class CfnRole extends cdk.CfnResource implements cdk.IInspectable, cdk.IT
   /**
    * The trust policy that is associated with this role.
    */
-  public readonly assumeRolePolicyDocument: any | cdk.IResolvable | string;
+  public assumeRolePolicyDocument: any | cdk.IResolvable | string;
 
   /**
    * A description of the role that you provide.
    */
-  public readonly description?: string;
+  public description?: string;
 
   /**
    * A list of Amazon Resource Names (ARNs) of the IAM managed policies that you want to attach to the role.
    */
-  public readonly managedPolicyArns?: Array<string>;
+  public managedPolicyArns?: Array<string>;
 
   /**
    * The maximum session duration (in seconds) that you want to set for the specified role.
    */
-  public readonly maxSessionDuration?: number;
+  public maxSessionDuration?: number;
 
   /**
    * The path to the role. For more information about paths, see [IAM Identifiers](https://docs.aws.amazon.com/IAM/latest/UserGuide/Using_Identifiers.html) in the *IAM User Guide* .
    */
-  public readonly path?: string;
+  public path?: string;
 
   /**
    * The ARN of the policy used to set the permissions boundary for the role.
    */
-  public readonly permissionsBoundary?: string;
+  public permissionsBoundary?: string;
 
   /**
    * Adds or updates an inline policy document that is embedded in the specified IAM role.
    */
-  public readonly policies?: Array<cdk.IResolvable | CfnRole.PolicyProperty> | cdk.IResolvable;
+  public policies?: Array<cdk.IResolvable | CfnRole.PolicyProperty> | cdk.IResolvable;
 
   /**
    * A name for the IAM role, up to 64 characters in length.
    */
-  public readonly roleName?: string;
+  public roleName?: string;
 
   /**
    * A list of tags that are attached to the role.
    */
-  public readonly tags: cdk.TagManager;
+  public tags: cdk.TagManager;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -1570,122 +1570,122 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
   /**
    * A description of the function.
    */
-  public readonly description?: string;
+  public description?: string;
 
   /**
    * Set \`Mode\` to \`Active\` to sample and trace a subset of incoming requests with [X-Ray](https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html) .
    */
-  public readonly tracingConfig?: cdk.IResolvable | CfnFunction.TracingConfigProperty;
+  public tracingConfig?: cdk.IResolvable | CfnFunction.TracingConfigProperty;
 
   /**
    * For network connectivity to AWS resources in a VPC, specify a list of security groups and subnets in the VPC.
    */
-  public readonly vpcConfig?: cdk.IResolvable | CfnFunction.VpcConfigProperty;
+  public vpcConfig?: cdk.IResolvable | CfnFunction.VpcConfigProperty;
 
   /**
    * Sets the runtime management configuration for a function's version.
    */
-  public readonly runtimeManagementConfig?: cdk.IResolvable | CfnFunction.RuntimeManagementConfigProperty;
+  public runtimeManagementConfig?: cdk.IResolvable | CfnFunction.RuntimeManagementConfigProperty;
 
   /**
    * The number of simultaneous executions to reserve for the function.
    */
-  public readonly reservedConcurrentExecutions?: number;
+  public reservedConcurrentExecutions?: number;
 
   /**
    * The function's [AWS Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html) setting.
    */
-  public readonly snapStart?: cdk.IResolvable | CfnFunction.SnapStartProperty;
+  public snapStart?: cdk.IResolvable | CfnFunction.SnapStartProperty;
 
   /**
    * Connection settings for an Amazon EFS file system.
    */
-  public readonly fileSystemConfigs?: Array<CfnFunction.FileSystemConfigProperty | cdk.IResolvable> | cdk.IResolvable;
+  public fileSystemConfigs?: Array<CfnFunction.FileSystemConfigProperty | cdk.IResolvable> | cdk.IResolvable;
 
   /**
    * The name of the Lambda function, up to 64 characters in length.
    */
-  public readonly functionName?: string;
+  public functionName?: string;
 
   /**
    * The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html) . Runtime is required if the deployment package is a .zip file archive.
    */
-  public readonly runtime?: string;
+  public runtime?: string;
 
   /**
    * The ARN of the AWS Key Management Service ( AWS KMS ) customer managed key that's used to encrypt your function's [environment variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-encryption) . When [Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart-security.html) is activated, this key is also used to encrypt your function's snapshot. If you don't provide a customer managed key, Lambda uses a default service key.
    */
-  public readonly kmsKeyArn?: string;
+  public kmsKeyArn?: string;
 
   /**
    * The type of deployment package.
    */
-  public readonly packageType?: string;
+  public packageType?: string;
 
   /**
    * To enable code signing for this function, specify the ARN of a code-signing configuration.
    */
-  public readonly codeSigningConfigArn?: string;
+  public codeSigningConfigArn?: string;
 
   /**
    * A list of [function layers](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html) to add to the function's execution environment. Specify each layer by its ARN, including the version.
    */
-  public readonly layers?: Array<string>;
+  public layers?: Array<string>;
 
   /**
    * A list of [tags](https://docs.aws.amazon.com/lambda/latest/dg/tagging.html) to apply to the function.
    */
-  public readonly tags: cdk.TagManager;
+  public tags: cdk.TagManager;
 
   /**
    * Configuration values that override the container image Dockerfile settings.
    */
-  public readonly imageConfig?: CfnFunction.ImageConfigProperty | cdk.IResolvable;
+  public imageConfig?: CfnFunction.ImageConfigProperty | cdk.IResolvable;
 
   /**
    * The amount of [memory available to the function](https://docs.aws.amazon.com/lambda/latest/dg/configuration-function-common.html#configuration-memory-console) at runtime. Increasing the function memory also increases its CPU allocation. The default value is 128 MB. The value can be any multiple of 1 MB.
    */
-  public readonly memorySize?: number;
+  public memorySize?: number;
 
   /**
    * A dead-letter queue configuration that specifies the queue or topic where Lambda sends asynchronous events when they fail processing.
    */
-  public readonly deadLetterConfig?: CfnFunction.DeadLetterConfigProperty | cdk.IResolvable;
+  public deadLetterConfig?: CfnFunction.DeadLetterConfigProperty | cdk.IResolvable;
 
   /**
    * The amount of time (in seconds) that Lambda allows a function to run before stopping it.
    */
-  public readonly timeout?: number;
+  public timeout?: number;
 
   /**
    * The name of the method within your code that Lambda calls to run your function.
    */
-  public readonly handler?: string;
+  public handler?: string;
 
   /**
    * The code for the function.
    */
-  public readonly code: CfnFunction.CodeProperty | cdk.IResolvable;
+  public code: CfnFunction.CodeProperty | cdk.IResolvable;
 
   /**
    * The Amazon Resource Name (ARN) of the function's execution role.
    */
-  public readonly role: string;
+  public role: string;
 
   /**
    * Environment variables that are accessible from function code during execution.
    */
-  public readonly environment?: CfnFunction.EnvironmentProperty | cdk.IResolvable;
+  public environment?: CfnFunction.EnvironmentProperty | cdk.IResolvable;
 
   /**
    * The size of the function's \`/tmp\` directory in MB.
    */
-  public readonly ephemeralStorage?: CfnFunction.EphemeralStorageProperty | cdk.IResolvable;
+  public ephemeralStorage?: CfnFunction.EphemeralStorageProperty | cdk.IResolvable;
 
   /**
    * The instruction set architecture that the function supports.
    */
-  public readonly architectures?: Array<string>;
+  public architectures?: Array<string>;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -2932,102 +2932,102 @@ export class CfnBucket extends cdk.CfnResource implements cdk.IInspectable, cdk.
   /**
    * Configures the transfer acceleration state for an Amazon S3 bucket.
    */
-  public readonly accelerateConfiguration?: CfnBucket.AccelerateConfigurationProperty | cdk.IResolvable;
+  public accelerateConfiguration?: CfnBucket.AccelerateConfigurationProperty | cdk.IResolvable;
 
   /**
    * A canned access control list (ACL) that grants predefined permissions to the bucket.
    */
-  public readonly accessControl?: string;
+  public accessControl?: string;
 
   /**
    * Specifies the configuration and any analyses for the analytics filter of an Amazon S3 bucket.
    */
-  public readonly analyticsConfigurations?: Array<CfnBucket.AnalyticsConfigurationProperty | cdk.IResolvable> | cdk.IResolvable;
+  public analyticsConfigurations?: Array<CfnBucket.AnalyticsConfigurationProperty | cdk.IResolvable> | cdk.IResolvable;
 
   /**
    * Specifies default encryption for a bucket using server-side encryption with Amazon S3-managed keys (SSE-S3) or AWS KMS-managed keys (SSE-KMS) bucket.
    */
-  public readonly bucketEncryption?: CfnBucket.BucketEncryptionProperty | cdk.IResolvable;
+  public bucketEncryption?: CfnBucket.BucketEncryptionProperty | cdk.IResolvable;
 
   /**
    * A name for the bucket.
    */
-  public readonly bucketName?: string;
+  public bucketName?: string;
 
   /**
    * Describes the cross-origin access configuration for objects in an Amazon S3 bucket.
    */
-  public readonly corsConfiguration?: CfnBucket.CorsConfigurationProperty | cdk.IResolvable;
+  public corsConfiguration?: CfnBucket.CorsConfigurationProperty | cdk.IResolvable;
 
   /**
    * Defines how Amazon S3 handles Intelligent-Tiering storage.
    */
-  public readonly intelligentTieringConfigurations?: Array<CfnBucket.IntelligentTieringConfigurationProperty | cdk.IResolvable> | cdk.IResolvable;
+  public intelligentTieringConfigurations?: Array<CfnBucket.IntelligentTieringConfigurationProperty | cdk.IResolvable> | cdk.IResolvable;
 
   /**
    * Specifies the inventory configuration for an Amazon S3 bucket.
    */
-  public readonly inventoryConfigurations?: Array<CfnBucket.InventoryConfigurationProperty | cdk.IResolvable> | cdk.IResolvable;
+  public inventoryConfigurations?: Array<CfnBucket.InventoryConfigurationProperty | cdk.IResolvable> | cdk.IResolvable;
 
   /**
    * Specifies the lifecycle configuration for objects in an Amazon S3 bucket.
    */
-  public readonly lifecycleConfiguration?: cdk.IResolvable | CfnBucket.LifecycleConfigurationProperty;
+  public lifecycleConfiguration?: cdk.IResolvable | CfnBucket.LifecycleConfigurationProperty;
 
   /**
    * Settings that define where logs are stored.
    */
-  public readonly loggingConfiguration?: cdk.IResolvable | CfnBucket.LoggingConfigurationProperty;
+  public loggingConfiguration?: cdk.IResolvable | CfnBucket.LoggingConfigurationProperty;
 
   /**
    * Specifies a metrics configuration for the CloudWatch request metrics (specified by the metrics configuration ID) from an Amazon S3 bucket.
    */
-  public readonly metricsConfigurations?: Array<cdk.IResolvable | CfnBucket.MetricsConfigurationProperty> | cdk.IResolvable;
+  public metricsConfigurations?: Array<cdk.IResolvable | CfnBucket.MetricsConfigurationProperty> | cdk.IResolvable;
 
   /**
    * Configuration that defines how Amazon S3 handles bucket notifications.
    */
-  public readonly notificationConfiguration?: cdk.IResolvable | CfnBucket.NotificationConfigurationProperty;
+  public notificationConfiguration?: cdk.IResolvable | CfnBucket.NotificationConfigurationProperty;
 
   /**
    * Places an Object Lock configuration on the specified bucket.
    */
-  public readonly objectLockConfiguration?: cdk.IResolvable | CfnBucket.ObjectLockConfigurationProperty;
+  public objectLockConfiguration?: cdk.IResolvable | CfnBucket.ObjectLockConfigurationProperty;
 
   /**
    * Indicates whether this bucket has an Object Lock configuration enabled.
    */
-  public readonly objectLockEnabled?: boolean | cdk.IResolvable;
+  public objectLockEnabled?: boolean | cdk.IResolvable;
 
   /**
    * Configuration that defines how Amazon S3 handles Object Ownership rules.
    */
-  public readonly ownershipControls?: cdk.IResolvable | CfnBucket.OwnershipControlsProperty;
+  public ownershipControls?: cdk.IResolvable | CfnBucket.OwnershipControlsProperty;
 
   /**
    * Configuration that defines how Amazon S3 handles public access.
    */
-  public readonly publicAccessBlockConfiguration?: cdk.IResolvable | CfnBucket.PublicAccessBlockConfigurationProperty;
+  public publicAccessBlockConfiguration?: cdk.IResolvable | CfnBucket.PublicAccessBlockConfigurationProperty;
 
   /**
    * Configuration for replicating objects in an S3 bucket.
    */
-  public readonly replicationConfiguration?: cdk.IResolvable | CfnBucket.ReplicationConfigurationProperty;
+  public replicationConfiguration?: cdk.IResolvable | CfnBucket.ReplicationConfigurationProperty;
 
   /**
    * An arbitrary set of tags (key-value pairs) for this S3 bucket.
    */
-  public readonly tags: cdk.TagManager;
+  public tags: cdk.TagManager;
 
   /**
    * Enables multiple versions of all objects in this bucket.
    */
-  public readonly versioningConfiguration?: cdk.IResolvable | CfnBucket.VersioningConfigurationProperty;
+  public versioningConfiguration?: cdk.IResolvable | CfnBucket.VersioningConfigurationProperty;
 
   /**
    * Information used to configure the bucket as a static website.
    */
-  public readonly websiteConfiguration?: cdk.IResolvable | CfnBucket.WebsiteConfigurationProperty;
+  public websiteConfiguration?: cdk.IResolvable | CfnBucket.WebsiteConfigurationProperty;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -8323,82 +8323,82 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
   /**
    * For first-in-first-out (FIFO) queues, specifies whether to enable content-based deduplication.
    */
-  public readonly contentBasedDeduplication?: boolean | cdk.IResolvable;
+  public contentBasedDeduplication?: boolean | cdk.IResolvable;
 
   /**
    * For high throughput for FIFO queues, specifies whether message deduplication occurs at the message group or queue level.
    */
-  public readonly deduplicationScope?: string;
+  public deduplicationScope?: string;
 
   /**
    * The time in seconds for which the delivery of all messages in the queue is delayed.
    */
-  public readonly delaySeconds?: number;
+  public delaySeconds?: number;
 
   /**
    * If set to true, creates a FIFO queue.
    */
-  public readonly fifoQueue?: boolean | cdk.IResolvable;
+  public fifoQueue?: boolean | cdk.IResolvable;
 
   /**
    * For high throughput for FIFO queues, specifies whether the FIFO queue throughput quota applies to the entire queue or per message group.
    */
-  public readonly fifoThroughputLimit?: string;
+  public fifoThroughputLimit?: string;
 
   /**
    * The length of time in seconds for which Amazon SQS can reuse a data key to encrypt or decrypt messages before calling AWS KMS again.
    */
-  public readonly kmsDataKeyReusePeriodSeconds?: number;
+  public kmsDataKeyReusePeriodSeconds?: number;
 
   /**
    * The ID of an AWS Key Management Service (KMS) for Amazon SQS , or a custom KMS.
    */
-  public readonly kmsMasterKeyId?: string;
+  public kmsMasterKeyId?: string;
 
   /**
    * Enables server-side queue encryption using SQS owned encryption keys.
    */
-  public readonly sqsManagedSseEnabled?: boolean | cdk.IResolvable;
+  public sqsManagedSseEnabled?: boolean | cdk.IResolvable;
 
   /**
    * The limit of how many bytes that a message can contain before Amazon SQS rejects it.
    */
-  public readonly maximumMessageSize?: number;
+  public maximumMessageSize?: number;
 
   /**
    * The number of seconds that Amazon SQS retains a message.
    */
-  public readonly messageRetentionPeriod?: number;
+  public messageRetentionPeriod?: number;
 
   /**
    * A name for the queue.
    */
-  public readonly queueName?: string;
+  public queueName?: string;
 
   /**
    * Specifies the duration, in seconds, that the ReceiveMessage action call waits until a message is in the queue in order to include it in the response, rather than returning an empty response if a message isn't yet available.
    */
-  public readonly receiveMessageWaitTimeSeconds?: number;
+  public receiveMessageWaitTimeSeconds?: number;
 
   /**
    * The string that includes the parameters for the permissions for the dead-letter queue redrive permission and which source queues can specify dead-letter queues as a JSON object.
    */
-  public readonly redriveAllowPolicy?: any | cdk.IResolvable | string;
+  public redriveAllowPolicy?: any | cdk.IResolvable | string;
 
   /**
    * The string that includes the parameters for the dead-letter queue functionality of the source queue as a JSON object.
    */
-  public readonly redrivePolicy?: any | cdk.IResolvable | string;
+  public redrivePolicy?: any | cdk.IResolvable | string;
 
   /**
    * The tags that you attach to this queue.
    */
-  public readonly tags: cdk.TagManager;
+  public tags: cdk.TagManager;
 
   /**
    * The length of time during which a message will be unavailable after a message is delivered from the queue.
    */
-  public readonly visibilityTimeout?: number;
+  public visibilityTimeout?: number;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -8813,17 +8813,17 @@ export class CfnSkill extends cdk.CfnResource implements cdk.IInspectable {
   /**
    * Login with Amazon (LWA) configuration used to authenticate with the Alexa service.
    */
-  public readonly authenticationConfiguration: CfnSkill.AuthenticationConfigurationProperty | cdk.IResolvable;
+  public authenticationConfiguration: CfnSkill.AuthenticationConfigurationProperty | cdk.IResolvable;
 
   /**
    * The vendor ID associated with the Amazon developer account that will host the skill.
    */
-  public readonly vendorId: string;
+  public vendorId: string;
 
   /**
    * Configuration for the skill package that contains the components of the Alexa skill.
    */
-  public readonly skillPackage: cdk.IResolvable | CfnSkill.SkillPackageProperty;
+  public skillPackage: cdk.IResolvable | CfnSkill.SkillPackageProperty;
 
   /**
    * @param scope Scope in which this resource is defined

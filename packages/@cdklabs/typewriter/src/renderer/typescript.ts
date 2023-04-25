@@ -388,10 +388,6 @@ export class TypeScriptRenderer extends Renderer {
       return new Identifier(sym.name);
     }
 
-    if (sym.name === 'VpnConnectionBase') {
-      debugger;
-    }
-
     for (const scope of this.scopes) {
       const expr = scope.symbolToExpression(sym);
       if (expr) {
