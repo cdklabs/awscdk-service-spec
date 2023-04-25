@@ -55,17 +55,17 @@ export class CfnSkill extends cdk.CfnResource implements cdk.IInspectable {
   /**
    * Login with Amazon (LWA) configuration used to authenticate with the Alexa service.
    */
-  public readonly authenticationConfiguration: CfnSkill.AuthenticationConfigurationProperty | cdk.IResolvable;
+  public authenticationConfiguration: CfnSkill.AuthenticationConfigurationProperty | cdk.IResolvable;
 
   /**
    * The vendor ID associated with the Amazon developer account that will host the skill.
    */
-  public readonly vendorId: string;
+  public vendorId: string;
 
   /**
    * Configuration for the skill package that contains the components of the Alexa skill.
    */
-  public readonly skillPackage: cdk.IResolvable | CfnSkill.SkillPackageProperty;
+  public skillPackage: cdk.IResolvable | CfnSkill.SkillPackageProperty;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -513,47 +513,47 @@ export class CfnMicrosoftTeamsChannelConfiguration extends cdk.CfnResource imple
   /**
    * The ID of the Microsoft Team authorized with AWS Chatbot .
    */
-  public readonly teamId: string;
+  public teamId: string;
 
   /**
    * The ID of the Microsoft Teams channel.
    */
-  public readonly teamsChannelId: string;
+  public teamsChannelId: string;
 
   /**
    * The ID of the Microsoft Teams tenant.
    */
-  public readonly teamsTenantId: string;
+  public teamsTenantId: string;
 
   /**
    * The name of the configuration.
    */
-  public readonly configurationName: string;
+  public configurationName: string;
 
   /**
    * The ARN of the IAM role that defines the permissions for AWS Chatbot .
    */
-  public readonly iamRoleArn: string;
+  public iamRoleArn: string;
 
   /**
    * The ARNs of the SNS topics that deliver notifications to AWS Chatbot .
    */
-  public readonly snsTopicArns?: Array<string>;
+  public snsTopicArns?: Array<string>;
 
   /**
    * Specifies the logging level for this configuration. This property affects the log entries pushed to Amazon CloudWatch Logs.
    */
-  public readonly loggingLevel?: string;
+  public loggingLevel?: string;
 
   /**
    * The list of IAM policy ARNs that are applied as channel guardrails.
    */
-  public readonly guardrailPolicies?: Array<string>;
+  public guardrailPolicies?: Array<string>;
 
   /**
    * Enables use of a user role requirement in your chat configuration.
    */
-  public readonly userRoleRequired?: boolean | cdk.IResolvable;
+  public userRoleRequired?: boolean | cdk.IResolvable;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -818,42 +818,42 @@ export class CfnSlackChannelConfiguration extends cdk.CfnResource implements cdk
   /**
    * The ID of the Slack workspace authorized with AWS Chatbot .
    */
-  public readonly slackWorkspaceId: string;
+  public slackWorkspaceId: string;
 
   /**
    * The ID of the Slack channel.
    */
-  public readonly slackChannelId: string;
+  public slackChannelId: string;
 
   /**
    * The name of the configuration.
    */
-  public readonly configurationName: string;
+  public configurationName: string;
 
   /**
    * The ARN of the IAM role that defines the permissions for AWS Chatbot .
    */
-  public readonly iamRoleArn: string;
+  public iamRoleArn: string;
 
   /**
    * The ARNs of the SNS topics that deliver notifications to AWS Chatbot .
    */
-  public readonly snsTopicArns?: Array<string>;
+  public snsTopicArns?: Array<string>;
 
   /**
    * Specifies the logging level for this configuration. This property affects the log entries pushed to Amazon CloudWatch Logs.
    */
-  public readonly loggingLevel?: string;
+  public loggingLevel?: string;
 
   /**
    * The list of IAM policy ARNs that are applied as channel guardrails.
    */
-  public readonly guardrailPolicies?: Array<string>;
+  public guardrailPolicies?: Array<string>;
 
   /**
    * Enables use of a user role requirement in your chat configuration.
    */
-  public readonly userRoleRequired?: boolean | cdk.IResolvable;
+  public userRoleRequired?: boolean | cdk.IResolvable;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -1101,51 +1101,51 @@ export class CfnApi extends cdk.CfnResource implements cdk.IInspectable, cdk.ITa
     return ret;
   }
 
-  public readonly accessLogSetting?: CfnApi.AccessLogSettingProperty | cdk.IResolvable;
+  public accessLogSetting?: CfnApi.AccessLogSettingProperty | cdk.IResolvable;
 
-  public readonly auth?: CfnApi.AuthProperty | cdk.IResolvable;
+  public auth?: CfnApi.AuthProperty | cdk.IResolvable;
 
-  public readonly binaryMediaTypes?: Array<string>;
+  public binaryMediaTypes?: Array<string>;
 
-  public readonly cacheClusterEnabled?: boolean | cdk.IResolvable;
+  public cacheClusterEnabled?: boolean | cdk.IResolvable;
 
-  public readonly cacheClusterSize?: string;
+  public cacheClusterSize?: string;
 
-  public readonly canarySetting?: CfnApi.CanarySettingProperty | cdk.IResolvable;
+  public canarySetting?: CfnApi.CanarySettingProperty | cdk.IResolvable;
 
-  public readonly cors?: CfnApi.CorsProperty | cdk.IResolvable | string;
+  public cors?: CfnApi.CorsProperty | cdk.IResolvable | string;
 
-  public readonly definitionBody?: any | cdk.IResolvable;
+  public definitionBody?: any | cdk.IResolvable;
 
-  public readonly definitionUri?: CfnApi.DefinitionUriProperty | cdk.IResolvable | string;
+  public definitionUri?: CfnApi.DefinitionUriProperty | cdk.IResolvable | string;
 
-  public readonly description?: string;
+  public description?: string;
 
-  public readonly disableExecuteApiEndpoint?: boolean | cdk.IResolvable;
+  public disableExecuteApiEndpoint?: boolean | cdk.IResolvable;
 
-  public readonly domain?: CfnApi.DomainConfigurationProperty | cdk.IResolvable;
+  public domain?: CfnApi.DomainConfigurationProperty | cdk.IResolvable;
 
-  public readonly endpointConfiguration?: CfnApi.EndpointConfigurationProperty | cdk.IResolvable;
+  public endpointConfiguration?: CfnApi.EndpointConfigurationProperty | cdk.IResolvable;
 
-  public readonly gatewayResponses?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
+  public gatewayResponses?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
 
-  public readonly methodSettings?: Array<any | cdk.IResolvable> | cdk.IResolvable;
+  public methodSettings?: Array<any | cdk.IResolvable> | cdk.IResolvable;
 
-  public readonly minimumCompressionSize?: number;
+  public minimumCompressionSize?: number;
 
-  public readonly models?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
+  public models?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
 
-  public readonly name?: string;
+  public name?: string;
 
-  public readonly openApiVersion?: string;
+  public openApiVersion?: string;
 
-  public readonly stageName?: string;
+  public stageName?: string;
 
   public readonly tags: cdk.TagManager;
 
-  public readonly tracingEnabled?: boolean | cdk.IResolvable;
+  public tracingEnabled?: boolean | cdk.IResolvable;
 
-  public readonly variables?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
+  public variables?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -2181,15 +2181,15 @@ export class CfnApplication extends cdk.CfnResource implements cdk.IInspectable,
     return ret;
   }
 
-  public readonly location?: cdk.IResolvable | CfnApplication.LocationProperty | string;
+  public location?: cdk.IResolvable | CfnApplication.LocationProperty | string;
 
-  public readonly notificationArns?: Array<string>;
+  public notificationArns?: Array<string>;
 
-  public readonly parameters?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
+  public parameters?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
 
   public readonly tags: cdk.TagManager;
 
-  public readonly timeoutInMinutes?: number;
+  public timeoutInMinutes?: number;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -2425,71 +2425,71 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
     return ret;
   }
 
-  public readonly architectures?: Array<string>;
+  public architectures?: Array<string>;
 
-  public readonly assumeRolePolicyDocument?: any | cdk.IResolvable;
+  public assumeRolePolicyDocument?: any | cdk.IResolvable;
 
-  public readonly autoPublishAlias?: string;
+  public autoPublishAlias?: string;
 
-  public readonly autoPublishCodeSha256?: string;
+  public autoPublishCodeSha256?: string;
 
-  public readonly codeSigningConfigArn?: string;
+  public codeSigningConfigArn?: string;
 
-  public readonly codeUri?: CfnFunction.CodeUriProperty | cdk.IResolvable | string;
+  public codeUri?: CfnFunction.CodeUriProperty | cdk.IResolvable | string;
 
-  public readonly deadLetterQueue?: CfnFunction.DeadLetterQueueProperty | cdk.IResolvable;
+  public deadLetterQueue?: CfnFunction.DeadLetterQueueProperty | cdk.IResolvable;
 
-  public readonly deploymentPreference?: CfnFunction.DeploymentPreferenceProperty | cdk.IResolvable;
+  public deploymentPreference?: CfnFunction.DeploymentPreferenceProperty | cdk.IResolvable;
 
-  public readonly description?: string;
+  public description?: string;
 
-  public readonly environment?: CfnFunction.FunctionEnvironmentProperty | cdk.IResolvable;
+  public environment?: CfnFunction.FunctionEnvironmentProperty | cdk.IResolvable;
 
-  public readonly eventInvokeConfig?: CfnFunction.EventInvokeConfigProperty | cdk.IResolvable;
+  public eventInvokeConfig?: CfnFunction.EventInvokeConfigProperty | cdk.IResolvable;
 
-  public readonly events?: cdk.IResolvable | Record<string, CfnFunction.EventSourceProperty | cdk.IResolvable>;
+  public events?: cdk.IResolvable | Record<string, CfnFunction.EventSourceProperty | cdk.IResolvable>;
 
-  public readonly fileSystemConfigs?: Array<CfnFunction.FileSystemConfigProperty | cdk.IResolvable> | cdk.IResolvable;
+  public fileSystemConfigs?: Array<CfnFunction.FileSystemConfigProperty | cdk.IResolvable> | cdk.IResolvable;
 
-  public readonly functionName?: string;
+  public functionName?: string;
 
-  public readonly handler?: string;
+  public handler?: string;
 
-  public readonly imageConfig?: CfnFunction.ImageConfigProperty | cdk.IResolvable;
+  public imageConfig?: CfnFunction.ImageConfigProperty | cdk.IResolvable;
 
-  public readonly imageUri?: string;
+  public imageUri?: string;
 
-  public readonly inlineCode?: string;
+  public inlineCode?: string;
 
-  public readonly kmsKeyArn?: string;
+  public kmsKeyArn?: string;
 
-  public readonly layers?: Array<string>;
+  public layers?: Array<string>;
 
-  public readonly memorySize?: number;
+  public memorySize?: number;
 
-  public readonly packageType?: string;
+  public packageType?: string;
 
-  public readonly permissionsBoundary?: string;
+  public permissionsBoundary?: string;
 
-  public readonly policies?: Array<CfnFunction.PoliciesProperty | CfnFunction.PoliciesProperty | string> | cdk.IResolvable | CfnFunction.PoliciesProperty | string;
+  public policies?: Array<CfnFunction.PoliciesProperty | CfnFunction.PoliciesProperty | string> | cdk.IResolvable | CfnFunction.PoliciesProperty | string;
 
-  public readonly provisionedConcurrencyConfig?: cdk.IResolvable | CfnFunction.ProvisionedConcurrencyConfigProperty;
+  public provisionedConcurrencyConfig?: cdk.IResolvable | CfnFunction.ProvisionedConcurrencyConfigProperty;
 
-  public readonly reservedConcurrentExecutions?: number;
+  public reservedConcurrentExecutions?: number;
 
-  public readonly role?: string;
+  public role?: string;
 
-  public readonly runtime?: string;
+  public runtime?: string;
 
   public readonly tags: cdk.TagManager;
 
-  public readonly timeout?: number;
+  public timeout?: number;
 
-  public readonly tracing?: string;
+  public tracing?: string;
 
-  public readonly versionDescription?: string;
+  public versionDescription?: string;
 
-  public readonly vpcConfig?: cdk.IResolvable | CfnFunction.VpcConfigProperty;
+  public vpcConfig?: cdk.IResolvable | CfnFunction.VpcConfigProperty;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -4023,31 +4023,31 @@ export class CfnHttpApi extends cdk.CfnResource implements cdk.IInspectable, cdk
     return ret;
   }
 
-  public readonly accessLogSetting?: CfnHttpApi.AccessLogSettingProperty | cdk.IResolvable;
+  public accessLogSetting?: CfnHttpApi.AccessLogSettingProperty | cdk.IResolvable;
 
-  public readonly auth?: CfnHttpApi.HttpApiAuthProperty | cdk.IResolvable;
+  public auth?: CfnHttpApi.HttpApiAuthProperty | cdk.IResolvable;
 
-  public readonly corsConfiguration?: boolean | CfnHttpApi.CorsConfigurationProperty | cdk.IResolvable;
+  public corsConfiguration?: boolean | CfnHttpApi.CorsConfigurationProperty | cdk.IResolvable;
 
-  public readonly defaultRouteSettings?: cdk.IResolvable | CfnHttpApi.RouteSettingsProperty;
+  public defaultRouteSettings?: cdk.IResolvable | CfnHttpApi.RouteSettingsProperty;
 
-  public readonly definitionBody?: any | cdk.IResolvable;
+  public definitionBody?: any | cdk.IResolvable;
 
-  public readonly definitionUri?: CfnHttpApi.DefinitionUriProperty | cdk.IResolvable | string;
+  public definitionUri?: CfnHttpApi.DefinitionUriProperty | cdk.IResolvable | string;
 
-  public readonly description?: string;
+  public description?: string;
 
-  public readonly disableExecuteApiEndpoint?: boolean | cdk.IResolvable;
+  public disableExecuteApiEndpoint?: boolean | cdk.IResolvable;
 
-  public readonly domain?: CfnHttpApi.HttpApiDomainConfigurationProperty | cdk.IResolvable;
+  public domain?: CfnHttpApi.HttpApiDomainConfigurationProperty | cdk.IResolvable;
 
-  public readonly failOnWarnings?: boolean | cdk.IResolvable;
+  public failOnWarnings?: boolean | cdk.IResolvable;
 
-  public readonly routeSettings?: cdk.IResolvable | CfnHttpApi.RouteSettingsProperty;
+  public routeSettings?: cdk.IResolvable | CfnHttpApi.RouteSettingsProperty;
 
-  public readonly stageName?: string;
+  public stageName?: string;
 
-  public readonly stageVariables?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
+  public stageVariables?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
 
   public readonly tags: cdk.TagManager;
 
@@ -4933,17 +4933,17 @@ export class CfnLayerVersion extends cdk.CfnResource implements cdk.IInspectable
     return ret;
   }
 
-  public readonly compatibleRuntimes?: Array<string>;
+  public compatibleRuntimes?: Array<string>;
 
-  public readonly contentUri?: CfnLayerVersion.ContentUriProperty | cdk.IResolvable | string;
+  public contentUri?: CfnLayerVersion.ContentUriProperty | cdk.IResolvable | string;
 
-  public readonly description?: string;
+  public description?: string;
 
-  public readonly layerName?: string;
+  public layerName?: string;
 
-  public readonly licenseInfo?: string;
+  public licenseInfo?: string;
 
-  public readonly retentionPolicy?: string;
+  public retentionPolicy?: string;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -5195,13 +5195,13 @@ export class CfnSimpleTable extends cdk.CfnResource implements cdk.IInspectable,
     return ret;
   }
 
-  public readonly primaryKey?: cdk.IResolvable | CfnSimpleTable.PrimaryKeyProperty;
+  public primaryKey?: cdk.IResolvable | CfnSimpleTable.PrimaryKeyProperty;
 
-  public readonly provisionedThroughput?: cdk.IResolvable | CfnSimpleTable.ProvisionedThroughputProperty;
+  public provisionedThroughput?: cdk.IResolvable | CfnSimpleTable.ProvisionedThroughputProperty;
 
-  public readonly sseSpecification?: cdk.IResolvable | CfnSimpleTable.SSESpecificationProperty;
+  public sseSpecification?: cdk.IResolvable | CfnSimpleTable.SSESpecificationProperty;
 
-  public readonly tableName?: string;
+  public tableName?: string;
 
   public readonly tags: cdk.TagManager;
 
@@ -5553,29 +5553,29 @@ export class CfnStateMachine extends cdk.CfnResource implements cdk.IInspectable
     return ret;
   }
 
-  public readonly definition?: any | cdk.IResolvable;
+  public definition?: any | cdk.IResolvable;
 
-  public readonly definitionSubstitutions?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
+  public definitionSubstitutions?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
 
-  public readonly definitionUri?: CfnStateMachine.DefinitionUriProperty | cdk.IResolvable | string;
+  public definitionUri?: CfnStateMachine.DefinitionUriProperty | cdk.IResolvable | string;
 
-  public readonly events?: cdk.IResolvable | Record<string, CfnStateMachine.EventSourceProperty | cdk.IResolvable>;
+  public events?: cdk.IResolvable | Record<string, CfnStateMachine.EventSourceProperty | cdk.IResolvable>;
 
-  public readonly logging?: cdk.IResolvable | CfnStateMachine.LoggingConfigurationProperty;
+  public logging?: cdk.IResolvable | CfnStateMachine.LoggingConfigurationProperty;
 
-  public readonly name?: string;
+  public name?: string;
 
-  public readonly permissionsBoundaries?: string;
+  public permissionsBoundaries?: string;
 
-  public readonly policies?: Array<CfnStateMachine.PoliciesProperty | CfnStateMachine.PoliciesProperty | string> | cdk.IResolvable | CfnStateMachine.PoliciesProperty | string;
+  public policies?: Array<CfnStateMachine.PoliciesProperty | CfnStateMachine.PoliciesProperty | string> | cdk.IResolvable | CfnStateMachine.PoliciesProperty | string;
 
-  public readonly role?: string;
+  public role?: string;
 
   public readonly tags: cdk.TagManager;
 
-  public readonly tracing?: cdk.IResolvable | CfnStateMachine.TracingConfigurationProperty;
+  public tracing?: cdk.IResolvable | CfnStateMachine.TracingConfigurationProperty;
 
-  public readonly type?: string;
+  public type?: string;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -6353,57 +6353,57 @@ export class CfnSchedule extends cdk.CfnResource implements cdk.IInspectable {
   /**
    * The description you specify for the schedule.
    */
-  public readonly description?: string;
+  public description?: string;
 
   /**
    * The date, in UTC, before which the schedule can invoke its target.
    */
-  public readonly endDate?: string;
+  public endDate?: string;
 
   /**
    * Allows you to configure a time window during which EventBridge Scheduler invokes the schedule.
    */
-  public readonly flexibleTimeWindow: CfnSchedule.FlexibleTimeWindowProperty | cdk.IResolvable;
+  public flexibleTimeWindow: CfnSchedule.FlexibleTimeWindowProperty | cdk.IResolvable;
 
   /**
    * The name of the schedule group associated with this schedule.
    */
-  public readonly groupName?: string;
+  public groupName?: string;
 
   /**
    * The Amazon Resource Name (ARN) for the customer managed KMS key that EventBridge Scheduler will use to encrypt and decrypt your data.
    */
-  public readonly kmsKeyArn?: string;
+  public kmsKeyArn?: string;
 
   /**
    * The name of the schedule.
    */
-  public readonly name?: string;
+  public name?: string;
 
   /**
    * The expression that defines when the schedule runs. The following formats are supported.
    */
-  public readonly scheduleExpression: string;
+  public scheduleExpression: string;
 
   /**
    * The timezone in which the scheduling expression is evaluated.
    */
-  public readonly scheduleExpressionTimezone?: string;
+  public scheduleExpressionTimezone?: string;
 
   /**
    * The date, in UTC, after which the schedule can begin invoking its target.
    */
-  public readonly startDate?: string;
+  public startDate?: string;
 
   /**
    * Specifies whether the schedule is enabled or disabled.
    */
-  public readonly state?: string;
+  public state?: string;
 
   /**
    * The schedule's target details.
    */
-  public readonly target: cdk.IResolvable | CfnSchedule.TargetProperty;
+  public target: cdk.IResolvable | CfnSchedule.TargetProperty;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -7967,7 +7967,7 @@ export class CfnScheduleGroup extends cdk.CfnResource implements cdk.IInspectabl
   /**
    * The name of the schedule group.
    */
-  public readonly name?: string;
+  public name?: string;
 
   /**
    * An array of key-value pairs to apply to this resource.
@@ -8475,72 +8475,72 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
   /**
    * For first-in-first-out (FIFO) queues, specifies whether to enable content-based deduplication.
    */
-  public readonly contentBasedDeduplication?: boolean | cdk.IResolvable;
+  public contentBasedDeduplication?: boolean | cdk.IResolvable;
 
   /**
    * For high throughput for FIFO queues, specifies whether message deduplication occurs at the message group or queue level.
    */
-  public readonly deduplicationScope?: string;
+  public deduplicationScope?: string;
 
   /**
    * The time in seconds for which the delivery of all messages in the queue is delayed.
    */
-  public readonly delaySeconds?: number;
+  public delaySeconds?: number;
 
   /**
    * If set to true, creates a FIFO queue.
    */
-  public readonly fifoQueue?: boolean | cdk.IResolvable;
+  public fifoQueue?: boolean | cdk.IResolvable;
 
   /**
    * For high throughput for FIFO queues, specifies whether the FIFO queue throughput quota applies to the entire queue or per message group.
    */
-  public readonly fifoThroughputLimit?: string;
+  public fifoThroughputLimit?: string;
 
   /**
    * The length of time in seconds for which Amazon SQS can reuse a data key to encrypt or decrypt messages before calling AWS KMS again.
    */
-  public readonly kmsDataKeyReusePeriodSeconds?: number;
+  public kmsDataKeyReusePeriodSeconds?: number;
 
   /**
    * The ID of an AWS Key Management Service (KMS) for Amazon SQS , or a custom KMS.
    */
-  public readonly kmsMasterKeyId?: string;
+  public kmsMasterKeyId?: string;
 
   /**
    * Enables server-side queue encryption using SQS owned encryption keys.
    */
-  public readonly sqsManagedSseEnabled?: boolean | cdk.IResolvable;
+  public sqsManagedSseEnabled?: boolean | cdk.IResolvable;
 
   /**
    * The limit of how many bytes that a message can contain before Amazon SQS rejects it.
    */
-  public readonly maximumMessageSize?: number;
+  public maximumMessageSize?: number;
 
   /**
    * The number of seconds that Amazon SQS retains a message.
    */
-  public readonly messageRetentionPeriod?: number;
+  public messageRetentionPeriod?: number;
 
   /**
    * A name for the queue.
    */
-  public readonly queueName?: string;
+  public queueName?: string;
 
   /**
    * Specifies the duration, in seconds, that the ReceiveMessage action call waits until a message is in the queue in order to include it in the response, rather than returning an empty response if a message isn't yet available.
    */
-  public readonly receiveMessageWaitTimeSeconds?: number;
+  public receiveMessageWaitTimeSeconds?: number;
 
   /**
    * The string that includes the parameters for the permissions for the dead-letter queue redrive permission and which source queues can specify dead-letter queues as a JSON object.
    */
-  public readonly redriveAllowPolicy?: any | cdk.IResolvable | string;
+  public redriveAllowPolicy?: any | cdk.IResolvable | string;
 
   /**
    * The string that includes the parameters for the dead-letter queue functionality of the source queue as a JSON object.
    */
-  public readonly redrivePolicy?: any | cdk.IResolvable | string;
+  public redrivePolicy?: any | cdk.IResolvable | string;
 
   /**
    * The tags that you attach to this queue.
@@ -8550,7 +8550,7 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
   /**
    * The length of time during which a message will be unavailable after a message is delivered from the queue.
    */
-  public readonly visibilityTimeout?: number;
+  public visibilityTimeout?: number;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -8954,12 +8954,12 @@ export class CfnQueuePolicy extends cdk.CfnResource implements cdk.IInspectable 
   /**
    * A policy document that contains the permissions for the specified Amazon SQS queues.
    */
-  public readonly policyDocument: any | cdk.IResolvable;
+  public policyDocument: any | cdk.IResolvable;
 
   /**
    * The URLs of the queues to which you want to add the policy.
    */
-  public readonly queues: Array<string>;
+  public queues: Array<string>;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -9125,42 +9125,42 @@ export class CfnApplicationV2 extends cdk.CfnResource implements cdk.IInspectabl
   /**
    * Use this parameter to configure the application.
    */
-  public readonly applicationConfiguration?: CfnApplicationV2.ApplicationConfigurationProperty | cdk.IResolvable;
+  public applicationConfiguration?: CfnApplicationV2.ApplicationConfigurationProperty | cdk.IResolvable;
 
   /**
    * The description of the application.
    */
-  public readonly applicationDescription?: string;
+  public applicationDescription?: string;
 
   /**
    * To create a Kinesis Data Analytics Studio notebook, you must set the mode to \`INTERACTIVE\` .
    */
-  public readonly applicationMode?: string;
+  public applicationMode?: string;
 
   /**
    * The name of the application.
    */
-  public readonly applicationName?: string;
+  public applicationName?: string;
 
   /**
    * The runtime environment for the application.
    */
-  public readonly runtimeEnvironment: string;
+  public runtimeEnvironment: string;
 
   /**
    * Specifies the IAM role that the application uses to access external resources.
    */
-  public readonly serviceExecutionRole: string;
+  public serviceExecutionRole: string;
 
   /**
    * Identifies the run configuration (start parameters) of a Kinesis Data Analytics application.
    */
-  public readonly runConfiguration?: cdk.IResolvable | CfnApplicationV2.RunConfigurationProperty;
+  public runConfiguration?: cdk.IResolvable | CfnApplicationV2.RunConfigurationProperty;
 
   /**
    * Describes the maintenance configuration for the application.
    */
-  public readonly applicationMaintenanceConfiguration?: CfnApplicationV2.ApplicationMaintenanceConfigurationProperty | cdk.IResolvable;
+  public applicationMaintenanceConfiguration?: CfnApplicationV2.ApplicationMaintenanceConfigurationProperty | cdk.IResolvable;
 
   /**
    * A list of one or more tags to assign to the application.
@@ -12086,12 +12086,12 @@ export class CfnApplicationCloudWatchLoggingOptionV2 extends cdk.CfnResource imp
   /**
    * The name of the application.
    */
-  public readonly applicationName: string;
+  public applicationName: string;
 
   /**
    * Provides a description of Amazon CloudWatch logging options, including the log stream Amazon Resource Name (ARN).
    */
-  public readonly cloudWatchLoggingOption: CfnApplicationCloudWatchLoggingOptionV2.CloudWatchLoggingOptionProperty | cdk.IResolvable;
+  public cloudWatchLoggingOption: CfnApplicationCloudWatchLoggingOptionV2.CloudWatchLoggingOptionProperty | cdk.IResolvable;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -12316,12 +12316,12 @@ export class CfnApplicationOutputV2 extends cdk.CfnResource implements cdk.IInsp
   /**
    * The name of the application.
    */
-  public readonly applicationName: string;
+  public applicationName: string;
 
   /**
    * Describes a SQL-based Kinesis Data Analytics application's output configuration, in which you identify an in-application stream and a destination where you want the in-application stream data to be written.
    */
-  public readonly output: cdk.IResolvable | CfnApplicationOutputV2.OutputProperty;
+  public output: cdk.IResolvable | CfnApplicationOutputV2.OutputProperty;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -12823,12 +12823,12 @@ export class CfnApplicationReferenceDataSourceV2 extends cdk.CfnResource impleme
   /**
    * The name of the application.
    */
-  public readonly applicationName: string;
+  public applicationName: string;
 
   /**
    * For a SQL-based Kinesis Data Analytics application, describes the reference data source by providing the source information (Amazon S3 bucket name and object key name), the resulting in-application table name that is created, and the necessary schema to map the data elements in the Amazon S3 object to the in-application table.
    */
-  public readonly referenceDataSource: cdk.IResolvable | CfnApplicationReferenceDataSourceV2.ReferenceDataSourceProperty;
+  public referenceDataSource: cdk.IResolvable | CfnApplicationReferenceDataSourceV2.ReferenceDataSourceProperty;
 
   /**
    * @param scope Scope in which this resource is defined

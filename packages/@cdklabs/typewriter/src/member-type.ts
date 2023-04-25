@@ -31,7 +31,6 @@ export abstract class MemberType extends TypeDeclaration {
   public addProperty(spec: PropertySpec): Property {
     const prop = new Property(this, {
       ...spec,
-      immutable: true,
     });
 
     this._properties.push(prop);
