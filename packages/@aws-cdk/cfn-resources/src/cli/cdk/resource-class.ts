@@ -95,11 +95,12 @@ export class ResourceClass extends ClassType {
     }
 
     // Copy properties onto class properties
-    for (const { name, prop, memberOptional, memberType } of this.mappableProperties()) {
+    for (const { name, prop, memberOptional, memberType, memberImmutable } of this.mappableProperties()) {
       this.addProperty({
         name: name,
         type: memberType,
         optional: memberOptional,
+        immutable: memberImmutable,
         docs: {
           summary: prop.docs?.summary,
         },
@@ -322,6 +323,7 @@ export class ResourceClass extends ClassType {
           name: 'tags',
           prop,
           memberOptional: false,
+          memberImmutable: true,
           memberType: CDK_CORE.TagManager,
           initializer: (props: Expression) =>
             new CDK_CORE.TagManager(
@@ -338,6 +340,7 @@ export class ResourceClass extends ClassType {
         name: prop.name,
         prop,
         memberOptional: prop.optional,
+        memberImmutable: false,
         memberType: prop.type,
         initializer: (props: Expression) => prop.from(props),
         valueToRender: $this[prop.name],

@@ -252,7 +252,7 @@ export class CfnRestApi extends cdk.CfnResource implements cdk.IInspectable, cdk
   /**
    * The key-value map of strings.
    */
-  public tags: cdk.TagManager;
+  public readonly tags: cdk.TagManager;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -829,7 +829,7 @@ export class CfnRole extends cdk.CfnResource implements cdk.IInspectable, cdk.IT
   /**
    * A list of tags that are attached to the role.
    */
-  public tags: cdk.TagManager;
+  public readonly tags: cdk.TagManager;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -1635,7 +1635,7 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
   /**
    * A list of [tags](https://docs.aws.amazon.com/lambda/latest/dg/tagging.html) to apply to the function.
    */
-  public tags: cdk.TagManager;
+  public readonly tags: cdk.TagManager;
 
   /**
    * Configuration values that override the container image Dockerfile settings.
@@ -3017,7 +3017,7 @@ export class CfnBucket extends cdk.CfnResource implements cdk.IInspectable, cdk.
   /**
    * An arbitrary set of tags (key-value pairs) for this S3 bucket.
    */
-  public tags: cdk.TagManager;
+  public readonly tags: cdk.TagManager;
 
   /**
    * Enables multiple versions of all objects in this bucket.
@@ -8393,7 +8393,7 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
   /**
    * The tags that you attach to this queue.
    */
-  public tags: cdk.TagManager;
+  public readonly tags: cdk.TagManager;
 
   /**
    * The length of time during which a message will be unavailable after a message is delivered from the queue.

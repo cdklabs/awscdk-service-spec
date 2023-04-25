@@ -1141,7 +1141,7 @@ export class CfnApi extends cdk.CfnResource implements cdk.IInspectable, cdk.ITa
 
   public stageName?: string;
 
-  public tags: cdk.TagManager;
+  public readonly tags: cdk.TagManager;
 
   public tracingEnabled?: boolean | cdk.IResolvable;
 
@@ -2187,7 +2187,7 @@ export class CfnApplication extends cdk.CfnResource implements cdk.IInspectable,
 
   public parameters?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
 
-  public tags: cdk.TagManager;
+  public readonly tags: cdk.TagManager;
 
   public timeoutInMinutes?: number;
 
@@ -2481,7 +2481,7 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
 
   public runtime?: string;
 
-  public tags: cdk.TagManager;
+  public readonly tags: cdk.TagManager;
 
   public timeout?: number;
 
@@ -4049,7 +4049,7 @@ export class CfnHttpApi extends cdk.CfnResource implements cdk.IInspectable, cdk
 
   public stageVariables?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
 
-  public tags: cdk.TagManager;
+  public readonly tags: cdk.TagManager;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -5203,7 +5203,7 @@ export class CfnSimpleTable extends cdk.CfnResource implements cdk.IInspectable,
 
   public tableName?: string;
 
-  public tags: cdk.TagManager;
+  public readonly tags: cdk.TagManager;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -5571,7 +5571,7 @@ export class CfnStateMachine extends cdk.CfnResource implements cdk.IInspectable
 
   public role?: string;
 
-  public tags: cdk.TagManager;
+  public readonly tags: cdk.TagManager;
 
   public tracing?: cdk.IResolvable | CfnStateMachine.TracingConfigurationProperty;
 
@@ -7972,7 +7972,7 @@ export class CfnScheduleGroup extends cdk.CfnResource implements cdk.IInspectabl
   /**
    * An array of key-value pairs to apply to this resource.
    */
-  public tags: cdk.TagManager;
+  public readonly tags: cdk.TagManager;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -8545,7 +8545,7 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
   /**
    * The tags that you attach to this queue.
    */
-  public tags: cdk.TagManager;
+  public readonly tags: cdk.TagManager;
 
   /**
    * The length of time during which a message will be unavailable after a message is delivered from the queue.
@@ -9165,7 +9165,7 @@ export class CfnApplicationV2 extends cdk.CfnResource implements cdk.IInspectabl
   /**
    * A list of one or more tags to assign to the application.
    */
-  public tags: cdk.TagManager;
+  public readonly tags: cdk.TagManager;
 
   /**
    * @param scope Scope in which this resource is defined
