@@ -16,6 +16,7 @@ import './legacy-untyped';
 
 // Services
 import './autoscaling';
+import './codebuild';
 import './cognito';
 import './elasticsearch';
 import './iot1click';

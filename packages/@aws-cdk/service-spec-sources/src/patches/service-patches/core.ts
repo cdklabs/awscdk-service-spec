@@ -90,6 +90,19 @@ export function renameDefinition(oldName: string, newName: string, reason: Reaso
 }
 
 /**
+ * Rename the a type definition, only if the definition actually exists.
+ *
+ * NOTE: returns a new patcher. Still needs to be applied to a lens.
+ */
+export function replaceDefinition(definition: string, schema: jsonschema.Schema, reason: Reason): JsonObjectPatcher {
+  return (lens) => {
+    if (lens.jsonPointer === `/definitions/${definition}`) {
+      lens.replaceValue(reason.reason, schema);
+    }
+  };
+}
+
+/**
  * Add a definition, only if the definition doesn't yet exist
  *
  * NOTE: returns a new patcher. Still needs to be applied to a lens.
