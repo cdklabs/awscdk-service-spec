@@ -3350,14 +3350,14 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
    *
    * @cloudformationAttribute DBClusterArn
    */
-  public readonly attrDBClusterArn: string;
+  public readonly attrDbClusterArn: string;
 
   /**
    * The AWS Region -unique, immutable identifier for the DB cluster. This identifier is found in AWS CloudTrail log entries whenever the KMS key for the DB cluster is accessed.
    *
    * @cloudformationAttribute DBClusterResourceId
    */
-  public readonly attrDBClusterResourceId: string;
+  public readonly attrDbClusterResourceId: string;
 
   /**
    * The connection endpoint for the DB cluster. For example: \`mystack-mydbcluster-123456789012.us-east-2.rds.amazonaws.com\`
@@ -3663,8 +3663,8 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
       "properties": props
     });
 
-    this.attrDBClusterArn = cdk.Token.asString(this.getAtt("DBClusterArn", cdk.ResolutionTypeHint.STRING));
-    this.attrDBClusterResourceId = cdk.Token.asString(this.getAtt("DBClusterResourceId", cdk.ResolutionTypeHint.STRING));
+    this.attrDbClusterArn = cdk.Token.asString(this.getAtt("DBClusterArn", cdk.ResolutionTypeHint.STRING));
+    this.attrDbClusterResourceId = cdk.Token.asString(this.getAtt("DBClusterResourceId", cdk.ResolutionTypeHint.STRING));
     this.attrEndpointAddress = cdk.Token.asString(this.getAtt("Endpoint.Address", cdk.ResolutionTypeHint.STRING));
     this.attrEndpointPort = cdk.Token.asString(this.getAtt("Endpoint.Port", cdk.ResolutionTypeHint.STRING));
     this.attrReadEndpointAddress = cdk.Token.asString(this.getAtt("ReadEndpoint.Address", cdk.ResolutionTypeHint.STRING));
