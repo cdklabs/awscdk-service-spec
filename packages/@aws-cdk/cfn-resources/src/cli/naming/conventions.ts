@@ -80,7 +80,7 @@ export function staticResourceTypeName() {
 }
 
 export function attributePropertyName(attrName: string) {
-  return `attr${attrName.replace(/[^a-zA-Z0-9]/g, '')}`;
+  return propertyNameFromCloudFormation(`attr${attrName.replace(/[^a-zA-Z0-9]/g, '')}`);
 }
 
 /**
