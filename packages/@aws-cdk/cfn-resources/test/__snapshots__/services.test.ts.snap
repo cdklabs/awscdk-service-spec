@@ -1152,7 +1152,7 @@ export class CfnApi extends cdk.CfnResource implements cdk.IInspectable, cdk.ITa
    * @param id Construct identifier for this resource (unique in its scope)
    * @param props Resource properties
    */
-  public constructor(scope: constructs.Construct, id: string, props: CfnApiProps) {
+  public constructor(scope: constructs.Construct, id: string, props: CfnApiProps = {}) {
     super(scope, id, {
       "type": CfnApi.CFN_RESOURCE_TYPE_NAME,
       "properties": props
@@ -2196,7 +2196,7 @@ export class CfnApplication extends cdk.CfnResource implements cdk.IInspectable,
    * @param id Construct identifier for this resource (unique in its scope)
    * @param props Resource properties
    */
-  public constructor(scope: constructs.Construct, id: string, props: CfnApplicationProps) {
+  public constructor(scope: constructs.Construct, id: string, props: CfnApplicationProps = {}) {
     super(scope, id, {
       "type": CfnApplication.CFN_RESOURCE_TYPE_NAME,
       "properties": props
@@ -2496,7 +2496,7 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
    * @param id Construct identifier for this resource (unique in its scope)
    * @param props Resource properties
    */
-  public constructor(scope: constructs.Construct, id: string, props: CfnFunctionProps) {
+  public constructor(scope: constructs.Construct, id: string, props: CfnFunctionProps = {}) {
     super(scope, id, {
       "type": CfnFunction.CFN_RESOURCE_TYPE_NAME,
       "properties": props
@@ -4056,7 +4056,7 @@ export class CfnHttpApi extends cdk.CfnResource implements cdk.IInspectable, cdk
    * @param id Construct identifier for this resource (unique in its scope)
    * @param props Resource properties
    */
-  public constructor(scope: constructs.Construct, id: string, props: CfnHttpApiProps) {
+  public constructor(scope: constructs.Construct, id: string, props: CfnHttpApiProps = {}) {
     super(scope, id, {
       "type": CfnHttpApi.CFN_RESOURCE_TYPE_NAME,
       "properties": props
@@ -4950,7 +4950,7 @@ export class CfnLayerVersion extends cdk.CfnResource implements cdk.IInspectable
    * @param id Construct identifier for this resource (unique in its scope)
    * @param props Resource properties
    */
-  public constructor(scope: constructs.Construct, id: string, props: CfnLayerVersionProps) {
+  public constructor(scope: constructs.Construct, id: string, props: CfnLayerVersionProps = {}) {
     super(scope, id, {
       "type": CfnLayerVersion.CFN_RESOURCE_TYPE_NAME,
       "properties": props
@@ -5210,7 +5210,7 @@ export class CfnSimpleTable extends cdk.CfnResource implements cdk.IInspectable,
    * @param id Construct identifier for this resource (unique in its scope)
    * @param props Resource properties
    */
-  public constructor(scope: constructs.Construct, id: string, props: CfnSimpleTableProps) {
+  public constructor(scope: constructs.Construct, id: string, props: CfnSimpleTableProps = {}) {
     super(scope, id, {
       "type": CfnSimpleTable.CFN_RESOURCE_TYPE_NAME,
       "properties": props
@@ -5582,7 +5582,7 @@ export class CfnStateMachine extends cdk.CfnResource implements cdk.IInspectable
    * @param id Construct identifier for this resource (unique in its scope)
    * @param props Resource properties
    */
-  public constructor(scope: constructs.Construct, id: string, props: CfnStateMachineProps) {
+  public constructor(scope: constructs.Construct, id: string, props: CfnStateMachineProps = {}) {
     super(scope, id, {
       "type": CfnStateMachine.CFN_RESOURCE_TYPE_NAME,
       "properties": props
@@ -7979,7 +7979,7 @@ export class CfnScheduleGroup extends cdk.CfnResource implements cdk.IInspectabl
    * @param id Construct identifier for this resource (unique in its scope)
    * @param props Resource properties
    */
-  public constructor(scope: constructs.Construct, id: string, props: CfnScheduleGroupProps) {
+  public constructor(scope: constructs.Construct, id: string, props: CfnScheduleGroupProps = {}) {
     super(scope, id, {
       "type": CfnScheduleGroup.CFN_RESOURCE_TYPE_NAME,
       "properties": props
@@ -8557,7 +8557,7 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
    * @param id Construct identifier for this resource (unique in its scope)
    * @param props Resource properties
    */
-  public constructor(scope: constructs.Construct, id: string, props: CfnQueueProps) {
+  public constructor(scope: constructs.Construct, id: string, props: CfnQueueProps = {}) {
     super(scope, id, {
       "type": CfnQueue.CFN_RESOURCE_TYPE_NAME,
       "properties": props

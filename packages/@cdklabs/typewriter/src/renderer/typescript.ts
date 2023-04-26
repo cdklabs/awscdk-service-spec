@@ -306,11 +306,15 @@ export class TypeScriptRenderer extends Renderer {
     this.emit('(');
     this.emitList(parameters, ', ', (p) => {
       this.emit(p._identifier_);
-      if (p.optional) {
+      if (p.optional && !p.default) {
         this.emit('?');
       }
       this.emit(': ');
       this.renderType(p.type);
+      if (p.default) {
+        this.emit(' = ');
+        this.renderExpression(p.default);
+      }
     });
     this.emit(')');
   }
@@ -622,6 +626,10 @@ export class TypeScriptRenderer extends Renderer {
   }
 
   protected renderObjectLiteral(obj: ObjectLiteral) {
+    if (obj._contents_.length === 0) {
+      return this.emit('{}');
+    }
+
     this.emitBlock('', () => {
       this.emitList(obj._contents_, ',\n', (what) => {
         if (what instanceof Splat) {
