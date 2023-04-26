@@ -17,6 +17,7 @@ test.each([
   'AWS::Lambda::Function',
   'AWS::S3::Bucket',
   'AWS::SQS::Queue',
+  'AWS::RDS::DBCluster',
 ])('%s', (cloudFormationType) => {
   const resource = db.lookup('resource', 'cloudFormationType', 'equals', cloudFormationType)[0];
 

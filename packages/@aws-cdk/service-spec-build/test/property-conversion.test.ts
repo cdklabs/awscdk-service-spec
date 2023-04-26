@@ -30,6 +30,29 @@ test('exclude readOnlyProperties from properties', () => {
   expect(propNames).toEqual(['Property']);
 });
 
+test("don't exclude readOnlyProperties from properties that are also createOnlyProperties", () => {
+  importCloudFormationRegistryResource({
+    db,
+    fails,
+    resource: {
+      description: 'Test resource',
+      typeName: 'AWS::Some::Type',
+      properties: {
+        Id: { type: 'string' },
+        ReplacementProperty: { type: 'string' },
+      },
+      readOnlyProperties: ['/properties/Id', '/properties/ReplacementProperty'],
+      createOnlyProperties: ['/properties/ReplacementProperty'],
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0];
+  const propNames = Object.keys(resource?.properties);
+  const attrNames = Object.keys(resource?.attributes);
+  expect(propNames).toEqual(['ReplacementProperty']);
+  expect(attrNames).toEqual(['Id']);
+});
+
 test('include readOnlyProperties in attributes', () => {
   importCloudFormationRegistryResource({
     db,
@@ -49,6 +72,40 @@ test('include readOnlyProperties in attributes', () => {
     db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.attributes,
   );
   expect(attrNames).toEqual(['Id']);
+});
+
+test('compound readOnlyProperties are included in attributes', () => {
+  importCloudFormationRegistryResource({
+    db,
+    fails,
+    resource: {
+      description: 'Test resource',
+      typeName: 'AWS::Some::Type',
+      properties: {
+        CompoundProp: { $ref: '#/definitions/CompoundProp' },
+      },
+      definitions: {
+        CompoundProp: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            Id: { type: 'string' },
+            Property: { type: 'string' },
+          },
+        },
+      },
+      readOnlyProperties: [
+        '/properties/CompoundProp',
+        '/properties/CompoundProp/Id',
+        '/properties/CompoundProp/Property',
+      ],
+    },
+  });
+
+  const attrNames = Object.keys(
+    db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.attributes,
+  );
+  expect(attrNames).toEqual(['CompoundProp', 'CompoundProp.Id', 'CompoundProp.Property']);
 });
 
 test('include legacy attributes in attributes', () => {
