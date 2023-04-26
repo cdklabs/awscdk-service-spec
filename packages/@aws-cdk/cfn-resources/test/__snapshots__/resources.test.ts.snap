@@ -3387,8 +3387,6 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
    */
   public readonly attrMasterUserSecretSecretArn: string;
 
-  public readEndpoint?: cdk.IResolvable | CfnDBCluster.ReadEndpointProperty;
-
   /**
    * The amount of storage in gibibytes (GiB) to allocate to each DB instance in the Multi-AZ DB cluster.
    */
@@ -3671,7 +3669,6 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
     this.attrEndpointPort = cdk.Token.asString(this.getAtt("Endpoint.Port", cdk.ResolutionTypeHint.STRING));
     this.attrReadEndpointAddress = cdk.Token.asString(this.getAtt("ReadEndpoint.Address", cdk.ResolutionTypeHint.STRING));
     this.attrMasterUserSecretSecretArn = cdk.Token.asString(this.getAtt("MasterUserSecret.SecretArn", cdk.ResolutionTypeHint.STRING));
-    this.readEndpoint = props.readEndpoint;
     this.allocatedStorage = props.allocatedStorage;
     this.associatedRoles = props.associatedRoles;
     this.availabilityZones = props.availabilityZones;
@@ -3736,7 +3733,6 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
 
   protected get cfnProperties(): Record<string, any> {
     return {
-      "readEndpoint": this.readEndpoint,
       "allocatedStorage": this.allocatedStorage,
       "associatedRoles": this.associatedRoles,
       "availabilityZones": this.availabilityZones,
@@ -3809,27 +3805,6 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
 }
 
 export namespace CfnDBCluster {
-  /**
-   * The \`ReadEndpoint\` return value specifies the reader endpoint for the DB cluster.
-   *
-   * The reader endpoint for a DB cluster load-balances connections across the Aurora Replicas that are available in a DB cluster. As clients request new connections to the reader endpoint, Aurora distributes the connection requests among the Aurora Replicas in the DB cluster. This functionality can help balance your read workload across multiple Aurora Replicas in your DB cluster.
-   *
-   * If a failover occurs, and the Aurora Replica that you are connected to is promoted to be the primary instance, your connection is dropped. To continue sending your read workload to other Aurora Replicas in the cluster, you can then reconnect to the reader endpoint.
-   *
-   * For more information about Aurora endpoints, see [Amazon Aurora connection management](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Endpoints.html) in the *Amazon Aurora User Guide* .
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-readendpoint.html
-   */
-  export interface ReadEndpointProperty {
-    /**
-     * The host address of the reader endpoint.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-readendpoint.html#cfn-rds-dbcluster-readendpoint-address
-     */
-    readonly address?: string;
-  }
-
   /**
    * Describes an AWS Identity and Access Management (IAM) role that is associated with a DB cluster.
    *
@@ -4007,11 +3982,6 @@ export namespace CfnDBCluster {
  * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html
  */
 export interface CfnDBClusterProps {
-  /**
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-readendpoint
-   */
-  readonly readEndpoint?: cdk.IResolvable | CfnDBCluster.ReadEndpointProperty;
-
   /**
    * The amount of storage in gibibytes (GiB) to allocate to each DB instance in the Multi-AZ DB cluster.
    *
@@ -4786,48 +4756,6 @@ export interface CfnDBClusterProps {
 }
 
 /**
- * Determine whether the given properties match those of a \`ReadEndpointProperty\`
- *
- * @param properties - the TypeScript properties of a \`ReadEndpointProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnDBClusterReadEndpointPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("address", cdk.validateString)(properties.address));
-  return errors.wrap("supplied properties not correct for \\"ReadEndpointProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnDBClusterReadEndpointPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnDBClusterReadEndpointPropertyValidator(properties).assertSuccess();
-  return {
-    "Address": cdk.stringToCloudFormation(properties.address)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnDBClusterReadEndpointPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnDBCluster.ReadEndpointProperty> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnDBCluster.ReadEndpointProperty>();
-  ret.addPropertyResult("address", "Address", (properties.Address != null ? cfn_parse.FromCloudFormation.getString(properties.Address) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
  * Determine whether the given properties match those of a \`DBClusterRoleProperty\`
  *
  * @param properties - the TypeScript properties of a \`DBClusterRoleProperty\`
@@ -5074,7 +5002,6 @@ function CfnDBClusterPropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("preferredBackupWindow", cdk.validateString)(properties.preferredBackupWindow));
   errors.collect(cdk.propertyValidator("preferredMaintenanceWindow", cdk.validateString)(properties.preferredMaintenanceWindow));
   errors.collect(cdk.propertyValidator("publiclyAccessible", cdk.validateBoolean)(properties.publiclyAccessible));
-  errors.collect(cdk.propertyValidator("readEndpoint", CfnDBClusterReadEndpointPropertyValidator)(properties.readEndpoint));
   errors.collect(cdk.propertyValidator("replicationSourceIdentifier", cdk.validateString)(properties.replicationSourceIdentifier));
   errors.collect(cdk.propertyValidator("restoreToTime", cdk.validateString)(properties.restoreToTime));
   errors.collect(cdk.propertyValidator("restoreType", cdk.validateString)(properties.restoreType));
@@ -5136,7 +5063,6 @@ function convertCfnDBClusterPropsToCloudFormation(properties: any): any {
     "PreferredBackupWindow": cdk.stringToCloudFormation(properties.preferredBackupWindow),
     "PreferredMaintenanceWindow": cdk.stringToCloudFormation(properties.preferredMaintenanceWindow),
     "PubliclyAccessible": cdk.booleanToCloudFormation(properties.publiclyAccessible),
-    "ReadEndpoint": convertCfnDBClusterReadEndpointPropertyToCloudFormation(properties.readEndpoint),
     "ReplicationSourceIdentifier": cdk.stringToCloudFormation(properties.replicationSourceIdentifier),
     "RestoreToTime": cdk.stringToCloudFormation(properties.restoreToTime),
     "RestoreType": cdk.stringToCloudFormation(properties.restoreType),
@@ -5203,7 +5129,6 @@ function CfnDBClusterPropsFromCloudFormation(properties: any): cfn_parse.FromClo
   ret.addPropertyResult("preferredBackupWindow", "PreferredBackupWindow", (properties.PreferredBackupWindow != null ? cfn_parse.FromCloudFormation.getString(properties.PreferredBackupWindow) : undefined));
   ret.addPropertyResult("preferredMaintenanceWindow", "PreferredMaintenanceWindow", (properties.PreferredMaintenanceWindow != null ? cfn_parse.FromCloudFormation.getString(properties.PreferredMaintenanceWindow) : undefined));
   ret.addPropertyResult("publiclyAccessible", "PubliclyAccessible", (properties.PubliclyAccessible != null ? cfn_parse.FromCloudFormation.getBoolean(properties.PubliclyAccessible) : undefined));
-  ret.addPropertyResult("readEndpoint", "ReadEndpoint", (properties.ReadEndpoint != null ? CfnDBClusterReadEndpointPropertyFromCloudFormation(properties.ReadEndpoint) : undefined));
   ret.addPropertyResult("replicationSourceIdentifier", "ReplicationSourceIdentifier", (properties.ReplicationSourceIdentifier != null ? cfn_parse.FromCloudFormation.getString(properties.ReplicationSourceIdentifier) : undefined));
   ret.addPropertyResult("restoreToTime", "RestoreToTime", (properties.RestoreToTime != null ? cfn_parse.FromCloudFormation.getString(properties.RestoreToTime) : undefined));
   ret.addPropertyResult("restoreType", "RestoreType", (properties.RestoreType != null ? cfn_parse.FromCloudFormation.getString(properties.RestoreType) : undefined));
