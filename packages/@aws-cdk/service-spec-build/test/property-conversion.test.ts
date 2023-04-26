@@ -74,6 +74,40 @@ test('include readOnlyProperties in attributes', () => {
   expect(attrNames).toEqual(['Id']);
 });
 
+test('compound readOnlyProperties are included in attributes', () => {
+  importCloudFormationRegistryResource({
+    db,
+    fails,
+    resource: {
+      description: 'Test resource',
+      typeName: 'AWS::Some::Type',
+      properties: {
+        CompoundProp: { $ref: '#/definitions/CompoundProp' },
+      },
+      definitions: {
+        CompoundProp: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            Id: { type: 'string' },
+            Property: { type: 'string' },
+          },
+        },
+      },
+      readOnlyProperties: [
+        '/properties/CompoundProp',
+        '/properties/CompoundProp/Id',
+        '/properties/CompoundProp/Property',
+      ],
+    },
+  });
+
+  const attrNames = Object.keys(
+    db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.attributes,
+  );
+  expect(attrNames).toEqual(['CompoundProp', 'CompoundProp.Id', 'CompoundProp.Property']);
+});
+
 test('include legacy attributes in attributes', () => {
   importCloudFormationRegistryResource({
     db,

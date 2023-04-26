@@ -228,7 +228,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
     const attributeNames = Array.from(
       new Set([
-        ...findAttributes(resource).map(simplePropNameFromJsonPtr),
+        ...findAttributes(source).map(simplePropNameFromJsonPtr),
         ...Object.keys(options.specResource?.Attributes ?? {}),
       ]),
     )
@@ -236,23 +236,24 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       // spec they will look like 'Container.Prop'. Some Registry resources incorrectly use '.' as well.
       // Normalize here.
       .map((x) => x.replace(/\./g, '/'))
-      // Then drop compound attributes for now.
-      .filter((x) => !x.includes('/'));
+      // Finally we convert compound names into user-friendly names in dot-notation.
+      // This is how they are publicized in the docs as well.
+      .map((x) => x.split('/').join('.'));
 
     for (const name of attributeNames) {
-      if (!source.properties[name]) {
-        fails.push(fail(`no definition for: ${name}`));
-        continue;
-      }
-      const resolved = resolve(source.properties[name]);
+      try {
+        const resolved = resolvePropertySchema(source, name);
 
-      withResult(schemaTypeToModelType(name, resolved, fail.in(`attribute ${name}`)), (type) => {
-        target[name] = {
-          type,
-          documentation: descriptionOf(resolved.schema),
-          required: ifTrue((source.required ?? []).includes(name)),
-        };
-      });
+        withResult(schemaTypeToModelType(name, resolved, fail.in(`attribute ${name}`)), (type) => {
+          target[name] = {
+            type,
+            documentation: descriptionOf(resolved.schema),
+            required: ifTrue((source.required ?? []).includes(name)),
+          };
+        });
+      } catch {
+        fails.push(fail(`no definition for: ${name}`));
+      }
     }
   }
 
@@ -293,6 +294,27 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       fails.push(x);
     }
   }
+}
+
+function resolvePropertySchema(root: CloudFormationRegistryResource, name: string): jsonschema.ResolvedSchema {
+  const resolve = jsonschema.makeResolver(root);
+  return name.split('.').reduce(
+    ({ schema }: jsonschema.ResolvedSchema, current: string) => {
+      if (
+        !(
+          jsonschema.isConcreteSingleton(schema) &&
+          !jsonschema.isAnyType(schema) &&
+          'properties' in schema &&
+          schema.properties[current]
+        )
+      ) {
+        throw new Error(`no definition for: ${name}`);
+      }
+
+      return resolve(schema.properties[current]);
+    },
+    { schema: root as jsonschema.ConcreteSchema },
+  );
 }
 
 export function readCloudFormationRegistryServiceFromResource(
