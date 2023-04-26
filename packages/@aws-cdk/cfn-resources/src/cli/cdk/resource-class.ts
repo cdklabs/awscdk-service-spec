@@ -18,6 +18,7 @@ import {
   AnonymousInterfaceImplementation,
   Lambda,
   Stability,
+  ObjectLiteral,
 } from '@cdklabs/typewriter';
 import { CDK_CORE, CONSTRUCTS } from './cdk';
 import {
@@ -186,10 +187,13 @@ export class ResourceClass extends ClassType {
       type: Type.STRING,
       documentation: 'Construct identifier for this resource (unique in its scope)',
     });
+
+    const hasRequiredProps = this.propsType.properties.some((p) => !p.optional);
     const props = init.addParameter({
       name: 'props',
       type: this.propsType.type,
       documentation: 'Resource properties',
+      default: hasRequiredProps ? undefined : new ObjectLiteral([]),
     });
 
     const $this = $E(expr.this_());

@@ -1,4 +1,5 @@
 import { CallableDeclaration } from './callable';
+import { Expression } from './expression';
 import { Identifier } from './expressions';
 import { Type } from './type';
 
@@ -7,6 +8,7 @@ export interface ParameterSpec {
   type: Type;
   documentation?: string;
   optional?: boolean;
+  default?: Expression;
 }
 
 /**
@@ -26,5 +28,9 @@ export class Parameter extends Identifier {
 
   public get type(): Type {
     return this.spec.type;
+  }
+
+  public get default(): Expression | undefined {
+    return this.spec.default;
   }
 }
