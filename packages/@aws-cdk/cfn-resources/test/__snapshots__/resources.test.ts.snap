@@ -6051,7 +6051,7 @@ export namespace CfnBucket {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html#cfn-s3-bucket-rule-objectsizegreaterthan
      */
-    readonly objectSizeGreaterThan?: string;
+    readonly objectSizeGreaterThan?: number;
 
     /**
      * Specifies the maximum object size in bytes for this rule to apply to.
@@ -6060,7 +6060,7 @@ export namespace CfnBucket {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html#cfn-s3-bucket-rule-objectsizelessthan
      */
-    readonly objectSizeLessThan?: string;
+    readonly objectSizeLessThan?: number;
 
     /**
      * (Deprecated.) Specifies when an object transitions to a specified storage class. If you specify an expiration and transition time, you must use the same time unit for both properties (either in days or by date). The expiration time must also be later than the transition time. If you specify this property, don't specify the \`Transitions\` property.
@@ -8383,8 +8383,8 @@ function CfnBucketRulePropertyValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("noncurrentVersionExpirationInDays", cdk.validateNumber)(properties.noncurrentVersionExpirationInDays));
   errors.collect(cdk.propertyValidator("noncurrentVersionTransition", CfnBucketNoncurrentVersionTransitionPropertyValidator)(properties.noncurrentVersionTransition));
   errors.collect(cdk.propertyValidator("noncurrentVersionTransitions", cdk.listValidator(CfnBucketNoncurrentVersionTransitionPropertyValidator))(properties.noncurrentVersionTransitions));
-  errors.collect(cdk.propertyValidator("objectSizeGreaterThan", cdk.validateString)(properties.objectSizeGreaterThan));
-  errors.collect(cdk.propertyValidator("objectSizeLessThan", cdk.validateString)(properties.objectSizeLessThan));
+  errors.collect(cdk.propertyValidator("objectSizeGreaterThan", cdk.validateNumber)(properties.objectSizeGreaterThan));
+  errors.collect(cdk.propertyValidator("objectSizeLessThan", cdk.validateNumber)(properties.objectSizeLessThan));
   errors.collect(cdk.propertyValidator("prefix", cdk.validateString)(properties.prefix));
   errors.collect(cdk.propertyValidator("status", cdk.requiredValidator)(properties.status));
   errors.collect(cdk.propertyValidator("status", cdk.validateString)(properties.status));
@@ -8408,8 +8408,8 @@ function convertCfnBucketRulePropertyToCloudFormation(properties: any): any {
     "NoncurrentVersionExpirationInDays": cdk.numberToCloudFormation(properties.noncurrentVersionExpirationInDays),
     "NoncurrentVersionTransition": convertCfnBucketNoncurrentVersionTransitionPropertyToCloudFormation(properties.noncurrentVersionTransition),
     "NoncurrentVersionTransitions": cdk.listMapper(convertCfnBucketNoncurrentVersionTransitionPropertyToCloudFormation)(properties.noncurrentVersionTransitions),
-    "ObjectSizeGreaterThan": cdk.stringToCloudFormation(properties.objectSizeGreaterThan),
-    "ObjectSizeLessThan": cdk.stringToCloudFormation(properties.objectSizeLessThan),
+    "ObjectSizeGreaterThan": cdk.numberToCloudFormation(properties.objectSizeGreaterThan),
+    "ObjectSizeLessThan": cdk.numberToCloudFormation(properties.objectSizeLessThan),
     "Prefix": cdk.stringToCloudFormation(properties.prefix),
     "Status": cdk.stringToCloudFormation(properties.status),
     "TagFilters": cdk.listMapper(convertCfnBucketTagFilterPropertyToCloudFormation)(properties.tagFilters),
@@ -8437,8 +8437,8 @@ function CfnBucketRulePropertyFromCloudFormation(properties: any): cfn_parse.Fro
   ret.addPropertyResult("noncurrentVersionExpirationInDays", "NoncurrentVersionExpirationInDays", (properties.NoncurrentVersionExpirationInDays != null ? cfn_parse.FromCloudFormation.getNumber(properties.NoncurrentVersionExpirationInDays) : undefined));
   ret.addPropertyResult("noncurrentVersionTransition", "NoncurrentVersionTransition", (properties.NoncurrentVersionTransition != null ? CfnBucketNoncurrentVersionTransitionPropertyFromCloudFormation(properties.NoncurrentVersionTransition) : undefined));
   ret.addPropertyResult("noncurrentVersionTransitions", "NoncurrentVersionTransitions", (properties.NoncurrentVersionTransitions != null ? cfn_parse.FromCloudFormation.getArray(CfnBucketNoncurrentVersionTransitionPropertyFromCloudFormation)(properties.NoncurrentVersionTransitions) : undefined));
-  ret.addPropertyResult("objectSizeGreaterThan", "ObjectSizeGreaterThan", (properties.ObjectSizeGreaterThan != null ? cfn_parse.FromCloudFormation.getString(properties.ObjectSizeGreaterThan) : undefined));
-  ret.addPropertyResult("objectSizeLessThan", "ObjectSizeLessThan", (properties.ObjectSizeLessThan != null ? cfn_parse.FromCloudFormation.getString(properties.ObjectSizeLessThan) : undefined));
+  ret.addPropertyResult("objectSizeGreaterThan", "ObjectSizeGreaterThan", (properties.ObjectSizeGreaterThan != null ? cfn_parse.FromCloudFormation.getNumber(properties.ObjectSizeGreaterThan) : undefined));
+  ret.addPropertyResult("objectSizeLessThan", "ObjectSizeLessThan", (properties.ObjectSizeLessThan != null ? cfn_parse.FromCloudFormation.getNumber(properties.ObjectSizeLessThan) : undefined));
   ret.addPropertyResult("prefix", "Prefix", (properties.Prefix != null ? cfn_parse.FromCloudFormation.getString(properties.Prefix) : undefined));
   ret.addPropertyResult("status", "Status", (properties.Status != null ? cfn_parse.FromCloudFormation.getString(properties.Status) : undefined));
   ret.addPropertyResult("tagFilters", "TagFilters", (properties.TagFilters != null ? cfn_parse.FromCloudFormation.getArray(CfnBucketTagFilterPropertyFromCloudFormation)(properties.TagFilters) : undefined));

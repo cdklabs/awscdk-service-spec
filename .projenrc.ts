@@ -35,9 +35,7 @@ const typewriter = new TypeScriptWorkspace({
   parent: repo,
   name: '@cdklabs/typewriter',
   description: 'Write typed code for jsii',
-  deps: [
-    'camelcase@^6', // camelcase 7 uses ESM
-  ],
+  deps: [],
 });
 
 const serviceSpecSources = new TypeScriptWorkspace({

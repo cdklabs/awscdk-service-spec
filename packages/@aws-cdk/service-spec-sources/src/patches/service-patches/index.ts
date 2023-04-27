@@ -16,9 +16,11 @@ import './legacy-untyped';
 
 // Services
 import './autoscaling';
+import './codebuild';
 import './cognito';
 import './elasticsearch';
 import './iot1click';
 import './opensearch';
 import './rds';
+import './s3';
 import './wafv2';

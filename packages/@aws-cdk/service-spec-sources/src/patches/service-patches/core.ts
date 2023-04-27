@@ -90,6 +90,19 @@ export function renameDefinition(oldName: string, newName: string, reason: Reaso
 }
 
 /**
+ * Replace the a type definition, only if the definition actually exists.
+ *
+ * NOTE: returns a new patcher. Still needs to be applied to a lens.
+ */
+export function replaceDefinition(definition: string, schema: jsonschema.Schema, reason: Reason): JsonObjectPatcher {
+  return (lens) => {
+    if (lens.jsonPointer === `/definitions/${definition}`) {
+      lens.replaceValue(reason.reason, schema);
+    }
+  };
+}
+
+/**
  * Add a definition, only if the definition doesn't yet exist
  *
  * NOTE: returns a new patcher. Still needs to be applied to a lens.
@@ -191,5 +204,57 @@ export namespace fp {
         return readOnlyProperties;
       },
     );
+  }
+
+  /**
+   * Replace properties in readOnlyProperties with a different one
+   */
+  export function replaceReadOnlyProperties<TypeName extends string = string>(
+    resource: TypeName,
+    replace: {
+      [oldName: string]: string;
+    },
+    reason: Reason,
+  ): Patcher<JsonLens> {
+    return patchResourceAt<CloudFormationRegistryResource['readOnlyProperties']>(
+      resource,
+      '/readOnlyProperties',
+      reason,
+      (readOnlyProperties = []) => {
+        for (const [oldName, newName] of Object.entries(replace)) {
+          const idx = readOnlyProperties.indexOf(`/properties/${oldName}`);
+          if (readOnlyProperties[idx]) {
+            readOnlyProperties[idx] = `/properties/${newName}`;
+          }
+        }
+        return readOnlyProperties;
+      },
+    );
+  }
+
+  /**
+   * Rename properties of a resource, only if the old property exists
+   */
+  export function renameProperties<TypeName extends string = string>(
+    resource: TypeName,
+    rename: {
+      [oldName: string]: string;
+    },
+    reason: Reason,
+  ): Patcher<JsonLens> {
+    return (lens) => {
+      const root = lens.rootPath[0];
+      if (
+        (root.value as unknown as CloudFormationRegistryResource).typeName === resource &&
+        lens.jsonPointer === '/properties' &&
+        lens.isJsonObject()
+      ) {
+        for (const [oldName, newName] of Object.entries(rename)) {
+          if (lens.value[oldName]) {
+            lens.renameProperty(reason.reason, oldName, newName);
+          }
+        }
+      }
+    };
   }
 }
