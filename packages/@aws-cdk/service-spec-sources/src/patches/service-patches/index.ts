@@ -22,4 +22,5 @@ import './elasticsearch';
 import './iot1click';
 import './opensearch';
 import './rds';
+import './s3';
 import './wafv2';
