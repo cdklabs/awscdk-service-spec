@@ -71,8 +71,11 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     recurseProperties(resource, res.properties, resourceFailure);
     // Every property that's a "readonly" property, remove it again from the `properties` collection.
     for (const propPtr of findAttributes(resource)) {
-      const propName = simplePropNameFromJsonPtr(propPtr);
-      delete res.properties[propName];
+      const attrName = simplePropNameFromJsonPtr(propPtr);
+      // A property might exists as exactly the attribute name
+      delete res.properties[attrName];
+      // or as a version with "."s removed
+      delete res.properties[attributeNameToPropertyName(attrName)];
     }
 
     for (const propPtr of resource.deprecatedProperties ?? []) {
@@ -231,21 +234,18 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         ...findAttributes(source).map(simplePropNameFromJsonPtr),
         ...Object.keys(options.specResource?.Attributes ?? {}),
       ]),
-    )
-      // In the Registry spec, compound attributes will look like 'Container/Prop', in the legacy
-      // spec they will look like 'Container.Prop'. Some Registry resources incorrectly use '.' as well.
-      // Normalize here.
-      .map((x) => x.replace(/\./g, '/'))
-      // Finally we convert compound names into user-friendly names in dot-notation.
-      // This is how they are publicized in the docs as well.
-      .map((x) => x.split('/').join('.'));
+    );
 
     for (const name of attributeNames) {
       try {
         const resolved = resolvePropertySchema(source, name);
 
+        // Convert compound names into user-friendly names in dot-notation.
+        // This is how they are publicized in the docs as well.
+        const attributeName = name.split('/').join('.');
+
         withResult(schemaTypeToModelType(name, resolved, fail.in(`attribute ${name}`)), (type) => {
-          target[name] = {
+          target[attributeName] = {
             type,
             documentation: descriptionOf(resolved.schema),
             required: ifTrue((source.required ?? []).includes(name)),
@@ -298,7 +298,24 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
 function resolvePropertySchema(root: CloudFormationRegistryResource, name: string): jsonschema.ResolvedSchema {
   const resolve = jsonschema.makeResolver(root);
-  return name.split('.').reduce(
+
+  // If a property exists with exactly that name (including . or /) then we use that property
+  if (root.properties[name]) {
+    return resolve(root.properties[name]);
+  }
+
+  // The property might also exist with a name that has any `.` stripped.
+  const sanitizedName = attributeNameToPropertyName(name);
+  if (root.properties[sanitizedName]) {
+    return resolve(root.properties[sanitizedName]);
+  }
+
+  // Otherwise assume the name represents a compound attribute
+  // In the Registry spec, compound attributes will look like 'Container/Prop'.
+  // In the legacy spec they will look like 'Container.Prop'.
+  // Some Registry resources incorrectly use '.' as well.
+  // We accept both here.
+  return name.split(/[\.\/]/).reduce(
     ({ schema }: jsonschema.ResolvedSchema, current: string) => {
       if (
         !(
@@ -373,4 +390,12 @@ function findAttributes(resource: CloudFormationRegistryResource): string[] {
   const exclusions = resource.createOnlyProperties ?? [];
 
   return Array.from(new Set([...candidates].filter((a) => !exclusions.includes(a))));
+}
+
+/**
+ * Turns a compound name into its property equivalent
+ * Compliance.Type -> ComplianceType
+ */
+function attributeNameToPropertyName(name: string) {
+  return name.split('.').join('');
 }
