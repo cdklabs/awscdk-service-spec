@@ -34,7 +34,14 @@ export async function buildDatabase(options: BuildDatabaseOptions = {}) {
         db,
         resource,
         fails: warnings,
-        specResource: resourceSpec.ResourceTypes[resource.typeName],
+        resourceSpec: {
+          spec: resourceSpec.ResourceTypes[resource.typeName],
+          types: Object.fromEntries(
+            Object.entries(resourceSpec.PropertyTypes)
+              .filter(([typeName]) => typeName.startsWith(resource.typeName))
+              .map(([typeName, typeDef]) => [typeName.split('.').splice(1).join('.'), typeDef]),
+          ),
+        },
       });
       db.link('regionHasResource', region, res);
 

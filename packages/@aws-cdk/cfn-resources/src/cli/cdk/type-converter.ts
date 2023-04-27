@@ -56,6 +56,8 @@ export class TypeConverter {
         return Type.NUMBER;
       case 'boolean':
         return Type.BOOLEAN;
+      case 'date-time':
+        return Type.DATE_TIME;
       case 'array':
         return Type.arrayOf(this.typeFromSpecType(type.element));
       case 'map':

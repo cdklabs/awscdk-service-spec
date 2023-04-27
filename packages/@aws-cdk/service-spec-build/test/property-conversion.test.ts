@@ -1,4 +1,4 @@
-import { emptyDatabase } from '@aws-cdk/service-spec';
+import { DefinitionReference, emptyDatabase } from '@aws-cdk/service-spec';
 import { Failures } from '@cdklabs/tskb';
 import { importCloudFormationRegistryResource } from '../src/import-cloudformation-registry';
 
@@ -121,9 +121,11 @@ test('include legacy attributes in attributes', () => {
       },
       readOnlyProperties: ['/properties/Id'],
     },
-    specResource: {
-      Attributes: {
-        Property: { PrimitiveType: 'String' },
+    resourceSpec: {
+      spec: {
+        Attributes: {
+          Property: { PrimitiveType: 'String' },
+        },
       },
     },
   });
@@ -174,4 +176,48 @@ test('reference types are correctly named', () => {
 
   expect(types.length).toBe(1);
   expect(types[0].entity.name).toBe('Property');
+});
+
+test('legacy timestamps are getting the timestamp format', () => {
+  importCloudFormationRegistryResource({
+    db,
+    fails,
+    resource: {
+      description: 'Test resource',
+      typeName: 'AWS::Some::Type',
+      properties: {
+        Property: { $ref: '#/definitions/Property' },
+        Id: { type: 'string' },
+      },
+      definitions: {
+        Property: {
+          type: 'object',
+          properties: {
+            DateTime: {
+              type: 'string',
+            },
+          },
+        },
+      },
+      readOnlyProperties: ['/properties/Id'],
+    },
+    resourceSpec: {
+      spec: {},
+      types: {
+        Property: {
+          Properties: {
+            DateTime: {
+              PrimitiveType: 'Timestamp',
+              UpdateType: 'Mutable',
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const prop = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.properties?.Property;
+  expect(prop.type.type).toBe('ref');
+  const type = db.get('typeDefinition', (prop.type as DefinitionReference).reference.$ref);
+  expect(type.properties.DateTime.type).toMatchObject({ type: 'date-time' });
 });

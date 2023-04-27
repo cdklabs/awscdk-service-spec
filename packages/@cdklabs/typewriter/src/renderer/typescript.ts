@@ -49,7 +49,7 @@ import {
 } from '../statements';
 import { StructType } from '../struct';
 import { ThingSymbol } from '../symbol';
-import { Type } from '../type';
+import { PrimitiveType, Type } from '../type';
 import { TypeParameterSpec } from '../type-declaration';
 import { Initializer, MemberVisibility, Method } from '../type-member';
 
@@ -344,7 +344,12 @@ export class TypeScriptRenderer extends Renderer {
       return this.emit('void');
     }
     if (ref.primitive) {
-      return this.emit(ref.primitive);
+      switch (ref.primitive) {
+        case PrimitiveType.DateTime:
+          return this.emit('Date');
+        default:
+          return this.emit(ref.primitive);
+      }
     }
 
     if (ref.symbol) {

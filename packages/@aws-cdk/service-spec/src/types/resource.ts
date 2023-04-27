@@ -163,7 +163,7 @@ export type PropertyType =
   | MapType<PropertyType>
   | TypeUnion<PropertyType>;
 
-export type PrimitiveType = StringType | NumberType | BooleanType | JsonType | NullType;
+export type PrimitiveType = StringType | NumberType | BooleanType | JsonType | DateTimeType | NullType;
 
 export function isPrimitiveType(x: PropertyType): x is PrimitiveType {
   return (x as any).type;
@@ -192,6 +192,10 @@ export interface JsonType {
 
 export interface NullType {
   readonly type: 'null';
+}
+
+export interface DateTimeType {
+  readonly type: 'date-time';
 }
 
 export interface DefinitionReference {
