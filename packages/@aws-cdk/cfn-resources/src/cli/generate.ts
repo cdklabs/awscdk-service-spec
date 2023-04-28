@@ -67,27 +67,26 @@ export async function generate(options: GenerateOptions) {
   const db = await loadDatabase();
   const renderer = new TypeScriptRenderer();
 
-  let resources: Record<string, string> = {};
+  let resources: Record<string, Record<string, string>> = {};
   const services = getServices(db, options.services).map((s) => {
     debug(s.name, 'ast');
     const ast = AstBuilder.forService(s, { db, importLocations, nameSuffix: options.serviceSuffixes?.[s.name] });
 
-    resources = {
-      ...resources,
-      ...ast.resources,
-    };
+    resources[s.name] = ast.resources || {};
     return ast;
   });
 
-  console.log('Generating %i Resources for %i Services', Object.keys(resources).length, services.length);
+  const resourceCount = Object.values(resources).reduce((total, res) => total + Object.keys(res).length, 0);
+  console.log('Generating %i Resources for %i Services', resourceCount, services.length);
 
   if (clearOutput) {
     fs.removeSync(outputPath);
   }
 
-  const outputFiles = new Array<string>();
+  const outputFiles: { [service: string]: string[] } = {};
   for (const s of services) {
     debug(`${s.module.service}`, 'render');
+    outputFiles[s.module.name] = [];
 
     const writer = new ServiceFileWriter(outputPath, renderer, {
       package: s.module.name.toLowerCase(),
@@ -112,7 +111,7 @@ export async function generate(options: GenerateOptions) {
       writer.writePattern(s.cannedMetrics, options.cannedMetricsFilePattern);
     }
 
-    outputFiles.push(...writer.outputFiles);
+    outputFiles[s.module.name].push(...writer.outputFiles);
   }
 
   return {
