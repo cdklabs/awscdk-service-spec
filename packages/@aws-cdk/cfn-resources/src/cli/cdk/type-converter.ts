@@ -70,7 +70,7 @@ export class TypeConverter {
           case 'asg':
             return this.typeFromSpecType(type.original);
           case 'map':
-            return Type.arrayOf(Type.mapOf(Type.STRING));
+            return Type.mapOf(Type.STRING);
           case 'standard':
           default:
             return Type.arrayOf(CDK_CORE.CfnTag);
