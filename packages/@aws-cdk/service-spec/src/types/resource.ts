@@ -70,19 +70,12 @@ export interface Resource extends Entity {
   tagPropertyName?: string;
 
   /**
-   * What type of tags
-   */
-  tagType?: TagType;
-
-  /**
    * Whether changes to this resource need to be scrutinized
    *
    * @default ResourceScrutinyType.NONE
    */
   scrutinizable?: ResourceScrutinyType;
 }
-
-export type TagType = 'standard' | 'asg' | 'map';
 
 export type ResourceProperties = Record<string, Property>;
 
@@ -157,7 +150,7 @@ Invariants.push(
 
 export type PropertyType =
   | PrimitiveType
-  | BuiltInType
+  | TagType
   | DefinitionReference
   | ArrayType<PropertyType>
   | MapType<PropertyType>
@@ -169,10 +162,20 @@ export function isPrimitiveType(x: PropertyType): x is PrimitiveType {
   return (x as any).type;
 }
 
-export interface BuiltInType {
-  readonly type: 'builtIn';
-  readonly builtInType: 'tag';
+export interface TagType {
+  readonly type: 'tag';
+  /**
+   * Used to instruct cdk.TagManager how to handle tags
+   */
+  readonly variant: TagVariant;
+  /**
+   * The original type of the property.
+   * Some tag variants use the original type definition.
+   */
+  readonly original: PropertyType;
 }
+
+export type TagVariant = 'standard' | 'asg' | 'map';
 
 export interface StringType {
   readonly type: 'string';

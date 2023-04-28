@@ -65,10 +65,15 @@ export class TypeConverter {
       case 'ref':
         const ref = this.db.get('typeDefinition', type.reference.$ref);
         return this.obtainTypeReference(ref).type;
-      case 'builtIn':
-        switch (type.builtInType) {
-          case 'tag':
-            return CDK_CORE.CfnTag;
+      case 'tag':
+        switch (type.variant) {
+          case 'asg':
+            return this.typeFromSpecType(type.original);
+          case 'map':
+            return Type.arrayOf(Type.mapOf(Type.STRING));
+          case 'standard':
+          default:
+            return Type.arrayOf(CDK_CORE.CfnTag);
         }
       case 'union':
         return Type.unionOf(...type.types.map((t) => this.typeFromSpecType(t)));
