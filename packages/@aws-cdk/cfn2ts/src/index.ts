@@ -58,6 +58,9 @@ export default async function generate(
  * @example "AWS::DynamoDB" -> "aws-dynamodb"
  */
 function scopeToServiceName(scope: string): string {
+  if (scope === 'AWS::Serverless') {
+    return 'aws-sam';
+  }
   return scope.replace('::', '-').toLowerCase();
 }
 
