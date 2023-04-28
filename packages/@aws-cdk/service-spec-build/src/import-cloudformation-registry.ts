@@ -291,14 +291,18 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         } else {
           const resolvedType = resolve(tagType).schema;
           res.tagPropertyName = tagProp;
+          const original = res.properties[tagProp].type;
+          res.properties[tagProp].type = { type: 'tag', variant: 'standard', original };
+
           if (res.cloudFormationType === 'AWS::AutoScaling::AutoScalingGroup') {
-            res.tagType = 'asg';
+            res.properties[tagProp].type = {
+              type: 'tag',
+              variant: 'asg',
+              original,
+            };
           } else if (jsonschema.isObject(resolvedType) && jsonschema.isMapLikeObject(resolvedType)) {
-            res.tagType = 'map';
-          } else {
-            res.tagType = 'standard';
+            res.properties[tagProp].type = { type: 'tag', variant: 'map', original };
           }
-          res.properties[tagProp].type = { type: 'array', element: { type: 'builtIn', builtInType: 'tag' } };
         }
       }
     });

@@ -328,9 +328,9 @@ export class ResourceClass extends ClassType {
     const $this = $E(expr.this_());
     return this.propsType.properties.map((prop) => {
       // FIXME: Would be nicer to thread this value through
-      const isTagType = prop.name === propertyNameFromCloudFormation(this.res.tagPropertyName ?? '');
+      const tagType = tryFindTagType(this.res, prop.name);
 
-      if (isTagType) {
+      if (tagType) {
         return {
           // The property must be called 'tags' for the resource to count as ITaggable
           name: 'tags',
@@ -340,7 +340,7 @@ export class ResourceClass extends ClassType {
           memberType: CDK_CORE.TagManager,
           initializer: (props: Expression) =>
             new CDK_CORE.TagManager(
-              translateTagType(this.res.tagType ?? 'standard'),
+              translateTagType(tagType),
               expr.lit(this.res.cloudFormationType),
               prop.from(props),
               expr.object({ tagPropertyName: expr.lit(prop.name) }),
@@ -400,8 +400,11 @@ export class ResourceClass extends ClassType {
   }
 }
 
+/**
+ * Translates a TagVariant to the core.TagType enum
+ */
 function translateTagType(x: TagType) {
-  switch (x) {
+  switch (x.variant) {
     case 'standard':
       return CDK_CORE.TagType.STANDARD;
     case 'asg':
@@ -409,4 +412,27 @@ function translateTagType(x: TagType) {
     case 'map':
       return CDK_CORE.TagType.MAP;
   }
+}
+
+/**
+ * For a given resource and property, if the property is the resource's tag property,
+ * returns the tag type for the property.
+ *
+ * Returns `undefined` otherwise.
+ */
+function tryFindTagType(resource: Resource, propName: string): TagType | undefined {
+  if (!resource.tagPropertyName) {
+    return;
+  }
+
+  if (propName !== propertyNameFromCloudFormation(resource.tagPropertyName)) {
+    return;
+  }
+
+  const propType = resource.properties[resource.tagPropertyName].type;
+  if (propType.type !== 'tag') {
+    return;
+  }
+
+  return propType;
 }
