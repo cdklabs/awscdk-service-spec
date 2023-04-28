@@ -11,6 +11,7 @@ jobs:
       contents: read
     env:
       CI: "1"
+      NODE_OPTIONS: --max-old-space-size=8196
     steps:
       - name: Checkout awscdk-service-spec
         uses: actions/checkout@v3

@@ -26,6 +26,7 @@ export class AwsCdkIntegrationTest extends pj.Component {
       runsOn: ['awscdk-service-spec_ubuntu-latest_32-core'],
       env: {
         CI: '1',
+        NODE_OPTIONS: '--max-old-space-size=8196',
       },
       permissions: {
         contents: pj.github.workflows.JobPermission.READ,
