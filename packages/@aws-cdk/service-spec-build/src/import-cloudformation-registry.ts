@@ -32,7 +32,10 @@ export interface LoadCloudFormationRegistryResourceOptions {
   readonly db: SpecDatabase;
   readonly resource: CloudFormationRegistryResource;
   readonly fails: Failures;
-  readonly specResource?: resourcespec.ResourceType;
+  readonly resourceSpec?: {
+    spec?: resourcespec.ResourceType;
+    types?: Record<string, resourcespec.PropertyType>;
+  };
 }
 export interface LoadCloudFormationRegistryServiceFromResourceOptions {
   readonly db: SpecDatabase;
@@ -68,7 +71,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       properties: {},
     });
 
-    recurseProperties(resource, res.properties, resourceFailure);
+    recurseProperties(resource, res.properties, resourceFailure, options.resourceSpec?.spec);
     // Every property that's a "readonly" property, remove it again from the `properties` collection.
     for (const propPtr of findAttributes(resource)) {
       const attrName = simplePropNameFromJsonPtr(propPtr);
@@ -90,13 +93,25 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     return res;
   }
 
-  function recurseProperties(source: ImplicitJsonSchemaRecord, target: ResourceProperties, fail: Fail) {
+  function recurseProperties(
+    source: ImplicitJsonSchemaRecord,
+    target: ResourceProperties,
+    fail: Fail,
+    spec?: resourcespec.PropertyType,
+  ) {
     if (!source.properties) {
       throw new Error(`Not an object type with properties: ${JSON.stringify(source)}`);
     }
 
     for (const [name, property] of Object.entries(source.properties)) {
-      const resolved = resolve(property);
+      let resolved = resolve(property);
+
+      if (spec?.Properties?.[name]?.PrimitiveType === 'Timestamp') {
+        resolved = {
+          ...resolved,
+          schema: { type: 'string', format: 'timestamp' },
+        };
+      }
 
       withResult(schemaTypeToModelType(name, resolved, fail.in(`property ${name}`)), (type) => {
         target[name] = {
@@ -135,6 +150,9 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       } else {
         switch (resolved.schema.type) {
           case 'string':
+            if (resolved.schema.format === 'timestamp') {
+              return { type: 'date-time' };
+            }
             return { type: 'string' };
 
           case 'array':
@@ -198,7 +216,12 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       db.link('usesType', res, typeDef);
       typeDefinitions.set(schema, typeDef);
 
-      recurseProperties(schema, typeDef.properties, fail.in(`typedef ${nameHint}`));
+      recurseProperties(
+        schema,
+        typeDef.properties,
+        fail.in(`typedef ${nameHint}`),
+        options.resourceSpec?.types?.[typeDef.name],
+      );
     }
 
     return { type: 'ref', reference: ref(typeDef) };
@@ -232,7 +255,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     const attributeNames = Array.from(
       new Set([
         ...findAttributes(source).map(simplePropNameFromJsonPtr),
-        ...Object.keys(options.specResource?.Attributes ?? {}),
+        ...Object.keys(options.resourceSpec?.spec?.Attributes ?? {}),
       ]),
     );
 

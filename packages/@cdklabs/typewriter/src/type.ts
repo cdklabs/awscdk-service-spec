@@ -8,9 +8,9 @@ import { MemberVisibility } from './type-member';
 
 export enum PrimitiveType {
   /**
-   * A JSON date (represented as it's ISO-8601 string form).
+   * A JSON date-time or date (represented as it's ISO-8601 string form).
    */
-  Date = 'date',
+  DateTime = 'date-time',
   /**
    * A plain string.
    */
@@ -56,6 +56,7 @@ export type TypeReferenceSpec =
 export class Type {
   public static readonly ANY = new Type({ primitive: PrimitiveType.Any });
   public static readonly VOID = new Type({ primitive: PrimitiveType.Void });
+  public static readonly DATE_TIME = new Type({ primitive: PrimitiveType.DateTime });
   public static readonly STRING = new Type({ primitive: PrimitiveType.String });
   public static readonly NUMBER = new Type({ primitive: PrimitiveType.Number });
   public static readonly BOOLEAN = new Type({ primitive: PrimitiveType.Boolean });

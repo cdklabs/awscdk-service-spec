@@ -5958,7 +5958,7 @@ export namespace CfnBucket {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-rule.html#cfn-s3-bucket-rule-expirationdate
      */
-    readonly expirationDate?: string;
+    readonly expirationDate?: Date | cdk.IResolvable;
 
     /**
      * Indicates the number of days after creation when objects are deleted from Amazon S3 and Amazon S3 Glacier.
@@ -6182,7 +6182,7 @@ export namespace CfnBucket {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-transition.html#cfn-s3-bucket-transition-transitiondate
      */
-    readonly transitionDate?: string;
+    readonly transitionDate?: Date | cdk.IResolvable;
 
     /**
      * Indicates the number of days after creation when objects are transitioned to the specified storage class.
@@ -8327,7 +8327,7 @@ function CfnBucketTransitionPropertyValidator(properties: any): cdk.ValidationRe
   }
   errors.collect(cdk.propertyValidator("storageClass", cdk.requiredValidator)(properties.storageClass));
   errors.collect(cdk.propertyValidator("storageClass", cdk.validateString)(properties.storageClass));
-  errors.collect(cdk.propertyValidator("transitionDate", cdk.validateString)(properties.transitionDate));
+  errors.collect(cdk.propertyValidator("transitionDate", cdk.validateDate)(properties.transitionDate));
   errors.collect(cdk.propertyValidator("transitionInDays", cdk.validateNumber)(properties.transitionInDays));
   return errors.wrap("supplied properties not correct for \\"TransitionProperty\\"");
 }
@@ -8338,7 +8338,7 @@ function convertCfnBucketTransitionPropertyToCloudFormation(properties: any): an
   CfnBucketTransitionPropertyValidator(properties).assertSuccess();
   return {
     "StorageClass": cdk.stringToCloudFormation(properties.storageClass),
-    "TransitionDate": cdk.stringToCloudFormation(properties.transitionDate),
+    "TransitionDate": cdk.dateToCloudFormation(properties.transitionDate),
     "TransitionInDays": cdk.numberToCloudFormation(properties.transitionInDays)
   };
 }
@@ -8354,7 +8354,7 @@ function CfnBucketTransitionPropertyFromCloudFormation(properties: any): cfn_par
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnBucket.TransitionProperty>();
   ret.addPropertyResult("storageClass", "StorageClass", (properties.StorageClass != null ? cfn_parse.FromCloudFormation.getString(properties.StorageClass) : undefined));
-  ret.addPropertyResult("transitionDate", "TransitionDate", (properties.TransitionDate != null ? cfn_parse.FromCloudFormation.getString(properties.TransitionDate) : undefined));
+  ret.addPropertyResult("transitionDate", "TransitionDate", (properties.TransitionDate != null ? cfn_parse.FromCloudFormation.getDate(properties.TransitionDate) : undefined));
   ret.addPropertyResult("transitionInDays", "TransitionInDays", (properties.TransitionInDays != null ? cfn_parse.FromCloudFormation.getNumber(properties.TransitionInDays) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
@@ -8375,7 +8375,7 @@ function CfnBucketRulePropertyValidator(properties: any): cdk.ValidationResult {
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
   errors.collect(cdk.propertyValidator("abortIncompleteMultipartUpload", CfnBucketAbortIncompleteMultipartUploadPropertyValidator)(properties.abortIncompleteMultipartUpload));
-  errors.collect(cdk.propertyValidator("expirationDate", cdk.validateString)(properties.expirationDate));
+  errors.collect(cdk.propertyValidator("expirationDate", cdk.validateDate)(properties.expirationDate));
   errors.collect(cdk.propertyValidator("expirationInDays", cdk.validateNumber)(properties.expirationInDays));
   errors.collect(cdk.propertyValidator("expiredObjectDeleteMarker", cdk.validateBoolean)(properties.expiredObjectDeleteMarker));
   errors.collect(cdk.propertyValidator("id", cdk.validateString)(properties.id));
@@ -8400,7 +8400,7 @@ function convertCfnBucketRulePropertyToCloudFormation(properties: any): any {
   CfnBucketRulePropertyValidator(properties).assertSuccess();
   return {
     "AbortIncompleteMultipartUpload": convertCfnBucketAbortIncompleteMultipartUploadPropertyToCloudFormation(properties.abortIncompleteMultipartUpload),
-    "ExpirationDate": cdk.stringToCloudFormation(properties.expirationDate),
+    "ExpirationDate": cdk.dateToCloudFormation(properties.expirationDate),
     "ExpirationInDays": cdk.numberToCloudFormation(properties.expirationInDays),
     "ExpiredObjectDeleteMarker": cdk.booleanToCloudFormation(properties.expiredObjectDeleteMarker),
     "Id": cdk.stringToCloudFormation(properties.id),
@@ -8429,7 +8429,7 @@ function CfnBucketRulePropertyFromCloudFormation(properties: any): cfn_parse.Fro
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnBucket.RuleProperty>();
   ret.addPropertyResult("abortIncompleteMultipartUpload", "AbortIncompleteMultipartUpload", (properties.AbortIncompleteMultipartUpload != null ? CfnBucketAbortIncompleteMultipartUploadPropertyFromCloudFormation(properties.AbortIncompleteMultipartUpload) : undefined));
-  ret.addPropertyResult("expirationDate", "ExpirationDate", (properties.ExpirationDate != null ? cfn_parse.FromCloudFormation.getString(properties.ExpirationDate) : undefined));
+  ret.addPropertyResult("expirationDate", "ExpirationDate", (properties.ExpirationDate != null ? cfn_parse.FromCloudFormation.getDate(properties.ExpirationDate) : undefined));
   ret.addPropertyResult("expirationInDays", "ExpirationInDays", (properties.ExpirationInDays != null ? cfn_parse.FromCloudFormation.getNumber(properties.ExpirationInDays) : undefined));
   ret.addPropertyResult("expiredObjectDeleteMarker", "ExpiredObjectDeleteMarker", (properties.ExpiredObjectDeleteMarker != null ? cfn_parse.FromCloudFormation.getBoolean(properties.ExpiredObjectDeleteMarker) : undefined));
   ret.addPropertyResult("id", "Id", (properties.Id != null ? cfn_parse.FromCloudFormation.getString(properties.Id) : undefined));

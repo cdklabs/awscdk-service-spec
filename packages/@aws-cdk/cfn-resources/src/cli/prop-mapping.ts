@@ -99,7 +99,7 @@ export class PropMapping {
           parse: CDK_CORE.helpers.FromCloudFormation.getString,
           validate: CDK_CORE.validateString,
         };
-      case PrimitiveType.Date:
+      case PrimitiveType.DateTime:
         return {
           produce: CDK_CORE.dateToCloudFormation,
           parse: CDK_CORE.helpers.FromCloudFormation.getDate,
