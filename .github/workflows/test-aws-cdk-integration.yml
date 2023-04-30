@@ -4,6 +4,9 @@ name: test-aws-cdk-integration
 on:
   workflow_dispatch: {}
   pull_request: {}
+  merge_group:
+    branches:
+      - main
 jobs:
   test-with-new-codegen:
     runs-on: awscdk-service-spec_ubuntu-latest_32-core

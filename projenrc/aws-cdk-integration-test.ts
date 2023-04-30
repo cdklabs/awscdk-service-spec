@@ -16,6 +16,9 @@ export class AwsCdkIntegrationTest extends pj.Component {
     workflow.on({
       workflowDispatch: {},
       pullRequest: {},
+      mergeGroup: {
+        branches: ['main'],
+      },
     });
 
     const projectPath = path.join(root.name, path.relative(root.outdir, project.outdir));
