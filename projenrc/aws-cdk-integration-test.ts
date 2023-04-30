@@ -16,6 +16,9 @@ export class AwsCdkIntegrationTest extends pj.Component {
     workflow.on({
       workflowDispatch: {},
       pullRequest: {},
+      mergeGroup: {
+        branches: ['main'],
+      },
     });
 
     const projectPath = path.join(root.name, path.relative(root.outdir, project.outdir));
@@ -26,6 +29,7 @@ export class AwsCdkIntegrationTest extends pj.Component {
       runsOn: ['awscdk-service-spec_ubuntu-latest_32-core'],
       env: {
         CI: '1',
+        NODE_OPTIONS: '--max-old-space-size=8196',
       },
       permissions: {
         contents: pj.github.workflows.JobPermission.READ,
