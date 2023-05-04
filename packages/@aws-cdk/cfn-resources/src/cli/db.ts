@@ -14,10 +14,6 @@ export function getAllServices(db: SpecDatabase) {
   return db.all('service');
 }
 
-export function getServicesByCloudFormationNamespace(db: SpecDatabase, services?: string[]) {
-  if (!services) {
-    return getAllServices(db);
-  }
-
-  return services.flatMap((name) => db.lookup('service', 'cloudFormationNamespace', 'equals', name));
+export function getServicesByCloudFormationNamespace(db: SpecDatabase, namespaces: string[]) {
+  return namespaces.flatMap((ns) => db.lookup('service', 'cloudFormationNamespace', 'equals', ns));
 }
