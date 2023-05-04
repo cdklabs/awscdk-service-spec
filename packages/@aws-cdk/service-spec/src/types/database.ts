@@ -30,6 +30,7 @@ export function emptyDatabase() {
       region: entityCollection<Region>(),
       service: entityCollection<Service>().index({
         name: fieldIndex('name', stringCmp),
+        cloudFormationNamespace: fieldIndex('cloudFormationNamespace', stringCmp),
       }),
       typeDefinition: entityCollection<TypeDefinition>(),
       augmentations: entityCollection<ResourceAugmentation>(),

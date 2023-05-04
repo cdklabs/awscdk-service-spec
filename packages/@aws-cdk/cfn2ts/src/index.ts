@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { generate as generateNew } from '@aws-cdk/cfn-resources';
+import { generate as generateModules } from '@aws-cdk/cfn-resources';
 import { loadDatabase } from '@aws-cdk/cfn-resources/src/cli/db';
 import { Service } from '@aws-cdk/service-spec';
 import * as fs from 'fs-extra';
@@ -31,42 +31,35 @@ export default async function generate(
 ): Promise<GenerateOutput> {
   const coreImport = options.coreImport ?? 'aws-cdk-lib';
   if (scopes === '*') {
-    scopes = await getAllScopes();
+    scopes = await getAllScopes('cloudFormationNamespace');
   } else if (typeof scopes === 'string') {
     scopes = [scopes];
   }
 
   console.log(`cfn-resources: ${scopes.join(', ')}`);
-  const generated = await generateNew({
-    resourceFilePattern: ({ shortname }) => `${shortname}.generated.ts`,
-    augmentationsFilePattern: ({ shortname }) => `${shortname}-augmentations.generated.ts`,
-    cannedMetricsFilePattern: ({ shortname }) => `${shortname}-canned-metrics.generated.ts`,
-    outputPath: outPath ?? 'lib',
-    clearOutput: false,
-    services: scopes.map(scopeToServiceName),
-    serviceSuffixes: computeServiceSuffixes(scopes),
-    importLocations: {
-      core: coreImport,
-      coreHelpers: `${coreImport}/${coreImport === '.' ? '' : 'lib/'}helpers-internal`,
+  const generated = await generateModules(
+    {
+      'aws-cdk-lib': {
+        services: scopes,
+        serviceSuffixes: computeServiceSuffixes(scopes),
+      },
     },
-  });
+    {
+      outputPath: outPath ?? 'lib',
+      clearOutput: false,
+      filePatterns: {
+        resources: ({ serviceShortName }) => `${serviceShortName}.generated.ts`,
+        augmentations: ({ serviceShortName }) => `${serviceShortName}-augmentations.generated.ts`,
+        cannedMetrics: ({ serviceShortName }) => `${serviceShortName}-canned-metrics.generated.ts`,
+      },
+      importLocations: {
+        core: coreImport,
+        coreHelpers: `${coreImport}/${coreImport === '.' ? '' : 'lib/'}helpers-internal`,
+      },
+    },
+  );
 
-  return {
-    outputFiles: Object.values(generated.outputFiles).flat(),
-    resources: Object.values(generated.resources).reduce((all, current) => ({ ...all, ...current }), {}),
-  };
-}
-
-/**
- * Convert a CFN style service scope to a service name
- *
- * @example "AWS::DynamoDB" -> "aws-dynamodb"
- */
-function scopeToServiceName(scope: string): string {
-  if (scope === 'AWS::Serverless') {
-    return 'aws-sam';
-  }
-  return scope.replace('::', '-').toLowerCase();
+  return generated;
 }
 
 /**
@@ -76,7 +69,7 @@ function computeServiceSuffixes(scopes: string[] = []): Record<string, string> {
   return scopes.reduce(
     (suffixes, scope) => ({
       ...suffixes,
-      [scopeToServiceName(scope)]: computeSuffix(scope, scopes),
+      [scope]: computeSuffix(scope, scopes),
     }),
     {},
   );
@@ -134,22 +127,43 @@ export async function generateAll(
     };
   }
 
-  const { resources } = await generateNew({
-    resourceFilePattern: ({ service, shortname }) => `${service}/lib/${shortname}.generated.ts`,
-    augmentationsFilePattern: ({ service, shortname }) => `${service}/lib/${shortname}-augmentations.generated.ts`,
-    cannedMetricsFilePattern: ({ service, shortname }) => `${service}/lib/${shortname}-canned-metrics.generated.ts`,
-    outputPath: outPath,
-    clearOutput: false,
-    services: scopes.map(scopeToServiceName),
-    serviceSuffixes: computeServiceSuffixes(scopes),
-    importLocations: {
-      core: options.coreImport,
-      coreHelpers: `${options.coreImport}/lib/helpers-internal`,
+  const coreModule = 'core';
+  const coreImportLocations = {
+    core: '.',
+    coreHelpers: `./helpers-internal`,
+  };
+
+  const generated = await generateModules(
+    Object.fromEntries(
+      Object.entries(moduleMap).map(([moduleName, { scopes: services }]) => [
+        moduleName,
+        {
+          services,
+          serviceSuffixes: computeServiceSuffixes(services),
+          moduleImportLocations: moduleName === coreModule ? coreImportLocations : undefined,
+        },
+      ]),
+    ),
+    {
+      outputPath: outPath,
+      clearOutput: false,
+      filePatterns: {
+        resources: ({ moduleName: m, serviceShortName: s }) => `${m}/lib/${s}.generated.ts`,
+        augmentations: ({ moduleName: m, serviceShortName: s }) => `${m}/lib/${s}-augmentations.generated.ts`,
+        cannedMetrics: ({ moduleName: m, serviceShortName: s }) => `${m}/lib/${s}-canned-metrics.generated.ts`,
+      },
+      importLocations: {
+        core: options.coreImport,
+        coreHelpers: `${options.coreImport}/lib/helpers-internal`,
+      },
     },
-  });
+  );
 
   Object.entries(moduleMap).map(async ([moduleName, { module: moduleDefinition }]) => {
-    // core is handled separately
+    // Add generated resources to module in map
+    moduleMap[moduleName].resources = generated.modules[moduleName].map((m) => m.resources).reduce(mergeObjects);
+
+    // core doesn't need a jsiirc file
     if (moduleName === 'core') {
       return;
     }
@@ -178,31 +192,7 @@ export async function generateAll(
       };
       fs.writeJsonSync(path.join(packagePath, '.jsiirc.json'), jsiirc, { spaces: 2 });
     }
-
-    // Add generated resources to module in map
-    moduleMap[moduleName].resources = resources[moduleName];
   });
-
-  // Special handling for core
-  const coreModule = 'core';
-  const coreScopes = moduleMap[coreModule].scopes;
-  const { resources: coreResources } = await generateNew({
-    resourceFilePattern: ({ shortname }) => `${shortname}.generated.ts`,
-    augmentationsFilePattern: ({ shortname }) => `${shortname}-augmentations.generated.ts`,
-    cannedMetricsFilePattern: ({ shortname }) => `${shortname}-canned-metrics.generated.ts`,
-    outputPath: path.join(outPath, coreModule, 'lib'),
-    clearOutput: false,
-    services: coreScopes.map(scopeToServiceName),
-    serviceSuffixes: computeServiceSuffixes(coreScopes),
-    importLocations: {
-      core: '.',
-      coreHelpers: `./helpers-internal`,
-    },
-  });
-
-  moduleMap[coreModule].resources = coreScopes
-    .map(scopeToServiceName)
-    .reduce((all, service) => ({ ...all, ...coreResources[service] }), {});
 
   return moduleMap;
 }
@@ -218,4 +208,11 @@ async function readScopeMap(filepath: string): Promise<ModuleMap> {
       [name]: { scopes: moduleScopes },
     };
   }, {});
+}
+
+function mergeObjects<T>(all: T, res: T) {
+  return {
+    ...all,
+    ...res,
+  };
 }

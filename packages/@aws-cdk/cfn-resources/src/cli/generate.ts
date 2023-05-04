@@ -1,152 +1,256 @@
 import path from 'path';
 import { SpecDatabase } from '@aws-cdk/service-spec';
-import { Module, TypeScriptRenderer } from '@cdklabs/typewriter';
+import { TypeScriptRenderer } from '@cdklabs/typewriter';
 import * as fs from 'fs-extra';
-import { AstBuilder } from './cdk/ast';
+import { AstBuilder, ServiceModule } from './cdk/ast';
 import { ModuleImportLocations } from './cdk/cdk';
-import { loadDatabase } from './db';
+import { getAllServices, getServicesByCloudFormationNamespace, loadDatabase } from './db';
 import { debug } from './log';
-import { PatternedString, PatternValues } from './naming/patterned-name';
+import { PatternedString } from './naming/patterned-name';
+import { TsFileWriter } from './ts-file-writer';
 
-type PatternKeys = 'package' | 'service' | 'shortname';
+export type PatternKeys = 'moduleName' | 'serviceName' | 'serviceShortName';
+
+export interface GenerateModuleOptions {
+  /**
+   * List of services to generate files for.
+   *
+   * In CloudFormation notation.
+   *
+   * @example ["AWS::Lambda", "AWS::S3"]
+   */
+  readonly services: string[];
+
+  /**
+   * Map of optional suffixes used for classes generated for a service.
+   *
+   * @example { "AWS::Lambda": "FooBar"} -> class CfnFunctionFooBar {}
+   */
+  readonly serviceSuffixes?: { [service: string]: string };
+
+  /**
+   * Override the default locations where modules are imported from on the module level
+   */
+  readonly moduleImportLocations?: ModuleImportLocations;
+}
+
+export interface GenerateFilePatterns {
+  /**
+   * The pattern used to name resource files.
+   * @default "%module.name%/%service.short%.generated.ts"
+   */
+  readonly resources?: PatternedString<PatternKeys>;
+
+  /**
+   * The pattern used to name augmentations.
+   * @default "%module.name%/%service.short%-augmentations.generated.ts"
+   */
+  readonly augmentations?: PatternedString<PatternKeys>;
+
+  /**
+   * The pattern used to name canned metrics.
+   * @default "%module.name%/%service.short%-canned-metrics.generated.ts"
+   */
+  readonly cannedMetrics?: PatternedString<PatternKeys>;
+}
 
 export interface GenerateOptions {
   /**
-   * Location of the generated files
+   * Default location for module imports
+   */
+  readonly importLocations?: ModuleImportLocations;
+
+  /**
+   * Configure where files are created exactly
+   */
+  readonly filePatterns?: GenerateFilePatterns;
+
+  /**
+   * Base path for generated files
+   *
+   * @see `options.filePatterns` to configure more complex scenarios.
+   *
+   * @default - current working directory
    */
   readonly outputPath: string;
+
   /**
    * Should the location be deleted before generating new files
    * @default false
    */
   readonly clearOutput?: boolean;
+
   /**
-   * The pattern used to name files.
+   * Generate L2 stub support files for augmentations (only for testing)
+   *
+   * @default false
    */
-  readonly resourceFilePattern: PatternedString<PatternKeys>;
-  /**
-   * The pattern used to name augmentations.
-   */
-  readonly augmentationsFilePattern: PatternedString<PatternKeys>;
-  /**
-   * The pattern used to name canned metrics.
-   */
-  readonly cannedMetricsFilePattern: PatternedString<PatternKeys>;
+  readonly augmentationsSupport?: boolean;
+
   /**
    * Output debug messages
    * @default false
    */
   readonly debug?: boolean;
-  /**
-   * The services to generate files for.
-   */
-  readonly services?: string[];
-  /**
-   * The services to generate files for.
-   */
-  readonly serviceSuffixes?: Record<string, string>;
-  /**
-   * Override the locations modules are imported from
-   */
-  readonly importLocations?: ModuleImportLocations;
-  /**
-   * Generate L2 support files for augmentations (only for testing)
-   *
-   * @default false
-   */
-  readonly augmentationsSupport?: boolean;
 }
 
-export async function generate(options: GenerateOptions) {
+export interface GenerateModuleMap {
+  [name: string]: GenerateModuleOptions;
+}
+
+export interface GenerateOutput {
+  outputFiles: string[];
+  resources: Record<string, string>;
+  modules: {
+    [name: string]: Array<{
+      module: AstBuilder<ServiceModule>;
+      options: GenerateModuleOptions;
+      resources: AstBuilder<ServiceModule>['resources'];
+      outputFiles: string[];
+    }>;
+  };
+}
+
+/**
+ * Generates Constructs for modules from the Service Specs
+ *
+ * @param modules A map of arbitrary module names to GenerateModuleOptions. This allows for flexible generation of different configurations at a time.
+ * @param options Configure the code generation
+ */
+export async function generate(modules: GenerateModuleMap, options: GenerateOptions) {
+  enableDebug(options);
+  const db = await loadDatabase();
+  return generator(db, modules, options);
+}
+
+/**
+ * Generates Constructs for all services, with modules name like the service
+ *
+ * @param outputPath Base path for generated files. Use `options.filePatterns` to configure more complex scenarios.
+ * @param options Additional configuration
+ */
+export async function generateAll(options: GenerateOptions) {
+  enableDebug(options);
+  const db = await loadDatabase();
+  const services = await getAllServices(db);
+
+  const modules: GenerateModuleMap = {};
+
+  for (const service of services) {
+    modules[service.name] = {
+      services: [service.cloudFormationNamespace],
+    };
+  }
+
+  return generator(db, modules, options);
+}
+
+function enableDebug(options: GenerateOptions) {
   if (options.debug) {
     process.env.DEBUG = '1';
   }
-  debug('Options', options);
-  const { outputPath, clearOutput, importLocations } = options;
+}
 
-  const db = await loadDatabase();
+async function generator(
+  db: SpecDatabase,
+  modules: { [name: string]: GenerateModuleOptions },
+  options: GenerateOptions,
+): Promise<GenerateOutput> {
+  const timeLabel = '🐢  Completed in';
+  console.time(timeLabel);
+  debug('Options', options);
+  const { augmentationsSupport, clearOutput, outputPath = process.cwd() } = options;
+  const filePatterns = ensureFilePatterns(options.filePatterns);
+
   const renderer = new TypeScriptRenderer();
 
-  let resources: Record<string, Record<string, string>> = {};
-  const services = getServices(db, options.services).map((s) => {
-    debug(s.name, 'ast');
-    const ast = AstBuilder.forService(s, { db, importLocations, nameSuffix: options.serviceSuffixes?.[s.name] });
+  // store results in a map of modules
+  const moduleMap: GenerateOutput['modules'] = {};
 
-    resources[s.name] = ast.resources || {};
-    return ast;
-  });
-
-  const resourceCount = Object.values(resources).reduce((total, res) => total + Object.keys(res).length, 0);
-  console.log('Generating %i Resources for %i Services', resourceCount, services.length);
-
+  // Clear output if requested
   if (clearOutput) {
     fs.removeSync(outputPath);
   }
 
-  const outputFiles: { [service: string]: string[] } = {};
-  for (const s of services) {
-    debug(`${s.module.service}`, 'render');
-    outputFiles[s.module.name] = [];
+  // Go through the module map
+  console.log('Generating %i modules...', Object.keys(modules).length);
+  for (const [moduleName, moduleOptions] of Object.entries(modules)) {
+    const { moduleImportLocations: importLocations = options.importLocations, serviceSuffixes } = moduleOptions;
+    moduleMap[moduleName] = getServicesByCloudFormationNamespace(db, moduleOptions.services).map((s) => {
+      debug(moduleName, s.name, 'ast');
+      const ast = AstBuilder.forService(s, {
+        db,
+        importLocations,
+        nameSuffix: serviceSuffixes?.[s.cloudFormationNamespace],
+      });
 
-    const writer = new ServiceFileWriter(outputPath, renderer, {
-      package: s.module.name.toLowerCase(),
-      service: s.module.service.toLowerCase(),
-      shortname: s.module.shortName.toLowerCase(),
-    });
+      debug(moduleName, s.name, 'render');
+      const writer = new TsFileWriter(outputPath, renderer, {
+        ['moduleName']: moduleName,
+        ['serviceName']: ast.module.service.toLowerCase(),
+        ['serviceShortName']: ast.module.shortName.toLowerCase(),
+      });
 
-    writer.writePattern(s.module, options.resourceFilePattern);
+      // Resources
+      writer.write(ast.module, filePatterns.resources);
 
-    if (s.augmentations?.hasAugmentations) {
-      const augFile = writer.writePattern(s.augmentations, options.augmentationsFilePattern);
+      if (ast.augmentations?.hasAugmentations) {
+        const augFile = writer.write(ast.augmentations, filePatterns.augmentations);
 
-      if (options.augmentationsSupport) {
-        const augDir = path.dirname(augFile);
-        for (const supportMod of s.augmentations.supportModules) {
-          writer.write(supportMod, path.resolve(augDir, `${supportMod.importName}.ts`));
+        if (augmentationsSupport) {
+          const augDir = path.dirname(augFile);
+          for (const supportMod of ast.augmentations.supportModules) {
+            writer.write(supportMod, path.resolve(augDir, `${supportMod.importName}.ts`));
+          }
         }
       }
-    }
 
-    if (s.cannedMetrics?.hasCannedMetrics) {
-      writer.writePattern(s.cannedMetrics, options.cannedMetricsFilePattern);
-    }
+      if (ast.cannedMetrics?.hasCannedMetrics) {
+        writer.write(ast.cannedMetrics, filePatterns.cannedMetrics);
+      }
 
-    outputFiles[s.module.name].push(...writer.outputFiles);
+      return {
+        module: ast,
+        options: moduleOptions,
+        resources: ast.resources,
+        outputFiles: writer.outputFiles,
+      };
+    });
   }
 
+  const result = {
+    modules: moduleMap,
+    resources: Object.values(moduleMap).flat().map(pick('resources')).reduce(mergeObjects),
+    outputFiles: Object.values(moduleMap).flat().flatMap(pick('outputFiles')),
+  };
+
+  console.log('Summary:');
+  console.log(`  Service files:  %i`, Object.values(moduleMap).flat().flatMap(pick('module')).length);
+  console.log(`  Resources:      %i`, Object.keys(result.resources).length);
+  console.timeEnd(timeLabel);
+
+  return result;
+}
+
+function ensureFilePatterns(patterns: GenerateFilePatterns = {}): Required<GenerateFilePatterns> {
   return {
-    resources,
-    outputFiles,
+    resources: ({ serviceShortName }) => `${serviceShortName}.generated.ts`,
+    augmentations: ({ serviceShortName }) => `${serviceShortName}-augmentations.generated.ts`,
+    cannedMetrics: ({ serviceShortName }) => `${serviceShortName}-canned-metrics.generated.ts`,
+    ...patterns,
   };
 }
 
-class ServiceFileWriter {
-  public outputFiles = new Array<string>();
-
-  constructor(
-    private readonly outputPath: string,
-    private readonly renderer: TypeScriptRenderer,
-    private readonly values: PatternValues<PatternKeys>,
-  ) {}
-
-  public writePattern(module: Module, fileNamePattern: PatternedString<PatternKeys>) {
-    const filePath = path.join(this.outputPath, fileNamePattern(this.values));
-    fs.outputFileSync(filePath, this.renderer.render(module));
-    this.outputFiles.push(filePath);
-    return filePath;
-  }
-
-  public write(module: Module, filePath: string) {
-    fs.outputFileSync(filePath, this.renderer.render(module));
-    this.outputFiles.push(filePath);
-    return filePath;
-  }
+function pick<T>(property: keyof T) {
+  type x = typeof property;
+  return (obj: Record<x, any>): any => {
+    return obj[property];
+  };
 }
 
-function getServices(db: SpecDatabase, services?: string[]) {
-  if (!services) {
-    return db.all('service');
-  }
-
-  return services.flatMap((name) => db.lookup('service', 'name', 'equals', name));
+function mergeObjects<T>(all: T, res: T) {
+  return {
+    ...all,
+    ...res,
+  };
 }

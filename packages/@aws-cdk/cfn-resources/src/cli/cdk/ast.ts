@@ -76,6 +76,9 @@ export class AstBuilder<T extends Module> {
   }
 
   public readonly db: SpecDatabase;
+  /**
+   * Map of CloudFormation resource name to generated class name
+   */
   public readonly resources: Record<string, string> = {};
   private nameSuffix?: string;
 
@@ -88,9 +91,9 @@ export class AstBuilder<T extends Module> {
     this.db = props.db;
     this.nameSuffix = props.nameSuffix;
 
-    CDK_CORE.import(module, 'cdk', { fromLocation: props.importLocations?.core });
-    CONSTRUCTS.import(module, 'constructs');
-    CDK_CORE.helpers.import(module, 'cfn_parse', { fromLocation: props.importLocations?.coreHelpers });
+    CDK_CORE.import(this.module, 'cdk', { fromLocation: props.importLocations?.core });
+    CONSTRUCTS.import(this.module, 'constructs');
+    CDK_CORE.helpers.import(this.module, 'cfn_parse', { fromLocation: props.importLocations?.coreHelpers });
   }
 
   public addResource(resource: Resource) {

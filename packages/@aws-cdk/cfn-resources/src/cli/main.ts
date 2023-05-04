@@ -1,6 +1,6 @@
 import path from 'path';
 import { parseArgv } from './args';
-import { generate } from './generate';
+import { PatternKeys, generate, generateAll } from './generate';
 import { debug } from './log';
 import { parsePattern } from './naming/patterned-name';
 
@@ -11,34 +11,43 @@ async function main(argv: string[]) {
   }
   debug('CLI args', args, options);
 
-  const pss = { package: true, service: true, shortname: true };
+  const pss: Record<PatternKeys, true> = { moduleName: true, serviceName: true, serviceShortName: true };
 
   const outputPath = args.output ?? path.join(__dirname, '..', 'services');
   const resourceFilePattern = parsePattern(
-    stringOr(options.pattern, path.join('%package%', '%shortname%.generated.ts')),
+    stringOr(options.pattern, path.join('%moduleName%', '%serviceShortName%.generated.ts')),
     pss,
   );
 
   const augmentationsFilePattern = parsePattern(
-    stringOr(options.augmentations, path.join('%package%', '%shortname%-augmentations.generated.ts')),
+    stringOr(options.augmentations, path.join('%moduleName%', '%serviceShortName%-augmentations.generated.ts')),
     pss,
   );
 
   const cannedMetricsFilePattern = parsePattern(
-    stringOr(options.metrics, path.join('%package%', '%shortname%-canned-metrics.generated.ts')),
+    stringOr(options.metrics, path.join('%moduleName%', '%serviceShortName%-canned-metrics.generated.ts')),
     pss,
   );
 
-  await generate({
+  const generatorOptions = {
     outputPath,
-    resourceFilePattern,
-    augmentationsFilePattern,
-    cannedMetricsFilePattern,
+    filePatterns: {
+      resources: resourceFilePattern,
+      augmentations: augmentationsFilePattern,
+      cannedMetrics: cannedMetricsFilePattern,
+    },
     clearOutput: !!options['clear-output'],
     augmentationsSupport: !!options['augmentations-support'],
-    services: options.service ? [options.service as string] : undefined,
     debug: options.debug as boolean,
-  });
+  };
+
+  if (options.service && typeof options.service === 'string') {
+    const moduleMap = { [options.service]: { services: [options.service] } };
+    await generate(moduleMap, generatorOptions);
+    return;
+  }
+
+  await generateAll(generatorOptions);
 }
 
 main(process.argv.splice(2)).catch((e) => {
