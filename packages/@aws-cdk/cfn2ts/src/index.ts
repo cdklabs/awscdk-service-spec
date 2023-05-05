@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { generate as generateNew } from '@aws-cdk/cfn-resources';
+import { generate as generateModules } from '@aws-cdk/cfn-resources';
 import { loadDatabase } from '@aws-cdk/cfn-resources/src/cli/db';
 import { Service } from '@aws-cdk/service-spec';
 import * as fs from 'fs-extra';
@@ -31,37 +31,35 @@ export default async function generate(
 ): Promise<GenerateOutput> {
   const coreImport = options.coreImport ?? 'aws-cdk-lib';
   if (scopes === '*') {
-    scopes = await getAllScopes();
+    scopes = await getAllScopes('cloudFormationNamespace');
   } else if (typeof scopes === 'string') {
     scopes = [scopes];
   }
 
   console.log(`cfn-resources: ${scopes.join(', ')}`);
-  return generateNew({
-    resourceFilePattern: ({ shortname }) => `${shortname}.generated.ts`,
-    augmentationsFilePattern: ({ shortname }) => `${shortname}-augmentations.generated.ts`,
-    cannedMetricsFilePattern: ({ shortname }) => `${shortname}-canned-metrics.generated.ts`,
-    outputPath: outPath ?? 'lib',
-    clearOutput: false,
-    services: scopes.map(scopeToServiceName),
-    serviceSuffixes: computeServiceSuffixes(scopes),
-    importLocations: {
-      core: coreImport,
-      coreHelpers: `${coreImport}/${coreImport === '.' ? '' : 'lib/'}helpers-internal`,
+  const generated = await generateModules(
+    {
+      'aws-cdk-lib': {
+        services: scopes,
+        serviceSuffixes: computeServiceSuffixes(scopes),
+      },
     },
-  });
-}
+    {
+      outputPath: outPath ?? 'lib',
+      clearOutput: false,
+      filePatterns: {
+        resources: ({ serviceShortName }) => `${serviceShortName}.generated.ts`,
+        augmentations: ({ serviceShortName }) => `${serviceShortName}-augmentations.generated.ts`,
+        cannedMetrics: ({ serviceShortName }) => `${serviceShortName}-canned-metrics.generated.ts`,
+      },
+      importLocations: {
+        core: coreImport,
+        coreHelpers: `${coreImport}/${coreImport === '.' ? '' : 'lib/'}helpers-internal`,
+      },
+    },
+  );
 
-/**
- * Convert a CFN style service scope to a service name
- *
- * @example "AWS::DynamoDB" -> "aws-dynamodb"
- */
-function scopeToServiceName(scope: string): string {
-  if (scope === 'AWS::Serverless') {
-    return 'aws-sam';
-  }
-  return scope.replace('::', '-').toLowerCase();
+  return generated;
 }
 
 /**
@@ -71,7 +69,7 @@ function computeServiceSuffixes(scopes: string[] = []): Record<string, string> {
   return scopes.reduce(
     (suffixes, scope) => ({
       ...suffixes,
-      [scopeToServiceName(scope)]: computeSuffix(scope, scopes),
+      [scope]: computeSuffix(scope, scopes),
     }),
     {},
   );
@@ -116,65 +114,85 @@ export async function generateAll(
   // Make sure all scopes have their own dedicated package/namespace.
   // Adds new submodules for new namespaces.
   for (const scope of scopes) {
-    const module = pkglint.createModuleDefinitionFromCfnNamespace(scope);
-    const currentScopes = moduleMap[module.moduleName]?.scopes ?? [];
+    const moduleDefinition = pkglint.createModuleDefinitionFromCfnNamespace(scope);
+    const currentScopes = moduleMap[moduleDefinition.moduleName]?.scopes ?? [];
     // remove dupes
     const newScopes = [...new Set([...currentScopes, scope])];
 
     // Add new modules to module map and return to caller
-    moduleMap[module.moduleName] = {
+    moduleMap[moduleDefinition.moduleName] = {
       scopes: newScopes,
-      module,
+      module: moduleDefinition,
       resources: {},
     };
   }
 
-  await Promise.all(
-    Object.entries(moduleMap).map(async ([moduleName, { scopes: moduleScopes, module }]) => {
-      const packagePath = path.join(outPath, moduleName);
-      const sourcePath = path.join(packagePath, 'lib');
+  const coreModule = 'core';
+  const coreImportLocations = {
+    core: '.',
+    coreHelpers: `./helpers-internal`,
+  };
 
-      const isCore = moduleName === 'core';
-      const { outputFiles, resources } = await generate(moduleScopes, sourcePath, {
-        ...options,
-        coreImport: isCore ? '.' : options.coreImport,
-      });
-
-      if (!fs.existsSync(path.join(packagePath, 'index.ts'))) {
-        let lines = moduleScopes.map((s: string) => `// ${s} Cloudformation Resources`);
-        lines.push(...outputFiles.map((f) => `export * from './lib/${f.replace('.ts', '')}'`));
-
-        await fs.writeFile(path.join(packagePath, 'index.ts'), lines.join('\n') + '\n');
-      }
-
-      // Create .jsiirc.json file if needed
-      if (!fs.existsSync(path.join(packagePath, '.jsiirc.json')) && !isCore) {
-        if (!module) {
-          throw new Error(
-            `Cannot infer path or namespace for submodule named "${moduleName}". Manually create ${packagePath}/.jsiirc.json file.`,
-          );
-        }
-
-        const jsiirc = {
-          targets: {
-            java: {
-              package: module.javaPackage,
-            },
-            dotnet: {
-              package: module.dotnetPackage,
-            },
-            python: {
-              module: module.pythonModuleName,
-            },
-          },
-        };
-        await fs.writeJson(path.join(packagePath, '.jsiirc.json'), jsiirc, { spaces: 2 });
-      }
-
-      // Add generated resources to module in map
-      moduleMap[moduleName].resources = resources;
-    }),
+  const generated = await generateModules(
+    Object.fromEntries(
+      Object.entries(moduleMap).map(([moduleName, { scopes: services }]) => [
+        moduleName,
+        {
+          services,
+          serviceSuffixes: computeServiceSuffixes(services),
+          moduleImportLocations: moduleName === coreModule ? coreImportLocations : undefined,
+        },
+      ]),
+    ),
+    {
+      outputPath: outPath,
+      clearOutput: false,
+      filePatterns: {
+        resources: ({ moduleName: m, serviceShortName: s }) => `${m}/lib/${s}.generated.ts`,
+        augmentations: ({ moduleName: m, serviceShortName: s }) => `${m}/lib/${s}-augmentations.generated.ts`,
+        cannedMetrics: ({ moduleName: m, serviceShortName: s }) => `${m}/lib/${s}-canned-metrics.generated.ts`,
+      },
+      importLocations: {
+        core: options.coreImport,
+        coreHelpers: `${options.coreImport}/lib/helpers-internal`,
+      },
+    },
   );
+
+  Object.entries(moduleMap).map(async ([moduleName, { module: moduleDefinition }]) => {
+    // Add generated resources to module in map
+    moduleMap[moduleName].resources = generated.modules[moduleName].map((m) => m.resources).reduce(mergeObjects);
+
+    // core doesn't need a jsiirc file
+    if (moduleName === 'core') {
+      return;
+    }
+
+    // Create .jsiirc.json file if needed
+    const packagePath = path.join(outPath, moduleName);
+    if (!fs.existsSync(path.join(packagePath, '.jsiirc.json'))) {
+      if (!moduleDefinition) {
+        throw new Error(
+          `Cannot infer path or namespace for submodule named "${moduleName}". Manually create ${packagePath}/.jsiirc.json file.`,
+        );
+      }
+
+      const jsiirc = {
+        targets: {
+          java: {
+            package: moduleDefinition.javaPackage,
+          },
+          dotnet: {
+            package: moduleDefinition.dotnetPackage,
+          },
+          python: {
+            module: moduleDefinition.pythonModuleName,
+          },
+        },
+      };
+      fs.writeJsonSync(path.join(packagePath, '.jsiirc.json'), jsiirc, { spaces: 2 });
+    }
+  });
 
   return moduleMap;
 }
@@ -183,7 +201,6 @@ export async function generateAll(
  * Reads the scope map from a file and transforms it into the type we need.
  */
 async function readScopeMap(filepath: string): Promise<ModuleMap> {
-  fs.existsSync;
   const scopeMap: Record<string, string[]> = await fs.readJson(filepath);
   return Object.entries(scopeMap).reduce((accum, [name, moduleScopes]) => {
     return {
@@ -191,4 +208,11 @@ async function readScopeMap(filepath: string): Promise<ModuleMap> {
       [name]: { scopes: moduleScopes },
     };
   }, {});
+}
+
+function mergeObjects<T>(all: T, res: T) {
+  return {
+    ...all,
+    ...res,
+  };
 }
