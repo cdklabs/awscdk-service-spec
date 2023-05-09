@@ -1,4 +1,4 @@
-import { PropertyType, Resource, TagType } from '@aws-cdk/service-spec';
+import { Attribute, PropertyType, Resource, TagType } from '@aws-cdk/service-spec';
 import {
   $E,
   $T,
@@ -292,13 +292,19 @@ export class ResourceClass extends ClassType {
     m.addBody(stmt.ret($E(expr.ident(cfnProducerNameFromType(this.propsType)))(props)));
   }
 
-  private mappableAttributes() {
+  private mappableAttributes(): Array<{
+    attrName: string;
+    attr: Attribute;
+    name: string;
+    type: Type;
+    tokenizer: Expression;
+  }> {
     const $this = $E(expr.this_());
     const $ResolutionTypeHint = $T(CDK_CORE.ResolutionTypeHint);
 
-    return Object.entries(this.res.attributes).flatMap(([attrName, attr]) => {
+    return Object.entries(this.res.attributes).map(([attrName, attr]) => {
       let type: Type | undefined;
-      let tokenizer: Expression = expr.ident('<dummy>');
+      let tokenizer: Expression | undefined;
 
       if (attr.type.type === 'string') {
         type = Type.STRING;
@@ -311,7 +317,13 @@ export class ResourceClass extends ClassType {
         tokenizer = CDK_CORE.tokenAsList($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.STRING_LIST));
       }
 
-      return type ? [{ attrName, attr, name: attributePropertyName(attrName), type, tokenizer }] : [];
+      return {
+        attrName,
+        attr,
+        name: attributePropertyName(attrName),
+        type: type ?? CDK_CORE.IResolvable,
+        tokenizer: tokenizer ?? $this.getAtt(expr.lit(attrName)),
+      };
     });
   }
 
