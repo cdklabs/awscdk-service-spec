@@ -1568,6 +1568,13 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
   public readonly attrArn: string;
 
   /**
+   * The function's SnapStart Response. When set to PublishedVersions, Lambda creates a snapshot of the execution environment when you publish a function version.
+   *
+   * @cloudformationAttribute SnapStartResponse
+   */
+  public readonly attrSnapStartResponse: cdk.IResolvable;
+
+  /**
    * Applying SnapStart setting on function resource type.
    *
    * @cloudformationAttribute SnapStartResponse.ApplyOn
@@ -1716,6 +1723,7 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
     cdk.requireProperty(props, "role", this);
 
     this.attrArn = cdk.Token.asString(this.getAtt("Arn", cdk.ResolutionTypeHint.STRING));
+    this.attrSnapStartResponse = this.getAtt("SnapStartResponse");
     this.attrSnapStartResponseApplyOn = cdk.Token.asString(this.getAtt("SnapStartResponse.ApplyOn", cdk.ResolutionTypeHint.STRING));
     this.attrSnapStartResponseOptimizationStatus = cdk.Token.asString(this.getAtt("SnapStartResponse.OptimizationStatus", cdk.ResolutionTypeHint.STRING));
     this.description = props.description;
@@ -3360,6 +3368,13 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
   public readonly attrDbClusterResourceId: string;
 
   /**
+   * The connection endpoint for the primary instance of the DB cluster.
+   *
+   * @cloudformationAttribute Endpoint
+   */
+  public readonly attrEndpoint: cdk.IResolvable;
+
+  /**
    * The connection endpoint for the DB cluster. For example: \`mystack-mydbcluster-123456789012.us-east-2.rds.amazonaws.com\`
    *
    * @cloudformationAttribute Endpoint.Address
@@ -3386,6 +3401,11 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
    * @cloudformationAttribute MasterUserSecret.SecretArn
    */
   public readonly attrMasterUserSecretSecretArn: string;
+
+  /**
+   * @cloudformationAttribute ReadEndpoint
+   */
+  public readonly attrReadEndpoint: cdk.IResolvable;
 
   /**
    * The amount of storage in gibibytes (GiB) to allocate to each DB instance in the Multi-AZ DB cluster.
@@ -3665,10 +3685,12 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
 
     this.attrDbClusterArn = cdk.Token.asString(this.getAtt("DBClusterArn", cdk.ResolutionTypeHint.STRING));
     this.attrDbClusterResourceId = cdk.Token.asString(this.getAtt("DBClusterResourceId", cdk.ResolutionTypeHint.STRING));
+    this.attrEndpoint = this.getAtt("Endpoint");
     this.attrEndpointAddress = cdk.Token.asString(this.getAtt("Endpoint.Address", cdk.ResolutionTypeHint.STRING));
     this.attrEndpointPort = cdk.Token.asString(this.getAtt("Endpoint.Port", cdk.ResolutionTypeHint.STRING));
     this.attrReadEndpointAddress = cdk.Token.asString(this.getAtt("ReadEndpoint.Address", cdk.ResolutionTypeHint.STRING));
     this.attrMasterUserSecretSecretArn = cdk.Token.asString(this.getAtt("MasterUserSecret.SecretArn", cdk.ResolutionTypeHint.STRING));
+    this.attrReadEndpoint = this.getAtt("ReadEndpoint");
     this.allocatedStorage = props.allocatedStorage;
     this.associatedRoles = props.associatedRoles;
     this.availabilityZones = props.availabilityZones;
