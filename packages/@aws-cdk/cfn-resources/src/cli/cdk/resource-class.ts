@@ -293,8 +293,10 @@ export class ResourceClass extends ClassType {
   }
 
   private mappableAttributes(): Array<{
+    /** The name of the CloudFormation attribute */
     attrName: string;
     attr: Attribute;
+    /** The name of the property used in generated code */
     name: string;
     type: Type;
     tokenizer: Expression;
@@ -302,29 +304,31 @@ export class ResourceClass extends ClassType {
     const $this = $E(expr.this_());
     const $ResolutionTypeHint = $T(CDK_CORE.ResolutionTypeHint);
 
-    return Object.entries(this.res.attributes).map(([attrName, attr]) => {
-      let type: Type | undefined;
-      let tokenizer: Expression | undefined;
+    return Object.entries(this.res.attributes)
+      .map(([attrName, attr]) => {
+        let type: Type | undefined;
+        let tokenizer: Expression | undefined;
 
-      if (attr.type.type === 'string') {
-        type = Type.STRING;
-        tokenizer = CDK_CORE.tokenAsString($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.STRING));
-      } else if (attr.type.type === 'number') {
-        type = Type.NUMBER;
-        tokenizer = CDK_CORE.tokenAsNumber($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.NUMBER));
-      } else if (attr.type.type === 'array' && attr.type.element.type === 'string') {
-        type = Type.arrayOf(Type.STRING);
-        tokenizer = CDK_CORE.tokenAsList($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.STRING_LIST));
-      }
+        if (attr.type.type === 'string') {
+          type = Type.STRING;
+          tokenizer = CDK_CORE.tokenAsString($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.STRING));
+        } else if (attr.type.type === 'number') {
+          type = Type.NUMBER;
+          tokenizer = CDK_CORE.tokenAsNumber($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.NUMBER));
+        } else if (attr.type.type === 'array' && attr.type.element.type === 'string') {
+          type = Type.arrayOf(Type.STRING);
+          tokenizer = CDK_CORE.tokenAsList($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.STRING_LIST));
+        }
 
-      return {
-        attrName,
-        attr,
-        name: attributePropertyName(attrName),
-        type: type ?? CDK_CORE.IResolvable,
-        tokenizer: tokenizer ?? $this.getAtt(expr.lit(attrName)),
-      };
-    });
+        return {
+          attrName,
+          attr,
+          name: attributePropertyName(attrName),
+          type: type ?? CDK_CORE.IResolvable,
+          tokenizer: tokenizer ?? $this.getAtt(expr.lit(attrName)),
+        };
+      })
+      .sort((a1, a2) => a1.name.localeCompare(a2.name));
   }
 
   private mappableProperties(): Array<{
@@ -338,41 +342,43 @@ export class ResourceClass extends ClassType {
     docsSummary?: string;
   }> {
     const $this = $E(expr.this_());
-    return this.propsType.properties.map((prop) => {
-      // FIXME: Would be nicer to thread this value through
-      const tagType = tryFindTagType(this.res, prop.name);
+    return this.propsType.properties
+      .map((prop) => {
+        // FIXME: Would be nicer to thread this value through
+        const tagType = tryFindTagType(this.res, prop.name);
 
-      if (tagType) {
+        if (tagType) {
+          return {
+            // The property must be called 'tags' for the resource to count as ITaggable
+            name: 'tags',
+            memberOptional: false,
+            validateRequired: false,
+            memberImmutable: true,
+            memberType: CDK_CORE.TagManager,
+            initializer: (props: Expression) =>
+              new CDK_CORE.TagManager(
+                translateTagType(tagType),
+                expr.lit(this.res.cloudFormationType),
+                prop.from(props),
+                expr.object({ tagPropertyName: expr.lit(prop.name) }),
+              ),
+            valueToRender: $this.tags.renderTags(),
+            docsSummary: prop.docs?.summary,
+          };
+        }
+
         return {
-          // The property must be called 'tags' for the resource to count as ITaggable
-          name: 'tags',
-          memberOptional: false,
-          validateRequired: false,
-          memberImmutable: true,
-          memberType: CDK_CORE.TagManager,
-          initializer: (props: Expression) =>
-            new CDK_CORE.TagManager(
-              translateTagType(tagType),
-              expr.lit(this.res.cloudFormationType),
-              prop.from(props),
-              expr.object({ tagPropertyName: expr.lit(prop.name) }),
-            ),
-          valueToRender: $this.tags.renderTags(),
+          name: prop.name,
+          memberOptional: prop.optional,
+          validateRequired: !prop.optional,
+          memberImmutable: false,
+          memberType: prop.type,
+          initializer: (props: Expression) => prop.from(props),
+          valueToRender: $this[prop.name],
           docsSummary: prop.docs?.summary,
         };
-      }
-
-      return {
-        name: prop.name,
-        memberOptional: prop.optional,
-        validateRequired: !prop.optional,
-        memberImmutable: false,
-        memberType: prop.type,
-        initializer: (props: Expression) => prop.from(props),
-        valueToRender: $this[prop.name],
-        docsSummary: prop.docs?.summary,
-      };
-    });
+      })
+      .sort((p1, p2) => p1.name.localeCompare(p2.name));
   }
 
   /**

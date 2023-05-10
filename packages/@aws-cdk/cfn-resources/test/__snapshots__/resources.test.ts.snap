@@ -205,11 +205,6 @@ export class CfnRestApi extends cdk.CfnResource implements cdk.IInspectable, cdk
   public cloneFrom?: string;
 
   /**
-   * A list of the endpoint types of the API.
-   */
-  public endpointConfiguration?: CfnRestApi.EndpointConfigurationProperty | cdk.IResolvable;
-
-  /**
    * The description of the RestApi.
    */
   public description?: string;
@@ -220,14 +215,14 @@ export class CfnRestApi extends cdk.CfnResource implements cdk.IInspectable, cdk
   public disableExecuteApiEndpoint?: boolean | cdk.IResolvable;
 
   /**
+   * A list of the endpoint types of the API.
+   */
+  public endpointConfiguration?: CfnRestApi.EndpointConfigurationProperty | cdk.IResolvable;
+
+  /**
    * A query parameter to indicate whether to rollback the API update ( \`true\` ) or not ( \`false\` ) when a warning is encountered.
    */
   public failOnWarnings?: boolean | cdk.IResolvable;
-
-  /**
-   * The name of the RestApi.
-   */
-  public name?: string;
 
   /**
    * A nullable integer that is used to enable compression (with non-negative between 0 and 10485760 (10M) bytes, inclusive) or disable compression (with a null value) on an API.
@@ -240,14 +235,19 @@ export class CfnRestApi extends cdk.CfnResource implements cdk.IInspectable, cdk
   public mode?: string;
 
   /**
-   * A policy document that contains the permissions for the \`RestApi\` resource.
+   * The name of the RestApi.
    */
-  public policy?: any | cdk.IResolvable | string;
+  public name?: string;
 
   /**
    * Custom header parameters as part of the request.
    */
   public parameters?: cdk.IResolvable | Record<string, string> | string;
+
+  /**
+   * A policy document that contains the permissions for the \`RestApi\` resource.
+   */
+  public policy?: any | cdk.IResolvable | string;
 
   /**
    * The key-value map of strings.
@@ -272,15 +272,15 @@ export class CfnRestApi extends cdk.CfnResource implements cdk.IInspectable, cdk
     this.body = props.body;
     this.bodyS3Location = props.bodyS3Location;
     this.cloneFrom = props.cloneFrom;
-    this.endpointConfiguration = props.endpointConfiguration;
     this.description = props.description;
     this.disableExecuteApiEndpoint = props.disableExecuteApiEndpoint;
+    this.endpointConfiguration = props.endpointConfiguration;
     this.failOnWarnings = props.failOnWarnings;
-    this.name = props.name;
     this.minimumCompressionSize = props.minimumCompressionSize;
     this.mode = props.mode;
-    this.policy = props.policy;
+    this.name = props.name;
     this.parameters = props.parameters;
+    this.policy = props.policy;
     this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::ApiGateway::RestApi", props.tags, {
       "tagPropertyName": "tags"
     });
@@ -293,15 +293,15 @@ export class CfnRestApi extends cdk.CfnResource implements cdk.IInspectable, cdk
       "body": this.body,
       "bodyS3Location": this.bodyS3Location,
       "cloneFrom": this.cloneFrom,
-      "endpointConfiguration": this.endpointConfiguration,
       "description": this.description,
       "disableExecuteApiEndpoint": this.disableExecuteApiEndpoint,
+      "endpointConfiguration": this.endpointConfiguration,
       "failOnWarnings": this.failOnWarnings,
-      "name": this.name,
       "minimumCompressionSize": this.minimumCompressionSize,
       "mode": this.mode,
-      "policy": this.policy,
+      "name": this.name,
       "parameters": this.parameters,
+      "policy": this.policy,
       "tags": this.tags.renderTags()
     };
   }
@@ -1589,99 +1589,9 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
   public readonly attrSnapStartResponseOptimizationStatus: string;
 
   /**
-   * A description of the function.
+   * The instruction set architecture that the function supports.
    */
-  public description?: string;
-
-  /**
-   * Set \`Mode\` to \`Active\` to sample and trace a subset of incoming requests with [X-Ray](https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html) .
-   */
-  public tracingConfig?: cdk.IResolvable | CfnFunction.TracingConfigProperty;
-
-  /**
-   * For network connectivity to AWS resources in a VPC, specify a list of security groups and subnets in the VPC.
-   */
-  public vpcConfig?: cdk.IResolvable | CfnFunction.VpcConfigProperty;
-
-  /**
-   * Sets the runtime management configuration for a function's version.
-   */
-  public runtimeManagementConfig?: cdk.IResolvable | CfnFunction.RuntimeManagementConfigProperty;
-
-  /**
-   * The number of simultaneous executions to reserve for the function.
-   */
-  public reservedConcurrentExecutions?: number;
-
-  /**
-   * The function's [AWS Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html) setting.
-   */
-  public snapStart?: cdk.IResolvable | CfnFunction.SnapStartProperty;
-
-  /**
-   * Connection settings for an Amazon EFS file system.
-   */
-  public fileSystemConfigs?: Array<CfnFunction.FileSystemConfigProperty | cdk.IResolvable> | cdk.IResolvable;
-
-  /**
-   * The name of the Lambda function, up to 64 characters in length.
-   */
-  public functionName?: string;
-
-  /**
-   * The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html) . Runtime is required if the deployment package is a .zip file archive.
-   */
-  public runtime?: string;
-
-  /**
-   * The ARN of the AWS Key Management Service ( AWS KMS ) customer managed key that's used to encrypt your function's [environment variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-encryption) . When [Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart-security.html) is activated, this key is also used to encrypt your function's snapshot. If you don't provide a customer managed key, Lambda uses a default service key.
-   */
-  public kmsKeyArn?: string;
-
-  /**
-   * The type of deployment package.
-   */
-  public packageType?: string;
-
-  /**
-   * To enable code signing for this function, specify the ARN of a code-signing configuration.
-   */
-  public codeSigningConfigArn?: string;
-
-  /**
-   * A list of [function layers](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html) to add to the function's execution environment. Specify each layer by its ARN, including the version.
-   */
-  public layers?: Array<string>;
-
-  /**
-   * A list of [tags](https://docs.aws.amazon.com/lambda/latest/dg/tagging.html) to apply to the function.
-   */
-  public readonly tags: cdk.TagManager;
-
-  /**
-   * Configuration values that override the container image Dockerfile settings.
-   */
-  public imageConfig?: CfnFunction.ImageConfigProperty | cdk.IResolvable;
-
-  /**
-   * The amount of [memory available to the function](https://docs.aws.amazon.com/lambda/latest/dg/configuration-function-common.html#configuration-memory-console) at runtime. Increasing the function memory also increases its CPU allocation. The default value is 128 MB. The value can be any multiple of 1 MB.
-   */
-  public memorySize?: number;
-
-  /**
-   * A dead-letter queue configuration that specifies the queue or topic where Lambda sends asynchronous events when they fail processing.
-   */
-  public deadLetterConfig?: CfnFunction.DeadLetterConfigProperty | cdk.IResolvable;
-
-  /**
-   * The amount of time (in seconds) that Lambda allows a function to run before stopping it.
-   */
-  public timeout?: number;
-
-  /**
-   * The name of the method within your code that Lambda calls to run your function.
-   */
-  public handler?: string;
+  public architectures?: Array<string>;
 
   /**
    * The code for the function.
@@ -1689,9 +1599,19 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
   public code: CfnFunction.CodeProperty | cdk.IResolvable;
 
   /**
-   * The Amazon Resource Name (ARN) of the function's execution role.
+   * To enable code signing for this function, specify the ARN of a code-signing configuration.
    */
-  public role: string;
+  public codeSigningConfigArn?: string;
+
+  /**
+   * A dead-letter queue configuration that specifies the queue or topic where Lambda sends asynchronous events when they fail processing.
+   */
+  public deadLetterConfig?: CfnFunction.DeadLetterConfigProperty | cdk.IResolvable;
+
+  /**
+   * A description of the function.
+   */
+  public description?: string;
 
   /**
    * Environment variables that are accessible from function code during execution.
@@ -1704,9 +1624,89 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
   public ephemeralStorage?: CfnFunction.EphemeralStorageProperty | cdk.IResolvable;
 
   /**
-   * The instruction set architecture that the function supports.
+   * Connection settings for an Amazon EFS file system.
    */
-  public architectures?: Array<string>;
+  public fileSystemConfigs?: Array<CfnFunction.FileSystemConfigProperty | cdk.IResolvable> | cdk.IResolvable;
+
+  /**
+   * The name of the Lambda function, up to 64 characters in length.
+   */
+  public functionName?: string;
+
+  /**
+   * The name of the method within your code that Lambda calls to run your function.
+   */
+  public handler?: string;
+
+  /**
+   * Configuration values that override the container image Dockerfile settings.
+   */
+  public imageConfig?: CfnFunction.ImageConfigProperty | cdk.IResolvable;
+
+  /**
+   * The ARN of the AWS Key Management Service ( AWS KMS ) customer managed key that's used to encrypt your function's [environment variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-encryption) . When [Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart-security.html) is activated, this key is also used to encrypt your function's snapshot. If you don't provide a customer managed key, Lambda uses a default service key.
+   */
+  public kmsKeyArn?: string;
+
+  /**
+   * A list of [function layers](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html) to add to the function's execution environment. Specify each layer by its ARN, including the version.
+   */
+  public layers?: Array<string>;
+
+  /**
+   * The amount of [memory available to the function](https://docs.aws.amazon.com/lambda/latest/dg/configuration-function-common.html#configuration-memory-console) at runtime. Increasing the function memory also increases its CPU allocation. The default value is 128 MB. The value can be any multiple of 1 MB.
+   */
+  public memorySize?: number;
+
+  /**
+   * The type of deployment package.
+   */
+  public packageType?: string;
+
+  /**
+   * The number of simultaneous executions to reserve for the function.
+   */
+  public reservedConcurrentExecutions?: number;
+
+  /**
+   * The Amazon Resource Name (ARN) of the function's execution role.
+   */
+  public role: string;
+
+  /**
+   * The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html) . Runtime is required if the deployment package is a .zip file archive.
+   */
+  public runtime?: string;
+
+  /**
+   * Sets the runtime management configuration for a function's version.
+   */
+  public runtimeManagementConfig?: cdk.IResolvable | CfnFunction.RuntimeManagementConfigProperty;
+
+  /**
+   * The function's [AWS Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html) setting.
+   */
+  public snapStart?: cdk.IResolvable | CfnFunction.SnapStartProperty;
+
+  /**
+   * A list of [tags](https://docs.aws.amazon.com/lambda/latest/dg/tagging.html) to apply to the function.
+   */
+  public readonly tags: cdk.TagManager;
+
+  /**
+   * The amount of time (in seconds) that Lambda allows a function to run before stopping it.
+   */
+  public timeout?: number;
+
+  /**
+   * Set \`Mode\` to \`Active\` to sample and trace a subset of incoming requests with [X-Ray](https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html) .
+   */
+  public tracingConfig?: cdk.IResolvable | CfnFunction.TracingConfigProperty;
+
+  /**
+   * For network connectivity to AWS resources in a VPC, specify a list of security groups and subnets in the VPC.
+   */
+  public vpcConfig?: cdk.IResolvable | CfnFunction.VpcConfigProperty;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -1726,60 +1726,60 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
     this.attrSnapStartResponse = this.getAtt("SnapStartResponse");
     this.attrSnapStartResponseApplyOn = cdk.Token.asString(this.getAtt("SnapStartResponse.ApplyOn", cdk.ResolutionTypeHint.STRING));
     this.attrSnapStartResponseOptimizationStatus = cdk.Token.asString(this.getAtt("SnapStartResponse.OptimizationStatus", cdk.ResolutionTypeHint.STRING));
+    this.architectures = props.architectures;
+    this.code = props.code;
+    this.codeSigningConfigArn = props.codeSigningConfigArn;
+    this.deadLetterConfig = props.deadLetterConfig;
     this.description = props.description;
-    this.tracingConfig = props.tracingConfig;
-    this.vpcConfig = props.vpcConfig;
-    this.runtimeManagementConfig = props.runtimeManagementConfig;
-    this.reservedConcurrentExecutions = props.reservedConcurrentExecutions;
-    this.snapStart = props.snapStart;
+    this.environment = props.environment;
+    this.ephemeralStorage = props.ephemeralStorage;
     this.fileSystemConfigs = props.fileSystemConfigs;
     this.functionName = props.functionName;
-    this.runtime = props.runtime;
+    this.handler = props.handler;
+    this.imageConfig = props.imageConfig;
     this.kmsKeyArn = props.kmsKeyArn;
-    this.packageType = props.packageType;
-    this.codeSigningConfigArn = props.codeSigningConfigArn;
     this.layers = props.layers;
+    this.memorySize = props.memorySize;
+    this.packageType = props.packageType;
+    this.reservedConcurrentExecutions = props.reservedConcurrentExecutions;
+    this.role = props.role;
+    this.runtime = props.runtime;
+    this.runtimeManagementConfig = props.runtimeManagementConfig;
+    this.snapStart = props.snapStart;
     this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::Lambda::Function", props.tags, {
       "tagPropertyName": "tags"
     });
-    this.imageConfig = props.imageConfig;
-    this.memorySize = props.memorySize;
-    this.deadLetterConfig = props.deadLetterConfig;
     this.timeout = props.timeout;
-    this.handler = props.handler;
-    this.code = props.code;
-    this.role = props.role;
-    this.environment = props.environment;
-    this.ephemeralStorage = props.ephemeralStorage;
-    this.architectures = props.architectures;
+    this.tracingConfig = props.tracingConfig;
+    this.vpcConfig = props.vpcConfig;
   }
 
   protected get cfnProperties(): Record<string, any> {
     return {
-      "description": this.description,
-      "tracingConfig": this.tracingConfig,
-      "vpcConfig": this.vpcConfig,
-      "runtimeManagementConfig": this.runtimeManagementConfig,
-      "reservedConcurrentExecutions": this.reservedConcurrentExecutions,
-      "snapStart": this.snapStart,
-      "fileSystemConfigs": this.fileSystemConfigs,
-      "functionName": this.functionName,
-      "runtime": this.runtime,
-      "kmsKeyArn": this.kmsKeyArn,
-      "packageType": this.packageType,
-      "codeSigningConfigArn": this.codeSigningConfigArn,
-      "layers": this.layers,
-      "tags": this.tags.renderTags(),
-      "imageConfig": this.imageConfig,
-      "memorySize": this.memorySize,
-      "deadLetterConfig": this.deadLetterConfig,
-      "timeout": this.timeout,
-      "handler": this.handler,
+      "architectures": this.architectures,
       "code": this.code,
-      "role": this.role,
+      "codeSigningConfigArn": this.codeSigningConfigArn,
+      "deadLetterConfig": this.deadLetterConfig,
+      "description": this.description,
       "environment": this.environment,
       "ephemeralStorage": this.ephemeralStorage,
-      "architectures": this.architectures
+      "fileSystemConfigs": this.fileSystemConfigs,
+      "functionName": this.functionName,
+      "handler": this.handler,
+      "imageConfig": this.imageConfig,
+      "kmsKeyArn": this.kmsKeyArn,
+      "layers": this.layers,
+      "memorySize": this.memorySize,
+      "packageType": this.packageType,
+      "reservedConcurrentExecutions": this.reservedConcurrentExecutions,
+      "role": this.role,
+      "runtime": this.runtime,
+      "runtimeManagementConfig": this.runtimeManagementConfig,
+      "snapStart": this.snapStart,
+      "tags": this.tags.renderTags(),
+      "timeout": this.timeout,
+      "tracingConfig": this.tracingConfig,
+      "vpcConfig": this.vpcConfig
     };
   }
 
@@ -3389,13 +3389,6 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
   public readonly attrEndpointPort: string;
 
   /**
-   * The reader endpoint for the DB cluster. For example: \`mystack-mydbcluster-ro-123456789012.us-east-2.rds.amazonaws.com\`
-   *
-   * @cloudformationAttribute ReadEndpoint.Address
-   */
-  public readonly attrReadEndpointAddress: string;
-
-  /**
    * The Amazon Resource Name (ARN) of the secret.
    *
    * @cloudformationAttribute MasterUserSecret.SecretArn
@@ -3408,6 +3401,13 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
   public readonly attrReadEndpoint: cdk.IResolvable;
 
   /**
+   * The reader endpoint for the DB cluster. For example: \`mystack-mydbcluster-ro-123456789012.us-east-2.rds.amazonaws.com\`
+   *
+   * @cloudformationAttribute ReadEndpoint.Address
+   */
+  public readonly attrReadEndpointAddress: string;
+
+  /**
    * The amount of storage in gibibytes (GiB) to allocate to each DB instance in the Multi-AZ DB cluster.
    */
   public allocatedStorage?: number;
@@ -3418,14 +3418,14 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
   public associatedRoles?: Array<CfnDBCluster.DBClusterRoleProperty | cdk.IResolvable> | cdk.IResolvable;
 
   /**
-   * A list of Availability Zones (AZs) where instances in the DB cluster can be created.
-   */
-  public availabilityZones?: Array<string>;
-
-  /**
    * A value that indicates whether minor engine upgrades are applied automatically to the DB cluster during the maintenance window.
    */
   public autoMinorVersionUpgrade?: boolean | cdk.IResolvable;
+
+  /**
+   * A list of Availability Zones (AZs) where instances in the DB cluster can be created.
+   */
+  public availabilityZones?: Array<string>;
 
   /**
    * The target backtrack window, in seconds. To disable backtracking, set this value to 0.
@@ -3448,29 +3448,14 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
   public databaseName?: string;
 
   /**
-   * The compute and memory capacity of each DB instance in the Multi-AZ DB cluster, for example db.m6gd.xlarge. Not all DB instance classes are available in all AWS Regions , or for all database engines.
-   */
-  public dbClusterInstanceClass?: string;
-
-  /**
-   * The name of the DB parameter group to apply to all instances of the DB cluster.
-   */
-  public dbInstanceParameterGroupName?: string;
-
-  /**
-   * Reserved for future use.
-   */
-  public dbSystemId?: string;
-
-  /**
-   * If you are configuring an Aurora global database cluster and want your Aurora DB cluster to be a secondary member in the global database cluster, specify the global cluster ID of the global database cluster.
-   */
-  public globalClusterIdentifier?: string;
-
-  /**
    * The DB cluster identifier. This parameter is stored as a lowercase string.
    */
   public dbClusterIdentifier?: string;
+
+  /**
+   * The compute and memory capacity of each DB instance in the Multi-AZ DB cluster, for example db.m6gd.xlarge. Not all DB instance classes are available in all AWS Regions , or for all database engines.
+   */
+  public dbClusterInstanceClass?: string;
 
   /**
    * The name of the DB cluster parameter group to associate with this DB cluster.
@@ -3478,9 +3463,19 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
   public dbClusterParameterGroupName?: string;
 
   /**
+   * The name of the DB parameter group to apply to all instances of the DB cluster.
+   */
+  public dbInstanceParameterGroupName?: string;
+
+  /**
    * A DB subnet group that you want to associate with this DB cluster.
    */
   public dbSubnetGroupName?: string;
+
+  /**
+   * Reserved for future use.
+   */
+  public dbSystemId?: string;
 
   /**
    * A value that indicates whether the DB cluster has deletion protection enabled.
@@ -3528,9 +3523,9 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
   public engineVersion?: string;
 
   /**
-   * A value that indicates whether to manage the master user password with AWS Secrets Manager.
+   * If you are configuring an Aurora global database cluster and want your Aurora DB cluster to be a secondary member in the global database cluster, specify the global cluster ID of the global database cluster.
    */
-  public manageMasterUserPassword?: boolean | cdk.IResolvable;
+  public globalClusterIdentifier?: string;
 
   /**
    * The amount of Provisioned IOPS (input/output operations per second) to be initially allocated for each DB instance in the Multi-AZ DB cluster.
@@ -3541,6 +3536,11 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
    * The Amazon Resource Name (ARN) of the AWS KMS key that is used to encrypt the database instances in the DB cluster, such as \`arn:aws:kms:us-east-1:012345678910:key/abcd1234-a123-456a-a12b-a123b4cd56ef\` .
    */
   public kmsKeyId?: string;
+
+  /**
+   * A value that indicates whether to manage the master user password with AWS Secrets Manager.
+   */
+  public manageMasterUserPassword?: boolean | cdk.IResolvable;
 
   /**
    * The name of the master user for the DB cluster.
@@ -3623,14 +3623,14 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
   public restoreType?: string;
 
   /**
-   * The \`ServerlessV2ScalingConfiguration\` property type specifies the scaling configuration of an Aurora Serverless V2 DB cluster.
-   */
-  public serverlessV2ScalingConfiguration?: cdk.IResolvable | CfnDBCluster.ServerlessV2ScalingConfigurationProperty;
-
-  /**
    * The \`ScalingConfiguration\` property type specifies the scaling configuration of an Aurora Serverless DB cluster.
    */
   public scalingConfiguration?: cdk.IResolvable | CfnDBCluster.ScalingConfigurationProperty;
+
+  /**
+   * The \`ServerlessV2ScalingConfiguration\` property type specifies the scaling configuration of an Aurora Serverless V2 DB cluster.
+   */
+  public serverlessV2ScalingConfiguration?: cdk.IResolvable | CfnDBCluster.ServerlessV2ScalingConfigurationProperty;
 
   /**
    * The identifier for the DB snapshot or DB cluster snapshot to restore from.
@@ -3688,24 +3688,23 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
     this.attrEndpoint = this.getAtt("Endpoint");
     this.attrEndpointAddress = cdk.Token.asString(this.getAtt("Endpoint.Address", cdk.ResolutionTypeHint.STRING));
     this.attrEndpointPort = cdk.Token.asString(this.getAtt("Endpoint.Port", cdk.ResolutionTypeHint.STRING));
-    this.attrReadEndpointAddress = cdk.Token.asString(this.getAtt("ReadEndpoint.Address", cdk.ResolutionTypeHint.STRING));
     this.attrMasterUserSecretSecretArn = cdk.Token.asString(this.getAtt("MasterUserSecret.SecretArn", cdk.ResolutionTypeHint.STRING));
     this.attrReadEndpoint = this.getAtt("ReadEndpoint");
+    this.attrReadEndpointAddress = cdk.Token.asString(this.getAtt("ReadEndpoint.Address", cdk.ResolutionTypeHint.STRING));
     this.allocatedStorage = props.allocatedStorage;
     this.associatedRoles = props.associatedRoles;
-    this.availabilityZones = props.availabilityZones;
     this.autoMinorVersionUpgrade = props.autoMinorVersionUpgrade;
+    this.availabilityZones = props.availabilityZones;
     this.backtrackWindow = props.backtrackWindow;
     this.backupRetentionPeriod = props.backupRetentionPeriod;
     this.copyTagsToSnapshot = props.copyTagsToSnapshot;
     this.databaseName = props.databaseName;
-    this.dbClusterInstanceClass = props.dbClusterInstanceClass;
-    this.dbInstanceParameterGroupName = props.dbInstanceParameterGroupName;
-    this.dbSystemId = props.dbSystemId;
-    this.globalClusterIdentifier = props.globalClusterIdentifier;
     this.dbClusterIdentifier = props.dbClusterIdentifier;
+    this.dbClusterInstanceClass = props.dbClusterInstanceClass;
     this.dbClusterParameterGroupName = props.dbClusterParameterGroupName;
+    this.dbInstanceParameterGroupName = props.dbInstanceParameterGroupName;
     this.dbSubnetGroupName = props.dbSubnetGroupName;
+    this.dbSystemId = props.dbSystemId;
     this.deletionProtection = props.deletionProtection;
     this.domain = props.domain;
     this.domainIamRoleName = props.domainIamRoleName;
@@ -3715,9 +3714,10 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
     this.engine = props.engine;
     this.engineMode = props.engineMode;
     this.engineVersion = props.engineVersion;
-    this.manageMasterUserPassword = props.manageMasterUserPassword;
+    this.globalClusterIdentifier = props.globalClusterIdentifier;
     this.iops = props.iops;
     this.kmsKeyId = props.kmsKeyId;
+    this.manageMasterUserPassword = props.manageMasterUserPassword;
     this.masterUsername = props.masterUsername;
     this.masterUserPassword = props.masterUserPassword;
     this.masterUserSecret = props.masterUserSecret;
@@ -3734,8 +3734,8 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
     this.replicationSourceIdentifier = props.replicationSourceIdentifier;
     this.restoreToTime = props.restoreToTime;
     this.restoreType = props.restoreType;
-    this.serverlessV2ScalingConfiguration = props.serverlessV2ScalingConfiguration;
     this.scalingConfiguration = props.scalingConfiguration;
+    this.serverlessV2ScalingConfiguration = props.serverlessV2ScalingConfiguration;
     this.snapshotIdentifier = props.snapshotIdentifier;
     this.sourceDbClusterIdentifier = props.sourceDbClusterIdentifier;
     this.sourceRegion = props.sourceRegion;
@@ -3757,19 +3757,18 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
     return {
       "allocatedStorage": this.allocatedStorage,
       "associatedRoles": this.associatedRoles,
-      "availabilityZones": this.availabilityZones,
       "autoMinorVersionUpgrade": this.autoMinorVersionUpgrade,
+      "availabilityZones": this.availabilityZones,
       "backtrackWindow": this.backtrackWindow,
       "backupRetentionPeriod": this.backupRetentionPeriod,
       "copyTagsToSnapshot": this.copyTagsToSnapshot,
       "databaseName": this.databaseName,
-      "dbClusterInstanceClass": this.dbClusterInstanceClass,
-      "dbInstanceParameterGroupName": this.dbInstanceParameterGroupName,
-      "dbSystemId": this.dbSystemId,
-      "globalClusterIdentifier": this.globalClusterIdentifier,
       "dbClusterIdentifier": this.dbClusterIdentifier,
+      "dbClusterInstanceClass": this.dbClusterInstanceClass,
       "dbClusterParameterGroupName": this.dbClusterParameterGroupName,
+      "dbInstanceParameterGroupName": this.dbInstanceParameterGroupName,
       "dbSubnetGroupName": this.dbSubnetGroupName,
+      "dbSystemId": this.dbSystemId,
       "deletionProtection": this.deletionProtection,
       "domain": this.domain,
       "domainIamRoleName": this.domainIamRoleName,
@@ -3779,9 +3778,10 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
       "engine": this.engine,
       "engineMode": this.engineMode,
       "engineVersion": this.engineVersion,
-      "manageMasterUserPassword": this.manageMasterUserPassword,
+      "globalClusterIdentifier": this.globalClusterIdentifier,
       "iops": this.iops,
       "kmsKeyId": this.kmsKeyId,
+      "manageMasterUserPassword": this.manageMasterUserPassword,
       "masterUsername": this.masterUsername,
       "masterUserPassword": this.masterUserPassword,
       "masterUserSecret": this.masterUserSecret,
@@ -3798,8 +3798,8 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
       "replicationSourceIdentifier": this.replicationSourceIdentifier,
       "restoreToTime": this.restoreToTime,
       "restoreType": this.restoreType,
-      "serverlessV2ScalingConfiguration": this.serverlessV2ScalingConfiguration,
       "scalingConfiguration": this.scalingConfiguration,
+      "serverlessV2ScalingConfiguration": this.serverlessV2ScalingConfiguration,
       "snapshotIdentifier": this.snapshotIdentifier,
       "sourceDbClusterIdentifier": this.sourceDbClusterIdentifier,
       "sourceRegion": this.sourceRegion,
@@ -10668,13 +10668,6 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
   }
 
   /**
-   * Returns the URLs of the queues from the policy.
-   *
-   * @cloudformationAttribute QueueUrl
-   */
-  public readonly attrQueueUrl: string;
-
-  /**
    * Returns the Amazon Resource Name (ARN) of the queue. For example: \`arn:aws:sqs:us-east-2:123456789012:mystack-myqueue-15PG5C2FC1CW8\` .
    *
    * @cloudformationAttribute Arn
@@ -10687,6 +10680,13 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
    * @cloudformationAttribute QueueName
    */
   public readonly attrQueueName: string;
+
+  /**
+   * Returns the URLs of the queues from the policy.
+   *
+   * @cloudformationAttribute QueueUrl
+   */
+  public readonly attrQueueUrl: string;
 
   /**
    * For first-in-first-out (FIFO) queues, specifies whether to enable content-based deduplication.
@@ -10724,11 +10724,6 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
   public kmsMasterKeyId?: string;
 
   /**
-   * Enables server-side queue encryption using SQS owned encryption keys.
-   */
-  public sqsManagedSseEnabled?: boolean | cdk.IResolvable;
-
-  /**
    * The limit of how many bytes that a message can contain before Amazon SQS rejects it.
    */
   public maximumMessageSize?: number;
@@ -10759,6 +10754,11 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
   public redrivePolicy?: any | cdk.IResolvable | string;
 
   /**
+   * Enables server-side queue encryption using SQS owned encryption keys.
+   */
+  public sqsManagedSseEnabled?: boolean | cdk.IResolvable;
+
+  /**
    * The tags that you attach to this queue.
    */
   public readonly tags: cdk.TagManager;
@@ -10779,9 +10779,9 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
       "properties": props
     });
 
-    this.attrQueueUrl = cdk.Token.asString(this.getAtt("QueueUrl", cdk.ResolutionTypeHint.STRING));
     this.attrArn = cdk.Token.asString(this.getAtt("Arn", cdk.ResolutionTypeHint.STRING));
     this.attrQueueName = cdk.Token.asString(this.getAtt("QueueName", cdk.ResolutionTypeHint.STRING));
+    this.attrQueueUrl = cdk.Token.asString(this.getAtt("QueueUrl", cdk.ResolutionTypeHint.STRING));
     this.contentBasedDeduplication = props.contentBasedDeduplication;
     this.deduplicationScope = props.deduplicationScope;
     this.delaySeconds = props.delaySeconds;
@@ -10789,13 +10789,13 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
     this.fifoThroughputLimit = props.fifoThroughputLimit;
     this.kmsDataKeyReusePeriodSeconds = props.kmsDataKeyReusePeriodSeconds;
     this.kmsMasterKeyId = props.kmsMasterKeyId;
-    this.sqsManagedSseEnabled = props.sqsManagedSseEnabled;
     this.maximumMessageSize = props.maximumMessageSize;
     this.messageRetentionPeriod = props.messageRetentionPeriod;
     this.queueName = props.queueName;
     this.receiveMessageWaitTimeSeconds = props.receiveMessageWaitTimeSeconds;
     this.redriveAllowPolicy = props.redriveAllowPolicy;
     this.redrivePolicy = props.redrivePolicy;
+    this.sqsManagedSseEnabled = props.sqsManagedSseEnabled;
     this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::SQS::Queue", props.tags, {
       "tagPropertyName": "tags"
     });
@@ -10816,13 +10816,13 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
       "fifoThroughputLimit": this.fifoThroughputLimit,
       "kmsDataKeyReusePeriodSeconds": this.kmsDataKeyReusePeriodSeconds,
       "kmsMasterKeyId": this.kmsMasterKeyId,
-      "sqsManagedSseEnabled": this.sqsManagedSseEnabled,
       "maximumMessageSize": this.maximumMessageSize,
       "messageRetentionPeriod": this.messageRetentionPeriod,
       "queueName": this.queueName,
       "receiveMessageWaitTimeSeconds": this.receiveMessageWaitTimeSeconds,
       "redriveAllowPolicy": this.redriveAllowPolicy,
       "redrivePolicy": this.redrivePolicy,
+      "sqsManagedSseEnabled": this.sqsManagedSseEnabled,
       "tags": this.tags.renderTags(),
       "visibilityTimeout": this.visibilityTimeout
     };
@@ -11184,14 +11184,14 @@ export class CfnSkill extends cdk.CfnResource implements cdk.IInspectable {
   public authenticationConfiguration: CfnSkill.AuthenticationConfigurationProperty | cdk.IResolvable;
 
   /**
-   * The vendor ID associated with the Amazon developer account that will host the skill.
-   */
-  public vendorId: string;
-
-  /**
    * Configuration for the skill package that contains the components of the Alexa skill.
    */
   public skillPackage: cdk.IResolvable | CfnSkill.SkillPackageProperty;
+
+  /**
+   * The vendor ID associated with the Amazon developer account that will host the skill.
+   */
+  public vendorId: string;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -11205,20 +11205,20 @@ export class CfnSkill extends cdk.CfnResource implements cdk.IInspectable {
     });
 
     cdk.requireProperty(props, "authenticationConfiguration", this);
-    cdk.requireProperty(props, "vendorId", this);
     cdk.requireProperty(props, "skillPackage", this);
+    cdk.requireProperty(props, "vendorId", this);
 
     this.attrId = cdk.Token.asString(this.getAtt("Id", cdk.ResolutionTypeHint.STRING));
     this.authenticationConfiguration = props.authenticationConfiguration;
-    this.vendorId = props.vendorId;
     this.skillPackage = props.skillPackage;
+    this.vendorId = props.vendorId;
   }
 
   protected get cfnProperties(): Record<string, any> {
     return {
       "authenticationConfiguration": this.authenticationConfiguration,
-      "vendorId": this.vendorId,
-      "skillPackage": this.skillPackage
+      "skillPackage": this.skillPackage,
+      "vendorId": this.vendorId
     };
   }
 

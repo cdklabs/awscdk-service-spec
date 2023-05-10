@@ -58,14 +58,14 @@ export class CfnSkill extends cdk.CfnResource implements cdk.IInspectable {
   public authenticationConfiguration: CfnSkill.AuthenticationConfigurationProperty | cdk.IResolvable;
 
   /**
-   * The vendor ID associated with the Amazon developer account that will host the skill.
-   */
-  public vendorId: string;
-
-  /**
    * Configuration for the skill package that contains the components of the Alexa skill.
    */
   public skillPackage: cdk.IResolvable | CfnSkill.SkillPackageProperty;
+
+  /**
+   * The vendor ID associated with the Amazon developer account that will host the skill.
+   */
+  public vendorId: string;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -79,20 +79,20 @@ export class CfnSkill extends cdk.CfnResource implements cdk.IInspectable {
     });
 
     cdk.requireProperty(props, "authenticationConfiguration", this);
-    cdk.requireProperty(props, "vendorId", this);
     cdk.requireProperty(props, "skillPackage", this);
+    cdk.requireProperty(props, "vendorId", this);
 
     this.attrId = cdk.Token.asString(this.getAtt("Id", cdk.ResolutionTypeHint.STRING));
     this.authenticationConfiguration = props.authenticationConfiguration;
-    this.vendorId = props.vendorId;
     this.skillPackage = props.skillPackage;
+    this.vendorId = props.vendorId;
   }
 
   protected get cfnProperties(): Record<string, any> {
     return {
       "authenticationConfiguration": this.authenticationConfiguration,
-      "vendorId": this.vendorId,
-      "skillPackage": this.skillPackage
+      "skillPackage": this.skillPackage,
+      "vendorId": this.vendorId
     };
   }
 
@@ -511,6 +511,31 @@ export class CfnMicrosoftTeamsChannelConfiguration extends cdk.CfnResource imple
   public readonly attrArn: string;
 
   /**
+   * The name of the configuration.
+   */
+  public configurationName: string;
+
+  /**
+   * The list of IAM policy ARNs that are applied as channel guardrails.
+   */
+  public guardrailPolicies?: Array<string>;
+
+  /**
+   * The ARN of the IAM role that defines the permissions for AWS Chatbot .
+   */
+  public iamRoleArn: string;
+
+  /**
+   * Specifies the logging level for this configuration. This property affects the log entries pushed to Amazon CloudWatch Logs.
+   */
+  public loggingLevel?: string;
+
+  /**
+   * The ARNs of the SNS topics that deliver notifications to AWS Chatbot .
+   */
+  public snsTopicArns?: Array<string>;
+
+  /**
    * The ID of the Microsoft Team authorized with AWS Chatbot .
    */
   public teamId: string;
@@ -524,31 +549,6 @@ export class CfnMicrosoftTeamsChannelConfiguration extends cdk.CfnResource imple
    * The ID of the Microsoft Teams tenant.
    */
   public teamsTenantId: string;
-
-  /**
-   * The name of the configuration.
-   */
-  public configurationName: string;
-
-  /**
-   * The ARN of the IAM role that defines the permissions for AWS Chatbot .
-   */
-  public iamRoleArn: string;
-
-  /**
-   * The ARNs of the SNS topics that deliver notifications to AWS Chatbot .
-   */
-  public snsTopicArns?: Array<string>;
-
-  /**
-   * Specifies the logging level for this configuration. This property affects the log entries pushed to Amazon CloudWatch Logs.
-   */
-  public loggingLevel?: string;
-
-  /**
-   * The list of IAM policy ARNs that are applied as channel guardrails.
-   */
-  public guardrailPolicies?: Array<string>;
 
   /**
    * Enables use of a user role requirement in your chat configuration.
@@ -566,34 +566,34 @@ export class CfnMicrosoftTeamsChannelConfiguration extends cdk.CfnResource imple
       "properties": props
     });
 
+    cdk.requireProperty(props, "configurationName", this);
+    cdk.requireProperty(props, "iamRoleArn", this);
     cdk.requireProperty(props, "teamId", this);
     cdk.requireProperty(props, "teamsChannelId", this);
     cdk.requireProperty(props, "teamsTenantId", this);
-    cdk.requireProperty(props, "configurationName", this);
-    cdk.requireProperty(props, "iamRoleArn", this);
 
     this.attrArn = cdk.Token.asString(this.getAtt("Arn", cdk.ResolutionTypeHint.STRING));
+    this.configurationName = props.configurationName;
+    this.guardrailPolicies = props.guardrailPolicies;
+    this.iamRoleArn = props.iamRoleArn;
+    this.loggingLevel = props.loggingLevel;
+    this.snsTopicArns = props.snsTopicArns;
     this.teamId = props.teamId;
     this.teamsChannelId = props.teamsChannelId;
     this.teamsTenantId = props.teamsTenantId;
-    this.configurationName = props.configurationName;
-    this.iamRoleArn = props.iamRoleArn;
-    this.snsTopicArns = props.snsTopicArns;
-    this.loggingLevel = props.loggingLevel;
-    this.guardrailPolicies = props.guardrailPolicies;
     this.userRoleRequired = props.userRoleRequired;
   }
 
   protected get cfnProperties(): Record<string, any> {
     return {
+      "configurationName": this.configurationName,
+      "guardrailPolicies": this.guardrailPolicies,
+      "iamRoleArn": this.iamRoleArn,
+      "loggingLevel": this.loggingLevel,
+      "snsTopicArns": this.snsTopicArns,
       "teamId": this.teamId,
       "teamsChannelId": this.teamsChannelId,
       "teamsTenantId": this.teamsTenantId,
-      "configurationName": this.configurationName,
-      "iamRoleArn": this.iamRoleArn,
-      "snsTopicArns": this.snsTopicArns,
-      "loggingLevel": this.loggingLevel,
-      "guardrailPolicies": this.guardrailPolicies,
       "userRoleRequired": this.userRoleRequired
     };
   }
@@ -816,19 +816,14 @@ export class CfnSlackChannelConfiguration extends cdk.CfnResource implements cdk
   public readonly attrArn: string;
 
   /**
-   * The ID of the Slack workspace authorized with AWS Chatbot .
-   */
-  public slackWorkspaceId: string;
-
-  /**
-   * The ID of the Slack channel.
-   */
-  public slackChannelId: string;
-
-  /**
    * The name of the configuration.
    */
   public configurationName: string;
+
+  /**
+   * The list of IAM policy ARNs that are applied as channel guardrails.
+   */
+  public guardrailPolicies?: Array<string>;
 
   /**
    * The ARN of the IAM role that defines the permissions for AWS Chatbot .
@@ -836,19 +831,24 @@ export class CfnSlackChannelConfiguration extends cdk.CfnResource implements cdk
   public iamRoleArn: string;
 
   /**
-   * The ARNs of the SNS topics that deliver notifications to AWS Chatbot .
-   */
-  public snsTopicArns?: Array<string>;
-
-  /**
    * Specifies the logging level for this configuration. This property affects the log entries pushed to Amazon CloudWatch Logs.
    */
   public loggingLevel?: string;
 
   /**
-   * The list of IAM policy ARNs that are applied as channel guardrails.
+   * The ID of the Slack channel.
    */
-  public guardrailPolicies?: Array<string>;
+  public slackChannelId: string;
+
+  /**
+   * The ID of the Slack workspace authorized with AWS Chatbot .
+   */
+  public slackWorkspaceId: string;
+
+  /**
+   * The ARNs of the SNS topics that deliver notifications to AWS Chatbot .
+   */
+  public snsTopicArns?: Array<string>;
 
   /**
    * Enables use of a user role requirement in your chat configuration.
@@ -866,31 +866,31 @@ export class CfnSlackChannelConfiguration extends cdk.CfnResource implements cdk
       "properties": props
     });
 
-    cdk.requireProperty(props, "slackWorkspaceId", this);
-    cdk.requireProperty(props, "slackChannelId", this);
     cdk.requireProperty(props, "configurationName", this);
     cdk.requireProperty(props, "iamRoleArn", this);
+    cdk.requireProperty(props, "slackChannelId", this);
+    cdk.requireProperty(props, "slackWorkspaceId", this);
 
     this.attrArn = cdk.Token.asString(this.getAtt("Arn", cdk.ResolutionTypeHint.STRING));
-    this.slackWorkspaceId = props.slackWorkspaceId;
-    this.slackChannelId = props.slackChannelId;
     this.configurationName = props.configurationName;
-    this.iamRoleArn = props.iamRoleArn;
-    this.snsTopicArns = props.snsTopicArns;
-    this.loggingLevel = props.loggingLevel;
     this.guardrailPolicies = props.guardrailPolicies;
+    this.iamRoleArn = props.iamRoleArn;
+    this.loggingLevel = props.loggingLevel;
+    this.slackChannelId = props.slackChannelId;
+    this.slackWorkspaceId = props.slackWorkspaceId;
+    this.snsTopicArns = props.snsTopicArns;
     this.userRoleRequired = props.userRoleRequired;
   }
 
   protected get cfnProperties(): Record<string, any> {
     return {
-      "slackWorkspaceId": this.slackWorkspaceId,
-      "slackChannelId": this.slackChannelId,
       "configurationName": this.configurationName,
-      "iamRoleArn": this.iamRoleArn,
-      "snsTopicArns": this.snsTopicArns,
-      "loggingLevel": this.loggingLevel,
       "guardrailPolicies": this.guardrailPolicies,
+      "iamRoleArn": this.iamRoleArn,
+      "loggingLevel": this.loggingLevel,
+      "slackChannelId": this.slackChannelId,
+      "slackWorkspaceId": this.slackWorkspaceId,
+      "snsTopicArns": this.snsTopicArns,
       "userRoleRequired": this.userRoleRequired
     };
   }
@@ -8452,13 +8452,6 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
   }
 
   /**
-   * Returns the URLs of the queues from the policy.
-   *
-   * @cloudformationAttribute QueueUrl
-   */
-  public readonly attrQueueUrl: string;
-
-  /**
    * Returns the Amazon Resource Name (ARN) of the queue. For example: \`arn:aws:sqs:us-east-2:123456789012:mystack-myqueue-15PG5C2FC1CW8\` .
    *
    * @cloudformationAttribute Arn
@@ -8471,6 +8464,13 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
    * @cloudformationAttribute QueueName
    */
   public readonly attrQueueName: string;
+
+  /**
+   * Returns the URLs of the queues from the policy.
+   *
+   * @cloudformationAttribute QueueUrl
+   */
+  public readonly attrQueueUrl: string;
 
   /**
    * For first-in-first-out (FIFO) queues, specifies whether to enable content-based deduplication.
@@ -8508,11 +8508,6 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
   public kmsMasterKeyId?: string;
 
   /**
-   * Enables server-side queue encryption using SQS owned encryption keys.
-   */
-  public sqsManagedSseEnabled?: boolean | cdk.IResolvable;
-
-  /**
    * The limit of how many bytes that a message can contain before Amazon SQS rejects it.
    */
   public maximumMessageSize?: number;
@@ -8543,6 +8538,11 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
   public redrivePolicy?: any | cdk.IResolvable | string;
 
   /**
+   * Enables server-side queue encryption using SQS owned encryption keys.
+   */
+  public sqsManagedSseEnabled?: boolean | cdk.IResolvable;
+
+  /**
    * The tags that you attach to this queue.
    */
   public readonly tags: cdk.TagManager;
@@ -8563,9 +8563,9 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
       "properties": props
     });
 
-    this.attrQueueUrl = cdk.Token.asString(this.getAtt("QueueUrl", cdk.ResolutionTypeHint.STRING));
     this.attrArn = cdk.Token.asString(this.getAtt("Arn", cdk.ResolutionTypeHint.STRING));
     this.attrQueueName = cdk.Token.asString(this.getAtt("QueueName", cdk.ResolutionTypeHint.STRING));
+    this.attrQueueUrl = cdk.Token.asString(this.getAtt("QueueUrl", cdk.ResolutionTypeHint.STRING));
     this.contentBasedDeduplication = props.contentBasedDeduplication;
     this.deduplicationScope = props.deduplicationScope;
     this.delaySeconds = props.delaySeconds;
@@ -8573,13 +8573,13 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
     this.fifoThroughputLimit = props.fifoThroughputLimit;
     this.kmsDataKeyReusePeriodSeconds = props.kmsDataKeyReusePeriodSeconds;
     this.kmsMasterKeyId = props.kmsMasterKeyId;
-    this.sqsManagedSseEnabled = props.sqsManagedSseEnabled;
     this.maximumMessageSize = props.maximumMessageSize;
     this.messageRetentionPeriod = props.messageRetentionPeriod;
     this.queueName = props.queueName;
     this.receiveMessageWaitTimeSeconds = props.receiveMessageWaitTimeSeconds;
     this.redriveAllowPolicy = props.redriveAllowPolicy;
     this.redrivePolicy = props.redrivePolicy;
+    this.sqsManagedSseEnabled = props.sqsManagedSseEnabled;
     this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::SQS::Queue", props.tags, {
       "tagPropertyName": "tags"
     });
@@ -8600,13 +8600,13 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
       "fifoThroughputLimit": this.fifoThroughputLimit,
       "kmsDataKeyReusePeriodSeconds": this.kmsDataKeyReusePeriodSeconds,
       "kmsMasterKeyId": this.kmsMasterKeyId,
-      "sqsManagedSseEnabled": this.sqsManagedSseEnabled,
       "maximumMessageSize": this.maximumMessageSize,
       "messageRetentionPeriod": this.messageRetentionPeriod,
       "queueName": this.queueName,
       "receiveMessageWaitTimeSeconds": this.receiveMessageWaitTimeSeconds,
       "redriveAllowPolicy": this.redriveAllowPolicy,
       "redrivePolicy": this.redrivePolicy,
+      "sqsManagedSseEnabled": this.sqsManagedSseEnabled,
       "tags": this.tags.renderTags(),
       "visibilityTimeout": this.visibilityTimeout
     };
@@ -9133,6 +9133,11 @@ export class CfnApplicationV2 extends cdk.CfnResource implements cdk.IInspectabl
   public applicationDescription?: string;
 
   /**
+   * Describes the maintenance configuration for the application.
+   */
+  public applicationMaintenanceConfiguration?: CfnApplicationV2.ApplicationMaintenanceConfigurationProperty | cdk.IResolvable;
+
+  /**
    * To create a Kinesis Data Analytics Studio notebook, you must set the mode to \`INTERACTIVE\` .
    */
   public applicationMode?: string;
@@ -9143,6 +9148,11 @@ export class CfnApplicationV2 extends cdk.CfnResource implements cdk.IInspectabl
   public applicationName?: string;
 
   /**
+   * Identifies the run configuration (start parameters) of a Kinesis Data Analytics application.
+   */
+  public runConfiguration?: cdk.IResolvable | CfnApplicationV2.RunConfigurationProperty;
+
+  /**
    * The runtime environment for the application.
    */
   public runtimeEnvironment: string;
@@ -9151,16 +9161,6 @@ export class CfnApplicationV2 extends cdk.CfnResource implements cdk.IInspectabl
    * Specifies the IAM role that the application uses to access external resources.
    */
   public serviceExecutionRole: string;
-
-  /**
-   * Identifies the run configuration (start parameters) of a Kinesis Data Analytics application.
-   */
-  public runConfiguration?: cdk.IResolvable | CfnApplicationV2.RunConfigurationProperty;
-
-  /**
-   * Describes the maintenance configuration for the application.
-   */
-  public applicationMaintenanceConfiguration?: CfnApplicationV2.ApplicationMaintenanceConfigurationProperty | cdk.IResolvable;
 
   /**
    * A list of one or more tags to assign to the application.
@@ -9183,12 +9183,12 @@ export class CfnApplicationV2 extends cdk.CfnResource implements cdk.IInspectabl
 
     this.applicationConfiguration = props.applicationConfiguration;
     this.applicationDescription = props.applicationDescription;
+    this.applicationMaintenanceConfiguration = props.applicationMaintenanceConfiguration;
     this.applicationMode = props.applicationMode;
     this.applicationName = props.applicationName;
+    this.runConfiguration = props.runConfiguration;
     this.runtimeEnvironment = props.runtimeEnvironment;
     this.serviceExecutionRole = props.serviceExecutionRole;
-    this.runConfiguration = props.runConfiguration;
-    this.applicationMaintenanceConfiguration = props.applicationMaintenanceConfiguration;
     this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::KinesisAnalyticsV2::Application", props.tags, {
       "tagPropertyName": "tags"
     });
@@ -9198,12 +9198,12 @@ export class CfnApplicationV2 extends cdk.CfnResource implements cdk.IInspectabl
     return {
       "applicationConfiguration": this.applicationConfiguration,
       "applicationDescription": this.applicationDescription,
+      "applicationMaintenanceConfiguration": this.applicationMaintenanceConfiguration,
       "applicationMode": this.applicationMode,
       "applicationName": this.applicationName,
+      "runConfiguration": this.runConfiguration,
       "runtimeEnvironment": this.runtimeEnvironment,
       "serviceExecutionRole": this.serviceExecutionRole,
-      "runConfiguration": this.runConfiguration,
-      "applicationMaintenanceConfiguration": this.applicationMaintenanceConfiguration,
       "tags": this.tags.renderTags()
     };
   }
