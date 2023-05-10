@@ -35,7 +35,7 @@
     "jest-junit": "^15",
     "npm-check-updates": "^16",
     "prettier": "^2.8.8",
-    "projen": "^0.71.46",
+    "projen": "^0.71.48",
     "ts-jest": "^29.1.0",
     "ts-json-schema-generator": "^1.2.0",
     "typescript": "^4.9.5"
