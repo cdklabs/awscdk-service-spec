@@ -1,4 +1,3 @@
-import * as path from 'path';
 import { generate as generateModules } from '@aws-cdk/cfn-resources';
 import { loadDatabase } from '@aws-cdk/cfn-resources/src/cli/db';
 import { Service } from '@aws-cdk/service-spec';
@@ -121,9 +120,11 @@ export async function generateAll(
 
     // Add new modules to module map and return to caller
     moduleMap[moduleDefinition.moduleName] = {
+      name: moduleDefinition.moduleName,
+      definition: moduleDefinition,
       scopes: newScopes,
-      module: moduleDefinition,
       resources: {},
+      files: [],
     };
   }
 
@@ -159,39 +160,10 @@ export async function generateAll(
     },
   );
 
-  Object.entries(moduleMap).map(async ([moduleName, { module: moduleDefinition }]) => {
-    // Add generated resources to module in map
-    moduleMap[moduleName].resources = generated.modules[moduleName].map((m) => m.resources).reduce(mergeObjects);
-
-    // core doesn't need a jsiirc file
-    if (moduleName === 'core') {
-      return;
-    }
-
-    // Create .jsiirc.json file if needed
-    const packagePath = path.join(outPath, moduleName);
-    if (!fs.existsSync(path.join(packagePath, '.jsiirc.json'))) {
-      if (!moduleDefinition) {
-        throw new Error(
-          `Cannot infer path or namespace for submodule named "${moduleName}". Manually create ${packagePath}/.jsiirc.json file.`,
-        );
-      }
-
-      const jsiirc = {
-        targets: {
-          java: {
-            package: moduleDefinition.javaPackage,
-          },
-          dotnet: {
-            package: moduleDefinition.dotnetPackage,
-          },
-          python: {
-            module: moduleDefinition.pythonModuleName,
-          },
-        },
-      };
-      fs.writeJsonSync(path.join(packagePath, '.jsiirc.json'), jsiirc, { spaces: 2 });
-    }
+  Object.keys(moduleMap).map(async (moduleName) => {
+    // Add generated resources and files to module in map
+    moduleMap[moduleName].resources = generated.modules[moduleName].map((m) => m.resources).reduce(mergeObjects, {});
+    moduleMap[moduleName].files = generated.modules[moduleName].flatMap((m) => m.outputFiles);
   });
 
   return moduleMap;
@@ -205,11 +177,19 @@ async function readScopeMap(filepath: string): Promise<ModuleMap> {
   return Object.entries(scopeMap).reduce((accum, [name, moduleScopes]) => {
     return {
       ...accum,
-      [name]: { scopes: moduleScopes },
+      [name]: {
+        name,
+        scopes: moduleScopes,
+        resources: {},
+        files: [],
+      },
     };
   }, {});
 }
 
+/**
+ * Reduce compatible merge objects
+ */
 function mergeObjects<T>(all: T, res: T) {
   return {
     ...all,
