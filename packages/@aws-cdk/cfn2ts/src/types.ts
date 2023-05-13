@@ -28,13 +28,20 @@ export interface GenerateAllOptions extends CodeGeneratorOptions, AugmentationsG
 }
 
 /**
- * A data structure holding information about generated modules. It maps
- * module names to their full module definition and their CFN scopes.
+ * A data structure holding information about a generated module.
+ */
+export interface ModuleMapEntry {
+  name: string;
+  definition?: any;
+  scopes: string[];
+  resources: Record<string, string>;
+  files: string[];
+}
+
+/**
+ * A data structure holding information about generated modules.
+ * It maps module names to their full module definition, CFN scopes, resources and generated files.
  */
 export interface ModuleMap {
-  [moduleName: string]: {
-    module?: Record<string, any>;
-    scopes: string[];
-    resources: Record<string, string>;
-  };
+  [moduleName: string]: ModuleMapEntry;
 }
