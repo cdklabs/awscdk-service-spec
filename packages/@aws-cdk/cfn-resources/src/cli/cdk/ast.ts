@@ -124,6 +124,13 @@ export class AstBuilder<T extends Module> {
       converter.addStructProperty(propsInterface, mapping, name, prop);
     }
 
+    // Add types for all attributes
+    for (const attr of Object.values(r.attributes)) {
+      // This is a mutable call to add complex types for attributes to the scope
+      // These are not used in the generated code, but we want to expose the types
+      converter.typeFromSpecType(attr.type);
+    }
+
     converter.makeCfnProducer(propsInterface, mapping);
     converter.makeCfnParser(propsInterface, mapping);
     return propsInterface;
