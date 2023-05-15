@@ -2049,6 +2049,28 @@ export namespace CfnFunction {
      */
     readonly size: number;
   }
+
+  /**
+   * The function's [SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html) setting.
+   *
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-snapstartresponse.html
+   */
+  export interface SnapStartResponseProperty {
+    /**
+     * When you provide a [qualified Amazon Resource Name (ARN)](https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html#versioning-versions-using) , this response element indicates whether SnapStart is activated for the specified function version.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-snapstartresponse.html#cfn-lambda-function-snapstartresponse-optimizationstatus
+     */
+    readonly optimizationStatus?: string;
+
+    /**
+     * When set to \`PublishedVersions\` , Lambda creates a snapshot of the execution environment when you publish a function version.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-snapstartresponse.html#cfn-lambda-function-snapstartresponse-applyon
+     */
+    readonly applyOn?: string;
+  }
 }
 
 /**
@@ -2707,6 +2729,51 @@ function CfnFunctionEphemeralStoragePropertyFromCloudFormation(properties: any):
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.EphemeralStorageProperty>();
   ret.addPropertyResult("size", "Size", (properties.Size != null ? cfn_parse.FromCloudFormation.getNumber(properties.Size) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
+}
+
+/**
+ * Determine whether the given properties match those of a \`SnapStartResponseProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`SnapStartResponseProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnFunctionSnapStartResponsePropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("applyOn", cdk.validateString)(properties.applyOn));
+  errors.collect(cdk.propertyValidator("optimizationStatus", cdk.validateString)(properties.optimizationStatus));
+  return errors.wrap("supplied properties not correct for \\"SnapStartResponseProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnFunctionSnapStartResponsePropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnFunctionSnapStartResponsePropertyValidator(properties).assertSuccess();
+  return {
+    "ApplyOn": cdk.stringToCloudFormation(properties.applyOn),
+    "OptimizationStatus": cdk.stringToCloudFormation(properties.optimizationStatus)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnFunctionSnapStartResponsePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnFunction.SnapStartResponseProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.SnapStartResponseProperty>();
+  ret.addPropertyResult("applyOn", "ApplyOn", (properties.ApplyOn != null ? cfn_parse.FromCloudFormation.getString(properties.ApplyOn) : undefined));
+  ret.addPropertyResult("optimizationStatus", "OptimizationStatus", (properties.OptimizationStatus != null ? cfn_parse.FromCloudFormation.getString(properties.OptimizationStatus) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -3994,6 +4061,49 @@ export namespace CfnDBCluster {
      */
     readonly timeoutAction?: string;
   }
+
+  /**
+   * Specifies the connection endpoint for the primary instance of the DB cluster.
+   *
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-endpoint.html
+   */
+  export interface EndpointProperty {
+    /**
+     * Specifies the connection endpoint for the primary instance of the DB cluster.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-endpoint.html#cfn-rds-dbcluster-endpoint-address
+     */
+    readonly address?: string;
+
+    /**
+     * Specifies the port that the database engine is listening on.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-endpoint.html#cfn-rds-dbcluster-endpoint-port
+     */
+    readonly port?: string;
+  }
+
+  /**
+   * The \`ReadEndpoint\` return value specifies the reader endpoint for the DB cluster.
+   *
+   * The reader endpoint for a DB cluster load-balances connections across the Aurora Replicas that are available in a DB cluster. As clients request new connections to the reader endpoint, Aurora distributes the connection requests among the Aurora Replicas in the DB cluster. This functionality can help balance your read workload across multiple Aurora Replicas in your DB cluster.
+   *
+   * If a failover occurs, and the Aurora Replica that you are connected to is promoted to be the primary instance, your connection is dropped. To continue sending your read workload to other Aurora Replicas in the cluster, you can then reconnect to the reader endpoint.
+   *
+   * For more information about Aurora endpoints, see [Amazon Aurora connection management](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Endpoints.html) in the *Amazon Aurora User Guide* .
+   *
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-readendpoint.html
+   */
+  export interface ReadEndpointProperty {
+    /**
+     * The host address of the reader endpoint.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-readendpoint.html#cfn-rds-dbcluster-readendpoint-address
+     */
+    readonly address?: string;
+  }
 }
 
 /**
@@ -4966,6 +5076,93 @@ function CfnDBClusterScalingConfigurationPropertyFromCloudFormation(properties: 
   ret.addPropertyResult("secondsBeforeTimeout", "SecondsBeforeTimeout", (properties.SecondsBeforeTimeout != null ? cfn_parse.FromCloudFormation.getNumber(properties.SecondsBeforeTimeout) : undefined));
   ret.addPropertyResult("secondsUntilAutoPause", "SecondsUntilAutoPause", (properties.SecondsUntilAutoPause != null ? cfn_parse.FromCloudFormation.getNumber(properties.SecondsUntilAutoPause) : undefined));
   ret.addPropertyResult("timeoutAction", "TimeoutAction", (properties.TimeoutAction != null ? cfn_parse.FromCloudFormation.getString(properties.TimeoutAction) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
+}
+
+/**
+ * Determine whether the given properties match those of a \`EndpointProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`EndpointProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnDBClusterEndpointPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("address", cdk.validateString)(properties.address));
+  errors.collect(cdk.propertyValidator("port", cdk.validateString)(properties.port));
+  return errors.wrap("supplied properties not correct for \\"EndpointProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnDBClusterEndpointPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnDBClusterEndpointPropertyValidator(properties).assertSuccess();
+  return {
+    "Address": cdk.stringToCloudFormation(properties.address),
+    "Port": cdk.stringToCloudFormation(properties.port)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnDBClusterEndpointPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnDBCluster.EndpointProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnDBCluster.EndpointProperty>();
+  ret.addPropertyResult("address", "Address", (properties.Address != null ? cfn_parse.FromCloudFormation.getString(properties.Address) : undefined));
+  ret.addPropertyResult("port", "Port", (properties.Port != null ? cfn_parse.FromCloudFormation.getString(properties.Port) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
+}
+
+/**
+ * Determine whether the given properties match those of a \`ReadEndpointProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`ReadEndpointProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnDBClusterReadEndpointPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("address", cdk.validateString)(properties.address));
+  return errors.wrap("supplied properties not correct for \\"ReadEndpointProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnDBClusterReadEndpointPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnDBClusterReadEndpointPropertyValidator(properties).assertSuccess();
+  return {
+    "Address": cdk.stringToCloudFormation(properties.address)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnDBClusterReadEndpointPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnDBCluster.ReadEndpointProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnDBCluster.ReadEndpointProperty>();
+  ret.addPropertyResult("address", "Address", (properties.Address != null ? cfn_parse.FromCloudFormation.getString(properties.Address) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
