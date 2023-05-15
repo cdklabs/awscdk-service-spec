@@ -81,7 +81,7 @@ export class AwsCdkIntegrationTest extends pj.Component {
         },
         {
           name: `Compare current and candidate spec`,
-          run: `npx jsii-diff --verbose npm:aws-cdk-lib@latest ${candidateSpec}`,
+          run: `npx jsii-diff --verbose --keys --error-on=non-experimental npm:aws-cdk-lib@latest ${candidateSpec}`,
         },
       ],
     });
