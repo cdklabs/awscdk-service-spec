@@ -80,4 +80,4 @@ jobs:
       - name: Install jsii-diff
         run: npm install jsii-diff
       - name: Compare current and candidate spec
-        run: npx jsii-diff --verbose npm:aws-cdk-lib@latest aws-cdk-lib-candidate
+        run: npx jsii-diff --verbose --keys --error-on=non-experimental npm:aws-cdk-lib@latest aws-cdk-lib-candidate
