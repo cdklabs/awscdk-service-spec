@@ -1,7 +1,7 @@
 import { createHash } from 'crypto';
 import { SpecDatabase } from '@aws-cdk/service-spec';
-import { CloudWatchConsoleServiceDirectory } from '@aws-cdk/service-spec-sources';
-import { Entity, failure, Failures, Plain } from '@cdklabs/tskb';
+import { CloudWatchConsoleServiceDirectory, ProblemReport, ReportAudience } from '@aws-cdk/service-spec-sources';
+import { Entity, failure, Plain } from '@cdklabs/tskb';
 
 /**
  * Returns a deduplicatable entity
@@ -32,7 +32,7 @@ function dedup<T extends Plain<Entity>, K extends keyof T>(
 export function importCannedMetrics(
   db: SpecDatabase,
   serviceDirectoryEntries: CloudWatchConsoleServiceDirectory,
-  fails: Failures,
+  report: ProblemReport,
 ) {
   const skippedResources = new Set<string>();
 
@@ -75,6 +75,10 @@ export function importCannedMetrics(
   }
 
   for (const r of Array.from(skippedResources).sort()) {
-    fails.push(failure.in('CloudWatchConsoleServiceDirectory').in(r)('skipping resource type not in db'));
+    report.reportFailure(
+      ReportAudience.cdkTeam(),
+      'interpreting',
+      failure.in('CloudWatchConsoleServiceDirectory').in(r)('skipping resource type not in db'),
+    );
   }
 }

@@ -1,12 +1,17 @@
 import { Region, Service, SpecDatabase } from '@aws-cdk/service-spec';
-import { CloudFormationRegistryResource, jsonschema, SamTemplateSchema } from '@aws-cdk/service-spec-sources';
-import { chain, failure, Failures, liftUndefined, unpackOr } from '@cdklabs/tskb';
+import {
+  CloudFormationRegistryResource,
+  jsonschema,
+  ProblemReport,
+  SamTemplateSchema,
+} from '@aws-cdk/service-spec-sources';
+import { chain, failure, liftUndefined, unpackOr } from '@cdklabs/tskb';
 import { importCloudFormationRegistryResource } from './import-cloudformation-registry';
 
 export interface SamResourcesOptions {
   readonly db: SpecDatabase;
   readonly samSchema: SamTemplateSchema;
-  readonly fails: Failures;
+  readonly report: ProblemReport;
 }
 
 /**
@@ -38,7 +43,7 @@ export class SamResources {
 
       const resource = importCloudFormationRegistryResource({
         db: this.db,
-        fails: this.options.fails,
+        report: this.options.report,
         resource: resourceSpec,
       });
 

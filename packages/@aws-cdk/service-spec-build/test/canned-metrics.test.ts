@@ -1,12 +1,13 @@
 import { emptyDatabase } from '@aws-cdk/service-spec';
-import { Failures } from '@cdklabs/tskb';
+import { ProblemReport } from '@aws-cdk/service-spec-sources';
 import { importCannedMetrics } from '../src/import-canned-metrics';
 
 let db: ReturnType<typeof emptyDatabase>;
-const warnings: Failures = [];
+let report: ProblemReport;
 
 beforeEach(() => {
   db = emptyDatabase();
+  report = new ProblemReport();
 
   // Put a service & a resource in the database
   const s = db.allocate('service', {
@@ -60,7 +61,7 @@ test('adds corresponding metrics to the database', () => {
         ],
       },
     ],
-    warnings,
+    report,
   );
 
   // THEN
@@ -118,7 +119,7 @@ test('does not add metrics for unknown resources', () => {
         ],
       },
     ],
-    warnings,
+    report,
   );
 
   // THEN

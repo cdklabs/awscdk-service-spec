@@ -1,12 +1,9 @@
 import { emptyDatabase } from '@aws-cdk/service-spec';
-import { Failures } from '@cdklabs/tskb';
 import { importStatefulResources } from '../src/import-stateful-resources';
 
 let db: ReturnType<typeof emptyDatabase>;
-let fails: Failures;
 beforeEach(() => {
   db = emptyDatabase();
-  fails = [];
 
   // Put a resource in the database
   db.allocate('resource', {
@@ -23,15 +20,11 @@ beforeEach(() => {
 
 test('mark resource types as stateful', () => {
   // WHEN
-  importStatefulResources(
-    db,
-    {
-      ResourceTypes: {
-        'AWS::Some::Type': {},
-      },
+  importStatefulResources(db, {
+    ResourceTypes: {
+      'AWS::Some::Type': {},
     },
-    fails,
-  );
+  });
 
   // THEN
   const res = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0];
