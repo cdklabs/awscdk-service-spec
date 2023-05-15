@@ -8,6 +8,7 @@ import { failure, Failure, isFailure, isSuccess, locateFailure, Result } from '@
 import Ajv from 'ajv';
 import * as _glob from 'glob';
 import { applyPatcher, JsonLensPatcher, PatchReport } from '../patching';
+import { BoundProblemReport } from '../report';
 
 export interface LoadOptions {
   /**
@@ -26,6 +27,11 @@ export interface LoadOptions {
    * If present, make filenames in errors relative to this directory
    */
   readonly errorRootDirectory?: string;
+
+  /**
+   * Where to send problem reports
+   */
+  readonly report?: BoundProblemReport;
 }
 
 export class Loader<A> {
@@ -60,10 +66,13 @@ export class Loader<A> {
       return failureFromErrors(this.validator.errors);
     }
 
+    const warnings = failuresFromErrors(this.validator.errors);
+    this.options.report?.reportFailure('loading', ...warnings);
+
     return {
       value: obj as any,
       patchesApplied,
-      warnings: failuresFromErrors(this.validator.errors),
+      warnings,
     };
   }
 
@@ -85,8 +94,13 @@ export class Loader<A> {
    *
    * Returns only successfully parsed objects.
    */
-  public async loadFiles(fileNames: string[]): Promise<LoadResult<A[]>> {
-    return combineLoadResults(await seqMap(fileNames, async (fileName) => this.loadFile(fileName)));
+  public async loadFiles(fileNames: string[]): Promise<LoadResult<A[]>>;
+  public async loadFiles<B>(fileNames: string[], combiner: (x: Result<LoadResult<A>>[]) => B): Promise<B>;
+  public async loadFiles<B>(
+    fileNames: string[],
+    combiner?: (x: Result<LoadResult<A>>[]) => B,
+  ): Promise<LoadResult<A[]> | B> {
+    return (combiner ?? combineLoadResults)(await seqMap(fileNames, async (fileName) => this.loadFile(fileName)));
   }
 
   private annotateWithFilename<B>(fileName: string, x: Result<LoadResult<B>>): Result<LoadResult<B>> {
@@ -123,7 +137,7 @@ function failuresFromErrors(errors: Ajv.ErrorObject[] | null | undefined): Failu
  *
  * (In case we're concerned about the performance implications of `Promise.all()`.)
  */
-async function seqMap<A, B>(xs: A[], fn: (x: A) => Promise<B>): Promise<B[]> {
+export async function seqMap<A, B>(xs: A[], fn: (x: A) => Promise<B>): Promise<B[]> {
   const ret: B[] = [];
   for (const x of xs) {
     ret.push(await fn(x));

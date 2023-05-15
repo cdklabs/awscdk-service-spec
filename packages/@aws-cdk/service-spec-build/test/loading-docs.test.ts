@@ -1,13 +1,10 @@
 import { emptyDatabase, Resource } from '@aws-cdk/service-spec';
-import { Failures } from '@cdklabs/tskb';
 import { importCloudFormationDocumentation } from '../src/import-cloudformation-docs';
 
 let db: ReturnType<typeof emptyDatabase>;
-let fails: Failures;
 let resource: Resource;
 beforeEach(() => {
   db = emptyDatabase();
-  fails = [];
 
   // Put a resource in the database
   resource = db.allocate('resource', {
@@ -24,25 +21,21 @@ beforeEach(() => {
 
 test('add documentation to resources in database', () => {
   // WHEN
-  importCloudFormationDocumentation(
-    db,
-    {
-      Types: {
-        'AWS::Some::Type': {
-          description: 'This is a fancy type',
-          attributes: {
-            MyAttr: 'Cool attr',
-            Other: 'Not a cool attr',
-          },
-          properties: {
-            MyProp: 'Cool prop',
-            OtherProp: 'Not a cool prop',
-          },
+  importCloudFormationDocumentation(db, {
+    Types: {
+      'AWS::Some::Type': {
+        description: 'This is a fancy type',
+        attributes: {
+          MyAttr: 'Cool attr',
+          Other: 'Not a cool attr',
+        },
+        properties: {
+          MyProp: 'Cool prop',
+          OtherProp: 'Not a cool prop',
         },
       },
     },
-    fails,
-  );
+  });
 
   // THEN
   const res = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0];
@@ -62,21 +55,17 @@ test('add documentation to property types in database', () => {
   db.link('usesType', resource, typeDef);
 
   // WHEN
-  importCloudFormationDocumentation(
-    db,
-    {
-      Types: {
-        'AWS::Some::Type.MyType': {
-          description: 'This is a fancy type',
-          properties: {
-            SomeProp: 'Cool prop',
-            OtherProp: 'Not a cool prop',
-          },
+  importCloudFormationDocumentation(db, {
+    Types: {
+      'AWS::Some::Type.MyType': {
+        description: 'This is a fancy type',
+        properties: {
+          SomeProp: 'Cool prop',
+          OtherProp: 'Not a cool prop',
         },
       },
     },
-    fails,
-  );
+  });
 
   // THEN
   const typ = db.all('typeDefinition')[0];

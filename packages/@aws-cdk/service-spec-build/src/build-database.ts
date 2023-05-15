@@ -1,7 +1,7 @@
 import { emptyDatabase } from '@aws-cdk/service-spec';
 import * as sources from '@aws-cdk/service-spec-sources';
-import { LoadResult, PatchReport } from '@aws-cdk/service-spec-sources';
-import { assertSuccess, Failures, Result } from '@cdklabs/tskb';
+import { LoadResult, ProblemReport } from '@aws-cdk/service-spec-sources';
+import { assertSuccess, Result } from '@cdklabs/tskb';
 import { Augmentations } from './import-augmentations';
 import { importCannedMetrics } from './import-canned-metrics';
 import { importCloudFormationDocumentation } from './import-cloudformation-docs';
@@ -19,12 +19,11 @@ export interface BuildDatabaseOptions {
 
 export async function buildDatabase(options: BuildDatabaseOptions = {}) {
   const db = emptyDatabase();
-  const warnings: Failures = [];
-  const patchesApplied: PatchReport[] = [];
+  const report = new ProblemReport();
 
   const resourceSpec = loadResult(await sources.loadDefaultResourceSpecification());
 
-  for (const resources of loadResult(await sources.loadDefaultCloudFormationRegistryResources(options.mustValidate))) {
+  for (const resources of await sources.loadDefaultCloudFormationRegistryResources(report, options.mustValidate)) {
     const region = db.allocate('region', {
       name: resources.regionName,
     });
@@ -33,7 +32,7 @@ export async function buildDatabase(options: BuildDatabaseOptions = {}) {
       const res = importCloudFormationRegistryResource({
         db,
         resource,
-        fails: warnings,
+        report,
         resourceSpec: {
           spec: resourceSpec.ResourceTypes[resource.typeName],
           types: Object.fromEntries(
@@ -55,26 +54,29 @@ export async function buildDatabase(options: BuildDatabaseOptions = {}) {
   }
 
   const samSchema = loadResult(await sources.loadSamResourceSpec());
-  new SamResources({ db, samSchema, fails: warnings }).import();
+  new SamResources({ db, samSchema, report }).import();
 
-  const docs = loadResult(await sources.loadDefaultCloudFormationDocs());
-  importCloudFormationDocumentation(db, docs, warnings);
+  const docs = await sources.loadDefaultCloudFormationDocs(report);
+  importCloudFormationDocumentation(db, docs);
 
   const stateful = loadResult(await sources.loadDefaultStatefulResources());
-  importStatefulResources(db, stateful, warnings);
+  importStatefulResources(db, stateful);
 
   const cloudWatchServiceDirectory = loadResult(await sources.loadDefaultCloudWatchConsoleServiceDirectory());
-  importCannedMetrics(db, cloudWatchServiceDirectory, warnings);
+  importCannedMetrics(db, cloudWatchServiceDirectory, report);
 
   new Scrutinies(db).import();
   new Augmentations(db).import();
 
-  return { db, warnings, patchesApplied };
+  return { db, report };
 
   function loadResult<A>(x: Result<LoadResult<A>>): A {
     assertSuccess(x);
-    warnings.push(...x.warnings);
-    patchesApplied.push(...x.patchesApplied);
+
+    // We might need to handle these issues earlier so that we can push them to appropriate teams
+    report.reportFailure(sources.ReportAudience.cdkTeam(), 'loading', ...x.warnings);
+    report.reportPatch(sources.ReportAudience.cdkTeam(), ...x.patchesApplied);
+
     return x.value;
   }
 }

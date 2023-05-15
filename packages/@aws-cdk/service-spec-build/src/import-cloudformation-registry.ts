@@ -14,24 +14,15 @@ import {
   simplePropNameFromJsonPtr,
   resourcespec,
   unionSchemas,
+  ProblemReport,
+  ReportAudience,
 } from '@aws-cdk/service-spec-sources';
-import {
-  locateFailure,
-  Fail,
-  failure,
-  Failures,
-  isFailure,
-  Result,
-  tryCatch,
-  using,
-  ref,
-  isSuccess,
-} from '@cdklabs/tskb';
+import { locateFailure, Fail, failure, isFailure, Result, tryCatch, using, ref, isSuccess } from '@cdklabs/tskb';
 
 export interface LoadCloudFormationRegistryResourceOptions {
   readonly db: SpecDatabase;
   readonly resource: CloudFormationRegistryResource;
-  readonly fails: Failures;
+  readonly report: ProblemReport;
   readonly resourceSpec?: {
     spec?: resourcespec.ResourceType;
     types?: Record<string, resourcespec.PropertyType>;
@@ -44,7 +35,8 @@ export interface LoadCloudFormationRegistryServiceFromResourceOptions {
 }
 
 export function importCloudFormationRegistryResource(options: LoadCloudFormationRegistryResourceOptions) {
-  const { db, resource, fails } = options;
+  const { db, resource } = options;
+  const report = options.report.forAudience(ReportAudience.fromCloudFormationResource(resource.typeName));
 
   const typeDefinitions = new Map<jsonschema.Object, TypeDefinition>();
 
@@ -141,7 +133,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         const types = jsonschema
           .innerSchemas(resolved.schema)
           .map((t) => schemaTypeToModelType(propertyName, fakeResolved(t), fail));
-        fails.push(...types.filter(isFailure));
+        report.reportFailure('interpreting', ...types.filter(isFailure));
         return { type: 'union', types: types.filter(isSuccess) };
       } else if (jsonschema.isAllOf(resolved.schema)) {
         // FIXME: Do a proper thing here
@@ -275,7 +267,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
           };
         });
       } catch {
-        fails.push(fail(`no definition for: ${name}`));
+        report.reportFailure('interpreting', fail(`no definition for: ${name}`));
       }
     }
   }
@@ -287,7 +279,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         const tagProp = simplePropNameFromJsonPtr(resource.tagging?.tagProperty ?? '/properties/Tags');
         const tagType = resource.properties[tagProp];
         if (!tagType) {
-          fails.push(fail(`marked as taggable, but tagProperty does not exist: ${tagProp}`));
+          report.reportFailure('interpreting', fail(`marked as taggable, but tagProperty does not exist: ${tagProp}`));
         } else {
           const resolvedType = resolve(tagType).schema;
           res.tagPropertyName = tagProp;
@@ -310,7 +302,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
   function withResult<A>(x: Result<A>, cb: (x: A) => void): void {
     if (isFailure(x)) {
-      fails.push(x);
+      report.reportFailure('interpreting', x);
     } else {
       cb(x);
     }
@@ -318,7 +310,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
   function handleFailure(x: Result<void>) {
     if (isFailure(x)) {
-      fails.push(x);
+      report.reportFailure('interpreting', x);
     }
   }
 }

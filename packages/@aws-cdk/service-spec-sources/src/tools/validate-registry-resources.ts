@@ -2,15 +2,16 @@
 //
 // Not a lot of thought given to where this needs to live yet.
 import * as path from 'path';
-import { errorMessage } from '@cdklabs/tskb';
 import { loadDefaultCloudFormationRegistryResources } from '../loading';
 import { formatPatchReport, PatchReport } from '../patching';
+import { ProblemReport } from '../report';
 
 async function main() {
-  const allResources = await loadDefaultCloudFormationRegistryResources(false);
+  const report = new ProblemReport();
+  await loadDefaultCloudFormationRegistryResources(report, false);
 
-  if (allResources.patchesApplied.length > 0) {
-    const patches = uniqueReports(allResources.patchesApplied);
+  if (report.patchesApplied.length > 0) {
+    const patches = uniqueReports(report.patchesApplied);
     console.log(`${patches.length} patches applied to sources`);
     console.log('===========================================');
     console.log();
@@ -20,15 +21,11 @@ async function main() {
     }
   }
 
-  if (allResources.warnings.length > 0) {
-    console.log(`${allResources.warnings.length} schema files do not validate (after patching)`);
+  if (report.counts.interpreting + report.counts.loading > 0) {
+    console.log(`${report.counts.interpreting + report.counts.loading} problems remaining after patching`);
     console.log('===========================================');
     console.log();
     process.exitCode = 1;
-
-    for (const fail of allResources.warnings) {
-      console.log(errorMessage(fail));
-    }
   }
 }
 

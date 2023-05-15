@@ -1,18 +1,18 @@
 import { DefinitionReference, emptyDatabase } from '@aws-cdk/service-spec';
-import { Failures } from '@cdklabs/tskb';
+import { ProblemReport } from '@aws-cdk/service-spec-sources';
 import { importCloudFormationRegistryResource } from '../src/import-cloudformation-registry';
 
 let db: ReturnType<typeof emptyDatabase>;
-let fails: Failures;
+let report: ProblemReport;
 beforeEach(() => {
   db = emptyDatabase();
-  fails = [];
+  report = new ProblemReport();
 });
 
 test('exclude readOnlyProperties from properties', () => {
   importCloudFormationRegistryResource({
     db,
-    fails,
+    report,
     resource: {
       description: 'Test resource',
       typeName: 'AWS::Some::Type',
@@ -33,7 +33,7 @@ test('exclude readOnlyProperties from properties', () => {
 test("don't exclude readOnlyProperties from properties that are also createOnlyProperties", () => {
   importCloudFormationRegistryResource({
     db,
-    fails,
+    report,
     resource: {
       description: 'Test resource',
       typeName: 'AWS::Some::Type',
@@ -56,7 +56,7 @@ test("don't exclude readOnlyProperties from properties that are also createOnlyP
 test('include readOnlyProperties in attributes', () => {
   importCloudFormationRegistryResource({
     db,
-    fails,
+    report,
     resource: {
       description: 'Test resource',
       typeName: 'AWS::Some::Type',
@@ -77,7 +77,7 @@ test('include readOnlyProperties in attributes', () => {
 test('compound readOnlyProperties are included in attributes', () => {
   importCloudFormationRegistryResource({
     db,
-    fails,
+    report,
     resource: {
       description: 'Test resource',
       typeName: 'AWS::Some::Type',
@@ -111,7 +111,7 @@ test('compound readOnlyProperties are included in attributes', () => {
 test('include legacy attributes in attributes', () => {
   importCloudFormationRegistryResource({
     db,
-    fails,
+    report,
     resource: {
       description: 'Test resource',
       typeName: 'AWS::Some::Type',
@@ -139,7 +139,7 @@ test('include legacy attributes in attributes', () => {
 test('reference types are correctly named', () => {
   importCloudFormationRegistryResource({
     db,
-    fails,
+    report,
     resource: {
       description: 'Test resource',
       typeName: 'AWS::Some::Type',
@@ -181,7 +181,7 @@ test('reference types are correctly named', () => {
 test('legacy timestamps are getting the timestamp format', () => {
   importCloudFormationRegistryResource({
     db,
-    fails,
+    report,
     resource: {
       description: 'Test resource',
       typeName: 'AWS::Some::Type',

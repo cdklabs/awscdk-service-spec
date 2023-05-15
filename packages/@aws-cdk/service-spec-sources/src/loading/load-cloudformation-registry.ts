@@ -1,17 +1,20 @@
 import * as path from 'path';
 import * as util from 'util';
+import { isSuccess, Result } from '@cdklabs/tskb';
 import * as _glob from 'glob';
-import { combineLoadResults, Loader, LoadResult } from './loader';
+import { Loader, LoadResult } from './loader';
 import { patchCloudFormationRegistry } from '../patches/registry-patches';
+import { ProblemReport, ReportAudience } from '../report';
 import { CloudFormationRegistryResource } from '../types';
 
 const glob = util.promisify(_glob.glob);
 
 export async function loadCloudFormationRegistryDirectory(
   directory: string,
+  report: ProblemReport,
   mustValidate = true,
   errorRootDirectory?: string,
-): Promise<LoadResult<CloudFormationRegistryResource[]>> {
+): Promise<CloudFormationRegistryResource[]> {
   const loader = await Loader.fromSchemaFile<CloudFormationRegistryResource>(
     'CloudFormationRegistryResource.schema.json',
     {
@@ -22,7 +25,7 @@ export async function loadCloudFormationRegistryDirectory(
   );
 
   const files = await glob(path.join(directory, '*.json'));
-  return loader.loadFiles(files);
+  return loader.loadFiles(files, problemReportCombiner(report));
 }
 
 export interface CloudFormationRegistryResources {
@@ -31,24 +34,38 @@ export interface CloudFormationRegistryResources {
 }
 
 export async function loadDefaultCloudFormationRegistryResources(
+  report: ProblemReport,
   mustValidate = true,
-): Promise<LoadResult<CloudFormationRegistryResources[]>> {
+): Promise<CloudFormationRegistryResources[]> {
   const errorRootDirectory = path.join(__dirname, '../../../../../sources/CloudFormationSchema');
   const files = await glob(`${errorRootDirectory}/*`);
-  return combineLoadResults(
-    await Promise.all(
-      files.map(async (directoryName) => {
-        const regionName = path.basename(directoryName);
-        const resources = await loadCloudFormationRegistryDirectory(directoryName, mustValidate, errorRootDirectory);
+  return Promise.all(
+    files.map(async (directoryName) => {
+      const regionName = path.basename(directoryName);
+      const resources = await loadCloudFormationRegistryDirectory(
+        directoryName,
+        report,
+        mustValidate,
+        errorRootDirectory,
+      );
 
-        return {
-          ...resources,
-          value: {
-            regionName,
-            resources: resources.value,
-          },
-        };
-      }),
-    ),
+      return { regionName, resources };
+    }),
   );
+}
+
+function problemReportCombiner(report: ProblemReport) {
+  return (results: Result<LoadResult<CloudFormationRegistryResource>>[]): CloudFormationRegistryResource[] => {
+    for (const r of results) {
+      if (isSuccess(r)) {
+        const audience = ReportAudience.fromCloudFormationResource(r.value.typeName);
+        report.reportFailure(audience, 'loading', ...r.warnings);
+        report.reportPatch(audience, ...r.patchesApplied);
+      } else {
+        report.reportFailure(ReportAudience.cdkTeam(), 'loading', r);
+      }
+    }
+
+    return results.filter(isSuccess).map((r) => r.value);
+  };
 }

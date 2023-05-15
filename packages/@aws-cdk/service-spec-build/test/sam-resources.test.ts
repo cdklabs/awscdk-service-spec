@@ -1,6 +1,5 @@
 import { emptyDatabase } from '@aws-cdk/service-spec';
-import { SamTemplateSchema, jsonschema } from '@aws-cdk/service-spec-sources';
-import { Failures } from '@cdklabs/tskb';
+import { ProblemReport, SamTemplateSchema, jsonschema } from '@aws-cdk/service-spec-sources';
 import { SamResources } from '../src/import-sam';
 
 const standardCfnProperties: jsonschema.ObjectProperties = {
@@ -91,10 +90,10 @@ test('import SAM types by recognizing the Type field that accepts a constant', (
   };
 
   const db = emptyDatabase();
-  const fails: Failures = [];
+  const report = new ProblemReport();
 
   // WHEN
-  new SamResources({ db, fails, samSchema }).import();
+  new SamResources({ db, report, samSchema }).import();
 
   // THEN
   const thing = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Serverless::Thing').only();
