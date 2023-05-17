@@ -1,15 +1,11 @@
 /**
- * These are patches for some service fields that used to be untyped once upon a
+ * These are historic types for some service fields that used to be untyped once upon a
  * type (type=Json) but got types added later.
  *
  * Unfortunately, we already emitted them as untyped, so we have to keep on doing that.
- *
- * FIXME: This is how we're doing it for now. In the future, we will add special consideration
- * for these types of progressively typed properties.
  */
 
-import { forResource, registerServicePatches, replaceDefinitionProperty, replaceResourceProperty } from './core';
-import { Reason } from '../../patching';
+import { FabricateTypeHistory } from '../type-history';
 
 const LEGACY_UNTYPED_PROPERTIES = {
   'AWS::Backup::ReportPlan': ['ReportDeliveryChannel', 'ReportSetting'],
@@ -73,17 +69,14 @@ const LEGACY_UNTYPED_PROPERTIES = {
   'AWS::XRay::SamplingRule': ['Tags'],
 };
 
+const fabricators = new Map<string, FabricateTypeHistory>();
 for (const [key, propertyNames] of Object.entries(LEGACY_UNTYPED_PROPERTIES)) {
-  const parts = key.split('.');
-  registerServicePatches(
-    forResource(parts[0], (lens) => {
-      for (const propertyName of propertyNames) {
-        if (parts.length === 2) {
-          replaceDefinitionProperty(parts[1], propertyName, { type: 'object' }, Reason.backwardsCompat())(lens);
-        } else {
-          replaceResourceProperty(propertyName, { type: 'object' }, Reason.backwardsCompat())(lens);
-        }
-      }
-    }),
-  );
+  for (const propertyName of propertyNames) {
+    // JSON types are always the oldest type in the history
+    fabricators.set(`${key}.${propertyName}`, (_key, history) => [{ type: 'json' }, ...history]);
+  }
 }
+
+const legacyUntyped: FabricateTypeHistory = (key, history) => fabricators.get(key)?.(key, history) ?? history;
+
+export default legacyUntyped;

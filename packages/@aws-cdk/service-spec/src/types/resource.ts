@@ -1,6 +1,4 @@
-import { Entity, evolutionInvariant, impliesU, Invariant, Reference, Relationship } from '@cdklabs/tskb';
-
-export const Invariants: Invariant[] = [];
+import { Entity, Reference, Relationship } from '@cdklabs/tskb';
 
 export interface Partition extends Entity {
   readonly partition: string;
@@ -86,10 +84,28 @@ export interface TypeDefinition extends Entity {
 }
 
 export interface Property {
+  /**
+   * Description of the property
+   */
   documentation?: string;
+
+  /**
+   * Is this property required
+   */
   required?: boolean;
+
+  /**
+   * The current type of this property
+   */
   type: PropertyType;
-  wasOnceJson?: boolean;
+
+  /**
+   * An ordered list of previous types of this property
+   *
+   * The first element is (index 0) is the oldest types.
+   * The last element is the the current type (same as `type`).
+   */
+  typeHistory?: PropertyType[];
 
   /**
    * A string representation the default value of this property
@@ -119,6 +135,7 @@ export interface Property {
 export interface Attribute {
   documentation?: string;
   type: PropertyType;
+  typeHistory?: PropertyType[];
 }
 
 export enum Deprecation {
@@ -139,14 +156,6 @@ export enum Deprecation {
    */
   IGNORE = 'IGNORE',
 }
-
-// FIXME: Should properties & attributes be entities or not?
-
-Invariants.push(
-  evolutionInvariant<Property>('wasOnceJson may never be switched off', (prev, cur) =>
-    impliesU(prev.wasOnceJson, cur.wasOnceJson),
-  ),
-);
 
 export type PropertyType =
   | PrimitiveType

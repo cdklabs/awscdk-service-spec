@@ -18,6 +18,7 @@ import {
   ReportAudience,
 } from '@aws-cdk/service-spec-sources';
 import { locateFailure, Fail, failure, isFailure, Result, tryCatch, using, ref, isSuccess } from '@cdklabs/tskb';
+import { fabricateTypeHistory } from './type-history';
 
 export interface LoadCloudFormationRegistryResourceOptions {
   readonly db: SpecDatabase;
@@ -108,6 +109,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       withResult(schemaTypeToModelType(name, resolved, fail.in(`property ${name}`)), (type) => {
         target[name] = {
           type,
+          typeHistory: maybeFabricateTypeHistory(`${resource.typeName}.${name}`, [type]),
           documentation: descriptionOf(resolved.schema),
           required: ifTrue((source.required ?? []).includes(name)),
           defaultValue: describeDefault(resolved.schema),
@@ -262,6 +264,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         withResult(schemaTypeToModelType(name, resolved, fail.in(`attribute ${name}`)), (type) => {
           target[attributeName] = {
             type,
+            typeHistory: maybeFabricateTypeHistory(`${resource.typeName}.${name}`, [type]),
             documentation: descriptionOf(resolved.schema),
             required: ifTrue((source.required ?? []).includes(name)),
           };
@@ -270,6 +273,15 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         report.reportFailure('interpreting', fail(`no definition for: ${name}`));
       }
     }
+  }
+
+  function maybeFabricateTypeHistory(key: string, history: PropertyType[]): PropertyType[] | undefined {
+    const rewrittenHistory = fabricateTypeHistory(key, history);
+
+    if (rewrittenHistory.length <= 1) {
+      return undefined;
+    }
+    return rewrittenHistory;
   }
 
   function handleTags(fail: Fail) {
