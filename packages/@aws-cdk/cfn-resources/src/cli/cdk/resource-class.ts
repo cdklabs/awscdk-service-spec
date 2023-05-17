@@ -313,8 +313,9 @@ export class ResourceClass extends ClassType {
           type = Type.STRING;
           tokenizer = CDK_CORE.tokenAsString($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.STRING));
         } else if (attr.type.type === 'number') {
-          type = Type.NUMBER;
-          tokenizer = CDK_CORE.tokenAsNumber($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.NUMBER));
+          // COMPAT: Although numbers could be represented as numbers, historically in cfn2ts they were represented as IResolvable.
+          type = CDK_CORE.IResolvable;
+          tokenizer = $this.getAtt(expr.lit(attrName), $ResolutionTypeHint.NUMBER);
         } else if (attr.type.type === 'array' && attr.type.element.type === 'string') {
           type = Type.arrayOf(Type.STRING);
           tokenizer = CDK_CORE.tokenAsList($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.STRING_LIST));
