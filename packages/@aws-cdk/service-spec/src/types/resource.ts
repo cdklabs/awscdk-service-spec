@@ -156,7 +156,7 @@ export type PropertyType =
   | MapType<PropertyType>
   | TypeUnion<PropertyType>;
 
-export type PrimitiveType = StringType | NumberType | BooleanType | JsonType | DateTimeType | NullType;
+export type PrimitiveType = StringType | NumberType | IntegerType | BooleanType | JsonType | DateTimeType | NullType;
 
 export function isPrimitiveType(x: PropertyType): x is PrimitiveType {
   return (x as any).type;
@@ -183,6 +183,10 @@ export interface StringType {
 
 export interface NumberType {
   readonly type: 'number';
+}
+
+export interface IntegerType {
+  readonly type: 'integer';
 }
 
 export interface BooleanType {
