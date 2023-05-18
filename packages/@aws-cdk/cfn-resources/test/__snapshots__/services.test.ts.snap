@@ -12384,13 +12384,6 @@ export class CfnIPAM extends cdk.CfnResource implements cdk.IInspectable, cdk.IT
   public readonly attrPublicDefaultScopeId: string;
 
   /**
-   * The count of resource discoveries associated with this IPAM.
-   *
-   * @cloudformationAttribute ResourceDiscoveryAssociationCount
-   */
-  public readonly attrResourceDiscoveryAssociationCount: number;
-
-  /**
    * The number of scopes in the IPAM. The scope quota is 5.
    *
    * @cloudformationAttribute ScopeCount
@@ -12442,7 +12435,6 @@ export class CfnIPAM extends cdk.CfnResource implements cdk.IInspectable, cdk.IT
     this.attrIpamId = cdk.Token.asString(this.getAtt("IpamId", cdk.ResolutionTypeHint.STRING));
     this.attrPrivateDefaultScopeId = cdk.Token.asString(this.getAtt("PrivateDefaultScopeId", cdk.ResolutionTypeHint.STRING));
     this.attrPublicDefaultScopeId = cdk.Token.asString(this.getAtt("PublicDefaultScopeId", cdk.ResolutionTypeHint.STRING));
-    this.attrResourceDiscoveryAssociationCount = cdk.Token.asNumber(this.getAtt("ResourceDiscoveryAssociationCount", cdk.ResolutionTypeHint.NUMBER));
     this.attrScopeCount = cdk.Token.asNumber(this.getAtt("ScopeCount", cdk.ResolutionTypeHint.NUMBER));
     this.defaultResourceDiscoveryAssociationId = props.defaultResourceDiscoveryAssociationId;
     this.defaultResourceDiscoveryId = props.defaultResourceDiscoveryId;
