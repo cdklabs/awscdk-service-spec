@@ -9035,6 +9035,43 @@ export class CfnFlowLog extends cdk.CfnResource implements cdk.IInspectable, cdk
   }
 }
 
+export namespace CfnFlowLog {
+  /**
+   * Describes the destination options for a flow log.
+   *
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-flowlog-destinationoptions.html
+   */
+  export interface DestinationOptionsProperty {
+    /**
+     * The format for the flow log.
+     *
+     * The default is \`plain-text\` .
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-flowlog-destinationoptions.html#cfn-ec2-flowlog-destinationoptions-fileformat
+     */
+    readonly fileFormat: string;
+
+    /**
+     * Indicates whether to use Hive-compatible prefixes for flow logs stored in Amazon S3.
+     *
+     * The default is \`false\` .
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-flowlog-destinationoptions.html#cfn-ec2-flowlog-destinationoptions-hivecompatiblepartitions
+     */
+    readonly hiveCompatiblePartitions: boolean | cdk.IResolvable;
+
+    /**
+     * Indicates whether to partition the flow log per hour.
+     *
+     * This reduces the cost and response time for queries. The default is \`false\` .
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-flowlog-destinationoptions.html#cfn-ec2-flowlog-destinationoptions-perhourpartition
+     */
+    readonly perHourPartition: boolean | cdk.IResolvable;
+  }
+}
+
 /**
  * Properties for defining a \`CfnFlowLog\`
  *
@@ -9157,6 +9194,57 @@ export interface CfnFlowLogProps {
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-flowlog.html#cfn-ec2-flowlog-destinationoptions
    */
   readonly destinationOptions?: any | cdk.IResolvable;
+}
+
+/**
+ * Determine whether the given properties match those of a \`DestinationOptionsProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`DestinationOptionsProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnFlowLogDestinationOptionsPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("fileFormat", cdk.requiredValidator)(properties.fileFormat));
+  errors.collect(cdk.propertyValidator("fileFormat", cdk.validateString)(properties.fileFormat));
+  errors.collect(cdk.propertyValidator("hiveCompatiblePartitions", cdk.requiredValidator)(properties.hiveCompatiblePartitions));
+  errors.collect(cdk.propertyValidator("hiveCompatiblePartitions", cdk.validateBoolean)(properties.hiveCompatiblePartitions));
+  errors.collect(cdk.propertyValidator("perHourPartition", cdk.requiredValidator)(properties.perHourPartition));
+  errors.collect(cdk.propertyValidator("perHourPartition", cdk.validateBoolean)(properties.perHourPartition));
+  return errors.wrap("supplied properties not correct for \\"DestinationOptionsProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnFlowLogDestinationOptionsPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnFlowLogDestinationOptionsPropertyValidator(properties).assertSuccess();
+  return {
+    "FileFormat": cdk.stringToCloudFormation(properties.fileFormat),
+    "HiveCompatiblePartitions": cdk.booleanToCloudFormation(properties.hiveCompatiblePartitions),
+    "PerHourPartition": cdk.booleanToCloudFormation(properties.perHourPartition)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnFlowLogDestinationOptionsPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnFlowLog.DestinationOptionsProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFlowLog.DestinationOptionsProperty>();
+  ret.addPropertyResult("fileFormat", "FileFormat", (properties.FileFormat != null ? cfn_parse.FromCloudFormation.getString(properties.FileFormat) : undefined));
+  ret.addPropertyResult("hiveCompatiblePartitions", "HiveCompatiblePartitions", (properties.HiveCompatiblePartitions != null ? cfn_parse.FromCloudFormation.getBoolean(properties.HiveCompatiblePartitions) : undefined));
+  ret.addPropertyResult("perHourPartition", "PerHourPartition", (properties.PerHourPartition != null ? cfn_parse.FromCloudFormation.getBoolean(properties.PerHourPartition) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
 }
 
 /**
@@ -30845,6 +30933,39 @@ export class CfnSubnet extends cdk.CfnResource implements cdk.IInspectable, cdk.
   }
 }
 
+export namespace CfnSubnet {
+  /**
+   * Describes the options for instance hostnames.
+   *
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-subnet-privatednsnameoptionsonlaunch.html
+   */
+  export interface PrivateDnsNameOptionsOnLaunchProperty {
+    /**
+     * The type of hostname for EC2 instances.
+     *
+     * For IPv4 only subnets, an instance DNS name must be based on the instance IPv4 address. For IPv6 only subnets, an instance DNS name must be based on the instance ID. For dual-stack subnets, you can specify whether DNS names use the instance IPv4 address or the instance ID.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-subnet-privatednsnameoptionsonlaunch.html#cfn-ec2-subnet-privatednsnameoptionsonlaunch-hostnametype
+     */
+    readonly hostnameType?: string;
+
+    /**
+     * Indicates whether to respond to DNS queries for instance hostnames with DNS A records.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-subnet-privatednsnameoptionsonlaunch.html#cfn-ec2-subnet-privatednsnameoptionsonlaunch-enableresourcenamednsarecord
+     */
+    readonly enableResourceNameDnsARecord?: boolean | cdk.IResolvable;
+
+    /**
+     * Indicates whether to respond to DNS queries for instance hostname with DNS AAAA records.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-subnet-privatednsnameoptionsonlaunch.html#cfn-ec2-subnet-privatednsnameoptionsonlaunch-enableresourcenamednsaaaarecord
+     */
+    readonly enableResourceNameDnsAaaaRecord?: boolean | cdk.IResolvable;
+  }
+}
+
 /**
  * Properties for defining a \`CfnSubnet\`
  *
@@ -30960,6 +31081,54 @@ export interface CfnSubnetProps {
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-subnet.html#cfn-ec2-subnet-tags
    */
   readonly tags?: Array<cdk.CfnTag>;
+}
+
+/**
+ * Determine whether the given properties match those of a \`PrivateDnsNameOptionsOnLaunchProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`PrivateDnsNameOptionsOnLaunchProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnSubnetPrivateDnsNameOptionsOnLaunchPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("enableResourceNameDnsAaaaRecord", cdk.validateBoolean)(properties.enableResourceNameDnsAaaaRecord));
+  errors.collect(cdk.propertyValidator("enableResourceNameDnsARecord", cdk.validateBoolean)(properties.enableResourceNameDnsARecord));
+  errors.collect(cdk.propertyValidator("hostnameType", cdk.validateString)(properties.hostnameType));
+  return errors.wrap("supplied properties not correct for \\"PrivateDnsNameOptionsOnLaunchProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnSubnetPrivateDnsNameOptionsOnLaunchPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnSubnetPrivateDnsNameOptionsOnLaunchPropertyValidator(properties).assertSuccess();
+  return {
+    "EnableResourceNameDnsAAAARecord": cdk.booleanToCloudFormation(properties.enableResourceNameDnsAaaaRecord),
+    "EnableResourceNameDnsARecord": cdk.booleanToCloudFormation(properties.enableResourceNameDnsARecord),
+    "HostnameType": cdk.stringToCloudFormation(properties.hostnameType)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnSubnetPrivateDnsNameOptionsOnLaunchPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnSubnet.PrivateDnsNameOptionsOnLaunchProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSubnet.PrivateDnsNameOptionsOnLaunchProperty>();
+  ret.addPropertyResult("enableResourceNameDnsAaaaRecord", "EnableResourceNameDnsAAAARecord", (properties.EnableResourceNameDnsAAAARecord != null ? cfn_parse.FromCloudFormation.getBoolean(properties.EnableResourceNameDnsAAAARecord) : undefined));
+  ret.addPropertyResult("enableResourceNameDnsARecord", "EnableResourceNameDnsARecord", (properties.EnableResourceNameDnsARecord != null ? cfn_parse.FromCloudFormation.getBoolean(properties.EnableResourceNameDnsARecord) : undefined));
+  ret.addPropertyResult("hostnameType", "HostnameType", (properties.HostnameType != null ? cfn_parse.FromCloudFormation.getString(properties.HostnameType) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
 }
 
 /**
@@ -33086,6 +33255,37 @@ export class CfnTransitGatewayAttachment extends cdk.CfnResource implements cdk.
   }
 }
 
+export namespace CfnTransitGatewayAttachment {
+  /**
+   * Describes the VPC attachment options.
+   *
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewayattachment-options.html
+   */
+  export interface OptionsProperty {
+    /**
+     * Indicates whether DNS support is enabled.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewayattachment-options.html#cfn-ec2-transitgatewayattachment-options-dnssupport
+     */
+    readonly dnsSupport?: string;
+
+    /**
+     * Indicates whether IPv6 support is disabled.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewayattachment-options.html#cfn-ec2-transitgatewayattachment-options-ipv6support
+     */
+    readonly ipv6Support?: string;
+
+    /**
+     * Indicates whether appliance mode support is enabled.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewayattachment-options.html#cfn-ec2-transitgatewayattachment-options-appliancemodesupport
+     */
+    readonly applianceModeSupport?: string;
+  }
+}
+
 /**
  * Properties for defining a \`CfnTransitGatewayAttachment\`
  *
@@ -33134,6 +33334,54 @@ export interface CfnTransitGatewayAttachmentProps {
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-transitgatewayattachment.html#cfn-ec2-transitgatewayattachment-options
    */
   readonly options?: any | cdk.IResolvable;
+}
+
+/**
+ * Determine whether the given properties match those of a \`OptionsProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`OptionsProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnTransitGatewayAttachmentOptionsPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("applianceModeSupport", cdk.validateString)(properties.applianceModeSupport));
+  errors.collect(cdk.propertyValidator("dnsSupport", cdk.validateString)(properties.dnsSupport));
+  errors.collect(cdk.propertyValidator("ipv6Support", cdk.validateString)(properties.ipv6Support));
+  return errors.wrap("supplied properties not correct for \\"OptionsProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnTransitGatewayAttachmentOptionsPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnTransitGatewayAttachmentOptionsPropertyValidator(properties).assertSuccess();
+  return {
+    "ApplianceModeSupport": cdk.stringToCloudFormation(properties.applianceModeSupport),
+    "DnsSupport": cdk.stringToCloudFormation(properties.dnsSupport),
+    "Ipv6Support": cdk.stringToCloudFormation(properties.ipv6Support)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnTransitGatewayAttachmentOptionsPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnTransitGatewayAttachment.OptionsProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnTransitGatewayAttachment.OptionsProperty>();
+  ret.addPropertyResult("applianceModeSupport", "ApplianceModeSupport", (properties.ApplianceModeSupport != null ? cfn_parse.FromCloudFormation.getString(properties.ApplianceModeSupport) : undefined));
+  ret.addPropertyResult("dnsSupport", "DnsSupport", (properties.DnsSupport != null ? cfn_parse.FromCloudFormation.getString(properties.DnsSupport) : undefined));
+  ret.addPropertyResult("ipv6Support", "Ipv6Support", (properties.Ipv6Support != null ? cfn_parse.FromCloudFormation.getString(properties.Ipv6Support) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
 }
 
 /**
@@ -33593,6 +33841,37 @@ export class CfnTransitGatewayMulticastDomain extends cdk.CfnResource implements
   }
 }
 
+export namespace CfnTransitGatewayMulticastDomain {
+  /**
+   * The options for the transit gateway multicast domain.
+   *
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewaymulticastdomain-options.html
+   */
+  export interface OptionsProperty {
+    /**
+     * Indicates whether to automatically accept cross-account subnet associations that are associated with the transit gateway multicast domain.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewaymulticastdomain-options.html#cfn-ec2-transitgatewaymulticastdomain-options-autoacceptsharedassociations
+     */
+    readonly autoAcceptSharedAssociations?: string;
+
+    /**
+     * Specify whether to enable Internet Group Management Protocol (IGMP) version 2 for the transit gateway multicast domain.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewaymulticastdomain-options.html#cfn-ec2-transitgatewaymulticastdomain-options-igmpv2support
+     */
+    readonly igmpv2Support?: string;
+
+    /**
+     * Specify whether to enable support for statically configuring multicast group sources for a domain.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewaymulticastdomain-options.html#cfn-ec2-transitgatewaymulticastdomain-options-staticsourcessupport
+     */
+    readonly staticSourcesSupport?: string;
+  }
+}
+
 /**
  * Properties for defining a \`CfnTransitGatewayMulticastDomain\`
  *
@@ -33625,6 +33904,54 @@ export interface CfnTransitGatewayMulticastDomainProps {
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-transitgatewaymulticastdomain.html#cfn-ec2-transitgatewaymulticastdomain-options
    */
   readonly options?: any | cdk.IResolvable;
+}
+
+/**
+ * Determine whether the given properties match those of a \`OptionsProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`OptionsProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnTransitGatewayMulticastDomainOptionsPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("autoAcceptSharedAssociations", cdk.validateString)(properties.autoAcceptSharedAssociations));
+  errors.collect(cdk.propertyValidator("igmpv2Support", cdk.validateString)(properties.igmpv2Support));
+  errors.collect(cdk.propertyValidator("staticSourcesSupport", cdk.validateString)(properties.staticSourcesSupport));
+  return errors.wrap("supplied properties not correct for \\"OptionsProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnTransitGatewayMulticastDomainOptionsPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnTransitGatewayMulticastDomainOptionsPropertyValidator(properties).assertSuccess();
+  return {
+    "AutoAcceptSharedAssociations": cdk.stringToCloudFormation(properties.autoAcceptSharedAssociations),
+    "Igmpv2Support": cdk.stringToCloudFormation(properties.igmpv2Support),
+    "StaticSourcesSupport": cdk.stringToCloudFormation(properties.staticSourcesSupport)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnTransitGatewayMulticastDomainOptionsPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnTransitGatewayMulticastDomain.OptionsProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnTransitGatewayMulticastDomain.OptionsProperty>();
+  ret.addPropertyResult("autoAcceptSharedAssociations", "AutoAcceptSharedAssociations", (properties.AutoAcceptSharedAssociations != null ? cfn_parse.FromCloudFormation.getString(properties.AutoAcceptSharedAssociations) : undefined));
+  ret.addPropertyResult("igmpv2Support", "Igmpv2Support", (properties.Igmpv2Support != null ? cfn_parse.FromCloudFormation.getString(properties.Igmpv2Support) : undefined));
+  ret.addPropertyResult("staticSourcesSupport", "StaticSourcesSupport", (properties.StaticSourcesSupport != null ? cfn_parse.FromCloudFormation.getString(properties.StaticSourcesSupport) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
 }
 
 /**
@@ -35511,6 +35838,37 @@ export class CfnTransitGatewayVpcAttachment extends cdk.CfnResource implements c
   }
 }
 
+export namespace CfnTransitGatewayVpcAttachment {
+  /**
+   * Describes the VPC attachment options.
+   *
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewayvpcattachment-options.html
+   */
+  export interface OptionsProperty {
+    /**
+     * Indicates whether DNS support is enabled.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewayvpcattachment-options.html#cfn-ec2-transitgatewayvpcattachment-options-dnssupport
+     */
+    readonly dnsSupport?: string;
+
+    /**
+     * Indicates whether IPv6 support is disabled.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewayvpcattachment-options.html#cfn-ec2-transitgatewayvpcattachment-options-ipv6support
+     */
+    readonly ipv6Support?: string;
+
+    /**
+     * Indicates whether appliance mode support is enabled.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewayvpcattachment-options.html#cfn-ec2-transitgatewayvpcattachment-options-appliancemodesupport
+     */
+    readonly applianceModeSupport?: string;
+  }
+}
+
 /**
  * Properties for defining a \`CfnTransitGatewayVpcAttachment\`
  *
@@ -35573,6 +35931,54 @@ export interface CfnTransitGatewayVpcAttachmentProps {
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-transitgatewayvpcattachment.html#cfn-ec2-transitgatewayvpcattachment-options
    */
   readonly options?: any | cdk.IResolvable;
+}
+
+/**
+ * Determine whether the given properties match those of a \`OptionsProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`OptionsProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnTransitGatewayVpcAttachmentOptionsPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("applianceModeSupport", cdk.validateString)(properties.applianceModeSupport));
+  errors.collect(cdk.propertyValidator("dnsSupport", cdk.validateString)(properties.dnsSupport));
+  errors.collect(cdk.propertyValidator("ipv6Support", cdk.validateString)(properties.ipv6Support));
+  return errors.wrap("supplied properties not correct for \\"OptionsProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnTransitGatewayVpcAttachmentOptionsPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnTransitGatewayVpcAttachmentOptionsPropertyValidator(properties).assertSuccess();
+  return {
+    "ApplianceModeSupport": cdk.stringToCloudFormation(properties.applianceModeSupport),
+    "DnsSupport": cdk.stringToCloudFormation(properties.dnsSupport),
+    "Ipv6Support": cdk.stringToCloudFormation(properties.ipv6Support)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnTransitGatewayVpcAttachmentOptionsPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnTransitGatewayVpcAttachment.OptionsProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnTransitGatewayVpcAttachment.OptionsProperty>();
+  ret.addPropertyResult("applianceModeSupport", "ApplianceModeSupport", (properties.ApplianceModeSupport != null ? cfn_parse.FromCloudFormation.getString(properties.ApplianceModeSupport) : undefined));
+  ret.addPropertyResult("dnsSupport", "DnsSupport", (properties.DnsSupport != null ? cfn_parse.FromCloudFormation.getString(properties.DnsSupport) : undefined));
+  ret.addPropertyResult("ipv6Support", "Ipv6Support", (properties.Ipv6Support != null ? cfn_parse.FromCloudFormation.getString(properties.Ipv6Support) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
 }
 
 /**
