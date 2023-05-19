@@ -2056,7 +2056,7 @@ export class CfnCapacityReservation extends cdk.CfnResource implements cdk.IInsp
    *
    * @cloudformationAttribute AvailableInstanceCount
    */
-  public readonly attrAvailableInstanceCount: cdk.IResolvable;
+  public readonly attrAvailableInstanceCount: number;
 
   /**
    * The ID of the Capacity Reservation.
@@ -2084,7 +2084,7 @@ export class CfnCapacityReservation extends cdk.CfnResource implements cdk.IInsp
    *
    * @cloudformationAttribute TotalInstanceCount
    */
-  public readonly attrTotalInstanceCount: cdk.IResolvable;
+  public readonly attrTotalInstanceCount: number;
 
   /**
    * The Availability Zone in which to create the Capacity Reservation.
@@ -2168,11 +2168,11 @@ export class CfnCapacityReservation extends cdk.CfnResource implements cdk.IInsp
     cdk.requireProperty(props, "instanceType", this);
 
     this.attrAvailabilityZone = cdk.Token.asString(this.getAtt("AvailabilityZone", cdk.ResolutionTypeHint.STRING));
-    this.attrAvailableInstanceCount = this.getAtt("AvailableInstanceCount", cdk.ResolutionTypeHint.NUMBER);
+    this.attrAvailableInstanceCount = cdk.Token.asNumber(this.getAtt("AvailableInstanceCount", cdk.ResolutionTypeHint.NUMBER));
     this.attrId = cdk.Token.asString(this.getAtt("Id", cdk.ResolutionTypeHint.STRING));
     this.attrInstanceType = cdk.Token.asString(this.getAtt("InstanceType", cdk.ResolutionTypeHint.STRING));
     this.attrTenancy = cdk.Token.asString(this.getAtt("Tenancy", cdk.ResolutionTypeHint.STRING));
-    this.attrTotalInstanceCount = this.getAtt("TotalInstanceCount", cdk.ResolutionTypeHint.NUMBER);
+    this.attrTotalInstanceCount = cdk.Token.asNumber(this.getAtt("TotalInstanceCount", cdk.ResolutionTypeHint.NUMBER));
     this.availabilityZone = props.availabilityZone;
     this.ebsOptimized = props.ebsOptimized;
     this.endDate = props.endDate;
@@ -12300,7 +12300,7 @@ export class CfnIPAM extends cdk.CfnResource implements cdk.IInspectable, cdk.IT
    *
    * @cloudformationAttribute ScopeCount
    */
-  public readonly attrScopeCount: cdk.IResolvable;
+  public readonly attrScopeCount: number;
 
   /**
    * The IPAM's default resource discovery association ID.
@@ -12347,7 +12347,7 @@ export class CfnIPAM extends cdk.CfnResource implements cdk.IInspectable, cdk.IT
     this.attrIpamId = cdk.Token.asString(this.getAtt("IpamId", cdk.ResolutionTypeHint.STRING));
     this.attrPrivateDefaultScopeId = cdk.Token.asString(this.getAtt("PrivateDefaultScopeId", cdk.ResolutionTypeHint.STRING));
     this.attrPublicDefaultScopeId = cdk.Token.asString(this.getAtt("PublicDefaultScopeId", cdk.ResolutionTypeHint.STRING));
-    this.attrScopeCount = this.getAtt("ScopeCount", cdk.ResolutionTypeHint.NUMBER);
+    this.attrScopeCount = cdk.Token.asNumber(this.getAtt("ScopeCount", cdk.ResolutionTypeHint.NUMBER));
     this.defaultResourceDiscoveryAssociationId = props.defaultResourceDiscoveryAssociationId;
     this.defaultResourceDiscoveryId = props.defaultResourceDiscoveryId;
     this.description = props.description;
@@ -12846,7 +12846,7 @@ export class CfnIPAMPool extends cdk.CfnResource implements cdk.IInspectable, cd
    *
    * @cloudformationAttribute PoolDepth
    */
-  public readonly attrPoolDepth: cdk.IResolvable;
+  public readonly attrPoolDepth: number;
 
   /**
    * The state of the IPAM pool.
@@ -12956,7 +12956,7 @@ export class CfnIPAMPool extends cdk.CfnResource implements cdk.IInspectable, cd
     this.attrIpamPoolId = cdk.Token.asString(this.getAtt("IpamPoolId", cdk.ResolutionTypeHint.STRING));
     this.attrIpamScopeArn = cdk.Token.asString(this.getAtt("IpamScopeArn", cdk.ResolutionTypeHint.STRING));
     this.attrIpamScopeType = cdk.Token.asString(this.getAtt("IpamScopeType", cdk.ResolutionTypeHint.STRING));
-    this.attrPoolDepth = this.getAtt("PoolDepth", cdk.ResolutionTypeHint.NUMBER);
+    this.attrPoolDepth = cdk.Token.asNumber(this.getAtt("PoolDepth", cdk.ResolutionTypeHint.NUMBER));
     this.attrState = cdk.Token.asString(this.getAtt("State", cdk.ResolutionTypeHint.STRING));
     this.attrStateMessage = cdk.Token.asString(this.getAtt("StateMessage", cdk.ResolutionTypeHint.STRING));
     this.addressFamily = props.addressFamily;
@@ -14202,7 +14202,7 @@ export class CfnIPAMScope extends cdk.CfnResource implements cdk.IInspectable, c
    *
    * @cloudformationAttribute PoolCount
    */
-  public readonly attrPoolCount: cdk.IResolvable;
+  public readonly attrPoolCount: number;
 
   /**
    * The description of the scope.
@@ -14237,7 +14237,7 @@ export class CfnIPAMScope extends cdk.CfnResource implements cdk.IInspectable, c
     this.attrIpamScopeId = cdk.Token.asString(this.getAtt("IpamScopeId", cdk.ResolutionTypeHint.STRING));
     this.attrIpamScopeType = cdk.Token.asString(this.getAtt("IpamScopeType", cdk.ResolutionTypeHint.STRING));
     this.attrIsDefault = this.getAtt("IsDefault");
-    this.attrPoolCount = this.getAtt("PoolCount", cdk.ResolutionTypeHint.NUMBER);
+    this.attrPoolCount = cdk.Token.asNumber(this.getAtt("PoolCount", cdk.ResolutionTypeHint.NUMBER));
     this.description = props.description;
     this.ipamId = props.ipamId;
     this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::EC2::IPAMScope", props.tags, {
@@ -20979,7 +20979,7 @@ export class CfnNetworkInsightsAccessScopeAnalysis extends cdk.CfnResource imple
    *
    * @cloudformationAttribute AnalyzedEniCount
    */
-  public readonly attrAnalyzedEniCount: cdk.IResolvable;
+  public readonly attrAnalyzedEniCount: number;
 
   /**
    * The end date of the analysis.
@@ -21053,7 +21053,7 @@ export class CfnNetworkInsightsAccessScopeAnalysis extends cdk.CfnResource imple
 
     cdk.requireProperty(props, "networkInsightsAccessScopeId", this);
 
-    this.attrAnalyzedEniCount = this.getAtt("AnalyzedEniCount", cdk.ResolutionTypeHint.NUMBER);
+    this.attrAnalyzedEniCount = cdk.Token.asNumber(this.getAtt("AnalyzedEniCount", cdk.ResolutionTypeHint.NUMBER));
     this.attrEndDate = cdk.Token.asString(this.getAtt("EndDate", cdk.ResolutionTypeHint.STRING));
     this.attrFindingsFound = cdk.Token.asString(this.getAtt("FindingsFound", cdk.ResolutionTypeHint.STRING));
     this.attrNetworkInsightsAccessScopeAnalysisArn = cdk.Token.asString(this.getAtt("NetworkInsightsAccessScopeAnalysisArn", cdk.ResolutionTypeHint.STRING));
@@ -25049,7 +25049,7 @@ export class CfnPrefixList extends cdk.CfnResource implements cdk.IInspectable, 
    *
    * @cloudformationAttribute Version
    */
-  public readonly attrVersion: cdk.IResolvable;
+  public readonly attrVersion: number;
 
   /**
    * The IP address type.
@@ -25094,7 +25094,7 @@ export class CfnPrefixList extends cdk.CfnResource implements cdk.IInspectable, 
     this.attrArn = cdk.Token.asString(this.getAtt("Arn", cdk.ResolutionTypeHint.STRING));
     this.attrOwnerId = cdk.Token.asString(this.getAtt("OwnerId", cdk.ResolutionTypeHint.STRING));
     this.attrPrefixListId = cdk.Token.asString(this.getAtt("PrefixListId", cdk.ResolutionTypeHint.STRING));
-    this.attrVersion = this.getAtt("Version", cdk.ResolutionTypeHint.NUMBER);
+    this.attrVersion = cdk.Token.asNumber(this.getAtt("Version", cdk.ResolutionTypeHint.NUMBER));
     this.addressFamily = props.addressFamily;
     this.entries = props.entries;
     this.maxEntries = props.maxEntries;

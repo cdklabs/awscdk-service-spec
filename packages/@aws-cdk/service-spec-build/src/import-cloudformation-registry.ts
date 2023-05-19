@@ -161,8 +161,10 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
             return schemaObjectToModelType(nameHint, resolved.schema, fail);
 
           case 'number':
-          case 'integer':
             return { type: 'number' };
+
+          case 'integer':
+            return { type: 'integer' };
 
           case 'null':
             return { type: 'null' };
