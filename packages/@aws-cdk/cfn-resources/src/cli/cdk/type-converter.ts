@@ -16,6 +16,7 @@ import {
 } from '@cdklabs/typewriter';
 import { CDK_CORE } from './cdk';
 import { PropertyValidator } from './property-validator';
+import { TaggabilityStyle, resourceTaggabilityStyle } from './tagging';
 import {
   cfnParserNameFromType,
   cfnProducerNameFromType,
@@ -40,12 +41,14 @@ export class TypeConverter {
   private readonly module: Module;
   private readonly resourceClass: ClassType;
   private readonly resource: Resource;
+  private readonly taggabilityStyle?: TaggabilityStyle;
 
   constructor(options: TypeConverterOptions) {
     this.db = options.db;
     this.resource = options.resource;
     this.resourceClass = options.resourceClass;
     this.module = Module.of(this.resourceClass);
+    this.taggabilityStyle = resourceTaggabilityStyle(this.resource);
   }
 
   public typeFromSpecType(type: PropertyType): Type {
@@ -65,16 +68,6 @@ export class TypeConverter {
       case 'ref':
         const ref = this.db.get('typeDefinition', type.reference.$ref);
         return this.obtainTypeReference(ref).type;
-      case 'tag':
-        switch (type.variant) {
-          case 'asg':
-            return this.typeFromSpecType(type.original);
-          case 'map':
-            return Type.mapOf(Type.STRING);
-          case 'standard':
-          default:
-            return Type.arrayOf(CDK_CORE.CfnTag);
-        }
       case 'union':
         return Type.unionOf(...type.types.map((t) => this.typeFromSpecType(t)));
       case 'json':
@@ -131,7 +124,21 @@ export class TypeConverter {
     const propTypeName = propertyFromType?.name;
 
     const name = propertyNameFromCloudFormation(propertyName);
-    const type = this.typeFromSpecType(property.type);
+    let type = this.typeFromSpecType(property.type);
+
+    // COMPAT: If this is a legacy-taggable standard property, we may need to override the type to a standardized type
+    // to be backwards compatible with what we used to do.
+    if (this.taggabilityStyle?.style === 'legacy' && this.taggabilityStyle.tagPropertyName === propertyName) {
+      switch (this.taggabilityStyle.variant) {
+        case 'map':
+          type = Type.mapOf(Type.STRING);
+          break;
+        case 'standard':
+          type = Type.arrayOf(CDK_CORE.CfnTag);
+          break;
+      }
+      // If not any of these we leave type what it is
+    }
 
     const spec = {
       name,

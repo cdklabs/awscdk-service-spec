@@ -5,6 +5,7 @@ import {
   ResourceProperties,
   Service,
   SpecDatabase,
+  TagVariant,
   TypeDefinition,
 } from '@aws-cdk/service-spec';
 import {
@@ -282,19 +283,18 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
           report.reportFailure('interpreting', fail(`marked as taggable, but tagProperty does not exist: ${tagProp}`));
         } else {
           const resolvedType = resolve(tagType).schema;
-          res.tagPropertyName = tagProp;
-          const original = res.properties[tagProp].type;
-          res.properties[tagProp].type = { type: 'tag', variant: 'standard', original };
 
+          let variant: TagVariant = 'standard';
           if (res.cloudFormationType === 'AWS::AutoScaling::AutoScalingGroup') {
-            res.properties[tagProp].type = {
-              type: 'tag',
-              variant: 'asg',
-              original,
-            };
+            variant = 'asg';
           } else if (jsonschema.isObject(resolvedType) && jsonschema.isMapLikeObject(resolvedType)) {
-            res.properties[tagProp].type = { type: 'tag', variant: 'map', original };
+            variant = 'map';
           }
+
+          res.tagInformation = {
+            tagPropertyName: tagProp,
+            variant,
+          };
         }
       }
     });

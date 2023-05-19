@@ -1,4 +1,4 @@
-import { Attribute, PropertyType, Resource, TagType } from '@aws-cdk/service-spec';
+import { Attribute, PropertyType, Resource } from '@aws-cdk/service-spec';
 import {
   $E,
   $T,
@@ -19,8 +19,10 @@ import {
   Lambda,
   Stability,
   ObjectLiteral,
+  Property,
 } from '@cdklabs/typewriter';
 import { CDK_CORE, CONSTRUCTS } from './cdk';
+import { TaggabilityStyle, resourceTaggabilityStyle } from './tagging';
 import {
   attributePropertyName,
   classNameFromResource,
@@ -40,10 +42,27 @@ export interface ResourceClassSpec {
   propsType: StructType;
 }
 
+// Depends on https://github.com/aws/aws-cdk/pull/25610
+const TAGGABILITY2_ENABLED = false;
+const RENDERTAGS_PARAM_ENABLED = false;
+
+// This convenience typewriter builder is used all over the place
+const $this = $E(expr.this_());
+
 export class ResourceClass extends ClassType {
   private _propsType?: StructType;
+  private readonly taggability?: TaggabilityStyle;
 
   constructor(scope: IScope, private readonly res: Resource, suffix?: string) {
+    const taggability = resourceTaggabilityStyle(res);
+
+    const taggabilityInterface =
+      taggability?.style === 'legacy'
+        ? [CDK_CORE.ITaggable]
+        : taggability?.style === 'modern' && TAGGABILITY2_ENABLED
+        ? [CDK_CORE.ITaggable2]
+        : [];
+
     super(scope, {
       export: true,
       name: classNameFromResource(res, suffix),
@@ -55,8 +74,10 @@ export class ResourceClass extends ClassType {
         }),
       },
       extends: CDK_CORE.CfnResource,
-      implements: [CDK_CORE.IInspectable, ...(res.tagPropertyName !== undefined ? [CDK_CORE.ITaggable] : [])],
+      implements: [CDK_CORE.IInspectable, ...taggabilityInterface],
     });
+
+    this.taggability = taggability;
   }
 
   private get propsType(): StructType {
@@ -196,8 +217,6 @@ export class ResourceClass extends ClassType {
       default: hasRequiredProps ? undefined : new ObjectLiteral([]),
     });
 
-    const $this = $E(expr.this_());
-
     init.addBody(
       new SuperInitializer(
         _scope,
@@ -267,7 +286,9 @@ export class ResourceClass extends ClassType {
       getterBody: Block.with(
         stmt.ret(
           expr.object(
-            Object.fromEntries(this.mappableProperties().map(({ name, valueToRender }) => [name, valueToRender])),
+            Object.fromEntries(
+              this.mappableProperties().flatMap(({ cfnValueToRender }) => Object.entries(cfnValueToRender)),
+            ),
           ),
         ),
       ),
@@ -301,7 +322,6 @@ export class ResourceClass extends ClassType {
     type: Type;
     tokenizer: Expression;
   }> {
-    const $this = $E(expr.this_());
     const $ResolutionTypeHint = $T(CDK_CORE.ResolutionTypeHint);
 
     return Object.entries(this.res.attributes)
@@ -331,54 +351,116 @@ export class ResourceClass extends ClassType {
       .sort((a1, a2) => a1.name.localeCompare(a2.name));
   }
 
-  private mappableProperties(): Array<{
-    name: string;
-    memberOptional: boolean;
-    validateRequired: boolean;
-    memberImmutable: boolean;
-    memberType: Type;
-    initializer: (props: Expression) => Expression;
-    valueToRender: Expression;
-    docsSummary?: string;
-  }> {
-    const $this = $E(expr.this_());
+  /**
+   * From the properties of the current resource's proptype, return class properties and how they should be initialized and converted to CloudFormation
+   */
+  private mappableProperties(): MappedProperty[] {
+    const tagsProperty = this.taggability
+      ? propertyNameFromCloudFormation(this.taggability.tagPropertyName)
+      : undefined;
+
     return this.propsType.properties
-      .map((prop) => {
-        // FIXME: Would be nicer to thread this value through
-        const tagType = tryFindTagType(this.res, prop.name);
-
-        if (tagType) {
-          return {
-            // The property must be called 'tags' for the resource to count as ITaggable
-            name: 'tags',
-            memberOptional: false,
-            validateRequired: false,
-            memberImmutable: true,
-            memberType: CDK_CORE.TagManager,
-            initializer: (props: Expression) =>
-              new CDK_CORE.TagManager(
-                translateTagType(tagType),
-                expr.lit(this.res.cloudFormationType),
-                prop.from(props),
-                expr.object({ tagPropertyName: expr.lit(prop.name) }),
-              ),
-            valueToRender: $this.tags.renderTags(),
-            docsSummary: prop.docs?.summary,
-          };
+      .flatMap((prop) => {
+        if (prop.name === undefined) {
+          throw new Error('wut');
         }
-
-        return {
-          name: prop.name,
-          memberOptional: prop.optional,
-          validateRequired: !prop.optional,
-          memberImmutable: false,
-          memberType: prop.type,
-          initializer: (props: Expression) => prop.from(props),
-          valueToRender: $this[prop.name],
-          docsSummary: prop.docs?.summary,
-        };
+        if (prop.name === tagsProperty) {
+          switch (this.taggability?.style) {
+            case 'legacy':
+              return this.mapLegacyTagProperty(prop);
+            case 'modern':
+              if (TAGGABILITY2_ENABLED) {
+                return this.mapModernTagProperty(prop);
+              }
+              break;
+          }
+        }
+        return this.mapPropertyDefault(prop);
       })
       .sort((p1, p2) => p1.name.localeCompare(p2.name));
+  }
+
+  /**
+   * Default mapping for a property
+   */
+  private mapPropertyDefault(prop: Property): MappedProperty[] {
+    return [
+      {
+        name: prop.name,
+        memberOptional: prop.optional,
+        validateRequired: !prop.optional,
+        memberImmutable: false,
+        memberType: prop.type,
+        initializer: (props: Expression) => prop.from(props),
+        cfnValueToRender: { [prop.name]: $this[prop.name] },
+        docsSummary: prop.docs?.summary,
+      },
+    ];
+  }
+
+  private mapLegacyTagProperty(prop: Property): MappedProperty[] {
+    const originalProp = this.mapPropertyDefault(prop)[0];
+    const rawTagsPropName = `${prop.name}Raw`;
+
+    return [
+      {
+        // The property must be called 'tags' for the resource to count as ITaggable
+        name: 'tags',
+        memberOptional: false,
+        validateRequired: false,
+        memberImmutable: true,
+        memberType: CDK_CORE.TagManager,
+        initializer: (props: Expression) =>
+          new CDK_CORE.TagManager(
+            this.tagManagerVariant(),
+            expr.lit(this.res.cloudFormationType),
+            prop.from(props),
+            expr.object({ tagPropertyName: expr.lit(prop.name) }),
+          ),
+        cfnValueToRender: {
+          [prop.name]: $this.tags.renderTags(...(RENDERTAGS_PARAM_ENABLED ? [$this[rawTagsPropName]] : [])),
+        },
+        docsSummary: prop.docs?.summary,
+      },
+      {
+        // Add the original property under the name 'tagsRaw'. This only exists to allow direct L1 mutation.
+        ...originalProp,
+        name: rawTagsPropName,
+        cfnValueToRender: {},
+      },
+    ];
+  }
+
+  private mapModernTagProperty(prop: Property): MappedProperty[] {
+    const originalProp = this.mapPropertyDefault(prop)[0];
+    const rawTagsPropName = prop.name;
+
+    return [
+      {
+        // The property must be called 'cdkTagManager' for the resource to count as ITaggable2
+        name: 'cdkTagManager',
+        memberOptional: false,
+        validateRequired: false,
+        memberImmutable: true,
+        memberType: CDK_CORE.TagManager,
+        initializer: (props: Expression) =>
+          new CDK_CORE.TagManager(
+            this.tagManagerVariant(),
+            expr.lit(this.res.cloudFormationType),
+            prop.from(props),
+            expr.object({ tagPropertyName: expr.lit(prop.name) }),
+          ),
+        cfnValueToRender: {
+          [prop.name]: $this.tags.renderTags(...(RENDERTAGS_PARAM_ENABLED ? [$this[rawTagsPropName]] : [])),
+        },
+        docsSummary: prop.docs?.summary,
+      },
+      {
+        // The original property only exist to allow L1 mutation. Actual render is done by the TagManager.
+        ...originalProp,
+        cfnValueToRender: {},
+      },
+    ];
   }
 
   /**
@@ -395,8 +477,6 @@ export class ResourceClass extends ClassType {
    *   templates that don't have DeletionPolicy set.
    */
   private addDeletionPolicyCheck(init: Initializer) {
-    const $this = $E(expr.this_());
-
     const validator = new AnonymousInterfaceImplementation({
       validate: new Lambda(
         [],
@@ -416,41 +496,37 @@ export class ResourceClass extends ClassType {
         .then(Block.with($this.node.addValidation(validator))),
     );
   }
-}
 
-/**
- * Translates a TagVariant to the core.TagType enum
- */
-function translateTagType(x: TagType) {
-  switch (x.variant) {
-    case 'standard':
-      return CDK_CORE.TagType.STANDARD;
-    case 'asg':
-      return CDK_CORE.TagType.AUTOSCALING_GROUP;
-    case 'map':
-      return CDK_CORE.TagType.MAP;
+  /**
+   * Translates a TagVariant to the core.TagType enum
+   */
+  private tagManagerVariant() {
+    switch (this.taggability?.variant) {
+      case 'standard':
+        return CDK_CORE.TagType.STANDARD;
+      case 'asg':
+        return CDK_CORE.TagType.AUTOSCALING_GROUP;
+      case 'map':
+        return CDK_CORE.TagType.MAP;
+    }
+
+    throw new Error(`Unknown variant: ${this.res.tagInformation?.variant}`);
   }
 }
 
-/**
- * For a given resource and property, if the property is the resource's tag property,
- * returns the tag type for the property.
- *
- * Returns `undefined` otherwise.
- */
-function tryFindTagType(resource: Resource, propName: string): TagType | undefined {
-  if (!resource.tagPropertyName) {
-    return;
-  }
+interface MappedProperty {
+  readonly name: string;
+  readonly memberOptional: boolean;
+  readonly validateRequired: boolean;
+  readonly memberImmutable: boolean;
+  readonly memberType: Type;
+  readonly initializer: (props: Expression) => Expression;
 
-  if (propName !== propertyNameFromCloudFormation(resource.tagPropertyName)) {
-    return;
-  }
-
-  const propType = resource.properties[resource.tagPropertyName].type;
-  if (propType.type !== 'tag') {
-    return;
-  }
-
-  return propType;
+  /**
+   * Lowercase property name(s) and expression(s) to render to get this property into CFN
+   *
+   * We will do a separate conversion of the casing of the props object, so don't do that here.
+   */
+  readonly cfnValueToRender: Record<string, Expression>;
+  readonly docsSummary?: string;
 }
