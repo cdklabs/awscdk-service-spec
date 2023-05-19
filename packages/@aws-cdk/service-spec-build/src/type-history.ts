@@ -1,21 +1,21 @@
 import { PropertyType } from '@aws-cdk/service-spec';
-import HISTORY_FABRICATORS from './history';
+import TYPE_HISTORY_MAKERS from './history';
 
 /**
  * For a given key and a history of types, returns a new history of types
  *
  * If no change should be made, return the unchanged history.
  */
-export type FabricateTypeHistory = (key: string, history: PropertyType[]) => PropertyType[];
+export type TypeHistoryMaker = (key: string, history: PropertyType[]) => PropertyType[];
 
 /**
  * For a given key and a history of types, returns a new history of types
  *
  * If no change should be made, return the unchanged history.
  */
-export const fabricateTypeHistory: FabricateTypeHistory = (key, history) => {
-  for (const fabricator of HISTORY_FABRICATORS) {
-    history = fabricator(key, history);
+export const makeTypeHistory: TypeHistoryMaker = (key, history) => {
+  for (const maker of TYPE_HISTORY_MAKERS) {
+    history = maker(key, history);
   }
 
   return history;

@@ -132,7 +132,7 @@ export class TypeConverter {
     const name = propertyNameFromCloudFormation(propertyName);
 
     // Mutable call to resolve types for all historical types
-    const typeHistory = (property.typeHistory ?? [property.type]).map((t) => this.typeFromSpecType(t));
+    const typeHistory = [...(property.previousTypes ?? []), property.type].map((t) => this.typeFromSpecType(t));
     // For backwards compatibility reasons we always have to use the original type
     const originalType = typeHistory[0];
 

@@ -5,7 +5,7 @@
  * Unfortunately, we already emitted them as untyped, so we have to keep on doing that.
  */
 
-import { FabricateTypeHistory } from '../type-history';
+import { TypeHistoryMaker } from '../type-history';
 
 const LEGACY_UNTYPED_PROPERTIES = {
   'AWS::Backup::ReportPlan': ['ReportDeliveryChannel', 'ReportSetting'],
@@ -69,14 +69,14 @@ const LEGACY_UNTYPED_PROPERTIES = {
   'AWS::XRay::SamplingRule': ['Tags'],
 };
 
-const fabricators = new Map<string, FabricateTypeHistory>();
+const historyMakers = new Map<string, TypeHistoryMaker>();
 for (const [key, propertyNames] of Object.entries(LEGACY_UNTYPED_PROPERTIES)) {
   for (const propertyName of propertyNames) {
     // JSON types are always the oldest type in the history
-    fabricators.set(`${key}.${propertyName}`, (_key, history) => [{ type: 'json' }, ...history]);
+    historyMakers.set(`${key}.${propertyName}`, (_key, history) => [{ type: 'json' }, ...history]);
   }
 }
 
-const legacyUntyped: FabricateTypeHistory = (key, history) => fabricators.get(key)?.(key, history) ?? history;
+const legacyUntyped: TypeHistoryMaker = (key, history) => historyMakers.get(key)?.(key, history) ?? history;
 
 export default legacyUntyped;

@@ -100,12 +100,11 @@ export interface Property {
   type: PropertyType;
 
   /**
-   * An ordered list of previous types of this property
+   * An ordered list of previous types of this property in ascending order
    *
-   * The first element is (index 0) is the oldest types.
-   * The last element is the the current type (same as `type`).
+   * Does not include the current type, use `type` for this.
    */
-  typeHistory?: PropertyType[];
+  previousTypes?: PropertyType[];
 
   /**
    * A string representation the default value of this property

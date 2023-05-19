@@ -1,6 +1,6 @@
 import legacyUntyped from './legacy-untyped';
-import { FabricateTypeHistory } from '../type-history';
+import { TypeHistoryMaker } from '../type-history';
 
-const HISTORY_FABRICATORS: FabricateTypeHistory[] = [legacyUntyped];
+const TYPE_HISTORY_MAKERS: TypeHistoryMaker[] = [legacyUntyped];
 
-export default HISTORY_FABRICATORS;
+export default TYPE_HISTORY_MAKERS;
