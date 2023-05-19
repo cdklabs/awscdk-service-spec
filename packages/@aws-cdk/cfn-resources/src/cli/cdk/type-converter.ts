@@ -53,6 +53,7 @@ export class TypeConverter {
       case 'string':
         return Type.STRING;
       case 'number':
+      case 'integer':
         return Type.NUMBER;
       case 'boolean':
         return Type.BOOLEAN;
