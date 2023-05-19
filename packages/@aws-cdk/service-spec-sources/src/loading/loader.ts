@@ -133,7 +133,7 @@ function failuresFromErrors(errors: Ajv.ErrorObject[] | null | undefined): Failu
 }
 
 /**
- * Sequantial map for async functions
+ * Sequential map for async functions
  *
  * (In case we're concerned about the performance implications of `Promise.all()`.)
  */

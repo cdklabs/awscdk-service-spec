@@ -11,9 +11,6 @@
 
 export { SERVICE_PATCHERS as EXCEPTIONS_PATCHERS } from './core';
 
-// Convert typed -> Json for some legacy types
-import './legacy-untyped';
-
 // Services
 import './autoscaling';
 import './codebuild';

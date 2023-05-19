@@ -130,13 +130,16 @@ export class TypeConverter {
     propertyFromType?: TypeDefinition,
   ) {
     const propTypeName = propertyFromType?.name;
-
     const name = propertyNameFromCloudFormation(propertyName);
-    const type = this.typeFromSpecType(property.type);
+
+    // Mutable call to resolve types for all historical types
+    const typeHistory = [...(property.previousTypes ?? []), property.type].map((t) => this.typeFromSpecType(t));
+    // For backwards compatibility reasons we always have to use the original type
+    const originalType = typeHistory[0];
 
     const spec = {
       name,
-      type,
+      type: originalType,
       optional: !property.required,
       docs: {
         ...splitDocumentation(property.documentation),
@@ -152,7 +155,7 @@ export class TypeConverter {
 
     struct.addProperty({
       ...spec,
-      type: this.makeTypeResolvable(type),
+      type: this.makeTypeResolvable(originalType),
     });
 
     map.add(propertyName, spec);
