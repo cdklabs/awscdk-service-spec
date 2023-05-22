@@ -135,13 +135,15 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       if (jsonschema.isAnyType(resolvedSchema)) {
         return { type: 'json' };
       } else if (jsonschema.isOneOf(resolvedSchema) || jsonschema.isAnyOf(resolvedSchema)) {
-        const types = jsonschema.innerSchemas(resolvedSchema).map((t) => schemaTypeToModelType(propertyName, t, fail));
+        const types = jsonschema
+          .innerSchemas(resolvedSchema)
+          .map((t) => schemaTypeToModelType(propertyName, resolve(t), fail));
         report.reportFailure('interpreting', ...types.filter(isFailure));
         return { type: 'union', types: types.filter(isSuccess) };
       } else if (jsonschema.isAllOf(resolvedSchema)) {
         // FIXME: Do a proper thing here
         const firstResolved = resolvedSchema.allOf[0];
-        return schemaTypeToModelType(propertyName, firstResolved, fail);
+        return schemaTypeToModelType(propertyName, resolve(firstResolved), fail);
       } else {
         switch (resolvedSchema.type) {
           case 'string':

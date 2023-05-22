@@ -75,13 +75,25 @@ export class SamResources {
     return ret;
   }
 
-  private findSamResources() {
+  private findSamResources(): jsonschema.RecordLikeObject[] {
     const serverlessType = /::Serverless::/;
-    return Object.values(this.options.samSchema.definitions ?? {})
-      .map((x) => this.resolve(x))
-      .filter(jsonschema.isObject)
-      .filter(jsonschema.isRecordLikeObject)
-      .filter((def) => this.resourceType(def)?.match(serverlessType));
+    const definitions = Object.values(this.options.samSchema.definitions ?? {});
+
+    const serverlessResources = new Array();
+
+    for (const def of definitions) {
+      const resolvedSchema = this.resolve(def);
+
+      if (
+        jsonschema.isObject(resolvedSchema) &&
+        jsonschema.isRecordLikeObject(resolvedSchema) &&
+        this.resourceType(resolvedSchema)?.match(serverlessType)
+      ) {
+        serverlessResources.push(resolvedSchema);
+      }
+    }
+
+    return serverlessResources;
   }
 
   /**
