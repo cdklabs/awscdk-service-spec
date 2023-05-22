@@ -43,8 +43,7 @@ export interface ResourceClassSpec {
 }
 
 // Depends on https://github.com/aws/aws-cdk/pull/25610
-const TAGGABILITY2_ENABLED = false;
-const RENDERTAGS_PARAM_ENABLED = false;
+const HAS_25610 = false;
 
 // This convenience typewriter builder is used all over the place
 const $this = $E(expr.this_());
@@ -59,7 +58,7 @@ export class ResourceClass extends ClassType {
     const taggabilityInterface =
       taggability?.style === 'legacy'
         ? [CDK_CORE.ITaggable]
-        : taggability?.style === 'modern' && TAGGABILITY2_ENABLED
+        : taggability?.style === 'modern' && HAS_25610
         ? [CDK_CORE.ITaggable2]
         : [];
 
@@ -373,7 +372,7 @@ export class ResourceClass extends ClassType {
             case 'legacy':
               return this.mapLegacyTagProperty(prop);
             case 'modern':
-              if (TAGGABILITY2_ENABLED) {
+              if (HAS_25610) {
                 return this.mapModernTagProperty(prop);
               }
               break;
@@ -422,7 +421,7 @@ export class ResourceClass extends ClassType {
             expr.object({ tagPropertyName: expr.lit(prop.name) }),
           ),
         cfnValueToRender: {
-          [prop.name]: $this.tags.renderTags(...(RENDERTAGS_PARAM_ENABLED ? [$this[rawTagsPropName]] : [])),
+          [prop.name]: $this.tags.renderTags(...(HAS_25610 ? [$this[rawTagsPropName]] : [])),
         },
         docsSummary: prop.docs?.summary,
       },
@@ -455,7 +454,7 @@ export class ResourceClass extends ClassType {
             expr.object({ tagPropertyName: expr.lit(prop.name) }),
           ),
         cfnValueToRender: {
-          [prop.name]: $this.tags.renderTags(...(RENDERTAGS_PARAM_ENABLED ? [$this[rawTagsPropName]] : [])),
+          [prop.name]: $this.tags.renderTags(...(HAS_25610 ? [$this[rawTagsPropName]] : [])),
         },
         docsSummary: prop.docs?.summary,
       },
