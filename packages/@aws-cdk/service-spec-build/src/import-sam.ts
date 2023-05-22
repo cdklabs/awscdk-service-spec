@@ -75,13 +75,25 @@ export class SamResources {
     return ret;
   }
 
-  private findSamResources() {
+  private findSamResources(): jsonschema.RecordLikeObject[] {
     const serverlessType = /::Serverless::/;
-    return Object.values(this.options.samSchema.definitions ?? {})
-      .map((x) => this.resolve(x).schema)
-      .filter(jsonschema.isObject)
-      .filter(jsonschema.isRecordLikeObject)
-      .filter((def) => this.resourceType(def)?.match(serverlessType));
+    const definitions = Object.values(this.options.samSchema.definitions ?? {});
+
+    const serverlessResources = new Array();
+
+    for (const def of definitions) {
+      const resolvedSchema = this.resolve(def);
+
+      if (
+        jsonschema.isObject(resolvedSchema) &&
+        jsonschema.isRecordLikeObject(resolvedSchema) &&
+        this.resourceType(resolvedSchema)?.match(serverlessType)
+      ) {
+        serverlessResources.push(resolvedSchema);
+      }
+    }
+
+    return serverlessResources;
   }
 
   /**
@@ -102,7 +114,7 @@ export class SamResources {
       chain(
         maybeResource,
         (x) => liftUndefined(x.properties.Type),
-        (x) => this.resolve(x).schema,
+        (x) => this.resolve(x),
         (x) => (jsonschema.isString(x) ? x : failure('Not a string')),
         (x) => (x.const ? x.const : x.enum?.length === 1 ? x.enum[0] : failure('Not an enum')),
       ),
@@ -114,7 +126,7 @@ export class SamResources {
     const typeName = this.resourceType(def) ?? '<dummy>';
 
     const emptyObject: jsonschema.RecordLikeObject = { type: 'object', additionalProperties: false, properties: {} };
-    const { schema: propertiesSchema } = this.resolve(def.properties.Properties ?? emptyObject);
+    const propertiesSchema = this.resolve(def.properties.Properties ?? emptyObject);
 
     const properties =
       jsonschema.isObject(propertiesSchema) && jsonschema.isRecordLikeObject(propertiesSchema)

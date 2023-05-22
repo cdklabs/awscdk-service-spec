@@ -234,16 +234,44 @@ export namespace jsonschema {
     readonly default?: boolean;
   }
 
-  export interface ResolvedSchema {
+  export const RESOLVED_REFERENCE_SYMBOL = Symbol('resolved-reference');
+  export type IsResolved = {
     /**
-     * The resolved reference
+     * If the sub-schema was resolved from a reference, the full reference is in here
      */
-    readonly schema: ConcreteSchema;
+    readonly [RESOLVED_REFERENCE_SYMBOL]: string | undefined;
+  };
 
-    /**
-     * The last part of the path of the reference we resolved, if any
-     */
-    readonly referenceName?: string;
+  export type ResolvedSchema = (Exclude<ConcreteSchema, AnyType> & IsResolved) | AnyType;
+
+  export function isResolvedSchema(x: Schema): x is ResolvedSchema {
+    return !isAnyType(x) && RESOLVED_REFERENCE_SYMBOL in x;
+  }
+
+  /**
+   * Returns the full reference if the given sub-schema was resolved from a reference
+   */
+  export function setResolvedReference(x: ConcreteSchema, ref: string | undefined = undefined): ResolvedSchema {
+    (x as any)[RESOLVED_REFERENCE_SYMBOL] = ref;
+
+    return x as ResolvedSchema;
+  }
+
+  /**
+   * Returns the full reference if the given sub-schema was resolved from a reference
+   */
+  export function resolvedReference(x: ResolvedSchema): string | undefined {
+    if (isAnyType(x)) {
+      return undefined;
+    }
+    return x[RESOLVED_REFERENCE_SYMBOL];
+  }
+
+  /**
+   * Returns the reference name (the last part of it), if the given sub-schema was resolved from a reference
+   */
+  export function resolvedReferenceName(x: ResolvedSchema): string | undefined {
+    return resolvedReference(x)?.split('/').at(-1);
   }
 
   /**
@@ -251,30 +279,32 @@ export namespace jsonschema {
    */
   export function makeResolver(root: any) {
     const resolve = (ref: Schema): ResolvedSchema => {
+      // Don't resolve again if schema is already resolved
+      if (isResolvedSchema(ref)) {
+        return ref;
+      }
+
       if (!isReference(ref)) {
-        // If this is a oneOf or anyOf, make sure the types inside the oneOf or anyOf get resolved
+        // If this is a oneOf or anyOf, make sure the types inside the oneOf or anyOf get resolve
         if (isOneOf(ref)) {
-          return {
-            schema: {
-              oneOf: ref.oneOf.map((x) => resolve(x).schema),
-            },
-          };
+          return setResolvedReference({
+            oneOf: ref.oneOf.map((x) => resolve(x)),
+          });
         } else if (isAnyOf(ref)) {
-          return {
-            schema: {
-              anyOf: ref.anyOf.map((x) => resolve(x).schema),
-            },
-          };
+          return setResolvedReference({
+            anyOf: ref.anyOf.map((x) => resolve(x)),
+          });
         } else if (isAllOf(ref)) {
-          return {
-            schema: {
-              allOf: ref.allOf.map((x) => resolve(x).schema),
-            },
-          };
-        } else if (isArray(ref) && ref.items && isReference(ref.items)) {
-          return { schema: ref, referenceName: ref.items.$ref.substring(2).split('/').at(-1) };
+          return setResolvedReference({
+            allOf: ref.allOf.map((x) => resolve(x)),
+          });
+        } else if (isArray(ref) && ref.items) {
+          return setResolvedReference({
+            ...ref,
+            items: resolve(ref.items),
+          });
         } else {
-          return { schema: ref };
+          return isAnyType(ref) ? ref : setResolvedReference(ref);
         }
       }
 
@@ -299,8 +329,12 @@ export namespace jsonschema {
 
       // Some funny people have decided to reference a reference, so we might
       // need to recurse here.
-      return isReference(current) ? resolve(current) : { schema: current, referenceName: lastKey };
+      if (isReference(current)) {
+        return resolve(current);
+      }
+      return setResolvedReference(current, path);
     };
+
     return resolve;
   }
 
