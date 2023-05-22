@@ -365,7 +365,7 @@ function resolvePropertySchema(root: CloudFormationRegistryResource, name: strin
     }
 
     return resolve(schema.properties[current]);
-  }, root as jsonschema.ConcreteSchema);
+  }, root as any);
 }
 
 export function readCloudFormationRegistryServiceFromResource(

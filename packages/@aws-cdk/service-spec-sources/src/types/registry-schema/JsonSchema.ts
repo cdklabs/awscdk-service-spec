@@ -239,7 +239,7 @@ export namespace jsonschema {
     /**
      * If the sub-schema was resolved from a reference, the full reference is in here
      */
-    readonly [RESOLVED_REFERENCE_SYMBOL]?: string;
+    readonly [RESOLVED_REFERENCE_SYMBOL]?: string | undefined;
   };
 
   export type ResolvedSchema = (Exclude<ConcreteSchema, AnyType> & IsResolved) | AnyType;
