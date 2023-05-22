@@ -239,7 +239,7 @@ export namespace jsonschema {
     /**
      * If the sub-schema was resolved from a reference, the full reference is in here
      */
-    readonly [RESOLVED_REFERENCE_SYMBOL]?: string | undefined;
+    readonly [RESOLVED_REFERENCE_SYMBOL]: string | undefined;
   };
 
   export type ResolvedSchema = (Exclude<ConcreteSchema, AnyType> & IsResolved) | AnyType;
@@ -251,10 +251,10 @@ export namespace jsonschema {
   /**
    * Returns the full reference if the given sub-schema was resolved from a reference
    */
-  export function withResolvedReference(x: ConcreteSchema, ref?: string): ResolvedSchema {
+  export function setResolvedReference(x: ConcreteSchema, ref: string | undefined = undefined): ResolvedSchema {
     (x as any)[RESOLVED_REFERENCE_SYMBOL] = ref;
 
-    return x;
+    return x as ResolvedSchema;
   }
 
   /**
@@ -287,24 +287,24 @@ export namespace jsonschema {
       if (!isReference(ref)) {
         // If this is a oneOf or anyOf, make sure the types inside the oneOf or anyOf get resolve
         if (isOneOf(ref)) {
-          return {
+          return setResolvedReference({
             oneOf: ref.oneOf.map((x) => resolve(x)),
-          };
+          });
         } else if (isAnyOf(ref)) {
-          return {
+          return setResolvedReference({
             anyOf: ref.anyOf.map((x) => resolve(x)),
-          };
+          });
         } else if (isAllOf(ref)) {
-          return {
+          return setResolvedReference({
             allOf: ref.allOf.map((x) => resolve(x)),
-          };
+          });
         } else if (isArray(ref) && ref.items) {
-          return {
+          return setResolvedReference({
             ...ref,
             items: resolve(ref.items),
-          };
+          });
         } else {
-          return isAnyType(ref) ? ref : withResolvedReference(ref);
+          return isAnyType(ref) ? ref : setResolvedReference(ref);
         }
       }
 
@@ -332,7 +332,7 @@ export namespace jsonschema {
       if (isReference(current)) {
         return resolve(current);
       }
-      return withResolvedReference(current, path);
+      return setResolvedReference(current, path);
     };
 
     return resolve;

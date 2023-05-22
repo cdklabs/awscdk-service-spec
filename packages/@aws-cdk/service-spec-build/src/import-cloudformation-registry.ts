@@ -100,7 +100,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       let resolvedSchema = resolve(property);
 
       if (spec?.Properties?.[name]?.PrimitiveType === 'Timestamp') {
-        resolvedSchema = jsonschema.withResolvedReference(
+        resolvedSchema = jsonschema.setResolvedReference(
           {
             type: 'string',
             format: 'timestamp',
