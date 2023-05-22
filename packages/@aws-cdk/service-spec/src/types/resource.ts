@@ -1,6 +1,4 @@
-import { Entity, evolutionInvariant, impliesU, Invariant, Reference, Relationship } from '@cdklabs/tskb';
-
-export const Invariants: Invariant[] = [];
+import { Entity, Reference, Relationship } from '@cdklabs/tskb';
 
 export interface Partition extends Entity {
   readonly partition: string;
@@ -86,10 +84,27 @@ export interface TypeDefinition extends Entity {
 }
 
 export interface Property {
+  /**
+   * Description of the property
+   */
   documentation?: string;
+
+  /**
+   * Is this property required
+   */
   required?: boolean;
+
+  /**
+   * The current type of this property
+   */
   type: PropertyType;
-  wasOnceJson?: boolean;
+
+  /**
+   * An ordered list of previous types of this property in ascending order
+   *
+   * Does not include the current type, use `type` for this.
+   */
+  previousTypes?: PropertyType[];
 
   /**
    * A string representation the default value of this property
@@ -119,6 +134,7 @@ export interface Property {
 export interface Attribute {
   documentation?: string;
   type: PropertyType;
+  typeHistory?: PropertyType[];
 }
 
 export enum Deprecation {
@@ -140,14 +156,6 @@ export enum Deprecation {
   IGNORE = 'IGNORE',
 }
 
-// FIXME: Should properties & attributes be entities or not?
-
-Invariants.push(
-  evolutionInvariant<Property>('wasOnceJson may never be switched off', (prev, cur) =>
-    impliesU(prev.wasOnceJson, cur.wasOnceJson),
-  ),
-);
-
 export type PropertyType =
   | PrimitiveType
   | DefinitionReference
@@ -155,7 +163,7 @@ export type PropertyType =
   | MapType<PropertyType>
   | TypeUnion<PropertyType>;
 
-export type PrimitiveType = StringType | NumberType | BooleanType | JsonType | DateTimeType | NullType;
+export type PrimitiveType = StringType | NumberType | IntegerType | BooleanType | JsonType | DateTimeType | NullType;
 
 export function isCollectionType(x: PropertyType): x is ArrayType<any> | MapType<any> {
   return x.type === 'array' || x.type === 'map';
@@ -181,6 +189,10 @@ export interface StringType {
 
 export interface NumberType {
   readonly type: 'number';
+}
+
+export interface IntegerType {
+  readonly type: 'integer';
 }
 
 export interface BooleanType {

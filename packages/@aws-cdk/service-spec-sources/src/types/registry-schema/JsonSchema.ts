@@ -225,6 +225,10 @@ export namespace jsonschema {
     readonly arrayType?: 'AttributeList' | 'Standard';
   }
 
+  export function isArray(x: ConcreteSchema): x is SchemaArray {
+    return isConcreteSingleton(x) && !isAnyType(x) && x.type === 'array';
+  }
+
   export interface Boolean extends Annotatable {
     readonly type: 'boolean';
     readonly default?: boolean;
@@ -267,6 +271,8 @@ export namespace jsonschema {
               allOf: ref.allOf.map((x) => resolve(x).schema),
             },
           };
+        } else if (isArray(ref) && ref.items && isReference(ref.items)) {
+          return { schema: ref, referenceName: ref.items.$ref.substring(2).split('/').at(-1) };
         } else {
           return { schema: ref };
         }

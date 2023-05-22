@@ -23,12 +23,12 @@ export async function buildDatabase(options: BuildDatabaseOptions = {}) {
 
   const resourceSpec = loadResult(await sources.loadDefaultResourceSpecification());
 
-  for (const resources of await sources.loadDefaultCloudFormationRegistryResources(report, options.mustValidate)) {
+  for (const regions of await sources.loadDefaultCloudFormationRegistryResources(report, options.mustValidate)) {
     const region = db.allocate('region', {
-      name: resources.regionName,
+      name: regions.regionName,
     });
 
-    for (const resource of resources.resources) {
+    for (const resource of regions.resources) {
       const res = importCloudFormationRegistryResource({
         db,
         resource,

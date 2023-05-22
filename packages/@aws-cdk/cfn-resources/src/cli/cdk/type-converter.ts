@@ -56,6 +56,7 @@ export class TypeConverter {
       case 'string':
         return Type.STRING;
       case 'number':
+      case 'integer':
         return Type.NUMBER;
       case 'boolean':
         return Type.BOOLEAN;
@@ -122,9 +123,12 @@ export class TypeConverter {
     propertyFromType?: TypeDefinition,
   ) {
     const propTypeName = propertyFromType?.name;
-
     const name = propertyNameFromCloudFormation(propertyName);
-    let type = this.typeFromSpecType(property.type);
+
+    // Mutable call to resolve types for all historical types
+    const typeHistory = [...(property.previousTypes ?? []), property.type];
+    // For backwards compatibility reasons we always have to use the original type
+    let type = this.typeFromSpecType(typeHistory[0]);
 
     // COMPAT: If this is a legacy-taggable standard property, we may need to override the type to a standardized type
     // to be backwards compatible with what we used to do.

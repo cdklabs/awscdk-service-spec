@@ -332,9 +332,13 @@ export class ResourceClass extends ClassType {
         if (attr.type.type === 'string') {
           type = Type.STRING;
           tokenizer = CDK_CORE.tokenAsString($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.STRING));
-        } else if (attr.type.type === 'number') {
+        } else if (attr.type.type === 'integer') {
           type = Type.NUMBER;
           tokenizer = CDK_CORE.tokenAsNumber($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.NUMBER));
+        } else if (attr.type.type === 'number') {
+          // COMPAT: Although numbers/doubles could be represented as numbers, historically in cfn2ts they were represented as IResolvable.
+          type = CDK_CORE.IResolvable;
+          tokenizer = $this.getAtt(expr.lit(attrName), $ResolutionTypeHint.NUMBER);
         } else if (attr.type.type === 'array' && attr.type.element.type === 'string') {
           type = Type.arrayOf(Type.STRING);
           tokenizer = CDK_CORE.tokenAsList($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.STRING_LIST));

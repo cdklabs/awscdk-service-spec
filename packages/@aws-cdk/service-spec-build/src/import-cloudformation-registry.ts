@@ -19,6 +19,7 @@ import {
   ReportAudience,
 } from '@aws-cdk/service-spec-sources';
 import { locateFailure, Fail, failure, isFailure, Result, tryCatch, using, ref, isSuccess } from '@cdklabs/tskb';
+import { makeTypeHistory } from './type-history';
 
 export interface LoadCloudFormationRegistryResourceOptions {
   readonly db: SpecDatabase;
@@ -109,6 +110,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       withResult(schemaTypeToModelType(name, resolved, fail.in(`property ${name}`)), (type) => {
         target[name] = {
           type,
+          previousTypes: getPreviousTypes(`${resource.typeName}.${name}`, [type]),
           documentation: descriptionOf(resolved.schema),
           required: ifTrue((source.required ?? []).includes(name)),
           defaultValue: describeDefault(resolved.schema),
@@ -162,8 +164,10 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
             return schemaObjectToModelType(nameHint, resolved.schema, fail);
 
           case 'number':
-          case 'integer':
             return { type: 'number' };
+
+          case 'integer':
+            return { type: 'integer' };
 
           case 'null':
             return { type: 'null' };
@@ -263,6 +267,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         withResult(schemaTypeToModelType(name, resolved, fail.in(`attribute ${name}`)), (type) => {
           target[attributeName] = {
             type,
+            previousTypes: getPreviousTypes(`${resource.typeName}.${name}`, [type]),
             documentation: descriptionOf(resolved.schema),
             required: ifTrue((source.required ?? []).includes(name)),
           };
@@ -271,6 +276,16 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         report.reportFailure('interpreting', fail(`no definition for: ${name}`));
       }
     }
+  }
+
+  function getPreviousTypes(key: string, history: PropertyType[]): PropertyType[] | undefined {
+    const rewrittenHistory = makeTypeHistory(key, history);
+    const previousTypes = rewrittenHistory.slice(0, -1);
+
+    if (!previousTypes.length) {
+      return undefined;
+    }
+    return previousTypes;
   }
 
   function handleTags(fail: Fail) {
