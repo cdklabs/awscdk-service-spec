@@ -128,15 +128,18 @@ export class SamResources {
     const emptyObject: jsonschema.RecordLikeObject = { type: 'object', additionalProperties: false, properties: {} };
     const propertiesSchema = this.resolve(def.properties.Properties ?? emptyObject);
 
-    const properties =
-      jsonschema.isObject(propertiesSchema) && jsonschema.isRecordLikeObject(propertiesSchema)
-        ? propertiesSchema.properties
-        : {};
+    let properties = {};
+    let required;
+    if (jsonschema.isObject(propertiesSchema) && jsonschema.isRecordLikeObject(propertiesSchema)) {
+      properties = propertiesSchema.properties;
+      required = propertiesSchema.required;
+    }
 
     return {
       typeName,
       description: `Definition of ${typeName}`,
       properties,
+      required,
 
       // This will make sure that all reference are still valid. Yes this will contain
       // too much, but that's okay.
