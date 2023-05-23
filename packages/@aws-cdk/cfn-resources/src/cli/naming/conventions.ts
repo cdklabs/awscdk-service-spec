@@ -79,6 +79,10 @@ export function staticResourceTypeName() {
   return 'CFN_RESOURCE_TYPE_NAME';
 }
 
+export function staticRequiredTransform() {
+  return 'REQUIRED_TRANSFORM';
+}
+
 export function attributePropertyName(attrName: string) {
   return propertyNameFromCloudFormation(`attr${attrName.replace(/[^a-zA-Z0-9]/g, '')}`);
 }

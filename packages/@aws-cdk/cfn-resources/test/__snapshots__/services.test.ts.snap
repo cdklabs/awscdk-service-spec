@@ -43681,6 +43681,11 @@ export class CfnApi extends cdk.CfnResource implements cdk.IInspectable, cdk.ITa
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "AWS::Serverless::Api";
 
   /**
+   * The \`Transform\` a template must use in order to use this resource
+   */
+  public static readonly REQUIRED_TRANSFORM: string = "AWS::Serverless-2016-10-31";
+
+  /**
    * Build a CfnApi from CloudFormation properties
    *
    * A factory method that creates a new instance of this class from an object
@@ -43762,6 +43767,8 @@ export class CfnApi extends cdk.CfnResource implements cdk.IInspectable, cdk.ITa
     });
 
     cdk.requireProperty(props, "stageName", this);
+
+    this.stack.addTransform(CfnApi.REQUIRED_TRANSFORM);
 
     this.accessLogSetting = props.accessLogSetting;
     this.auth = props.auth;
@@ -44764,6 +44771,11 @@ export class CfnApplication extends cdk.CfnResource implements cdk.IInspectable,
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "AWS::Serverless::Application";
 
   /**
+   * The \`Transform\` a template must use in order to use this resource
+   */
+  public static readonly REQUIRED_TRANSFORM: string = "AWS::Serverless-2016-10-31";
+
+  /**
    * Build a CfnApplication from CloudFormation properties
    *
    * A factory method that creates a new instance of this class from an object
@@ -44809,6 +44821,8 @@ export class CfnApplication extends cdk.CfnResource implements cdk.IInspectable,
     });
 
     cdk.requireProperty(props, "location", this);
+
+    this.stack.addTransform(CfnApplication.REQUIRED_TRANSFORM);
 
     this.location = props.location;
     this.notificationArns = props.notificationArns;
@@ -45011,6 +45025,11 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "AWS::Serverless::Function";
 
   /**
+   * The \`Transform\` a template must use in order to use this resource
+   */
+  public static readonly REQUIRED_TRANSFORM: string = "AWS::Serverless-2016-10-31";
+
+  /**
    * Build a CfnFunction from CloudFormation properties
    *
    * A factory method that creates a new instance of this class from an object
@@ -45110,6 +45129,8 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
       "type": CfnFunction.CFN_RESOURCE_TYPE_NAME,
       "properties": props
     });
+
+    this.stack.addTransform(CfnFunction.REQUIRED_TRANSFORM);
 
     this.architectures = props.architectures;
     this.assumeRolePolicyDocument = props.assumeRolePolicyDocument;
@@ -49410,6 +49431,11 @@ export class CfnHttpApi extends cdk.CfnResource implements cdk.IInspectable, cdk
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "AWS::Serverless::HttpApi";
 
   /**
+   * The \`Transform\` a template must use in order to use this resource
+   */
+  public static readonly REQUIRED_TRANSFORM: string = "AWS::Serverless-2016-10-31";
+
+  /**
    * Build a CfnHttpApi from CloudFormation properties
    *
    * A factory method that creates a new instance of this class from an object
@@ -49471,6 +49497,8 @@ export class CfnHttpApi extends cdk.CfnResource implements cdk.IInspectable, cdk
       "type": CfnHttpApi.CFN_RESOURCE_TYPE_NAME,
       "properties": props
     });
+
+    this.stack.addTransform(CfnHttpApi.REQUIRED_TRANSFORM);
 
     this.accessLogSetting = props.accessLogSetting;
     this.auth = props.auth;
@@ -50320,6 +50348,11 @@ export class CfnLayerVersion extends cdk.CfnResource implements cdk.IInspectable
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "AWS::Serverless::LayerVersion";
 
   /**
+   * The \`Transform\` a template must use in order to use this resource
+   */
+  public static readonly REQUIRED_TRANSFORM: string = "AWS::Serverless-2016-10-31";
+
+  /**
    * Build a CfnLayerVersion from CloudFormation properties
    *
    * A factory method that creates a new instance of this class from an object
@@ -50365,6 +50398,8 @@ export class CfnLayerVersion extends cdk.CfnResource implements cdk.IInspectable
       "type": CfnLayerVersion.CFN_RESOURCE_TYPE_NAME,
       "properties": props
     });
+
+    this.stack.addTransform(CfnLayerVersion.REQUIRED_TRANSFORM);
 
     this.compatibleRuntimes = props.compatibleRuntimes;
     this.contentUri = props.contentUri;
@@ -50582,6 +50617,11 @@ export class CfnSimpleTable extends cdk.CfnResource implements cdk.IInspectable,
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "AWS::Serverless::SimpleTable";
 
   /**
+   * The \`Transform\` a template must use in order to use this resource
+   */
+  public static readonly REQUIRED_TRANSFORM: string = "AWS::Serverless-2016-10-31";
+
+  /**
    * Build a CfnSimpleTable from CloudFormation properties
    *
    * A factory method that creates a new instance of this class from an object
@@ -50625,6 +50665,8 @@ export class CfnSimpleTable extends cdk.CfnResource implements cdk.IInspectable,
       "type": CfnSimpleTable.CFN_RESOURCE_TYPE_NAME,
       "properties": props
     });
+
+    this.stack.addTransform(CfnSimpleTable.REQUIRED_TRANSFORM);
 
     this.primaryKey = props.primaryKey;
     this.provisionedThroughput = props.provisionedThroughput;
@@ -50940,6 +50982,11 @@ export class CfnStateMachine extends cdk.CfnResource implements cdk.IInspectable
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "AWS::Serverless::StateMachine";
 
   /**
+   * The \`Transform\` a template must use in order to use this resource
+   */
+  public static readonly REQUIRED_TRANSFORM: string = "AWS::Serverless-2016-10-31";
+
+  /**
    * Build a CfnStateMachine from CloudFormation properties
    *
    * A factory method that creates a new instance of this class from an object
@@ -50997,6 +51044,8 @@ export class CfnStateMachine extends cdk.CfnResource implements cdk.IInspectable
       "type": CfnStateMachine.CFN_RESOURCE_TYPE_NAME,
       "properties": props
     });
+
+    this.stack.addTransform(CfnStateMachine.REQUIRED_TRANSFORM);
 
     this.definition = props.definition;
     this.definitionSubstitutions = props.definitionSubstitutions;
