@@ -12418,11 +12418,6 @@ export class CfnIPAM extends cdk.CfnResource implements cdk.IInspectable, cdk.IT
   public operatingRegions?: Array<CfnIPAM.IpamOperatingRegionProperty | cdk.IResolvable> | cdk.IResolvable;
 
   /**
-   * The IPAM's resource discovery association count.
-   */
-  public resourceDiscoveryAssociationCount?: number;
-
-  /**
    * The key/value combination of a tag assigned to the resource.
    */
   public readonly tags: cdk.TagManager;
@@ -12448,7 +12443,6 @@ export class CfnIPAM extends cdk.CfnResource implements cdk.IInspectable, cdk.IT
     this.defaultResourceDiscoveryId = props.defaultResourceDiscoveryId;
     this.description = props.description;
     this.operatingRegions = props.operatingRegions;
-    this.resourceDiscoveryAssociationCount = props.resourceDiscoveryAssociationCount;
     this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::EC2::IPAM", props.tags, {
       "tagPropertyName": "tags"
     });
@@ -12460,7 +12454,6 @@ export class CfnIPAM extends cdk.CfnResource implements cdk.IInspectable, cdk.IT
       "defaultResourceDiscoveryId": this.defaultResourceDiscoveryId,
       "description": this.description,
       "operatingRegions": this.operatingRegions,
-      "resourceDiscoveryAssociationCount": this.resourceDiscoveryAssociationCount,
       "tags": this.tags.renderTags()
     };
   }
@@ -12522,13 +12515,6 @@ export interface CfnIPAMProps {
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-ipam.html#cfn-ec2-ipam-defaultresourcediscoveryassociationid
    */
   readonly defaultResourceDiscoveryAssociationId?: string;
-
-  /**
-   * The IPAM's resource discovery association count.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-ipam.html#cfn-ec2-ipam-resourcediscoveryassociationcount
-   */
-  readonly resourceDiscoveryAssociationCount?: number;
 
   /**
    * The description for the IPAM.
@@ -12619,7 +12605,6 @@ function CfnIPAMPropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("defaultResourceDiscoveryId", cdk.validateString)(properties.defaultResourceDiscoveryId));
   errors.collect(cdk.propertyValidator("description", cdk.validateString)(properties.description));
   errors.collect(cdk.propertyValidator("operatingRegions", cdk.listValidator(CfnIPAMIpamOperatingRegionPropertyValidator))(properties.operatingRegions));
-  errors.collect(cdk.propertyValidator("resourceDiscoveryAssociationCount", cdk.validateNumber)(properties.resourceDiscoveryAssociationCount));
   errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
   return errors.wrap("supplied properties not correct for \\"CfnIPAMProps\\"");
 }
@@ -12633,7 +12618,6 @@ function convertCfnIPAMPropsToCloudFormation(properties: any): any {
     "DefaultResourceDiscoveryId": cdk.stringToCloudFormation(properties.defaultResourceDiscoveryId),
     "Description": cdk.stringToCloudFormation(properties.description),
     "OperatingRegions": cdk.listMapper(convertCfnIPAMIpamOperatingRegionPropertyToCloudFormation)(properties.operatingRegions),
-    "ResourceDiscoveryAssociationCount": cdk.numberToCloudFormation(properties.resourceDiscoveryAssociationCount),
     "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags)
   };
 }
@@ -12652,7 +12636,6 @@ function CfnIPAMPropsFromCloudFormation(properties: any): cfn_parse.FromCloudFor
   ret.addPropertyResult("defaultResourceDiscoveryId", "DefaultResourceDiscoveryId", (properties.DefaultResourceDiscoveryId != null ? cfn_parse.FromCloudFormation.getString(properties.DefaultResourceDiscoveryId) : undefined));
   ret.addPropertyResult("description", "Description", (properties.Description != null ? cfn_parse.FromCloudFormation.getString(properties.Description) : undefined));
   ret.addPropertyResult("operatingRegions", "OperatingRegions", (properties.OperatingRegions != null ? cfn_parse.FromCloudFormation.getArray(CfnIPAMIpamOperatingRegionPropertyFromCloudFormation)(properties.OperatingRegions) : undefined));
-  ret.addPropertyResult("resourceDiscoveryAssociationCount", "ResourceDiscoveryAssociationCount", (properties.ResourceDiscoveryAssociationCount != null ? cfn_parse.FromCloudFormation.getNumber(properties.ResourceDiscoveryAssociationCount) : undefined));
   ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
@@ -31254,6 +31237,8 @@ export class CfnSubnetCidrBlock extends cdk.CfnResource implements cdk.IInspecta
   }
 
   /**
+   * Information about the IPv6 association.
+   *
    * @cloudformationAttribute Id
    */
   public readonly attrId: string;
