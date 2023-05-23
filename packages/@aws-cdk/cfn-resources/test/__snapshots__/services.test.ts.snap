@@ -43733,7 +43733,7 @@ export class CfnApi extends cdk.CfnResource implements cdk.IInspectable, cdk.ITa
 
   public domain?: CfnApi.DomainConfigurationProperty | cdk.IResolvable;
 
-  public endpointConfiguration?: CfnApi.EndpointConfigurationProperty | cdk.IResolvable;
+  public endpointConfiguration?: CfnApi.EndpointConfigurationProperty | cdk.IResolvable | string;
 
   public gatewayResponses?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
 
@@ -44137,7 +44137,7 @@ export interface CfnApiProps {
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-endpointconfiguration
    */
-  readonly endpointConfiguration?: CfnApi.EndpointConfigurationProperty | cdk.IResolvable;
+  readonly endpointConfiguration?: CfnApi.EndpointConfigurationProperty | cdk.IResolvable | string;
 
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-gatewayresponses
@@ -44675,7 +44675,7 @@ function CfnApiPropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("description", cdk.validateString)(properties.description));
   errors.collect(cdk.propertyValidator("disableExecuteApiEndpoint", cdk.validateBoolean)(properties.disableExecuteApiEndpoint));
   errors.collect(cdk.propertyValidator("domain", CfnApiDomainConfigurationPropertyValidator)(properties.domain));
-  errors.collect(cdk.propertyValidator("endpointConfiguration", CfnApiEndpointConfigurationPropertyValidator)(properties.endpointConfiguration));
+  errors.collect(cdk.propertyValidator("endpointConfiguration", cdk.unionValidator(CfnApiEndpointConfigurationPropertyValidator, cdk.validateString))(properties.endpointConfiguration));
   errors.collect(cdk.propertyValidator("gatewayResponses", cdk.hashValidator(cdk.validateObject))(properties.gatewayResponses));
   errors.collect(cdk.propertyValidator("methodSettings", cdk.listValidator(cdk.validateObject))(properties.methodSettings));
   errors.collect(cdk.propertyValidator("minimumCompressionSize", cdk.validateNumber)(properties.minimumCompressionSize));
@@ -44707,7 +44707,7 @@ function convertCfnApiPropsToCloudFormation(properties: any): any {
     "Description": cdk.stringToCloudFormation(properties.description),
     "DisableExecuteApiEndpoint": cdk.booleanToCloudFormation(properties.disableExecuteApiEndpoint),
     "Domain": convertCfnApiDomainConfigurationPropertyToCloudFormation(properties.domain),
-    "EndpointConfiguration": convertCfnApiEndpointConfigurationPropertyToCloudFormation(properties.endpointConfiguration),
+    "EndpointConfiguration": cdk.unionMapper([CfnApiEndpointConfigurationPropertyValidator, cdk.validateString], [convertCfnApiEndpointConfigurationPropertyToCloudFormation, cdk.stringToCloudFormation])(properties.endpointConfiguration),
     "GatewayResponses": cdk.hashMapper(cdk.objectToCloudFormation)(properties.gatewayResponses),
     "MethodSettings": cdk.listMapper(cdk.objectToCloudFormation)(properties.methodSettings),
     "MinimumCompressionSize": cdk.numberToCloudFormation(properties.minimumCompressionSize),
@@ -44743,7 +44743,7 @@ function CfnApiPropsFromCloudFormation(properties: any): cfn_parse.FromCloudForm
   ret.addPropertyResult("description", "Description", (properties.Description != null ? cfn_parse.FromCloudFormation.getString(properties.Description) : undefined));
   ret.addPropertyResult("disableExecuteApiEndpoint", "DisableExecuteApiEndpoint", (properties.DisableExecuteApiEndpoint != null ? cfn_parse.FromCloudFormation.getBoolean(properties.DisableExecuteApiEndpoint) : undefined));
   ret.addPropertyResult("domain", "Domain", (properties.Domain != null ? CfnApiDomainConfigurationPropertyFromCloudFormation(properties.Domain) : undefined));
-  ret.addPropertyResult("endpointConfiguration", "EndpointConfiguration", (properties.EndpointConfiguration != null ? CfnApiEndpointConfigurationPropertyFromCloudFormation(properties.EndpointConfiguration) : undefined));
+  ret.addPropertyResult("endpointConfiguration", "EndpointConfiguration", (properties.EndpointConfiguration != null ? cfn_parse.FromCloudFormation.getTypeUnion([CfnApiEndpointConfigurationPropertyValidator, cdk.validateString], [CfnApiEndpointConfigurationPropertyFromCloudFormation, cfn_parse.FromCloudFormation.getString])(properties.EndpointConfiguration) : undefined));
   ret.addPropertyResult("gatewayResponses", "GatewayResponses", (properties.GatewayResponses != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getAny)(properties.GatewayResponses) : undefined));
   ret.addPropertyResult("methodSettings", "MethodSettings", (properties.MethodSettings != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getAny)(properties.MethodSettings) : undefined));
   ret.addPropertyResult("minimumCompressionSize", "MinimumCompressionSize", (properties.MinimumCompressionSize != null ? cfn_parse.FromCloudFormation.getNumber(properties.MinimumCompressionSize) : undefined));
