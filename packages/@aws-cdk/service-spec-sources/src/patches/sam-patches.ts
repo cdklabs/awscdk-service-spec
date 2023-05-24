@@ -30,16 +30,27 @@ const deploymentPreferenceHooks: Patcher<JsonObjectLens> = (lens) => {
   )(lens);
 };
 
-const apiEndpointConfiguration: Patcher<JsonObjectLens> = (lens) => {
-  const reason = Reason.backwardsCompat();
-
+const serverlessApi: Patcher<JsonObjectLens> = (lens) => {
   replaceSamResourceProperty(
     'AWS::Serverless::Api',
     'EndpointConfiguration',
     {
       anyOf: [{ $ref: '#/definitions/AWS::Serverless::Api.EndpointConfiguration' }, { type: 'string' }],
     },
-    reason,
+    Reason.backwardsCompat('Make the EndpointConfiguration property of AWS::Serverless::Api have a union type'),
+  )(lens);
+
+  replaceSamResourceProperty(
+    'AWS::Serverless::Api',
+    'GatewayResponses',
+    { type: 'object' },
+    Reason.backwardsCompat('Make the GatewayResponses property of AWS::Serverless::Api accept JSON'),
+  )(lens);
+  replaceSamResourceProperty(
+    'AWS::Serverless::Api',
+    'Models',
+    { type: 'object' },
+    Reason.backwardsCompat('Make the Models property of AWS::Serverless::Api accept JSON'),
   )(lens);
 };
 
@@ -48,7 +59,7 @@ const apiEndpointConfiguration: Patcher<JsonObjectLens> = (lens) => {
  */
 export const patchSamTemplateSpec = makeCompositePatcher(
   normalizeJsonSchema,
-  onlyObjects(makeCompositePatcher(deploymentPreferenceHooks, apiEndpointConfiguration)),
+  onlyObjects(makeCompositePatcher(deploymentPreferenceHooks, serverlessApi)),
 );
 
 /**
