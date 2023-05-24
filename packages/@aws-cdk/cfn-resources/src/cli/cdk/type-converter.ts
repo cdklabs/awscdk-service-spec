@@ -271,7 +271,7 @@ export class TypeConverter {
     }
 
     if (type.unionOfTypes) {
-      return Type.unionOf(...type.unionOfTypes, CDK_CORE.IResolvable);
+      return Type.distinctUnionOf(...type.unionOfTypes.map((t) => this.makeTypeResolvable(t)), CDK_CORE.IResolvable);
     }
 
     return Type.unionOf(type, CDK_CORE.IResolvable);

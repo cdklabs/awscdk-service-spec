@@ -79,6 +79,24 @@ export class Type {
     return new Type({ union: types.sort((a, b) => a.toString().localeCompare(b.toString())) });
   }
 
+  /**
+   * A union that only contains distinct elements
+   *
+   * Flattens any unions of unions into a single flat union.
+   * Type distinctiveness is determined based on its string representation.
+   */
+  public static distinctUnionOf(...types: Type[]) {
+    const unique = (xs: Type[]) => {
+      var seen: Record<string, Type> = {};
+      return xs.filter((x) => {
+        const key = x.toString();
+        return !(key in seen) && (seen[key] = x);
+      });
+    };
+
+    return Type.unionOf(...unique(types.flatMap((x) => (x.unionOfTypes ? x.unionOfTypes : x))));
+  }
+
   public static ambient(name: string) {
     return Type.fromName(AMBIENT_SCOPE, name);
   }
