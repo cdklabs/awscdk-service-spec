@@ -53,6 +53,10 @@ export interface Documentation extends Entity {
 export interface Resource extends Entity {
   readonly name: string;
   readonly cloudFormationType: string;
+  /**
+   * If set, this CloudFormation Transform is required by the resource
+   */
+  cloudFormationTransform?: string;
   documentation?: string;
   readonly properties: ResourceProperties;
   readonly attributes: Record<string, Attribute>;

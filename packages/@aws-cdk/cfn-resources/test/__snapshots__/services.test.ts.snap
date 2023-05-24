@@ -43666,6 +43666,11 @@ export class CfnApi extends cdk.CfnResource implements cdk.IInspectable, cdk.ITa
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "AWS::Serverless::Api";
 
   /**
+   * The \`Transform\` a template must use in order to use this resource
+   */
+  public static readonly REQUIRED_TRANSFORM: string = "AWS::Serverless-2016-10-31";
+
+  /**
    * Build a CfnApi from CloudFormation properties
    *
    * A factory method that creates a new instance of this class from an object
@@ -43713,21 +43718,21 @@ export class CfnApi extends cdk.CfnResource implements cdk.IInspectable, cdk.ITa
 
   public domain?: CfnApi.DomainConfigurationProperty | cdk.IResolvable;
 
-  public endpointConfiguration?: CfnApi.EndpointConfigurationProperty | cdk.IResolvable;
+  public endpointConfiguration?: CfnApi.EndpointConfigurationProperty | cdk.IResolvable | string;
 
-  public gatewayResponses?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
+  public gatewayResponses?: any | cdk.IResolvable;
 
   public methodSettings?: Array<any | cdk.IResolvable> | cdk.IResolvable;
 
   public minimumCompressionSize?: number;
 
-  public models?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
+  public models?: any | cdk.IResolvable;
 
   public name?: string;
 
   public openApiVersion?: string;
 
-  public stageName?: string;
+  public stageName: string;
 
   public readonly tags: cdk.TagManager;
 
@@ -43740,11 +43745,15 @@ export class CfnApi extends cdk.CfnResource implements cdk.IInspectable, cdk.ITa
    * @param id Construct identifier for this resource (unique in its scope)
    * @param props Resource properties
    */
-  public constructor(scope: constructs.Construct, id: string, props: CfnApiProps = {}) {
+  public constructor(scope: constructs.Construct, id: string, props: CfnApiProps) {
     super(scope, id, {
       "type": CfnApi.CFN_RESOURCE_TYPE_NAME,
       "properties": props
     });
+
+    cdk.requireProperty(props, "stageName", this);
+
+    this.stack.addTransform(CfnApi.REQUIRED_TRANSFORM);
 
     this.accessLogSetting = props.accessLogSetting;
     this.auth = props.auth;
@@ -44113,12 +44122,12 @@ export interface CfnApiProps {
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-endpointconfiguration
    */
-  readonly endpointConfiguration?: CfnApi.EndpointConfigurationProperty | cdk.IResolvable;
+  readonly endpointConfiguration?: CfnApi.EndpointConfigurationProperty | cdk.IResolvable | string;
 
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-gatewayresponses
    */
-  readonly gatewayResponses?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
+  readonly gatewayResponses?: any | cdk.IResolvable;
 
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-methodsettings
@@ -44133,7 +44142,7 @@ export interface CfnApiProps {
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-models
    */
-  readonly models?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
+  readonly models?: any | cdk.IResolvable;
 
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-name
@@ -44148,7 +44157,7 @@ export interface CfnApiProps {
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-stagename
    */
-  readonly stageName?: string;
+  readonly stageName: string;
 
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-tags
@@ -44651,13 +44660,14 @@ function CfnApiPropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("description", cdk.validateString)(properties.description));
   errors.collect(cdk.propertyValidator("disableExecuteApiEndpoint", cdk.validateBoolean)(properties.disableExecuteApiEndpoint));
   errors.collect(cdk.propertyValidator("domain", CfnApiDomainConfigurationPropertyValidator)(properties.domain));
-  errors.collect(cdk.propertyValidator("endpointConfiguration", CfnApiEndpointConfigurationPropertyValidator)(properties.endpointConfiguration));
-  errors.collect(cdk.propertyValidator("gatewayResponses", cdk.hashValidator(cdk.validateObject))(properties.gatewayResponses));
+  errors.collect(cdk.propertyValidator("endpointConfiguration", cdk.unionValidator(CfnApiEndpointConfigurationPropertyValidator, cdk.validateString))(properties.endpointConfiguration));
+  errors.collect(cdk.propertyValidator("gatewayResponses", cdk.validateObject)(properties.gatewayResponses));
   errors.collect(cdk.propertyValidator("methodSettings", cdk.listValidator(cdk.validateObject))(properties.methodSettings));
   errors.collect(cdk.propertyValidator("minimumCompressionSize", cdk.validateNumber)(properties.minimumCompressionSize));
-  errors.collect(cdk.propertyValidator("models", cdk.hashValidator(cdk.validateObject))(properties.models));
+  errors.collect(cdk.propertyValidator("models", cdk.validateObject)(properties.models));
   errors.collect(cdk.propertyValidator("name", cdk.validateString)(properties.name));
   errors.collect(cdk.propertyValidator("openApiVersion", cdk.validateString)(properties.openApiVersion));
+  errors.collect(cdk.propertyValidator("stageName", cdk.requiredValidator)(properties.stageName));
   errors.collect(cdk.propertyValidator("stageName", cdk.validateString)(properties.stageName));
   errors.collect(cdk.propertyValidator("tags", cdk.hashValidator(cdk.validateString))(properties.tags));
   errors.collect(cdk.propertyValidator("tracingEnabled", cdk.validateBoolean)(properties.tracingEnabled));
@@ -44682,11 +44692,11 @@ function convertCfnApiPropsToCloudFormation(properties: any): any {
     "Description": cdk.stringToCloudFormation(properties.description),
     "DisableExecuteApiEndpoint": cdk.booleanToCloudFormation(properties.disableExecuteApiEndpoint),
     "Domain": convertCfnApiDomainConfigurationPropertyToCloudFormation(properties.domain),
-    "EndpointConfiguration": convertCfnApiEndpointConfigurationPropertyToCloudFormation(properties.endpointConfiguration),
-    "GatewayResponses": cdk.hashMapper(cdk.objectToCloudFormation)(properties.gatewayResponses),
+    "EndpointConfiguration": cdk.unionMapper([CfnApiEndpointConfigurationPropertyValidator, cdk.validateString], [convertCfnApiEndpointConfigurationPropertyToCloudFormation, cdk.stringToCloudFormation])(properties.endpointConfiguration),
+    "GatewayResponses": cdk.objectToCloudFormation(properties.gatewayResponses),
     "MethodSettings": cdk.listMapper(cdk.objectToCloudFormation)(properties.methodSettings),
     "MinimumCompressionSize": cdk.numberToCloudFormation(properties.minimumCompressionSize),
-    "Models": cdk.hashMapper(cdk.objectToCloudFormation)(properties.models),
+    "Models": cdk.objectToCloudFormation(properties.models),
     "Name": cdk.stringToCloudFormation(properties.name),
     "OpenApiVersion": cdk.stringToCloudFormation(properties.openApiVersion),
     "StageName": cdk.stringToCloudFormation(properties.stageName),
@@ -44718,11 +44728,11 @@ function CfnApiPropsFromCloudFormation(properties: any): cfn_parse.FromCloudForm
   ret.addPropertyResult("description", "Description", (properties.Description != null ? cfn_parse.FromCloudFormation.getString(properties.Description) : undefined));
   ret.addPropertyResult("disableExecuteApiEndpoint", "DisableExecuteApiEndpoint", (properties.DisableExecuteApiEndpoint != null ? cfn_parse.FromCloudFormation.getBoolean(properties.DisableExecuteApiEndpoint) : undefined));
   ret.addPropertyResult("domain", "Domain", (properties.Domain != null ? CfnApiDomainConfigurationPropertyFromCloudFormation(properties.Domain) : undefined));
-  ret.addPropertyResult("endpointConfiguration", "EndpointConfiguration", (properties.EndpointConfiguration != null ? CfnApiEndpointConfigurationPropertyFromCloudFormation(properties.EndpointConfiguration) : undefined));
-  ret.addPropertyResult("gatewayResponses", "GatewayResponses", (properties.GatewayResponses != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getAny)(properties.GatewayResponses) : undefined));
+  ret.addPropertyResult("endpointConfiguration", "EndpointConfiguration", (properties.EndpointConfiguration != null ? cfn_parse.FromCloudFormation.getTypeUnion([CfnApiEndpointConfigurationPropertyValidator, cdk.validateString], [CfnApiEndpointConfigurationPropertyFromCloudFormation, cfn_parse.FromCloudFormation.getString])(properties.EndpointConfiguration) : undefined));
+  ret.addPropertyResult("gatewayResponses", "GatewayResponses", (properties.GatewayResponses != null ? cfn_parse.FromCloudFormation.getAny(properties.GatewayResponses) : undefined));
   ret.addPropertyResult("methodSettings", "MethodSettings", (properties.MethodSettings != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getAny)(properties.MethodSettings) : undefined));
   ret.addPropertyResult("minimumCompressionSize", "MinimumCompressionSize", (properties.MinimumCompressionSize != null ? cfn_parse.FromCloudFormation.getNumber(properties.MinimumCompressionSize) : undefined));
-  ret.addPropertyResult("models", "Models", (properties.Models != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getAny)(properties.Models) : undefined));
+  ret.addPropertyResult("models", "Models", (properties.Models != null ? cfn_parse.FromCloudFormation.getAny(properties.Models) : undefined));
   ret.addPropertyResult("name", "Name", (properties.Name != null ? cfn_parse.FromCloudFormation.getString(properties.Name) : undefined));
   ret.addPropertyResult("openApiVersion", "OpenApiVersion", (properties.OpenApiVersion != null ? cfn_parse.FromCloudFormation.getString(properties.OpenApiVersion) : undefined));
   ret.addPropertyResult("stageName", "StageName", (properties.StageName != null ? cfn_parse.FromCloudFormation.getString(properties.StageName) : undefined));
@@ -44744,6 +44754,11 @@ export class CfnApplication extends cdk.CfnResource implements cdk.IInspectable,
    * The CloudFormation resource type name for this resource class.
    */
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "AWS::Serverless::Application";
+
+  /**
+   * The \`Transform\` a template must use in order to use this resource
+   */
+  public static readonly REQUIRED_TRANSFORM: string = "AWS::Serverless-2016-10-31";
 
   /**
    * Build a CfnApplication from CloudFormation properties
@@ -44769,7 +44784,7 @@ export class CfnApplication extends cdk.CfnResource implements cdk.IInspectable,
     return ret;
   }
 
-  public location?: CfnApplication.ApplicationLocationProperty | cdk.IResolvable | string;
+  public location: CfnApplication.ApplicationLocationProperty | cdk.IResolvable | string;
 
   public notificationArns?: Array<string>;
 
@@ -44784,11 +44799,15 @@ export class CfnApplication extends cdk.CfnResource implements cdk.IInspectable,
    * @param id Construct identifier for this resource (unique in its scope)
    * @param props Resource properties
    */
-  public constructor(scope: constructs.Construct, id: string, props: CfnApplicationProps = {}) {
+  public constructor(scope: constructs.Construct, id: string, props: CfnApplicationProps) {
     super(scope, id, {
       "type": CfnApplication.CFN_RESOURCE_TYPE_NAME,
       "properties": props
     });
+
+    cdk.requireProperty(props, "location", this);
+
+    this.stack.addTransform(CfnApplication.REQUIRED_TRANSFORM);
 
     this.location = props.location;
     this.notificationArns = props.notificationArns;
@@ -44853,7 +44872,7 @@ export interface CfnApplicationProps {
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-application.html#cfn-serverless-application-location
    */
-  readonly location?: CfnApplication.ApplicationLocationProperty | cdk.IResolvable | string;
+  readonly location: CfnApplication.ApplicationLocationProperty | cdk.IResolvable | string;
 
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-application.html#cfn-serverless-application-notificationarns
@@ -44937,6 +44956,7 @@ function CfnApplicationPropsValidator(properties: any): cdk.ValidationResult {
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
+  errors.collect(cdk.propertyValidator("location", cdk.requiredValidator)(properties.location));
   errors.collect(cdk.propertyValidator("location", cdk.unionValidator(CfnApplicationApplicationLocationPropertyValidator, cdk.validateString))(properties.location));
   errors.collect(cdk.propertyValidator("notificationArns", cdk.listValidator(cdk.validateString))(properties.notificationArns));
   errors.collect(cdk.propertyValidator("parameters", cdk.hashValidator(cdk.validateObject))(properties.parameters));
@@ -44988,6 +45008,11 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
    * The CloudFormation resource type name for this resource class.
    */
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "AWS::Serverless::Function";
+
+  /**
+   * The \`Transform\` a template must use in order to use this resource
+   */
+  public static readonly REQUIRED_TRANSFORM: string = "AWS::Serverless-2016-10-31";
 
   /**
    * Build a CfnFunction from CloudFormation properties
@@ -45089,6 +45114,8 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
       "type": CfnFunction.CFN_RESOURCE_TYPE_NAME,
       "properties": props
     });
+
+    this.stack.addTransform(CfnFunction.REQUIRED_TRANSFORM);
 
     this.architectures = props.architectures;
     this.assumeRolePolicyDocument = props.assumeRolePolicyDocument;
@@ -45236,7 +45263,7 @@ export namespace CfnFunction {
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-deploymentpreference.html#cfn-serverless-function-deploymentpreference-hooks
      */
-    readonly hooks?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
+    readonly hooks?: CfnFunction.HooksProperty | cdk.IResolvable;
 
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-deploymentpreference.html#cfn-serverless-function-deploymentpreference-role
@@ -45247,6 +45274,22 @@ export namespace CfnFunction {
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-deploymentpreference.html#cfn-serverless-function-deploymentpreference-type
      */
     readonly type?: string;
+  }
+
+  /**
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-hooks.html
+   */
+  export interface HooksProperty {
+    /**
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-hooks.html#cfn-serverless-function-hooks-pretraffic
+     */
+    readonly preTraffic?: string;
+
+    /**
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-hooks.html#cfn-serverless-function-hooks-posttraffic
+     */
+    readonly postTraffic?: string;
   }
 
   /**
@@ -45953,7 +45996,7 @@ export namespace CfnFunction {
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-iampolicydocument.html#cfn-serverless-function-iampolicydocument-statement
      */
-    readonly statement: Array<any | cdk.IResolvable> | cdk.IResolvable;
+    readonly statement: any | cdk.IResolvable;
 
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-iampolicydocument.html#cfn-serverless-function-iampolicydocument-version
@@ -46615,6 +46658,51 @@ function CfnFunctionDeadLetterQueuePropertyFromCloudFormation(properties: any): 
 }
 
 /**
+ * Determine whether the given properties match those of a \`HooksProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`HooksProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnFunctionHooksPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("postTraffic", cdk.validateString)(properties.postTraffic));
+  errors.collect(cdk.propertyValidator("preTraffic", cdk.validateString)(properties.preTraffic));
+  return errors.wrap("supplied properties not correct for \\"HooksProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnFunctionHooksPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnFunctionHooksPropertyValidator(properties).assertSuccess();
+  return {
+    "PostTraffic": cdk.stringToCloudFormation(properties.postTraffic),
+    "PreTraffic": cdk.stringToCloudFormation(properties.preTraffic)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnFunctionHooksPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnFunction.HooksProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.HooksProperty>();
+  ret.addPropertyResult("postTraffic", "PostTraffic", (properties.PostTraffic != null ? cfn_parse.FromCloudFormation.getString(properties.PostTraffic) : undefined));
+  ret.addPropertyResult("preTraffic", "PreTraffic", (properties.PreTraffic != null ? cfn_parse.FromCloudFormation.getString(properties.PreTraffic) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
+}
+
+/**
  * Determine whether the given properties match those of a \`DeploymentPreferenceProperty\`
  *
  * @param properties - the TypeScript properties of a \`DeploymentPreferenceProperty\`
@@ -46630,7 +46718,7 @@ function CfnFunctionDeploymentPreferencePropertyValidator(properties: any): cdk.
   }
   errors.collect(cdk.propertyValidator("alarms", cdk.listValidator(cdk.validateString))(properties.alarms));
   errors.collect(cdk.propertyValidator("enabled", cdk.validateBoolean)(properties.enabled));
-  errors.collect(cdk.propertyValidator("hooks", cdk.hashValidator(cdk.validateObject))(properties.hooks));
+  errors.collect(cdk.propertyValidator("hooks", CfnFunctionHooksPropertyValidator)(properties.hooks));
   errors.collect(cdk.propertyValidator("role", cdk.validateString)(properties.role));
   errors.collect(cdk.propertyValidator("type", cdk.validateString)(properties.type));
   return errors.wrap("supplied properties not correct for \\"DeploymentPreferenceProperty\\"");
@@ -46643,7 +46731,7 @@ function convertCfnFunctionDeploymentPreferencePropertyToCloudFormation(properti
   return {
     "Alarms": cdk.listMapper(cdk.stringToCloudFormation)(properties.alarms),
     "Enabled": cdk.booleanToCloudFormation(properties.enabled),
-    "Hooks": cdk.hashMapper(cdk.objectToCloudFormation)(properties.hooks),
+    "Hooks": convertCfnFunctionHooksPropertyToCloudFormation(properties.hooks),
     "Role": cdk.stringToCloudFormation(properties.role),
     "Type": cdk.stringToCloudFormation(properties.type)
   };
@@ -46661,7 +46749,7 @@ function CfnFunctionDeploymentPreferencePropertyFromCloudFormation(properties: a
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.DeploymentPreferenceProperty>();
   ret.addPropertyResult("alarms", "Alarms", (properties.Alarms != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.Alarms) : undefined));
   ret.addPropertyResult("enabled", "Enabled", (properties.Enabled != null ? cfn_parse.FromCloudFormation.getBoolean(properties.Enabled) : undefined));
-  ret.addPropertyResult("hooks", "Hooks", (properties.Hooks != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getAny)(properties.Hooks) : undefined));
+  ret.addPropertyResult("hooks", "Hooks", (properties.Hooks != null ? CfnFunctionHooksPropertyFromCloudFormation(properties.Hooks) : undefined));
   ret.addPropertyResult("role", "Role", (properties.Role != null ? cfn_parse.FromCloudFormation.getString(properties.Role) : undefined));
   ret.addPropertyResult("type", "Type", (properties.Type != null ? cfn_parse.FromCloudFormation.getString(properties.Type) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
@@ -48228,7 +48316,7 @@ function CfnFunctionIAMPolicyDocumentPropertyValidator(properties: any): cdk.Val
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
   errors.collect(cdk.propertyValidator("statement", cdk.requiredValidator)(properties.statement));
-  errors.collect(cdk.propertyValidator("statement", cdk.listValidator(cdk.validateObject))(properties.statement));
+  errors.collect(cdk.propertyValidator("statement", cdk.validateObject)(properties.statement));
   errors.collect(cdk.propertyValidator("version", cdk.validateString)(properties.version));
   return errors.wrap("supplied properties not correct for \\"IAMPolicyDocumentProperty\\"");
 }
@@ -48238,7 +48326,7 @@ function convertCfnFunctionIAMPolicyDocumentPropertyToCloudFormation(properties:
   if (!cdk.canInspect(properties)) return properties;
   CfnFunctionIAMPolicyDocumentPropertyValidator(properties).assertSuccess();
   return {
-    "Statement": cdk.listMapper(cdk.objectToCloudFormation)(properties.statement),
+    "Statement": cdk.objectToCloudFormation(properties.statement),
     "Version": cdk.stringToCloudFormation(properties.version)
   };
 }
@@ -48253,7 +48341,7 @@ function CfnFunctionIAMPolicyDocumentPropertyFromCloudFormation(properties: any)
     return new cfn_parse.FromCloudFormationResult(properties);
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.IAMPolicyDocumentProperty>();
-  ret.addPropertyResult("statement", "Statement", (properties.Statement != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getAny)(properties.Statement) : undefined));
+  ret.addPropertyResult("statement", "Statement", (properties.Statement != null ? cfn_parse.FromCloudFormation.getAny(properties.Statement) : undefined));
   ret.addPropertyResult("version", "Version", (properties.Version != null ? cfn_parse.FromCloudFormation.getString(properties.Version) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
@@ -49328,6 +49416,11 @@ export class CfnHttpApi extends cdk.CfnResource implements cdk.IInspectable, cdk
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "AWS::Serverless::HttpApi";
 
   /**
+   * The \`Transform\` a template must use in order to use this resource
+   */
+  public static readonly REQUIRED_TRANSFORM: string = "AWS::Serverless-2016-10-31";
+
+  /**
    * Build a CfnHttpApi from CloudFormation properties
    *
    * A factory method that creates a new instance of this class from an object
@@ -49389,6 +49482,8 @@ export class CfnHttpApi extends cdk.CfnResource implements cdk.IInspectable, cdk
       "type": CfnHttpApi.CFN_RESOURCE_TYPE_NAME,
       "properties": props
     });
+
+    this.stack.addTransform(CfnHttpApi.REQUIRED_TRANSFORM);
 
     this.accessLogSetting = props.accessLogSetting;
     this.auth = props.auth;
@@ -50238,6 +50333,11 @@ export class CfnLayerVersion extends cdk.CfnResource implements cdk.IInspectable
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "AWS::Serverless::LayerVersion";
 
   /**
+   * The \`Transform\` a template must use in order to use this resource
+   */
+  public static readonly REQUIRED_TRANSFORM: string = "AWS::Serverless-2016-10-31";
+
+  /**
    * Build a CfnLayerVersion from CloudFormation properties
    *
    * A factory method that creates a new instance of this class from an object
@@ -50283,6 +50383,8 @@ export class CfnLayerVersion extends cdk.CfnResource implements cdk.IInspectable
       "type": CfnLayerVersion.CFN_RESOURCE_TYPE_NAME,
       "properties": props
     });
+
+    this.stack.addTransform(CfnLayerVersion.REQUIRED_TRANSFORM);
 
     this.compatibleRuntimes = props.compatibleRuntimes;
     this.contentUri = props.contentUri;
@@ -50500,6 +50602,11 @@ export class CfnSimpleTable extends cdk.CfnResource implements cdk.IInspectable,
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "AWS::Serverless::SimpleTable";
 
   /**
+   * The \`Transform\` a template must use in order to use this resource
+   */
+  public static readonly REQUIRED_TRANSFORM: string = "AWS::Serverless-2016-10-31";
+
+  /**
    * Build a CfnSimpleTable from CloudFormation properties
    *
    * A factory method that creates a new instance of this class from an object
@@ -50543,6 +50650,8 @@ export class CfnSimpleTable extends cdk.CfnResource implements cdk.IInspectable,
       "type": CfnSimpleTable.CFN_RESOURCE_TYPE_NAME,
       "properties": props
     });
+
+    this.stack.addTransform(CfnSimpleTable.REQUIRED_TRANSFORM);
 
     this.primaryKey = props.primaryKey;
     this.provisionedThroughput = props.provisionedThroughput;
@@ -50858,6 +50967,11 @@ export class CfnStateMachine extends cdk.CfnResource implements cdk.IInspectable
   public static readonly CFN_RESOURCE_TYPE_NAME: string = "AWS::Serverless::StateMachine";
 
   /**
+   * The \`Transform\` a template must use in order to use this resource
+   */
+  public static readonly REQUIRED_TRANSFORM: string = "AWS::Serverless-2016-10-31";
+
+  /**
    * Build a CfnStateMachine from CloudFormation properties
    *
    * A factory method that creates a new instance of this class from an object
@@ -50915,6 +51029,8 @@ export class CfnStateMachine extends cdk.CfnResource implements cdk.IInspectable
       "type": CfnStateMachine.CFN_RESOURCE_TYPE_NAME,
       "properties": props
     });
+
+    this.stack.addTransform(CfnStateMachine.REQUIRED_TRANSFORM);
 
     this.definition = props.definition;
     this.definitionSubstitutions = props.definitionSubstitutions;
@@ -51142,7 +51258,7 @@ export namespace CfnStateMachine {
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-statemachine-iampolicydocument.html#cfn-serverless-statemachine-iampolicydocument-statement
      */
-    readonly statement: Array<any | cdk.IResolvable> | cdk.IResolvable;
+    readonly statement: any | cdk.IResolvable;
 
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-statemachine-iampolicydocument.html#cfn-serverless-statemachine-iampolicydocument-version
@@ -51718,7 +51834,7 @@ function CfnStateMachineIAMPolicyDocumentPropertyValidator(properties: any): cdk
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
   errors.collect(cdk.propertyValidator("statement", cdk.requiredValidator)(properties.statement));
-  errors.collect(cdk.propertyValidator("statement", cdk.listValidator(cdk.validateObject))(properties.statement));
+  errors.collect(cdk.propertyValidator("statement", cdk.validateObject)(properties.statement));
   errors.collect(cdk.propertyValidator("version", cdk.requiredValidator)(properties.version));
   errors.collect(cdk.propertyValidator("version", cdk.validateString)(properties.version));
   return errors.wrap("supplied properties not correct for \\"IAMPolicyDocumentProperty\\"");
@@ -51729,7 +51845,7 @@ function convertCfnStateMachineIAMPolicyDocumentPropertyToCloudFormation(propert
   if (!cdk.canInspect(properties)) return properties;
   CfnStateMachineIAMPolicyDocumentPropertyValidator(properties).assertSuccess();
   return {
-    "Statement": cdk.listMapper(cdk.objectToCloudFormation)(properties.statement),
+    "Statement": cdk.objectToCloudFormation(properties.statement),
     "Version": cdk.stringToCloudFormation(properties.version)
   };
 }
@@ -51744,7 +51860,7 @@ function CfnStateMachineIAMPolicyDocumentPropertyFromCloudFormation(properties: 
     return new cfn_parse.FromCloudFormationResult(properties);
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnStateMachine.IAMPolicyDocumentProperty>();
-  ret.addPropertyResult("statement", "Statement", (properties.Statement != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getAny)(properties.Statement) : undefined));
+  ret.addPropertyResult("statement", "Statement", (properties.Statement != null ? cfn_parse.FromCloudFormation.getAny(properties.Statement) : undefined));
   ret.addPropertyResult("version", "Version", (properties.Version != null ? cfn_parse.FromCloudFormation.getString(properties.Version) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;

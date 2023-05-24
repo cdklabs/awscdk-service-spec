@@ -25,6 +25,7 @@ export class SamResources {
   private readonly resolve: ReturnType<typeof jsonschema.makeResolver>;
   private readonly regions: Region[];
   private readonly db: SpecDatabase;
+  private readonly defaultTransform = 'AWS::Serverless-2016-10-31';
 
   constructor(private readonly options: SamResourcesOptions) {
     this.db = options.db;
@@ -34,8 +35,8 @@ export class SamResources {
 
   public import() {
     const samResources = this.findSamResources();
-
     const samService = this.samService();
+    const cloudFormationTransform = this.cloudFormationTransform();
 
     for (const samResource of samResources) {
       // Convert resource definition to something that can go into the regular registry parser
@@ -46,6 +47,7 @@ export class SamResources {
         report: this.options.report,
         resource: resourceSpec,
       });
+      resource.cloudFormationTransform = cloudFormationTransform;
 
       this.db.link('hasResource', samService, resource);
       for (const region of this.regions) {
@@ -128,19 +130,26 @@ export class SamResources {
     const emptyObject: jsonschema.RecordLikeObject = { type: 'object', additionalProperties: false, properties: {} };
     const propertiesSchema = this.resolve(def.properties.Properties ?? emptyObject);
 
-    const properties =
-      jsonschema.isObject(propertiesSchema) && jsonschema.isRecordLikeObject(propertiesSchema)
-        ? propertiesSchema.properties
-        : {};
+    let properties = {};
+    let required;
+    if (jsonschema.isObject(propertiesSchema) && jsonschema.isRecordLikeObject(propertiesSchema)) {
+      properties = propertiesSchema.properties;
+      required = propertiesSchema.required;
+    }
 
     return {
       typeName,
       description: `Definition of ${typeName}`,
       properties,
+      required,
 
       // This will make sure that all reference are still valid. Yes this will contain
       // too much, but that's okay.
       definitions: this.options.samSchema.definitions,
     };
+  }
+
+  private cloudFormationTransform(): string {
+    return (this.options.samSchema?.properties?.Transform as any)?.enum?.[0] ?? this.defaultTransform;
   }
 }
