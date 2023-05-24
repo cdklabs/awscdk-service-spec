@@ -271,15 +271,6 @@ export class TypeConverter {
     }
 
     if (type.unionOfTypes) {
-      // const u = new Set(
-      //   [...type.unionOfTypes.map((t) => this.makeTypeResolvable(t)), CDK_CORE.IResolvable].flatMap((t) => {
-      //     if (t.unionOfTypes) {
-      //       return t.unionOfTypes;
-      //     }
-
-      //     return t;
-      //   }),
-      // );
       return Type.distinctUnionOf(...type.unionOfTypes.map((t) => this.makeTypeResolvable(t)), CDK_CORE.IResolvable);
     }
 

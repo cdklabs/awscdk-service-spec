@@ -144,13 +144,6 @@ export class Type {
     throw new Error(`Unknown type reference: ${JSON.stringify(this.spec)}`);
   }
 
-  /**
-   * Is this type equal to another one.
-   */
-  public compare(that: Type): number {
-    return this.toString().localeCompare(that.toString());
-  }
-
   public get fqn(): string | undefined {
     return this.spec && isFqnSpec(this.spec) ? this.spec.fqn : undefined;
   }
