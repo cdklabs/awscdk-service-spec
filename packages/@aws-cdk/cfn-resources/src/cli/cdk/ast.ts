@@ -4,7 +4,6 @@ import { AugmentationsModule } from './augmentation-generator';
 import { CannedMetricsModule } from './canned-metrics';
 import { CDK_CORE, CONSTRUCTS, ModuleImportLocations } from './cdk';
 import { ResourceClass } from './resource-class';
-import { TypeConverter } from './type-converter';
 
 /**
  * A module containing a single resource
@@ -94,11 +93,10 @@ export class AstBuilder<T extends Module> {
   }
 
   public addResource(resource: Resource) {
-    const resourceClass = new ResourceClass(this.module, resource, this.nameSuffix);
+    const resourceClass = new ResourceClass(this.module, this.db, resource, this.nameSuffix);
     this.resources[resource.cloudFormationType] = resourceClass.spec.name;
 
-    const converter = new TypeConverter({ db: this.db, resource, resourceClass });
-    resourceClass.build(converter);
+    resourceClass.build();
 
     this.augmentations?.augmentResource(resource, resourceClass);
   }

@@ -1,7 +1,17 @@
 import { SpecDatabase, PropertyType, Resource, TypeDefinition, Attribute, Property } from '@aws-cdk/service-spec';
-import { ClassType, Expression, Module, PrimitiveType, StructType, Type, TypeDeclaration } from '@cdklabs/typewriter';
+import {
+  ClassType,
+  Expression,
+  Module,
+  PrimitiveType,
+  RichScope,
+  StructType,
+  Type,
+  TypeDeclaration,
+} from '@cdklabs/typewriter';
 import { CDK_CORE } from './cdk';
 import { TypeDefinitionTypeBuilder } from './typedefinition-type-builder';
+import { structNameFromTypeDefinition } from '../naming/conventions';
 
 export interface TypeConverterOptions {
   readonly db: SpecDatabase;
@@ -38,6 +48,19 @@ export class TypeConverter {
     return new TypeConverter({
       ...opts,
       typeDefinitionConverter: (typeDefinition, converter) => {
+        // Defensive programming: we have some current issues in the database
+        // that would lead to duplicate definitions. Short-circuit that by checking if the
+        // type already exists and return that instead.
+        const existing = new RichScope(opts.resourceClass).tryFindTypeByName(
+          structNameFromTypeDefinition(typeDefinition),
+        );
+        if (existing) {
+          return {
+            structType: existing as StructType,
+            build: () => {},
+          };
+        }
+
         const builder = new TypeDefinitionTypeBuilder({
           resource: opts.resource,
           resourceClass: opts.resourceClass,

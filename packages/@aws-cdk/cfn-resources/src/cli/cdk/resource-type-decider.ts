@@ -95,7 +95,7 @@ export class ResourceTypeDecider {
         immutable: false,
         docs: this.defaultPropDocs(cfnName, prop),
       },
-      initializer: (props: Expression) => $E(props)[name],
+      initializer: (props: Expression) => expr.get(props, name),
       cfnValueToRender: { [name]: $this[name] },
     });
   }
