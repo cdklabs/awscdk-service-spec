@@ -5,9 +5,9 @@ import { structNameFromTypeDefinition } from '../naming/conventions';
 import { splitDocumentation } from '../split-summary';
 import { cloudFormationDocLink } from '../naming/doclink';
 import { CloudFormationMapping } from '../cloudformation-mapping';
-import { TypeDefinitionDecider } from './type-definition-decider';
+import { TypeDefinitionDecider } from './typedefinition-decider';
 
-export interface TypeDefinitionTypeBuilderOptions {
+export interface TypeDefinitionStructOptions {
   readonly typeDefinition: TypeDefinition;
   readonly converter: TypeConverter;
   readonly resource: Resource;
@@ -19,46 +19,43 @@ export interface TypeDefinitionTypeBuilderOptions {
  *
  * Uses the TypeDefinitionDecider for the actual decisions, and carries those out.
  */
-export class TypeDefinitionTypeBuilder {
-  public readonly structType: StructType;
-
+export class TypeDefinitionStruct extends StructType {
   private readonly typeDefinition: TypeDefinition;
   private readonly converter: TypeConverter;
   private readonly resource: Resource;
-  private readonly resourceClass: ClassType;
   private readonly module: Module;
 
-  constructor(options: TypeDefinitionTypeBuilderOptions) {
-    this.typeDefinition = options.typeDefinition;
-    this.converter = options.converter;
-    this.resource = options.resource;
-    this.resourceClass = options.resourceClass;
-
-    this.module = Module.of(this.resourceClass);
-    this.structType = new StructType(this.resourceClass, {
+  constructor(options: TypeDefinitionStructOptions) {
+    super(options.resourceClass, {
       export: true,
-      name: structNameFromTypeDefinition(this.typeDefinition),
+      name: structNameFromTypeDefinition(options.typeDefinition),
       docs: {
-        ...splitDocumentation(this.typeDefinition.documentation),
+        ...splitDocumentation(options.typeDefinition.documentation),
         see: cloudFormationDocLink({
-          resourceType: this.resource.cloudFormationType,
-          propTypeName: this.typeDefinition.name,
+          resourceType: options.resource.cloudFormationType,
+          propTypeName: options.typeDefinition.name,
         }),
       },
     });
+
+    this.typeDefinition = options.typeDefinition;
+    this.converter = options.converter;
+    this.resource = options.resource;
+
+    this.module = Module.of(this);
   }
 
-  public makeMembers() {
+  public build() {
     const cfnMapping = new CloudFormationMapping(this.module);
 
     const decider = new TypeDefinitionDecider(this.resource, this.typeDefinition, this.converter);
 
     for (const prop of decider.properties) {
-      this.structType.addProperty(prop.propertySpec);
+      this.addProperty(prop.propertySpec);
       cfnMapping.add(prop.cfnMapping);
     }
 
-    cfnMapping.makeCfnProducer(this.module, this.structType);
-    cfnMapping.makeCfnParser(this.module, this.structType);
+    cfnMapping.makeCfnProducer(this.module, this);
+    cfnMapping.makeCfnParser(this.module, this);
   }
 }

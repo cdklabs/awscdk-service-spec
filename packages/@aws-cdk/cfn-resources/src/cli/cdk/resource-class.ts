@@ -30,7 +30,7 @@ import {
 } from '../naming/conventions';
 import { cloudFormationDocLink } from '../naming/doclink';
 import { splitDocumentation } from '../split-summary';
-import { ResourceTypeDecider } from './resource-type-decider';
+import { ResourceDecider } from './resource-decider';
 import { TypeConverter } from './type-converter';
 import { CloudFormationMapping } from '../cloudformation-mapping';
 
@@ -43,7 +43,7 @@ const $this = $E(expr.this_());
 
 export class ResourceClass extends ClassType {
   private readonly propsType: StructType;
-  private readonly decider: ResourceTypeDecider;
+  private readonly decider: ResourceDecider;
   private readonly module: Module;
 
   constructor(scope: IScope, db: SpecDatabase, private readonly resource: Resource, private readonly suffix?: string) {
@@ -58,7 +58,7 @@ export class ResourceClass extends ClassType {
         }),
       },
       extends: CDK_CORE.CfnResource,
-      implements: [CDK_CORE.IInspectable, ...ResourceTypeDecider.taggabilityInterfaces(resource)],
+      implements: [CDK_CORE.IInspectable, ...ResourceDecider.taggabilityInterfaces(resource)],
     });
 
     this.module = Module.of(this);
@@ -81,7 +81,7 @@ export class ResourceClass extends ClassType {
       resourceClass: this,
     });
 
-    this.decider = new ResourceTypeDecider(this.resource, converter);
+    this.decider = new ResourceDecider(this.resource, converter);
   }
 
   /**

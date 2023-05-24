@@ -17,7 +17,7 @@ const $this = $E(expr.this_());
 /**
  * Decide how properties get mapped between model types, Typescript types, and CloudFormation
  */
-export class ResourceTypeDecider {
+export class ResourceDecider {
   public static taggabilityInterfaces(resource: Resource) {
     const taggability = resourceTaggabilityStyle(resource);
     return taggability?.style === 'legacy'
@@ -165,7 +165,7 @@ export class ResourceTypeDecider {
       {
         propertySpec: {
           name: rawTagsPropName,
-          type: originalType,
+          type: propsTagType,
           optional: true, // Tags are never required
           docs: this.defaultPropDocs(cfnName, prop),
         },

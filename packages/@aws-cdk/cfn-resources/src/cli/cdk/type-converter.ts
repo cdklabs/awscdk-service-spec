@@ -10,7 +10,7 @@ import {
   TypeDeclaration,
 } from '@cdklabs/typewriter';
 import { CDK_CORE } from './cdk';
-import { TypeDefinitionTypeBuilder } from './typedefinition-type-builder';
+import { TypeDefinitionStruct } from './typedefinition-struct';
 import { structNameFromTypeDefinition } from '../naming/conventions';
 
 export interface TypeConverterOptions {
@@ -61,7 +61,7 @@ export class TypeConverter {
           };
         }
 
-        const builder = new TypeDefinitionTypeBuilder({
+        const structType = new TypeDefinitionStruct({
           resource: opts.resource,
           resourceClass: opts.resourceClass,
           converter,
@@ -69,8 +69,8 @@ export class TypeConverter {
         });
 
         return {
-          structType: builder.structType,
-          build: () => builder.makeMembers(),
+          structType: structType,
+          build: () => structType.build(),
         };
       },
     });

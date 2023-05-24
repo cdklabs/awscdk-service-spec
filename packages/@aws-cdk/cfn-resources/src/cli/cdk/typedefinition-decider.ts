@@ -2,7 +2,7 @@ import { Property, Resource, TypeDefinition } from '@aws-cdk/service-spec';
 import { PropertySpec, Type } from '@cdklabs/typewriter';
 import { TypeConverter } from './type-converter';
 import { propertyNameFromCloudFormation } from '../naming/conventions';
-import { deprecationMessage } from './resource-type-decider';
+import { deprecationMessage } from './resource-decider';
 import { splitDocumentation } from '../split-summary';
 import { cloudFormationDocLink } from '../naming/doclink';
 import { PropertyMapping } from '../cloudformation-mapping';
