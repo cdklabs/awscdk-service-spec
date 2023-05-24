@@ -271,7 +271,16 @@ export class TypeConverter {
     }
 
     if (type.unionOfTypes) {
-      return Type.unionOf(...type.unionOfTypes, CDK_CORE.IResolvable);
+      // const u = new Set(
+      //   [...type.unionOfTypes.map((t) => this.makeTypeResolvable(t)), CDK_CORE.IResolvable].flatMap((t) => {
+      //     if (t.unionOfTypes) {
+      //       return t.unionOfTypes;
+      //     }
+
+      //     return t;
+      //   }),
+      // );
+      return Type.distinctUnionOf(...type.unionOfTypes.map((t) => this.makeTypeResolvable(t)), CDK_CORE.IResolvable);
     }
 
     return Type.unionOf(type, CDK_CORE.IResolvable);
