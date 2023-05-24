@@ -93,7 +93,7 @@ export class ResourceDecider {
         type,
         optional,
         immutable: false,
-        docs: this.defaultPropDocs(cfnName, prop),
+        docs: this.defaultClassPropDocs(cfnName, prop),
       },
       initializer: (props: Expression) => expr.get(props, name),
       cfnValueToRender: { [name]: $this[name] },
@@ -150,6 +150,9 @@ export class ResourceDecider {
           name: 'tags',
           type: CDK_CORE.TagManager,
           immutable: true,
+          docs: {
+            summary: 'Tag Manager which manages the tags for this resource',
+          },
         },
         initializer: (props: Expression) =>
           new CDK_CORE.TagManager(
@@ -167,7 +170,7 @@ export class ResourceDecider {
           name: rawTagsPropName,
           type: propsTagType,
           optional: true, // Tags are never required
-          docs: this.defaultPropDocs(cfnName, prop),
+          docs: this.defaultClassPropDocs(cfnName, prop),
         },
         initializer: (props: Expression) => $E(props)[originalName],
         cfnValueToRender: {}, // Gets rendered as part of the TagManager above
@@ -202,6 +205,9 @@ export class ResourceDecider {
           name: 'cdkTagManager',
           type: CDK_CORE.TagManager,
           immutable: true,
+          docs: {
+            summary: 'Tag Manager which manages the tags for this resource',
+          },
         },
         initializer: (props: Expression) =>
           new CDK_CORE.TagManager(
@@ -219,7 +225,7 @@ export class ResourceDecider {
           name: originalName,
           type: originalType,
           optional: true, // Tags are never required
-          docs: this.defaultPropDocs(cfnName, prop),
+          docs: this.defaultClassPropDocs(cfnName, prop),
         },
         initializer: (props: Expression) => $E(props)[originalName],
         cfnValueToRender: {}, // Gets rendered as part of the TagManager above
@@ -273,6 +279,17 @@ export class ResourceDecider {
     return {
       ...splitDocumentation(prop.documentation),
       default: prop.defaultValue ?? undefined,
+      see: cloudFormationDocLink({
+        resourceType: this.resource.cloudFormationType,
+        propName: cfnName,
+      }),
+      deprecated: deprecationMessage(prop),
+    };
+  }
+
+  private defaultClassPropDocs(cfnName: string, prop: Property) {
+    return {
+      summary: splitDocumentation(prop.documentation).summary,
       see: cloudFormationDocLink({
         resourceType: this.resource.cloudFormationType,
         propName: cfnName,
