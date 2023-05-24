@@ -1,11 +1,11 @@
 import { $E, expr, FreeFunction, IScope, stmt, StructType, Type } from '@cdklabs/typewriter';
 import { CDK_CORE } from './cdk';
 import { cfnPropsValidatorNameFromType } from '../naming/conventions';
-import { PropMapping } from '../prop-mapping';
+import { CloudFormationMapping } from '../cloudformation-mapping';
 
 export interface PropertyValidatorSpec {
   type: StructType;
-  mapping: PropMapping;
+  mapping: CloudFormationMapping;
 }
 
 export class PropertyValidator extends FreeFunction {

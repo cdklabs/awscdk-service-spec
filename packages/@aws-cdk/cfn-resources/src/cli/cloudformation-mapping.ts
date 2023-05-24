@@ -4,27 +4,41 @@ import {
   ObjectPropertyAccess,
   IsNotNullish,
   Type,
-  PropertySpec,
   ThingSymbol,
   IScope,
   StructType,
   PrimitiveType,
+  FreeFunction,
+  stmt,
+  $E,
+  IsObject,
 } from '@cdklabs/typewriter';
 import { CDK_CORE } from './cdk/cdk';
 import { cfnParserNameFromType, cfnProducerNameFromType, cfnPropsValidatorNameFromType } from './naming/conventions';
+import { PropertyValidator } from './cdk/property-validator';
+
+export interface PropertyMapping {
+  readonly cfnName: string;
+  readonly propName: string;
+  readonly baseType: Type;
+  readonly optional?: boolean;
+}
 
 /**
- * Retain a list of properties with their CloudFormation and TypeScript names
+ * Convert values between CloudFormation and TypeScript
+ *
+ * Retain a list of properties with their CloudFormation and TypeScript names, and generate
+ * TypeScript expression that convert between the respective types.
  */
-export class PropMapping {
+export class CloudFormationMapping {
   private readonly cfn2ts: Record<string, string> = {};
-  private readonly cfn2Prop: Record<string, PropertySpec> = {};
+  private readonly cfn2Prop: Record<string, PropertyMapping> = {};
 
   constructor(private readonly mapperFunctionsScope: IScope) {}
 
-  public add(cfnName: string, property: PropertySpec) {
-    this.cfn2ts[cfnName] = property.name;
-    this.cfn2Prop[cfnName] = property;
+  public add(mapping: PropertyMapping) {
+    this.cfn2ts[mapping.cfnName] = mapping.propName;
+    this.cfn2Prop[mapping.cfnName] = mapping;
   }
 
   public cfnFromTs(): Array<[string, string]> {
@@ -37,7 +51,7 @@ export class PropMapping {
 
   public produceProperty(cfnName: string, struct: Expression): Expression {
     const value = new ObjectPropertyAccess(struct, this.cfn2ts[cfnName]);
-    const type = this.cfn2Prop[cfnName].type;
+    const type = this.cfn2Prop[cfnName].baseType;
     if (!type) {
       throw new Error(`No type for ${cfnName}`);
     }
@@ -47,7 +61,7 @@ export class PropMapping {
 
   public parseProperty(cfnName: string, propsObj: Expression): Expression {
     const value = new ObjectPropertyAccess(propsObj, cfnName);
-    const type = this.cfn2Prop[cfnName].type;
+    const type = this.cfn2Prop[cfnName].baseType;
     if (!type) {
       throw new Error(`No type for ${cfnName}`);
     }
@@ -65,8 +79,8 @@ export class PropMapping {
         errorsObj.callMethod(
           'collect',
           CDK_CORE.propertyValidator
-            .call(expr.lit(prop.name), CDK_CORE.requiredValidator)
-            .call(propsObj.prop(prop.name)),
+            .call(expr.lit(prop.propName), CDK_CORE.requiredValidator)
+            .call(propsObj.prop(prop.propName)),
         ),
       );
     }
@@ -75,8 +89,8 @@ export class PropMapping {
       errorsObj.callMethod(
         'collect',
         CDK_CORE.propertyValidator
-          .call(expr.lit(prop.name), this.typeHandlers(prop.type).validate)
-          .call(propsObj.prop(prop.name)),
+          .call(expr.lit(prop.propName), this.typeHandlers(prop.baseType).validate)
+          .call(propsObj.prop(prop.propName)),
       ),
     );
 
@@ -174,6 +188,77 @@ export class PropMapping {
 
     const todo = expr.ident(`/* @todo typeHandlers(${type}) */`);
     return { produce: todo, parse: todo, validate: todo };
+  }
+
+  /**
+   * Make the function that translates code -> CFN
+   */
+  public makeCfnProducer(scope: IScope, propsInterface: StructType) {
+    const validator = new PropertyValidator(scope, {
+      type: propsInterface,
+      mapping: this,
+    });
+
+    const producer = new FreeFunction(scope, {
+      name: cfnProducerNameFromType(propsInterface),
+      returnType: Type.ANY,
+    });
+
+    const propsObj = producer.addParameter({
+      name: 'properties',
+      type: Type.ANY,
+    });
+
+    producer.addBody(
+      stmt.if_(expr.not(CDK_CORE.canInspect(propsObj))).then(stmt.ret(propsObj)),
+      validator.fn.call(propsObj).callMethod('assertSuccess'),
+      stmt.ret(expr.object(this.cfnProperties().map((cfn) => [cfn, this.produceProperty(cfn, propsObj)] as const))),
+    );
+
+    return producer;
+  }
+
+  /**
+   * Make the function that translates CFN -> code
+   */
+  public makeCfnParser(scope: IScope, propsInterface: StructType) {
+    const parserType = Type.unionOf(propsInterface.type, CDK_CORE.IResolvable);
+
+    const parser = new FreeFunction(scope, {
+      name: cfnParserNameFromType(propsInterface),
+      returnType: CDK_CORE.helpers.FromCloudFormationResult.withGenericArguments(parserType),
+    });
+
+    const propsObj = parser.addParameter({
+      name: 'properties',
+      type: Type.ANY,
+    });
+
+    const $ret = $E(expr.ident('ret'));
+
+    parser.addBody(
+      stmt
+        .if_(CDK_CORE.isResolvableObject(propsObj))
+        .then(stmt.block(stmt.ret(new CDK_CORE.helpers.FromCloudFormationResult(propsObj)))),
+      stmt.assign(propsObj, expr.cond(expr.binOp(propsObj, '==', expr.NULL)).then(expr.lit({})).else(propsObj)),
+      stmt
+        .if_(expr.not(new IsObject(propsObj)))
+        .then(stmt.block(stmt.ret(new CDK_CORE.helpers.FromCloudFormationResult(propsObj)))),
+
+      stmt.constVar(
+        $ret,
+        CDK_CORE.helpers.FromCloudFormationPropertyObject.withGenericArguments(propsInterface.type).newInstance(),
+      ),
+
+      ...this.cfnFromTs().map(([cfnName, tsName]) =>
+        $ret.addPropertyResult(expr.lit(tsName), expr.lit(cfnName), this.parseProperty(cfnName, propsObj)),
+      ),
+
+      $ret.addUnrecognizedPropertiesAsExtra(propsObj),
+      stmt.ret($ret),
+    );
+
+    return parser;
   }
 }
 

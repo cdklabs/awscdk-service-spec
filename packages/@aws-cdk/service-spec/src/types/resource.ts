@@ -91,6 +91,8 @@ export interface Property {
 
   /**
    * Is this property required
+   *
+   * @default false
    */
   required?: boolean;
 

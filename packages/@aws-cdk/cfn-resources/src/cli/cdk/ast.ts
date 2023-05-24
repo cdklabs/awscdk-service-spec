@@ -1,13 +1,10 @@
 import { SpecDatabase, Resource, Service } from '@aws-cdk/service-spec';
-import { StructType, Module, Stability } from '@cdklabs/typewriter';
+import { Module } from '@cdklabs/typewriter';
 import { AugmentationsModule } from './augmentation-generator';
 import { CannedMetricsModule } from './canned-metrics';
 import { CDK_CORE, CONSTRUCTS, ModuleImportLocations } from './cdk';
 import { ResourceClass } from './resource-class';
 import { TypeConverter } from './type-converter';
-import { classNameFromResource, propStructNameFromResource } from '../naming/conventions';
-import { cloudFormationDocLink } from '../naming/doclink';
-import { PropMapping } from '../prop-mapping';
 
 /**
  * A module containing a single resource
@@ -101,38 +98,8 @@ export class AstBuilder<T extends Module> {
     this.resources[resource.cloudFormationType] = resourceClass.spec.name;
 
     const converter = new TypeConverter({ db: this.db, resource, resourceClass });
-    const propsType = this.addResourcePropsType(resource, converter);
-    resourceClass.buildMembers(propsType);
+    resourceClass.build(converter);
 
     this.augmentations?.augmentResource(resource, resourceClass);
-  }
-
-  protected addResourcePropsType(r: Resource, converter: TypeConverter) {
-    const propsInterface = new StructType(this.module, {
-      export: true,
-      name: propStructNameFromResource(r, this.nameSuffix),
-      docs: {
-        summary: `Properties for defining a \`${classNameFromResource(r)}\``,
-        stability: Stability.External,
-        see: cloudFormationDocLink({
-          resourceType: r.cloudFormationType,
-        }),
-      },
-    });
-    const mapping = new PropMapping(this.module);
-    for (const [name, prop] of Object.entries(r.properties)) {
-      converter.addStructProperty(propsInterface, mapping, name, prop);
-    }
-
-    // Add types for all attributes
-    for (const attr of Object.values(r.attributes)) {
-      // This is a mutable call to add complex types for attributes to the scope
-      // These are not used in the generated code, but we want to expose the types
-      converter.typeFromSpecType(attr.type);
-    }
-
-    converter.makeCfnProducer(propsInterface, mapping);
-    converter.makeCfnParser(propsInterface, mapping);
-    return propsInterface;
   }
 }
