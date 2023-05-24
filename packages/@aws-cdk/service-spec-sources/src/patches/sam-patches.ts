@@ -3,33 +3,6 @@ import { addDefinitions, replaceDefinitionProperty } from './service-patches/cor
 import { JsonObjectLens, JsonObjectPatcher, Patcher, Reason, makeCompositePatcher, onlyObjects } from '../patching';
 import { jsonschema } from '../types';
 
-const deploymentPreferenceHooks: Patcher<JsonObjectLens> = (lens) => {
-  const reason = Reason.sourceIssue('Use of pattern properties but type is actually well-known.');
-
-  replaceDefinitionProperty(
-    'AWS::Serverless::Function.DeploymentPreference',
-    'Hooks',
-    {
-      $ref: '#/definitions/AWS::Serverless::Function.Hooks',
-    },
-    reason,
-  )(lens);
-
-  addDefinitions(
-    {
-      'AWS::Serverless::Function.Hooks': {
-        type: 'object',
-        properties: {
-          PreTraffic: { type: 'string' },
-          PostTraffic: { type: 'string' },
-        },
-        additionalProperties: false,
-      },
-    },
-    reason,
-  )(lens);
-};
-
 const serverlessApi: Patcher<JsonObjectLens> = (lens) => {
   replaceSamResourceProperty(
     'AWS::Serverless::Api',
@@ -54,12 +27,63 @@ const serverlessApi: Patcher<JsonObjectLens> = (lens) => {
   )(lens);
 };
 
+const serverlessFunction: Patcher<JsonObjectLens> = (lens) => {
+  const hooksReason = Reason.sourceIssue('Use of pattern properties but type is actually well-known.');
+
+  replaceDefinitionProperty(
+    'AWS::Serverless::Function.DeploymentPreference',
+    'Hooks',
+    {
+      $ref: '#/definitions/AWS::Serverless::Function.Hooks',
+    },
+    hooksReason,
+  )(lens);
+
+  addDefinitions(
+    {
+      'AWS::Serverless::Function.Hooks': {
+        type: 'object',
+        properties: {
+          PreTraffic: { type: 'string' },
+          PostTraffic: { type: 'string' },
+        },
+        additionalProperties: false,
+      },
+    },
+    hooksReason,
+  )(lens);
+
+  replaceDefinitionProperty(
+    'AWS::Serverless::Function.IAMPolicyDocument',
+    'Statement',
+    {
+      type: 'object',
+    },
+    Reason.backwardsCompat(
+      'This was once typed as Json, and adding types now is a breaking change. Keep them as Json forever',
+    ),
+  )(lens);
+};
+
+const serverlessStateMachine: Patcher<JsonObjectLens> = (lens) => {
+  replaceDefinitionProperty(
+    'AWS::Serverless::StateMachine.IAMPolicyDocument',
+    'Statement',
+    {
+      type: 'object',
+    },
+    Reason.backwardsCompat(
+      'This was once typed as Json, and adding types now is a breaking change. Keep them as Json forever',
+    ),
+  )(lens);
+};
+
 /**
  * Patchers that apply to the SAM Template spec file
  */
 export const patchSamTemplateSpec = makeCompositePatcher(
   normalizeJsonSchema,
-  onlyObjects(makeCompositePatcher(deploymentPreferenceHooks, serverlessApi)),
+  onlyObjects(makeCompositePatcher(serverlessApi, serverlessFunction, serverlessStateMachine)),
 );
 
 /**
