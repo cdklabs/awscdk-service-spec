@@ -88,15 +88,13 @@ export class Type {
   public static distinctUnionOf(...types: Type[]) {
     const unique = (xs: Type[]) => {
       var seen: Record<string, Type> = {};
-      return xs
-        .flatMap((x) => (x.unionOfTypes ? x.unionOfTypes : x))
-        .filter((x) => {
-          const key = x.toString();
-          return !(key in seen) && (seen[key] = x);
-        });
+      return xs.filter((x) => {
+        const key = x.toString();
+        return !(key in seen) && (seen[key] = x);
+      });
     };
 
-    return Type.unionOf(...unique(types));
+    return Type.unionOf(...unique(types.flatMap((x) => (x.unionOfTypes ? x.unionOfTypes : x))));
   }
 
   public static ambient(name: string) {
