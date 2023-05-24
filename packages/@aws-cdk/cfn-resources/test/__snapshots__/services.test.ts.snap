@@ -43735,13 +43735,13 @@ export class CfnApi extends cdk.CfnResource implements cdk.IInspectable, cdk.ITa
 
   public endpointConfiguration?: CfnApi.EndpointConfigurationProperty | cdk.IResolvable | string;
 
-  public gatewayResponses?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
+  public gatewayResponses?: any | cdk.IResolvable;
 
   public methodSettings?: Array<any | cdk.IResolvable> | cdk.IResolvable;
 
   public minimumCompressionSize?: number;
 
-  public models?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
+  public models?: any | cdk.IResolvable;
 
   public name?: string;
 
@@ -44142,7 +44142,7 @@ export interface CfnApiProps {
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-gatewayresponses
    */
-  readonly gatewayResponses?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
+  readonly gatewayResponses?: any | cdk.IResolvable;
 
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-methodsettings
@@ -44157,7 +44157,7 @@ export interface CfnApiProps {
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-models
    */
-  readonly models?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
+  readonly models?: any | cdk.IResolvable;
 
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-name
@@ -44676,10 +44676,10 @@ function CfnApiPropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("disableExecuteApiEndpoint", cdk.validateBoolean)(properties.disableExecuteApiEndpoint));
   errors.collect(cdk.propertyValidator("domain", CfnApiDomainConfigurationPropertyValidator)(properties.domain));
   errors.collect(cdk.propertyValidator("endpointConfiguration", cdk.unionValidator(CfnApiEndpointConfigurationPropertyValidator, cdk.validateString))(properties.endpointConfiguration));
-  errors.collect(cdk.propertyValidator("gatewayResponses", cdk.hashValidator(cdk.validateObject))(properties.gatewayResponses));
+  errors.collect(cdk.propertyValidator("gatewayResponses", cdk.validateObject)(properties.gatewayResponses));
   errors.collect(cdk.propertyValidator("methodSettings", cdk.listValidator(cdk.validateObject))(properties.methodSettings));
   errors.collect(cdk.propertyValidator("minimumCompressionSize", cdk.validateNumber)(properties.minimumCompressionSize));
-  errors.collect(cdk.propertyValidator("models", cdk.hashValidator(cdk.validateObject))(properties.models));
+  errors.collect(cdk.propertyValidator("models", cdk.validateObject)(properties.models));
   errors.collect(cdk.propertyValidator("name", cdk.validateString)(properties.name));
   errors.collect(cdk.propertyValidator("openApiVersion", cdk.validateString)(properties.openApiVersion));
   errors.collect(cdk.propertyValidator("stageName", cdk.requiredValidator)(properties.stageName));
@@ -44708,10 +44708,10 @@ function convertCfnApiPropsToCloudFormation(properties: any): any {
     "DisableExecuteApiEndpoint": cdk.booleanToCloudFormation(properties.disableExecuteApiEndpoint),
     "Domain": convertCfnApiDomainConfigurationPropertyToCloudFormation(properties.domain),
     "EndpointConfiguration": cdk.unionMapper([CfnApiEndpointConfigurationPropertyValidator, cdk.validateString], [convertCfnApiEndpointConfigurationPropertyToCloudFormation, cdk.stringToCloudFormation])(properties.endpointConfiguration),
-    "GatewayResponses": cdk.hashMapper(cdk.objectToCloudFormation)(properties.gatewayResponses),
+    "GatewayResponses": cdk.objectToCloudFormation(properties.gatewayResponses),
     "MethodSettings": cdk.listMapper(cdk.objectToCloudFormation)(properties.methodSettings),
     "MinimumCompressionSize": cdk.numberToCloudFormation(properties.minimumCompressionSize),
-    "Models": cdk.hashMapper(cdk.objectToCloudFormation)(properties.models),
+    "Models": cdk.objectToCloudFormation(properties.models),
     "Name": cdk.stringToCloudFormation(properties.name),
     "OpenApiVersion": cdk.stringToCloudFormation(properties.openApiVersion),
     "StageName": cdk.stringToCloudFormation(properties.stageName),
@@ -44744,10 +44744,10 @@ function CfnApiPropsFromCloudFormation(properties: any): cfn_parse.FromCloudForm
   ret.addPropertyResult("disableExecuteApiEndpoint", "DisableExecuteApiEndpoint", (properties.DisableExecuteApiEndpoint != null ? cfn_parse.FromCloudFormation.getBoolean(properties.DisableExecuteApiEndpoint) : undefined));
   ret.addPropertyResult("domain", "Domain", (properties.Domain != null ? CfnApiDomainConfigurationPropertyFromCloudFormation(properties.Domain) : undefined));
   ret.addPropertyResult("endpointConfiguration", "EndpointConfiguration", (properties.EndpointConfiguration != null ? cfn_parse.FromCloudFormation.getTypeUnion([CfnApiEndpointConfigurationPropertyValidator, cdk.validateString], [CfnApiEndpointConfigurationPropertyFromCloudFormation, cfn_parse.FromCloudFormation.getString])(properties.EndpointConfiguration) : undefined));
-  ret.addPropertyResult("gatewayResponses", "GatewayResponses", (properties.GatewayResponses != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getAny)(properties.GatewayResponses) : undefined));
+  ret.addPropertyResult("gatewayResponses", "GatewayResponses", (properties.GatewayResponses != null ? cfn_parse.FromCloudFormation.getAny(properties.GatewayResponses) : undefined));
   ret.addPropertyResult("methodSettings", "MethodSettings", (properties.MethodSettings != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getAny)(properties.MethodSettings) : undefined));
   ret.addPropertyResult("minimumCompressionSize", "MinimumCompressionSize", (properties.MinimumCompressionSize != null ? cfn_parse.FromCloudFormation.getNumber(properties.MinimumCompressionSize) : undefined));
-  ret.addPropertyResult("models", "Models", (properties.Models != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getAny)(properties.Models) : undefined));
+  ret.addPropertyResult("models", "Models", (properties.Models != null ? cfn_parse.FromCloudFormation.getAny(properties.Models) : undefined));
   ret.addPropertyResult("name", "Name", (properties.Name != null ? cfn_parse.FromCloudFormation.getString(properties.Name) : undefined));
   ret.addPropertyResult("openApiVersion", "OpenApiVersion", (properties.OpenApiVersion != null ? cfn_parse.FromCloudFormation.getString(properties.OpenApiVersion) : undefined));
   ret.addPropertyResult("stageName", "StageName", (properties.StageName != null ? cfn_parse.FromCloudFormation.getString(properties.StageName) : undefined));
@@ -46011,7 +46011,7 @@ export namespace CfnFunction {
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-iampolicydocument.html#cfn-serverless-function-iampolicydocument-statement
      */
-    readonly statement: Array<any | cdk.IResolvable> | cdk.IResolvable;
+    readonly statement: any | cdk.IResolvable;
 
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-iampolicydocument.html#cfn-serverless-function-iampolicydocument-version
@@ -48331,7 +48331,7 @@ function CfnFunctionIAMPolicyDocumentPropertyValidator(properties: any): cdk.Val
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
   errors.collect(cdk.propertyValidator("statement", cdk.requiredValidator)(properties.statement));
-  errors.collect(cdk.propertyValidator("statement", cdk.listValidator(cdk.validateObject))(properties.statement));
+  errors.collect(cdk.propertyValidator("statement", cdk.validateObject)(properties.statement));
   errors.collect(cdk.propertyValidator("version", cdk.validateString)(properties.version));
   return errors.wrap("supplied properties not correct for \\"IAMPolicyDocumentProperty\\"");
 }
@@ -48341,7 +48341,7 @@ function convertCfnFunctionIAMPolicyDocumentPropertyToCloudFormation(properties:
   if (!cdk.canInspect(properties)) return properties;
   CfnFunctionIAMPolicyDocumentPropertyValidator(properties).assertSuccess();
   return {
-    "Statement": cdk.listMapper(cdk.objectToCloudFormation)(properties.statement),
+    "Statement": cdk.objectToCloudFormation(properties.statement),
     "Version": cdk.stringToCloudFormation(properties.version)
   };
 }
@@ -48356,7 +48356,7 @@ function CfnFunctionIAMPolicyDocumentPropertyFromCloudFormation(properties: any)
     return new cfn_parse.FromCloudFormationResult(properties);
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.IAMPolicyDocumentProperty>();
-  ret.addPropertyResult("statement", "Statement", (properties.Statement != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getAny)(properties.Statement) : undefined));
+  ret.addPropertyResult("statement", "Statement", (properties.Statement != null ? cfn_parse.FromCloudFormation.getAny(properties.Statement) : undefined));
   ret.addPropertyResult("version", "Version", (properties.Version != null ? cfn_parse.FromCloudFormation.getString(properties.Version) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
@@ -51273,7 +51273,7 @@ export namespace CfnStateMachine {
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-statemachine-iampolicydocument.html#cfn-serverless-statemachine-iampolicydocument-statement
      */
-    readonly statement: Array<any | cdk.IResolvable> | cdk.IResolvable;
+    readonly statement: any | cdk.IResolvable;
 
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-statemachine-iampolicydocument.html#cfn-serverless-statemachine-iampolicydocument-version
@@ -51849,7 +51849,7 @@ function CfnStateMachineIAMPolicyDocumentPropertyValidator(properties: any): cdk
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
   errors.collect(cdk.propertyValidator("statement", cdk.requiredValidator)(properties.statement));
-  errors.collect(cdk.propertyValidator("statement", cdk.listValidator(cdk.validateObject))(properties.statement));
+  errors.collect(cdk.propertyValidator("statement", cdk.validateObject)(properties.statement));
   errors.collect(cdk.propertyValidator("version", cdk.requiredValidator)(properties.version));
   errors.collect(cdk.propertyValidator("version", cdk.validateString)(properties.version));
   return errors.wrap("supplied properties not correct for \\"IAMPolicyDocumentProperty\\"");
@@ -51860,7 +51860,7 @@ function convertCfnStateMachineIAMPolicyDocumentPropertyToCloudFormation(propert
   if (!cdk.canInspect(properties)) return properties;
   CfnStateMachineIAMPolicyDocumentPropertyValidator(properties).assertSuccess();
   return {
-    "Statement": cdk.listMapper(cdk.objectToCloudFormation)(properties.statement),
+    "Statement": cdk.objectToCloudFormation(properties.statement),
     "Version": cdk.stringToCloudFormation(properties.version)
   };
 }
@@ -51875,7 +51875,7 @@ function CfnStateMachineIAMPolicyDocumentPropertyFromCloudFormation(properties: 
     return new cfn_parse.FromCloudFormationResult(properties);
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnStateMachine.IAMPolicyDocumentProperty>();
-  ret.addPropertyResult("statement", "Statement", (properties.Statement != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getAny)(properties.Statement) : undefined));
+  ret.addPropertyResult("statement", "Statement", (properties.Statement != null ? cfn_parse.FromCloudFormation.getAny(properties.Statement) : undefined));
   ret.addPropertyResult("version", "Version", (properties.Version != null ? cfn_parse.FromCloudFormation.getString(properties.Version) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
