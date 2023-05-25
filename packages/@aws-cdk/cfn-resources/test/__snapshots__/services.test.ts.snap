@@ -10170,7 +10170,7 @@ export namespace CfnInstance {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance-blockdevicemapping.html#cfn-ec2-instance-blockdevicemapping-nodevice
      */
-    readonly noDevice?: any | cdk.IResolvable;
+    readonly noDevice?: cdk.IResolvable | CfnInstance.NoDeviceProperty;
 
     /**
      * The virtual device name ( \`ephemeral\` N).
@@ -10204,6 +10204,20 @@ export namespace CfnInstance {
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance-blockdevicemapping.html#cfn-ec2-instance-blockdevicemapping-devicename
      */
     readonly deviceName: string;
+  }
+
+  /**
+   * Suppresses the specified device included in the block device mapping of the AMI.
+   *
+   * To suppress a device, specify an empty string.
+   *
+   * \`NoDevice\` is a property of the [Amazon EC2 BlockDeviceMapping](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-blockdev-mapping.html) property.
+   *
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance-nodevice.html
+   */
+  export interface NoDeviceProperty {
+
   }
 
   /**
@@ -11192,6 +11206,44 @@ export interface CfnInstanceProps {
 }
 
 /**
+ * Determine whether the given properties match those of a \`NoDeviceProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`NoDeviceProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnInstanceNoDevicePropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  return errors.wrap("supplied properties not correct for \\"NoDeviceProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnInstanceNoDevicePropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnInstanceNoDevicePropertyValidator(properties).assertSuccess();
+  return {};
+}
+
+// @ts-ignore TS6133
+function CfnInstanceNoDevicePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnInstance.NoDeviceProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnInstance.NoDeviceProperty>();
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
+}
+
+/**
  * Determine whether the given properties match those of a \`EbsProperty\`
  *
  * @param properties - the TypeScript properties of a \`EbsProperty\`
@@ -11268,7 +11320,7 @@ function CfnInstanceBlockDeviceMappingPropertyValidator(properties: any): cdk.Va
   errors.collect(cdk.propertyValidator("deviceName", cdk.requiredValidator)(properties.deviceName));
   errors.collect(cdk.propertyValidator("deviceName", cdk.validateString)(properties.deviceName));
   errors.collect(cdk.propertyValidator("ebs", CfnInstanceEbsPropertyValidator)(properties.ebs));
-  errors.collect(cdk.propertyValidator("noDevice", cdk.validateObject)(properties.noDevice));
+  errors.collect(cdk.propertyValidator("noDevice", CfnInstanceNoDevicePropertyValidator)(properties.noDevice));
   errors.collect(cdk.propertyValidator("virtualName", cdk.validateString)(properties.virtualName));
   return errors.wrap("supplied properties not correct for \\"BlockDeviceMappingProperty\\"");
 }
@@ -11280,7 +11332,7 @@ function convertCfnInstanceBlockDeviceMappingPropertyToCloudFormation(properties
   return {
     "DeviceName": cdk.stringToCloudFormation(properties.deviceName),
     "Ebs": convertCfnInstanceEbsPropertyToCloudFormation(properties.ebs),
-    "NoDevice": cdk.objectToCloudFormation(properties.noDevice),
+    "NoDevice": convertCfnInstanceNoDevicePropertyToCloudFormation(properties.noDevice),
     "VirtualName": cdk.stringToCloudFormation(properties.virtualName)
   };
 }
@@ -11297,7 +11349,7 @@ function CfnInstanceBlockDeviceMappingPropertyFromCloudFormation(properties: any
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnInstance.BlockDeviceMappingProperty>();
   ret.addPropertyResult("deviceName", "DeviceName", (properties.DeviceName != null ? cfn_parse.FromCloudFormation.getString(properties.DeviceName) : undefined));
   ret.addPropertyResult("ebs", "Ebs", (properties.Ebs != null ? CfnInstanceEbsPropertyFromCloudFormation(properties.Ebs) : undefined));
-  ret.addPropertyResult("noDevice", "NoDevice", (properties.NoDevice != null ? cfn_parse.FromCloudFormation.getAny(properties.NoDevice) : undefined));
+  ret.addPropertyResult("noDevice", "NoDevice", (properties.NoDevice != null ? CfnInstanceNoDevicePropertyFromCloudFormation(properties.NoDevice) : undefined));
   ret.addPropertyResult("virtualName", "VirtualName", (properties.VirtualName != null ? cfn_parse.FromCloudFormation.getString(properties.VirtualName) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;

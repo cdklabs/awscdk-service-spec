@@ -215,8 +215,9 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         return using(unifiedPatternProps, (unifiedType) =>
           using(schemaTypeToModelType(nameHint, resolve(unifiedType), fail), (element) => ({ type: 'map', element })),
         );
-      } else {
-        // Fully untyped map
+      } else if (!jsonschema.resolvedReference(schema)) {
+        // Fully untyped map that's not a type
+        // @todo types should probably also just be json since they are useless otherwise. Fix after this package is in use.
         // FIXME: is 'json' really a primitive type, or do we mean `Map<unknown>` or `Map<any>` ?
         return { type: 'json' };
       }
@@ -233,12 +234,16 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       db.link('usesType', res, typeDef);
       typeDefinitions.set(typeKey, typeDef);
 
-      recurseProperties(
-        schema,
-        typeDef.properties,
-        fail.in(`typedef ${nameHint}`),
-        options.resourceSpec?.types?.[typeDef.name],
-      );
+      // If the type has no props, it's not a RecordLikeObject and we don't need to recurse
+      // @todo The type should probably also just be json since they are useless otherwise. Fix after this package is in use.
+      if (jsonschema.isRecordLikeObject(schema)) {
+        recurseProperties(
+          schema,
+          typeDef.properties,
+          fail.in(`typedef ${nameHint}`),
+          options.resourceSpec?.types?.[typeDef.name],
+        );
+      }
     }
 
     return { type: 'ref', reference: ref(typeDefinitions.get(typeKey)!) };

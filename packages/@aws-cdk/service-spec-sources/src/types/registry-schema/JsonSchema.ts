@@ -260,8 +260,8 @@ export namespace jsonschema {
   /**
    * Returns the full reference if the given sub-schema was resolved from a reference
    */
-  export function resolvedReference(x: ResolvedSchema): string | undefined {
-    if (isAnyType(x)) {
+  export function resolvedReference(x: jsonschema.Schema): string | undefined {
+    if (isAnyType(x) || !isResolvedSchema(x)) {
       return undefined;
     }
     return x[RESOLVED_REFERENCE_SYMBOL];
@@ -270,7 +270,7 @@ export namespace jsonschema {
   /**
    * Returns the reference name (the last part of it), if the given sub-schema was resolved from a reference
    */
-  export function resolvedReferenceName(x: ResolvedSchema): string | undefined {
+  export function resolvedReferenceName(x: jsonschema.Schema): string | undefined {
     return resolvedReference(x)?.split('/').at(-1);
   }
 
