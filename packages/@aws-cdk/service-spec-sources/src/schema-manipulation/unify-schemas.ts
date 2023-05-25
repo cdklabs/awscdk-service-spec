@@ -134,6 +134,7 @@ function simplifyUnion(x: jsonschema.UnionSchema<jsonschema.Schema>): jsonschema
   // Expand inner unions
   const schemas = jsonschema
     .innerSchemas(x)
+    .filter(Boolean)
     .flatMap((y) => (jsonschema.isUnionSchema(y) ? jsonschema.innerSchemas(y) : [y]));
   for (let i = 0; i < schemas.length; ) {
     const lhs = schemas[i];
