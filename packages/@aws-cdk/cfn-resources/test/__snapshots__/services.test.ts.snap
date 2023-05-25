@@ -41788,7 +41788,7 @@ export class CfnAnnotationStore extends cdk.CfnResource implements cdk.IInspecta
   /**
    * Tags for the store.
    */
-  public tagsRaw?: Array<cdk.CfnTag>;
+  public tagsRaw?: Record<string, string>;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -41817,7 +41817,7 @@ export class CfnAnnotationStore extends cdk.CfnResource implements cdk.IInspecta
     this.sseConfig = props.sseConfig;
     this.storeFormat = props.storeFormat;
     this.storeOptions = props.storeOptions;
-    this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::Omics::AnnotationStore", props.tags, {
+    this.tags = new cdk.TagManager(cdk.TagType.MAP, "AWS::Omics::AnnotationStore", props.tags, {
       "tagPropertyName": "tags"
     });
     this.tagsRaw = props.tags;
@@ -41988,7 +41988,7 @@ export interface CfnAnnotationStoreProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-omics-annotationstore.html#cfn-omics-annotationstore-tags
    */
-  readonly tags?: Array<cdk.CfnTag>;
+  readonly tags?: Record<string, string>;
 }
 
 /**
@@ -42193,7 +42193,7 @@ function CfnAnnotationStorePropsValidator(properties: any): cdk.ValidationResult
   errors.collect(cdk.propertyValidator("storeFormat", cdk.requiredValidator)(properties.storeFormat));
   errors.collect(cdk.propertyValidator("storeFormat", cdk.validateString)(properties.storeFormat));
   errors.collect(cdk.propertyValidator("storeOptions", CfnAnnotationStoreStoreOptionsPropertyValidator)(properties.storeOptions));
-  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
+  errors.collect(cdk.propertyValidator("tags", cdk.hashValidator(cdk.validateString))(properties.tags));
   return errors.wrap("supplied properties not correct for \\"CfnAnnotationStoreProps\\"");
 }
 
@@ -42208,7 +42208,7 @@ function convertCfnAnnotationStorePropsToCloudFormation(properties: any): any {
     "SseConfig": convertCfnAnnotationStoreSseConfigPropertyToCloudFormation(properties.sseConfig),
     "StoreFormat": cdk.stringToCloudFormation(properties.storeFormat),
     "StoreOptions": convertCfnAnnotationStoreStoreOptionsPropertyToCloudFormation(properties.storeOptions),
-    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags)
+    "Tags": cdk.hashMapper(cdk.stringToCloudFormation)(properties.tags)
   };
 }
 
@@ -42228,7 +42228,7 @@ function CfnAnnotationStorePropsFromCloudFormation(properties: any): cfn_parse.F
   ret.addPropertyResult("sseConfig", "SseConfig", (properties.SseConfig != null ? CfnAnnotationStoreSseConfigPropertyFromCloudFormation(properties.SseConfig) : undefined));
   ret.addPropertyResult("storeFormat", "StoreFormat", (properties.StoreFormat != null ? cfn_parse.FromCloudFormation.getString(properties.StoreFormat) : undefined));
   ret.addPropertyResult("storeOptions", "StoreOptions", (properties.StoreOptions != null ? CfnAnnotationStoreStoreOptionsPropertyFromCloudFormation(properties.StoreOptions) : undefined));
-  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
+  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString)(properties.Tags) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -42313,7 +42313,7 @@ export class CfnReferenceStore extends cdk.CfnResource implements cdk.IInspectab
   /**
    * Tags for the store.
    */
-  public tagsRaw?: Array<cdk.CfnTag>;
+  public tagsRaw?: Record<string, string>;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -42334,7 +42334,7 @@ export class CfnReferenceStore extends cdk.CfnResource implements cdk.IInspectab
     this.description = props.description;
     this.name = props.name;
     this.sseConfig = props.sseConfig;
-    this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::Omics::ReferenceStore", props.tags, {
+    this.tags = new cdk.TagManager(cdk.TagType.MAP, "AWS::Omics::ReferenceStore", props.tags, {
       "tagPropertyName": "tags"
     });
     this.tagsRaw = props.tags;
@@ -42422,7 +42422,7 @@ export interface CfnReferenceStoreProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-omics-referencestore.html#cfn-omics-referencestore-tags
    */
-  readonly tags?: Array<cdk.CfnTag>;
+  readonly tags?: Record<string, string>;
 }
 
 /**
@@ -42489,7 +42489,7 @@ function CfnReferenceStorePropsValidator(properties: any): cdk.ValidationResult 
   errors.collect(cdk.propertyValidator("name", cdk.requiredValidator)(properties.name));
   errors.collect(cdk.propertyValidator("name", cdk.validateString)(properties.name));
   errors.collect(cdk.propertyValidator("sseConfig", CfnReferenceStoreSseConfigPropertyValidator)(properties.sseConfig));
-  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
+  errors.collect(cdk.propertyValidator("tags", cdk.hashValidator(cdk.validateString))(properties.tags));
   return errors.wrap("supplied properties not correct for \\"CfnReferenceStoreProps\\"");
 }
 
@@ -42501,7 +42501,7 @@ function convertCfnReferenceStorePropsToCloudFormation(properties: any): any {
     "Description": cdk.stringToCloudFormation(properties.description),
     "Name": cdk.stringToCloudFormation(properties.name),
     "SseConfig": convertCfnReferenceStoreSseConfigPropertyToCloudFormation(properties.sseConfig),
-    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags)
+    "Tags": cdk.hashMapper(cdk.stringToCloudFormation)(properties.tags)
   };
 }
 
@@ -42518,7 +42518,7 @@ function CfnReferenceStorePropsFromCloudFormation(properties: any): cfn_parse.Fr
   ret.addPropertyResult("description", "Description", (properties.Description != null ? cfn_parse.FromCloudFormation.getString(properties.Description) : undefined));
   ret.addPropertyResult("name", "Name", (properties.Name != null ? cfn_parse.FromCloudFormation.getString(properties.Name) : undefined));
   ret.addPropertyResult("sseConfig", "SseConfig", (properties.SseConfig != null ? CfnReferenceStoreSseConfigPropertyFromCloudFormation(properties.SseConfig) : undefined));
-  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
+  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString)(properties.Tags) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -42608,7 +42608,7 @@ export class CfnRunGroup extends cdk.CfnResource implements cdk.IInspectable, cd
   /**
    * Tags for the group.
    */
-  public tagsRaw?: Array<cdk.CfnTag>;
+  public tagsRaw?: Record<string, string>;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -42628,7 +42628,7 @@ export class CfnRunGroup extends cdk.CfnResource implements cdk.IInspectable, cd
     this.maxDuration = props.maxDuration;
     this.maxRuns = props.maxRuns;
     this.name = props.name;
-    this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::Omics::RunGroup", props.tags, {
+    this.tags = new cdk.TagManager(cdk.TagType.MAP, "AWS::Omics::RunGroup", props.tags, {
       "tagPropertyName": "tags"
     });
     this.tagsRaw = props.tags;
@@ -42700,7 +42700,7 @@ export interface CfnRunGroupProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-omics-rungroup.html#cfn-omics-rungroup-tags
    */
-  readonly tags?: Array<cdk.CfnTag>;
+  readonly tags?: Record<string, string>;
 }
 
 /**
@@ -42721,7 +42721,7 @@ function CfnRunGroupPropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("maxDuration", cdk.validateNumber)(properties.maxDuration));
   errors.collect(cdk.propertyValidator("maxRuns", cdk.validateNumber)(properties.maxRuns));
   errors.collect(cdk.propertyValidator("name", cdk.validateString)(properties.name));
-  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
+  errors.collect(cdk.propertyValidator("tags", cdk.hashValidator(cdk.validateString))(properties.tags));
   return errors.wrap("supplied properties not correct for \\"CfnRunGroupProps\\"");
 }
 
@@ -42734,7 +42734,7 @@ function convertCfnRunGroupPropsToCloudFormation(properties: any): any {
     "MaxDuration": cdk.numberToCloudFormation(properties.maxDuration),
     "MaxRuns": cdk.numberToCloudFormation(properties.maxRuns),
     "Name": cdk.stringToCloudFormation(properties.name),
-    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags)
+    "Tags": cdk.hashMapper(cdk.stringToCloudFormation)(properties.tags)
   };
 }
 
@@ -42752,7 +42752,7 @@ function CfnRunGroupPropsFromCloudFormation(properties: any): cfn_parse.FromClou
   ret.addPropertyResult("maxDuration", "MaxDuration", (properties.MaxDuration != null ? cfn_parse.FromCloudFormation.getNumber(properties.MaxDuration) : undefined));
   ret.addPropertyResult("maxRuns", "MaxRuns", (properties.MaxRuns != null ? cfn_parse.FromCloudFormation.getNumber(properties.MaxRuns) : undefined));
   ret.addPropertyResult("name", "Name", (properties.Name != null ? cfn_parse.FromCloudFormation.getString(properties.Name) : undefined));
-  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
+  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString)(properties.Tags) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -42837,7 +42837,7 @@ export class CfnSequenceStore extends cdk.CfnResource implements cdk.IInspectabl
   /**
    * Tags for the store.
    */
-  public tagsRaw?: Array<cdk.CfnTag>;
+  public tagsRaw?: Record<string, string>;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -42858,7 +42858,7 @@ export class CfnSequenceStore extends cdk.CfnResource implements cdk.IInspectabl
     this.description = props.description;
     this.name = props.name;
     this.sseConfig = props.sseConfig;
-    this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::Omics::SequenceStore", props.tags, {
+    this.tags = new cdk.TagManager(cdk.TagType.MAP, "AWS::Omics::SequenceStore", props.tags, {
       "tagPropertyName": "tags"
     });
     this.tagsRaw = props.tags;
@@ -42946,7 +42946,7 @@ export interface CfnSequenceStoreProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-omics-sequencestore.html#cfn-omics-sequencestore-tags
    */
-  readonly tags?: Array<cdk.CfnTag>;
+  readonly tags?: Record<string, string>;
 }
 
 /**
@@ -43013,7 +43013,7 @@ function CfnSequenceStorePropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("name", cdk.requiredValidator)(properties.name));
   errors.collect(cdk.propertyValidator("name", cdk.validateString)(properties.name));
   errors.collect(cdk.propertyValidator("sseConfig", CfnSequenceStoreSseConfigPropertyValidator)(properties.sseConfig));
-  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
+  errors.collect(cdk.propertyValidator("tags", cdk.hashValidator(cdk.validateString))(properties.tags));
   return errors.wrap("supplied properties not correct for \\"CfnSequenceStoreProps\\"");
 }
 
@@ -43025,7 +43025,7 @@ function convertCfnSequenceStorePropsToCloudFormation(properties: any): any {
     "Description": cdk.stringToCloudFormation(properties.description),
     "Name": cdk.stringToCloudFormation(properties.name),
     "SseConfig": convertCfnSequenceStoreSseConfigPropertyToCloudFormation(properties.sseConfig),
-    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags)
+    "Tags": cdk.hashMapper(cdk.stringToCloudFormation)(properties.tags)
   };
 }
 
@@ -43042,7 +43042,7 @@ function CfnSequenceStorePropsFromCloudFormation(properties: any): cfn_parse.Fro
   ret.addPropertyResult("description", "Description", (properties.Description != null ? cfn_parse.FromCloudFormation.getString(properties.Description) : undefined));
   ret.addPropertyResult("name", "Name", (properties.Name != null ? cfn_parse.FromCloudFormation.getString(properties.Name) : undefined));
   ret.addPropertyResult("sseConfig", "SseConfig", (properties.SseConfig != null ? CfnSequenceStoreSseConfigPropertyFromCloudFormation(properties.SseConfig) : undefined));
-  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
+  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString)(properties.Tags) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -43160,7 +43160,7 @@ export class CfnVariantStore extends cdk.CfnResource implements cdk.IInspectable
   /**
    * Tags for the store.
    */
-  public tagsRaw?: Array<cdk.CfnTag>;
+  public tagsRaw?: Record<string, string>;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -43187,7 +43187,7 @@ export class CfnVariantStore extends cdk.CfnResource implements cdk.IInspectable
     this.name = props.name;
     this.reference = props.reference;
     this.sseConfig = props.sseConfig;
-    this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::Omics::VariantStore", props.tags, {
+    this.tags = new cdk.TagManager(cdk.TagType.MAP, "AWS::Omics::VariantStore", props.tags, {
       "tagPropertyName": "tags"
     });
     this.tagsRaw = props.tags;
@@ -43298,7 +43298,7 @@ export interface CfnVariantStoreProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-omics-variantstore.html#cfn-omics-variantstore-tags
    */
-  readonly tags?: Array<cdk.CfnTag>;
+  readonly tags?: Record<string, string>;
 }
 
 /**
@@ -43410,7 +43410,7 @@ function CfnVariantStorePropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("reference", cdk.requiredValidator)(properties.reference));
   errors.collect(cdk.propertyValidator("reference", CfnVariantStoreReferenceItemPropertyValidator)(properties.reference));
   errors.collect(cdk.propertyValidator("sseConfig", CfnVariantStoreSseConfigPropertyValidator)(properties.sseConfig));
-  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
+  errors.collect(cdk.propertyValidator("tags", cdk.hashValidator(cdk.validateString))(properties.tags));
   return errors.wrap("supplied properties not correct for \\"CfnVariantStoreProps\\"");
 }
 
@@ -43423,7 +43423,7 @@ function convertCfnVariantStorePropsToCloudFormation(properties: any): any {
     "Name": cdk.stringToCloudFormation(properties.name),
     "Reference": convertCfnVariantStoreReferenceItemPropertyToCloudFormation(properties.reference),
     "SseConfig": convertCfnVariantStoreSseConfigPropertyToCloudFormation(properties.sseConfig),
-    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags)
+    "Tags": cdk.hashMapper(cdk.stringToCloudFormation)(properties.tags)
   };
 }
 
@@ -43441,7 +43441,7 @@ function CfnVariantStorePropsFromCloudFormation(properties: any): cfn_parse.From
   ret.addPropertyResult("name", "Name", (properties.Name != null ? cfn_parse.FromCloudFormation.getString(properties.Name) : undefined));
   ret.addPropertyResult("reference", "Reference", (properties.Reference != null ? CfnVariantStoreReferenceItemPropertyFromCloudFormation(properties.Reference) : undefined));
   ret.addPropertyResult("sseConfig", "SseConfig", (properties.SseConfig != null ? CfnVariantStoreSseConfigPropertyFromCloudFormation(properties.SseConfig) : undefined));
-  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
+  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString)(properties.Tags) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -43560,7 +43560,7 @@ export class CfnWorkflow extends cdk.CfnResource implements cdk.IInspectable, cd
   /**
    * Tags for the workflow.
    */
-  public tagsRaw?: Array<cdk.CfnTag>;
+  public tagsRaw?: Record<string, string>;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -43585,7 +43585,7 @@ export class CfnWorkflow extends cdk.CfnResource implements cdk.IInspectable, cd
     this.name = props.name;
     this.parameterTemplate = props.parameterTemplate;
     this.storageCapacity = props.storageCapacity;
-    this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::Omics::Workflow", props.tags, {
+    this.tags = new cdk.TagManager(cdk.TagType.MAP, "AWS::Omics::Workflow", props.tags, {
       "tagPropertyName": "tags"
     });
     this.tagsRaw = props.tags;
@@ -43705,7 +43705,7 @@ export interface CfnWorkflowProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-omics-workflow.html#cfn-omics-workflow-tags
    */
-  readonly tags?: Array<cdk.CfnTag>;
+  readonly tags?: Record<string, string>;
 }
 
 /**
@@ -43774,7 +43774,7 @@ function CfnWorkflowPropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("name", cdk.validateString)(properties.name));
   errors.collect(cdk.propertyValidator("parameterTemplate", cdk.hashValidator(CfnWorkflowWorkflowParameterPropertyValidator))(properties.parameterTemplate));
   errors.collect(cdk.propertyValidator("storageCapacity", cdk.validateNumber)(properties.storageCapacity));
-  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
+  errors.collect(cdk.propertyValidator("tags", cdk.hashValidator(cdk.validateString))(properties.tags));
   return errors.wrap("supplied properties not correct for \\"CfnWorkflowProps\\"");
 }
 
@@ -43790,7 +43790,7 @@ function convertCfnWorkflowPropsToCloudFormation(properties: any): any {
     "Name": cdk.stringToCloudFormation(properties.name),
     "ParameterTemplate": cdk.hashMapper(convertCfnWorkflowWorkflowParameterPropertyToCloudFormation)(properties.parameterTemplate),
     "StorageCapacity": cdk.numberToCloudFormation(properties.storageCapacity),
-    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags)
+    "Tags": cdk.hashMapper(cdk.stringToCloudFormation)(properties.tags)
   };
 }
 
@@ -43811,7 +43811,7 @@ function CfnWorkflowPropsFromCloudFormation(properties: any): cfn_parse.FromClou
   ret.addPropertyResult("name", "Name", (properties.Name != null ? cfn_parse.FromCloudFormation.getString(properties.Name) : undefined));
   ret.addPropertyResult("parameterTemplate", "ParameterTemplate", (properties.ParameterTemplate != null ? cfn_parse.FromCloudFormation.getMap(CfnWorkflowWorkflowParameterPropertyFromCloudFormation)(properties.ParameterTemplate) : undefined));
   ret.addPropertyResult("storageCapacity", "StorageCapacity", (properties.StorageCapacity != null ? cfn_parse.FromCloudFormation.getNumber(properties.StorageCapacity) : undefined));
-  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
+  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString)(properties.Tags) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }",
@@ -43913,7 +43913,7 @@ export class CfnApi extends cdk.CfnResource implements cdk.IInspectable, cdk.ITa
    */
   public readonly tags: cdk.TagManager;
 
-  public tagsRaw?: Array<cdk.CfnTag>;
+  public tagsRaw?: Record<string, string>;
 
   public tracingEnabled?: boolean | cdk.IResolvable;
 
@@ -43954,7 +43954,7 @@ export class CfnApi extends cdk.CfnResource implements cdk.IInspectable, cdk.ITa
     this.name = props.name;
     this.openApiVersion = props.openApiVersion;
     this.stageName = props.stageName;
-    this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::Serverless::Api", props.tags, {
+    this.tags = new cdk.TagManager(cdk.TagType.MAP, "AWS::Serverless::Api", props.tags, {
       "tagPropertyName": "tags"
     });
     this.tagsRaw = props.tags;
@@ -44342,7 +44342,7 @@ export interface CfnApiProps {
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-tags
    */
-  readonly tags?: Array<cdk.CfnTag>;
+  readonly tags?: Record<string, string>;
 
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-tracingenabled
@@ -44849,7 +44849,7 @@ function CfnApiPropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("openApiVersion", cdk.validateString)(properties.openApiVersion));
   errors.collect(cdk.propertyValidator("stageName", cdk.requiredValidator)(properties.stageName));
   errors.collect(cdk.propertyValidator("stageName", cdk.validateString)(properties.stageName));
-  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
+  errors.collect(cdk.propertyValidator("tags", cdk.hashValidator(cdk.validateString))(properties.tags));
   errors.collect(cdk.propertyValidator("tracingEnabled", cdk.validateBoolean)(properties.tracingEnabled));
   errors.collect(cdk.propertyValidator("variables", cdk.hashValidator(cdk.validateObject))(properties.variables));
   return errors.wrap("supplied properties not correct for \\"CfnApiProps\\"");
@@ -44880,7 +44880,7 @@ function convertCfnApiPropsToCloudFormation(properties: any): any {
     "Name": cdk.stringToCloudFormation(properties.name),
     "OpenApiVersion": cdk.stringToCloudFormation(properties.openApiVersion),
     "StageName": cdk.stringToCloudFormation(properties.stageName),
-    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags),
+    "Tags": cdk.hashMapper(cdk.stringToCloudFormation)(properties.tags),
     "TracingEnabled": cdk.booleanToCloudFormation(properties.tracingEnabled),
     "Variables": cdk.hashMapper(cdk.objectToCloudFormation)(properties.variables)
   };
@@ -44916,7 +44916,7 @@ function CfnApiPropsFromCloudFormation(properties: any): cfn_parse.FromCloudForm
   ret.addPropertyResult("name", "Name", (properties.Name != null ? cfn_parse.FromCloudFormation.getString(properties.Name) : undefined));
   ret.addPropertyResult("openApiVersion", "OpenApiVersion", (properties.OpenApiVersion != null ? cfn_parse.FromCloudFormation.getString(properties.OpenApiVersion) : undefined));
   ret.addPropertyResult("stageName", "StageName", (properties.StageName != null ? cfn_parse.FromCloudFormation.getString(properties.StageName) : undefined));
-  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
+  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString)(properties.Tags) : undefined));
   ret.addPropertyResult("tracingEnabled", "TracingEnabled", (properties.TracingEnabled != null ? cfn_parse.FromCloudFormation.getBoolean(properties.TracingEnabled) : undefined));
   ret.addPropertyResult("variables", "Variables", (properties.Variables != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getAny)(properties.Variables) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
@@ -44975,7 +44975,7 @@ export class CfnApplication extends cdk.CfnResource implements cdk.IInspectable,
    */
   public readonly tags: cdk.TagManager;
 
-  public tagsRaw?: Array<cdk.CfnTag>;
+  public tagsRaw?: Record<string, string>;
 
   public timeoutInMinutes?: number;
 
@@ -44997,7 +44997,7 @@ export class CfnApplication extends cdk.CfnResource implements cdk.IInspectable,
     this.location = props.location;
     this.notificationArns = props.notificationArns;
     this.parameters = props.parameters;
-    this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::Serverless::Application", props.tags, {
+    this.tags = new cdk.TagManager(cdk.TagType.MAP, "AWS::Serverless::Application", props.tags, {
       "tagPropertyName": "tags"
     });
     this.tagsRaw = props.tags;
@@ -45073,7 +45073,7 @@ export interface CfnApplicationProps {
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-application.html#cfn-serverless-application-tags
    */
-  readonly tags?: Array<cdk.CfnTag>;
+  readonly tags?: Record<string, string>;
 
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-application.html#cfn-serverless-application-timeoutinminutes
@@ -45146,7 +45146,7 @@ function CfnApplicationPropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("location", cdk.unionValidator(CfnApplicationApplicationLocationPropertyValidator, cdk.validateString))(properties.location));
   errors.collect(cdk.propertyValidator("notificationArns", cdk.listValidator(cdk.validateString))(properties.notificationArns));
   errors.collect(cdk.propertyValidator("parameters", cdk.hashValidator(cdk.validateObject))(properties.parameters));
-  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
+  errors.collect(cdk.propertyValidator("tags", cdk.hashValidator(cdk.validateString))(properties.tags));
   errors.collect(cdk.propertyValidator("timeoutInMinutes", cdk.validateNumber)(properties.timeoutInMinutes));
   return errors.wrap("supplied properties not correct for \\"CfnApplicationProps\\"");
 }
@@ -45159,7 +45159,7 @@ function convertCfnApplicationPropsToCloudFormation(properties: any): any {
     "Location": cdk.unionMapper([CfnApplicationApplicationLocationPropertyValidator, cdk.validateString], [convertCfnApplicationApplicationLocationPropertyToCloudFormation, cdk.stringToCloudFormation])(properties.location),
     "NotificationArns": cdk.listMapper(cdk.stringToCloudFormation)(properties.notificationArns),
     "Parameters": cdk.hashMapper(cdk.objectToCloudFormation)(properties.parameters),
-    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags),
+    "Tags": cdk.hashMapper(cdk.stringToCloudFormation)(properties.tags),
     "TimeoutInMinutes": cdk.numberToCloudFormation(properties.timeoutInMinutes)
   };
 }
@@ -45177,7 +45177,7 @@ function CfnApplicationPropsFromCloudFormation(properties: any): cfn_parse.FromC
   ret.addPropertyResult("location", "Location", (properties.Location != null ? cfn_parse.FromCloudFormation.getTypeUnion([CfnApplicationApplicationLocationPropertyValidator, cdk.validateString], [CfnApplicationApplicationLocationPropertyFromCloudFormation, cfn_parse.FromCloudFormation.getString])(properties.Location) : undefined));
   ret.addPropertyResult("notificationArns", "NotificationArns", (properties.NotificationArns != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.NotificationArns) : undefined));
   ret.addPropertyResult("parameters", "Parameters", (properties.Parameters != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getAny)(properties.Parameters) : undefined));
-  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
+  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString)(properties.Tags) : undefined));
   ret.addPropertyResult("timeoutInMinutes", "TimeoutInMinutes", (properties.TimeoutInMinutes != null ? cfn_parse.FromCloudFormation.getNumber(properties.TimeoutInMinutes) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
@@ -45285,7 +45285,7 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
    */
   public readonly tags: cdk.TagManager;
 
-  public tagsRaw?: Array<cdk.CfnTag>;
+  public tagsRaw?: Record<string, string>;
 
   public timeout?: number;
 
@@ -45336,7 +45336,7 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
     this.reservedConcurrentExecutions = props.reservedConcurrentExecutions;
     this.role = props.role;
     this.runtime = props.runtime;
-    this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::Serverless::Function", props.tags, {
+    this.tags = new cdk.TagManager(cdk.TagType.MAP, "AWS::Serverless::Function", props.tags, {
       "tagPropertyName": "tags"
     });
     this.tagsRaw = props.tags;
@@ -46729,7 +46729,7 @@ export interface CfnFunctionProps {
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-function.html#cfn-serverless-function-tags
    */
-  readonly tags?: Array<cdk.CfnTag>;
+  readonly tags?: Record<string, string>;
 
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-function.html#cfn-serverless-function-timeout
@@ -49499,7 +49499,7 @@ function CfnFunctionPropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("reservedConcurrentExecutions", cdk.validateNumber)(properties.reservedConcurrentExecutions));
   errors.collect(cdk.propertyValidator("role", cdk.validateString)(properties.role));
   errors.collect(cdk.propertyValidator("runtime", cdk.validateString)(properties.runtime));
-  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
+  errors.collect(cdk.propertyValidator("tags", cdk.hashValidator(cdk.validateString))(properties.tags));
   errors.collect(cdk.propertyValidator("timeout", cdk.validateNumber)(properties.timeout));
   errors.collect(cdk.propertyValidator("tracing", cdk.validateString)(properties.tracing));
   errors.collect(cdk.propertyValidator("versionDescription", cdk.validateString)(properties.versionDescription));
@@ -49540,7 +49540,7 @@ function convertCfnFunctionPropsToCloudFormation(properties: any): any {
     "ReservedConcurrentExecutions": cdk.numberToCloudFormation(properties.reservedConcurrentExecutions),
     "Role": cdk.stringToCloudFormation(properties.role),
     "Runtime": cdk.stringToCloudFormation(properties.runtime),
-    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags),
+    "Tags": cdk.hashMapper(cdk.stringToCloudFormation)(properties.tags),
     "Timeout": cdk.numberToCloudFormation(properties.timeout),
     "Tracing": cdk.stringToCloudFormation(properties.tracing),
     "VersionDescription": cdk.stringToCloudFormation(properties.versionDescription),
@@ -49586,7 +49586,7 @@ function CfnFunctionPropsFromCloudFormation(properties: any): cfn_parse.FromClou
   ret.addPropertyResult("reservedConcurrentExecutions", "ReservedConcurrentExecutions", (properties.ReservedConcurrentExecutions != null ? cfn_parse.FromCloudFormation.getNumber(properties.ReservedConcurrentExecutions) : undefined));
   ret.addPropertyResult("role", "Role", (properties.Role != null ? cfn_parse.FromCloudFormation.getString(properties.Role) : undefined));
   ret.addPropertyResult("runtime", "Runtime", (properties.Runtime != null ? cfn_parse.FromCloudFormation.getString(properties.Runtime) : undefined));
-  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
+  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString)(properties.Tags) : undefined));
   ret.addPropertyResult("timeout", "Timeout", (properties.Timeout != null ? cfn_parse.FromCloudFormation.getNumber(properties.Timeout) : undefined));
   ret.addPropertyResult("tracing", "Tracing", (properties.Tracing != null ? cfn_parse.FromCloudFormation.getString(properties.Tracing) : undefined));
   ret.addPropertyResult("versionDescription", "VersionDescription", (properties.VersionDescription != null ? cfn_parse.FromCloudFormation.getString(properties.VersionDescription) : undefined));
@@ -49667,7 +49667,7 @@ export class CfnHttpApi extends cdk.CfnResource implements cdk.IInspectable, cdk
    */
   public readonly tags: cdk.TagManager;
 
-  public tagsRaw?: Array<cdk.CfnTag>;
+  public tagsRaw?: Record<string, string>;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -49695,7 +49695,7 @@ export class CfnHttpApi extends cdk.CfnResource implements cdk.IInspectable, cdk
     this.routeSettings = props.routeSettings;
     this.stageName = props.stageName;
     this.stageVariables = props.stageVariables;
-    this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::Serverless::HttpApi", props.tags, {
+    this.tags = new cdk.TagManager(cdk.TagType.MAP, "AWS::Serverless::HttpApi", props.tags, {
       "tagPropertyName": "tags"
     });
     this.tagsRaw = props.tags;
@@ -50021,7 +50021,7 @@ export interface CfnHttpApiProps {
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-httpapi.html#cfn-serverless-httpapi-tags
    */
-  readonly tags?: Array<cdk.CfnTag>;
+  readonly tags?: Record<string, string>;
 }
 
 /**
@@ -50464,7 +50464,7 @@ function CfnHttpApiPropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("routeSettings", CfnHttpApiRouteSettingsPropertyValidator)(properties.routeSettings));
   errors.collect(cdk.propertyValidator("stageName", cdk.validateString)(properties.stageName));
   errors.collect(cdk.propertyValidator("stageVariables", cdk.hashValidator(cdk.validateObject))(properties.stageVariables));
-  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
+  errors.collect(cdk.propertyValidator("tags", cdk.hashValidator(cdk.validateString))(properties.tags));
   return errors.wrap("supplied properties not correct for \\"CfnHttpApiProps\\"");
 }
 
@@ -50486,7 +50486,7 @@ function convertCfnHttpApiPropsToCloudFormation(properties: any): any {
     "RouteSettings": convertCfnHttpApiRouteSettingsPropertyToCloudFormation(properties.routeSettings),
     "StageName": cdk.stringToCloudFormation(properties.stageName),
     "StageVariables": cdk.hashMapper(cdk.objectToCloudFormation)(properties.stageVariables),
-    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags)
+    "Tags": cdk.hashMapper(cdk.stringToCloudFormation)(properties.tags)
   };
 }
 
@@ -50513,7 +50513,7 @@ function CfnHttpApiPropsFromCloudFormation(properties: any): cfn_parse.FromCloud
   ret.addPropertyResult("routeSettings", "RouteSettings", (properties.RouteSettings != null ? CfnHttpApiRouteSettingsPropertyFromCloudFormation(properties.RouteSettings) : undefined));
   ret.addPropertyResult("stageName", "StageName", (properties.StageName != null ? cfn_parse.FromCloudFormation.getString(properties.StageName) : undefined));
   ret.addPropertyResult("stageVariables", "StageVariables", (properties.StageVariables != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getAny)(properties.StageVariables) : undefined));
-  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
+  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString)(properties.Tags) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -50841,7 +50841,7 @@ export class CfnSimpleTable extends cdk.CfnResource implements cdk.IInspectable,
    */
   public readonly tags: cdk.TagManager;
 
-  public tagsRaw?: Array<cdk.CfnTag>;
+  public tagsRaw?: Record<string, string>;
 
   /**
    * @param scope Scope in which this resource is defined
@@ -50860,7 +50860,7 @@ export class CfnSimpleTable extends cdk.CfnResource implements cdk.IInspectable,
     this.provisionedThroughput = props.provisionedThroughput;
     this.sseSpecification = props.sseSpecification;
     this.tableName = props.tableName;
-    this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::Serverless::SimpleTable", props.tags, {
+    this.tags = new cdk.TagManager(cdk.TagType.MAP, "AWS::Serverless::SimpleTable", props.tags, {
       "tagPropertyName": "tags"
     });
     this.tagsRaw = props.tags;
@@ -50967,7 +50967,7 @@ export interface CfnSimpleTableProps {
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-simpletable.html#cfn-serverless-simpletable-tags
    */
-  readonly tags?: Array<cdk.CfnTag>;
+  readonly tags?: Record<string, string>;
 }
 
 /**
@@ -51122,7 +51122,7 @@ function CfnSimpleTablePropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("provisionedThroughput", CfnSimpleTableProvisionedThroughputPropertyValidator)(properties.provisionedThroughput));
   errors.collect(cdk.propertyValidator("sseSpecification", CfnSimpleTableSSESpecificationPropertyValidator)(properties.sseSpecification));
   errors.collect(cdk.propertyValidator("tableName", cdk.validateString)(properties.tableName));
-  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
+  errors.collect(cdk.propertyValidator("tags", cdk.hashValidator(cdk.validateString))(properties.tags));
   return errors.wrap("supplied properties not correct for \\"CfnSimpleTableProps\\"");
 }
 
@@ -51135,7 +51135,7 @@ function convertCfnSimpleTablePropsToCloudFormation(properties: any): any {
     "ProvisionedThroughput": convertCfnSimpleTableProvisionedThroughputPropertyToCloudFormation(properties.provisionedThroughput),
     "SSESpecification": convertCfnSimpleTableSSESpecificationPropertyToCloudFormation(properties.sseSpecification),
     "TableName": cdk.stringToCloudFormation(properties.tableName),
-    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags)
+    "Tags": cdk.hashMapper(cdk.stringToCloudFormation)(properties.tags)
   };
 }
 
@@ -51153,7 +51153,7 @@ function CfnSimpleTablePropsFromCloudFormation(properties: any): cfn_parse.FromC
   ret.addPropertyResult("provisionedThroughput", "ProvisionedThroughput", (properties.ProvisionedThroughput != null ? CfnSimpleTableProvisionedThroughputPropertyFromCloudFormation(properties.ProvisionedThroughput) : undefined));
   ret.addPropertyResult("sseSpecification", "SSESpecification", (properties.SSESpecification != null ? CfnSimpleTableSSESpecificationPropertyFromCloudFormation(properties.SSESpecification) : undefined));
   ret.addPropertyResult("tableName", "TableName", (properties.TableName != null ? cfn_parse.FromCloudFormation.getString(properties.TableName) : undefined));
-  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
+  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString)(properties.Tags) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -51222,7 +51222,7 @@ export class CfnStateMachine extends cdk.CfnResource implements cdk.IInspectable
    */
   public readonly tags: cdk.TagManager;
 
-  public tagsRaw?: Array<cdk.CfnTag>;
+  public tagsRaw?: Record<string, string>;
 
   public tracing?: cdk.IResolvable | CfnStateMachine.TracingConfigurationProperty;
 
@@ -51250,7 +51250,7 @@ export class CfnStateMachine extends cdk.CfnResource implements cdk.IInspectable
     this.permissionsBoundaries = props.permissionsBoundaries;
     this.policies = props.policies;
     this.role = props.role;
-    this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::Serverless::StateMachine", props.tags, {
+    this.tags = new cdk.TagManager(cdk.TagType.MAP, "AWS::Serverless::StateMachine", props.tags, {
       "tagPropertyName": "tags"
     });
     this.tagsRaw = props.tags;
@@ -51582,7 +51582,7 @@ export interface CfnStateMachineProps {
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-statemachine.html#cfn-serverless-statemachine-tags
    */
-  readonly tags?: Array<cdk.CfnTag>;
+  readonly tags?: Record<string, string>;
 
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-statemachine.html#cfn-serverless-statemachine-tracing
@@ -52272,7 +52272,7 @@ function CfnStateMachinePropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("permissionsBoundaries", cdk.validateString)(properties.permissionsBoundaries));
   errors.collect(cdk.propertyValidator("policies", cdk.unionValidator(cdk.listValidator(cdk.unionValidator(CfnStateMachineIAMPolicyDocumentPropertyValidator, CfnStateMachineSAMPolicyTemplatePropertyValidator, cdk.validateString)), CfnStateMachineIAMPolicyDocumentPropertyValidator, cdk.validateString))(properties.policies));
   errors.collect(cdk.propertyValidator("role", cdk.validateString)(properties.role));
-  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
+  errors.collect(cdk.propertyValidator("tags", cdk.hashValidator(cdk.validateString))(properties.tags));
   errors.collect(cdk.propertyValidator("tracing", CfnStateMachineTracingConfigurationPropertyValidator)(properties.tracing));
   errors.collect(cdk.propertyValidator("type", cdk.validateString)(properties.type));
   return errors.wrap("supplied properties not correct for \\"CfnStateMachineProps\\"");
@@ -52292,7 +52292,7 @@ function convertCfnStateMachinePropsToCloudFormation(properties: any): any {
     "PermissionsBoundaries": cdk.stringToCloudFormation(properties.permissionsBoundaries),
     "Policies": cdk.unionMapper([cdk.listValidator(cdk.unionValidator(CfnStateMachineIAMPolicyDocumentPropertyValidator, CfnStateMachineSAMPolicyTemplatePropertyValidator, cdk.validateString)), CfnStateMachineIAMPolicyDocumentPropertyValidator, cdk.validateString], [cdk.listMapper(cdk.unionMapper([CfnStateMachineIAMPolicyDocumentPropertyValidator, CfnStateMachineSAMPolicyTemplatePropertyValidator, cdk.validateString], [convertCfnStateMachineIAMPolicyDocumentPropertyToCloudFormation, convertCfnStateMachineSAMPolicyTemplatePropertyToCloudFormation, cdk.stringToCloudFormation])), convertCfnStateMachineIAMPolicyDocumentPropertyToCloudFormation, cdk.stringToCloudFormation])(properties.policies),
     "Role": cdk.stringToCloudFormation(properties.role),
-    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags),
+    "Tags": cdk.hashMapper(cdk.stringToCloudFormation)(properties.tags),
     "Tracing": convertCfnStateMachineTracingConfigurationPropertyToCloudFormation(properties.tracing),
     "Type": cdk.stringToCloudFormation(properties.type)
   };
@@ -52317,7 +52317,7 @@ function CfnStateMachinePropsFromCloudFormation(properties: any): cfn_parse.From
   ret.addPropertyResult("permissionsBoundaries", "PermissionsBoundaries", (properties.PermissionsBoundaries != null ? cfn_parse.FromCloudFormation.getString(properties.PermissionsBoundaries) : undefined));
   ret.addPropertyResult("policies", "Policies", (properties.Policies != null ? cfn_parse.FromCloudFormation.getTypeUnion([cdk.listValidator(cdk.unionValidator(CfnStateMachineIAMPolicyDocumentPropertyValidator, CfnStateMachineSAMPolicyTemplatePropertyValidator, cdk.validateString)), CfnStateMachineIAMPolicyDocumentPropertyValidator, cdk.validateString], [cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getTypeUnion([CfnStateMachineIAMPolicyDocumentPropertyValidator, CfnStateMachineSAMPolicyTemplatePropertyValidator, cdk.validateString], [CfnStateMachineIAMPolicyDocumentPropertyFromCloudFormation, CfnStateMachineSAMPolicyTemplatePropertyFromCloudFormation, cfn_parse.FromCloudFormation.getString])), CfnStateMachineIAMPolicyDocumentPropertyFromCloudFormation, cfn_parse.FromCloudFormation.getString])(properties.Policies) : undefined));
   ret.addPropertyResult("role", "Role", (properties.Role != null ? cfn_parse.FromCloudFormation.getString(properties.Role) : undefined));
-  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
+  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString)(properties.Tags) : undefined));
   ret.addPropertyResult("tracing", "Tracing", (properties.Tracing != null ? CfnStateMachineTracingConfigurationPropertyFromCloudFormation(properties.Tracing) : undefined));
   ret.addPropertyResult("type", "Type", (properties.Type != null ? cfn_parse.FromCloudFormation.getString(properties.Type) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);

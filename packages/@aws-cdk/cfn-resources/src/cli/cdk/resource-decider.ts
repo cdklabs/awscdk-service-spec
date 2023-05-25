@@ -114,6 +114,9 @@ export class ResourceDecider {
    * to add tags apart from the TagManager.
    */
   private handleTagPropertyLegacy(cfnName: string, prop: Property) {
+    if (this.resource.cloudFormationType === 'AWS::EKS::Nodegroup') {
+      debugger;
+    }
     const originalName = propertyNameFromCloudFormation(cfnName);
     const rawTagsPropName = `${originalName}Raw`;
 
