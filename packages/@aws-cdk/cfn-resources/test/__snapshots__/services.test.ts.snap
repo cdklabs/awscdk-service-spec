@@ -12924,7 +12924,7 @@ export class CfnIPAMPool extends cdk.CfnResource implements cdk.IInspectable, cd
   /**
    * Tags that are required for resources that use CIDRs from this IPAM pool.
    */
-  public allocationResourceTags?: Array<cdk.IResolvable | CfnIPAMPool.TagProperty> | cdk.IResolvable;
+  public allocationResourceTags?: Array<cdk.CfnTag>;
 
   /**
    * If selected, IPAM will continuously look for resources within the CIDR range of this pool and automatically import them as allocations into your IPAM.
@@ -13060,32 +13060,6 @@ export class CfnIPAMPool extends cdk.CfnResource implements cdk.IInspectable, cd
 
 export namespace CfnIPAMPool {
   /**
-   * A key-value pair to associate with a resource.
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-ipampool-tag.html
-   */
-  export interface TagProperty {
-    /**
-     * The key name of the tag.
-     *
-     * You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-ipampool-tag.html#cfn-ec2-ipampool-tag-key
-     */
-    readonly key: string;
-
-    /**
-     * The value for the tag.
-     *
-     * You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-ipampool-tag.html#cfn-ec2-ipampool-tag-value
-     */
-    readonly value: string;
-  }
-
-  /**
    * The CIDR provisioned to the IPAM pool.
    *
    * A CIDR is a representation of an IP address and its associated network mask (or netmask) and refers to a range of IP addresses. An IPv4 CIDR example is \`10.24.34.0/23\` . An IPv6 CIDR example is \`2001:DB8::/32\` .
@@ -13156,7 +13130,7 @@ export interface CfnIPAMPoolProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-ipampool.html#cfn-ec2-ipampool-allocationresourcetags
    */
-  readonly allocationResourceTags?: Array<cdk.IResolvable | CfnIPAMPool.TagProperty> | cdk.IResolvable;
+  readonly allocationResourceTags?: Array<cdk.CfnTag>;
 
   /**
    * If selected, IPAM will continuously look for resources within the CIDR range of this pool and automatically import them as allocations into your IPAM.
@@ -13246,53 +13220,6 @@ export interface CfnIPAMPoolProps {
 }
 
 /**
- * Determine whether the given properties match those of a \`TagProperty\`
- *
- * @param properties - the TypeScript properties of a \`TagProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnIPAMPoolTagPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
-  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
-  errors.collect(cdk.propertyValidator("value", cdk.requiredValidator)(properties.value));
-  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
-  return errors.wrap("supplied properties not correct for \\"TagProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnIPAMPoolTagPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnIPAMPoolTagPropertyValidator(properties).assertSuccess();
-  return {
-    "Key": cdk.stringToCloudFormation(properties.key),
-    "Value": cdk.stringToCloudFormation(properties.value)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnIPAMPoolTagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnIPAMPool.TagProperty> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnIPAMPool.TagProperty>();
-  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
-  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
  * Determine whether the given properties match those of a \`ProvisionedCidrProperty\`
  *
  * @param properties - the TypeScript properties of a \`ProvisionedCidrProperty\`
@@ -13354,7 +13281,7 @@ function CfnIPAMPoolPropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("allocationDefaultNetmaskLength", cdk.validateNumber)(properties.allocationDefaultNetmaskLength));
   errors.collect(cdk.propertyValidator("allocationMaxNetmaskLength", cdk.validateNumber)(properties.allocationMaxNetmaskLength));
   errors.collect(cdk.propertyValidator("allocationMinNetmaskLength", cdk.validateNumber)(properties.allocationMinNetmaskLength));
-  errors.collect(cdk.propertyValidator("allocationResourceTags", cdk.listValidator(CfnIPAMPoolTagPropertyValidator))(properties.allocationResourceTags));
+  errors.collect(cdk.propertyValidator("allocationResourceTags", cdk.listValidator(cdk.validateCfnTag))(properties.allocationResourceTags));
   errors.collect(cdk.propertyValidator("autoImport", cdk.validateBoolean)(properties.autoImport));
   errors.collect(cdk.propertyValidator("awsService", cdk.validateString)(properties.awsService));
   errors.collect(cdk.propertyValidator("description", cdk.validateString)(properties.description));
@@ -13378,7 +13305,7 @@ function convertCfnIPAMPoolPropsToCloudFormation(properties: any): any {
     "AllocationDefaultNetmaskLength": cdk.numberToCloudFormation(properties.allocationDefaultNetmaskLength),
     "AllocationMaxNetmaskLength": cdk.numberToCloudFormation(properties.allocationMaxNetmaskLength),
     "AllocationMinNetmaskLength": cdk.numberToCloudFormation(properties.allocationMinNetmaskLength),
-    "AllocationResourceTags": cdk.listMapper(convertCfnIPAMPoolTagPropertyToCloudFormation)(properties.allocationResourceTags),
+    "AllocationResourceTags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.allocationResourceTags),
     "AutoImport": cdk.booleanToCloudFormation(properties.autoImport),
     "AwsService": cdk.stringToCloudFormation(properties.awsService),
     "Description": cdk.stringToCloudFormation(properties.description),
@@ -13406,7 +13333,7 @@ function CfnIPAMPoolPropsFromCloudFormation(properties: any): cfn_parse.FromClou
   ret.addPropertyResult("allocationDefaultNetmaskLength", "AllocationDefaultNetmaskLength", (properties.AllocationDefaultNetmaskLength != null ? cfn_parse.FromCloudFormation.getNumber(properties.AllocationDefaultNetmaskLength) : undefined));
   ret.addPropertyResult("allocationMaxNetmaskLength", "AllocationMaxNetmaskLength", (properties.AllocationMaxNetmaskLength != null ? cfn_parse.FromCloudFormation.getNumber(properties.AllocationMaxNetmaskLength) : undefined));
   ret.addPropertyResult("allocationMinNetmaskLength", "AllocationMinNetmaskLength", (properties.AllocationMinNetmaskLength != null ? cfn_parse.FromCloudFormation.getNumber(properties.AllocationMinNetmaskLength) : undefined));
-  ret.addPropertyResult("allocationResourceTags", "AllocationResourceTags", (properties.AllocationResourceTags != null ? cfn_parse.FromCloudFormation.getArray(CfnIPAMPoolTagPropertyFromCloudFormation)(properties.AllocationResourceTags) : undefined));
+  ret.addPropertyResult("allocationResourceTags", "AllocationResourceTags", (properties.AllocationResourceTags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.AllocationResourceTags) : undefined));
   ret.addPropertyResult("autoImport", "AutoImport", (properties.AutoImport != null ? cfn_parse.FromCloudFormation.getBoolean(properties.AutoImport) : undefined));
   ret.addPropertyResult("awsService", "AwsService", (properties.AwsService != null ? cfn_parse.FromCloudFormation.getString(properties.AwsService) : undefined));
   ret.addPropertyResult("description", "Description", (properties.Description != null ? cfn_parse.FromCloudFormation.getString(properties.Description) : undefined));
@@ -35867,7 +35794,7 @@ function CfnTransitGatewayVpcAttachmentPropsFromCloudFormation(properties: any):
  * @stability external
  * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-verifiedaccessendpoint.html
  */
-export class CfnVerifiedAccessEndpoint extends cdk.CfnResource implements cdk.IInspectable {
+export class CfnVerifiedAccessEndpoint extends cdk.CfnResource implements cdk.IInspectable, cdk.ITaggable {
   /**
    * The CloudFormation resource type name for this resource class.
    */
@@ -36002,9 +35929,14 @@ export class CfnVerifiedAccessEndpoint extends cdk.CfnResource implements cdk.II
   public securityGroupIds?: Array<string>;
 
   /**
+   * Tag Manager which manages the tags for this resource
+   */
+  public readonly tags: cdk.TagManager;
+
+  /**
    * The tags.
    */
-  public tags?: Array<cdk.IResolvable | CfnVerifiedAccessEndpoint.TagProperty> | cdk.IResolvable;
+  public tagsRaw?: Array<cdk.CfnTag>;
 
   /**
    * The ID of the AWS Verified Access group.
@@ -36047,7 +35979,10 @@ export class CfnVerifiedAccessEndpoint extends cdk.CfnResource implements cdk.II
     this.policyDocument = props.policyDocument;
     this.policyEnabled = props.policyEnabled;
     this.securityGroupIds = props.securityGroupIds;
-    this.tags = props.tags;
+    this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::EC2::VerifiedAccessEndpoint", props.tags, {
+      "tagPropertyName": "tags"
+    });
+    this.tagsRaw = props.tags;
     this.verifiedAccessGroupId = props.verifiedAccessGroupId;
   }
 
@@ -36064,7 +35999,7 @@ export class CfnVerifiedAccessEndpoint extends cdk.CfnResource implements cdk.II
       "policyDocument": this.policyDocument,
       "policyEnabled": this.policyEnabled,
       "securityGroupIds": this.securityGroupIds,
-      "tags": this.tags,
+      "tags": this.tags.renderTags(),
       "verifiedAccessGroupId": this.verifiedAccessGroupId
     };
   }
@@ -36148,32 +36083,6 @@ export namespace CfnVerifiedAccessEndpoint {
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-verifiedaccessendpoint-loadbalanceroptions.html#cfn-ec2-verifiedaccessendpoint-loadbalanceroptions-subnetids
      */
     readonly subnetIds?: Array<string>;
-  }
-
-  /**
-   * A key-value pair to associate with a resource.
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-verifiedaccessendpoint-tag.html
-   */
-  export interface TagProperty {
-    /**
-     * The key name of the tag.
-     *
-     * You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-verifiedaccessendpoint-tag.html#cfn-ec2-verifiedaccessendpoint-tag-key
-     */
-    readonly key: string;
-
-    /**
-     * The value for the tag.
-     *
-     * You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-verifiedaccessendpoint-tag.html#cfn-ec2-verifiedaccessendpoint-tag-value
-     */
-    readonly value: string;
   }
 }
 
@@ -36269,7 +36178,7 @@ export interface CfnVerifiedAccessEndpointProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-verifiedaccessendpoint.html#cfn-ec2-verifiedaccessendpoint-tags
    */
-  readonly tags?: Array<cdk.IResolvable | CfnVerifiedAccessEndpoint.TagProperty> | cdk.IResolvable;
+  readonly tags?: Array<cdk.CfnTag>;
 
   /**
    * The ID of the AWS Verified Access group.
@@ -36379,53 +36288,6 @@ function CfnVerifiedAccessEndpointLoadBalancerOptionsPropertyFromCloudFormation(
 }
 
 /**
- * Determine whether the given properties match those of a \`TagProperty\`
- *
- * @param properties - the TypeScript properties of a \`TagProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnVerifiedAccessEndpointTagPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
-  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
-  errors.collect(cdk.propertyValidator("value", cdk.requiredValidator)(properties.value));
-  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
-  return errors.wrap("supplied properties not correct for \\"TagProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnVerifiedAccessEndpointTagPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnVerifiedAccessEndpointTagPropertyValidator(properties).assertSuccess();
-  return {
-    "Key": cdk.stringToCloudFormation(properties.key),
-    "Value": cdk.stringToCloudFormation(properties.value)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnVerifiedAccessEndpointTagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnVerifiedAccessEndpoint.TagProperty> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnVerifiedAccessEndpoint.TagProperty>();
-  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
-  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
  * Determine whether the given properties match those of a \`CfnVerifiedAccessEndpointProps\`
  *
  * @param properties - the TypeScript properties of a \`CfnVerifiedAccessEndpointProps\`
@@ -36455,7 +36317,7 @@ function CfnVerifiedAccessEndpointPropsValidator(properties: any): cdk.Validatio
   errors.collect(cdk.propertyValidator("policyDocument", cdk.validateString)(properties.policyDocument));
   errors.collect(cdk.propertyValidator("policyEnabled", cdk.validateBoolean)(properties.policyEnabled));
   errors.collect(cdk.propertyValidator("securityGroupIds", cdk.listValidator(cdk.validateString))(properties.securityGroupIds));
-  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(CfnVerifiedAccessEndpointTagPropertyValidator))(properties.tags));
+  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
   errors.collect(cdk.propertyValidator("verifiedAccessGroupId", cdk.requiredValidator)(properties.verifiedAccessGroupId));
   errors.collect(cdk.propertyValidator("verifiedAccessGroupId", cdk.validateString)(properties.verifiedAccessGroupId));
   return errors.wrap("supplied properties not correct for \\"CfnVerifiedAccessEndpointProps\\"");
@@ -36477,7 +36339,7 @@ function convertCfnVerifiedAccessEndpointPropsToCloudFormation(properties: any):
     "PolicyDocument": cdk.stringToCloudFormation(properties.policyDocument),
     "PolicyEnabled": cdk.booleanToCloudFormation(properties.policyEnabled),
     "SecurityGroupIds": cdk.listMapper(cdk.stringToCloudFormation)(properties.securityGroupIds),
-    "Tags": cdk.listMapper(convertCfnVerifiedAccessEndpointTagPropertyToCloudFormation)(properties.tags),
+    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags),
     "VerifiedAccessGroupId": cdk.stringToCloudFormation(properties.verifiedAccessGroupId)
   };
 }
@@ -36503,7 +36365,7 @@ function CfnVerifiedAccessEndpointPropsFromCloudFormation(properties: any): cfn_
   ret.addPropertyResult("policyDocument", "PolicyDocument", (properties.PolicyDocument != null ? cfn_parse.FromCloudFormation.getString(properties.PolicyDocument) : undefined));
   ret.addPropertyResult("policyEnabled", "PolicyEnabled", (properties.PolicyEnabled != null ? cfn_parse.FromCloudFormation.getBoolean(properties.PolicyEnabled) : undefined));
   ret.addPropertyResult("securityGroupIds", "SecurityGroupIds", (properties.SecurityGroupIds != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.SecurityGroupIds) : undefined));
-  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(CfnVerifiedAccessEndpointTagPropertyFromCloudFormation)(properties.Tags) : undefined));
+  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
   ret.addPropertyResult("verifiedAccessGroupId", "VerifiedAccessGroupId", (properties.VerifiedAccessGroupId != null ? cfn_parse.FromCloudFormation.getString(properties.VerifiedAccessGroupId) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
@@ -36515,7 +36377,7 @@ function CfnVerifiedAccessEndpointPropsFromCloudFormation(properties: any): cfn_
  * @stability external
  * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-verifiedaccessgroup.html
  */
-export class CfnVerifiedAccessGroup extends cdk.CfnResource implements cdk.IInspectable {
+export class CfnVerifiedAccessGroup extends cdk.CfnResource implements cdk.IInspectable, cdk.ITaggable {
   /**
    * The CloudFormation resource type name for this resource class.
    */
@@ -36596,9 +36458,14 @@ export class CfnVerifiedAccessGroup extends cdk.CfnResource implements cdk.IInsp
   public policyEnabled?: boolean | cdk.IResolvable;
 
   /**
+   * Tag Manager which manages the tags for this resource
+   */
+  public readonly tags: cdk.TagManager;
+
+  /**
    * The tags.
    */
-  public tags?: Array<cdk.IResolvable | CfnVerifiedAccessGroup.TagProperty> | cdk.IResolvable;
+  public tagsRaw?: Array<cdk.CfnTag>;
 
   /**
    * The ID of the AWS Verified Access instance.
@@ -36626,7 +36493,10 @@ export class CfnVerifiedAccessGroup extends cdk.CfnResource implements cdk.IInsp
     this.description = props.description;
     this.policyDocument = props.policyDocument;
     this.policyEnabled = props.policyEnabled;
-    this.tags = props.tags;
+    this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::EC2::VerifiedAccessGroup", props.tags, {
+      "tagPropertyName": "tags"
+    });
+    this.tagsRaw = props.tags;
     this.verifiedAccessInstanceId = props.verifiedAccessInstanceId;
   }
 
@@ -36635,7 +36505,7 @@ export class CfnVerifiedAccessGroup extends cdk.CfnResource implements cdk.IInsp
       "description": this.description,
       "policyDocument": this.policyDocument,
       "policyEnabled": this.policyEnabled,
-      "tags": this.tags,
+      "tags": this.tags.renderTags(),
       "verifiedAccessInstanceId": this.verifiedAccessInstanceId
     };
   }
@@ -36652,34 +36522,6 @@ export class CfnVerifiedAccessGroup extends cdk.CfnResource implements cdk.IInsp
 
   protected renderProperties(props: Record<string, any>): Record<string, any> {
     return convertCfnVerifiedAccessGroupPropsToCloudFormation(props);
-  }
-}
-
-export namespace CfnVerifiedAccessGroup {
-  /**
-   * A key-value pair to associate with a resource.
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-verifiedaccessgroup-tag.html
-   */
-  export interface TagProperty {
-    /**
-     * The key name of the tag.
-     *
-     * You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-verifiedaccessgroup-tag.html#cfn-ec2-verifiedaccessgroup-tag-key
-     */
-    readonly key: string;
-
-    /**
-     * The value for the tag.
-     *
-     * You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-verifiedaccessgroup-tag.html#cfn-ec2-verifiedaccessgroup-tag-value
-     */
-    readonly value: string;
   }
 }
 
@@ -36717,7 +36559,7 @@ export interface CfnVerifiedAccessGroupProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-verifiedaccessgroup.html#cfn-ec2-verifiedaccessgroup-tags
    */
-  readonly tags?: Array<cdk.IResolvable | CfnVerifiedAccessGroup.TagProperty> | cdk.IResolvable;
+  readonly tags?: Array<cdk.CfnTag>;
 
   /**
    * The ID of the AWS Verified Access instance.
@@ -36725,53 +36567,6 @@ export interface CfnVerifiedAccessGroupProps {
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-verifiedaccessgroup.html#cfn-ec2-verifiedaccessgroup-verifiedaccessinstanceid
    */
   readonly verifiedAccessInstanceId: string;
-}
-
-/**
- * Determine whether the given properties match those of a \`TagProperty\`
- *
- * @param properties - the TypeScript properties of a \`TagProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnVerifiedAccessGroupTagPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
-  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
-  errors.collect(cdk.propertyValidator("value", cdk.requiredValidator)(properties.value));
-  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
-  return errors.wrap("supplied properties not correct for \\"TagProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnVerifiedAccessGroupTagPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnVerifiedAccessGroupTagPropertyValidator(properties).assertSuccess();
-  return {
-    "Key": cdk.stringToCloudFormation(properties.key),
-    "Value": cdk.stringToCloudFormation(properties.value)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnVerifiedAccessGroupTagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnVerifiedAccessGroup.TagProperty> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnVerifiedAccessGroup.TagProperty>();
-  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
-  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
 }
 
 /**
@@ -36791,7 +36586,7 @@ function CfnVerifiedAccessGroupPropsValidator(properties: any): cdk.ValidationRe
   errors.collect(cdk.propertyValidator("description", cdk.validateString)(properties.description));
   errors.collect(cdk.propertyValidator("policyDocument", cdk.validateString)(properties.policyDocument));
   errors.collect(cdk.propertyValidator("policyEnabled", cdk.validateBoolean)(properties.policyEnabled));
-  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(CfnVerifiedAccessGroupTagPropertyValidator))(properties.tags));
+  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
   errors.collect(cdk.propertyValidator("verifiedAccessInstanceId", cdk.requiredValidator)(properties.verifiedAccessInstanceId));
   errors.collect(cdk.propertyValidator("verifiedAccessInstanceId", cdk.validateString)(properties.verifiedAccessInstanceId));
   return errors.wrap("supplied properties not correct for \\"CfnVerifiedAccessGroupProps\\"");
@@ -36805,7 +36600,7 @@ function convertCfnVerifiedAccessGroupPropsToCloudFormation(properties: any): an
     "Description": cdk.stringToCloudFormation(properties.description),
     "PolicyDocument": cdk.stringToCloudFormation(properties.policyDocument),
     "PolicyEnabled": cdk.booleanToCloudFormation(properties.policyEnabled),
-    "Tags": cdk.listMapper(convertCfnVerifiedAccessGroupTagPropertyToCloudFormation)(properties.tags),
+    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags),
     "VerifiedAccessInstanceId": cdk.stringToCloudFormation(properties.verifiedAccessInstanceId)
   };
 }
@@ -36823,7 +36618,7 @@ function CfnVerifiedAccessGroupPropsFromCloudFormation(properties: any): cfn_par
   ret.addPropertyResult("description", "Description", (properties.Description != null ? cfn_parse.FromCloudFormation.getString(properties.Description) : undefined));
   ret.addPropertyResult("policyDocument", "PolicyDocument", (properties.PolicyDocument != null ? cfn_parse.FromCloudFormation.getString(properties.PolicyDocument) : undefined));
   ret.addPropertyResult("policyEnabled", "PolicyEnabled", (properties.PolicyEnabled != null ? cfn_parse.FromCloudFormation.getBoolean(properties.PolicyEnabled) : undefined));
-  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(CfnVerifiedAccessGroupTagPropertyFromCloudFormation)(properties.Tags) : undefined));
+  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
   ret.addPropertyResult("verifiedAccessInstanceId", "VerifiedAccessInstanceId", (properties.VerifiedAccessInstanceId != null ? cfn_parse.FromCloudFormation.getString(properties.VerifiedAccessInstanceId) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
@@ -36835,7 +36630,7 @@ function CfnVerifiedAccessGroupPropsFromCloudFormation(properties: any): cfn_par
  * @stability external
  * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-verifiedaccessinstance.html
  */
-export class CfnVerifiedAccessInstance extends cdk.CfnResource implements cdk.IInspectable {
+export class CfnVerifiedAccessInstance extends cdk.CfnResource implements cdk.IInspectable, cdk.ITaggable {
   /**
    * The CloudFormation resource type name for this resource class.
    */
@@ -36897,9 +36692,14 @@ export class CfnVerifiedAccessInstance extends cdk.CfnResource implements cdk.II
   public loggingConfigurations?: cdk.IResolvable | CfnVerifiedAccessInstance.VerifiedAccessLogsProperty;
 
   /**
+   * Tag Manager which manages the tags for this resource
+   */
+  public readonly tags: cdk.TagManager;
+
+  /**
    * The tags.
    */
-  public tags?: Array<cdk.IResolvable | CfnVerifiedAccessInstance.TagProperty> | cdk.IResolvable;
+  public tagsRaw?: Array<cdk.CfnTag>;
 
   /**
    * The IDs of the AWS Verified Access trust providers.
@@ -36927,7 +36727,10 @@ export class CfnVerifiedAccessInstance extends cdk.CfnResource implements cdk.II
     this.attrVerifiedAccessInstanceId = cdk.Token.asString(this.getAtt("VerifiedAccessInstanceId", cdk.ResolutionTypeHint.STRING));
     this.description = props.description;
     this.loggingConfigurations = props.loggingConfigurations;
-    this.tags = props.tags;
+    this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::EC2::VerifiedAccessInstance", props.tags, {
+      "tagPropertyName": "tags"
+    });
+    this.tagsRaw = props.tags;
     this.verifiedAccessTrustProviderIds = props.verifiedAccessTrustProviderIds;
     this.verifiedAccessTrustProviders = props.verifiedAccessTrustProviders;
   }
@@ -36936,7 +36739,7 @@ export class CfnVerifiedAccessInstance extends cdk.CfnResource implements cdk.II
     return {
       "description": this.description,
       "loggingConfigurations": this.loggingConfigurations,
-      "tags": this.tags,
+      "tags": this.tags.renderTags(),
       "verifiedAccessTrustProviderIds": this.verifiedAccessTrustProviderIds,
       "verifiedAccessTrustProviders": this.verifiedAccessTrustProviders
     };
@@ -37109,32 +36912,6 @@ export namespace CfnVerifiedAccessInstance {
      */
     readonly prefix?: string;
   }
-
-  /**
-   * A key-value pair to associate with a resource.
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-verifiedaccessinstance-tag.html
-   */
-  export interface TagProperty {
-    /**
-     * The key name of the tag.
-     *
-     * You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-verifiedaccessinstance-tag.html#cfn-ec2-verifiedaccessinstance-tag-key
-     */
-    readonly key: string;
-
-    /**
-     * The value for the tag.
-     *
-     * You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-verifiedaccessinstance-tag.html#cfn-ec2-verifiedaccessinstance-tag-value
-     */
-    readonly value: string;
-  }
 }
 
 /**
@@ -37164,7 +36941,7 @@ export interface CfnVerifiedAccessInstanceProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-verifiedaccessinstance.html#cfn-ec2-verifiedaccessinstance-tags
    */
-  readonly tags?: Array<cdk.IResolvable | CfnVerifiedAccessInstance.TagProperty> | cdk.IResolvable;
+  readonly tags?: Array<cdk.CfnTag>;
 
   /**
    * The IDs of the AWS Verified Access trust providers.
@@ -37425,53 +37202,6 @@ function CfnVerifiedAccessInstanceVerifiedAccessLogsPropertyFromCloudFormation(p
 }
 
 /**
- * Determine whether the given properties match those of a \`TagProperty\`
- *
- * @param properties - the TypeScript properties of a \`TagProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnVerifiedAccessInstanceTagPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
-  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
-  errors.collect(cdk.propertyValidator("value", cdk.requiredValidator)(properties.value));
-  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
-  return errors.wrap("supplied properties not correct for \\"TagProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnVerifiedAccessInstanceTagPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnVerifiedAccessInstanceTagPropertyValidator(properties).assertSuccess();
-  return {
-    "Key": cdk.stringToCloudFormation(properties.key),
-    "Value": cdk.stringToCloudFormation(properties.value)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnVerifiedAccessInstanceTagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnVerifiedAccessInstance.TagProperty> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnVerifiedAccessInstance.TagProperty>();
-  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
-  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
  * Determine whether the given properties match those of a \`CfnVerifiedAccessInstanceProps\`
  *
  * @param properties - the TypeScript properties of a \`CfnVerifiedAccessInstanceProps\`
@@ -37487,7 +37217,7 @@ function CfnVerifiedAccessInstancePropsValidator(properties: any): cdk.Validatio
   }
   errors.collect(cdk.propertyValidator("description", cdk.validateString)(properties.description));
   errors.collect(cdk.propertyValidator("loggingConfigurations", CfnVerifiedAccessInstanceVerifiedAccessLogsPropertyValidator)(properties.loggingConfigurations));
-  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(CfnVerifiedAccessInstanceTagPropertyValidator))(properties.tags));
+  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
   errors.collect(cdk.propertyValidator("verifiedAccessTrustProviderIds", cdk.listValidator(cdk.validateString))(properties.verifiedAccessTrustProviderIds));
   errors.collect(cdk.propertyValidator("verifiedAccessTrustProviders", cdk.listValidator(CfnVerifiedAccessInstanceVerifiedAccessTrustProviderPropertyValidator))(properties.verifiedAccessTrustProviders));
   return errors.wrap("supplied properties not correct for \\"CfnVerifiedAccessInstanceProps\\"");
@@ -37500,7 +37230,7 @@ function convertCfnVerifiedAccessInstancePropsToCloudFormation(properties: any):
   return {
     "Description": cdk.stringToCloudFormation(properties.description),
     "LoggingConfigurations": convertCfnVerifiedAccessInstanceVerifiedAccessLogsPropertyToCloudFormation(properties.loggingConfigurations),
-    "Tags": cdk.listMapper(convertCfnVerifiedAccessInstanceTagPropertyToCloudFormation)(properties.tags),
+    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags),
     "VerifiedAccessTrustProviderIds": cdk.listMapper(cdk.stringToCloudFormation)(properties.verifiedAccessTrustProviderIds),
     "VerifiedAccessTrustProviders": cdk.listMapper(convertCfnVerifiedAccessInstanceVerifiedAccessTrustProviderPropertyToCloudFormation)(properties.verifiedAccessTrustProviders)
   };
@@ -37518,7 +37248,7 @@ function CfnVerifiedAccessInstancePropsFromCloudFormation(properties: any): cfn_
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnVerifiedAccessInstanceProps>();
   ret.addPropertyResult("description", "Description", (properties.Description != null ? cfn_parse.FromCloudFormation.getString(properties.Description) : undefined));
   ret.addPropertyResult("loggingConfigurations", "LoggingConfigurations", (properties.LoggingConfigurations != null ? CfnVerifiedAccessInstanceVerifiedAccessLogsPropertyFromCloudFormation(properties.LoggingConfigurations) : undefined));
-  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(CfnVerifiedAccessInstanceTagPropertyFromCloudFormation)(properties.Tags) : undefined));
+  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
   ret.addPropertyResult("verifiedAccessTrustProviderIds", "VerifiedAccessTrustProviderIds", (properties.VerifiedAccessTrustProviderIds != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.VerifiedAccessTrustProviderIds) : undefined));
   ret.addPropertyResult("verifiedAccessTrustProviders", "VerifiedAccessTrustProviders", (properties.VerifiedAccessTrustProviders != null ? cfn_parse.FromCloudFormation.getArray(CfnVerifiedAccessInstanceVerifiedAccessTrustProviderPropertyFromCloudFormation)(properties.VerifiedAccessTrustProviders) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
@@ -37531,7 +37261,7 @@ function CfnVerifiedAccessInstancePropsFromCloudFormation(properties: any): cfn_
  * @stability external
  * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-verifiedaccesstrustprovider.html
  */
-export class CfnVerifiedAccessTrustProvider extends cdk.CfnResource implements cdk.IInspectable {
+export class CfnVerifiedAccessTrustProvider extends cdk.CfnResource implements cdk.IInspectable, cdk.ITaggable {
   /**
    * The CloudFormation resource type name for this resource class.
    */
@@ -37608,9 +37338,14 @@ export class CfnVerifiedAccessTrustProvider extends cdk.CfnResource implements c
   public policyReferenceName: string;
 
   /**
+   * Tag Manager which manages the tags for this resource
+   */
+  public readonly tags: cdk.TagManager;
+
+  /**
    * The tags.
    */
-  public tags?: Array<cdk.IResolvable | CfnVerifiedAccessTrustProvider.TagProperty> | cdk.IResolvable;
+  public tagsRaw?: Array<cdk.CfnTag>;
 
   /**
    * The type of Verified Access trust provider.
@@ -37644,7 +37379,10 @@ export class CfnVerifiedAccessTrustProvider extends cdk.CfnResource implements c
     this.deviceTrustProviderType = props.deviceTrustProviderType;
     this.oidcOptions = props.oidcOptions;
     this.policyReferenceName = props.policyReferenceName;
-    this.tags = props.tags;
+    this.tags = new cdk.TagManager(cdk.TagType.STANDARD, "AWS::EC2::VerifiedAccessTrustProvider", props.tags, {
+      "tagPropertyName": "tags"
+    });
+    this.tagsRaw = props.tags;
     this.trustProviderType = props.trustProviderType;
     this.userTrustProviderType = props.userTrustProviderType;
   }
@@ -37656,7 +37394,7 @@ export class CfnVerifiedAccessTrustProvider extends cdk.CfnResource implements c
       "deviceTrustProviderType": this.deviceTrustProviderType,
       "oidcOptions": this.oidcOptions,
       "policyReferenceName": this.policyReferenceName,
-      "tags": this.tags,
+      "tags": this.tags.renderTags(),
       "trustProviderType": this.trustProviderType,
       "userTrustProviderType": this.userTrustProviderType
     };
@@ -37749,32 +37487,6 @@ export namespace CfnVerifiedAccessTrustProvider {
      */
     readonly tenantId?: string;
   }
-
-  /**
-   * A key-value pair to associate with a resource.
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-verifiedaccesstrustprovider-tag.html
-   */
-  export interface TagProperty {
-    /**
-     * The key name of the tag.
-     *
-     * You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-verifiedaccesstrustprovider-tag.html#cfn-ec2-verifiedaccesstrustprovider-tag-key
-     */
-    readonly key: string;
-
-    /**
-     * The value for the tag.
-     *
-     * You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-verifiedaccesstrustprovider-tag.html#cfn-ec2-verifiedaccesstrustprovider-tag-value
-     */
-    readonly value: string;
-  }
 }
 
 /**
@@ -37825,7 +37537,7 @@ export interface CfnVerifiedAccessTrustProviderProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-verifiedaccesstrustprovider.html#cfn-ec2-verifiedaccesstrustprovider-tags
    */
-  readonly tags?: Array<cdk.IResolvable | CfnVerifiedAccessTrustProvider.TagProperty> | cdk.IResolvable;
+  readonly tags?: Array<cdk.CfnTag>;
 
   /**
    * The type of Verified Access trust provider.
@@ -37945,53 +37657,6 @@ function CfnVerifiedAccessTrustProviderDeviceOptionsPropertyFromCloudFormation(p
 }
 
 /**
- * Determine whether the given properties match those of a \`TagProperty\`
- *
- * @param properties - the TypeScript properties of a \`TagProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnVerifiedAccessTrustProviderTagPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
-  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
-  errors.collect(cdk.propertyValidator("value", cdk.requiredValidator)(properties.value));
-  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
-  return errors.wrap("supplied properties not correct for \\"TagProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnVerifiedAccessTrustProviderTagPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnVerifiedAccessTrustProviderTagPropertyValidator(properties).assertSuccess();
-  return {
-    "Key": cdk.stringToCloudFormation(properties.key),
-    "Value": cdk.stringToCloudFormation(properties.value)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnVerifiedAccessTrustProviderTagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnVerifiedAccessTrustProvider.TagProperty> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnVerifiedAccessTrustProvider.TagProperty>();
-  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
-  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
  * Determine whether the given properties match those of a \`CfnVerifiedAccessTrustProviderProps\`
  *
  * @param properties - the TypeScript properties of a \`CfnVerifiedAccessTrustProviderProps\`
@@ -38011,7 +37676,7 @@ function CfnVerifiedAccessTrustProviderPropsValidator(properties: any): cdk.Vali
   errors.collect(cdk.propertyValidator("oidcOptions", CfnVerifiedAccessTrustProviderOidcOptionsPropertyValidator)(properties.oidcOptions));
   errors.collect(cdk.propertyValidator("policyReferenceName", cdk.requiredValidator)(properties.policyReferenceName));
   errors.collect(cdk.propertyValidator("policyReferenceName", cdk.validateString)(properties.policyReferenceName));
-  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(CfnVerifiedAccessTrustProviderTagPropertyValidator))(properties.tags));
+  errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
   errors.collect(cdk.propertyValidator("trustProviderType", cdk.requiredValidator)(properties.trustProviderType));
   errors.collect(cdk.propertyValidator("trustProviderType", cdk.validateString)(properties.trustProviderType));
   errors.collect(cdk.propertyValidator("userTrustProviderType", cdk.validateString)(properties.userTrustProviderType));
@@ -38028,7 +37693,7 @@ function convertCfnVerifiedAccessTrustProviderPropsToCloudFormation(properties: 
     "DeviceTrustProviderType": cdk.stringToCloudFormation(properties.deviceTrustProviderType),
     "OidcOptions": convertCfnVerifiedAccessTrustProviderOidcOptionsPropertyToCloudFormation(properties.oidcOptions),
     "PolicyReferenceName": cdk.stringToCloudFormation(properties.policyReferenceName),
-    "Tags": cdk.listMapper(convertCfnVerifiedAccessTrustProviderTagPropertyToCloudFormation)(properties.tags),
+    "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags),
     "TrustProviderType": cdk.stringToCloudFormation(properties.trustProviderType),
     "UserTrustProviderType": cdk.stringToCloudFormation(properties.userTrustProviderType)
   };
@@ -38049,7 +37714,7 @@ function CfnVerifiedAccessTrustProviderPropsFromCloudFormation(properties: any):
   ret.addPropertyResult("deviceTrustProviderType", "DeviceTrustProviderType", (properties.DeviceTrustProviderType != null ? cfn_parse.FromCloudFormation.getString(properties.DeviceTrustProviderType) : undefined));
   ret.addPropertyResult("oidcOptions", "OidcOptions", (properties.OidcOptions != null ? CfnVerifiedAccessTrustProviderOidcOptionsPropertyFromCloudFormation(properties.OidcOptions) : undefined));
   ret.addPropertyResult("policyReferenceName", "PolicyReferenceName", (properties.PolicyReferenceName != null ? cfn_parse.FromCloudFormation.getString(properties.PolicyReferenceName) : undefined));
-  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(CfnVerifiedAccessTrustProviderTagPropertyFromCloudFormation)(properties.Tags) : undefined));
+  ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
   ret.addPropertyResult("trustProviderType", "TrustProviderType", (properties.TrustProviderType != null ? cfn_parse.FromCloudFormation.getString(properties.TrustProviderType) : undefined));
   ret.addPropertyResult("userTrustProviderType", "UserTrustProviderType", (properties.UserTrustProviderType != null ? cfn_parse.FromCloudFormation.getString(properties.UserTrustProviderType) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);

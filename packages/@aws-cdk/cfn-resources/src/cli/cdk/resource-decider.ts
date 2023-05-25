@@ -32,6 +32,7 @@ export class ResourceDecider {
   public readonly propsProperties = new Array<PropsProperty>();
   public readonly classProperties = new Array<ClassProperty>();
   public readonly classAttributeProperties = new Array<ClassAttributeProperty>();
+  private readonly legacyTagTypeProperties = new Set<string>();
 
   constructor(
     private readonly db: SpecDatabase,
@@ -39,6 +40,9 @@ export class ResourceDecider {
     private readonly converter: TypeConverter,
   ) {
     this.taggability = resourceTaggabilityStyle(this.resource);
+    this.legacyTagTypeProperties = new Set(
+      this.db.follow('hasLegacyTag', this.resource).map((x) => x.entity.propertyName),
+    );
 
     this.convertProperties();
     this.convertAttributes();
@@ -49,13 +53,8 @@ export class ResourceDecider {
   }
 
   private convertProperties() {
-    const legacyTaggableProps = this.db.follow('hasLegacyTag', this.resource).map((x) => x.entity.propertyName);
-
     for (const [name, prop] of Object.entries(this.resource.properties)) {
-      if (legacyTaggableProps.includes(name)) {
-        this.handleTagPropertyLegacy(name, prop, 'standard');
-        continue;
-      } else if (name === this.taggability?.tagPropertyName) {
+      if (name === this.taggability?.tagPropertyName) {
         switch (this.taggability?.style) {
           case 'legacy':
             this.handleTagPropertyLegacy(name, prop, this.taggability.variant);
@@ -67,6 +66,7 @@ export class ResourceDecider {
             }
         }
       }
+
       this.handlePropertyDefault(name, prop);
     }
   }
@@ -76,7 +76,12 @@ export class ResourceDecider {
    */
   private handlePropertyDefault(cfnName: string, prop: Property) {
     const name = propertyNameFromCloudFormation(cfnName);
-    const baseType = this.converter.typeFromProperty(prop);
+
+    // Some properties are not THE tags property, but still have the intrinsic Tag type
+    const baseType = this.legacyTagTypeProperties.has(cfnName)
+      ? Type.arrayOf(CDK_CORE.CfnTag)
+      : this.converter.typeFromProperty(prop);
+
     const type = this.converter.makeTypeResolvable(baseType);
     const optional = !prop.required;
 
@@ -130,11 +135,11 @@ export class ResourceDecider {
       case 'map':
         propsTagType = Type.mapOf(Type.STRING);
         break;
-      case 'standard':
-        propsTagType = Type.arrayOf(CDK_CORE.CfnTag);
-        break;
       default:
-        propsTagType = this.converter.typeFromProperty(prop);
+        // Some properties are not THE tags property, but still have the intrinsic Tag type
+        propsTagType = this.legacyTagTypeProperties.has(cfnName)
+          ? Type.arrayOf(CDK_CORE.CfnTag)
+          : this.converter.typeFromProperty(prop);
         break;
     }
 
