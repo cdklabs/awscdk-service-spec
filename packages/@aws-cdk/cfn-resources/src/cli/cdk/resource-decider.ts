@@ -14,6 +14,8 @@ export const HAS_25610 = false;
 // This convenience typewriter builder is used all over the place
 const $this = $E(expr.this_());
 
+const TAG_ARRAY_TYPE = Type.arrayOf(CDK_CORE.CfnTag);
+
 /**
  * Decide how properties get mapped between model types, Typescript types, and CloudFormation
  */
@@ -77,12 +79,9 @@ export class ResourceDecider {
   private handlePropertyDefault(cfnName: string, prop: Property) {
     const name = propertyNameFromCloudFormation(cfnName);
 
-    // Some properties are not THE tags property, but still have the intrinsic Tag type
-    const baseType = this.legacyTagTypeProperties.has(cfnName)
-      ? Type.arrayOf(CDK_CORE.CfnTag)
-      : this.converter.typeFromProperty(prop);
-
-    const type = this.converter.makeTypeResolvable(baseType);
+    const baseType = this.propsPropType(cfnName, prop);
+    // If we ended up with the special CfnTag[] type, don't make it IResolvable, otherwise do
+    const type = baseType.equals(TAG_ARRAY_TYPE) ? baseType : this.converter.makeTypeResolvable(baseType);
     const optional = !prop.required;
 
     this.propsProperties.push({
@@ -130,18 +129,7 @@ export class ResourceDecider {
     const originalName = propertyNameFromCloudFormation(cfnName);
     const rawTagsPropName = `${originalName}Raw`;
 
-    let propsTagType;
-    switch (variant) {
-      case 'map':
-        propsTagType = Type.mapOf(Type.STRING);
-        break;
-      default:
-        // Some properties are not THE tags property, but still have the intrinsic Tag type
-        propsTagType = this.legacyTagTypeProperties.has(cfnName)
-          ? Type.arrayOf(CDK_CORE.CfnTag)
-          : this.converter.typeFromProperty(prop);
-        break;
-    }
+    const propsTagType = variant === 'map' ? Type.mapOf(Type.STRING) : this.propsPropType(cfnName, prop);
 
     this.propsProperties.push({
       propertySpec: {
@@ -246,6 +234,17 @@ export class ResourceDecider {
         cfnValueToRender: {}, // Gets rendered as part of the TagManager above
       },
     );
+  }
+
+  /**
+   * Return the type for the given property that should go into the Props interface
+   *
+   * Returns the special Tag type if this property had the intrinstic 'Tag' type
+   * in the old spec, otherwise resolves the type as normal.
+   */
+  private propsPropType(cfnName: string, prop: Property) {
+    // Some properties are not THE tags property, but still have the intrinsic Tag type
+    return this.legacyTagTypeProperties.has(cfnName) ? TAG_ARRAY_TYPE : this.converter.typeFromProperty(prop);
   }
 
   private convertAttributes() {
