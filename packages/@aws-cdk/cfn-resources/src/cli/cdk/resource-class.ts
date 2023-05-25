@@ -30,6 +30,7 @@ import {
   staticResourceTypeName,
   cfnProducerNameFromType,
   propStructNameFromResource,
+  staticRequiredTransform,
 } from '../naming/conventions';
 import { cloudFormationDocLink } from '../naming/doclink';
 import { splitDocumentation } from '../split-summary';
@@ -109,6 +110,19 @@ export class ResourceClass extends ClassType {
     });
 
     this.makeFromCloudFormationFactory();
+
+    if (this.resource.cloudFormationTransform) {
+      this.addProperty({
+        name: staticRequiredTransform(),
+        immutable: true,
+        static: true,
+        type: Type.STRING,
+        initializer: expr.lit(this.resource.cloudFormationTransform),
+        docs: {
+          summary: 'The `Transform` a template must use in order to use this resource',
+        },
+      });
+    }
 
     for (const prop of this.decider.classAttributeProperties) {
       this.addProperty(prop.propertySpec);
@@ -230,6 +244,10 @@ export class ResourceClass extends ClassType {
 
       stmt.sep(),
     );
+
+    if (this.resource.cloudFormationTransform) {
+      init.addBody($this.stack.addTransform($T(this.type)[staticRequiredTransform()]), stmt.sep());
+    }
 
     init.addBody(
       // Attributes

@@ -40,7 +40,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
   const { db, resource } = options;
   const report = options.report.forAudience(ReportAudience.fromCloudFormationResource(resource.typeName));
 
-  const typeDefinitions = new Map<jsonschema.Object, TypeDefinition>();
+  const typeDefinitions = new Map<string, TypeDefinition>();
 
   const resolve = jsonschema.makeResolver(resource);
 
@@ -98,22 +98,25 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     }
 
     for (const [name, property] of Object.entries(source.properties)) {
-      let resolved = resolve(property);
+      let resolvedSchema = resolve(property);
 
       if (spec?.Properties?.[name]?.PrimitiveType === 'Timestamp') {
-        resolved = {
-          ...resolved,
-          schema: { type: 'string', format: 'timestamp' },
-        };
+        resolvedSchema = jsonschema.setResolvedReference(
+          {
+            type: 'string',
+            format: 'timestamp',
+          },
+          jsonschema.resolvedReference(resolvedSchema),
+        );
       }
 
-      withResult(schemaTypeToModelType(name, resolved, fail.in(`property ${name}`)), (type) => {
+      withResult(schemaTypeToModelType(name, resolvedSchema, fail.in(`property ${name}`)), (type) => {
         target[name] = {
           type,
           previousTypes: getPreviousTypes(`${resource.typeName}.${name}`, [type]),
-          documentation: descriptionOf(resolved.schema),
+          documentation: descriptionOf(resolvedSchema),
           required: ifTrue((source.required ?? []).includes(name)),
-          defaultValue: describeDefault(resolved.schema),
+          defaultValue: describeDefault(resolvedSchema),
         };
       });
     }
@@ -124,35 +127,53 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
    */
   function schemaTypeToModelType(
     propertyName: string,
-    resolved: jsonschema.ResolvedSchema,
+    resolvedSchema: jsonschema.ResolvedSchema,
     fail: Fail,
   ): Result<PropertyType> {
     return tryCatch(fail, (): Result<PropertyType> => {
-      const nameHint = lastWord(resolved.referenceName) ?? propertyName;
+      const reference = jsonschema.resolvedReference(resolvedSchema);
+      const referenceName = jsonschema.resolvedReferenceName(resolvedSchema);
+      const nameHint = referenceName ? lastWord(referenceName) : lastWord(propertyName);
 
-      if (jsonschema.isAnyType(resolved.schema)) {
+      if (jsonschema.isAnyType(resolvedSchema)) {
         return { type: 'json' };
-      } else if (jsonschema.isOneOf(resolved.schema) || jsonschema.isAnyOf(resolved.schema)) {
-        const types = jsonschema
-          .innerSchemas(resolved.schema)
-          .map((t) => schemaTypeToModelType(propertyName, fakeResolved(t), fail));
+      } else if (jsonschema.isOneOf(resolvedSchema) || jsonschema.isAnyOf(resolvedSchema)) {
+        const inner = jsonschema.innerSchemas(resolvedSchema);
+        // The union type is a type definition
+        // This is something we don't support at the moment as it's effectively a XOR for the property type
+        // In future we should create an enum like class for this, but we cannot at the moment to maintain backwards compatibility
+        // For now we assume the union is merged into a single object
+        if (reference && inner.every((s) => jsonschema.isObject(s))) {
+          report.reportFailure(
+            'interpreting',
+            fail(`Ref ${referenceName} is a union of objects. Merging into a single type.`),
+          );
+          const combinedType = unionSchemas(...inner) as jsonschema.ConcreteSchema;
+          if (isFailure(combinedType)) {
+            return combinedType;
+          }
+          return schemaTypeToModelType(nameHint, jsonschema.setResolvedReference(combinedType, reference), fail);
+        }
+
+        const types = inner.map((t) => schemaTypeToModelType(nameHint, resolve(t), fail));
         report.reportFailure('interpreting', ...types.filter(isFailure));
+
         return { type: 'union', types: types.filter(isSuccess) };
-      } else if (jsonschema.isAllOf(resolved.schema)) {
+      } else if (jsonschema.isAllOf(resolvedSchema)) {
         // FIXME: Do a proper thing here
-        const firstResolved = fakeResolved(resolved.schema.allOf[0], resolved.referenceName);
-        return schemaTypeToModelType(propertyName, firstResolved, fail);
+        const firstResolved = resolvedSchema.allOf[0];
+        return schemaTypeToModelType(nameHint, resolve(firstResolved), fail);
       } else {
-        switch (resolved.schema.type) {
+        switch (resolvedSchema.type) {
           case 'string':
-            if (resolved.schema.format === 'timestamp') {
+            if (resolvedSchema.format === 'timestamp') {
               return { type: 'date-time' };
             }
             return { type: 'string' };
 
           case 'array':
             // FIXME: insertionOrder, uniqueItems
-            return using(schemaTypeToModelType(nameHint, resolve(resolved.schema.items ?? true), fail), (element) => ({
+            return using(schemaTypeToModelType(nameHint, resolve(resolvedSchema.items ?? true), fail), (element) => ({
               type: 'array',
               element,
             }));
@@ -161,7 +182,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
             return { type: 'boolean' };
 
           case 'object':
-            return schemaObjectToModelType(nameHint, resolved.schema, fail);
+            return schemaObjectToModelType(nameHint, resolvedSchema, fail);
 
           case 'number':
             return { type: 'number' };
@@ -203,15 +224,15 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     }
 
     // Object type
-    let typeDef = typeDefinitions.get(schema);
-    if (!typeDef) {
-      typeDef = db.allocate('typeDefinition', {
+    const typeKey = resource.typeName + nameHint + JSON.stringify(schema);
+    if (!typeDefinitions.has(typeKey)) {
+      const typeDef = db.allocate('typeDefinition', {
         name: nameHint,
         documentation: schema.description,
         properties: {},
       });
       db.link('usesType', res, typeDef);
-      typeDefinitions.set(schema, typeDef);
+      typeDefinitions.set(typeKey, typeDef);
 
       recurseProperties(
         schema,
@@ -221,7 +242,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       );
     }
 
-    return { type: 'ref', reference: ref(typeDef) };
+    return { type: 'ref', reference: ref(typeDefinitions.get(typeKey)!) };
   }
 
   function describeDefault(schema: jsonschema.ConcreteSchema): string | undefined {
@@ -258,17 +279,17 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
     for (const name of attributeNames) {
       try {
-        const resolved = resolvePropertySchema(source, name);
+        const resolvedSchema = resolvePropertySchema(source, name);
 
         // Convert compound names into user-friendly names in dot-notation.
         // This is how they are publicized in the docs as well.
         const attributeName = name.split('/').join('.');
 
-        withResult(schemaTypeToModelType(name, resolved, fail.in(`attribute ${name}`)), (type) => {
+        withResult(schemaTypeToModelType(name, resolvedSchema, fail.in(`attribute ${name}`)), (type) => {
           target[attributeName] = {
             type,
             previousTypes: getPreviousTypes(`${resource.typeName}.${name}`, [type]),
-            documentation: descriptionOf(resolved.schema),
+            documentation: descriptionOf(resolvedSchema),
             required: ifTrue((source.required ?? []).includes(name)),
           };
         });
@@ -297,7 +318,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         if (!tagType) {
           report.reportFailure('interpreting', fail(`marked as taggable, but tagProperty does not exist: ${tagProp}`));
         } else {
-          const resolvedType = resolve(tagType).schema;
+          const resolvedType = resolve(tagType);
 
           let variant: TagVariant = 'standard';
           if (res.cloudFormationType === 'AWS::AutoScaling::AutoScalingGroup') {
@@ -349,23 +370,20 @@ function resolvePropertySchema(root: CloudFormationRegistryResource, name: strin
   // In the legacy spec they will look like 'Container.Prop'.
   // Some Registry resources incorrectly use '.' as well.
   // We accept both here.
-  return name.split(/[\.\/]/).reduce(
-    ({ schema }: jsonschema.ResolvedSchema, current: string) => {
-      if (
-        !(
-          jsonschema.isConcreteSingleton(schema) &&
-          !jsonschema.isAnyType(schema) &&
-          'properties' in schema &&
-          schema.properties[current]
-        )
-      ) {
-        throw new Error(`no definition for: ${name}`);
-      }
+  return name.split(/[\.\/]/).reduce((schema: jsonschema.ResolvedSchema, current: string) => {
+    if (
+      !(
+        jsonschema.isConcreteSingleton(schema) &&
+        !jsonschema.isAnyType(schema) &&
+        'properties' in schema &&
+        schema.properties[current]
+      )
+    ) {
+      throw new Error(`no definition for: ${name}`);
+    }
 
-      return resolve(schema.properties[current]);
-    },
-    { schema: root as jsonschema.ConcreteSchema },
-  );
+    return resolve(schema.properties[current]);
+  }, root as any);
 }
 
 export function readCloudFormationRegistryServiceFromResource(
@@ -407,16 +425,8 @@ function descriptionOf(x: jsonschema.ConcreteSchema) {
   return jsonschema.isAnyType(x) ? undefined : x.description;
 }
 
-function lastWord(x?: string): string | undefined {
-  if (!x) {
-    return undefined;
-  }
-
-  return x.match(/([a-zA-Z0-9]+)$/)?.[1];
-}
-
-function fakeResolved(schema: jsonschema.ConcreteSchema, referenceName?: string): jsonschema.ResolvedSchema {
-  return { schema, referenceName };
+function lastWord(x: string): string {
+  return x.match(/([a-zA-Z0-9]+)$/)?.[1] ?? x;
 }
 
 function findAttributes(resource: CloudFormationRegistryResource): string[] {

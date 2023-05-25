@@ -25,6 +25,7 @@ export class SamResources {
   private readonly resolve: ReturnType<typeof jsonschema.makeResolver>;
   private readonly regions: Region[];
   private readonly db: SpecDatabase;
+  private readonly defaultTransform = 'AWS::Serverless-2016-10-31';
 
   constructor(private readonly options: SamResourcesOptions) {
     this.db = options.db;
@@ -34,8 +35,8 @@ export class SamResources {
 
   public import() {
     const samResources = this.findSamResources();
-
     const samService = this.samService();
+    const cloudFormationTransform = this.cloudFormationTransform();
 
     for (const samResource of samResources) {
       // Convert resource definition to something that can go into the regular registry parser
@@ -46,6 +47,7 @@ export class SamResources {
         report: this.options.report,
         resource: resourceSpec,
       });
+      resource.cloudFormationTransform = cloudFormationTransform;
 
       this.db.link('hasResource', samService, resource);
       for (const region of this.regions) {
@@ -75,13 +77,25 @@ export class SamResources {
     return ret;
   }
 
-  private findSamResources() {
+  private findSamResources(): jsonschema.RecordLikeObject[] {
     const serverlessType = /::Serverless::/;
-    return Object.values(this.options.samSchema.definitions ?? {})
-      .map((x) => this.resolve(x).schema)
-      .filter(jsonschema.isObject)
-      .filter(jsonschema.isRecordLikeObject)
-      .filter((def) => this.resourceType(def)?.match(serverlessType));
+    const definitions = Object.values(this.options.samSchema.definitions ?? {});
+
+    const serverlessResources = new Array();
+
+    for (const def of definitions) {
+      const resolvedSchema = this.resolve(def);
+
+      if (
+        jsonschema.isObject(resolvedSchema) &&
+        jsonschema.isRecordLikeObject(resolvedSchema) &&
+        this.resourceType(resolvedSchema)?.match(serverlessType)
+      ) {
+        serverlessResources.push(resolvedSchema);
+      }
+    }
+
+    return serverlessResources;
   }
 
   /**
@@ -102,7 +116,7 @@ export class SamResources {
       chain(
         maybeResource,
         (x) => liftUndefined(x.properties.Type),
-        (x) => this.resolve(x).schema,
+        (x) => this.resolve(x),
         (x) => (jsonschema.isString(x) ? x : failure('Not a string')),
         (x) => (x.const ? x.const : x.enum?.length === 1 ? x.enum[0] : failure('Not an enum')),
       ),
@@ -114,21 +128,28 @@ export class SamResources {
     const typeName = this.resourceType(def) ?? '<dummy>';
 
     const emptyObject: jsonschema.RecordLikeObject = { type: 'object', additionalProperties: false, properties: {} };
-    const { schema: propertiesSchema } = this.resolve(def.properties.Properties ?? emptyObject);
+    const propertiesSchema = this.resolve(def.properties.Properties ?? emptyObject);
 
-    const properties =
-      jsonschema.isObject(propertiesSchema) && jsonschema.isRecordLikeObject(propertiesSchema)
-        ? propertiesSchema.properties
-        : {};
+    let properties = {};
+    let required;
+    if (jsonschema.isObject(propertiesSchema) && jsonschema.isRecordLikeObject(propertiesSchema)) {
+      properties = propertiesSchema.properties;
+      required = propertiesSchema.required;
+    }
 
     return {
       typeName,
       description: `Definition of ${typeName}`,
       properties,
+      required,
 
       // This will make sure that all reference are still valid. Yes this will contain
       // too much, but that's okay.
       definitions: this.options.samSchema.definitions,
     };
+  }
+
+  private cloudFormationTransform(): string {
+    return (this.options.samSchema?.properties?.Transform as any)?.enum?.[0] ?? this.defaultTransform;
   }
 }

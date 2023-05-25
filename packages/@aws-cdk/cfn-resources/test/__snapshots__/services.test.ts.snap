@@ -45252,7 +45252,7 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
 
   public permissionsBoundary?: string;
 
-  public policies?: Array<CfnFunction.PoliciesProperty | CfnFunction.PoliciesProperty | string> | cdk.IResolvable | CfnFunction.PoliciesProperty | string;
+  public policies?: Array<cdk.IResolvable | CfnFunction.PoliciesProperty | string> | cdk.IResolvable | CfnFunction.PoliciesProperty | string;
 
   public provisionedConcurrencyConfig?: cdk.IResolvable | CfnFunction.ProvisionedConcurrencyConfigProperty;
 
@@ -45520,7 +45520,7 @@ export namespace CfnFunction {
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-eventsource.html#cfn-serverless-function-eventsource-properties
      */
-    readonly properties: cdk.IResolvable | CfnFunction.PropertiesProperty | CfnFunction.PropertiesProperty | CfnFunction.PropertiesProperty | CfnFunction.PropertiesProperty | CfnFunction.PropertiesProperty | CfnFunction.PropertiesProperty | CfnFunction.PropertiesProperty | CfnFunction.PropertiesProperty | CfnFunction.PropertiesProperty | CfnFunction.PropertiesProperty | CfnFunction.PropertiesProperty | CfnFunction.PropertiesProperty | CfnFunction.PropertiesProperty | CfnFunction.PropertiesProperty;
+    readonly properties: cdk.IResolvable | CfnFunction.PropertiesProperty;
 
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-eventsource.html#cfn-serverless-function-eventsource-type
@@ -45794,7 +45794,7 @@ export interface CfnFunctionProps {
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-function.html#cfn-serverless-function-policies
    */
-  readonly policies?: Array<CfnFunction.PoliciesProperty | CfnFunction.PoliciesProperty | string> | cdk.IResolvable | CfnFunction.PoliciesProperty | string;
+  readonly policies?: Array<cdk.IResolvable | CfnFunction.PoliciesProperty | string> | cdk.IResolvable | CfnFunction.PoliciesProperty | string;
 
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-function.html#cfn-serverless-function-provisionedconcurrencyconfig
@@ -48366,7 +48366,7 @@ export class CfnStateMachine extends cdk.CfnResource implements cdk.IInspectable
 
   public permissionsBoundaries?: string;
 
-  public policies?: Array<CfnStateMachine.PoliciesProperty | CfnStateMachine.PoliciesProperty | string> | cdk.IResolvable | CfnStateMachine.PoliciesProperty | string;
+  public policies?: Array<cdk.IResolvable | CfnStateMachine.PoliciesProperty | string> | cdk.IResolvable | CfnStateMachine.PoliciesProperty | string;
 
   public role?: string;
 
@@ -48471,7 +48471,7 @@ export namespace CfnStateMachine {
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-statemachine-eventsource.html#cfn-serverless-statemachine-eventsource-properties
      */
-    readonly properties: cdk.IResolvable | CfnStateMachine.PropertiesProperty | CfnStateMachine.PropertiesProperty | CfnStateMachine.PropertiesProperty | CfnStateMachine.PropertiesProperty;
+    readonly properties: cdk.IResolvable | CfnStateMachine.PropertiesProperty;
 
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-statemachine-eventsource.html#cfn-serverless-statemachine-eventsource-type
@@ -48622,7 +48622,7 @@ export interface CfnStateMachineProps {
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-statemachine.html#cfn-serverless-statemachine-policies
    */
-  readonly policies?: Array<CfnStateMachine.PoliciesProperty | CfnStateMachine.PoliciesProperty | string> | cdk.IResolvable | CfnStateMachine.PoliciesProperty | string;
+  readonly policies?: Array<cdk.IResolvable | CfnStateMachine.PoliciesProperty | string> | cdk.IResolvable | CfnStateMachine.PoliciesProperty | string;
 
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-statemachine.html#cfn-serverless-statemachine-role
