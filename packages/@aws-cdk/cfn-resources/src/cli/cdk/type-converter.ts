@@ -1,14 +1,5 @@
-import { SpecDatabase, PropertyType, Resource, TypeDefinition, Attribute, Property } from '@aws-cdk/service-spec';
-import {
-  ClassType,
-  Expression,
-  Module,
-  PrimitiveType,
-  RichScope,
-  StructType,
-  Type,
-  TypeDeclaration,
-} from '@cdklabs/typewriter';
+import { SpecDatabase, PropertyType, Resource, TypeDefinition, Property } from '@aws-cdk/service-spec';
+import { ClassType, Module, PrimitiveType, RichScope, StructType, Type, TypeDeclaration } from '@cdklabs/typewriter';
 import { CDK_CORE } from './cdk';
 import { TypeDefinitionStruct } from './typedefinition-struct';
 import { structNameFromTypeDefinition } from '../naming/conventions';
@@ -165,38 +156,6 @@ export class TypeConverter {
 
     return Type.unionOf(type, CDK_CORE.IResolvable);
   }
-}
-
-export interface MappedProperty {
-  readonly name: string;
-  readonly memberOptional: boolean;
-  readonly validateRequired: boolean;
-  readonly memberImmutable: boolean;
-
-  /** The type of this property on the props type */
-  readonly propsType: Type;
-  /** The type of this property on the class */
-  readonly memberType: Type;
-  /** Given the props value, produce the member value */
-  readonly initializer: (props: Expression) => Expression;
-
-  /**
-   * Lowercase property name(s) and expression(s) to render to get this property into CFN
-   *
-   * We will do a separate conversion of the casing of the props object, so don't do that here.
-   */
-  readonly cfnValueToRender: Record<string, Expression>;
-  readonly docsSummary?: string;
-}
-
-export interface MappedAttribute {
-  /** The name of the CloudFormation attribute */
-  attrName: string;
-  attr: Attribute;
-  /** The name of the property used in generated code */
-  name: string;
-  type: Type;
-  tokenizer: Expression;
 }
 
 /**
