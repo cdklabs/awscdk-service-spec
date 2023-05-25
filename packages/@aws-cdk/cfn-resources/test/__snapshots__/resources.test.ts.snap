@@ -181,99 +181,71 @@ export class CfnRestApi extends cdk.CfnResource implements cdk.IInspectable, cdk
 
   /**
    * The source of the API key for metering requests according to a usage plan.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-apikeysourcetype
    */
   public apiKeySourceType?: string;
 
   /**
    * The list of binary media types supported by the RestApi.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-binarymediatypes
    */
   public binaryMediaTypes?: Array<string>;
 
   /**
    * An OpenAPI specification that defines a set of RESTful APIs in JSON format.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-body
    */
   public body?: any | cdk.IResolvable | string;
 
   /**
    * The Amazon Simple Storage Service (Amazon S3) location that points to an OpenAPI file, which defines a set of RESTful APIs in JSON or YAML format.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-bodys3location
    */
   public bodyS3Location?: cdk.IResolvable | CfnRestApi.S3LocationProperty;
 
   /**
    * The ID of the RestApi that you want to clone from.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-clonefrom
    */
   public cloneFrom?: string;
 
   /**
    * The description of the RestApi.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-description
    */
   public description?: string;
 
   /**
    * Specifies whether clients can invoke your API by using the default \`execute-api\` endpoint.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-disableexecuteapiendpoint
    */
   public disableExecuteApiEndpoint?: boolean | cdk.IResolvable;
 
   /**
    * A list of the endpoint types of the API.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-endpointconfiguration
    */
   public endpointConfiguration?: CfnRestApi.EndpointConfigurationProperty | cdk.IResolvable;
 
   /**
    * A query parameter to indicate whether to rollback the API update ( \`true\` ) or not ( \`false\` ) when a warning is encountered.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-failonwarnings
    */
   public failOnWarnings?: boolean | cdk.IResolvable;
 
   /**
    * A nullable integer that is used to enable compression (with non-negative between 0 and 10485760 (10M) bytes, inclusive) or disable compression (with a null value) on an API.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-minimumcompressionsize
    */
   public minimumCompressionSize?: number;
 
   /**
    * This property applies only when you use OpenAPI to define your REST API.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-mode
    */
   public mode?: string;
 
   /**
    * The name of the RestApi.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-name
    */
   public name?: string;
 
   /**
    * Custom header parameters as part of the request.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-parameters
    */
   public parameters?: cdk.IResolvable | Record<string, string> | string;
 
   /**
    * A policy document that contains the permissions for the \`RestApi\` resource.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-policy
    */
   public policy?: any | cdk.IResolvable | string;
 
@@ -284,8 +256,6 @@ export class CfnRestApi extends cdk.CfnResource implements cdk.IInspectable, cdk
 
   /**
    * The key-value map of strings.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-tags
    */
   public tagsRaw?: Array<cdk.CfnTag>;
 
@@ -424,22 +394,6 @@ export namespace CfnRestApi {
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-endpointconfiguration.html#cfn-apigateway-restapi-endpointconfiguration-vpcendpointids
      */
     readonly vpcEndpointIds?: Array<string>;
-  }
-
-  /**
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-tag.html
-   */
-  export interface TagProperty {
-    /**
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-tag.html#cfn-apigateway-restapi-tag-key
-     */
-    readonly key: string;
-
-    /**
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-tag.html#cfn-apigateway-restapi-tag-value
-     */
-    readonly value: string;
   }
 }
 
@@ -686,53 +640,6 @@ function CfnRestApiEndpointConfigurationPropertyFromCloudFormation(properties: a
 }
 
 /**
- * Determine whether the given properties match those of a \`TagProperty\`
- *
- * @param properties - the TypeScript properties of a \`TagProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnRestApiTagPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
-  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
-  errors.collect(cdk.propertyValidator("value", cdk.requiredValidator)(properties.value));
-  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
-  return errors.wrap("supplied properties not correct for \\"TagProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnRestApiTagPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnRestApiTagPropertyValidator(properties).assertSuccess();
-  return {
-    "Key": cdk.stringToCloudFormation(properties.key),
-    "Value": cdk.stringToCloudFormation(properties.value)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnRestApiTagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnRestApi.TagProperty> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnRestApi.TagProperty>();
-  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
-  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
  * Determine whether the given properties match those of a \`CfnRestApiProps\`
  *
  * @param properties - the TypeScript properties of a \`CfnRestApiProps\`
@@ -887,57 +794,41 @@ export class CfnRole extends cdk.CfnResource implements cdk.IInspectable, cdk.IT
 
   /**
    * The trust policy that is associated with this role.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-assumerolepolicydocument
    */
   public assumeRolePolicyDocument: any | cdk.IResolvable | string;
 
   /**
    * A description of the role that you provide.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-description
    */
   public description?: string;
 
   /**
    * A list of Amazon Resource Names (ARNs) of the IAM managed policies that you want to attach to the role.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-managedpolicyarns
    */
   public managedPolicyArns?: Array<string>;
 
   /**
    * The maximum session duration (in seconds) that you want to set for the specified role.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-maxsessionduration
    */
   public maxSessionDuration?: number;
 
   /**
    * The path to the role. For more information about paths, see [IAM Identifiers](https://docs.aws.amazon.com/IAM/latest/UserGuide/Using_Identifiers.html) in the *IAM User Guide* .
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-path
    */
   public path?: string;
 
   /**
    * The ARN of the policy used to set the permissions boundary for the role.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-permissionsboundary
    */
   public permissionsBoundary?: string;
 
   /**
    * Adds or updates an inline policy document that is embedded in the specified IAM role.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-policies
    */
   public policies?: Array<cdk.IResolvable | CfnRole.PolicyProperty> | cdk.IResolvable;
 
   /**
    * A name for the IAM role, up to 64 characters in length.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-rolename
    */
   public roleName?: string;
 
@@ -948,8 +839,6 @@ export class CfnRole extends cdk.CfnResource implements cdk.IInspectable, cdk.IT
 
   /**
    * A list of tags that are attached to the role.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html#cfn-iam-role-tags
    */
   public tagsRaw?: Array<cdk.CfnTag>;
 
@@ -1038,32 +927,6 @@ export namespace CfnRole {
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-policy.html#cfn-iam-role-policy-policyname
      */
     readonly policyName: string;
-  }
-
-  /**
-   * A key-value pair to associate with a resource.
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-tag.html
-   */
-  export interface TagProperty {
-    /**
-     * The key name of the tag.
-     *
-     * You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-tag.html#cfn-iam-role-tag-key
-     */
-    readonly key: string;
-
-    /**
-     * The value for the tag.
-     *
-     * You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-tag.html#cfn-iam-role-tag-value
-     */
-    readonly value: string;
   }
 }
 
@@ -1216,53 +1079,6 @@ function CfnRolePolicyPropertyFromCloudFormation(properties: any): cfn_parse.Fro
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnRole.PolicyProperty>();
   ret.addPropertyResult("policyDocument", "PolicyDocument", (properties.PolicyDocument != null ? cfn_parse.FromCloudFormation.getTypeUnion([cdk.validateObject, cdk.validateString], [cfn_parse.FromCloudFormation.getAny, cfn_parse.FromCloudFormation.getString])(properties.PolicyDocument) : undefined));
   ret.addPropertyResult("policyName", "PolicyName", (properties.PolicyName != null ? cfn_parse.FromCloudFormation.getString(properties.PolicyName) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
- * Determine whether the given properties match those of a \`TagProperty\`
- *
- * @param properties - the TypeScript properties of a \`TagProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnRoleTagPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
-  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
-  errors.collect(cdk.propertyValidator("value", cdk.requiredValidator)(properties.value));
-  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
-  return errors.wrap("supplied properties not correct for \\"TagProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnRoleTagPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnRoleTagPropertyValidator(properties).assertSuccess();
-  return {
-    "Key": cdk.stringToCloudFormation(properties.key),
-    "Value": cdk.stringToCloudFormation(properties.value)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnRoleTagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnRole.TagProperty> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnRole.TagProperty>();
-  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
-  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -1786,141 +1602,101 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
 
   /**
    * The instruction set architecture that the function supports.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-architectures
    */
   public architectures?: Array<string>;
 
   /**
    * The code for the function.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-code
    */
   public code: CfnFunction.CodeProperty | cdk.IResolvable;
 
   /**
    * To enable code signing for this function, specify the ARN of a code-signing configuration.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-codesigningconfigarn
    */
   public codeSigningConfigArn?: string;
 
   /**
    * A dead-letter queue configuration that specifies the queue or topic where Lambda sends asynchronous events when they fail processing.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-deadletterconfig
    */
   public deadLetterConfig?: CfnFunction.DeadLetterConfigProperty | cdk.IResolvable;
 
   /**
    * A description of the function.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-description
    */
   public description?: string;
 
   /**
    * Environment variables that are accessible from function code during execution.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-environment
    */
   public environment?: CfnFunction.EnvironmentProperty | cdk.IResolvable;
 
   /**
    * The size of the function's \`/tmp\` directory in MB.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-ephemeralstorage
    */
   public ephemeralStorage?: CfnFunction.EphemeralStorageProperty | cdk.IResolvable;
 
   /**
    * Connection settings for an Amazon EFS file system.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-filesystemconfigs
    */
   public fileSystemConfigs?: Array<CfnFunction.FileSystemConfigProperty | cdk.IResolvable> | cdk.IResolvable;
 
   /**
    * The name of the Lambda function, up to 64 characters in length.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-functionname
    */
   public functionName?: string;
 
   /**
    * The name of the method within your code that Lambda calls to run your function.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-handler
    */
   public handler?: string;
 
   /**
    * Configuration values that override the container image Dockerfile settings.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-imageconfig
    */
   public imageConfig?: CfnFunction.ImageConfigProperty | cdk.IResolvable;
 
   /**
    * The ARN of the AWS Key Management Service ( AWS KMS ) customer managed key that's used to encrypt your function's [environment variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-encryption) . When [Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart-security.html) is activated, this key is also used to encrypt your function's snapshot. If you don't provide a customer managed key, Lambda uses a default service key.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-kmskeyarn
    */
   public kmsKeyArn?: string;
 
   /**
    * A list of [function layers](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html) to add to the function's execution environment. Specify each layer by its ARN, including the version.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-layers
    */
   public layers?: Array<string>;
 
   /**
    * The amount of [memory available to the function](https://docs.aws.amazon.com/lambda/latest/dg/configuration-function-common.html#configuration-memory-console) at runtime. Increasing the function memory also increases its CPU allocation. The default value is 128 MB. The value can be any multiple of 1 MB.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-memorysize
    */
   public memorySize?: number;
 
   /**
    * The type of deployment package.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-packagetype
    */
   public packageType?: string;
 
   /**
    * The number of simultaneous executions to reserve for the function.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-reservedconcurrentexecutions
    */
   public reservedConcurrentExecutions?: number;
 
   /**
    * The Amazon Resource Name (ARN) of the function's execution role.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-role
    */
   public role: string;
 
   /**
    * The identifier of the function's [runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html) . Runtime is required if the deployment package is a .zip file archive.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtime
    */
   public runtime?: string;
 
   /**
    * Sets the runtime management configuration for a function's version.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-runtimemanagementconfig
    */
   public runtimeManagementConfig?: cdk.IResolvable | CfnFunction.RuntimeManagementConfigProperty;
 
   /**
    * The function's [AWS Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html) setting.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-snapstart
    */
   public snapStart?: cdk.IResolvable | CfnFunction.SnapStartProperty;
 
@@ -1931,29 +1707,21 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
 
   /**
    * A list of [tags](https://docs.aws.amazon.com/lambda/latest/dg/tagging.html) to apply to the function.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tags
    */
   public tagsRaw?: Array<cdk.CfnTag>;
 
   /**
    * The amount of time (in seconds) that Lambda allows a function to run before stopping it.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-timeout
    */
   public timeout?: number;
 
   /**
    * Set \`Mode\` to \`Active\` to sample and trace a subset of incoming requests with [X-Ray](https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html) .
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-tracingconfig
    */
   public tracingConfig?: cdk.IResolvable | CfnFunction.TracingConfigProperty;
 
   /**
    * For network connectivity to AWS resources in a VPC, specify a list of security groups and subnets in the VPC.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-vpcconfig
    */
   public vpcConfig?: cdk.IResolvable | CfnFunction.VpcConfigProperty;
 
@@ -2159,30 +1927,6 @@ export namespace CfnFunction {
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-filesystemconfig.html#cfn-lambda-function-filesystemconfig-localmountpath
      */
     readonly localMountPath: string;
-  }
-
-  /**
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-tag.html
-   */
-  export interface TagProperty {
-    /**
-     * The key name of the tag.
-     *
-     * You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-tag.html#cfn-lambda-function-tag-key
-     */
-    readonly key: string;
-
-    /**
-     * The value for the tag.
-     *
-     * You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-tag.html#cfn-lambda-function-tag-value
-     */
-    readonly value?: string;
   }
 
   /**
@@ -2774,52 +2518,6 @@ function CfnFunctionFileSystemConfigPropertyFromCloudFormation(properties: any):
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.FileSystemConfigProperty>();
   ret.addPropertyResult("arn", "Arn", (properties.Arn != null ? cfn_parse.FromCloudFormation.getString(properties.Arn) : undefined));
   ret.addPropertyResult("localMountPath", "LocalMountPath", (properties.LocalMountPath != null ? cfn_parse.FromCloudFormation.getString(properties.LocalMountPath) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
- * Determine whether the given properties match those of a \`TagProperty\`
- *
- * @param properties - the TypeScript properties of a \`TagProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnFunctionTagPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
-  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
-  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
-  return errors.wrap("supplied properties not correct for \\"TagProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnFunctionTagPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnFunctionTagPropertyValidator(properties).assertSuccess();
-  return {
-    "Key": cdk.stringToCloudFormation(properties.key),
-    "Value": cdk.stringToCloudFormation(properties.value)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnFunctionTagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnFunction.TagProperty> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.TagProperty>();
-  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
-  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -3796,351 +3494,251 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
 
   /**
    * The amount of storage in gibibytes (GiB) to allocate to each DB instance in the Multi-AZ DB cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-allocatedstorage
    */
   public allocatedStorage?: number;
 
   /**
    * Provides a list of the AWS Identity and Access Management (IAM) roles that are associated with the DB cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-associatedroles
    */
   public associatedRoles?: Array<CfnDBCluster.DBClusterRoleProperty | cdk.IResolvable> | cdk.IResolvable;
 
   /**
    * A value that indicates whether minor engine upgrades are applied automatically to the DB cluster during the maintenance window.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-autominorversionupgrade
    */
   public autoMinorVersionUpgrade?: boolean | cdk.IResolvable;
 
   /**
    * A list of Availability Zones (AZs) where instances in the DB cluster can be created.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-availabilityzones
    */
   public availabilityZones?: Array<string>;
 
   /**
    * The target backtrack window, in seconds. To disable backtracking, set this value to 0.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-backtrackwindow
    */
   public backtrackWindow?: number;
 
   /**
    * The number of days for which automated backups are retained.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-backupretentionperiod
    */
   public backupRetentionPeriod?: number;
 
   /**
    * A value that indicates whether to copy all tags from the DB cluster to snapshots of the DB cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-copytagstosnapshot
    */
   public copyTagsToSnapshot?: boolean | cdk.IResolvable;
 
   /**
    * The name of your database.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-databasename
    */
   public databaseName?: string;
 
   /**
    * The DB cluster identifier. This parameter is stored as a lowercase string.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-dbclusteridentifier
    */
   public dbClusterIdentifier?: string;
 
   /**
    * The compute and memory capacity of each DB instance in the Multi-AZ DB cluster, for example db.m6gd.xlarge. Not all DB instance classes are available in all AWS Regions , or for all database engines.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-dbclusterinstanceclass
    */
   public dbClusterInstanceClass?: string;
 
   /**
    * The name of the DB cluster parameter group to associate with this DB cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-dbclusterparametergroupname
    */
   public dbClusterParameterGroupName?: string;
 
   /**
    * The name of the DB parameter group to apply to all instances of the DB cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-dbinstanceparametergroupname
    */
   public dbInstanceParameterGroupName?: string;
 
   /**
    * A DB subnet group that you want to associate with this DB cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-dbsubnetgroupname
    */
   public dbSubnetGroupName?: string;
 
   /**
    * Reserved for future use.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-dbsystemid
    */
   public dbSystemId?: string;
 
   /**
    * A value that indicates whether the DB cluster has deletion protection enabled.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-deletionprotection
    */
   public deletionProtection?: boolean | cdk.IResolvable;
 
   /**
    * Indicates the directory ID of the Active Directory to create the DB cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-domain
    */
   public domain?: string;
 
   /**
    * Specifies the name of the IAM role to use when making API calls to the Directory Service.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-domainiamrolename
    */
   public domainIamRoleName?: string;
 
   /**
    * The list of log types that need to be enabled for exporting to CloudWatch Logs.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-enablecloudwatchlogsexports
    */
   public enableCloudwatchLogsExports?: Array<string>;
 
   /**
    * A value that indicates whether to enable the HTTP endpoint for an Aurora Serverless DB cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-enablehttpendpoint
    */
   public enableHttpEndpoint?: boolean | cdk.IResolvable;
 
   /**
    * A value that indicates whether to enable mapping of AWS Identity and Access Management (IAM) accounts to database accounts.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-enableiamdatabaseauthentication
    */
   public enableIamDatabaseAuthentication?: boolean | cdk.IResolvable;
 
   /**
    * The name of the database engine to be used for this DB cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-engine
    */
   public engine?: string;
 
   /**
    * The DB engine mode of the DB cluster, either \`provisioned\` , \`serverless\` , \`parallelquery\` , \`global\` , or \`multimaster\` .
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-enginemode
    */
   public engineMode?: string;
 
   /**
    * The version number of the database engine to use.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-engineversion
    */
   public engineVersion?: string;
 
   /**
    * If you are configuring an Aurora global database cluster and want your Aurora DB cluster to be a secondary member in the global database cluster, specify the global cluster ID of the global database cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-globalclusteridentifier
    */
   public globalClusterIdentifier?: string;
 
   /**
    * The amount of Provisioned IOPS (input/output operations per second) to be initially allocated for each DB instance in the Multi-AZ DB cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-iops
    */
   public iops?: number;
 
   /**
    * The Amazon Resource Name (ARN) of the AWS KMS key that is used to encrypt the database instances in the DB cluster, such as \`arn:aws:kms:us-east-1:012345678910:key/abcd1234-a123-456a-a12b-a123b4cd56ef\` .
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-kmskeyid
    */
   public kmsKeyId?: string;
 
   /**
    * A value that indicates whether to manage the master user password with AWS Secrets Manager.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-managemasteruserpassword
    */
   public manageMasterUserPassword?: boolean | cdk.IResolvable;
 
   /**
    * The name of the master user for the DB cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-masterusername
    */
   public masterUsername?: string;
 
   /**
    * The master password for the DB instance.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-masteruserpassword
    */
   public masterUserPassword?: string;
 
   /**
    * Contains the secret managed by RDS in AWS Secrets Manager for the master user password.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-masterusersecret
    */
   public masterUserSecret?: cdk.IResolvable | CfnDBCluster.MasterUserSecretProperty;
 
   /**
    * The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-monitoringinterval
    */
   public monitoringInterval?: number;
 
   /**
    * The Amazon Resource Name (ARN) for the IAM role that permits RDS to send Enhanced Monitoring metrics to Amazon CloudWatch Logs.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-monitoringrolearn
    */
   public monitoringRoleArn?: string;
 
   /**
    * The network type of the DB cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-networktype
    */
   public networkType?: string;
 
   /**
    * A value that indicates whether to turn on Performance Insights for the DB cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-performanceinsightsenabled
    */
   public performanceInsightsEnabled?: boolean | cdk.IResolvable;
 
   /**
    * The AWS KMS key identifier for encryption of Performance Insights data.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-performanceinsightskmskeyid
    */
   public performanceInsightsKmsKeyId?: string;
 
   /**
    * The number of days to retain Performance Insights data. The default is 7 days. The following values are valid:.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-performanceinsightsretentionperiod
    */
   public performanceInsightsRetentionPeriod?: number;
 
   /**
    * The port number on which the DB instances in the DB cluster accept connections.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-port
    */
   public port?: number;
 
   /**
    * The daily time range during which automated backups are created.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-preferredbackupwindow
    */
   public preferredBackupWindow?: string;
 
   /**
    * The weekly time range during which system maintenance can occur, in Universal Coordinated Time (UTC).
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-preferredmaintenancewindow
    */
   public preferredMaintenanceWindow?: string;
 
   /**
    * A value that indicates whether the DB cluster is publicly accessible.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-publiclyaccessible
    */
   public publiclyAccessible?: boolean | cdk.IResolvable;
 
   /**
    * The Amazon Resource Name (ARN) of the source DB instance or DB cluster if this DB cluster is created as a read replica.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-replicationsourceidentifier
    */
   public replicationSourceIdentifier?: string;
 
   /**
    * The date and time to restore the DB cluster to.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-restoretotime
    */
   public restoreToTime?: string;
 
   /**
    * The type of restore to be performed. You can specify one of the following values:.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-restoretype
    */
   public restoreType?: string;
 
   /**
    * The \`ScalingConfiguration\` property type specifies the scaling configuration of an Aurora Serverless DB cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-scalingconfiguration
    */
   public scalingConfiguration?: cdk.IResolvable | CfnDBCluster.ScalingConfigurationProperty;
 
   /**
    * The \`ServerlessV2ScalingConfiguration\` property type specifies the scaling configuration of an Aurora Serverless V2 DB cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-serverlessv2scalingconfiguration
    */
   public serverlessV2ScalingConfiguration?: cdk.IResolvable | CfnDBCluster.ServerlessV2ScalingConfigurationProperty;
 
   /**
    * The identifier for the DB snapshot or DB cluster snapshot to restore from.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-snapshotidentifier
    */
   public snapshotIdentifier?: string;
 
   /**
    * When restoring a DB cluster to a point in time, the identifier of the source DB cluster from which to restore.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-sourcedbclusteridentifier
    */
   public sourceDbClusterIdentifier?: string;
 
   /**
    * The AWS Region which contains the source DB cluster when replicating a DB cluster. For example, \`us-east-1\` .
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-sourceregion
    */
   public sourceRegion?: string;
 
   /**
    * Indicates whether the DB cluster is encrypted.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-storageencrypted
    */
   public storageEncrypted?: boolean | cdk.IResolvable;
 
   /**
    * Specifies the storage type to be associated with the DB cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-storagetype
    */
   public storageType?: string;
 
@@ -4151,22 +3749,16 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
 
   /**
    * An optional array of key-value pairs to apply to this DB cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-tags
    */
   public tagsRaw?: Array<cdk.CfnTag>;
 
   /**
    * A value that indicates whether to restore the DB cluster to the latest restorable backup time.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-uselatestrestorabletime
    */
   public useLatestRestorableTime?: boolean | cdk.IResolvable;
 
   /**
    * A list of EC2 VPC security groups to associate with this DB cluster.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-vpcsecuritygroupids
    */
   public vpcSecurityGroupIds?: Array<string>;
 
@@ -4492,32 +4084,6 @@ export namespace CfnDBCluster {
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-scalingconfiguration.html#cfn-rds-dbcluster-scalingconfiguration-timeoutaction
      */
     readonly timeoutAction?: string;
-  }
-
-  /**
-   * A key-value pair to associate with a resource.
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-tag.html
-   */
-  export interface TagProperty {
-    /**
-     * The key name of the tag.
-     *
-     * You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-tag.html#cfn-rds-dbcluster-tag-key
-     */
-    readonly key: string;
-
-    /**
-     * The value for the tag.
-     *
-     * You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-tag.html#cfn-rds-dbcluster-tag-value
-     */
-    readonly value?: string;
   }
 
   /**
@@ -5539,52 +5105,6 @@ function CfnDBClusterScalingConfigurationPropertyFromCloudFormation(properties: 
 }
 
 /**
- * Determine whether the given properties match those of a \`TagProperty\`
- *
- * @param properties - the TypeScript properties of a \`TagProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnDBClusterTagPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
-  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
-  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
-  return errors.wrap("supplied properties not correct for \\"TagProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnDBClusterTagPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnDBClusterTagPropertyValidator(properties).assertSuccess();
-  return {
-    "Key": cdk.stringToCloudFormation(properties.key),
-    "Value": cdk.stringToCloudFormation(properties.value)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnDBClusterTagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnDBCluster.TagProperty> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnDBCluster.TagProperty>();
-  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
-  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
  * Determine whether the given properties match those of a \`EndpointProperty\`
  *
  * @param properties - the TypeScript properties of a \`EndpointProperty\`
@@ -6000,120 +5520,86 @@ export class CfnBucket extends cdk.CfnResource implements cdk.IInspectable, cdk.
 
   /**
    * Configures the transfer acceleration state for an Amazon S3 bucket.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-accelerateconfiguration
    */
   public accelerateConfiguration?: CfnBucket.AccelerateConfigurationProperty | cdk.IResolvable;
 
   /**
    * A canned access control list (ACL) that grants predefined permissions to the bucket.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-accesscontrol
    */
   public accessControl?: string;
 
   /**
    * Specifies the configuration and any analyses for the analytics filter of an Amazon S3 bucket.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-analyticsconfigurations
    */
   public analyticsConfigurations?: Array<CfnBucket.AnalyticsConfigurationProperty | cdk.IResolvable> | cdk.IResolvable;
 
   /**
    * Specifies default encryption for a bucket using server-side encryption with Amazon S3-managed keys (SSE-S3) or AWS KMS-managed keys (SSE-KMS) bucket.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-bucketencryption
    */
   public bucketEncryption?: CfnBucket.BucketEncryptionProperty | cdk.IResolvable;
 
   /**
    * A name for the bucket.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-bucketname
    */
   public bucketName?: string;
 
   /**
    * Describes the cross-origin access configuration for objects in an Amazon S3 bucket.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-corsconfiguration
    */
   public corsConfiguration?: CfnBucket.CorsConfigurationProperty | cdk.IResolvable;
 
   /**
    * Defines how Amazon S3 handles Intelligent-Tiering storage.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-intelligenttieringconfigurations
    */
   public intelligentTieringConfigurations?: Array<CfnBucket.IntelligentTieringConfigurationProperty | cdk.IResolvable> | cdk.IResolvable;
 
   /**
    * Specifies the inventory configuration for an Amazon S3 bucket.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-inventoryconfigurations
    */
   public inventoryConfigurations?: Array<CfnBucket.InventoryConfigurationProperty | cdk.IResolvable> | cdk.IResolvable;
 
   /**
    * Specifies the lifecycle configuration for objects in an Amazon S3 bucket.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-lifecycleconfiguration
    */
   public lifecycleConfiguration?: cdk.IResolvable | CfnBucket.LifecycleConfigurationProperty;
 
   /**
    * Settings that define where logs are stored.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-loggingconfiguration
    */
   public loggingConfiguration?: cdk.IResolvable | CfnBucket.LoggingConfigurationProperty;
 
   /**
    * Specifies a metrics configuration for the CloudWatch request metrics (specified by the metrics configuration ID) from an Amazon S3 bucket.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-metricsconfigurations
    */
   public metricsConfigurations?: Array<cdk.IResolvable | CfnBucket.MetricsConfigurationProperty> | cdk.IResolvable;
 
   /**
    * Configuration that defines how Amazon S3 handles bucket notifications.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-notificationconfiguration
    */
   public notificationConfiguration?: cdk.IResolvable | CfnBucket.NotificationConfigurationProperty;
 
   /**
    * Places an Object Lock configuration on the specified bucket.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-objectlockconfiguration
    */
   public objectLockConfiguration?: cdk.IResolvable | CfnBucket.ObjectLockConfigurationProperty;
 
   /**
    * Indicates whether this bucket has an Object Lock configuration enabled.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-objectlockenabled
    */
   public objectLockEnabled?: boolean | cdk.IResolvable;
 
   /**
    * Configuration that defines how Amazon S3 handles Object Ownership rules.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-ownershipcontrols
    */
   public ownershipControls?: cdk.IResolvable | CfnBucket.OwnershipControlsProperty;
 
   /**
    * Configuration that defines how Amazon S3 handles public access.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-publicaccessblockconfiguration
    */
   public publicAccessBlockConfiguration?: cdk.IResolvable | CfnBucket.PublicAccessBlockConfigurationProperty;
 
   /**
    * Configuration for replicating objects in an S3 bucket.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-replicationconfiguration
    */
   public replicationConfiguration?: cdk.IResolvable | CfnBucket.ReplicationConfigurationProperty;
 
@@ -6124,22 +5610,16 @@ export class CfnBucket extends cdk.CfnResource implements cdk.IInspectable, cdk.
 
   /**
    * An arbitrary set of tags (key-value pairs) for this S3 bucket.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-tags
    */
   public tagsRaw?: Array<cdk.CfnTag>;
 
   /**
    * Enables multiple versions of all objects in this bucket.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-versioningconfiguration
    */
   public versioningConfiguration?: cdk.IResolvable | CfnBucket.VersioningConfigurationProperty;
 
   /**
    * Information used to configure the bucket as a static website.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-s3-bucket.html#cfn-s3-bucket-websiteconfiguration
    */
   public websiteConfiguration?: cdk.IResolvable | CfnBucket.WebsiteConfigurationProperty;
 
@@ -7866,22 +7346,6 @@ export namespace CfnBucket {
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-ssekmsencryptedobjects.html#cfn-s3-bucket-ssekmsencryptedobjects-status
      */
     readonly status: string;
-  }
-
-  /**
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tag.html
-   */
-  export interface TagProperty {
-    /**
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tag.html#cfn-s3-bucket-tag-key
-     */
-    readonly key: string;
-
-    /**
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tag.html#cfn-s3-bucket-tag-value
-     */
-    readonly value: string;
   }
 
   /**
@@ -10683,53 +10147,6 @@ function CfnBucketReplicationConfigurationPropertyFromCloudFormation(properties:
 }
 
 /**
- * Determine whether the given properties match those of a \`TagProperty\`
- *
- * @param properties - the TypeScript properties of a \`TagProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnBucketTagPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
-  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
-  errors.collect(cdk.propertyValidator("value", cdk.requiredValidator)(properties.value));
-  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
-  return errors.wrap("supplied properties not correct for \\"TagProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnBucketTagPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnBucketTagPropertyValidator(properties).assertSuccess();
-  return {
-    "Key": cdk.stringToCloudFormation(properties.key),
-    "Value": cdk.stringToCloudFormation(properties.value)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnBucketTagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.TagProperty> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnBucket.TagProperty>();
-  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
-  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
  * Determine whether the given properties match those of a \`VersioningConfigurationProperty\`
  *
  * @param properties - the TypeScript properties of a \`VersioningConfigurationProperty\`
@@ -11500,99 +10917,71 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
 
   /**
    * For first-in-first-out (FIFO) queues, specifies whether to enable content-based deduplication.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-contentbaseddeduplication
    */
   public contentBasedDeduplication?: boolean | cdk.IResolvable;
 
   /**
    * For high throughput for FIFO queues, specifies whether message deduplication occurs at the message group or queue level.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-deduplicationscope
    */
   public deduplicationScope?: string;
 
   /**
    * The time in seconds for which the delivery of all messages in the queue is delayed.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-delayseconds
    */
   public delaySeconds?: number;
 
   /**
    * If set to true, creates a FIFO queue.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-fifoqueue
    */
   public fifoQueue?: boolean | cdk.IResolvable;
 
   /**
    * For high throughput for FIFO queues, specifies whether the FIFO queue throughput quota applies to the entire queue or per message group.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-fifothroughputlimit
    */
   public fifoThroughputLimit?: string;
 
   /**
    * The length of time in seconds for which Amazon SQS can reuse a data key to encrypt or decrypt messages before calling AWS KMS again.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-kmsdatakeyreuseperiodseconds
    */
   public kmsDataKeyReusePeriodSeconds?: number;
 
   /**
    * The ID of an AWS Key Management Service (KMS) for Amazon SQS , or a custom KMS.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-kmsmasterkeyid
    */
   public kmsMasterKeyId?: string;
 
   /**
    * The limit of how many bytes that a message can contain before Amazon SQS rejects it.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-maximummessagesize
    */
   public maximumMessageSize?: number;
 
   /**
    * The number of seconds that Amazon SQS retains a message.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-messageretentionperiod
    */
   public messageRetentionPeriod?: number;
 
   /**
    * A name for the queue.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-queuename
    */
   public queueName?: string;
 
   /**
    * Specifies the duration, in seconds, that the ReceiveMessage action call waits until a message is in the queue in order to include it in the response, rather than returning an empty response if a message isn't yet available.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-receivemessagewaittimeseconds
    */
   public receiveMessageWaitTimeSeconds?: number;
 
   /**
    * The string that includes the parameters for the permissions for the dead-letter queue redrive permission and which source queues can specify dead-letter queues as a JSON object.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-redriveallowpolicy
    */
   public redriveAllowPolicy?: any | cdk.IResolvable | string;
 
   /**
    * The string that includes the parameters for the dead-letter queue functionality of the source queue as a JSON object.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-redrivepolicy
    */
   public redrivePolicy?: any | cdk.IResolvable | string;
 
   /**
    * Enables server-side queue encryption using SQS owned encryption keys.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-sqsmanagedsseenabled
    */
   public sqsManagedSseEnabled?: boolean | cdk.IResolvable;
 
@@ -11603,15 +10992,11 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
 
   /**
    * The tags that you attach to this queue.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-tags
    */
   public tagsRaw?: Array<cdk.CfnTag>;
 
   /**
    * The length of time during which a message will be unavailable after a message is delivered from the queue.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-visibilitytimeout
    */
   public visibilityTimeout?: number;
 
@@ -11688,32 +11073,6 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
 
   protected renderProperties(props: Record<string, any>): Record<string, any> {
     return convertCfnQueuePropsToCloudFormation(props);
-  }
-}
-
-export namespace CfnQueue {
-  /**
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-tag.html
-   */
-  export interface TagProperty {
-    /**
-     * The key name of the tag.
-     *
-     * You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-tag.html#cfn-sqs-queue-tag-key
-     */
-    readonly key: string;
-
-    /**
-     * The value for the tag.
-     *
-     * You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-tag.html#cfn-sqs-queue-tag-value
-     */
-    readonly value: string;
   }
 }
 
@@ -11912,53 +11271,6 @@ export interface CfnQueueProps {
 }
 
 /**
- * Determine whether the given properties match those of a \`TagProperty\`
- *
- * @param properties - the TypeScript properties of a \`TagProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnQueueTagPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
-  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
-  errors.collect(cdk.propertyValidator("value", cdk.requiredValidator)(properties.value));
-  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
-  return errors.wrap("supplied properties not correct for \\"TagProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnQueueTagPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnQueueTagPropertyValidator(properties).assertSuccess();
-  return {
-    "Key": cdk.stringToCloudFormation(properties.key),
-    "Value": cdk.stringToCloudFormation(properties.value)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnQueueTagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnQueue.TagProperty> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnQueue.TagProperty>();
-  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
-  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
  * Determine whether the given properties match those of a \`CfnQueueProps\`
  *
  * @param properties - the TypeScript properties of a \`CfnQueueProps\`
@@ -12101,22 +11413,16 @@ export class CfnSkill extends cdk.CfnResource implements cdk.IInspectable {
 
   /**
    * Login with Amazon (LWA) configuration used to authenticate with the Alexa service.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ask-skill.html#cfn-ask-skill-authenticationconfiguration
    */
   public authenticationConfiguration: CfnSkill.AuthenticationConfigurationProperty | cdk.IResolvable;
 
   /**
    * Configuration for the skill package that contains the components of the Alexa skill.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ask-skill.html#cfn-ask-skill-skillpackage
    */
   public skillPackage: cdk.IResolvable | CfnSkill.SkillPackageProperty;
 
   /**
    * The vendor ID associated with the Amazon developer account that will host the skill.
-   *
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ask-skill.html#cfn-ask-skill-vendorid
    */
   public vendorId: string;
 

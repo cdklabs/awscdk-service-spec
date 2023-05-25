@@ -23,7 +23,7 @@ export class ResourceDecider {
     return taggability?.style === 'legacy'
       ? [CDK_CORE.ITaggable]
       : taggability?.style === 'modern' && HAS_25610
-      ? [CDK_CORE.ITaggable2]
+      ? [CDK_CORE.ITaggableV2]
       : [];
   }
 
@@ -115,16 +115,18 @@ export class ResourceDecider {
    */
   private handleTagPropertyLegacy(cfnName: string, prop: Property) {
     const originalName = propertyNameFromCloudFormation(cfnName);
-    const originalType = this.converter.typeFromProperty(prop);
     const rawTagsPropName = `${originalName}Raw`;
 
-    let propsTagType = originalType;
+    let propsTagType;
     switch (this.taggability?.variant) {
       case 'map':
         propsTagType = Type.mapOf(Type.STRING);
         break;
       case 'standard':
         propsTagType = Type.arrayOf(CDK_CORE.CfnTag);
+        break;
+      default:
+        propsTagType = this.converter.typeFromProperty(prop);
         break;
     }
 
@@ -288,12 +290,9 @@ export class ResourceDecider {
   }
 
   private defaultClassPropDocs(cfnName: string, prop: Property) {
+    void cfnName;
     return {
       summary: splitDocumentation(prop.documentation).summary,
-      see: cloudFormationDocLink({
-        resourceType: this.resource.cloudFormationType,
-        propName: cfnName,
-      }),
       deprecated: deprecationMessage(prop),
     };
   }
