@@ -106,6 +106,14 @@ export class CloudFormationMapping {
       };
     }
 
+    if (type.equals(CDK_CORE.IResolvable)) {
+      return {
+        produce: CDK_CORE.objectToCloudFormation,
+        parse: CDK_CORE.helpers.FromCloudFormation.getAny,
+        validate: CDK_CORE.validateObject,
+      };
+    }
+
     switch (type.primitive) {
       case PrimitiveType.String:
         return {

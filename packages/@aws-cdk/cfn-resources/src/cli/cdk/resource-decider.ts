@@ -1,4 +1,4 @@
-import { Deprecation, Property, Resource } from '@aws-cdk/service-spec';
+import { Deprecation, Property, Resource, SpecDatabase, TagVariant } from '@aws-cdk/service-spec';
 import { $E, $T, Expression, PropertySpec, Type, expr } from '@cdklabs/typewriter';
 import { CDK_CORE } from './cdk';
 import { TaggabilityStyle, resourceTaggabilityStyle } from './tagging';
@@ -30,7 +30,11 @@ export class ResourceDecider {
   public readonly classProperties = new Array<ClassProperty>();
   public readonly classAttributeProperties = new Array<ClassAttributeProperty>();
 
-  constructor(private readonly resource: Resource, private readonly converter: TypeConverter) {
+  constructor(
+    private readonly db: SpecDatabase,
+    private readonly resource: Resource,
+    private readonly converter: TypeConverter,
+  ) {
     this.taggability = resourceTaggabilityStyle(this.resource);
 
     this.convertProperties();
@@ -42,14 +46,19 @@ export class ResourceDecider {
   }
 
   private convertProperties() {
+    const legacyTaggableProps = this.db.follow('hasLegacyTag', this.resource).map((x) => x.entity.propertyName);
+
     for (const [name, prop] of Object.entries(this.resource.properties)) {
-      if (name === this.taggability?.tagPropertyName) {
+      if (legacyTaggableProps.includes(name)) {
+        this.handleTagPropertyLegacy(name, prop, 'standard');
+        continue;
+      } else if (name === this.taggability?.tagPropertyName) {
         switch (this.taggability?.style) {
           case 'legacy':
-            this.handleTagPropertyLegacy(name, prop);
+            this.handleTagPropertyLegacy(name, prop, this.taggability.variant);
             continue;
           case 'modern':
-            this.handleTagPropertyModern(name, prop);
+            this.handleTagPropertyModern(name, prop, this.taggability.variant);
             continue;
         }
       }
@@ -107,15 +116,12 @@ export class ResourceDecider {
    * We also add a mutable L1 property called '<tagsProperty>Raw' which can be used
    * to add tags apart from the TagManager.
    */
-  private handleTagPropertyLegacy(cfnName: string, prop: Property) {
-    if (this.resource.cloudFormationType === 'AWS::EKS::Nodegroup') {
-      debugger;
-    }
+  private handleTagPropertyLegacy(cfnName: string, prop: Property, variant: TagVariant) {
     const originalName = propertyNameFromCloudFormation(cfnName);
     const rawTagsPropName = `${originalName}Raw`;
 
     let propsTagType;
-    switch (this.taggability?.variant) {
+    switch (variant) {
       case 'map':
         propsTagType = Type.mapOf(Type.STRING);
         break;
@@ -155,7 +161,7 @@ export class ResourceDecider {
         },
         initializer: () =>
           new CDK_CORE.TagManager(
-            this.tagManagerVariant(),
+            this.tagManagerVariant(variant),
             expr.lit(this.resource.cloudFormationType),
             expr.UNDEFINED, // Raw tags are passed in renderTags()
             expr.object({ tagPropertyName: expr.lit(originalName) }),
@@ -177,7 +183,7 @@ export class ResourceDecider {
     );
   }
 
-  private handleTagPropertyModern(cfnName: string, prop: Property) {
+  private handleTagPropertyModern(cfnName: string, prop: Property, variant: TagVariant) {
     const originalName = propertyNameFromCloudFormation(cfnName);
     const originalType = this.converter.makeTypeResolvable(this.converter.typeFromProperty(prop));
 
@@ -210,7 +216,7 @@ export class ResourceDecider {
         },
         initializer: () =>
           new CDK_CORE.TagManager(
-            this.tagManagerVariant(),
+            this.tagManagerVariant(variant),
             expr.lit(this.resource.cloudFormationType),
             expr.UNDEFINED, // Raw tags are passed in renderTags()
             expr.object({ tagPropertyName: expr.lit(originalName) }),
@@ -297,8 +303,8 @@ export class ResourceDecider {
   /**
    * Translates a TagVariant to the core.TagType enum
    */
-  private tagManagerVariant() {
-    switch (this.taggability?.variant) {
+  private tagManagerVariant(variant: TagVariant) {
+    switch (variant) {
       case 'standard':
         return CDK_CORE.TagType.STANDARD;
       case 'asg':

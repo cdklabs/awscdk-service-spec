@@ -82,7 +82,7 @@ export class ResourceClass extends ClassType {
       resourceClass: this,
     });
 
-    this.decider = new ResourceDecider(this.resource, converter);
+    this.decider = new ResourceDecider(db, this.resource, converter);
   }
 
   /**
