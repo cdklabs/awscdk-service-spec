@@ -1,11 +1,11 @@
 import { Resource, TypeDefinition } from '@aws-cdk/service-spec';
-import { TypeConverter } from './type-converter';
 import { ClassType, Module, StructType } from '@cdklabs/typewriter';
-import { structNameFromTypeDefinition } from '../naming/conventions';
-import { splitDocumentation } from '../split-summary';
-import { cloudFormationDocLink } from '../naming/doclink';
-import { CloudFormationMapping } from '../cloudformation-mapping';
+import { TypeConverter } from './type-converter';
 import { TypeDefinitionDecider } from './typedefinition-decider';
+import { CloudFormationMapping } from '../cloudformation-mapping';
+import { structNameFromTypeDefinition } from '../naming/conventions';
+import { cloudFormationDocLink } from '../naming/doclink';
+import { splitDocumentation } from '../split-summary';
 
 export interface TypeDefinitionStructOptions {
   readonly typeDefinition: TypeDefinition;

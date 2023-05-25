@@ -1,12 +1,12 @@
 import { Deprecation, Property, Resource } from '@aws-cdk/service-spec';
 import { $E, $T, Expression, PropertySpec, Type, expr } from '@cdklabs/typewriter';
-import { TypeConverter } from './type-converter';
-import { TaggabilityStyle, resourceTaggabilityStyle } from './tagging';
-import { attributePropertyName, propertyNameFromCloudFormation } from '../naming/conventions';
-import { splitDocumentation } from '../split-summary';
-import { cloudFormationDocLink } from '../naming/doclink';
 import { CDK_CORE } from './cdk';
+import { TaggabilityStyle, resourceTaggabilityStyle } from './tagging';
+import { TypeConverter } from './type-converter';
 import { PropertyMapping } from '../cloudformation-mapping';
+import { attributePropertyName, propertyNameFromCloudFormation } from '../naming/conventions';
+import { cloudFormationDocLink } from '../naming/doclink';
+import { splitDocumentation } from '../split-summary';
 
 // Depends on https://github.com/aws/aws-cdk/pull/25610
 export const HAS_25610 = false;

@@ -21,6 +21,9 @@ import {
   Module,
 } from '@cdklabs/typewriter';
 import { CDK_CORE, CONSTRUCTS } from './cdk';
+import { ResourceDecider } from './resource-decider';
+import { TypeConverter } from './type-converter';
+import { CloudFormationMapping } from '../cloudformation-mapping';
 import {
   classNameFromResource,
   cfnParserNameFromType,
@@ -30,9 +33,6 @@ import {
 } from '../naming/conventions';
 import { cloudFormationDocLink } from '../naming/doclink';
 import { splitDocumentation } from '../split-summary';
-import { ResourceDecider } from './resource-decider';
-import { TypeConverter } from './type-converter';
-import { CloudFormationMapping } from '../cloudformation-mapping';
 
 export interface ITypeHost {
   typeFromSpecType(type: PropertyType): Type;

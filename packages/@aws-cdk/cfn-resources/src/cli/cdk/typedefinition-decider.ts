@@ -1,11 +1,11 @@
 import { Property, Resource, TypeDefinition } from '@aws-cdk/service-spec';
 import { PropertySpec, Type } from '@cdklabs/typewriter';
-import { TypeConverter } from './type-converter';
-import { propertyNameFromCloudFormation } from '../naming/conventions';
 import { deprecationMessage } from './resource-decider';
-import { splitDocumentation } from '../split-summary';
-import { cloudFormationDocLink } from '../naming/doclink';
+import { TypeConverter } from './type-converter';
 import { PropertyMapping } from '../cloudformation-mapping';
+import { propertyNameFromCloudFormation } from '../naming/conventions';
+import { cloudFormationDocLink } from '../naming/doclink';
+import { splitDocumentation } from '../split-summary';
 
 /**
  * Decide how properties get mapped between model types, Typescript types, and CloudFormation
@@ -23,7 +23,7 @@ export class TypeDefinitionDecider {
   }
 
   private convertProperties() {
-    for (const [name, prop] of Object.entries(this.resource.properties)) {
+    for (const [name, prop] of Object.entries(this.typeDefinition.properties)) {
       this.handlePropertyDefault(name, prop);
     }
   }

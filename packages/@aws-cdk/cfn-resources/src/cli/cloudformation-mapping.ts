@@ -14,8 +14,8 @@ import {
   IsObject,
 } from '@cdklabs/typewriter';
 import { CDK_CORE } from './cdk/cdk';
-import { cfnParserNameFromType, cfnProducerNameFromType, cfnPropsValidatorNameFromType } from './naming/conventions';
 import { PropertyValidator } from './cdk/property-validator';
+import { cfnParserNameFromType, cfnProducerNameFromType, cfnPropsValidatorNameFromType } from './naming/conventions';
 
 export interface PropertyMapping {
   readonly cfnName: string;
