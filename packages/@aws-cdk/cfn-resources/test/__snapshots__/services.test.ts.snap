@@ -18777,12 +18777,12 @@ export class CfnLocalGatewayRoute extends cdk.CfnResource implements cdk.IInspec
   /**
    * The CIDR block used for destination matches.
    */
-  public destinationCidrBlock?: string;
+  public destinationCidrBlock: string;
 
   /**
    * The ID of the local gateway route table.
    */
-  public localGatewayRouteTableId?: string;
+  public localGatewayRouteTableId: string;
 
   /**
    * The ID of the virtual interface group.
@@ -18799,11 +18799,14 @@ export class CfnLocalGatewayRoute extends cdk.CfnResource implements cdk.IInspec
    * @param id Construct identifier for this resource (unique in its scope)
    * @param props Resource properties
    */
-  public constructor(scope: constructs.Construct, id: string, props: CfnLocalGatewayRouteProps = {}) {
+  public constructor(scope: constructs.Construct, id: string, props: CfnLocalGatewayRouteProps) {
     super(scope, id, {
       "type": CfnLocalGatewayRoute.CFN_RESOURCE_TYPE_NAME,
       "properties": props
     });
+
+    cdk.requireProperty(props, "destinationCidrBlock", this);
+    cdk.requireProperty(props, "localGatewayRouteTableId", this);
 
     this.attrState = cdk.Token.asString(this.getAtt("State", cdk.ResolutionTypeHint.STRING));
     this.attrType = cdk.Token.asString(this.getAtt("Type", cdk.ResolutionTypeHint.STRING));
@@ -18850,14 +18853,14 @@ export interface CfnLocalGatewayRouteProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-localgatewayroute.html#cfn-ec2-localgatewayroute-destinationcidrblock
    */
-  readonly destinationCidrBlock?: string;
+  readonly destinationCidrBlock: string;
 
   /**
    * The ID of the local gateway route table.
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-localgatewayroute.html#cfn-ec2-localgatewayroute-localgatewayroutetableid
    */
-  readonly localGatewayRouteTableId?: string;
+  readonly localGatewayRouteTableId: string;
 
   /**
    * The ID of the virtual interface group.
@@ -18888,7 +18891,9 @@ function CfnLocalGatewayRoutePropsValidator(properties: any): cdk.ValidationResu
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
+  errors.collect(cdk.propertyValidator("destinationCidrBlock", cdk.requiredValidator)(properties.destinationCidrBlock));
   errors.collect(cdk.propertyValidator("destinationCidrBlock", cdk.validateString)(properties.destinationCidrBlock));
+  errors.collect(cdk.propertyValidator("localGatewayRouteTableId", cdk.requiredValidator)(properties.localGatewayRouteTableId));
   errors.collect(cdk.propertyValidator("localGatewayRouteTableId", cdk.validateString)(properties.localGatewayRouteTableId));
   errors.collect(cdk.propertyValidator("localGatewayVirtualInterfaceGroupId", cdk.validateString)(properties.localGatewayVirtualInterfaceGroupId));
   errors.collect(cdk.propertyValidator("networkInterfaceId", cdk.validateString)(properties.networkInterfaceId));
