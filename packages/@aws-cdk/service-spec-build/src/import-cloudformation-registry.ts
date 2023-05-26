@@ -96,6 +96,8 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       throw new Error(`Not an object type with properties: ${JSON.stringify(source)}`);
     }
 
+    const required = calculateDefinitelyRequired(source);
+
     for (const [name, property] of Object.entries(source.properties)) {
       let resolvedSchema = resolve(property);
 
@@ -114,7 +116,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
           type,
           previousTypes: getPreviousTypes(`${resource.typeName}.${name}`, [type]),
           documentation: descriptionOf(resolvedSchema),
-          required: ifTrue((source.required ?? []).includes(name)),
+          required: ifTrue(required.has(name)),
           defaultValue: describeDefault(resolvedSchema),
         };
       });
@@ -341,6 +343,25 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     });
   }
 
+  /**
+   * Derive a 'required' array from the oneOfs/anyOfs/allOfs in this source
+   */
+  function calculateDefinitelyRequired(source: RequiredContainer): Set<string> {
+    const ret = new Set([...(source.required ?? [])]);
+
+    if (source.oneOf) {
+      setExtend(ret, setIntersect(...source.oneOf.map(calculateDefinitelyRequired)));
+    }
+    if (source.anyOf) {
+      setExtend(ret, setIntersect(...source.anyOf.map(calculateDefinitelyRequired)));
+    }
+    if (source.allOf) {
+      setExtend(ret, ...source.allOf.map(calculateDefinitelyRequired));
+    }
+
+    return ret;
+  }
+
   function withResult<A>(x: Result<A>, cb: (x: A) => void): void {
     if (isFailure(x)) {
       report.reportFailure('interpreting', x);
@@ -447,4 +468,32 @@ function findAttributes(resource: CloudFormationRegistryResource): string[] {
  */
 function attributeNameToPropertyName(name: string) {
   return name.split('.').join('');
+}
+
+interface RequiredContainer {
+  readonly required?: string[];
+  readonly oneOf?: RequiredContainer[];
+  readonly anyOf?: RequiredContainer[];
+  readonly allOf?: RequiredContainer[];
+}
+
+function setIntersect<A>(...xs: Set<A>[]): Set<A> {
+  if (xs.length === 0) {
+    return new Set();
+  }
+  const ret = new Set(xs[0]);
+  for (const x of xs) {
+    for (const e of ret) {
+      if (!x.has(e)) {
+        ret.delete(e);
+      }
+    }
+  }
+  return ret;
+}
+
+function setExtend<A>(ss: Set<A>, ...xs: Set<A>[]): void {
+  for (const e of xs.flatMap((x) => Array.from(x))) {
+    ss.add(e);
+  }
 }

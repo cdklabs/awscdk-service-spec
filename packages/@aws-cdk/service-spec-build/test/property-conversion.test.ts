@@ -221,3 +221,34 @@ test('legacy timestamps are getting the timestamp format', () => {
   const type = db.get('typeDefinition', (prop.type as DefinitionReference).reference.$ref);
   expect(type.properties.DateTime.type).toMatchObject({ type: 'date-time' });
 });
+
+test('read required properties from allOf/anyOf', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::Test::Resource',
+      description: 'Test resource',
+      properties: {
+        Mutex1: { type: 'string' },
+        Mutex2: { type: 'string' },
+        InBoth: { type: 'string' },
+      },
+      additionalProperties: false,
+      oneOf: [
+        {
+          required: ['Mutex1', 'InBoth'],
+        },
+        {
+          required: ['Mutex2', 'InBoth'],
+        },
+      ],
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Test::Resource').only();
+  const requiredProps = Object.entries(resource.properties)
+    .filter(([_, value]) => value.required)
+    .map(([name, _]) => name);
+  expect(requiredProps).toContain('InBoth');
+});
