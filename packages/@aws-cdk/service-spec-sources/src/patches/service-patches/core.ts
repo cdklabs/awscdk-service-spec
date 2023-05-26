@@ -86,6 +86,16 @@ export function renameDefinition(oldName: string, newName: string, reason: Reaso
     if (lens.jsonPointer === `/definitions`) {
       lens.renameProperty(reason.reason, oldName, newName);
     }
+    if (lens.value.$ref === `#/definitions/${oldName}`) {
+      lens.recordPatch(reason.reason, {
+        op: 'replace',
+        path: lens.jsonPointer,
+        value: {
+          ...lens.value,
+          $ref: `#/definitions/${newName}`,
+        },
+      });
+    }
   };
 }
 
