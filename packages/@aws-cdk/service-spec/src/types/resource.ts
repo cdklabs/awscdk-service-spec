@@ -162,35 +162,32 @@ export enum Deprecation {
 
 export type PropertyType =
   | PrimitiveType
-  | TagType
   | DefinitionReference
   | ArrayType<PropertyType>
   | MapType<PropertyType>
   | TypeUnion<PropertyType>;
 
-export type PrimitiveType = StringType | NumberType | IntegerType | BooleanType | JsonType | DateTimeType | NullType;
+export type PrimitiveType =
+  | StringType
+  | NumberType
+  | IntegerType
+  | BooleanType
+  | JsonType
+  | DateTimeType
+  | NullType
+  | BuiltinTagType;
 
 export function isPrimitiveType(x: PropertyType): x is PrimitiveType {
   return (x as any).type;
-}
-
-export interface TagType {
-  readonly type: 'tag';
-  /**
-   * Used to instruct cdk.TagManager how to handle tags
-   */
-  readonly variant: TagVariant;
-  /**
-   * The original type of the property.
-   * Some tag variants use the original type definition.
-   */
-  readonly original: PropertyType;
 }
 
 export type TagVariant = 'standard' | 'asg' | 'map';
 
 export interface StringType {
   readonly type: 'string';
+}
+export interface BuiltinTagType {
+  readonly type: 'tag';
 }
 
 export interface NumberType {

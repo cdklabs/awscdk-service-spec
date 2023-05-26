@@ -1,4 +1,4 @@
-import { Attribute, PropertyType, Resource, TagType } from '@aws-cdk/service-spec';
+import { Attribute, PropertyType, Resource } from '@aws-cdk/service-spec';
 import {
   $E,
   $T,
@@ -19,6 +19,7 @@ import {
   Lambda,
   Stability,
   ObjectLiteral,
+  Property,
 } from '@cdklabs/typewriter';
 import { CDK_CORE, CONSTRUCTS } from './cdk';
 import {
@@ -27,7 +28,6 @@ import {
   cfnParserNameFromType,
   staticResourceTypeName,
   cfnProducerNameFromType,
-  propertyNameFromCloudFormation,
   staticRequiredTransform,
 } from '../naming/conventions';
 import { cloudFormationDocLink } from '../naming/doclink';
@@ -367,7 +367,7 @@ export class ResourceClass extends ClassType {
     return this.propsType.properties
       .map((prop) => {
         // FIXME: Would be nicer to thread this value through
-        const tagType = tryFindTagType(this.res, prop.name);
+        const tagType = isTagType(this.res, prop.name);
 
         if (tagType) {
           return {
@@ -379,7 +379,7 @@ export class ResourceClass extends ClassType {
             memberType: CDK_CORE.TagManager,
             initializer: (props: Expression) =>
               new CDK_CORE.TagManager(
-                translateTagType(tagType),
+                translateTagType(this.res, prop),
                 expr.lit(this.res.cloudFormationType),
                 prop.from(props),
                 expr.object({ tagPropertyName: expr.lit(prop.name) }),
@@ -443,15 +443,16 @@ export class ResourceClass extends ClassType {
 /**
  * Translates a TagVariant to the core.TagType enum
  */
-function translateTagType(x: TagType) {
-  switch (x.variant) {
-    case 'standard':
-      return CDK_CORE.TagType.STANDARD;
-    case 'asg':
-      return CDK_CORE.TagType.AUTOSCALING_GROUP;
-    case 'map':
-      return CDK_CORE.TagType.MAP;
+function translateTagType(resource: Resource, prop: Property) {
+  if (resource.cloudFormationType === 'AWS::AutoScaling::AutoScalingGroup') {
+    return CDK_CORE.TagType.AUTOSCALING_GROUP;
   }
+
+  if (prop.type.mapOfType) {
+    return CDK_CORE.TagType.MAP;
+  }
+
+  return CDK_CORE.TagType.STANDARD;
 }
 
 /**
@@ -460,19 +461,14 @@ function translateTagType(x: TagType) {
  *
  * Returns `undefined` otherwise.
  */
-function tryFindTagType(resource: Resource, propName: string): TagType | undefined {
-  if (!resource.tagPropertyName) {
-    return;
-  }
+function isTagType(_resource: Resource, propName: string): boolean {
+  const tagPropertyNames = {
+    fileSystemTags: '',
+    hostedZoneTags: '',
+    tags: '',
+    userPoolTags: '',
+    accessPointTags: '',
+  };
 
-  if (propName !== propertyNameFromCloudFormation(resource.tagPropertyName)) {
-    return;
-  }
-
-  const propType = resource.properties[resource.tagPropertyName].type;
-  if (propType.type !== 'tag') {
-    return;
-  }
-
-  return propType;
+  return propName in tagPropertyNames;
 }

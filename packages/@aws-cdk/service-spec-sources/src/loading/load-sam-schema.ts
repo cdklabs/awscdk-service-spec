@@ -4,7 +4,10 @@ import { Loader, LoadResult } from './loader';
 import { patchSamTemplateSpec } from '../patches/sam-patches';
 import { SamTemplateSchema } from '../types';
 
-export async function loadSamResourceSpec(mustValidate = true): Promise<LoadResult<SamTemplateSchema>> {
+/**
+ * Load the new SAM (json) schema
+ */
+export async function loadSamSchema(mustValidate = true): Promise<LoadResult<SamTemplateSchema>> {
   const loader = await Loader.fromSchemaFile<SamTemplateSchema>('SamTemplateSchema.schema.json', {
     mustValidate,
     patcher: patchSamTemplateSpec,

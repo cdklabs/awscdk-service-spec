@@ -53,7 +53,7 @@ export async function buildDatabase(options: BuildDatabaseOptions = {}) {
     }
   }
 
-  const samSchema = loadResult(await sources.loadSamResourceSpec());
+  const samSchema = loadResult(await sources.loadSamSchema());
   new SamResources({ db, samSchema, report }).import();
 
   const docs = await sources.loadDefaultCloudFormationDocs(report);

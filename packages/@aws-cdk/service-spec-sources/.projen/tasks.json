@@ -85,6 +85,9 @@
           "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudFormationResourceSpecification --out schemas/CloudFormationResourceSpecification.schema.json"
         },
         {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type SAMResourceSpecification --out schemas/SAMResourceSpecification.schema.json"
+        },
+        {
           "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudFormationDocumentation --out schemas/CloudFormationDocumentation.schema.json"
         },
         {

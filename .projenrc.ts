@@ -54,6 +54,7 @@ const serviceSpecSchemaTask = serviceSpecSources.addTask('gen-schemas', {
   steps: [
     'CloudFormationRegistryResource',
     'CloudFormationResourceSpecification',
+    'SAMResourceSpecification',
     'CloudFormationDocumentation',
     'StatefulResources',
     'SamTemplateSchema',
