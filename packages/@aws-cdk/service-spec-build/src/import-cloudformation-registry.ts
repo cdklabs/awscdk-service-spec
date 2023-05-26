@@ -174,7 +174,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
           case 'array':
             // FIXME: insertionOrder, uniqueItems
             return using(
-              schemaTypeToModelType(`${nameHint}Items`, resolve(resolvedSchema.items ?? true), fail),
+              schemaTypeToModelType(collectionNameHint(nameHint), resolve(resolvedSchema.items ?? true), fail),
               (element) => ({
                 type: 'array',
                 element,
@@ -204,7 +204,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
   function schemaObjectToModelType(nameHint: string, schema: jsonschema.Object, fail: Fail): Result<PropertyType> {
     if (jsonschema.isMapLikeObject(schema)) {
-      const innerNameHint = `${nameHint}Items`;
+      const innerNameHint = collectionNameHint(nameHint);
 
       // Map type -- if we have 'additionalProperties', we will use that as the type of everything
       // (and assume it subsumes patterned types).
@@ -450,4 +450,11 @@ function findAttributes(resource: CloudFormationRegistryResource): string[] {
  */
 function attributeNameToPropertyName(name: string) {
   return name.split('.').join('');
+}
+
+/**
+ * Turn the namehint into a namehint for collections
+ */
+function collectionNameHint(nameHint: string) {
+  return `${nameHint}Items`;
 }
