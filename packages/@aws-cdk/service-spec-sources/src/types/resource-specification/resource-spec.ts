@@ -44,4 +44,8 @@ export namespace resourcespec {
     readonly PrimitiveItemType?: string;
     readonly DuplicatesAllowed?: boolean;
   }
+
+  export function isPropType(x: PropertyType | Property): x is PropertyType {
+    return !!(x as any).Properties;
+  }
 }

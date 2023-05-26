@@ -9,6 +9,7 @@ import {
   importCloudFormationRegistryResource,
   readCloudFormationRegistryServiceFromResource,
 } from './import-cloudformation-registry';
+import { importLegacyInformation } from './import-legacy-information';
 import { SamResources } from './import-sam';
 import { Scrutinies } from './import-scrutinies';
 import { importStatefulResources } from './import-stateful-resources';
@@ -64,6 +65,8 @@ export async function buildDatabase(options: BuildDatabaseOptions = {}) {
 
   const cloudWatchServiceDirectory = loadResult(await sources.loadDefaultCloudWatchConsoleServiceDirectory());
   importCannedMetrics(db, cloudWatchServiceDirectory, report);
+
+  importLegacyInformation(db, resourceSpec, report);
 
   new Scrutinies(db).import();
   new Augmentations(db).import();

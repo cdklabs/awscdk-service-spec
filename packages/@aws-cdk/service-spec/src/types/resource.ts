@@ -65,11 +65,11 @@ export interface Resource extends Entity {
   isStateful?: boolean;
 
   /**
-   * The name of the property that contains the tags
+   * Information about the taggability of this resource
    *
    * Undefined if the resource is not taggable.
    */
-  tagPropertyName?: string;
+  tagInformation?: TagInformation;
 
   /**
    * Whether changes to this resource need to be scrutinized
@@ -95,6 +95,8 @@ export interface Property {
 
   /**
    * Is this property required
+   *
+   * @default false
    */
   required?: boolean;
 
@@ -135,6 +137,17 @@ export interface Property {
   scrutinizable?: PropertyScrutinyType;
 }
 
+export class RichProperty {
+  constructor(private readonly property: Property) {}
+
+  public addPreviousType(type: PropertyType) {
+    if (!this.property.previousTypes) {
+      this.property.previousTypes = [];
+    }
+    this.property.previousTypes.unshift(type);
+  }
+}
+
 export interface Attribute {
   documentation?: string;
   type: PropertyType;
@@ -162,29 +175,28 @@ export enum Deprecation {
 
 export type PropertyType =
   | PrimitiveType
-  | TagType
   | DefinitionReference
+  | BuiltinTagType
   | ArrayType<PropertyType>
   | MapType<PropertyType>
   | TypeUnion<PropertyType>;
 
 export type PrimitiveType = StringType | NumberType | IntegerType | BooleanType | JsonType | DateTimeType | NullType;
 
-export function isPrimitiveType(x: PropertyType): x is PrimitiveType {
-  return (x as any).type;
+export function isCollectionType(x: PropertyType): x is ArrayType<any> | MapType<any> {
+  return x.type === 'array' || x.type === 'map';
 }
 
-export interface TagType {
-  readonly type: 'tag';
+export interface TagInformation {
+  /**
+   * Name of the property that holds the tags
+   */
+  readonly tagPropertyName: string;
+
   /**
    * Used to instruct cdk.TagManager how to handle tags
    */
   readonly variant: TagVariant;
-  /**
-   * The original type of the property.
-   * Some tag variants use the original type definition.
-   */
-  readonly original: PropertyType;
 }
 
 export type TagVariant = 'standard' | 'asg' | 'map';
@@ -215,6 +227,13 @@ export interface NullType {
 
 export interface DateTimeType {
   readonly type: 'date-time';
+}
+
+/**
+ * The "legacy" tag type (used in the old resource spec)
+ */
+export interface BuiltinTagType {
+  readonly type: 'tag';
 }
 
 export interface DefinitionReference {

@@ -11,6 +11,7 @@ import {
   NotExpression,
   Null,
   ObjectLiteral,
+  ObjectPropertyAccess,
   StrConcat,
   Structure,
   Ternary,
@@ -29,6 +30,10 @@ export function directCode(code: string): Expression {
 
 export function ident(identifier: string): Identifier {
   return new Identifier(identifier);
+}
+
+export function get(lhs: Expression, prop: string) {
+  return new ObjectPropertyAccess(lhs, prop);
 }
 
 export function sym(symb: ThingSymbol): Expression {

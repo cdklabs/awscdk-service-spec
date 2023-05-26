@@ -108,6 +108,57 @@ test('compound readOnlyProperties are included in attributes', () => {
   expect(attrNames).toEqual(['CompoundProp', 'CompoundProp.Id', 'CompoundProp.Property']);
 });
 
+test('anonymous types are named after their property', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      description: 'Test resource',
+      typeName: 'AWS::Some::Type',
+      properties: {
+        Banana: {
+          type: 'object',
+          properties: {
+            color: { type: 'string' },
+          },
+          required: ['color'],
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type').only();
+  const typeNames = db.follow('usesType', resource).map((x) => x.entity.name);
+  expect(typeNames).toContain('Banana');
+});
+
+test('anonymous types in a collection are named after their property with "Items" appended', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      description: 'Test resource',
+      typeName: 'AWS::Some::Type',
+      properties: {
+        Bananas: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              color: { type: 'string' },
+            },
+            required: ['color'],
+          },
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type').only();
+  const typeNames = db.follow('usesType', resource).map((x) => x.entity.name);
+  expect(typeNames).toContain('BananasItems');
+});
+
 test('include legacy attributes in attributes', () => {
   importCloudFormationRegistryResource({
     db,
