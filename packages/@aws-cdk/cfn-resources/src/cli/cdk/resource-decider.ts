@@ -33,10 +33,7 @@ export class ResourceDecider {
   public readonly classProperties = new Array<ClassProperty>();
   public readonly classAttributeProperties = new Array<ClassAttributeProperty>();
 
-  constructor(
-    private readonly resource: Resource,
-    private readonly converter: TypeConverter,
-  ) {
+  constructor(private readonly resource: Resource, private readonly converter: TypeConverter) {
     this.taggability = resourceTaggabilityStyle(this.resource);
 
     this.convertProperties();
