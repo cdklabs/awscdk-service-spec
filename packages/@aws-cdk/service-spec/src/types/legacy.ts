@@ -1,7 +1,8 @@
 import { Entity, Relationship } from '@cdklabs/tskb';
-import { Resource } from './resource';
+import { Resource, TypeDefinition } from './resource';
 
-export type HasLegacyTag = Relationship<Resource, LegacyTagProperty>;
+export type ResourceHasLegacyTag = Relationship<Resource, LegacyTagProperty>;
+export type TypeDefinitionHasLegacyTag = Relationship<TypeDefinition, LegacyTagProperty>;
 
 /**
  * Used to record what properties are marked with type 'Tag' in the old spec
