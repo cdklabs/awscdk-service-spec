@@ -97,6 +97,8 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       throw new Error(`Not an object type with properties: ${JSON.stringify(source)}`);
     }
 
+    const required = calculateDefinitelyRequired(source);
+
     for (const [name, property] of Object.entries(source.properties)) {
       let resolvedSchema = resolve(property);
 
@@ -115,7 +117,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
           type,
           previousTypes: getPreviousTypes(`${resource.typeName}.${name}`, [type]),
           documentation: descriptionOf(resolvedSchema),
-          required: ifTrue((source.required ?? []).includes(name)),
+          required: ifTrue(required.has(name)),
           defaultValue: describeDefault(resolvedSchema),
         };
       });
@@ -224,8 +226,9 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
             element,
           })),
         );
-      } else {
-        // Fully untyped map
+      } else if (!jsonschema.resolvedReference(schema)) {
+        // Fully untyped map that's not a type
+        // @todo types should probably also just be json since they are useless otherwise. Fix after this package is in use.
         // FIXME: is 'json' really a primitive type, or do we mean `Map<unknown>` or `Map<any>` ?
         return { type: 'json' };
       }
@@ -242,12 +245,16 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       db.link('usesType', res, typeDef);
       typeDefinitions.set(typeKey, typeDef);
 
-      recurseProperties(
-        schema,
-        typeDef.properties,
-        fail.in(`typedef ${nameHint}`),
-        options.resourceSpec?.types?.[typeDef.name],
-      );
+      // If the type has no props, it's not a RecordLikeObject and we don't need to recurse
+      // @todo The type should probably also just be json since they are useless otherwise. Fix after this package is in use.
+      if (jsonschema.isRecordLikeObject(schema)) {
+        recurseProperties(
+          schema,
+          typeDef.properties,
+          fail.in(`typedef ${nameHint}`),
+          options.resourceSpec?.types?.[typeDef.name],
+        );
+      }
     }
 
     return { type: 'ref', reference: ref(typeDefinitions.get(typeKey)!) };
@@ -342,6 +349,25 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         }
       }
     });
+  }
+
+  /**
+   * Derive a 'required' array from the oneOfs/anyOfs/allOfs in this source
+   */
+  function calculateDefinitelyRequired(source: RequiredContainer): Set<string> {
+    const ret = new Set([...(source.required ?? [])]);
+
+    if (source.oneOf) {
+      setExtend(ret, setIntersect(...source.oneOf.map(calculateDefinitelyRequired)));
+    }
+    if (source.anyOf) {
+      setExtend(ret, setIntersect(...source.anyOf.map(calculateDefinitelyRequired)));
+    }
+    if (source.allOf) {
+      setExtend(ret, ...source.allOf.map(calculateDefinitelyRequired));
+    }
+
+    return ret;
   }
 
   function withResult<A>(x: Result<A>, cb: (x: A) => void): void {
@@ -457,4 +483,32 @@ function attributeNameToPropertyName(name: string) {
  */
 function collectionNameHint(nameHint: string) {
   return `${nameHint}Items`;
+}
+
+interface RequiredContainer {
+  readonly required?: string[];
+  readonly oneOf?: RequiredContainer[];
+  readonly anyOf?: RequiredContainer[];
+  readonly allOf?: RequiredContainer[];
+}
+
+function setIntersect<A>(...xs: Set<A>[]): Set<A> {
+  if (xs.length === 0) {
+    return new Set();
+  }
+  const ret = new Set(xs[0]);
+  for (const x of xs) {
+    for (const e of ret) {
+      if (!x.has(e)) {
+        ret.delete(e);
+      }
+    }
+  }
+  return ret;
+}
+
+function setExtend<A>(ss: Set<A>, ...xs: Set<A>[]): void {
+  for (const e of xs.flatMap((x) => Array.from(x))) {
+    ss.add(e);
+  }
 }
