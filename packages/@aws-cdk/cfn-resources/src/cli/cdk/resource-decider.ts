@@ -79,9 +79,7 @@ export class ResourceDecider {
   private handlePropertyDefault(cfnName: string, prop: Property) {
     const name = propertyNameFromCloudFormation(cfnName);
 
-    const baseType = this.propsPropType(cfnName, prop);
-    // If we ended up with the special CfnTag[] type, don't make it IResolvable, otherwise do
-    const type = baseType.equals(TAG_ARRAY_TYPE) ? baseType : this.converter.makeTypeResolvable(baseType);
+    const { type, baseType } = this.legacyCompatiblePropType(cfnName, prop);
     const optional = !prop.required;
 
     this.propsProperties.push({
@@ -129,12 +127,15 @@ export class ResourceDecider {
     const originalName = propertyNameFromCloudFormation(cfnName);
     const rawTagsPropName = `${originalName}Raw`;
 
-    const propsTagType = variant === 'map' ? Type.mapOf(Type.STRING) : this.propsPropType(cfnName, prop);
+    const { type, baseType } =
+      variant === 'map'
+        ? { type: Type.mapOf(Type.STRING), baseType: Type.mapOf(Type.STRING) }
+        : this.legacyCompatiblePropType(cfnName, prop);
 
     this.propsProperties.push({
       propertySpec: {
         name: originalName,
-        type: propsTagType,
+        type,
         optional: true, // Tags are never required
         docs: this.defaultPropDocs(cfnName, prop),
       },
@@ -142,7 +143,7 @@ export class ResourceDecider {
       cfnMapping: {
         cfnName,
         propName: originalName,
-        baseType: propsTagType,
+        baseType,
         optional: true,
       },
     });
@@ -171,7 +172,7 @@ export class ResourceDecider {
       {
         propertySpec: {
           name: rawTagsPropName,
-          type: propsTagType,
+          type,
           optional: true, // Tags are never required
           docs: this.defaultClassPropDocs(cfnName, prop),
         },
@@ -237,14 +238,34 @@ export class ResourceDecider {
   }
 
   /**
-   * Return the type for the given property that should go into the Props interface
+   * Return the resolvable and base types for a given property
    *
-   * Returns the special Tag type if this property had the intrinstic 'Tag' type
-   * in the old spec, otherwise resolves the type as normal.
+   * Does type deducation compatibly with the old cfn2ts code base.
+   *
+   * - Returns the special Tag type if this property had the intrinstic 'Tag' type
+   *   in the old spec, otherwise resolves the type as normal.
+   * - Skips making the type resolvable if the property has one of the predefined tag
+   *   property names.
    */
-  private propsPropType(cfnName: string, prop: Property) {
-    // Some properties are not THE tags property, but still have the intrinsic Tag type
-    return this.legacyTagTypeProperties.has(cfnName) ? TAG_ARRAY_TYPE : this.converter.typeFromProperty(prop);
+  private legacyCompatiblePropType(cfnName: string, prop: Property) {
+    const tagPropertyNames = {
+      FileSystemTags: '',
+      HostedZoneTags: '',
+      Tags: '',
+      UserPoolTags: '',
+      AccessPointTags: '',
+    };
+
+    // The use of the `cdk.CfnTag[]` type originally derived from the typing of
+    // a property as the intrinsic 'List<Tag>' in the CloudFormation specification.
+    const baseType = this.legacyTagTypeProperties.has(cfnName) ? TAG_ARRAY_TYPE : this.converter.typeFromProperty(prop);
+
+    // Whether or not a property is made `IResolvable` originally depended on
+    // the name of the property. These conditions were probably expected to coincide,
+    // but didn't.
+    const type = cfnName in tagPropertyNames ? baseType : this.converter.makeTypeResolvable(baseType);
+
+    return { type, baseType };
   }
 
   private convertAttributes() {
