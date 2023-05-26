@@ -12924,7 +12924,7 @@ export class CfnIPAMPool extends cdk.CfnResource implements cdk.IInspectable, cd
   /**
    * Tags that are required for resources that use CIDRs from this IPAM pool.
    */
-  public allocationResourceTags?: Array<cdk.CfnTag>;
+  public allocationResourceTags?: Array<cdk.CfnTag | cdk.IResolvable> | cdk.IResolvable;
 
   /**
    * If selected, IPAM will continuously look for resources within the CIDR range of this pool and automatically import them as allocations into your IPAM.
@@ -13130,7 +13130,7 @@ export interface CfnIPAMPoolProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-ipampool.html#cfn-ec2-ipampool-allocationresourcetags
    */
-  readonly allocationResourceTags?: Array<cdk.CfnTag>;
+  readonly allocationResourceTags?: Array<cdk.CfnTag | cdk.IResolvable> | cdk.IResolvable;
 
   /**
    * If selected, IPAM will continuously look for resources within the CIDR range of this pool and automatically import them as allocations into your IPAM.

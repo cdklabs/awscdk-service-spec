@@ -134,7 +134,7 @@ export class TypeConverter {
    * If not we recursively apply a type union with `cdk.IResolvable` to the type.
    */
   public makeTypeResolvable(type: Type): Type {
-    if (isTokenizableType(type) || isTagType(type)) {
+    if (isTokenizableType(type)) {
       return type;
     }
 
@@ -156,13 +156,6 @@ export class TypeConverter {
 
     return Type.unionOf(type, CDK_CORE.IResolvable);
   }
-}
-
-/**
- * Is the given type a builtin tag
- */
-function isTagType(type: Type): boolean {
-  return type.fqn === CDK_CORE.CfnTag.fqn || type.arrayOfType?.fqn === CDK_CORE.CfnTag.fqn;
 }
 
 /**
