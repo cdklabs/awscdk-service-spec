@@ -2568,8 +2568,14 @@ export class CfnCapacityReservationFleet extends cdk.CfnResource implements cdk.
    */
   public instanceTypeSpecifications?: Array<CfnCapacityReservationFleet.InstanceTypeSpecificationProperty | cdk.IResolvable> | cdk.IResolvable;
 
+  /**
+   * Used to add an end date to a Capacity Reservation Fleet that has no end date and time.
+   */
   public noRemoveEndDate?: boolean | cdk.IResolvable;
 
+  /**
+   * Used to remove an end date from a Capacity Reservation Fleet that is configured to end automatically at a specific date and time.
+   */
   public removeEndDate?: boolean | cdk.IResolvable;
 
   /**
@@ -2789,11 +2795,19 @@ export interface CfnCapacityReservationFleetProps {
   readonly instanceTypeSpecifications?: Array<CfnCapacityReservationFleet.InstanceTypeSpecificationProperty | cdk.IResolvable> | cdk.IResolvable;
 
   /**
+   * Used to add an end date to a Capacity Reservation Fleet that has no end date and time.
+   *
+   * To add an end date to a Capacity Reservation Fleet, specify \`true\` for this paramater and specify the end date and time (in UTC time format) for the *EndDate* parameter.
+   *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-capacityreservationfleet.html#cfn-ec2-capacityreservationfleet-noremoveenddate
    */
   readonly noRemoveEndDate?: boolean | cdk.IResolvable;
 
   /**
+   * Used to remove an end date from a Capacity Reservation Fleet that is configured to end automatically at a specific date and time.
+   *
+   * To remove the end date from a Capacity Reservation Fleet, specify \`true\` for this paramater and omit the *EndDate* parameter.
+   *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-capacityreservationfleet.html#cfn-ec2-capacityreservationfleet-removeenddate
    */
   readonly removeEndDate?: boolean | cdk.IResolvable;
@@ -15540,6 +15554,10 @@ export namespace CfnLaunchTemplate {
    */
   export interface CpuOptionsProperty {
     /**
+     * Indicates whether to enable the instance for AMD SEV-SNP.
+     *
+     * AMD SEV-SNP is supported with M6a, R6a, and C6a instance types only. For more information, see [AMD SEV-SNP](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/sev-snp.html) .
+     *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-launchtemplate-cpuoptions.html#cfn-ec2-launchtemplate-cpuoptions-amdsevsnp
      */
     readonly amdSevSnp?: string;
@@ -23135,8 +23153,14 @@ export class CfnNetworkInsightsPath extends cdk.CfnResource implements cdk.IInsp
    */
   public destinationPort?: number;
 
+  /**
+   * Scopes the analysis to network paths that match specific filters at the destination.
+   */
   public filterAtDestination?: cdk.IResolvable | CfnNetworkInsightsPath.PathFilterProperty;
 
+  /**
+   * Scopes the analysis to network paths that match specific filters at the source.
+   */
   public filterAtSource?: cdk.IResolvable | CfnNetworkInsightsPath.PathFilterProperty;
 
   /**
@@ -23228,42 +23252,60 @@ export class CfnNetworkInsightsPath extends cdk.CfnResource implements cdk.IInsp
 
 export namespace CfnNetworkInsightsPath {
   /**
+   * Describes a set of filters for a path analysis.
+   *
+   * Use path filters to scope the analysis when there can be multiple resulting paths.
+   *
    * @struct
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-networkinsightspath-pathfilter.html
    */
   export interface PathFilterProperty {
     /**
+     * The destination IPv4 address.
+     *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-networkinsightspath-pathfilter.html#cfn-ec2-networkinsightspath-pathfilter-destinationaddress
      */
     readonly destinationAddress?: string;
 
     /**
+     * The destination port range.
+     *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-networkinsightspath-pathfilter.html#cfn-ec2-networkinsightspath-pathfilter-destinationportrange
      */
     readonly destinationPortRange?: CfnNetworkInsightsPath.FilterPortRangeProperty | cdk.IResolvable;
 
     /**
+     * The source IPv4 address.
+     *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-networkinsightspath-pathfilter.html#cfn-ec2-networkinsightspath-pathfilter-sourceaddress
      */
     readonly sourceAddress?: string;
 
     /**
+     * The source port range.
+     *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-networkinsightspath-pathfilter.html#cfn-ec2-networkinsightspath-pathfilter-sourceportrange
      */
     readonly sourcePortRange?: CfnNetworkInsightsPath.FilterPortRangeProperty | cdk.IResolvable;
   }
 
   /**
+   * Describes a port range.
+   *
    * @struct
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-networkinsightspath-filterportrange.html
    */
   export interface FilterPortRangeProperty {
     /**
+     * The first port in the range.
+     *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-networkinsightspath-filterportrange.html#cfn-ec2-networkinsightspath-filterportrange-fromport
      */
     readonly fromPort?: number;
 
     /**
+     * The last port in the range.
+     *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-networkinsightspath-filterportrange.html#cfn-ec2-networkinsightspath-filterportrange-toport
      */
     readonly toPort?: number;
@@ -23302,11 +23344,19 @@ export interface CfnNetworkInsightsPathProps {
   readonly destinationPort?: number;
 
   /**
+   * Scopes the analysis to network paths that match specific filters at the destination.
+   *
+   * If you specify this parameter, you can't specify the parameter for the destination IP address.
+   *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-networkinsightspath.html#cfn-ec2-networkinsightspath-filteratdestination
    */
   readonly filterAtDestination?: cdk.IResolvable | CfnNetworkInsightsPath.PathFilterProperty;
 
   /**
+   * Scopes the analysis to network paths that match specific filters at the source.
+   *
+   * If you specify this parameter, you can't specify the parameters for the source IP address or the destination port.
+   *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-networkinsightspath.html#cfn-ec2-networkinsightspath-filteratsource
    */
   readonly filterAtSource?: cdk.IResolvable | CfnNetworkInsightsPath.PathFilterProperty;
@@ -25167,7 +25217,7 @@ export class CfnRoute extends cdk.CfnResource implements cdk.IInspectable {
   public carrierGatewayId?: string;
 
   /**
-   * The IPv4 CIDR block used for the destination match.
+   * The IPv4 CIDR address block used for the destination match.
    */
   public destinationCidrBlock?: string;
 
@@ -25177,7 +25227,7 @@ export class CfnRoute extends cdk.CfnResource implements cdk.IInspectable {
   public destinationIpv6CidrBlock?: string;
 
   /**
-   * The ID of the egress-only internet gateway.
+   * [IPv6 traffic only] The ID of an egress-only internet gateway.
    */
   public egressOnlyInternetGatewayId?: string;
 
@@ -25197,17 +25247,17 @@ export class CfnRoute extends cdk.CfnResource implements cdk.IInspectable {
   public localGatewayId?: string;
 
   /**
-   * The ID of a NAT gateway.
+   * [IPv4 traffic only] The ID of a NAT gateway.
    */
   public natGatewayId?: string;
 
   /**
-   * The ID of the network interface.
+   * The ID of a network interface.
    */
   public networkInterfaceId?: string;
 
   /**
-   * The ID of the route table.
+   * The ID of the route table for the route.
    */
   public routeTableId: string;
 
@@ -25299,12 +25349,16 @@ export interface CfnRouteProps {
   /**
    * The ID of the carrier gateway.
    *
+   * You can only use this option when the VPC contains a subnet which is associated with a Wavelength Zone.
+   *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route.html#cfn-ec2-route-carriergatewayid
    */
   readonly carrierGatewayId?: string;
 
   /**
-   * The IPv4 CIDR block used for the destination match.
+   * The IPv4 CIDR address block used for the destination match.
+   *
+   * Routing decisions are based on the most specific match. We modify the specified CIDR block to its canonical form; for example, if you specify \`100.68.0.18/18\` , we modify it to \`100.68.0.0/18\` .
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route.html#cfn-ec2-route-destinationcidrblock
    */
@@ -25313,12 +25367,14 @@ export interface CfnRouteProps {
   /**
    * The IPv6 CIDR block used for the destination match.
    *
+   * Routing decisions are based on the most specific match.
+   *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route.html#cfn-ec2-route-destinationipv6cidrblock
    */
   readonly destinationIpv6CidrBlock?: string;
 
   /**
-   * The ID of the egress-only internet gateway.
+   * [IPv6 traffic only] The ID of an egress-only internet gateway.
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route.html#cfn-ec2-route-egressonlyinternetgatewayid
    */
@@ -25334,6 +25390,8 @@ export interface CfnRouteProps {
   /**
    * The ID of a NAT instance in your VPC.
    *
+   * The operation fails if you specify an instance ID unless exactly one network interface is attached.
+   *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route.html#cfn-ec2-route-instanceid
    */
   readonly instanceId?: string;
@@ -25346,23 +25404,21 @@ export interface CfnRouteProps {
   readonly localGatewayId?: string;
 
   /**
-   * The ID of a NAT gateway.
+   * [IPv4 traffic only] The ID of a NAT gateway.
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route.html#cfn-ec2-route-natgatewayid
    */
   readonly natGatewayId?: string;
 
   /**
-   * The ID of the network interface.
+   * The ID of a network interface.
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route.html#cfn-ec2-route-networkinterfaceid
    */
   readonly networkInterfaceId?: string;
 
   /**
-   * The ID of the route table.
-   *
-   * The routing table must be associated with the same VPC that the virtual private gateway is attached to.
+   * The ID of the route table for the route.
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route.html#cfn-ec2-route-routetableid
    */
@@ -28400,7 +28456,9 @@ export namespace CfnSpotFleet {
    */
   export interface LaunchTemplateConfigProperty {
     /**
-     * The launch template.
+     * The launch template to use.
+     *
+     * Make sure that the launch template does not contain the \`NetworkInterfaceId\` parameter because you can't specify a network interface ID in a Spot Fleet.
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-spotfleet-launchtemplateconfig.html#cfn-ec2-spotfleet-launchtemplateconfig-launchtemplatespecification
      */
@@ -30842,7 +30900,7 @@ export class CfnSubnetCidrBlock extends cdk.CfnResource implements cdk.IInspecta
   }
 
   /**
-   * Information about the IPv6 association.
+   * The ID of the association.
    *
    * @cloudformationAttribute Id
    */
@@ -52030,7 +52088,7 @@ export namespace CfnSchedule {
     readonly enableExecuteCommand?: boolean | cdk.IResolvable;
 
     /**
-     * Specifies an ECS task group for the task.
+     * Specifies an Amazon ECS task group for the task.
      *
      * The maximum length is 255 characters.
      *
@@ -52082,7 +52140,7 @@ export namespace CfnSchedule {
     /**
      * Specifies whether to propagate the tags from the task definition to the task.
      *
-     * If no value is specified, the tags are not propagated. Tags can only be propagated to the task during task creation. To add tags to a task after task creation, use Amazon ECS's [\`TagResource\`](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_TagResource.html) API action.
+     * If no value is specified, the tags are not propagated. Tags can only be propagated to the task during task creation. To add tags to a task after task creation, use the Amazon ECS [\`TagResource\`](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_TagResource.html) API action.
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-ecsparameters.html#cfn-scheduler-schedule-ecsparameters-propagatetags
      */
@@ -52411,7 +52469,7 @@ export interface CfnScheduleProps {
    * The expression that defines when the schedule runs. The following formats are supported.
    *
    * - \`at\` expression - \`at(yyyy-mm-ddThh:mm:ss)\`
-   * - \`rate\` expression - \`rate(unit value)\`
+   * - \`rate\` expression - \`rate(value unit)\`
    * - \`cron\` expression - \`cron(fields)\`
    *
    * You can use \`at\` expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use \`rate\` and \`cron\` expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.
