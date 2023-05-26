@@ -173,10 +173,13 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
           case 'array':
             // FIXME: insertionOrder, uniqueItems
-            return using(schemaTypeToModelType(nameHint, resolve(resolvedSchema.items ?? true), fail), (element) => ({
-              type: 'array',
-              element,
-            }));
+            return using(
+              schemaTypeToModelType(`${nameHint}Items`, resolve(resolvedSchema.items ?? true), fail),
+              (element) => ({
+                type: 'array',
+                element,
+              }),
+            );
 
           case 'boolean':
             return { type: 'boolean' };
@@ -201,10 +204,12 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
   function schemaObjectToModelType(nameHint: string, schema: jsonschema.Object, fail: Fail): Result<PropertyType> {
     if (jsonschema.isMapLikeObject(schema)) {
+      const innerNameHint = `${nameHint}Items`;
+
       // Map type -- if we have 'additionalProperties', we will use that as the type of everything
       // (and assume it subsumes patterned types).
       if (schema.additionalProperties) {
-        return using(schemaTypeToModelType(nameHint, resolve(schema.additionalProperties), fail), (element) => ({
+        return using(schemaTypeToModelType(innerNameHint, resolve(schema.additionalProperties), fail), (element) => ({
           type: 'map',
           element,
         }));
@@ -214,7 +219,10 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         );
 
         return using(unifiedPatternProps, (unifiedType) =>
-          using(schemaTypeToModelType(nameHint, resolve(unifiedType), fail), (element) => ({ type: 'map', element })),
+          using(schemaTypeToModelType(innerNameHint, resolve(unifiedType), fail), (element) => ({
+            type: 'map',
+            element,
+          })),
         );
       } else {
         // Fully untyped map
