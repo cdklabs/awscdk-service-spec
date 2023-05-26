@@ -1,6 +1,5 @@
 import { Database, entityCollection, fieldIndex, stringCmp } from '@cdklabs/tskb';
 import { IsAugmentedResource, ResourceAugmentation } from './augmentations';
-import { TypeDefinitionHasLegacyTag, LegacyTagProperty, ResourceHasLegacyTag } from './legacy';
 import {
   DimensionSet,
   Metric,
@@ -43,7 +42,6 @@ export function emptyDatabase() {
       dimensionSet: entityCollection<DimensionSet>().index({
         dedupKey: fieldIndex('dedupKey', stringCmp),
       }),
-      legacyTag: entityCollection<LegacyTagProperty>(),
     },
     (r) => ({
       hasResource: r.relationship<HasResource>('service', 'resource'),
@@ -56,8 +54,6 @@ export function emptyDatabase() {
       serviceHasMetric: r.relationship<ServiceHasMetric>('service', 'metric'),
       resourceHasDimensionSet: r.relationship<ResourceHasDimensionSet>('resource', 'dimensionSet'),
       serviceHasDimensionSet: r.relationship<ServiceHasDimensionSet>('service', 'dimensionSet'),
-      resourceHasLegacyTag: r.relationship<ResourceHasLegacyTag>('resource', 'legacyTag'),
-      typeDefininitionHasLegacyTag: r.relationship<TypeDefinitionHasLegacyTag>('typeDefinition', 'legacyTag'),
     }),
   );
 }

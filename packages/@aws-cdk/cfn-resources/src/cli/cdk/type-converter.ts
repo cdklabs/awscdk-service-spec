@@ -107,8 +107,11 @@ export class TypeConverter {
         return this.obtainTypeDefinitionType(ref).type;
       case 'union':
         return Type.unionOf(...type.types.map((t) => this.typeFromSpecType(t)));
+      case 'null':
+        return Type.UNDEFINED;
+      case 'tag':
+        return CDK_CORE.CfnTag;
       case 'json':
-      default:
         return Type.ANY;
     }
   }

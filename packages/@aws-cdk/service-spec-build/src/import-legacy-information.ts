@@ -1,6 +1,9 @@
-import { SpecDatabase } from '@aws-cdk/service-spec';
+import { RichProperty, SpecDatabase } from '@aws-cdk/service-spec';
 import { CloudFormationResourceSpecification, ProblemReport, resourcespec } from '@aws-cdk/service-spec-sources';
 
+/**
+ * Import type information from the legacy spec
+ */
 export function importLegacyInformation(
   db: SpecDatabase,
   specification: CloudFormationResourceSpecification,
@@ -12,11 +15,11 @@ export function importLegacyInformation(
     for (const [propName, propSpec] of Object.entries(resourceSpec.Properties ?? {})) {
       if (propSpec.Type === 'List' && propSpec.ItemType === 'Tag') {
         const resource = db.lookup('resource', 'cloudFormationType', 'equals', resourceName).only();
-        const legacyTag = db.allocate('legacyTag', {
-          propertyName: propName,
-        });
 
-        db.link('resourceHasLegacyTag', resource, legacyTag);
+        new RichProperty(resource.properties[propName]).addPreviousType({
+          type: 'array',
+          element: { type: 'tag' },
+        });
       }
     }
   }
@@ -35,13 +38,14 @@ export function importLegacyInformation(
           .map((r) => r.entity)
           .filter((t) => t.name === typeDefName);
 
-        if (typeDefs.length === 1) {
-          const legacyTag = db.allocate('legacyTag', {
-            propertyName: propName,
-          });
-
-          db.link('typeDefininitionHasLegacyTag', typeDefs[0], legacyTag);
+        if (typeDefs.length !== 1) {
+          continue;
         }
+
+        new RichProperty(typeDefs[0].properties[propName]).addPreviousType({
+          type: 'array',
+          element: { type: 'tag' },
+        });
       }
     }
   }

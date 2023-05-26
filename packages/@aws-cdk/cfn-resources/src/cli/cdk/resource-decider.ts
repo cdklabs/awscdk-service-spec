@@ -1,4 +1,4 @@
-import { Deprecation, Property, Resource, SpecDatabase, TagVariant } from '@aws-cdk/service-spec';
+import { Deprecation, Property, Resource, TagVariant } from '@aws-cdk/service-spec';
 import { $E, $T, Expression, PropertySpec, Type, expr } from '@cdklabs/typewriter';
 import { CDK_CORE } from './cdk';
 import { NON_RESOLVABLE_PROPERTY_NAMES, TaggabilityStyle, resourceTaggabilityStyle } from './tagging';
@@ -13,8 +13,6 @@ export const HAS_25610 = false;
 
 // This convenience typewriter builder is used all over the place
 const $this = $E(expr.this_());
-
-const TAG_ARRAY_TYPE = Type.arrayOf(CDK_CORE.CfnTag);
 
 /**
  * Decide how properties get mapped between model types, Typescript types, and CloudFormation
@@ -34,17 +32,12 @@ export class ResourceDecider {
   public readonly propsProperties = new Array<PropsProperty>();
   public readonly classProperties = new Array<ClassProperty>();
   public readonly classAttributeProperties = new Array<ClassAttributeProperty>();
-  private readonly legacyTagTypeProperties = new Set<string>();
 
   constructor(
-    private readonly db: SpecDatabase,
     private readonly resource: Resource,
     private readonly converter: TypeConverter,
   ) {
     this.taggability = resourceTaggabilityStyle(this.resource);
-    this.legacyTagTypeProperties = new Set(
-      this.db.follow('hasLegacyTag', this.resource).map((x) => x.entity.propertyName),
-    );
 
     this.convertProperties();
     this.convertAttributes();
@@ -248,9 +241,7 @@ export class ResourceDecider {
    *   property names.
    */
   private legacyCompatiblePropType(cfnName: string, prop: Property) {
-    // The use of the `cdk.CfnTag[]` type originally derived from the typing of
-    // a property as the intrinsic 'List<Tag>' in the CloudFormation specification.
-    const baseType = this.legacyTagTypeProperties.has(cfnName) ? TAG_ARRAY_TYPE : this.converter.typeFromProperty(prop);
+    const baseType = this.converter.typeFromProperty(prop);
 
     // Whether or not a property is made `IResolvable` originally depended on
     // the name of the property. These conditions were probably expected to coincide,
