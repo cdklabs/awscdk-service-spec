@@ -2245,7 +2245,7 @@ export namespace CfnCapacityReservation {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-capacityreservation-tagspecification.html#cfn-ec2-capacityreservation-tagspecification-tags
      */
-    readonly tags?: Array<cdk.IResolvable | CfnCapacityReservation.TagProperty> | cdk.IResolvable;
+    readonly tags?: Array<CfnCapacityReservation.TagProperty>;
   }
 
   /**
@@ -2728,7 +2728,7 @@ export namespace CfnCapacityReservationFleet {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-capacityreservationfleet-tagspecification.html#cfn-ec2-capacityreservationfleet-tagspecification-tags
      */
-    readonly tags?: Array<cdk.IResolvable | CfnCapacityReservationFleet.TagProperty> | cdk.IResolvable;
+    readonly tags?: Array<CfnCapacityReservationFleet.TagProperty>;
   }
 
   /**
@@ -3777,7 +3777,7 @@ export namespace CfnClientVpnEndpoint {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-clientvpnendpoint-tagspecification.html#cfn-ec2-clientvpnendpoint-tagspecification-tags
      */
-    readonly tags: Array<cdk.IResolvable | CfnClientVpnEndpoint.TagProperty> | cdk.IResolvable;
+    readonly tags: Array<CfnClientVpnEndpoint.TagProperty>;
   }
 
   /**
@@ -5796,7 +5796,7 @@ export namespace CfnEC2Fleet {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-ec2fleet-tagspecification.html#cfn-ec2-ec2fleet-tagspecification-tags
      */
-    readonly tags?: Array<cdk.IResolvable | CfnEC2Fleet.TagProperty> | cdk.IResolvable;
+    readonly tags?: Array<CfnEC2Fleet.TagProperty>;
   }
 
   /**
@@ -15031,7 +15031,7 @@ export namespace CfnLaunchTemplate {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-launchtemplate-tagspecification.html#cfn-ec2-launchtemplate-tagspecification-tags
      */
-    readonly tags?: Array<cdk.IResolvable | CfnLaunchTemplate.TagProperty> | cdk.IResolvable;
+    readonly tags?: Array<CfnLaunchTemplate.TagProperty>;
   }
 
   /**
@@ -16537,7 +16537,7 @@ export namespace CfnLaunchTemplate {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-launchtemplate-launchtemplatetagspecification.html#cfn-ec2-launchtemplate-launchtemplatetagspecification-tags
      */
-    readonly tags?: Array<cdk.IResolvable | CfnLaunchTemplate.TagProperty> | cdk.IResolvable;
+    readonly tags?: Array<CfnLaunchTemplate.TagProperty>;
   }
 }
 
@@ -28093,7 +28093,7 @@ export namespace CfnSpotFleet {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-spotfleet-spotfleettagspecification.html#cfn-ec2-spotfleet-spotfleettagspecification-tags
      */
-    readonly tags?: Array<cdk.IResolvable | CfnSpotFleet.TagProperty> | cdk.IResolvable;
+    readonly tags?: Array<CfnSpotFleet.TagProperty>;
   }
 
   /**
@@ -52423,7 +52423,7 @@ export namespace CfnSchedule {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-ecsparameters.html#cfn-scheduler-schedule-ecsparameters-tags
      */
-    readonly tags?: Array<cdk.IResolvable | Record<string, string>> | cdk.IResolvable;
+    readonly tags?: Array<Record<string, string>>;
 
     /**
      * The number of tasks to create based on \`TaskDefinition\` .

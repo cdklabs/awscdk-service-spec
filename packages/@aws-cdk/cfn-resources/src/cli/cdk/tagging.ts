@@ -1,5 +1,16 @@
 import { Resource, TagInformation, TagVariant } from '@aws-cdk/service-spec';
 
+/**
+ * Property names that were not extended with the IResolvable type because they were considered to be tags
+ */
+export const NON_RESOLVABLE_PROPERTY_NAMES = {
+  FileSystemTags: '',
+  HostedZoneTags: '',
+  Tags: '',
+  UserPoolTags: '',
+  AccessPointTags: '',
+};
+
 export type TaggabilityStyle =
   | { readonly style: 'legacy'; readonly tagPropertyName: string; readonly variant: TagVariant }
   | { readonly style: 'modern'; readonly tagPropertyName: string; readonly variant: TagVariant };

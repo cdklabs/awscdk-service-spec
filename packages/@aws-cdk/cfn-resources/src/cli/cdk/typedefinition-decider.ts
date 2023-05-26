@@ -1,6 +1,7 @@
 import { Property, Resource, TypeDefinition } from '@aws-cdk/service-spec';
 import { PropertySpec, Type } from '@cdklabs/typewriter';
 import { deprecationMessage } from './resource-decider';
+import { NON_RESOLVABLE_PROPERTY_NAMES } from './tagging';
 import { TypeConverter } from './type-converter';
 import { PropertyMapping } from '../cloudformation-mapping';
 import { propertyNameFromCloudFormation } from '../naming/conventions';
@@ -34,7 +35,11 @@ export class TypeDefinitionDecider {
   private handlePropertyDefault(cfnName: string, prop: Property) {
     const name = propertyNameFromCloudFormation(cfnName);
     const baseType = this.converter.typeFromProperty(prop);
-    const type = this.converter.makeTypeResolvable(baseType);
+
+    // Whether or not a property is made `IResolvable` originally depended on
+    // the name of the property. These conditions were probably expected to coincide,
+    // but didn't.
+    const type = cfnName in NON_RESOLVABLE_PROPERTY_NAMES ? baseType : this.converter.makeTypeResolvable(baseType);
     const optional = !prop.required;
 
     this.properties.push({

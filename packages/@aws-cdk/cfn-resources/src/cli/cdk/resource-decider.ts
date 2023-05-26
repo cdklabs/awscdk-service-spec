@@ -1,7 +1,7 @@
 import { Deprecation, Property, Resource, SpecDatabase, TagVariant } from '@aws-cdk/service-spec';
 import { $E, $T, Expression, PropertySpec, Type, expr } from '@cdklabs/typewriter';
 import { CDK_CORE } from './cdk';
-import { TaggabilityStyle, resourceTaggabilityStyle } from './tagging';
+import { NON_RESOLVABLE_PROPERTY_NAMES, TaggabilityStyle, resourceTaggabilityStyle } from './tagging';
 import { TypeConverter } from './type-converter';
 import { PropertyMapping } from '../cloudformation-mapping';
 import { attributePropertyName, propertyNameFromCloudFormation } from '../naming/conventions';
@@ -248,14 +248,6 @@ export class ResourceDecider {
    *   property names.
    */
   private legacyCompatiblePropType(cfnName: string, prop: Property) {
-    const tagPropertyNames = {
-      FileSystemTags: '',
-      HostedZoneTags: '',
-      Tags: '',
-      UserPoolTags: '',
-      AccessPointTags: '',
-    };
-
     // The use of the `cdk.CfnTag[]` type originally derived from the typing of
     // a property as the intrinsic 'List<Tag>' in the CloudFormation specification.
     const baseType = this.legacyTagTypeProperties.has(cfnName) ? TAG_ARRAY_TYPE : this.converter.typeFromProperty(prop);
@@ -263,7 +255,7 @@ export class ResourceDecider {
     // Whether or not a property is made `IResolvable` originally depended on
     // the name of the property. These conditions were probably expected to coincide,
     // but didn't.
-    const type = cfnName in tagPropertyNames ? baseType : this.converter.makeTypeResolvable(baseType);
+    const type = cfnName in NON_RESOLVABLE_PROPERTY_NAMES ? baseType : this.converter.makeTypeResolvable(baseType);
 
     return { type, baseType };
   }
