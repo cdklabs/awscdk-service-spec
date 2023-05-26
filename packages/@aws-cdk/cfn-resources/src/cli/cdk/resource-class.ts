@@ -1,11 +1,10 @@
-import { Attribute, PropertyType, Resource } from '@aws-cdk/service-spec';
+import { PropertyType, Resource, SpecDatabase } from '@aws-cdk/service-spec';
 import {
   $E,
   $T,
   Block,
   ClassType,
   expr,
-  Expression,
   MemberVisibility,
   IScope,
   stmt,
@@ -19,15 +18,18 @@ import {
   Lambda,
   Stability,
   ObjectLiteral,
-  Property,
+  Module,
 } from '@cdklabs/typewriter';
 import { CDK_CORE, CONSTRUCTS } from './cdk';
+import { ResourceDecider } from './resource-decider';
+import { TypeConverter } from './type-converter';
+import { CloudFormationMapping } from '../cloudformation-mapping';
 import {
-  attributePropertyName,
   classNameFromResource,
   cfnParserNameFromType,
   staticResourceTypeName,
   cfnProducerNameFromType,
+  propStructNameFromResource,
   staticRequiredTransform,
 } from '../naming/conventions';
 import { cloudFormationDocLink } from '../naming/doclink';
@@ -37,98 +39,111 @@ export interface ITypeHost {
   typeFromSpecType(type: PropertyType): Type;
 }
 
-export interface ResourceClassSpec {
-  propsType: StructType;
-}
+// This convenience typewriter builder is used all over the place
+const $this = $E(expr.this_());
 
 export class ResourceClass extends ClassType {
-  private _propsType?: StructType;
+  private readonly propsType: StructType;
+  private readonly decider: ResourceDecider;
+  private readonly module: Module;
 
-  constructor(scope: IScope, private readonly res: Resource, suffix?: string) {
+  constructor(scope: IScope, db: SpecDatabase, private readonly resource: Resource, private readonly suffix?: string) {
     super(scope, {
       export: true,
-      name: classNameFromResource(res, suffix),
+      name: classNameFromResource(resource, suffix),
       docs: {
-        ...splitDocumentation(res.documentation),
+        ...splitDocumentation(resource.documentation),
         stability: Stability.External,
         see: cloudFormationDocLink({
-          resourceType: res.cloudFormationType,
+          resourceType: resource.cloudFormationType,
         }),
       },
       extends: CDK_CORE.CfnResource,
-      implements: [CDK_CORE.IInspectable, ...(res.tagPropertyName !== undefined ? [CDK_CORE.ITaggable] : [])],
+      implements: [CDK_CORE.IInspectable, ...ResourceDecider.taggabilityInterfaces(resource)],
     });
+
+    this.module = Module.of(this);
+
+    this.propsType = new StructType(this.scope, {
+      export: true,
+      name: propStructNameFromResource(this.resource, this.suffix),
+      docs: {
+        summary: `Properties for defining a \`${classNameFromResource(this.resource)}\``,
+        stability: Stability.External,
+        see: cloudFormationDocLink({
+          resourceType: this.resource.cloudFormationType,
+        }),
+      },
+    });
+
+    const converter = TypeConverter.forResource({
+      db: db,
+      resource: this.resource,
+      resourceClass: this,
+    });
+
+    this.decider = new ResourceDecider(this.resource, converter);
   }
 
-  private get propsType(): StructType {
-    if (!this._propsType) {
-      throw new Error('_propsType must be set before calling this method');
+  /**
+   * Build the elements of the Resource Class and the props type
+   */
+  public build() {
+    // Build the props type
+    const cfnMapping = new CloudFormationMapping(this.module);
+
+    for (const prop of this.decider.propsProperties) {
+      this.propsType.addProperty(prop.propertySpec);
+      cfnMapping.add(prop.cfnMapping);
     }
-    return this._propsType;
-  }
 
-  public buildMembers(propsType: StructType) {
-    this._propsType = propsType;
-
+    // Build the members of this class
     this.addProperty({
       name: staticResourceTypeName(),
       immutable: true,
       static: true,
       type: Type.STRING,
-      initializer: expr.lit(this.res.cloudFormationType),
+      initializer: expr.lit(this.resource.cloudFormationType),
       docs: {
         summary: 'The CloudFormation resource type name for this resource class.',
       },
     });
 
-    if (this.res.cloudFormationTransform) {
+    this.makeFromCloudFormationFactory();
+
+    if (this.resource.cloudFormationTransform) {
       this.addProperty({
         name: staticRequiredTransform(),
         immutable: true,
         static: true,
         type: Type.STRING,
-        initializer: expr.lit(this.res.cloudFormationTransform),
+        initializer: expr.lit(this.resource.cloudFormationTransform),
         docs: {
           summary: 'The `Transform` a template must use in order to use this resource',
         },
       });
     }
 
-    this.addFromCloudFormationFactory(propsType);
-
-    // Attributes
-    for (const { attrName, name, type, attr } of this.mappableAttributes()) {
-      this.addProperty({
-        name,
-        type,
-        immutable: true,
-        docs: {
-          summary: attr.documentation,
-          remarks: [`@cloudformationAttribute ${attrName}`].join('\n'),
-        },
-      });
+    for (const prop of this.decider.classAttributeProperties) {
+      this.addProperty(prop.propertySpec);
     }
 
-    // Copy properties onto class properties
-    for (const { name, memberOptional, memberType, memberImmutable, docsSummary } of this.mappableProperties()) {
-      this.addProperty({
-        name: name,
-        type: memberType,
-        optional: memberOptional,
-        immutable: memberImmutable,
-        docs: {
-          summary: docsSummary,
-        },
-      });
+    for (const prop of this.decider.classProperties) {
+      this.addProperty(prop.propertySpec);
     }
 
+    // Copy properties onto class and props type
     this.makeConstructor();
     this.makeInspectMethod();
     this.makeCfnProperties();
     this.makeRenderProperties();
+
+    // Make converter functions for the props type
+    cfnMapping.makeCfnProducer(this.module, this.propsType);
+    cfnMapping.makeCfnParser(this.module, this.propsType);
   }
 
-  private addFromCloudFormationFactory(propsType: StructType) {
+  private makeFromCloudFormationFactory() {
     const factory = this.addMethod({
       name: '_fromCloudFormation',
       static: true,
@@ -159,7 +174,7 @@ export class ResourceClass extends ClassType {
     const propsResult = $E(expr.ident('propsResult'));
     const ret = $E(expr.ident('ret'));
 
-    const reverseMapper = expr.ident(cfnParserNameFromType(propsType));
+    const reverseMapper = expr.ident(cfnParserNameFromType(this.propsType));
 
     factory.addBody(
       stmt.assign(resourceAttributes, new TruthyOr(resourceAttributes, expr.lit({}))),
@@ -188,7 +203,7 @@ export class ResourceClass extends ClassType {
     // Ctor
     const init = this.addInitializer({
       docs: {
-        summary: `Create a new \`${this.res.cloudFormationType}\`.`,
+        summary: `Create a new \`${this.resource.cloudFormationType}\`.`,
       },
     });
     const _scope = init.addParameter({
@@ -210,8 +225,6 @@ export class ResourceClass extends ClassType {
       default: hasRequiredProps ? undefined : new ObjectLiteral([]),
     });
 
-    const $this = $E(expr.this_());
-
     init.addBody(
       new SuperInitializer(
         _scope,
@@ -225,26 +238,30 @@ export class ResourceClass extends ClassType {
       stmt.sep(),
 
       // Validate required properties
-      ...this.mappableProperties()
-        .filter(({ validateRequired }) => validateRequired)
-        .map(({ name }) => CDK_CORE.requireProperty(props, expr.lit(name), $this)),
+      ...this.decider.propsProperties
+        .filter(({ validateRequiredInConstructor }) => validateRequiredInConstructor)
+        .map(({ propertySpec: { name } }) => CDK_CORE.requireProperty(props, expr.lit(name), $this)),
 
       stmt.sep(),
     );
 
-    if (this.res.cloudFormationTransform) {
+    if (this.resource.cloudFormationTransform) {
       init.addBody($this.stack.addTransform($T(this.type)[staticRequiredTransform()]), stmt.sep());
     }
 
     init.addBody(
       // Attributes
-      ...this.mappableAttributes().map(({ name, tokenizer }) => stmt.assign($this[name], tokenizer)),
+      ...this.decider.classAttributeProperties.map(({ propertySpec: { name }, initializer }) =>
+        stmt.assign($this[name], initializer),
+      ),
 
       // Props
-      ...this.mappableProperties().map(({ name, initializer }) => stmt.assign($this[name], initializer(props))),
+      ...this.decider.classProperties.map(({ propertySpec: { name }, initializer }) =>
+        stmt.assign($this[name], initializer(props)),
+      ),
     );
 
-    if (this.res.isStateful) {
+    if (this.resource.isStateful) {
       this.addDeletionPolicyCheck(init);
     }
   }
@@ -285,7 +302,9 @@ export class ResourceClass extends ClassType {
       getterBody: Block.with(
         stmt.ret(
           expr.object(
-            Object.fromEntries(this.mappableProperties().map(({ name, valueToRender }) => [name, valueToRender])),
+            Object.fromEntries(
+              this.decider.classProperties.flatMap(({ cfnValueToRender }) => Object.entries(cfnValueToRender)),
+            ),
           ),
         ),
       ),
@@ -310,99 +329,6 @@ export class ResourceClass extends ClassType {
     m.addBody(stmt.ret($E(expr.ident(cfnProducerNameFromType(this.propsType)))(props)));
   }
 
-  private mappableAttributes(): Array<{
-    /** The name of the CloudFormation attribute */
-    attrName: string;
-    attr: Attribute;
-    /** The name of the property used in generated code */
-    name: string;
-    type: Type;
-    tokenizer: Expression;
-  }> {
-    const $this = $E(expr.this_());
-    const $ResolutionTypeHint = $T(CDK_CORE.ResolutionTypeHint);
-
-    return Object.entries(this.res.attributes)
-      .map(([attrName, attr]) => {
-        let type: Type | undefined;
-        let tokenizer: Expression | undefined;
-
-        if (attr.type.type === 'string') {
-          type = Type.STRING;
-          tokenizer = CDK_CORE.tokenAsString($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.STRING));
-        } else if (attr.type.type === 'integer') {
-          type = Type.NUMBER;
-          tokenizer = CDK_CORE.tokenAsNumber($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.NUMBER));
-        } else if (attr.type.type === 'number') {
-          // COMPAT: Although numbers/doubles could be represented as numbers, historically in cfn2ts they were represented as IResolvable.
-          type = CDK_CORE.IResolvable;
-          tokenizer = $this.getAtt(expr.lit(attrName), $ResolutionTypeHint.NUMBER);
-        } else if (attr.type.type === 'array' && attr.type.element.type === 'string') {
-          type = Type.arrayOf(Type.STRING);
-          tokenizer = CDK_CORE.tokenAsList($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.STRING_LIST));
-        }
-
-        return {
-          attrName,
-          attr,
-          name: attributePropertyName(attrName),
-          type: type ?? CDK_CORE.IResolvable,
-          tokenizer: tokenizer ?? $this.getAtt(expr.lit(attrName)),
-        };
-      })
-      .sort((a1, a2) => a1.name.localeCompare(a2.name));
-  }
-
-  private mappableProperties(): Array<{
-    name: string;
-    memberOptional: boolean;
-    validateRequired: boolean;
-    memberImmutable: boolean;
-    memberType: Type;
-    initializer: (props: Expression) => Expression;
-    valueToRender: Expression;
-    docsSummary?: string;
-  }> {
-    const $this = $E(expr.this_());
-    return this.propsType.properties
-      .map((prop) => {
-        // FIXME: Would be nicer to thread this value through
-        const tagType = isTagType(this.res, prop.name);
-
-        if (tagType) {
-          return {
-            // The property must be called 'tags' for the resource to count as ITaggable
-            name: 'tags',
-            memberOptional: false,
-            validateRequired: false,
-            memberImmutable: true,
-            memberType: CDK_CORE.TagManager,
-            initializer: (props: Expression) =>
-              new CDK_CORE.TagManager(
-                translateTagType(this.res, prop),
-                expr.lit(this.res.cloudFormationType),
-                prop.from(props),
-                expr.object({ tagPropertyName: expr.lit(prop.name) }),
-              ),
-            valueToRender: $this.tags.renderTags(),
-            docsSummary: prop.docs?.summary,
-          };
-        }
-
-        return {
-          name: prop.name,
-          memberOptional: prop.optional,
-          validateRequired: !prop.optional,
-          memberImmutable: false,
-          memberType: prop.type,
-          initializer: (props: Expression) => prop.from(props),
-          valueToRender: $this[prop.name],
-          docsSummary: prop.docs?.summary,
-        };
-      })
-      .sort((p1, p2) => p1.name.localeCompare(p2.name));
-  }
-
   /**
    * Add a validation to ensure that this resource has a deletionPolicy
    *
@@ -417,15 +343,13 @@ export class ResourceClass extends ClassType {
    *   templates that don't have DeletionPolicy set.
    */
   private addDeletionPolicyCheck(init: Initializer) {
-    const $this = $E(expr.this_());
-
     const validator = new AnonymousInterfaceImplementation({
       validate: new Lambda(
         [],
         expr.cond(
           expr.eq($this.cfnOptions.deletionPolicy, expr.UNDEFINED),
           expr.lit([
-            `'${this.res.cloudFormationType}' is a stateful resource type, and you must specify a Removal Policy for it. Call 'resource.applyRemovalPolicy()'.`,
+            `'${this.resource.cloudFormationType}' is a stateful resource type, and you must specify a Removal Policy for it. Call 'resource.applyRemovalPolicy()'.`,
           ]),
           expr.lit([]),
         ),
@@ -438,37 +362,4 @@ export class ResourceClass extends ClassType {
         .then(Block.with($this.node.addValidation(validator))),
     );
   }
-}
-
-/**
- * Translates a TagVariant to the core.TagType enum
- */
-function translateTagType(resource: Resource, prop: Property) {
-  if (resource.cloudFormationType === 'AWS::AutoScaling::AutoScalingGroup') {
-    return CDK_CORE.TagType.AUTOSCALING_GROUP;
-  }
-
-  if (prop.type.mapOfType) {
-    return CDK_CORE.TagType.MAP;
-  }
-
-  return CDK_CORE.TagType.STANDARD;
-}
-
-/**
- * For a given resource and property, if the property is the resource's tag property,
- * returns the tag type for the property.
- *
- * Returns `undefined` otherwise.
- */
-function isTagType(_resource: Resource, propName: string): boolean {
-  const tagPropertyNames = {
-    fileSystemTags: '',
-    hostedZoneTags: '',
-    tags: '',
-    userPoolTags: '',
-    accessPointTags: '',
-  };
-
-  return propName in tagPropertyNames;
 }

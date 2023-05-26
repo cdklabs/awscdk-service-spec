@@ -5,6 +5,7 @@ import {
   ResourceProperties,
   Service,
   SpecDatabase,
+  TagVariant,
   TypeDefinition,
 } from '@aws-cdk/service-spec';
 import {
@@ -174,10 +175,13 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
           case 'array':
             // FIXME: insertionOrder, uniqueItems
-            return using(schemaTypeToModelType(nameHint, resolve(resolvedSchema.items ?? true), fail), (element) => ({
-              type: 'array',
-              element,
-            }));
+            return using(
+              schemaTypeToModelType(collectionNameHint(nameHint), resolve(resolvedSchema.items ?? true), fail),
+              (element) => ({
+                type: 'array',
+                element,
+              }),
+            );
 
           case 'boolean':
             return { type: 'boolean' };
@@ -202,10 +206,12 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
   function schemaObjectToModelType(nameHint: string, schema: jsonschema.Object, fail: Fail): Result<PropertyType> {
     if (jsonschema.isMapLikeObject(schema)) {
+      const innerNameHint = collectionNameHint(nameHint);
+
       // Map type -- if we have 'additionalProperties', we will use that as the type of everything
       // (and assume it subsumes patterned types).
       if (schema.additionalProperties) {
-        return using(schemaTypeToModelType(nameHint, resolve(schema.additionalProperties), fail), (element) => ({
+        return using(schemaTypeToModelType(innerNameHint, resolve(schema.additionalProperties), fail), (element) => ({
           type: 'map',
           element,
         }));
@@ -215,7 +221,10 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         );
 
         return using(unifiedPatternProps, (unifiedType) =>
-          using(schemaTypeToModelType(nameHint, resolve(unifiedType), fail), (element) => ({ type: 'map', element })),
+          using(schemaTypeToModelType(innerNameHint, resolve(unifiedType), fail), (element) => ({
+            type: 'map',
+            element,
+          })),
         );
       } else if (!jsonschema.resolvedReference(schema)) {
         // Fully untyped map that's not a type
@@ -325,19 +334,18 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
           report.reportFailure('interpreting', fail(`marked as taggable, but tagProperty does not exist: ${tagProp}`));
         } else {
           const resolvedType = resolve(tagType);
-          res.tagPropertyName = tagProp;
-          const original = res.properties[tagProp].type;
-          res.properties[tagProp].type = { type: 'tag', variant: 'standard', original };
 
+          let variant: TagVariant = 'standard';
           if (res.cloudFormationType === 'AWS::AutoScaling::AutoScalingGroup') {
-            res.properties[tagProp].type = {
-              type: 'tag',
-              variant: 'asg',
-              original,
-            };
+            variant = 'asg';
           } else if (jsonschema.isObject(resolvedType) && jsonschema.isMapLikeObject(resolvedType)) {
-            res.properties[tagProp].type = { type: 'tag', variant: 'map', original };
+            variant = 'map';
           }
+
+          res.tagInformation = {
+            tagPropertyName: tagProp,
+            variant,
+          };
         }
       }
     });
@@ -468,6 +476,13 @@ function findAttributes(resource: CloudFormationRegistryResource): string[] {
  */
 function attributeNameToPropertyName(name: string) {
   return name.split('.').join('');
+}
+
+/**
+ * Turn the namehint into a namehint for collections
+ */
+function collectionNameHint(nameHint: string) {
+  return `${nameHint}Items`;
 }
 
 interface RequiredContainer {

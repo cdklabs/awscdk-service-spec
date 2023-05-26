@@ -160,7 +160,8 @@ export class RichScope {
     if (ownType) {
       return ownType;
     }
-    throw new Error(`Type '${fqn}' not found in ${this}`);
+    debugger;
+    throw new Error(`Type '${fqn}' not found in ${this.scope}`);
   }
 
   /**
