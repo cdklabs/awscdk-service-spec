@@ -64,11 +64,18 @@ jobs:
   jsii-diff:
     needs: test-with-new-codegen
     runs-on: awscdk-service-spec_ubuntu-latest_32-core
-    permissions: {}
+    permissions:
+      contents: read
     env:
       CI: "1"
       NODE_OPTIONS: --max-old-space-size=8196
     steps:
+      - name: Checkout awscdk-service-spec
+        uses: actions/checkout@v3
+        with:
+          path: awscdk-service-spec
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
       - name: Download aws-cdk-lib-candidate
         uses: actions/download-artifact@v3
         with:
@@ -80,4 +87,4 @@ jobs:
       - name: Install jsii-diff
         run: npm install jsii-diff
       - name: Compare current and candidate spec
-        run: npx jsii-diff --verbose --keys --error-on=non-experimental npm:aws-cdk-lib@latest aws-cdk-lib-candidate
+        run: npx jsii-diff --verbose --keys --ignore-file=awscdk-service-spec/packages/@aws-cdk/cfn2ts/.jsiidiffignore --error-on=non-experimental npm:aws-cdk-lib@latest aws-cdk-lib-candidate

@@ -1,6 +1,7 @@
 import * as pj from 'projen';
 import { yarn } from 'cdklabs-projen-project-types';
 import path from 'path';
+import { JobPermission } from 'projen/lib/github/workflows-model';
 
 export class AwsCdkIntegrationTest extends pj.Component {
   public constructor(project: yarn.TypeScriptWorkspace) {
@@ -66,14 +67,30 @@ export class AwsCdkIntegrationTest extends pj.Component {
      * @TODO Separate job for now because this it is failing
      * Once it passes, this should be merged with the main job above
      */
+    const diffIgnoreFile = path.join(
+      project.root.name,
+      path.relative(project.root.outdir, project.outdir),
+      '.jsiidiffignore',
+    );
     workflow.addJob('jsii-diff', {
       needs: [candidateSpecJobName],
       runsOn,
       env: {
         ...awsCdkLibEnv(),
       },
-      permissions: {},
+      permissions: {
+        contents: JobPermission.READ,
+      },
       steps: [
+        {
+          name: `Checkout ${root.name}`,
+          uses: 'actions/checkout@v3',
+          with: {
+            path: root.name,
+            ref: '${{ github.event.pull_request.head.ref }}',
+            repository: '${{ github.event.pull_request.head.repo.full_name }}',
+          },
+        },
         ...specFromArtifact(candidateSpec),
         {
           name: `Install jsii-diff`,
@@ -81,7 +98,7 @@ export class AwsCdkIntegrationTest extends pj.Component {
         },
         {
           name: `Compare current and candidate spec`,
-          run: `npx jsii-diff --verbose --keys --error-on=non-experimental npm:aws-cdk-lib@latest ${candidateSpec}`,
+          run: `npx jsii-diff --verbose --keys --ignore-file=${diffIgnoreFile} --error-on=non-experimental npm:aws-cdk-lib@latest ${candidateSpec}`,
         },
       ],
     });
