@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { combineLoadResults, Loader, LoadResult, mapLoadResult } from './loader';
-import { CloudFormationResourceSpecification } from '../types';
 import { applyPatchSet } from '../patching/json-patch-set';
+import { CloudFormationResourceSpecification } from '../types';
 
 export async function loadDefaultResourceSpecification(
   mustValidate = true,

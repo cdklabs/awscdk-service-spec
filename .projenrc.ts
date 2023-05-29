@@ -42,7 +42,7 @@ const serviceSpecSources = new TypeScriptWorkspace({
   parent: repo,
   name: '@aws-cdk/service-spec-sources',
   description: 'Sources for the service spec',
-  deps: ['ajv', 'glob', tsKb, 'fast-json-patch', 'canonicalize'],
+  deps: ['ajv', 'glob', tsKb, 'fast-json-patch', 'canonicalize', 'fs-extra'],
   devDeps: ['ts-json-schema-generator', '@types/glob', 'ajv-cli'],
   private: true,
 });

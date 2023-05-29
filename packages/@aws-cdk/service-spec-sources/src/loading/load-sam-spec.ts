@@ -1,8 +1,8 @@
 import * as path from 'path';
 import { assertSuccess } from '@cdklabs/tskb';
 import { Loader, LoadResult } from './loader';
-import { SAMResourceSpecification } from '../types';
 import { applyPatchSet } from '../patching/json-patch-set';
+import { SAMResourceSpecification } from '../types';
 
 /**
  * Load the old SAM spec (CloudFormation spec + extensions)
