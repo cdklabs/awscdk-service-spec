@@ -395,6 +395,22 @@ export namespace CfnRestApi {
      */
     readonly vpcEndpointIds?: Array<string>;
   }
+
+  /**
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-tag.html
+   */
+  export interface TagProperty {
+    /**
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-tag.html#cfn-apigateway-restapi-tag-key
+     */
+    readonly key: string;
+
+    /**
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-apigateway-restapi-tag.html#cfn-apigateway-restapi-tag-value
+     */
+    readonly value: string;
+  }
 }
 
 /**
@@ -637,6 +653,53 @@ function CfnRestApiEndpointConfigurationPropertyFromCloudFormation(properties: a
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnRestApi.EndpointConfigurationProperty>();
   ret.addPropertyResult("types", "Types", (properties.Types != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.Types) : undefined));
   ret.addPropertyResult("vpcEndpointIds", "VpcEndpointIds", (properties.VpcEndpointIds != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.VpcEndpointIds) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
+}
+
+/**
+ * Determine whether the given properties match those of a \`TagProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`TagProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnRestApiTagPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
+  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
+  errors.collect(cdk.propertyValidator("value", cdk.requiredValidator)(properties.value));
+  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
+  return errors.wrap("supplied properties not correct for \\"TagProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnRestApiTagPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnRestApiTagPropertyValidator(properties).assertSuccess();
+  return {
+    "Key": cdk.stringToCloudFormation(properties.key),
+    "Value": cdk.stringToCloudFormation(properties.value)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnRestApiTagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnRestApi.TagProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnRestApi.TagProperty>();
+  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
+  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -930,6 +993,32 @@ export namespace CfnRole {
      */
     readonly policyName: string;
   }
+
+  /**
+   * A key-value pair to associate with a resource.
+   *
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-tag.html
+   */
+  export interface TagProperty {
+    /**
+     * The key name of the tag.
+     *
+     * You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-tag.html#cfn-iam-role-tag-key
+     */
+    readonly key: string;
+
+    /**
+     * The value for the tag.
+     *
+     * You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-iam-role-tag.html#cfn-iam-role-tag-value
+     */
+    readonly value: string;
+  }
 }
 
 /**
@@ -1081,6 +1170,53 @@ function CfnRolePolicyPropertyFromCloudFormation(properties: any): cfn_parse.Fro
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnRole.PolicyProperty>();
   ret.addPropertyResult("policyDocument", "PolicyDocument", (properties.PolicyDocument != null ? cfn_parse.FromCloudFormation.getTypeUnion([cdk.validateObject, cdk.validateString], [cfn_parse.FromCloudFormation.getAny, cfn_parse.FromCloudFormation.getString])(properties.PolicyDocument) : undefined));
   ret.addPropertyResult("policyName", "PolicyName", (properties.PolicyName != null ? cfn_parse.FromCloudFormation.getString(properties.PolicyName) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
+}
+
+/**
+ * Determine whether the given properties match those of a \`TagProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`TagProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnRoleTagPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
+  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
+  errors.collect(cdk.propertyValidator("value", cdk.requiredValidator)(properties.value));
+  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
+  return errors.wrap("supplied properties not correct for \\"TagProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnRoleTagPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnRoleTagPropertyValidator(properties).assertSuccess();
+  return {
+    "Key": cdk.stringToCloudFormation(properties.key),
+    "Value": cdk.stringToCloudFormation(properties.value)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnRoleTagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnRole.TagProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnRole.TagProperty>();
+  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
+  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -1932,6 +2068,30 @@ export namespace CfnFunction {
   }
 
   /**
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-tag.html
+   */
+  export interface TagProperty {
+    /**
+     * The key name of the tag.
+     *
+     * You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-tag.html#cfn-lambda-function-tag-key
+     */
+    readonly key: string;
+
+    /**
+     * The value for the tag.
+     *
+     * You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-tag.html#cfn-lambda-function-tag-value
+     */
+    readonly value?: string;
+  }
+
+  /**
    * Configuration values that override the container image Dockerfile settings.
    *
    * For more information, see [Container image settings](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-parms) .
@@ -2520,6 +2680,52 @@ function CfnFunctionFileSystemConfigPropertyFromCloudFormation(properties: any):
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.FileSystemConfigProperty>();
   ret.addPropertyResult("arn", "Arn", (properties.Arn != null ? cfn_parse.FromCloudFormation.getString(properties.Arn) : undefined));
   ret.addPropertyResult("localMountPath", "LocalMountPath", (properties.LocalMountPath != null ? cfn_parse.FromCloudFormation.getString(properties.LocalMountPath) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
+}
+
+/**
+ * Determine whether the given properties match those of a \`TagProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`TagProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnFunctionTagPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
+  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
+  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
+  return errors.wrap("supplied properties not correct for \\"TagProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnFunctionTagPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnFunctionTagPropertyValidator(properties).assertSuccess();
+  return {
+    "Key": cdk.stringToCloudFormation(properties.key),
+    "Value": cdk.stringToCloudFormation(properties.value)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnFunctionTagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnFunction.TagProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.TagProperty>();
+  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
+  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -4089,6 +4295,32 @@ export namespace CfnDBCluster {
   }
 
   /**
+   * A key-value pair to associate with a resource.
+   *
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-tag.html
+   */
+  export interface TagProperty {
+    /**
+     * The key name of the tag.
+     *
+     * You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-tag.html#cfn-rds-dbcluster-tag-key
+     */
+    readonly key: string;
+
+    /**
+     * The value for the tag.
+     *
+     * You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-tag.html#cfn-rds-dbcluster-tag-value
+     */
+    readonly value?: string;
+  }
+
+  /**
    * Specifies the connection endpoint for the primary instance of the DB cluster.
    *
    * @struct
@@ -5104,6 +5336,52 @@ function CfnDBClusterScalingConfigurationPropertyFromCloudFormation(properties: 
   ret.addPropertyResult("secondsBeforeTimeout", "SecondsBeforeTimeout", (properties.SecondsBeforeTimeout != null ? cfn_parse.FromCloudFormation.getNumber(properties.SecondsBeforeTimeout) : undefined));
   ret.addPropertyResult("secondsUntilAutoPause", "SecondsUntilAutoPause", (properties.SecondsUntilAutoPause != null ? cfn_parse.FromCloudFormation.getNumber(properties.SecondsUntilAutoPause) : undefined));
   ret.addPropertyResult("timeoutAction", "TimeoutAction", (properties.TimeoutAction != null ? cfn_parse.FromCloudFormation.getString(properties.TimeoutAction) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
+}
+
+/**
+ * Determine whether the given properties match those of a \`TagProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`TagProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnDBClusterTagPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
+  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
+  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
+  return errors.wrap("supplied properties not correct for \\"TagProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnDBClusterTagPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnDBClusterTagPropertyValidator(properties).assertSuccess();
+  return {
+    "Key": cdk.stringToCloudFormation(properties.key),
+    "Value": cdk.stringToCloudFormation(properties.value)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnDBClusterTagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnDBCluster.TagProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnDBCluster.TagProperty>();
+  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
+  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -7350,6 +7628,22 @@ export namespace CfnBucket {
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-ssekmsencryptedobjects.html#cfn-s3-bucket-ssekmsencryptedobjects-status
      */
     readonly status: string;
+  }
+
+  /**
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tag.html
+   */
+  export interface TagProperty {
+    /**
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tag.html#cfn-s3-bucket-tag-key
+     */
+    readonly key: string;
+
+    /**
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tag.html#cfn-s3-bucket-tag-value
+     */
+    readonly value: string;
   }
 
   /**
@@ -10151,6 +10445,53 @@ function CfnBucketReplicationConfigurationPropertyFromCloudFormation(properties:
 }
 
 /**
+ * Determine whether the given properties match those of a \`TagProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`TagProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnBucketTagPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
+  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
+  errors.collect(cdk.propertyValidator("value", cdk.requiredValidator)(properties.value));
+  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
+  return errors.wrap("supplied properties not correct for \\"TagProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnBucketTagPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnBucketTagPropertyValidator(properties).assertSuccess();
+  return {
+    "Key": cdk.stringToCloudFormation(properties.key),
+    "Value": cdk.stringToCloudFormation(properties.value)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnBucketTagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.TagProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnBucket.TagProperty>();
+  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
+  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
+}
+
+/**
  * Determine whether the given properties match those of a \`VersioningConfigurationProperty\`
  *
  * @param properties - the TypeScript properties of a \`VersioningConfigurationProperty\`
@@ -11080,6 +11421,32 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
   }
 }
 
+export namespace CfnQueue {
+  /**
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-tag.html
+   */
+  export interface TagProperty {
+    /**
+     * The key name of the tag.
+     *
+     * You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-tag.html#cfn-sqs-queue-tag-key
+     */
+    readonly key: string;
+
+    /**
+     * The value for the tag.
+     *
+     * You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queue-tag.html#cfn-sqs-queue-tag-value
+     */
+    readonly value: string;
+  }
+}
+
 /**
  * Properties for defining a \`CfnQueue\`
  *
@@ -11272,6 +11639,53 @@ export interface CfnQueueProps {
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-visibilitytimeout
    */
   readonly visibilityTimeout?: number;
+}
+
+/**
+ * Determine whether the given properties match those of a \`TagProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`TagProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnQueueTagPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
+  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
+  errors.collect(cdk.propertyValidator("value", cdk.requiredValidator)(properties.value));
+  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
+  return errors.wrap("supplied properties not correct for \\"TagProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnQueueTagPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnQueueTagPropertyValidator(properties).assertSuccess();
+  return {
+    "Key": cdk.stringToCloudFormation(properties.key),
+    "Value": cdk.stringToCloudFormation(properties.value)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnQueueTagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnQueue.TagProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnQueue.TagProperty>();
+  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
+  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
 }
 
 /**

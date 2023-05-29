@@ -82,9 +82,14 @@ export class TypeConverter {
    * Return the appropriate typewriter type for a servicespec type
    */
   public typeFromProperty(property: Property): Type {
-    const typeHistory = [...(property.previousTypes ?? []), property.type];
+    const typeHistory = [...(property.previousTypes ?? []), property.type]
+      // Mutable call to add all historic types to the module
+      // This is required for backwards compatibility reasons
+      // We currently render all types into the spec
+      .map((t) => this.typeFromSpecType(t));
+
     // For backwards compatibility reasons we always have to use the original type
-    return this.typeFromSpecType(typeHistory[0]);
+    return typeHistory[0];
   }
 
   public typeFromSpecType(type: PropertyType): Type {
