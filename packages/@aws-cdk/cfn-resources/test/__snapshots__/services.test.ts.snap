@@ -23619,6 +23619,11 @@ export class CfnNetworkInterface extends cdk.CfnResource implements cdk.IInspect
   public description?: string;
 
   /**
+   * If you have instances or ENIs that rely on the IPv6 address not changing, to avoid disrupting traffic to instances or ENIs, you can enable a primary IPv6 address.
+   */
+  public enablePrimaryIpv6?: boolean | cdk.IResolvable;
+
+  /**
    * The security group IDs associated with this network interface.
    */
   public groupSet?: Array<string>;
@@ -23690,6 +23695,7 @@ export class CfnNetworkInterface extends cdk.CfnResource implements cdk.IInspect
     this.attrPrimaryPrivateIpAddress = cdk.Token.asString(this.getAtt("PrimaryPrivateIpAddress", cdk.ResolutionTypeHint.STRING));
     this.attrSecondaryPrivateIpAddresses = cdk.Token.asList(this.getAtt("SecondaryPrivateIpAddresses", cdk.ResolutionTypeHint.STRING_LIST));
     this.description = props.description;
+    this.enablePrimaryIpv6 = props.enablePrimaryIpv6;
     this.groupSet = props.groupSet;
     this.interfaceType = props.interfaceType;
     this.ipv6AddressCount = props.ipv6AddressCount;
@@ -23708,6 +23714,7 @@ export class CfnNetworkInterface extends cdk.CfnResource implements cdk.IInspect
   protected get cfnProperties(): Record<string, any> {
     return {
       "description": this.description,
+      "enablePrimaryIpv6": this.enablePrimaryIpv6,
       "groupSet": this.groupSet,
       "interfaceType": this.interfaceType,
       "ipv6AddressCount": this.ipv6AddressCount,
@@ -23791,6 +23798,15 @@ export interface CfnNetworkInterfaceProps {
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-networkinterface.html#cfn-ec2-networkinterface-description
    */
   readonly description?: string;
+
+  /**
+   * If you have instances or ENIs that rely on the IPv6 address not changing, to avoid disrupting traffic to instances or ENIs, you can enable a primary IPv6 address.
+   *
+   * Enable this option to automatically assign an IPv6 associated with the ENI attached to your instance to be the primary IPv6 address. When you enable an IPv6 address to be a primary IPv6, you cannot disable it. Traffic will be routed to the primary IPv6 address until the instance is terminated or the ENI is detached. If you have multiple IPv6 addresses associated with an ENI and you enable a primary IPv6 address, the first IPv6 address associated with the ENI becomes the primary IPv6 address.
+   *
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-networkinterface.html#cfn-ec2-networkinterface-enableprimaryipv6
+   */
+  readonly enablePrimaryIpv6?: boolean | cdk.IResolvable;
 
   /**
    * The security group IDs associated with this network interface.
@@ -23984,6 +24000,7 @@ function CfnNetworkInterfacePropsValidator(properties: any): cdk.ValidationResul
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
   errors.collect(cdk.propertyValidator("description", cdk.validateString)(properties.description));
+  errors.collect(cdk.propertyValidator("enablePrimaryIpv6", cdk.validateBoolean)(properties.enablePrimaryIpv6));
   errors.collect(cdk.propertyValidator("groupSet", cdk.listValidator(cdk.validateString))(properties.groupSet));
   errors.collect(cdk.propertyValidator("interfaceType", cdk.validateString)(properties.interfaceType));
   errors.collect(cdk.propertyValidator("ipv6AddressCount", cdk.validateNumber)(properties.ipv6AddressCount));
@@ -24004,6 +24021,7 @@ function convertCfnNetworkInterfacePropsToCloudFormation(properties: any): any {
   CfnNetworkInterfacePropsValidator(properties).assertSuccess();
   return {
     "Description": cdk.stringToCloudFormation(properties.description),
+    "EnablePrimaryIpv6": cdk.booleanToCloudFormation(properties.enablePrimaryIpv6),
     "GroupSet": cdk.listMapper(cdk.stringToCloudFormation)(properties.groupSet),
     "InterfaceType": cdk.stringToCloudFormation(properties.interfaceType),
     "Ipv6AddressCount": cdk.numberToCloudFormation(properties.ipv6AddressCount),
@@ -24028,6 +24046,7 @@ function CfnNetworkInterfacePropsFromCloudFormation(properties: any): cfn_parse.
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnNetworkInterfaceProps>();
   ret.addPropertyResult("description", "Description", (properties.Description != null ? cfn_parse.FromCloudFormation.getString(properties.Description) : undefined));
+  ret.addPropertyResult("enablePrimaryIpv6", "EnablePrimaryIpv6", (properties.EnablePrimaryIpv6 != null ? cfn_parse.FromCloudFormation.getBoolean(properties.EnablePrimaryIpv6) : undefined));
   ret.addPropertyResult("groupSet", "GroupSet", (properties.GroupSet != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.GroupSet) : undefined));
   ret.addPropertyResult("interfaceType", "InterfaceType", (properties.InterfaceType != null ? cfn_parse.FromCloudFormation.getString(properties.InterfaceType) : undefined));
   ret.addPropertyResult("ipv6AddressCount", "Ipv6AddressCount", (properties.Ipv6AddressCount != null ? cfn_parse.FromCloudFormation.getNumber(properties.Ipv6AddressCount) : undefined));
