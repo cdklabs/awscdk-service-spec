@@ -70,12 +70,6 @@
           },
           "type": "array"
         },
-        "ItemPrimitiveTypes": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
         "ItemType": {
           "type": "string"
         },
@@ -87,6 +81,12 @@
         },
         "PrimitiveItemType": {
           "type": "string"
+        },
+        "PrimitiveItemTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         },
         "PrimitiveType": {
           "type": "string"

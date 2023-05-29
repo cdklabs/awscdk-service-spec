@@ -75,7 +75,7 @@ export namespace resourcespec {
     readonly Types?: string[];
     readonly PrimitiveTypes?: string[];
     readonly ItemTypes?: string[];
-    readonly ItemPrimitiveTypes?: string[];
+    readonly PrimitiveItemTypes?: string[];
     readonly InclusiveItemPattern?: boolean;
     readonly InclusiveItemTypes?: string[];
     readonly InclusivePrimitiveItemTypes?: string[];
