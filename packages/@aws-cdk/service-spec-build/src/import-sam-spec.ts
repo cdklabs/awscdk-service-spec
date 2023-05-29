@@ -1,4 +1,11 @@
-import { PropertyType, Resource, ResourceProperties, SpecDatabase, TypeDefinition } from '@aws-cdk/service-spec';
+import {
+  PropertyType,
+  Resource,
+  ResourceProperties,
+  Service,
+  SpecDatabase,
+  TypeDefinition,
+} from '@aws-cdk/service-spec';
 import { SAMResourceSpecification, resourcespec } from '@aws-cdk/service-spec-sources';
 import { ref } from '@cdklabs/tskb';
 
@@ -29,12 +36,16 @@ export class SAMSpecImporter {
   }
 
   private importResource() {
+    const service = this.createSamService();
+
     const res = this.db.allocate('resource', {
       cloudFormationType: this.resourceName,
       name: last(this.resourceName.split('::')),
       attributes: {},
       properties: {},
     });
+
+    this.db.link('hasResource', service, res);
 
     this.allocateTypeDefs(res);
     this.handleProperties(this.specification.ResourceTypes[this.resourceName].Properties ?? {}, res.properties);
@@ -45,6 +56,15 @@ export class SAMSpecImporter {
         this.handleProperties(propType.Properties ?? {}, typeDef.properties);
       }
     }
+  }
+
+  private createSamService(): Service {
+    return this.db.findOrAllocate('service', 'name', 'equals', {
+      name: 'aws-sam',
+      shortName: 'sam',
+      capitalized: 'SAM',
+      cloudFormationNamespace: 'AWS::Serverless',
+    });
   }
 
   private allocateTypeDefs(resource: Resource) {
