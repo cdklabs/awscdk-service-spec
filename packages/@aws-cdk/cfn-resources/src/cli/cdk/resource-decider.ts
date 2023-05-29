@@ -238,6 +238,14 @@ export class ResourceDecider {
    *   property names.
    */
   private legacyCompatiblePropType(cfnName: string, prop: Property) {
+    // Mutable call to add all historic types to the module
+    // This is required for backwards compatibility reasons
+    // We currently render all types into the spec and need to keep doing that
+    this.converter
+      .typeHistoryFromProperty(prop)
+      .slice(1)
+      .map((t) => this.converter.typeFromSpecType(t));
+
     const baseType = this.converter.typeFromProperty(prop);
 
     // Whether or not a property is made `IResolvable` originally depended on
