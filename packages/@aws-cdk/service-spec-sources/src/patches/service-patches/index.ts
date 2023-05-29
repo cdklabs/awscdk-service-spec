@@ -16,6 +16,7 @@ import './autoscaling';
 import './batch';
 import './codebuild';
 import './cognito';
+import './config';
 import './elasticsearch';
 import './iot1click';
 import './opensearch';
