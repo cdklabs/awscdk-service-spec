@@ -8,6 +8,7 @@ import {
 } from '@aws-cdk/service-spec';
 import { CloudFormationResourceSpecification, resourcespec } from '@aws-cdk/service-spec-sources';
 import { ref } from '@cdklabs/tskb';
+import { readCloudFormationRegistryServiceFromResource } from './import-cloudformation-registry';
 
 export interface ImportResourceSpecOptions {
   readonly db: SpecDatabase;
@@ -36,12 +37,19 @@ export class ResourceSpecImporter {
   }
 
   private importResource() {
+    const service = readCloudFormationRegistryServiceFromResource({
+      db: this.db,
+      resource: { typeName: this.resourceName },
+    });
+
     const res = this.db.allocate('resource', {
       cloudFormationType: this.resourceName,
       name: last(this.resourceName.split('::')),
       attributes: {},
       properties: {},
     });
+
+    this.db.link('hasResource', service, res);
 
     const resourceSpec = this.specification.ResourceTypes[this.resourceName];
 

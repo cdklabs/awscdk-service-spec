@@ -32,7 +32,7 @@ export interface LoadCloudFormationRegistryResourceOptions {
 }
 export interface LoadCloudFormationRegistryServiceFromResourceOptions {
   readonly db: SpecDatabase;
-  readonly resource: CloudFormationRegistryResource;
+  readonly resource: { readonly typeName: string };
   readonly resourceTypeNameSeparator?: string;
 }
 
