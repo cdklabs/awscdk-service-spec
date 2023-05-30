@@ -57,6 +57,8 @@ export class ResourceDecider {
               continue;
             }
         }
+      } else {
+        this.handleTypeHistoryTypes(prop);
       }
 
       this.handlePropertyDefault(name, prop);
@@ -98,6 +100,18 @@ export class ResourceDecider {
       initializer: (props: Expression) => expr.get(props, name),
       cfnValueToRender: { [name]: $this[name] },
     });
+  }
+
+  /**
+   * Emit unused types from type history
+   *
+   * We currently render all types into the spec and need to keep doing that for backwards compatibility.
+   */
+  private handleTypeHistoryTypes(prop: Property) {
+    this.converter
+      .typeHistoryFromProperty(prop)
+      .slice(1)
+      .map((t) => this.converter.typeFromSpecType(t));
   }
 
   /**
