@@ -13,11 +13,14 @@ export { SERVICE_PATCHERS as EXCEPTIONS_PATCHERS } from './core';
 
 // Services
 import './autoscaling';
+import './batch';
 import './codebuild';
 import './cognito';
+import './config';
 import './elasticsearch';
 import './iot1click';
 import './opensearch';
 import './rds';
 import './s3';
+import './sagemaker';
 import './wafv2';

@@ -12,6 +12,7 @@ const LEGACY_UNTYPED_PROPERTIES = {
   'AWS::CloudFormation::StackSet': ['ManagedExecution'],
   'AWS::CodeGuruProfiler::ProfilingGroup': ['AgentPermissions'],
   'AWS::Config::ConformancePack': ['TemplateSSMDocumentDetails'],
+  'AWS::Config::RemediationConfiguration': ['Parameters'],
   'AWS::Connect::TaskTemplate': ['Constraints'],
   'AWS::EC2::FlowLog': ['DestinationOptions'],
   'AWS::EC2::Subnet': ['PrivateDnsNameOptionsOnLaunch'],
