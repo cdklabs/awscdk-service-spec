@@ -58,7 +58,7 @@ export class AwsCdkIntegrationTest extends pj.Component {
         },
         ...checkoutRepository(awsCdkRepo, awsCdkPath),
         ...linkPackage(project, awsCdkPath),
-        ...buildAwsCdkLib(awsCdkRepo, awsCdkPath),
+        ...buildTestAwsCdkLib(awsCdkRepo, awsCdkPath),
         ...uploadSpec(candidateSpec, awsCdkPath),
       ],
     });
@@ -141,7 +141,7 @@ function linkPackage(project: pj.Project, targetPath: string): pj.github.workflo
   ];
 }
 
-function buildAwsCdkLib(repository: string, path: string): pj.github.workflows.Step[] {
+function buildTestAwsCdkLib(repository: string, path: string): pj.github.workflows.Step[] {
   return [
     {
       name: `Setup ${repository}`,
@@ -149,9 +149,9 @@ function buildAwsCdkLib(repository: string, path: string): pj.github.workflows.S
       run: 'yarn install',
     },
     {
-      name: `Build ${repository}`,
+      name: `Build+Test ${repository}`,
       workingDirectory: path,
-      run: 'npx lerna run build --no-bail --scope aws-cdk-lib --include-dependencies',
+      run: './build.sh --no-bail',
     },
   ];
 }

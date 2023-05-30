@@ -43,8 +43,8 @@ jobs:
       - name: Setup aws/aws-cdk
         run: yarn install
         working-directory: aws-cdk
-      - name: Build aws/aws-cdk
-        run: npx lerna run build --no-bail --scope aws-cdk-lib --include-dependencies
+      - name: Build+Test aws/aws-cdk
+        run: ./build.sh --no-bail
         working-directory: aws-cdk
       - name: Prepare artifacts
         run: |-
