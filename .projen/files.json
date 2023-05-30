@@ -11,6 +11,7 @@
     ".github/workflows/update-source-cfn-schema.yml",
     ".github/workflows/update-source-documentation.yml",
     ".github/workflows/update-source-resource-spec.yml",
+    ".github/workflows/update-source-sam-spec.yml",
     ".github/workflows/update-source-sam.yml",
     ".github/workflows/update-source-stateful-resources.yml",
     ".github/workflows/upgrade.yml",

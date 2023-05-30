@@ -170,6 +170,13 @@ new RegionalSource(repo, {
   sources: {
     'us-east-1': 'https://d1uauaxba7bl26.cloudfront.net/latest/gzip/CloudFormationResourceSpecification.json',
   },
+  fileName: '000_cloudformation/000_CloudFormationResourceSpecification.json',
+});
+new SingleSource(repo, {
+  name: 'sam-spec',
+  dir: 'sources/CloudFormationResourceSpecification/us-east-1/100_sam/000_official',
+  source: 'https://raw.githubusercontent.com/awslabs/goformation/master/generate/sam-2016-10-31.json',
+  fileName: 'spec.json',
 });
 new RegionalSource(repo, {
   name: 'cfn-schema',
