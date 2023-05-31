@@ -1,6 +1,6 @@
 import { Entity, Reference, Relationship } from '@cdklabs/tskb';
-import { sortKeyComparator } from '../util/sorting';
 import { SpecDatabase } from './database';
+import { sortKeyComparator } from '../util/sorting';
 
 export interface Partition extends Entity {
   readonly partition: string;

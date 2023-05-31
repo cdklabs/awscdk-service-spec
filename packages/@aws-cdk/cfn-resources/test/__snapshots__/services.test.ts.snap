@@ -12962,32 +12962,6 @@ export class CfnIPAMPool extends cdk.CfnResource implements cdk.IInspectable, cd
 
 export namespace CfnIPAMPool {
   /**
-   * A key-value pair to associate with a resource.
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-ipampool-tag.html
-   */
-  export interface TagProperty {
-    /**
-     * The key name of the tag.
-     *
-     * You can specify a value that is 1 to 128 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-ipampool-tag.html#cfn-ec2-ipampool-tag-key
-     */
-    readonly key: string;
-
-    /**
-     * The value for the tag.
-     *
-     * You can specify a value that is 0 to 256 Unicode characters in length and cannot be prefixed with aws:. You can use any of the following characters: the set of Unicode letters, digits, whitespace, _, ., /, =, +, and -.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-ipampool-tag.html#cfn-ec2-ipampool-tag-value
-     */
-    readonly value: string;
-  }
-
-  /**
    * The CIDR provisioned to the IPAM pool.
    *
    * A CIDR is a representation of an IP address and its associated network mask (or netmask) and refers to a range of IP addresses. An IPv4 CIDR example is \`10.24.34.0/23\` . An IPv6 CIDR example is \`2001:DB8::/32\` .
@@ -13145,53 +13119,6 @@ export interface CfnIPAMPoolProps {
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-ipampool.html#cfn-ec2-ipampool-tags
    */
   readonly tags?: Array<cdk.CfnTag>;
-}
-
-/**
- * Determine whether the given properties match those of a \`TagProperty\`
- *
- * @param properties - the TypeScript properties of a \`TagProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnIPAMPoolTagPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
-  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
-  errors.collect(cdk.propertyValidator("value", cdk.requiredValidator)(properties.value));
-  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
-  return errors.wrap("supplied properties not correct for \\"TagProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnIPAMPoolTagPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnIPAMPoolTagPropertyValidator(properties).assertSuccess();
-  return {
-    "Key": cdk.stringToCloudFormation(properties.key),
-    "Value": cdk.stringToCloudFormation(properties.value)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnIPAMPoolTagPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnIPAMPool.TagProperty> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnIPAMPool.TagProperty>();
-  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
-  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
 }
 
 /**
@@ -39420,7 +39347,7 @@ export class CfnVPCEndpoint extends cdk.CfnResource implements cdk.IInspectable 
   /**
    * A policy that controls access to the service from the VPC.
    */
-  public policyDocument?: any | cdk.IResolvable;
+  public policyDocument?: any | cdk.IResolvable | string;
 
   /**
    * Indicate whether to associate a private hosted zone with the specified VPC.
@@ -39530,7 +39457,7 @@ export interface CfnVPCEndpointProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpcendpoint.html#cfn-ec2-vpcendpoint-policydocument
    */
-  readonly policyDocument?: any | cdk.IResolvable;
+  readonly policyDocument?: any | cdk.IResolvable | string;
 
   /**
    * Indicate whether to associate a private hosted zone with the specified VPC.
@@ -39612,7 +39539,7 @@ function CfnVPCEndpointPropsValidator(properties: any): cdk.ValidationResult {
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
-  errors.collect(cdk.propertyValidator("policyDocument", cdk.validateObject)(properties.policyDocument));
+  errors.collect(cdk.propertyValidator("policyDocument", cdk.unionValidator(cdk.validateObject, cdk.validateString))(properties.policyDocument));
   errors.collect(cdk.propertyValidator("privateDnsEnabled", cdk.validateBoolean)(properties.privateDnsEnabled));
   errors.collect(cdk.propertyValidator("routeTableIds", cdk.listValidator(cdk.validateString))(properties.routeTableIds));
   errors.collect(cdk.propertyValidator("securityGroupIds", cdk.listValidator(cdk.validateString))(properties.securityGroupIds));
@@ -39630,7 +39557,7 @@ function convertCfnVPCEndpointPropsToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
   CfnVPCEndpointPropsValidator(properties).assertSuccess();
   return {
-    "PolicyDocument": cdk.objectToCloudFormation(properties.policyDocument),
+    "PolicyDocument": cdk.unionMapper([cdk.validateObject, cdk.validateString], [cdk.objectToCloudFormation, cdk.stringToCloudFormation])(properties.policyDocument),
     "PrivateDnsEnabled": cdk.booleanToCloudFormation(properties.privateDnsEnabled),
     "RouteTableIds": cdk.listMapper(cdk.stringToCloudFormation)(properties.routeTableIds),
     "SecurityGroupIds": cdk.listMapper(cdk.stringToCloudFormation)(properties.securityGroupIds),
@@ -39651,7 +39578,7 @@ function CfnVPCEndpointPropsFromCloudFormation(properties: any): cfn_parse.FromC
     return new cfn_parse.FromCloudFormationResult(properties);
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnVPCEndpointProps>();
-  ret.addPropertyResult("policyDocument", "PolicyDocument", (properties.PolicyDocument != null ? cfn_parse.FromCloudFormation.getAny(properties.PolicyDocument) : undefined));
+  ret.addPropertyResult("policyDocument", "PolicyDocument", (properties.PolicyDocument != null ? cfn_parse.FromCloudFormation.getTypeUnion([cdk.validateObject, cdk.validateString], [cfn_parse.FromCloudFormation.getAny, cfn_parse.FromCloudFormation.getString])(properties.PolicyDocument) : undefined));
   ret.addPropertyResult("privateDnsEnabled", "PrivateDnsEnabled", (properties.PrivateDnsEnabled != null ? cfn_parse.FromCloudFormation.getBoolean(properties.PrivateDnsEnabled) : undefined));
   ret.addPropertyResult("routeTableIds", "RouteTableIds", (properties.RouteTableIds != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.RouteTableIds) : undefined));
   ret.addPropertyResult("securityGroupIds", "SecurityGroupIds", (properties.SecurityGroupIds != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.SecurityGroupIds) : undefined));
@@ -45170,7 +45097,7 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
 
   public permissionsBoundary?: string;
 
-  public policies?: CfnFunction.IAMPolicyDocumentProperty | cdk.IResolvable | string;
+  public policies?: Array<CfnFunction.IAMPolicyDocumentProperty | cdk.IResolvable | CfnFunction.SAMPolicyTemplateProperty | string> | CfnFunction.IAMPolicyDocumentProperty | cdk.IResolvable | string;
 
   public provisionedConcurrencyConfig?: cdk.IResolvable | CfnFunction.ProvisionedConcurrencyConfigProperty;
 
@@ -45477,7 +45404,7 @@ export namespace CfnFunction {
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-s3event.html#cfn-serverless-function-s3event-events
      */
-    readonly events: string;
+    readonly events: Array<string> | cdk.IResolvable | string;
 
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-s3event.html#cfn-serverless-function-s3event-filter
@@ -46035,7 +45962,7 @@ export namespace CfnFunction {
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-cognitoevent.html#cfn-serverless-function-cognitoevent-trigger
      */
-    readonly trigger: string;
+    readonly trigger: Array<string> | cdk.IResolvable | string;
 
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-cognitoevent.html#cfn-serverless-function-cognitoevent-userpool
@@ -46604,7 +46531,7 @@ export interface CfnFunctionProps {
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-function.html#cfn-serverless-function-policies
    */
-  readonly policies?: CfnFunction.IAMPolicyDocumentProperty | cdk.IResolvable | string;
+  readonly policies?: Array<CfnFunction.IAMPolicyDocumentProperty | cdk.IResolvable | CfnFunction.SAMPolicyTemplateProperty | string> | CfnFunction.IAMPolicyDocumentProperty | cdk.IResolvable | string;
 
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-function.html#cfn-serverless-function-provisionedconcurrencyconfig
@@ -47182,7 +47109,7 @@ function CfnFunctionS3EventPropertyValidator(properties: any): cdk.ValidationRes
   errors.collect(cdk.propertyValidator("bucket", cdk.requiredValidator)(properties.bucket));
   errors.collect(cdk.propertyValidator("bucket", cdk.validateString)(properties.bucket));
   errors.collect(cdk.propertyValidator("events", cdk.requiredValidator)(properties.events));
-  errors.collect(cdk.propertyValidator("events", cdk.validateString)(properties.events));
+  errors.collect(cdk.propertyValidator("events", cdk.unionValidator(cdk.listValidator(cdk.validateString), cdk.validateString))(properties.events));
   errors.collect(cdk.propertyValidator("filter", CfnFunctionS3NotificationFilterPropertyValidator)(properties.filter));
   return errors.wrap("supplied properties not correct for \\"S3EventProperty\\"");
 }
@@ -47193,7 +47120,7 @@ function convertCfnFunctionS3EventPropertyToCloudFormation(properties: any): any
   CfnFunctionS3EventPropertyValidator(properties).assertSuccess();
   return {
     "Bucket": cdk.stringToCloudFormation(properties.bucket),
-    "Events": cdk.stringToCloudFormation(properties.events),
+    "Events": cdk.unionMapper([cdk.listValidator(cdk.validateString), cdk.validateString], [cdk.listMapper(cdk.stringToCloudFormation), cdk.stringToCloudFormation])(properties.events),
     "Filter": convertCfnFunctionS3NotificationFilterPropertyToCloudFormation(properties.filter)
   };
 }
@@ -47209,7 +47136,7 @@ function CfnFunctionS3EventPropertyFromCloudFormation(properties: any): cfn_pars
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.S3EventProperty>();
   ret.addPropertyResult("bucket", "Bucket", (properties.Bucket != null ? cfn_parse.FromCloudFormation.getString(properties.Bucket) : undefined));
-  ret.addPropertyResult("events", "Events", (properties.Events != null ? cfn_parse.FromCloudFormation.getString(properties.Events) : undefined));
+  ret.addPropertyResult("events", "Events", (properties.Events != null ? cfn_parse.FromCloudFormation.getTypeUnion([cdk.listValidator(cdk.validateString), cdk.validateString], [cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString), cfn_parse.FromCloudFormation.getString])(properties.Events) : undefined));
   ret.addPropertyResult("filter", "Filter", (properties.Filter != null ? CfnFunctionS3NotificationFilterPropertyFromCloudFormation(properties.Filter) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
@@ -48221,7 +48148,7 @@ function CfnFunctionCognitoEventPropertyValidator(properties: any): cdk.Validati
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
   errors.collect(cdk.propertyValidator("trigger", cdk.requiredValidator)(properties.trigger));
-  errors.collect(cdk.propertyValidator("trigger", cdk.validateString)(properties.trigger));
+  errors.collect(cdk.propertyValidator("trigger", cdk.unionValidator(cdk.listValidator(cdk.validateString), cdk.validateString))(properties.trigger));
   errors.collect(cdk.propertyValidator("userPool", cdk.requiredValidator)(properties.userPool));
   errors.collect(cdk.propertyValidator("userPool", cdk.validateString)(properties.userPool));
   return errors.wrap("supplied properties not correct for \\"CognitoEventProperty\\"");
@@ -48232,7 +48159,7 @@ function convertCfnFunctionCognitoEventPropertyToCloudFormation(properties: any)
   if (!cdk.canInspect(properties)) return properties;
   CfnFunctionCognitoEventPropertyValidator(properties).assertSuccess();
   return {
-    "Trigger": cdk.stringToCloudFormation(properties.trigger),
+    "Trigger": cdk.unionMapper([cdk.listValidator(cdk.validateString), cdk.validateString], [cdk.listMapper(cdk.stringToCloudFormation), cdk.stringToCloudFormation])(properties.trigger),
     "UserPool": cdk.stringToCloudFormation(properties.userPool)
   };
 }
@@ -48247,7 +48174,7 @@ function CfnFunctionCognitoEventPropertyFromCloudFormation(properties: any): cfn
     return new cfn_parse.FromCloudFormationResult(properties);
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.CognitoEventProperty>();
-  ret.addPropertyResult("trigger", "Trigger", (properties.Trigger != null ? cfn_parse.FromCloudFormation.getString(properties.Trigger) : undefined));
+  ret.addPropertyResult("trigger", "Trigger", (properties.Trigger != null ? cfn_parse.FromCloudFormation.getTypeUnion([cdk.listValidator(cdk.validateString), cdk.validateString], [cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString), cfn_parse.FromCloudFormation.getString])(properties.Trigger) : undefined));
   ret.addPropertyResult("userPool", "UserPool", (properties.UserPool != null ? cfn_parse.FromCloudFormation.getString(properties.UserPool) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
@@ -49394,7 +49321,7 @@ function CfnFunctionPropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("memorySize", cdk.validateNumber)(properties.memorySize));
   errors.collect(cdk.propertyValidator("packageType", cdk.validateString)(properties.packageType));
   errors.collect(cdk.propertyValidator("permissionsBoundary", cdk.validateString)(properties.permissionsBoundary));
-  errors.collect(cdk.propertyValidator("policies", cdk.unionValidator(CfnFunctionIAMPolicyDocumentPropertyValidator, cdk.validateString))(properties.policies));
+  errors.collect(cdk.propertyValidator("policies", cdk.unionValidator(cdk.listValidator(cdk.unionValidator(CfnFunctionIAMPolicyDocumentPropertyValidator, CfnFunctionSAMPolicyTemplatePropertyValidator, cdk.validateString)), CfnFunctionIAMPolicyDocumentPropertyValidator, cdk.validateString))(properties.policies));
   errors.collect(cdk.propertyValidator("provisionedConcurrencyConfig", CfnFunctionProvisionedConcurrencyConfigPropertyValidator)(properties.provisionedConcurrencyConfig));
   errors.collect(cdk.propertyValidator("reservedConcurrentExecutions", cdk.validateNumber)(properties.reservedConcurrentExecutions));
   errors.collect(cdk.propertyValidator("role", cdk.validateString)(properties.role));
@@ -49435,7 +49362,7 @@ function convertCfnFunctionPropsToCloudFormation(properties: any): any {
     "MemorySize": cdk.numberToCloudFormation(properties.memorySize),
     "PackageType": cdk.stringToCloudFormation(properties.packageType),
     "PermissionsBoundary": cdk.stringToCloudFormation(properties.permissionsBoundary),
-    "Policies": cdk.unionMapper([CfnFunctionIAMPolicyDocumentPropertyValidator, cdk.validateString], [convertCfnFunctionIAMPolicyDocumentPropertyToCloudFormation, cdk.stringToCloudFormation])(properties.policies),
+    "Policies": cdk.unionMapper([cdk.listValidator(cdk.unionValidator(CfnFunctionIAMPolicyDocumentPropertyValidator, CfnFunctionSAMPolicyTemplatePropertyValidator, cdk.validateString)), CfnFunctionIAMPolicyDocumentPropertyValidator, cdk.validateString], [cdk.listMapper(cdk.unionMapper([CfnFunctionIAMPolicyDocumentPropertyValidator, CfnFunctionSAMPolicyTemplatePropertyValidator, cdk.validateString], [convertCfnFunctionIAMPolicyDocumentPropertyToCloudFormation, convertCfnFunctionSAMPolicyTemplatePropertyToCloudFormation, cdk.stringToCloudFormation])), convertCfnFunctionIAMPolicyDocumentPropertyToCloudFormation, cdk.stringToCloudFormation])(properties.policies),
     "ProvisionedConcurrencyConfig": convertCfnFunctionProvisionedConcurrencyConfigPropertyToCloudFormation(properties.provisionedConcurrencyConfig),
     "ReservedConcurrentExecutions": cdk.numberToCloudFormation(properties.reservedConcurrentExecutions),
     "Role": cdk.stringToCloudFormation(properties.role),
@@ -49481,7 +49408,7 @@ function CfnFunctionPropsFromCloudFormation(properties: any): cfn_parse.FromClou
   ret.addPropertyResult("memorySize", "MemorySize", (properties.MemorySize != null ? cfn_parse.FromCloudFormation.getNumber(properties.MemorySize) : undefined));
   ret.addPropertyResult("packageType", "PackageType", (properties.PackageType != null ? cfn_parse.FromCloudFormation.getString(properties.PackageType) : undefined));
   ret.addPropertyResult("permissionsBoundary", "PermissionsBoundary", (properties.PermissionsBoundary != null ? cfn_parse.FromCloudFormation.getString(properties.PermissionsBoundary) : undefined));
-  ret.addPropertyResult("policies", "Policies", (properties.Policies != null ? cfn_parse.FromCloudFormation.getTypeUnion([CfnFunctionIAMPolicyDocumentPropertyValidator, cdk.validateString], [CfnFunctionIAMPolicyDocumentPropertyFromCloudFormation, cfn_parse.FromCloudFormation.getString])(properties.Policies) : undefined));
+  ret.addPropertyResult("policies", "Policies", (properties.Policies != null ? cfn_parse.FromCloudFormation.getTypeUnion([cdk.listValidator(cdk.unionValidator(CfnFunctionIAMPolicyDocumentPropertyValidator, CfnFunctionSAMPolicyTemplatePropertyValidator, cdk.validateString)), CfnFunctionIAMPolicyDocumentPropertyValidator, cdk.validateString], [cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getTypeUnion([CfnFunctionIAMPolicyDocumentPropertyValidator, CfnFunctionSAMPolicyTemplatePropertyValidator, cdk.validateString], [CfnFunctionIAMPolicyDocumentPropertyFromCloudFormation, CfnFunctionSAMPolicyTemplatePropertyFromCloudFormation, cfn_parse.FromCloudFormation.getString])), CfnFunctionIAMPolicyDocumentPropertyFromCloudFormation, cfn_parse.FromCloudFormation.getString])(properties.Policies) : undefined));
   ret.addPropertyResult("provisionedConcurrencyConfig", "ProvisionedConcurrencyConfig", (properties.ProvisionedConcurrencyConfig != null ? CfnFunctionProvisionedConcurrencyConfigPropertyFromCloudFormation(properties.ProvisionedConcurrencyConfig) : undefined));
   ret.addPropertyResult("reservedConcurrentExecutions", "ReservedConcurrentExecutions", (properties.ReservedConcurrentExecutions != null ? cfn_parse.FromCloudFormation.getNumber(properties.ReservedConcurrentExecutions) : undefined));
   ret.addPropertyResult("role", "Role", (properties.Role != null ? cfn_parse.FromCloudFormation.getString(properties.Role) : undefined));
@@ -51113,7 +51040,7 @@ export class CfnStateMachine extends cdk.CfnResource implements cdk.IInspectable
 
   public permissionsBoundaries?: string;
 
-  public policies?: CfnStateMachine.IAMPolicyDocumentProperty | cdk.IResolvable | string;
+  public policies?: Array<CfnStateMachine.IAMPolicyDocumentProperty | cdk.IResolvable | CfnStateMachine.SAMPolicyTemplateProperty | string> | CfnStateMachine.IAMPolicyDocumentProperty | cdk.IResolvable | string;
 
   public role?: string;
 
@@ -51472,7 +51399,7 @@ export interface CfnStateMachineProps {
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-statemachine.html#cfn-serverless-statemachine-policies
    */
-  readonly policies?: CfnStateMachine.IAMPolicyDocumentProperty | cdk.IResolvable | string;
+  readonly policies?: Array<CfnStateMachine.IAMPolicyDocumentProperty | cdk.IResolvable | CfnStateMachine.SAMPolicyTemplateProperty | string> | CfnStateMachine.IAMPolicyDocumentProperty | cdk.IResolvable | string;
 
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-statemachine.html#cfn-serverless-statemachine-role
@@ -52170,7 +52097,7 @@ function CfnStateMachinePropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("logging", CfnStateMachineLoggingConfigurationPropertyValidator)(properties.logging));
   errors.collect(cdk.propertyValidator("name", cdk.validateString)(properties.name));
   errors.collect(cdk.propertyValidator("permissionsBoundaries", cdk.validateString)(properties.permissionsBoundaries));
-  errors.collect(cdk.propertyValidator("policies", cdk.unionValidator(CfnStateMachineIAMPolicyDocumentPropertyValidator, cdk.validateString))(properties.policies));
+  errors.collect(cdk.propertyValidator("policies", cdk.unionValidator(cdk.listValidator(cdk.unionValidator(CfnStateMachineIAMPolicyDocumentPropertyValidator, CfnStateMachineSAMPolicyTemplatePropertyValidator, cdk.validateString)), CfnStateMachineIAMPolicyDocumentPropertyValidator, cdk.validateString))(properties.policies));
   errors.collect(cdk.propertyValidator("role", cdk.validateString)(properties.role));
   errors.collect(cdk.propertyValidator("tags", cdk.hashValidator(cdk.validateString))(properties.tags));
   errors.collect(cdk.propertyValidator("tracing", CfnStateMachineTracingConfigurationPropertyValidator)(properties.tracing));
@@ -52190,7 +52117,7 @@ function convertCfnStateMachinePropsToCloudFormation(properties: any): any {
     "Logging": convertCfnStateMachineLoggingConfigurationPropertyToCloudFormation(properties.logging),
     "Name": cdk.stringToCloudFormation(properties.name),
     "PermissionsBoundaries": cdk.stringToCloudFormation(properties.permissionsBoundaries),
-    "Policies": cdk.unionMapper([CfnStateMachineIAMPolicyDocumentPropertyValidator, cdk.validateString], [convertCfnStateMachineIAMPolicyDocumentPropertyToCloudFormation, cdk.stringToCloudFormation])(properties.policies),
+    "Policies": cdk.unionMapper([cdk.listValidator(cdk.unionValidator(CfnStateMachineIAMPolicyDocumentPropertyValidator, CfnStateMachineSAMPolicyTemplatePropertyValidator, cdk.validateString)), CfnStateMachineIAMPolicyDocumentPropertyValidator, cdk.validateString], [cdk.listMapper(cdk.unionMapper([CfnStateMachineIAMPolicyDocumentPropertyValidator, CfnStateMachineSAMPolicyTemplatePropertyValidator, cdk.validateString], [convertCfnStateMachineIAMPolicyDocumentPropertyToCloudFormation, convertCfnStateMachineSAMPolicyTemplatePropertyToCloudFormation, cdk.stringToCloudFormation])), convertCfnStateMachineIAMPolicyDocumentPropertyToCloudFormation, cdk.stringToCloudFormation])(properties.policies),
     "Role": cdk.stringToCloudFormation(properties.role),
     "Tags": cdk.hashMapper(cdk.stringToCloudFormation)(properties.tags),
     "Tracing": convertCfnStateMachineTracingConfigurationPropertyToCloudFormation(properties.tracing),
@@ -52215,7 +52142,7 @@ function CfnStateMachinePropsFromCloudFormation(properties: any): cfn_parse.From
   ret.addPropertyResult("logging", "Logging", (properties.Logging != null ? CfnStateMachineLoggingConfigurationPropertyFromCloudFormation(properties.Logging) : undefined));
   ret.addPropertyResult("name", "Name", (properties.Name != null ? cfn_parse.FromCloudFormation.getString(properties.Name) : undefined));
   ret.addPropertyResult("permissionsBoundaries", "PermissionsBoundaries", (properties.PermissionsBoundaries != null ? cfn_parse.FromCloudFormation.getString(properties.PermissionsBoundaries) : undefined));
-  ret.addPropertyResult("policies", "Policies", (properties.Policies != null ? cfn_parse.FromCloudFormation.getTypeUnion([CfnStateMachineIAMPolicyDocumentPropertyValidator, cdk.validateString], [CfnStateMachineIAMPolicyDocumentPropertyFromCloudFormation, cfn_parse.FromCloudFormation.getString])(properties.Policies) : undefined));
+  ret.addPropertyResult("policies", "Policies", (properties.Policies != null ? cfn_parse.FromCloudFormation.getTypeUnion([cdk.listValidator(cdk.unionValidator(CfnStateMachineIAMPolicyDocumentPropertyValidator, CfnStateMachineSAMPolicyTemplatePropertyValidator, cdk.validateString)), CfnStateMachineIAMPolicyDocumentPropertyValidator, cdk.validateString], [cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getTypeUnion([CfnStateMachineIAMPolicyDocumentPropertyValidator, CfnStateMachineSAMPolicyTemplatePropertyValidator, cdk.validateString], [CfnStateMachineIAMPolicyDocumentPropertyFromCloudFormation, CfnStateMachineSAMPolicyTemplatePropertyFromCloudFormation, cfn_parse.FromCloudFormation.getString])), CfnStateMachineIAMPolicyDocumentPropertyFromCloudFormation, cfn_parse.FromCloudFormation.getString])(properties.Policies) : undefined));
   ret.addPropertyResult("role", "Role", (properties.Role != null ? cfn_parse.FromCloudFormation.getString(properties.Role) : undefined));
   ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString)(properties.Tags) : undefined));
   ret.addPropertyResult("tracing", "Tracing", (properties.Tracing != null ? CfnStateMachineTracingConfigurationPropertyFromCloudFormation(properties.Tracing) : undefined));
@@ -54470,12 +54397,12 @@ export class CfnQueue extends cdk.CfnResource implements cdk.IInspectable, cdk.I
   /**
    * The string that includes the parameters for the permissions for the dead-letter queue redrive permission and which source queues can specify dead-letter queues as a JSON object.
    */
-  public redriveAllowPolicy?: any | cdk.IResolvable;
+  public redriveAllowPolicy?: any | cdk.IResolvable | string;
 
   /**
    * The string that includes the parameters for the dead-letter queue functionality of the source queue as a JSON object.
    */
-  public redrivePolicy?: any | cdk.IResolvable;
+  public redrivePolicy?: any | cdk.IResolvable | string;
 
   /**
    * Enables server-side queue encryption using SQS owned encryption keys.
@@ -54709,7 +54636,7 @@ export interface CfnQueueProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-redriveallowpolicy
    */
-  readonly redriveAllowPolicy?: any | cdk.IResolvable;
+  readonly redriveAllowPolicy?: any | cdk.IResolvable | string;
 
   /**
    * The string that includes the parameters for the dead-letter queue functionality of the source queue as a JSON object.
@@ -54733,7 +54660,7 @@ export interface CfnQueueProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sqs-queue.html#cfn-sqs-queue-redrivepolicy
    */
-  readonly redrivePolicy?: any | cdk.IResolvable;
+  readonly redrivePolicy?: any | cdk.IResolvable | string;
 
   /**
    * Enables server-side queue encryption using SQS owned encryption keys.
@@ -54792,8 +54719,8 @@ function CfnQueuePropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("messageRetentionPeriod", cdk.validateNumber)(properties.messageRetentionPeriod));
   errors.collect(cdk.propertyValidator("queueName", cdk.validateString)(properties.queueName));
   errors.collect(cdk.propertyValidator("receiveMessageWaitTimeSeconds", cdk.validateNumber)(properties.receiveMessageWaitTimeSeconds));
-  errors.collect(cdk.propertyValidator("redriveAllowPolicy", cdk.validateObject)(properties.redriveAllowPolicy));
-  errors.collect(cdk.propertyValidator("redrivePolicy", cdk.validateObject)(properties.redrivePolicy));
+  errors.collect(cdk.propertyValidator("redriveAllowPolicy", cdk.unionValidator(cdk.validateObject, cdk.validateString))(properties.redriveAllowPolicy));
+  errors.collect(cdk.propertyValidator("redrivePolicy", cdk.unionValidator(cdk.validateObject, cdk.validateString))(properties.redrivePolicy));
   errors.collect(cdk.propertyValidator("sqsManagedSseEnabled", cdk.validateBoolean)(properties.sqsManagedSseEnabled));
   errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
   errors.collect(cdk.propertyValidator("visibilityTimeout", cdk.validateNumber)(properties.visibilityTimeout));
@@ -54816,8 +54743,8 @@ function convertCfnQueuePropsToCloudFormation(properties: any): any {
     "MessageRetentionPeriod": cdk.numberToCloudFormation(properties.messageRetentionPeriod),
     "QueueName": cdk.stringToCloudFormation(properties.queueName),
     "ReceiveMessageWaitTimeSeconds": cdk.numberToCloudFormation(properties.receiveMessageWaitTimeSeconds),
-    "RedriveAllowPolicy": cdk.objectToCloudFormation(properties.redriveAllowPolicy),
-    "RedrivePolicy": cdk.objectToCloudFormation(properties.redrivePolicy),
+    "RedriveAllowPolicy": cdk.unionMapper([cdk.validateObject, cdk.validateString], [cdk.objectToCloudFormation, cdk.stringToCloudFormation])(properties.redriveAllowPolicy),
+    "RedrivePolicy": cdk.unionMapper([cdk.validateObject, cdk.validateString], [cdk.objectToCloudFormation, cdk.stringToCloudFormation])(properties.redrivePolicy),
     "SqsManagedSseEnabled": cdk.booleanToCloudFormation(properties.sqsManagedSseEnabled),
     "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags),
     "VisibilityTimeout": cdk.numberToCloudFormation(properties.visibilityTimeout)
@@ -54845,8 +54772,8 @@ function CfnQueuePropsFromCloudFormation(properties: any): cfn_parse.FromCloudFo
   ret.addPropertyResult("messageRetentionPeriod", "MessageRetentionPeriod", (properties.MessageRetentionPeriod != null ? cfn_parse.FromCloudFormation.getNumber(properties.MessageRetentionPeriod) : undefined));
   ret.addPropertyResult("queueName", "QueueName", (properties.QueueName != null ? cfn_parse.FromCloudFormation.getString(properties.QueueName) : undefined));
   ret.addPropertyResult("receiveMessageWaitTimeSeconds", "ReceiveMessageWaitTimeSeconds", (properties.ReceiveMessageWaitTimeSeconds != null ? cfn_parse.FromCloudFormation.getNumber(properties.ReceiveMessageWaitTimeSeconds) : undefined));
-  ret.addPropertyResult("redriveAllowPolicy", "RedriveAllowPolicy", (properties.RedriveAllowPolicy != null ? cfn_parse.FromCloudFormation.getAny(properties.RedriveAllowPolicy) : undefined));
-  ret.addPropertyResult("redrivePolicy", "RedrivePolicy", (properties.RedrivePolicy != null ? cfn_parse.FromCloudFormation.getAny(properties.RedrivePolicy) : undefined));
+  ret.addPropertyResult("redriveAllowPolicy", "RedriveAllowPolicy", (properties.RedriveAllowPolicy != null ? cfn_parse.FromCloudFormation.getTypeUnion([cdk.validateObject, cdk.validateString], [cfn_parse.FromCloudFormation.getAny, cfn_parse.FromCloudFormation.getString])(properties.RedriveAllowPolicy) : undefined));
+  ret.addPropertyResult("redrivePolicy", "RedrivePolicy", (properties.RedrivePolicy != null ? cfn_parse.FromCloudFormation.getTypeUnion([cdk.validateObject, cdk.validateString], [cfn_parse.FromCloudFormation.getAny, cfn_parse.FromCloudFormation.getString])(properties.RedrivePolicy) : undefined));
   ret.addPropertyResult("sqsManagedSseEnabled", "SqsManagedSseEnabled", (properties.SqsManagedSseEnabled != null ? cfn_parse.FromCloudFormation.getBoolean(properties.SqsManagedSseEnabled) : undefined));
   ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
   ret.addPropertyResult("visibilityTimeout", "VisibilityTimeout", (properties.VisibilityTimeout != null ? cfn_parse.FromCloudFormation.getNumber(properties.VisibilityTimeout) : undefined));
