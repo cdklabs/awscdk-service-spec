@@ -98,6 +98,10 @@ const buildDb = serviceSpecBuild.tasks.addTask('build:db', {
   exec: 'node -r source-map-support/register lib/cli/build',
 });
 serviceSpecBuild.postCompileTask.spawn(buildDb);
+serviceSpecBuild.tasks.addTask('analyze:db', {
+  exec: 'ts-node src/cli/analyze-db',
+  receiveArgs: true,
+});
 serviceSpecBuild.gitignore.addPatterns('db.json');
 serviceSpecBuild.gitignore.addPatterns('db-build-report.txt');
 serviceSpecBuild.gitignore.addPatterns('build-report');

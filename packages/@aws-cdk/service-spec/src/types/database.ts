@@ -1,4 +1,5 @@
 import { Database, entityCollection, fieldIndex, stringCmp } from '@cdklabs/tskb';
+import { promises as fs } from 'fs';
 import { IsAugmentedResource, ResourceAugmentation } from './augmentations';
 import {
   DimensionSet,
@@ -56,6 +57,12 @@ export function emptyDatabase() {
       serviceHasDimensionSet: r.relationship<ServiceHasDimensionSet>('service', 'dimensionSet'),
     }),
   );
+}
+
+export async function loadDatabase(pathToDb: string) {
+  const db = emptyDatabase();
+  db.load(JSON.parse(await fs.readFile(pathToDb, { encoding: 'utf-8' })));
+  return db;
 }
 
 export type SpecDatabase = ReturnType<typeof emptyDatabase>;

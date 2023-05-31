@@ -1,5 +1,14 @@
 {
   "tasks": {
+    "analyze:db": {
+      "name": "analyze:db",
+      "steps": [
+        {
+          "exec": "ts-node src/cli/analyze-db",
+          "receiveArgs": true
+        }
+      ]
+    },
     "build": {
       "name": "build",
       "description": "Full release build",

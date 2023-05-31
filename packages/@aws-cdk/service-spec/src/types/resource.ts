@@ -1,5 +1,6 @@
 import { Entity, Reference, Relationship } from '@cdklabs/tskb';
 import { sortKeyComparator } from '../util/sorting';
+import { SpecDatabase } from './database';
 
 export interface Partition extends Entity {
   readonly partition: string;
@@ -406,6 +407,29 @@ export class RichPropertyType {
         const lhsKey = this.sortKey();
         const rhsKey = new RichPropertyType(rhs).sortKey();
         return lhsKey.length === rhsKey.length && lhsKey.every((l, i) => l === rhsKey[i]);
+    }
+  }
+
+  public stringify(db: SpecDatabase): string {
+    switch (this.type.type) {
+      case 'integer':
+      case 'boolean':
+      case 'date-time':
+      case 'json':
+      case 'null':
+      case 'number':
+      case 'string':
+      case 'tag':
+        return this.type.type;
+      case 'array':
+        return `Map<string, ${new RichPropertyType(this.type.element).stringify(db)}>`;
+      case 'map':
+        return `${new RichPropertyType(this.type.element).stringify(db)}[]`;
+      case 'ref':
+        const type = db.get('typeDefinition', this.type.reference);
+        return type.name;
+      case 'union':
+        return this.type.types.map((t) => new RichPropertyType(t).stringify(db)).join(' | ');
     }
   }
 
