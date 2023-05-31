@@ -5,14 +5,14 @@ export interface CloudFormationResourceSpecification {
   /**
    * Not really valid for this to be a plain property, but it happens in practice anyway
    */
-  readonly PropertyTypes: Record<string, resourcespec.PropertyType | resourcespec.Property>;
+  readonly PropertyTypes: Record<string, resourcespec.PropertyType | resourcespec.SingleTypeAlias>;
 }
 
 /**
  * SAM has defined a custom extension to the CFN resource specification
  */
 export interface SAMResourceSpecification {
-  readonly Globals: Record<string, unknown>;
+  readonly Globals?: Record<string, unknown>;
   readonly ResourceSpecificationTransform: string;
   readonly ResourceSpecificationVersion: string;
   readonly ResourceTypes: Record<string, resourcespec.SAMResourceType>;
@@ -20,7 +20,7 @@ export interface SAMResourceSpecification {
   /**
    * Not really valid for this to be a plain property, but it happens in practice anyway
    */
-  readonly PropertyTypes: Record<string, resourcespec.SAMPropertyType | resourcespec.SAMProperty>;
+  readonly PropertyTypes: Record<string, resourcespec.SAMPropertyType | resourcespec.SAMSingleTypeAlias>;
 }
 
 /**
@@ -34,36 +34,44 @@ export namespace resourcespec {
     readonly Attributes?: Record<string, Attribute>;
   }
 
-  export interface PropertyType {
+  export interface CfnTypeDefinition {
+    readonly Type?: string;
+    readonly PrimitiveType?: string;
+    readonly ItemType?: string;
+    readonly PrimitiveItemType?: string;
+    readonly DuplicatesAllowed?: boolean;
+  }
+
+  export interface PropertyType extends CfnTypeDefinition {
     readonly Documentation?: string;
     readonly Properties?: Record<string, Property>;
   }
 
-  export interface Property {
+  /**
+   * Used for PropertyTypes that alias a single other type (usually Json)
+   */
+  export interface SingleTypeAlias extends CfnTypeDefinition {
     readonly Documentation?: string;
-    readonly Required?: boolean;
-    readonly Type?: string;
-    readonly PrimitiveType?: string;
-    readonly ItemType?: string;
-    readonly PrimitiveItemType?: string;
-    readonly UpdateType: 'Mutable' | 'Immutable' | 'Conditional';
-    readonly DuplicatesAllowed?: boolean;
   }
 
-  export interface Attribute {
+  export interface Property extends CfnTypeDefinition {
     readonly Documentation?: string;
     readonly Required?: boolean;
-    readonly Type?: string;
-    readonly PrimitiveType?: string;
-    readonly ItemType?: string;
-    readonly PrimitiveItemType?: string;
-    readonly DuplicatesAllowed?: boolean;
+    readonly UpdateType: 'Mutable' | 'Immutable' | 'Conditional';
+  }
+
+  export interface Attribute extends CfnTypeDefinition {
+    readonly Documentation?: string;
+    readonly Required?: boolean;
   }
 
   export interface SAMResourceType {
     readonly AdditionalProperties?: boolean;
     readonly Documentation?: string;
     readonly Properties?: Record<string, SAMProperty>;
+
+    // Actuaally will never have attributes but putting it here anyway is easier for regularity
+    readonly Attributes?: Record<string, SAMProperty>;
   }
 
   export interface SAMPropertyType {
@@ -71,7 +79,11 @@ export namespace resourcespec {
     readonly Properties?: Record<string, SAMProperty>;
   }
 
-  export interface SAMProperty extends Property {
+  export interface SAMSingleTypeAlias extends SAMTypeDefinition {
+    readonly Documentation?: string;
+  }
+
+  export interface SAMTypeDefinition extends CfnTypeDefinition {
     readonly Types?: string[];
     readonly PrimitiveTypes?: string[];
     readonly ItemTypes?: string[];
@@ -81,7 +93,12 @@ export namespace resourcespec {
     readonly InclusivePrimitiveItemTypes?: string[];
   }
 
-  export function isPropType(x: PropertyType | Property): x is PropertyType {
+  export interface SAMProperty extends Property, SAMTypeDefinition {}
+
+  export function isPropType(x: PropertyType | Property): x is PropertyType | SAMPropertyType {
+    if (!x) {
+      debugger;
+    }
     return !!(x as any).Properties;
   }
 }

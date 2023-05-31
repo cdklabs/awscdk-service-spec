@@ -10,16 +10,12 @@ import {
   readCloudFormationRegistryServiceFromResource,
 } from './import-cloudformation-registry';
 import { importLegacyInformation } from './import-legacy-information';
-import { ResourceSpecImporter } from './import-resource-spec';
+import { ResourceSpecImporter, SAMSpecImporter } from './import-resource-spec';
 import { SamResources } from './import-sam';
-import { SAMSpecImporter } from './import-sam-spec';
 import { Scrutinies } from './import-scrutinies';
 import { importStatefulResources } from './import-stateful-resources';
 
-export type SpecSource = 'registry' | 'resource-spec';
-
 export interface BuildDatabaseOptions {
-  readonly source: SpecSource;
   readonly mustValidate?: boolean;
 }
 
@@ -35,16 +31,11 @@ export class DatabaseBuilder {
   constructor(private readonly options: BuildDatabaseOptions) {}
 
   public async build() {
-    this.resourceSpec = this.loadResult(await sources.loadDefaultResourceSpecification());
+    this.resourceSpec = this.loadResult(await sources.loadDefaultResourceSpecification(this.options.mustValidate));
 
-    switch (this.options.source) {
-      case 'registry':
-        await this.importRegistryResources();
-        break;
-      case 'resource-spec':
-        await this.importSpecResources();
-        break;
-    }
+    await this.importRegistryResources();
+
+    await this.importOldTypesFromSpec();
 
     await this.importEnhancements();
 
@@ -94,15 +85,15 @@ export class DatabaseBuilder {
     importLegacyInformation(this.db, this.resourceSpec, this.report);
   }
 
-  private async importSpecResources() {
-    ResourceSpecImporter.import({
+  private async importOldTypesFromSpec() {
+    ResourceSpecImporter.importOldTypes({
       db: this.db,
       specification: this.resourceSpec,
     });
 
     const samSpec = this.loadResult(await sources.loadSamSpec(this.options.mustValidate));
 
-    SAMSpecImporter.import({
+    SAMSpecImporter.importOldTypes({
       db: this.db,
       specification: samSpec,
     });

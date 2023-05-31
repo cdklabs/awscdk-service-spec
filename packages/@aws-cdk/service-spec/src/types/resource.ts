@@ -1,4 +1,5 @@
 import { Entity, Reference, Relationship } from '@cdklabs/tskb';
+import { sortKeyComparator } from '../util/sorting';
 
 export interface Partition extends Entity {
   readonly partition: string;
@@ -137,21 +138,43 @@ export interface Property {
   scrutinizable?: PropertyScrutinyType;
 }
 
-export class RichProperty {
-  constructor(private readonly property: Property) {}
+export class RichTypedField {
+  constructor(private readonly field: Pick<Property, 'type' | 'previousTypes'>) {}
 
   public addPreviousType(type: PropertyType) {
-    if (!this.property.previousTypes) {
-      this.property.previousTypes = [];
+    const richType = new RichPropertyType(type);
+    if ([this.field.type, ...(this.field.previousTypes ?? [])].some((t) => richType.equals(t))) {
+      // Nothing to do, type is already in there
+      return;
     }
-    this.property.previousTypes.unshift(type);
+    if (!this.field.previousTypes) {
+      this.field.previousTypes = [];
+    }
+    this.field.previousTypes.unshift(type);
+  }
+}
+
+export class RichProperty extends RichTypedField {
+  constructor(property: Property) {
+    super(property);
+  }
+}
+
+export class RichAttribute extends RichTypedField {
+  constructor(attr: Attribute) {
+    super(attr);
   }
 }
 
 export interface Attribute {
   documentation?: string;
   type: PropertyType;
-  typeHistory?: PropertyType[];
+  /**
+   * An ordered list of previous types of this property in ascending order
+   *
+   * Does not include the current type, use `type` for this.
+   */
+  previousTypes?: PropertyType[];
 }
 
 export enum Deprecation {
@@ -358,4 +381,54 @@ export enum PropertyScrutinyType {
    * A set of egress rules (on a security group)
    */
   EgressRules = 'EgressRules',
+}
+
+export class RichPropertyType {
+  constructor(private readonly type: PropertyType) {}
+
+  public equals(rhs: PropertyType): boolean {
+    switch (this.type.type) {
+      case 'integer':
+      case 'boolean':
+      case 'date-time':
+      case 'json':
+      case 'null':
+      case 'number':
+      case 'string':
+      case 'tag':
+        return rhs.type === this.type.type;
+      case 'array':
+      case 'map':
+        return rhs.type === this.type.type && new RichPropertyType(this.type.element).equals(rhs.element);
+      case 'ref':
+        return rhs.type === 'ref' && this.type.reference.$ref === rhs.reference.$ref;
+      case 'union':
+        const lhsKey = this.sortKey();
+        const rhsKey = new RichPropertyType(rhs).sortKey();
+        return lhsKey.length === rhsKey.length && lhsKey.every((l, i) => l === rhsKey[i]);
+    }
+  }
+
+  public sortKey(): string[] {
+    switch (this.type.type) {
+      case 'integer':
+      case 'boolean':
+      case 'date-time':
+      case 'json':
+      case 'null':
+      case 'number':
+      case 'string':
+      case 'tag':
+        return [this.type.type];
+      case 'array':
+      case 'map':
+        return [this.type.type, ...new RichPropertyType(this.type.element).sortKey()];
+      case 'ref':
+        return [this.type.type, this.type.reference.$ref];
+      case 'union':
+        const typeKeys = this.type.types.map((t) => new RichPropertyType(t).sortKey());
+        typeKeys.sort(sortKeyComparator((x) => x));
+        return [this.type.type, ...typeKeys.flatMap((x) => x)];
+    }
+  }
 }

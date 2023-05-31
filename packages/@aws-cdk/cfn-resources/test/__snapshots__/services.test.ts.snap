@@ -4326,7 +4326,7 @@ export class CfnTransitGatewayAttachment extends cdk.CfnResource implements cdk.
   /**
    * The VPC attachment options, in JSON or YAML.
    */
-  public options?: cdk.IResolvable | CfnTransitGatewayAttachment.OptionsProperty;
+  public options?: any | cdk.IResolvable;
 
   /**
    * The IDs of one or more subnets.
@@ -4404,37 +4404,6 @@ export class CfnTransitGatewayAttachment extends cdk.CfnResource implements cdk.
   }
 }
 
-export namespace CfnTransitGatewayAttachment {
-  /**
-   * Describes the VPC attachment options.
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewayattachment-options.html
-   */
-  export interface OptionsProperty {
-    /**
-     * Indicates whether appliance mode support is enabled.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewayattachment-options.html#cfn-ec2-transitgatewayattachment-options-appliancemodesupport
-     */
-    readonly applianceModeSupport?: string;
-
-    /**
-     * Indicates whether DNS support is enabled.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewayattachment-options.html#cfn-ec2-transitgatewayattachment-options-dnssupport
-     */
-    readonly dnsSupport?: string;
-
-    /**
-     * Indicates whether IPv6 support is disabled.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewayattachment-options.html#cfn-ec2-transitgatewayattachment-options-ipv6support
-     */
-    readonly ipv6Support?: string;
-  }
-}
-
 /**
  * Properties for defining a \`CfnTransitGatewayAttachment\`
  *
@@ -4452,7 +4421,7 @@ export interface CfnTransitGatewayAttachmentProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-transitgatewayattachment.html#cfn-ec2-transitgatewayattachment-options
    */
-  readonly options?: cdk.IResolvable | CfnTransitGatewayAttachment.OptionsProperty;
+  readonly options?: any | cdk.IResolvable;
 
   /**
    * The IDs of one or more subnets.
@@ -4486,54 +4455,6 @@ export interface CfnTransitGatewayAttachmentProps {
 }
 
 /**
- * Determine whether the given properties match those of a \`OptionsProperty\`
- *
- * @param properties - the TypeScript properties of a \`OptionsProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnTransitGatewayAttachmentOptionsPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("applianceModeSupport", cdk.validateString)(properties.applianceModeSupport));
-  errors.collect(cdk.propertyValidator("dnsSupport", cdk.validateString)(properties.dnsSupport));
-  errors.collect(cdk.propertyValidator("ipv6Support", cdk.validateString)(properties.ipv6Support));
-  return errors.wrap("supplied properties not correct for \\"OptionsProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnTransitGatewayAttachmentOptionsPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnTransitGatewayAttachmentOptionsPropertyValidator(properties).assertSuccess();
-  return {
-    "ApplianceModeSupport": cdk.stringToCloudFormation(properties.applianceModeSupport),
-    "DnsSupport": cdk.stringToCloudFormation(properties.dnsSupport),
-    "Ipv6Support": cdk.stringToCloudFormation(properties.ipv6Support)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnTransitGatewayAttachmentOptionsPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnTransitGatewayAttachment.OptionsProperty> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnTransitGatewayAttachment.OptionsProperty>();
-  ret.addPropertyResult("applianceModeSupport", "ApplianceModeSupport", (properties.ApplianceModeSupport != null ? cfn_parse.FromCloudFormation.getString(properties.ApplianceModeSupport) : undefined));
-  ret.addPropertyResult("dnsSupport", "DnsSupport", (properties.DnsSupport != null ? cfn_parse.FromCloudFormation.getString(properties.DnsSupport) : undefined));
-  ret.addPropertyResult("ipv6Support", "Ipv6Support", (properties.Ipv6Support != null ? cfn_parse.FromCloudFormation.getString(properties.Ipv6Support) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
  * Determine whether the given properties match those of a \`CfnTransitGatewayAttachmentProps\`
  *
  * @param properties - the TypeScript properties of a \`CfnTransitGatewayAttachmentProps\`
@@ -4547,7 +4468,7 @@ function CfnTransitGatewayAttachmentPropsValidator(properties: any): cdk.Validat
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
-  errors.collect(cdk.propertyValidator("options", CfnTransitGatewayAttachmentOptionsPropertyValidator)(properties.options));
+  errors.collect(cdk.propertyValidator("options", cdk.validateObject)(properties.options));
   errors.collect(cdk.propertyValidator("subnetIds", cdk.requiredValidator)(properties.subnetIds));
   errors.collect(cdk.propertyValidator("subnetIds", cdk.listValidator(cdk.validateString))(properties.subnetIds));
   errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
@@ -4563,7 +4484,7 @@ function convertCfnTransitGatewayAttachmentPropsToCloudFormation(properties: any
   if (!cdk.canInspect(properties)) return properties;
   CfnTransitGatewayAttachmentPropsValidator(properties).assertSuccess();
   return {
-    "Options": convertCfnTransitGatewayAttachmentOptionsPropertyToCloudFormation(properties.options),
+    "Options": cdk.objectToCloudFormation(properties.options),
     "SubnetIds": cdk.listMapper(cdk.stringToCloudFormation)(properties.subnetIds),
     "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags),
     "TransitGatewayId": cdk.stringToCloudFormation(properties.transitGatewayId),
@@ -4581,7 +4502,7 @@ function CfnTransitGatewayAttachmentPropsFromCloudFormation(properties: any): cf
     return new cfn_parse.FromCloudFormationResult(properties);
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnTransitGatewayAttachmentProps>();
-  ret.addPropertyResult("options", "Options", (properties.Options != null ? CfnTransitGatewayAttachmentOptionsPropertyFromCloudFormation(properties.Options) : undefined));
+  ret.addPropertyResult("options", "Options", (properties.Options != null ? cfn_parse.FromCloudFormation.getAny(properties.Options) : undefined));
   ret.addPropertyResult("subnetIds", "SubnetIds", (properties.SubnetIds != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.SubnetIds) : undefined));
   ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
   ret.addPropertyResult("transitGatewayId", "TransitGatewayId", (properties.TransitGatewayId != null ? cfn_parse.FromCloudFormation.getString(properties.TransitGatewayId) : undefined));
@@ -8286,6 +8207,10 @@ export namespace CfnLaunchTemplate {
    */
   export interface CpuOptionsProperty {
     /**
+     * Indicates whether to enable the instance for AMD SEV-SNP.
+     *
+     * AMD SEV-SNP is supported with M6a, R6a, and C6a instance types only. For more information, see [AMD SEV-SNP](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/sev-snp.html) .
+     *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-launchtemplate-cpuoptions.html#cfn-ec2-launchtemplate-cpuoptions-amdsevsnp
      */
     readonly amdSevSnp?: string;
@@ -13119,6 +13044,8 @@ export class CfnNetworkInterface extends cdk.CfnResource implements cdk.IInspect
    */
   public description?: string;
 
+  public enablePrimaryIpv6?: boolean | cdk.IResolvable;
+
   /**
    * The security group IDs associated with this network interface.
    */
@@ -13191,6 +13118,7 @@ export class CfnNetworkInterface extends cdk.CfnResource implements cdk.IInspect
     this.attrPrimaryPrivateIpAddress = cdk.Token.asString(this.getAtt("PrimaryPrivateIpAddress", cdk.ResolutionTypeHint.STRING));
     this.attrSecondaryPrivateIpAddresses = cdk.Token.asList(this.getAtt("SecondaryPrivateIpAddresses", cdk.ResolutionTypeHint.STRING_LIST));
     this.description = props.description;
+    this.enablePrimaryIpv6 = props.enablePrimaryIpv6;
     this.groupSet = props.groupSet;
     this.interfaceType = props.interfaceType;
     this.ipv6AddressCount = props.ipv6AddressCount;
@@ -13209,6 +13137,7 @@ export class CfnNetworkInterface extends cdk.CfnResource implements cdk.IInspect
   protected get cfnProperties(): Record<string, any> {
     return {
       "description": this.description,
+      "enablePrimaryIpv6": this.enablePrimaryIpv6,
       "groupSet": this.groupSet,
       "interfaceType": this.interfaceType,
       "ipv6AddressCount": this.ipv6AddressCount,
@@ -13292,6 +13221,11 @@ export interface CfnNetworkInterfaceProps {
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-networkinterface.html#cfn-ec2-networkinterface-description
    */
   readonly description?: string;
+
+  /**
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-networkinterface.html#cfn-ec2-networkinterface-enableprimaryipv6
+   */
+  readonly enablePrimaryIpv6?: boolean | cdk.IResolvable;
 
   /**
    * The security group IDs associated with this network interface.
@@ -13485,6 +13419,7 @@ function CfnNetworkInterfacePropsValidator(properties: any): cdk.ValidationResul
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
   errors.collect(cdk.propertyValidator("description", cdk.validateString)(properties.description));
+  errors.collect(cdk.propertyValidator("enablePrimaryIpv6", cdk.validateBoolean)(properties.enablePrimaryIpv6));
   errors.collect(cdk.propertyValidator("groupSet", cdk.listValidator(cdk.validateString))(properties.groupSet));
   errors.collect(cdk.propertyValidator("interfaceType", cdk.validateString)(properties.interfaceType));
   errors.collect(cdk.propertyValidator("ipv6AddressCount", cdk.validateNumber)(properties.ipv6AddressCount));
@@ -13505,6 +13440,7 @@ function convertCfnNetworkInterfacePropsToCloudFormation(properties: any): any {
   CfnNetworkInterfacePropsValidator(properties).assertSuccess();
   return {
     "Description": cdk.stringToCloudFormation(properties.description),
+    "EnablePrimaryIpv6": cdk.booleanToCloudFormation(properties.enablePrimaryIpv6),
     "GroupSet": cdk.listMapper(cdk.stringToCloudFormation)(properties.groupSet),
     "InterfaceType": cdk.stringToCloudFormation(properties.interfaceType),
     "Ipv6AddressCount": cdk.numberToCloudFormation(properties.ipv6AddressCount),
@@ -13529,6 +13465,7 @@ function CfnNetworkInterfacePropsFromCloudFormation(properties: any): cfn_parse.
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnNetworkInterfaceProps>();
   ret.addPropertyResult("description", "Description", (properties.Description != null ? cfn_parse.FromCloudFormation.getString(properties.Description) : undefined));
+  ret.addPropertyResult("enablePrimaryIpv6", "EnablePrimaryIpv6", (properties.EnablePrimaryIpv6 != null ? cfn_parse.FromCloudFormation.getBoolean(properties.EnablePrimaryIpv6) : undefined));
   ret.addPropertyResult("groupSet", "GroupSet", (properties.GroupSet != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.GroupSet) : undefined));
   ret.addPropertyResult("interfaceType", "InterfaceType", (properties.InterfaceType != null ? cfn_parse.FromCloudFormation.getString(properties.InterfaceType) : undefined));
   ret.addPropertyResult("ipv6AddressCount", "Ipv6AddressCount", (properties.Ipv6AddressCount != null ? cfn_parse.FromCloudFormation.getNumber(properties.Ipv6AddressCount) : undefined));
@@ -15091,7 +15028,7 @@ export class CfnTransitGatewayMulticastDomain extends cdk.CfnResource implements
   /**
    * The options for the transit gateway multicast domain.
    */
-  public options?: cdk.IResolvable | CfnTransitGatewayMulticastDomain.OptionsProperty;
+  public options?: any | cdk.IResolvable;
 
   /**
    * Tag Manager which manages the tags for this resource
@@ -15156,37 +15093,6 @@ export class CfnTransitGatewayMulticastDomain extends cdk.CfnResource implements
   }
 }
 
-export namespace CfnTransitGatewayMulticastDomain {
-  /**
-   * The options for the transit gateway multicast domain.
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewaymulticastdomain-options.html
-   */
-  export interface OptionsProperty {
-    /**
-     * Indicates whether to automatically accept cross-account subnet associations that are associated with the transit gateway multicast domain.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewaymulticastdomain-options.html#cfn-ec2-transitgatewaymulticastdomain-options-autoacceptsharedassociations
-     */
-    readonly autoAcceptSharedAssociations?: string;
-
-    /**
-     * Specify whether to enable Internet Group Management Protocol (IGMP) version 2 for the transit gateway multicast domain.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewaymulticastdomain-options.html#cfn-ec2-transitgatewaymulticastdomain-options-igmpv2support
-     */
-    readonly igmpv2Support?: string;
-
-    /**
-     * Specify whether to enable support for statically configuring multicast group sources for a domain.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewaymulticastdomain-options.html#cfn-ec2-transitgatewaymulticastdomain-options-staticsourcessupport
-     */
-    readonly staticSourcesSupport?: string;
-  }
-}
-
 /**
  * Properties for defining a \`CfnTransitGatewayMulticastDomain\`
  *
@@ -15204,7 +15110,7 @@ export interface CfnTransitGatewayMulticastDomainProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-transitgatewaymulticastdomain.html#cfn-ec2-transitgatewaymulticastdomain-options
    */
-  readonly options?: cdk.IResolvable | CfnTransitGatewayMulticastDomain.OptionsProperty;
+  readonly options?: any | cdk.IResolvable;
 
   /**
    * The tags for the transit gateway multicast domain.
@@ -15222,54 +15128,6 @@ export interface CfnTransitGatewayMulticastDomainProps {
 }
 
 /**
- * Determine whether the given properties match those of a \`OptionsProperty\`
- *
- * @param properties - the TypeScript properties of a \`OptionsProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnTransitGatewayMulticastDomainOptionsPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("autoAcceptSharedAssociations", cdk.validateString)(properties.autoAcceptSharedAssociations));
-  errors.collect(cdk.propertyValidator("igmpv2Support", cdk.validateString)(properties.igmpv2Support));
-  errors.collect(cdk.propertyValidator("staticSourcesSupport", cdk.validateString)(properties.staticSourcesSupport));
-  return errors.wrap("supplied properties not correct for \\"OptionsProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnTransitGatewayMulticastDomainOptionsPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnTransitGatewayMulticastDomainOptionsPropertyValidator(properties).assertSuccess();
-  return {
-    "AutoAcceptSharedAssociations": cdk.stringToCloudFormation(properties.autoAcceptSharedAssociations),
-    "Igmpv2Support": cdk.stringToCloudFormation(properties.igmpv2Support),
-    "StaticSourcesSupport": cdk.stringToCloudFormation(properties.staticSourcesSupport)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnTransitGatewayMulticastDomainOptionsPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnTransitGatewayMulticastDomain.OptionsProperty> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnTransitGatewayMulticastDomain.OptionsProperty>();
-  ret.addPropertyResult("autoAcceptSharedAssociations", "AutoAcceptSharedAssociations", (properties.AutoAcceptSharedAssociations != null ? cfn_parse.FromCloudFormation.getString(properties.AutoAcceptSharedAssociations) : undefined));
-  ret.addPropertyResult("igmpv2Support", "Igmpv2Support", (properties.Igmpv2Support != null ? cfn_parse.FromCloudFormation.getString(properties.Igmpv2Support) : undefined));
-  ret.addPropertyResult("staticSourcesSupport", "StaticSourcesSupport", (properties.StaticSourcesSupport != null ? cfn_parse.FromCloudFormation.getString(properties.StaticSourcesSupport) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
  * Determine whether the given properties match those of a \`CfnTransitGatewayMulticastDomainProps\`
  *
  * @param properties - the TypeScript properties of a \`CfnTransitGatewayMulticastDomainProps\`
@@ -15283,7 +15141,7 @@ function CfnTransitGatewayMulticastDomainPropsValidator(properties: any): cdk.Va
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
-  errors.collect(cdk.propertyValidator("options", CfnTransitGatewayMulticastDomainOptionsPropertyValidator)(properties.options));
+  errors.collect(cdk.propertyValidator("options", cdk.validateObject)(properties.options));
   errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
   errors.collect(cdk.propertyValidator("transitGatewayId", cdk.requiredValidator)(properties.transitGatewayId));
   errors.collect(cdk.propertyValidator("transitGatewayId", cdk.validateString)(properties.transitGatewayId));
@@ -15295,7 +15153,7 @@ function convertCfnTransitGatewayMulticastDomainPropsToCloudFormation(properties
   if (!cdk.canInspect(properties)) return properties;
   CfnTransitGatewayMulticastDomainPropsValidator(properties).assertSuccess();
   return {
-    "Options": convertCfnTransitGatewayMulticastDomainOptionsPropertyToCloudFormation(properties.options),
+    "Options": cdk.objectToCloudFormation(properties.options),
     "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags),
     "TransitGatewayId": cdk.stringToCloudFormation(properties.transitGatewayId)
   };
@@ -15311,7 +15169,7 @@ function CfnTransitGatewayMulticastDomainPropsFromCloudFormation(properties: any
     return new cfn_parse.FromCloudFormationResult(properties);
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnTransitGatewayMulticastDomainProps>();
-  ret.addPropertyResult("options", "Options", (properties.Options != null ? CfnTransitGatewayMulticastDomainOptionsPropertyFromCloudFormation(properties.Options) : undefined));
+  ret.addPropertyResult("options", "Options", (properties.Options != null ? cfn_parse.FromCloudFormation.getAny(properties.Options) : undefined));
   ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
   ret.addPropertyResult("transitGatewayId", "TransitGatewayId", (properties.TransitGatewayId != null ? cfn_parse.FromCloudFormation.getString(properties.TransitGatewayId) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
@@ -23227,8 +23085,14 @@ export class CfnCapacityReservationFleet extends cdk.CfnResource implements cdk.
    */
   public instanceTypeSpecifications?: Array<CfnCapacityReservationFleet.InstanceTypeSpecificationProperty | cdk.IResolvable> | cdk.IResolvable;
 
+  /**
+   * Used to add an end date to a Capacity Reservation Fleet that has no end date and time.
+   */
   public noRemoveEndDate?: boolean | cdk.IResolvable;
 
+  /**
+   * Used to remove an end date from a Capacity Reservation Fleet that is configured to end automatically at a specific date and time.
+   */
   public removeEndDate?: boolean | cdk.IResolvable;
 
   /**
@@ -23448,11 +23312,19 @@ export interface CfnCapacityReservationFleetProps {
   readonly instanceTypeSpecifications?: Array<CfnCapacityReservationFleet.InstanceTypeSpecificationProperty | cdk.IResolvable> | cdk.IResolvable;
 
   /**
+   * Used to add an end date to a Capacity Reservation Fleet that has no end date and time.
+   *
+   * To add an end date to a Capacity Reservation Fleet, specify \`true\` for this paramater and specify the end date and time (in UTC time format) for the *EndDate* parameter.
+   *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-capacityreservationfleet.html#cfn-ec2-capacityreservationfleet-noremoveenddate
    */
   readonly noRemoveEndDate?: boolean | cdk.IResolvable;
 
   /**
+   * Used to remove an end date from a Capacity Reservation Fleet that is configured to end automatically at a specific date and time.
+   *
+   * To remove the end date from a Capacity Reservation Fleet, specify \`true\` for this paramater and omit the *EndDate* parameter.
+   *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-capacityreservationfleet.html#cfn-ec2-capacityreservationfleet-removeenddate
    */
   readonly removeEndDate?: boolean | cdk.IResolvable;
@@ -24539,7 +24411,7 @@ export class CfnTransitGatewayVpcAttachment extends cdk.CfnResource implements c
   /**
    * The VPC attachment options, in JSON or YAML.
    */
-  public options?: cdk.IResolvable | CfnTransitGatewayVpcAttachment.OptionsProperty;
+  public options?: any | cdk.IResolvable;
 
   /**
    * The IDs of one or more subnets to remove.
@@ -24626,37 +24498,6 @@ export class CfnTransitGatewayVpcAttachment extends cdk.CfnResource implements c
   }
 }
 
-export namespace CfnTransitGatewayVpcAttachment {
-  /**
-   * Describes the VPC attachment options.
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewayvpcattachment-options.html
-   */
-  export interface OptionsProperty {
-    /**
-     * Indicates whether appliance mode support is enabled.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewayvpcattachment-options.html#cfn-ec2-transitgatewayvpcattachment-options-appliancemodesupport
-     */
-    readonly applianceModeSupport?: string;
-
-    /**
-     * Indicates whether DNS support is enabled.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewayvpcattachment-options.html#cfn-ec2-transitgatewayvpcattachment-options-dnssupport
-     */
-    readonly dnsSupport?: string;
-
-    /**
-     * Indicates whether IPv6 support is disabled.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-transitgatewayvpcattachment-options.html#cfn-ec2-transitgatewayvpcattachment-options-ipv6support
-     */
-    readonly ipv6Support?: string;
-  }
-}
-
 /**
  * Properties for defining a \`CfnTransitGatewayVpcAttachment\`
  *
@@ -24683,7 +24524,7 @@ export interface CfnTransitGatewayVpcAttachmentProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-transitgatewayvpcattachment.html#cfn-ec2-transitgatewayvpcattachment-options
    */
-  readonly options?: cdk.IResolvable | CfnTransitGatewayVpcAttachment.OptionsProperty;
+  readonly options?: any | cdk.IResolvable;
 
   /**
    * The IDs of one or more subnets to remove.
@@ -24722,54 +24563,6 @@ export interface CfnTransitGatewayVpcAttachmentProps {
 }
 
 /**
- * Determine whether the given properties match those of a \`OptionsProperty\`
- *
- * @param properties - the TypeScript properties of a \`OptionsProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnTransitGatewayVpcAttachmentOptionsPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("applianceModeSupport", cdk.validateString)(properties.applianceModeSupport));
-  errors.collect(cdk.propertyValidator("dnsSupport", cdk.validateString)(properties.dnsSupport));
-  errors.collect(cdk.propertyValidator("ipv6Support", cdk.validateString)(properties.ipv6Support));
-  return errors.wrap("supplied properties not correct for \\"OptionsProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnTransitGatewayVpcAttachmentOptionsPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnTransitGatewayVpcAttachmentOptionsPropertyValidator(properties).assertSuccess();
-  return {
-    "ApplianceModeSupport": cdk.stringToCloudFormation(properties.applianceModeSupport),
-    "DnsSupport": cdk.stringToCloudFormation(properties.dnsSupport),
-    "Ipv6Support": cdk.stringToCloudFormation(properties.ipv6Support)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnTransitGatewayVpcAttachmentOptionsPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnTransitGatewayVpcAttachment.OptionsProperty> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnTransitGatewayVpcAttachment.OptionsProperty>();
-  ret.addPropertyResult("applianceModeSupport", "ApplianceModeSupport", (properties.ApplianceModeSupport != null ? cfn_parse.FromCloudFormation.getString(properties.ApplianceModeSupport) : undefined));
-  ret.addPropertyResult("dnsSupport", "DnsSupport", (properties.DnsSupport != null ? cfn_parse.FromCloudFormation.getString(properties.DnsSupport) : undefined));
-  ret.addPropertyResult("ipv6Support", "Ipv6Support", (properties.Ipv6Support != null ? cfn_parse.FromCloudFormation.getString(properties.Ipv6Support) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
  * Determine whether the given properties match those of a \`CfnTransitGatewayVpcAttachmentProps\`
  *
  * @param properties - the TypeScript properties of a \`CfnTransitGatewayVpcAttachmentProps\`
@@ -24784,7 +24577,7 @@ function CfnTransitGatewayVpcAttachmentPropsValidator(properties: any): cdk.Vali
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
   errors.collect(cdk.propertyValidator("addSubnetIds", cdk.listValidator(cdk.validateString))(properties.addSubnetIds));
-  errors.collect(cdk.propertyValidator("options", CfnTransitGatewayVpcAttachmentOptionsPropertyValidator)(properties.options));
+  errors.collect(cdk.propertyValidator("options", cdk.validateObject)(properties.options));
   errors.collect(cdk.propertyValidator("removeSubnetIds", cdk.listValidator(cdk.validateString))(properties.removeSubnetIds));
   errors.collect(cdk.propertyValidator("subnetIds", cdk.requiredValidator)(properties.subnetIds));
   errors.collect(cdk.propertyValidator("subnetIds", cdk.listValidator(cdk.validateString))(properties.subnetIds));
@@ -24802,7 +24595,7 @@ function convertCfnTransitGatewayVpcAttachmentPropsToCloudFormation(properties: 
   CfnTransitGatewayVpcAttachmentPropsValidator(properties).assertSuccess();
   return {
     "AddSubnetIds": cdk.listMapper(cdk.stringToCloudFormation)(properties.addSubnetIds),
-    "Options": convertCfnTransitGatewayVpcAttachmentOptionsPropertyToCloudFormation(properties.options),
+    "Options": cdk.objectToCloudFormation(properties.options),
     "RemoveSubnetIds": cdk.listMapper(cdk.stringToCloudFormation)(properties.removeSubnetIds),
     "SubnetIds": cdk.listMapper(cdk.stringToCloudFormation)(properties.subnetIds),
     "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags),
@@ -24822,7 +24615,7 @@ function CfnTransitGatewayVpcAttachmentPropsFromCloudFormation(properties: any):
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnTransitGatewayVpcAttachmentProps>();
   ret.addPropertyResult("addSubnetIds", "AddSubnetIds", (properties.AddSubnetIds != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.AddSubnetIds) : undefined));
-  ret.addPropertyResult("options", "Options", (properties.Options != null ? CfnTransitGatewayVpcAttachmentOptionsPropertyFromCloudFormation(properties.Options) : undefined));
+  ret.addPropertyResult("options", "Options", (properties.Options != null ? cfn_parse.FromCloudFormation.getAny(properties.Options) : undefined));
   ret.addPropertyResult("removeSubnetIds", "RemoveSubnetIds", (properties.RemoveSubnetIds != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.RemoveSubnetIds) : undefined));
   ret.addPropertyResult("subnetIds", "SubnetIds", (properties.SubnetIds != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.SubnetIds) : undefined));
   ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
@@ -25287,7 +25080,7 @@ export class CfnFlowLog extends cdk.CfnResource implements cdk.IInspectable, cdk
   /**
    * The destination options. The following options are supported:.
    */
-  public destinationOptions?: CfnFlowLog.DestinationOptionsProperty | cdk.IResolvable;
+  public destinationOptions?: any | cdk.IResolvable;
 
   /**
    * The destination for the flow log data. The meaning of this parameter depends on the destination type.
@@ -25401,43 +25194,6 @@ export class CfnFlowLog extends cdk.CfnResource implements cdk.IInspectable, cdk
   }
 }
 
-export namespace CfnFlowLog {
-  /**
-   * Describes the destination options for a flow log.
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-flowlog-destinationoptions.html
-   */
-  export interface DestinationOptionsProperty {
-    /**
-     * The format for the flow log.
-     *
-     * The default is \`plain-text\` .
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-flowlog-destinationoptions.html#cfn-ec2-flowlog-destinationoptions-fileformat
-     */
-    readonly fileFormat: string;
-
-    /**
-     * Indicates whether to use Hive-compatible prefixes for flow logs stored in Amazon S3.
-     *
-     * The default is \`false\` .
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-flowlog-destinationoptions.html#cfn-ec2-flowlog-destinationoptions-hivecompatiblepartitions
-     */
-    readonly hiveCompatiblePartitions: boolean | cdk.IResolvable;
-
-    /**
-     * Indicates whether to partition the flow log per hour.
-     *
-     * This reduces the cost and response time for queries. The default is \`false\` .
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-flowlog-destinationoptions.html#cfn-ec2-flowlog-destinationoptions-perhourpartition
-     */
-    readonly perHourPartition: boolean | cdk.IResolvable;
-  }
-}
-
 /**
  * Properties for defining a \`CfnFlowLog\`
  *
@@ -25464,7 +25220,7 @@ export interface CfnFlowLogProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-flowlog.html#cfn-ec2-flowlog-destinationoptions
    */
-  readonly destinationOptions?: CfnFlowLog.DestinationOptionsProperty | cdk.IResolvable;
+  readonly destinationOptions?: any | cdk.IResolvable;
 
   /**
    * The destination for the flow log data. The meaning of this parameter depends on the destination type.
@@ -25563,57 +25319,6 @@ export interface CfnFlowLogProps {
 }
 
 /**
- * Determine whether the given properties match those of a \`DestinationOptionsProperty\`
- *
- * @param properties - the TypeScript properties of a \`DestinationOptionsProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnFlowLogDestinationOptionsPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("fileFormat", cdk.requiredValidator)(properties.fileFormat));
-  errors.collect(cdk.propertyValidator("fileFormat", cdk.validateString)(properties.fileFormat));
-  errors.collect(cdk.propertyValidator("hiveCompatiblePartitions", cdk.requiredValidator)(properties.hiveCompatiblePartitions));
-  errors.collect(cdk.propertyValidator("hiveCompatiblePartitions", cdk.validateBoolean)(properties.hiveCompatiblePartitions));
-  errors.collect(cdk.propertyValidator("perHourPartition", cdk.requiredValidator)(properties.perHourPartition));
-  errors.collect(cdk.propertyValidator("perHourPartition", cdk.validateBoolean)(properties.perHourPartition));
-  return errors.wrap("supplied properties not correct for \\"DestinationOptionsProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnFlowLogDestinationOptionsPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnFlowLogDestinationOptionsPropertyValidator(properties).assertSuccess();
-  return {
-    "FileFormat": cdk.stringToCloudFormation(properties.fileFormat),
-    "HiveCompatiblePartitions": cdk.booleanToCloudFormation(properties.hiveCompatiblePartitions),
-    "PerHourPartition": cdk.booleanToCloudFormation(properties.perHourPartition)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnFlowLogDestinationOptionsPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnFlowLog.DestinationOptionsProperty | cdk.IResolvable> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFlowLog.DestinationOptionsProperty>();
-  ret.addPropertyResult("fileFormat", "FileFormat", (properties.FileFormat != null ? cfn_parse.FromCloudFormation.getString(properties.FileFormat) : undefined));
-  ret.addPropertyResult("hiveCompatiblePartitions", "HiveCompatiblePartitions", (properties.HiveCompatiblePartitions != null ? cfn_parse.FromCloudFormation.getBoolean(properties.HiveCompatiblePartitions) : undefined));
-  ret.addPropertyResult("perHourPartition", "PerHourPartition", (properties.PerHourPartition != null ? cfn_parse.FromCloudFormation.getBoolean(properties.PerHourPartition) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
  * Determine whether the given properties match those of a \`CfnFlowLogProps\`
  *
  * @param properties - the TypeScript properties of a \`CfnFlowLogProps\`
@@ -25628,7 +25333,7 @@ function CfnFlowLogPropsValidator(properties: any): cdk.ValidationResult {
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
   errors.collect(cdk.propertyValidator("deliverLogsPermissionArn", cdk.validateString)(properties.deliverLogsPermissionArn));
-  errors.collect(cdk.propertyValidator("destinationOptions", CfnFlowLogDestinationOptionsPropertyValidator)(properties.destinationOptions));
+  errors.collect(cdk.propertyValidator("destinationOptions", cdk.validateObject)(properties.destinationOptions));
   errors.collect(cdk.propertyValidator("logDestination", cdk.validateString)(properties.logDestination));
   errors.collect(cdk.propertyValidator("logDestinationType", cdk.validateString)(properties.logDestinationType));
   errors.collect(cdk.propertyValidator("logFormat", cdk.validateString)(properties.logFormat));
@@ -25649,7 +25354,7 @@ function convertCfnFlowLogPropsToCloudFormation(properties: any): any {
   CfnFlowLogPropsValidator(properties).assertSuccess();
   return {
     "DeliverLogsPermissionArn": cdk.stringToCloudFormation(properties.deliverLogsPermissionArn),
-    "DestinationOptions": convertCfnFlowLogDestinationOptionsPropertyToCloudFormation(properties.destinationOptions),
+    "DestinationOptions": cdk.objectToCloudFormation(properties.destinationOptions),
     "LogDestination": cdk.stringToCloudFormation(properties.logDestination),
     "LogDestinationType": cdk.stringToCloudFormation(properties.logDestinationType),
     "LogFormat": cdk.stringToCloudFormation(properties.logFormat),
@@ -25673,7 +25378,7 @@ function CfnFlowLogPropsFromCloudFormation(properties: any): cfn_parse.FromCloud
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFlowLogProps>();
   ret.addPropertyResult("deliverLogsPermissionArn", "DeliverLogsPermissionArn", (properties.DeliverLogsPermissionArn != null ? cfn_parse.FromCloudFormation.getString(properties.DeliverLogsPermissionArn) : undefined));
-  ret.addPropertyResult("destinationOptions", "DestinationOptions", (properties.DestinationOptions != null ? CfnFlowLogDestinationOptionsPropertyFromCloudFormation(properties.DestinationOptions) : undefined));
+  ret.addPropertyResult("destinationOptions", "DestinationOptions", (properties.DestinationOptions != null ? cfn_parse.FromCloudFormation.getAny(properties.DestinationOptions) : undefined));
   ret.addPropertyResult("logDestination", "LogDestination", (properties.LogDestination != null ? cfn_parse.FromCloudFormation.getString(properties.LogDestination) : undefined));
   ret.addPropertyResult("logDestinationType", "LogDestinationType", (properties.LogDestinationType != null ? cfn_parse.FromCloudFormation.getString(properties.LogDestinationType) : undefined));
   ret.addPropertyResult("logFormat", "LogFormat", (properties.LogFormat != null ? cfn_parse.FromCloudFormation.getString(properties.LogFormat) : undefined));
@@ -25819,7 +25524,7 @@ export class CfnSubnet extends cdk.CfnResource implements cdk.IInspectable, cdk.
   /**
    * The hostname type for EC2 instances launched into this subnet and how DNS A and AAAA record queries to the instances should be handled.
    */
-  public privateDnsNameOptionsOnLaunch?: cdk.IResolvable | CfnSubnet.PrivateDnsNameOptionsOnLaunchProperty;
+  public privateDnsNameOptionsOnLaunch?: any | cdk.IResolvable;
 
   /**
    * Tag Manager which manages the tags for this resource
@@ -25901,39 +25606,6 @@ export class CfnSubnet extends cdk.CfnResource implements cdk.IInspectable, cdk.
 
   protected renderProperties(props: Record<string, any>): Record<string, any> {
     return convertCfnSubnetPropsToCloudFormation(props);
-  }
-}
-
-export namespace CfnSubnet {
-  /**
-   * Describes the options for instance hostnames.
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-subnet-privatednsnameoptionsonlaunch.html
-   */
-  export interface PrivateDnsNameOptionsOnLaunchProperty {
-    /**
-     * Indicates whether to respond to DNS queries for instance hostname with DNS AAAA records.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-subnet-privatednsnameoptionsonlaunch.html#cfn-ec2-subnet-privatednsnameoptionsonlaunch-enableresourcenamednsaaaarecord
-     */
-    readonly enableResourceNameDnsAaaaRecord?: boolean | cdk.IResolvable;
-
-    /**
-     * Indicates whether to respond to DNS queries for instance hostnames with DNS A records.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-subnet-privatednsnameoptionsonlaunch.html#cfn-ec2-subnet-privatednsnameoptionsonlaunch-enableresourcenamednsarecord
-     */
-    readonly enableResourceNameDnsARecord?: boolean | cdk.IResolvable;
-
-    /**
-     * The type of hostname for EC2 instances.
-     *
-     * For IPv4 only subnets, an instance DNS name must be based on the instance IPv4 address. For IPv6 only subnets, an instance DNS name must be based on the instance ID. For dual-stack subnets, you can specify whether DNS names use the instance IPv4 address or the instance ID.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-subnet-privatednsnameoptionsonlaunch.html#cfn-ec2-subnet-privatednsnameoptionsonlaunch-hostnametype
-     */
-    readonly hostnameType?: string;
   }
 }
 
@@ -26035,7 +25707,7 @@ export interface CfnSubnetProps {
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-subnet.html#cfn-ec2-subnet-privatednsnameoptionsonlaunch
    */
-  readonly privateDnsNameOptionsOnLaunch?: cdk.IResolvable | CfnSubnet.PrivateDnsNameOptionsOnLaunchProperty;
+  readonly privateDnsNameOptionsOnLaunch?: any | cdk.IResolvable;
 
   /**
    * Any tags assigned to the subnet.
@@ -26052,54 +25724,6 @@ export interface CfnSubnetProps {
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-subnet.html#cfn-ec2-subnet-vpcid
    */
   readonly vpcId: string;
-}
-
-/**
- * Determine whether the given properties match those of a \`PrivateDnsNameOptionsOnLaunchProperty\`
- *
- * @param properties - the TypeScript properties of a \`PrivateDnsNameOptionsOnLaunchProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnSubnetPrivateDnsNameOptionsOnLaunchPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("enableResourceNameDnsAaaaRecord", cdk.validateBoolean)(properties.enableResourceNameDnsAaaaRecord));
-  errors.collect(cdk.propertyValidator("enableResourceNameDnsARecord", cdk.validateBoolean)(properties.enableResourceNameDnsARecord));
-  errors.collect(cdk.propertyValidator("hostnameType", cdk.validateString)(properties.hostnameType));
-  return errors.wrap("supplied properties not correct for \\"PrivateDnsNameOptionsOnLaunchProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnSubnetPrivateDnsNameOptionsOnLaunchPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnSubnetPrivateDnsNameOptionsOnLaunchPropertyValidator(properties).assertSuccess();
-  return {
-    "EnableResourceNameDnsAAAARecord": cdk.booleanToCloudFormation(properties.enableResourceNameDnsAaaaRecord),
-    "EnableResourceNameDnsARecord": cdk.booleanToCloudFormation(properties.enableResourceNameDnsARecord),
-    "HostnameType": cdk.stringToCloudFormation(properties.hostnameType)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnSubnetPrivateDnsNameOptionsOnLaunchPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnSubnet.PrivateDnsNameOptionsOnLaunchProperty> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSubnet.PrivateDnsNameOptionsOnLaunchProperty>();
-  ret.addPropertyResult("enableResourceNameDnsAaaaRecord", "EnableResourceNameDnsAAAARecord", (properties.EnableResourceNameDnsAAAARecord != null ? cfn_parse.FromCloudFormation.getBoolean(properties.EnableResourceNameDnsAAAARecord) : undefined));
-  ret.addPropertyResult("enableResourceNameDnsARecord", "EnableResourceNameDnsARecord", (properties.EnableResourceNameDnsARecord != null ? cfn_parse.FromCloudFormation.getBoolean(properties.EnableResourceNameDnsARecord) : undefined));
-  ret.addPropertyResult("hostnameType", "HostnameType", (properties.HostnameType != null ? cfn_parse.FromCloudFormation.getString(properties.HostnameType) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
 }
 
 /**
@@ -26125,7 +25749,7 @@ function CfnSubnetPropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("ipv6Native", cdk.validateBoolean)(properties.ipv6Native));
   errors.collect(cdk.propertyValidator("mapPublicIpOnLaunch", cdk.validateBoolean)(properties.mapPublicIpOnLaunch));
   errors.collect(cdk.propertyValidator("outpostArn", cdk.validateString)(properties.outpostArn));
-  errors.collect(cdk.propertyValidator("privateDnsNameOptionsOnLaunch", CfnSubnetPrivateDnsNameOptionsOnLaunchPropertyValidator)(properties.privateDnsNameOptionsOnLaunch));
+  errors.collect(cdk.propertyValidator("privateDnsNameOptionsOnLaunch", cdk.validateObject)(properties.privateDnsNameOptionsOnLaunch));
   errors.collect(cdk.propertyValidator("tags", cdk.listValidator(cdk.validateCfnTag))(properties.tags));
   errors.collect(cdk.propertyValidator("vpcId", cdk.requiredValidator)(properties.vpcId));
   errors.collect(cdk.propertyValidator("vpcId", cdk.validateString)(properties.vpcId));
@@ -26146,7 +25770,7 @@ function convertCfnSubnetPropsToCloudFormation(properties: any): any {
     "Ipv6Native": cdk.booleanToCloudFormation(properties.ipv6Native),
     "MapPublicIpOnLaunch": cdk.booleanToCloudFormation(properties.mapPublicIpOnLaunch),
     "OutpostArn": cdk.stringToCloudFormation(properties.outpostArn),
-    "PrivateDnsNameOptionsOnLaunch": convertCfnSubnetPrivateDnsNameOptionsOnLaunchPropertyToCloudFormation(properties.privateDnsNameOptionsOnLaunch),
+    "PrivateDnsNameOptionsOnLaunch": cdk.objectToCloudFormation(properties.privateDnsNameOptionsOnLaunch),
     "Tags": cdk.listMapper(cdk.cfnTagToCloudFormation)(properties.tags),
     "VpcId": cdk.stringToCloudFormation(properties.vpcId)
   };
@@ -26171,7 +25795,7 @@ function CfnSubnetPropsFromCloudFormation(properties: any): cfn_parse.FromCloudF
   ret.addPropertyResult("ipv6Native", "Ipv6Native", (properties.Ipv6Native != null ? cfn_parse.FromCloudFormation.getBoolean(properties.Ipv6Native) : undefined));
   ret.addPropertyResult("mapPublicIpOnLaunch", "MapPublicIpOnLaunch", (properties.MapPublicIpOnLaunch != null ? cfn_parse.FromCloudFormation.getBoolean(properties.MapPublicIpOnLaunch) : undefined));
   ret.addPropertyResult("outpostArn", "OutpostArn", (properties.OutpostArn != null ? cfn_parse.FromCloudFormation.getString(properties.OutpostArn) : undefined));
-  ret.addPropertyResult("privateDnsNameOptionsOnLaunch", "PrivateDnsNameOptionsOnLaunch", (properties.PrivateDnsNameOptionsOnLaunch != null ? CfnSubnetPrivateDnsNameOptionsOnLaunchPropertyFromCloudFormation(properties.PrivateDnsNameOptionsOnLaunch) : undefined));
+  ret.addPropertyResult("privateDnsNameOptionsOnLaunch", "PrivateDnsNameOptionsOnLaunch", (properties.PrivateDnsNameOptionsOnLaunch != null ? cfn_parse.FromCloudFormation.getAny(properties.PrivateDnsNameOptionsOnLaunch) : undefined));
   ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getCfnTag)(properties.Tags) : undefined));
   ret.addPropertyResult("vpcId", "VpcId", (properties.VpcId != null ? cfn_parse.FromCloudFormation.getString(properties.VpcId) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
@@ -29910,8 +29534,14 @@ export class CfnNetworkInsightsPath extends cdk.CfnResource implements cdk.IInsp
    */
   public destinationPort?: number;
 
+  /**
+   * Scopes the analysis to network paths that match specific filters at the destination.
+   */
   public filterAtDestination?: cdk.IResolvable | CfnNetworkInsightsPath.PathFilterProperty;
 
+  /**
+   * Scopes the analysis to network paths that match specific filters at the source.
+   */
   public filterAtSource?: cdk.IResolvable | CfnNetworkInsightsPath.PathFilterProperty;
 
   /**
@@ -30003,42 +29633,60 @@ export class CfnNetworkInsightsPath extends cdk.CfnResource implements cdk.IInsp
 
 export namespace CfnNetworkInsightsPath {
   /**
+   * Describes a set of filters for a path analysis.
+   *
+   * Use path filters to scope the analysis when there can be multiple resulting paths.
+   *
    * @struct
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-networkinsightspath-pathfilter.html
    */
   export interface PathFilterProperty {
     /**
+     * The destination IPv4 address.
+     *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-networkinsightspath-pathfilter.html#cfn-ec2-networkinsightspath-pathfilter-destinationaddress
      */
     readonly destinationAddress?: string;
 
     /**
+     * The destination port range.
+     *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-networkinsightspath-pathfilter.html#cfn-ec2-networkinsightspath-pathfilter-destinationportrange
      */
     readonly destinationPortRange?: CfnNetworkInsightsPath.FilterPortRangeProperty | cdk.IResolvable;
 
     /**
+     * The source IPv4 address.
+     *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-networkinsightspath-pathfilter.html#cfn-ec2-networkinsightspath-pathfilter-sourceaddress
      */
     readonly sourceAddress?: string;
 
     /**
+     * The source port range.
+     *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-networkinsightspath-pathfilter.html#cfn-ec2-networkinsightspath-pathfilter-sourceportrange
      */
     readonly sourcePortRange?: CfnNetworkInsightsPath.FilterPortRangeProperty | cdk.IResolvable;
   }
 
   /**
+   * Describes a port range.
+   *
    * @struct
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-networkinsightspath-filterportrange.html
    */
   export interface FilterPortRangeProperty {
     /**
+     * The first port in the range.
+     *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-networkinsightspath-filterportrange.html#cfn-ec2-networkinsightspath-filterportrange-fromport
      */
     readonly fromPort?: number;
 
     /**
+     * The last port in the range.
+     *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-networkinsightspath-filterportrange.html#cfn-ec2-networkinsightspath-filterportrange-toport
      */
     readonly toPort?: number;
@@ -30077,11 +29725,19 @@ export interface CfnNetworkInsightsPathProps {
   readonly destinationPort?: number;
 
   /**
+   * Scopes the analysis to network paths that match specific filters at the destination.
+   *
+   * If you specify this parameter, you can't specify the parameter for the destination IP address.
+   *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-networkinsightspath.html#cfn-ec2-networkinsightspath-filteratdestination
    */
   readonly filterAtDestination?: cdk.IResolvable | CfnNetworkInsightsPath.PathFilterProperty;
 
   /**
+   * Scopes the analysis to network paths that match specific filters at the source.
+   *
+   * If you specify this parameter, you can't specify the parameters for the source IP address or the destination port.
+   *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-networkinsightspath.html#cfn-ec2-networkinsightspath-filteratsource
    */
   readonly filterAtSource?: cdk.IResolvable | CfnNetworkInsightsPath.PathFilterProperty;
@@ -32623,7 +32279,9 @@ export namespace CfnSpotFleet {
    */
   export interface LaunchTemplateConfigProperty {
     /**
-     * The launch template.
+     * The launch template to use.
+     *
+     * Make sure that the launch template does not contain the \`NetworkInterfaceId\` parameter because you can't specify a network interface ID in a Spot Fleet.
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-spotfleet-launchtemplateconfig.html#cfn-ec2-spotfleet-launchtemplateconfig-launchtemplatespecification
      */
@@ -36455,7 +36113,7 @@ export class CfnRoute extends cdk.CfnResource implements cdk.IInspectable {
   public carrierGatewayId?: string;
 
   /**
-   * The IPv4 CIDR block used for the destination match.
+   * The IPv4 CIDR address block used for the destination match.
    */
   public destinationCidrBlock?: string;
 
@@ -36465,7 +36123,7 @@ export class CfnRoute extends cdk.CfnResource implements cdk.IInspectable {
   public destinationIpv6CidrBlock?: string;
 
   /**
-   * The ID of the egress-only internet gateway.
+   * [IPv6 traffic only] The ID of an egress-only internet gateway.
    */
   public egressOnlyInternetGatewayId?: string;
 
@@ -36485,17 +36143,17 @@ export class CfnRoute extends cdk.CfnResource implements cdk.IInspectable {
   public localGatewayId?: string;
 
   /**
-   * The ID of a NAT gateway.
+   * [IPv4 traffic only] The ID of a NAT gateway.
    */
   public natGatewayId?: string;
 
   /**
-   * The ID of the network interface.
+   * The ID of a network interface.
    */
   public networkInterfaceId?: string;
 
   /**
-   * The ID of the route table.
+   * The ID of the route table for the route.
    */
   public routeTableId: string;
 
@@ -36586,12 +36244,16 @@ export interface CfnRouteProps {
   /**
    * The ID of the carrier gateway.
    *
+   * You can only use this option when the VPC contains a subnet which is associated with a Wavelength Zone.
+   *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route.html#cfn-ec2-route-carriergatewayid
    */
   readonly carrierGatewayId?: string;
 
   /**
-   * The IPv4 CIDR block used for the destination match.
+   * The IPv4 CIDR address block used for the destination match.
+   *
+   * Routing decisions are based on the most specific match. We modify the specified CIDR block to its canonical form; for example, if you specify \`100.68.0.18/18\` , we modify it to \`100.68.0.0/18\` .
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route.html#cfn-ec2-route-destinationcidrblock
    */
@@ -36600,12 +36262,14 @@ export interface CfnRouteProps {
   /**
    * The IPv6 CIDR block used for the destination match.
    *
+   * Routing decisions are based on the most specific match.
+   *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route.html#cfn-ec2-route-destinationipv6cidrblock
    */
   readonly destinationIpv6CidrBlock?: string;
 
   /**
-   * The ID of the egress-only internet gateway.
+   * [IPv6 traffic only] The ID of an egress-only internet gateway.
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route.html#cfn-ec2-route-egressonlyinternetgatewayid
    */
@@ -36621,6 +36285,8 @@ export interface CfnRouteProps {
   /**
    * The ID of a NAT instance in your VPC.
    *
+   * The operation fails if you specify an instance ID unless exactly one network interface is attached.
+   *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route.html#cfn-ec2-route-instanceid
    */
   readonly instanceId?: string;
@@ -36633,23 +36299,21 @@ export interface CfnRouteProps {
   readonly localGatewayId?: string;
 
   /**
-   * The ID of a NAT gateway.
+   * [IPv4 traffic only] The ID of a NAT gateway.
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route.html#cfn-ec2-route-natgatewayid
    */
   readonly natGatewayId?: string;
 
   /**
-   * The ID of the network interface.
+   * The ID of a network interface.
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route.html#cfn-ec2-route-networkinterfaceid
    */
   readonly networkInterfaceId?: string;
 
   /**
-   * The ID of the route table.
-   *
-   * The routing table must be associated with the same VPC that the virtual private gateway is attached to.
+   * The ID of the route table for the route.
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-route.html#cfn-ec2-route-routetableid
    */
@@ -37407,6 +37071,8 @@ export class CfnSubnetCidrBlock extends cdk.CfnResource implements cdk.IInspecta
   }
 
   /**
+   * The ID of the association.
+   *
    * @cloudformationAttribute Id
    */
   public readonly attrId: string;
@@ -43461,15 +43127,15 @@ export class CfnApi extends cdk.CfnResource implements cdk.IInspectable, cdk.ITa
 
   public domain?: CfnApi.DomainConfigurationProperty | cdk.IResolvable;
 
-  public endpointConfiguration?: CfnApi.EndpointConfigurationProperty | cdk.IResolvable;
+  public endpointConfiguration?: CfnApi.EndpointConfigurationProperty | cdk.IResolvable | string;
 
-  public gatewayResponses?: cdk.IResolvable | Record<string, string>;
+  public gatewayResponses?: any | cdk.IResolvable;
 
   public methodSettings?: Array<any | cdk.IResolvable> | cdk.IResolvable;
 
   public minimumCompressionSize?: number;
 
-  public models?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
+  public models?: any | cdk.IResolvable;
 
   public name?: string;
 
@@ -43869,12 +43535,12 @@ export interface CfnApiProps {
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-endpointconfiguration
    */
-  readonly endpointConfiguration?: CfnApi.EndpointConfigurationProperty | cdk.IResolvable;
+  readonly endpointConfiguration?: CfnApi.EndpointConfigurationProperty | cdk.IResolvable | string;
 
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-gatewayresponses
    */
-  readonly gatewayResponses?: cdk.IResolvable | Record<string, string>;
+  readonly gatewayResponses?: any | cdk.IResolvable;
 
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-methodsettings
@@ -43889,7 +43555,7 @@ export interface CfnApiProps {
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-models
    */
-  readonly models?: cdk.IResolvable | Record<string, any | cdk.IResolvable>;
+  readonly models?: any | cdk.IResolvable;
 
   /**
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-serverless-api.html#cfn-serverless-api-name
@@ -44407,11 +44073,11 @@ function CfnApiPropsValidator(properties: any): cdk.ValidationResult {
   errors.collect(cdk.propertyValidator("description", cdk.validateString)(properties.description));
   errors.collect(cdk.propertyValidator("disableExecuteApiEndpoint", cdk.validateBoolean)(properties.disableExecuteApiEndpoint));
   errors.collect(cdk.propertyValidator("domain", CfnApiDomainConfigurationPropertyValidator)(properties.domain));
-  errors.collect(cdk.propertyValidator("endpointConfiguration", CfnApiEndpointConfigurationPropertyValidator)(properties.endpointConfiguration));
-  errors.collect(cdk.propertyValidator("gatewayResponses", cdk.hashValidator(cdk.validateString))(properties.gatewayResponses));
+  errors.collect(cdk.propertyValidator("endpointConfiguration", cdk.unionValidator(CfnApiEndpointConfigurationPropertyValidator, cdk.validateString))(properties.endpointConfiguration));
+  errors.collect(cdk.propertyValidator("gatewayResponses", cdk.validateObject)(properties.gatewayResponses));
   errors.collect(cdk.propertyValidator("methodSettings", cdk.listValidator(cdk.validateObject))(properties.methodSettings));
   errors.collect(cdk.propertyValidator("minimumCompressionSize", cdk.validateNumber)(properties.minimumCompressionSize));
-  errors.collect(cdk.propertyValidator("models", cdk.hashValidator(cdk.validateObject))(properties.models));
+  errors.collect(cdk.propertyValidator("models", cdk.validateObject)(properties.models));
   errors.collect(cdk.propertyValidator("name", cdk.validateString)(properties.name));
   errors.collect(cdk.propertyValidator("openApiVersion", cdk.validateString)(properties.openApiVersion));
   errors.collect(cdk.propertyValidator("stageName", cdk.requiredValidator)(properties.stageName));
@@ -44439,11 +44105,11 @@ function convertCfnApiPropsToCloudFormation(properties: any): any {
     "Description": cdk.stringToCloudFormation(properties.description),
     "DisableExecuteApiEndpoint": cdk.booleanToCloudFormation(properties.disableExecuteApiEndpoint),
     "Domain": convertCfnApiDomainConfigurationPropertyToCloudFormation(properties.domain),
-    "EndpointConfiguration": convertCfnApiEndpointConfigurationPropertyToCloudFormation(properties.endpointConfiguration),
-    "GatewayResponses": cdk.hashMapper(cdk.stringToCloudFormation)(properties.gatewayResponses),
+    "EndpointConfiguration": cdk.unionMapper([CfnApiEndpointConfigurationPropertyValidator, cdk.validateString], [convertCfnApiEndpointConfigurationPropertyToCloudFormation, cdk.stringToCloudFormation])(properties.endpointConfiguration),
+    "GatewayResponses": cdk.objectToCloudFormation(properties.gatewayResponses),
     "MethodSettings": cdk.listMapper(cdk.objectToCloudFormation)(properties.methodSettings),
     "MinimumCompressionSize": cdk.numberToCloudFormation(properties.minimumCompressionSize),
-    "Models": cdk.hashMapper(cdk.objectToCloudFormation)(properties.models),
+    "Models": cdk.objectToCloudFormation(properties.models),
     "Name": cdk.stringToCloudFormation(properties.name),
     "OpenApiVersion": cdk.stringToCloudFormation(properties.openApiVersion),
     "StageName": cdk.stringToCloudFormation(properties.stageName),
@@ -44475,11 +44141,11 @@ function CfnApiPropsFromCloudFormation(properties: any): cfn_parse.FromCloudForm
   ret.addPropertyResult("description", "Description", (properties.Description != null ? cfn_parse.FromCloudFormation.getString(properties.Description) : undefined));
   ret.addPropertyResult("disableExecuteApiEndpoint", "DisableExecuteApiEndpoint", (properties.DisableExecuteApiEndpoint != null ? cfn_parse.FromCloudFormation.getBoolean(properties.DisableExecuteApiEndpoint) : undefined));
   ret.addPropertyResult("domain", "Domain", (properties.Domain != null ? CfnApiDomainConfigurationPropertyFromCloudFormation(properties.Domain) : undefined));
-  ret.addPropertyResult("endpointConfiguration", "EndpointConfiguration", (properties.EndpointConfiguration != null ? CfnApiEndpointConfigurationPropertyFromCloudFormation(properties.EndpointConfiguration) : undefined));
-  ret.addPropertyResult("gatewayResponses", "GatewayResponses", (properties.GatewayResponses != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString)(properties.GatewayResponses) : undefined));
+  ret.addPropertyResult("endpointConfiguration", "EndpointConfiguration", (properties.EndpointConfiguration != null ? cfn_parse.FromCloudFormation.getTypeUnion([CfnApiEndpointConfigurationPropertyValidator, cdk.validateString], [CfnApiEndpointConfigurationPropertyFromCloudFormation, cfn_parse.FromCloudFormation.getString])(properties.EndpointConfiguration) : undefined));
+  ret.addPropertyResult("gatewayResponses", "GatewayResponses", (properties.GatewayResponses != null ? cfn_parse.FromCloudFormation.getAny(properties.GatewayResponses) : undefined));
   ret.addPropertyResult("methodSettings", "MethodSettings", (properties.MethodSettings != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getAny)(properties.MethodSettings) : undefined));
   ret.addPropertyResult("minimumCompressionSize", "MinimumCompressionSize", (properties.MinimumCompressionSize != null ? cfn_parse.FromCloudFormation.getNumber(properties.MinimumCompressionSize) : undefined));
-  ret.addPropertyResult("models", "Models", (properties.Models != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getAny)(properties.Models) : undefined));
+  ret.addPropertyResult("models", "Models", (properties.Models != null ? cfn_parse.FromCloudFormation.getAny(properties.Models) : undefined));
   ret.addPropertyResult("name", "Name", (properties.Name != null ? cfn_parse.FromCloudFormation.getString(properties.Name) : undefined));
   ret.addPropertyResult("openApiVersion", "OpenApiVersion", (properties.OpenApiVersion != null ? cfn_parse.FromCloudFormation.getString(properties.OpenApiVersion) : undefined));
   ret.addPropertyResult("stageName", "StageName", (properties.StageName != null ? cfn_parse.FromCloudFormation.getString(properties.StageName) : undefined));
@@ -44999,22 +44665,33 @@ export namespace CfnFunction {
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-deploymentpreference.html#cfn-serverless-function-deploymentpreference-enabled
      */
-    readonly enabled?: boolean | cdk.IResolvable;
+    readonly enabled: boolean | cdk.IResolvable;
 
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-deploymentpreference.html#cfn-serverless-function-deploymentpreference-hooks
      */
-    readonly hooks?: cdk.IResolvable | Record<string, string>;
-
-    /**
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-deploymentpreference.html#cfn-serverless-function-deploymentpreference-role
-     */
-    readonly role?: string;
+    readonly hooks?: CfnFunction.HooksProperty | cdk.IResolvable;
 
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-deploymentpreference.html#cfn-serverless-function-deploymentpreference-type
      */
-    readonly type?: string;
+    readonly type: string;
+  }
+
+  /**
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-hooks.html
+   */
+  export interface HooksProperty {
+    /**
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-hooks.html#cfn-serverless-function-hooks-posttraffic
+     */
+    readonly postTraffic?: string;
+
+    /**
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-hooks.html#cfn-serverless-function-hooks-pretraffic
+     */
+    readonly preTraffic?: string;
   }
 
   /**
@@ -45721,7 +45398,7 @@ export namespace CfnFunction {
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-iampolicydocument.html#cfn-serverless-function-iampolicydocument-statement
      */
-    readonly statement: Array<any | cdk.IResolvable> | cdk.IResolvable;
+    readonly statement: any | cdk.IResolvable;
 
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-function-iampolicydocument.html#cfn-serverless-function-iampolicydocument-version
@@ -46029,6 +45706,51 @@ function CfnFunctionDeadLetterQueuePropertyFromCloudFormation(properties: any): 
 }
 
 /**
+ * Determine whether the given properties match those of a \`HooksProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`HooksProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnFunctionHooksPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("postTraffic", cdk.validateString)(properties.postTraffic));
+  errors.collect(cdk.propertyValidator("preTraffic", cdk.validateString)(properties.preTraffic));
+  return errors.wrap("supplied properties not correct for \\"HooksProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnFunctionHooksPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnFunctionHooksPropertyValidator(properties).assertSuccess();
+  return {
+    "PostTraffic": cdk.stringToCloudFormation(properties.postTraffic),
+    "PreTraffic": cdk.stringToCloudFormation(properties.preTraffic)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnFunctionHooksPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnFunction.HooksProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.HooksProperty>();
+  ret.addPropertyResult("postTraffic", "PostTraffic", (properties.PostTraffic != null ? cfn_parse.FromCloudFormation.getString(properties.PostTraffic) : undefined));
+  ret.addPropertyResult("preTraffic", "PreTraffic", (properties.PreTraffic != null ? cfn_parse.FromCloudFormation.getString(properties.PreTraffic) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
+}
+
+/**
  * Determine whether the given properties match those of a \`DeploymentPreferenceProperty\`
  *
  * @param properties - the TypeScript properties of a \`DeploymentPreferenceProperty\`
@@ -46043,9 +45765,10 @@ function CfnFunctionDeploymentPreferencePropertyValidator(properties: any): cdk.
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
   errors.collect(cdk.propertyValidator("alarms", cdk.listValidator(cdk.validateString))(properties.alarms));
+  errors.collect(cdk.propertyValidator("enabled", cdk.requiredValidator)(properties.enabled));
   errors.collect(cdk.propertyValidator("enabled", cdk.validateBoolean)(properties.enabled));
-  errors.collect(cdk.propertyValidator("hooks", cdk.hashValidator(cdk.validateString))(properties.hooks));
-  errors.collect(cdk.propertyValidator("role", cdk.validateString)(properties.role));
+  errors.collect(cdk.propertyValidator("hooks", CfnFunctionHooksPropertyValidator)(properties.hooks));
+  errors.collect(cdk.propertyValidator("type", cdk.requiredValidator)(properties.type));
   errors.collect(cdk.propertyValidator("type", cdk.validateString)(properties.type));
   return errors.wrap("supplied properties not correct for \\"DeploymentPreferenceProperty\\"");
 }
@@ -46057,8 +45780,7 @@ function convertCfnFunctionDeploymentPreferencePropertyToCloudFormation(properti
   return {
     "Alarms": cdk.listMapper(cdk.stringToCloudFormation)(properties.alarms),
     "Enabled": cdk.booleanToCloudFormation(properties.enabled),
-    "Hooks": cdk.hashMapper(cdk.stringToCloudFormation)(properties.hooks),
-    "Role": cdk.stringToCloudFormation(properties.role),
+    "Hooks": convertCfnFunctionHooksPropertyToCloudFormation(properties.hooks),
     "Type": cdk.stringToCloudFormation(properties.type)
   };
 }
@@ -46075,8 +45797,7 @@ function CfnFunctionDeploymentPreferencePropertyFromCloudFormation(properties: a
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.DeploymentPreferenceProperty>();
   ret.addPropertyResult("alarms", "Alarms", (properties.Alarms != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.Alarms) : undefined));
   ret.addPropertyResult("enabled", "Enabled", (properties.Enabled != null ? cfn_parse.FromCloudFormation.getBoolean(properties.Enabled) : undefined));
-  ret.addPropertyResult("hooks", "Hooks", (properties.Hooks != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString)(properties.Hooks) : undefined));
-  ret.addPropertyResult("role", "Role", (properties.Role != null ? cfn_parse.FromCloudFormation.getString(properties.Role) : undefined));
+  ret.addPropertyResult("hooks", "Hooks", (properties.Hooks != null ? CfnFunctionHooksPropertyFromCloudFormation(properties.Hooks) : undefined));
   ret.addPropertyResult("type", "Type", (properties.Type != null ? cfn_parse.FromCloudFormation.getString(properties.Type) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
@@ -47642,7 +47363,7 @@ function CfnFunctionIAMPolicyDocumentPropertyValidator(properties: any): cdk.Val
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
   errors.collect(cdk.propertyValidator("statement", cdk.requiredValidator)(properties.statement));
-  errors.collect(cdk.propertyValidator("statement", cdk.listValidator(cdk.validateObject))(properties.statement));
+  errors.collect(cdk.propertyValidator("statement", cdk.validateObject)(properties.statement));
   errors.collect(cdk.propertyValidator("version", cdk.validateString)(properties.version));
   return errors.wrap("supplied properties not correct for \\"IAMPolicyDocumentProperty\\"");
 }
@@ -47652,7 +47373,7 @@ function convertCfnFunctionIAMPolicyDocumentPropertyToCloudFormation(properties:
   if (!cdk.canInspect(properties)) return properties;
   CfnFunctionIAMPolicyDocumentPropertyValidator(properties).assertSuccess();
   return {
-    "Statement": cdk.listMapper(cdk.objectToCloudFormation)(properties.statement),
+    "Statement": cdk.objectToCloudFormation(properties.statement),
     "Version": cdk.stringToCloudFormation(properties.version)
   };
 }
@@ -47667,7 +47388,7 @@ function CfnFunctionIAMPolicyDocumentPropertyFromCloudFormation(properties: any)
     return new cfn_parse.FromCloudFormationResult(properties);
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.IAMPolicyDocumentProperty>();
-  ret.addPropertyResult("statement", "Statement", (properties.Statement != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getAny)(properties.Statement) : undefined));
+  ret.addPropertyResult("statement", "Statement", (properties.Statement != null ? cfn_parse.FromCloudFormation.getAny(properties.Statement) : undefined));
   ret.addPropertyResult("version", "Version", (properties.Version != null ? cfn_parse.FromCloudFormation.getString(properties.Version) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
@@ -49738,7 +49459,7 @@ export namespace CfnStateMachine {
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-statemachine-iampolicydocument.html#cfn-serverless-statemachine-iampolicydocument-statement
      */
-    readonly statement: Array<any | cdk.IResolvable> | cdk.IResolvable;
+    readonly statement: any | cdk.IResolvable;
 
     /**
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-serverless-statemachine-iampolicydocument.html#cfn-serverless-statemachine-iampolicydocument-version
@@ -50276,7 +49997,7 @@ function CfnStateMachineIAMPolicyDocumentPropertyValidator(properties: any): cdk
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
   errors.collect(cdk.propertyValidator("statement", cdk.requiredValidator)(properties.statement));
-  errors.collect(cdk.propertyValidator("statement", cdk.listValidator(cdk.validateObject))(properties.statement));
+  errors.collect(cdk.propertyValidator("statement", cdk.validateObject)(properties.statement));
   errors.collect(cdk.propertyValidator("version", cdk.requiredValidator)(properties.version));
   errors.collect(cdk.propertyValidator("version", cdk.validateString)(properties.version));
   return errors.wrap("supplied properties not correct for \\"IAMPolicyDocumentProperty\\"");
@@ -50287,7 +50008,7 @@ function convertCfnStateMachineIAMPolicyDocumentPropertyToCloudFormation(propert
   if (!cdk.canInspect(properties)) return properties;
   CfnStateMachineIAMPolicyDocumentPropertyValidator(properties).assertSuccess();
   return {
-    "Statement": cdk.listMapper(cdk.objectToCloudFormation)(properties.statement),
+    "Statement": cdk.objectToCloudFormation(properties.statement),
     "Version": cdk.stringToCloudFormation(properties.version)
   };
 }
@@ -50302,7 +50023,7 @@ function CfnStateMachineIAMPolicyDocumentPropertyFromCloudFormation(properties: 
     return new cfn_parse.FromCloudFormationResult(properties);
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnStateMachine.IAMPolicyDocumentProperty>();
-  ret.addPropertyResult("statement", "Statement", (properties.Statement != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getAny)(properties.Statement) : undefined));
+  ret.addPropertyResult("statement", "Statement", (properties.Statement != null ? cfn_parse.FromCloudFormation.getAny(properties.Statement) : undefined));
   ret.addPropertyResult("version", "Version", (properties.Version != null ? cfn_parse.FromCloudFormation.getString(properties.Version) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
@@ -50949,7 +50670,7 @@ export namespace CfnSchedule {
     readonly enableExecuteCommand?: boolean | cdk.IResolvable;
 
     /**
-     * Specifies an ECS task group for the task.
+     * Specifies an Amazon ECS task group for the task.
      *
      * The maximum length is 255 characters.
      *
@@ -51001,7 +50722,7 @@ export namespace CfnSchedule {
     /**
      * Specifies whether to propagate the tags from the task definition to the task.
      *
-     * If no value is specified, the tags are not propagated. Tags can only be propagated to the task during task creation. To add tags to a task after task creation, use Amazon ECS's [\`TagResource\`](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_TagResource.html) API action.
+     * If no value is specified, the tags are not propagated. Tags can only be propagated to the task during task creation. To add tags to a task after task creation, use the Amazon ECS [\`TagResource\`](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_TagResource.html) API action.
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-scheduler-schedule-ecsparameters.html#cfn-scheduler-schedule-ecsparameters-propagatetags
      */
@@ -51365,7 +51086,7 @@ export interface CfnScheduleProps {
    * The expression that defines when the schedule runs. The following formats are supported.
    *
    * - \`at\` expression - \`at(yyyy-mm-ddThh:mm:ss)\`
-   * - \`rate\` expression - \`rate(unit value)\`
+   * - \`rate\` expression - \`rate(value unit)\`
    * - \`cron\` expression - \`cron(fields)\`
    *
    * You can use \`at\` expressions to create one-time schedules that invoke a target once, at the time and in the time zone, that you specify. You can use \`rate\` and \`cron\` expressions to create recurring schedules. Rate-based schedules are useful when you want to invoke a target at regular intervals, such as every 15 minutes or every five days. Cron-based schedules are useful when you want to invoke a target periodically at a specific time, such as at 8:00 am (UTC+0) every 1st day of the month.

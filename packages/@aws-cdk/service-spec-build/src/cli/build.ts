@@ -4,7 +4,6 @@ import { DatabaseBuilder } from '../build-database';
 async function main() {
   console.log('Building...');
   const { db, report } = await DatabaseBuilder.buildDatabase({
-    source: 'resource-spec',
     // FIXME: Switch this to 'true' at some point
     mustValidate: false,
   });

@@ -13,7 +13,7 @@ export async function loadSamSpec(mustValidate = true): Promise<LoadResult<SAMRe
   });
 
   const cfnSpecDir = path.join(__dirname, '../../../../../sources/CloudFormationResourceSpecification');
-  const usEast1 = applyPatchSet(path.join(cfnSpecDir, 'us-east-1', '100_sam'));
+  const usEast1 = await applyPatchSet(path.join(cfnSpecDir, 'us-east-1', '100_sam'));
 
   const usEast1Result = await loader.load(usEast1);
   assertSuccess(usEast1Result);

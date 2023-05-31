@@ -511,6 +511,8 @@ export interface CfnRestApiProps {
   /**
    * The name of the RestApi.
    *
+   * A name is required if the REST API is not based on an OpenAPI specification.
+   *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-apigateway-restapi.html#cfn-apigateway-restapi-name
    */
   readonly name?: string;
@@ -1650,7 +1652,7 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
   public imageConfig?: CfnFunction.ImageConfigProperty | cdk.IResolvable;
 
   /**
-   * The ARN of the AWS Key Management Service ( AWS KMS ) customer managed key that's used to encrypt your function's [environment variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-encryption) . When [Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart-security.html) is activated, this key is also used to encrypt your function's snapshot. If you don't provide a customer managed key, Lambda uses a default service key.
+   * The ARN of the AWS Key Management Service ( AWS KMS ) customer managed key that's used to encrypt your function's [environment variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-encryption) . When [Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart-security.html) is activated, Lambda also uses this key is to encrypt your function's snapshot. If you deploy your function using a container image, Lambda also uses this key to encrypt your function when it's deployed. Note that this is not the same key that's used to protect your container image in the Amazon Elastic Container Registry (Amazon ECR). If you don't provide a customer managed key, Lambda uses a default service key.
    */
   public kmsKeyArn?: string;
 
@@ -2192,7 +2194,7 @@ export interface CfnFunctionProps {
   readonly imageConfig?: CfnFunction.ImageConfigProperty | cdk.IResolvable;
 
   /**
-   * The ARN of the AWS Key Management Service ( AWS KMS ) customer managed key that's used to encrypt your function's [environment variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-encryption) . When [Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart-security.html) is activated, this key is also used to encrypt your function's snapshot. If you don't provide a customer managed key, Lambda uses a default service key.
+   * The ARN of the AWS Key Management Service ( AWS KMS ) customer managed key that's used to encrypt your function's [environment variables](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-encryption) . When [Lambda SnapStart](https://docs.aws.amazon.com/lambda/latest/dg/snapstart-security.html) is activated, Lambda also uses this key is to encrypt your function's snapshot. If you deploy your function using a container image, Lambda also uses this key to encrypt your function when it's deployed. Note that this is not the same key that's used to protect your container image in the Amazon Elastic Container Registry (Amazon ECR). If you don't provide a customer managed key, Lambda uses a default service key.
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html#cfn-lambda-function-kmskeyarn
    */
@@ -4829,13 +4831,15 @@ export interface CfnDBClusterProps {
    *
    * This setting is required to create a Multi-AZ DB cluster.
    *
-   * Valid values: \`io1\`
+   * When specified for a Multi-AZ DB cluster, a value for the \`Iops\` parameter is required.
    *
-   * When specified, a value for the \`Iops\` parameter is required.
+   * Valid values: \`aurora\` , \`aurora-iopt1\` (Aurora DB clusters); \`io1\` (Multi-AZ DB clusters)
    *
-   * Default: \`io1\`
+   * Default: \`aurora\` (Aurora DB clusters); \`io1\` (Multi-AZ DB clusters)
    *
-   * Valid for: Multi-AZ DB clusters only
+   * Valid for: Aurora DB clusters and Multi-AZ DB clusters
+   *
+   * For more information on storage types for Aurora DB clusters, see [Storage configurations for Amazon Aurora DB clusters](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.StorageReliability.html#aurora-storage-type) . For more information on storage types for Multi-AZ DB clusters, see [Settings for creating Multi-AZ DB clusters](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/create-multi-az-db-cluster.html#create-multi-az-db-cluster-settings) .
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-storagetype
    */
@@ -5847,7 +5851,7 @@ export namespace CfnBucket {
     /**
      * KMS key ID to use for the default encryption. This parameter is allowed if SSEAlgorithm is aws:kms.
      *
-     * You can specify the key ID, key alias, or the Amazon Resource Name (ARN) of the CMK. However, if you are using encryption with cross-account operations, you must use a fully qualified CMK ARN. For more information, see [Using encryption for cross-account operations](https://docs.aws.amazon.com/AmazonS3/latest/dev/bucket-encryption.html#bucket-encryption-update-bucket-policy) .
+     * You can specify the key ID or the Amazon Resource Name (ARN) of the CMK. However, if you are using encryption with cross-account operations, you must use a fully qualified CMK ARN. For more information, see [Using encryption for cross-account operations](https://docs.aws.amazon.com/AmazonS3/latest/dev/bucket-encryption.html#bucket-encryption-update-bucket-policy) .
      *
      * For example:
      *

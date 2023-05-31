@@ -17,7 +17,7 @@
                 "$ref": "#/definitions/resourcespec.SAMPropertyType"
               },
               {
-                "$ref": "#/definitions/resourcespec.SAMProperty"
+                "$ref": "#/definitions/resourcespec.SAMSingleTypeAlias"
               }
             ]
           },
@@ -38,7 +38,6 @@
         }
       },
       "required": [
-        "Globals",
         "ResourceSpecificationTransform",
         "ResourceSpecificationVersion",
         "ResourceTypes",
@@ -144,6 +143,12 @@
         "AdditionalProperties": {
           "type": "boolean"
         },
+        "Attributes": {
+          "additionalProperties": {
+            "$ref": "#/definitions/resourcespec.SAMProperty"
+          },
+          "type": "object"
+        },
         "Documentation": {
           "type": "string"
         },
@@ -152,6 +157,69 @@
             "$ref": "#/definitions/resourcespec.SAMProperty"
           },
           "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "resourcespec.SAMSingleTypeAlias": {
+      "additionalProperties": false,
+      "properties": {
+        "Documentation": {
+          "type": "string"
+        },
+        "DuplicatesAllowed": {
+          "type": "boolean"
+        },
+        "InclusiveItemPattern": {
+          "type": "boolean"
+        },
+        "InclusiveItemTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "InclusivePrimitiveItemTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "ItemType": {
+          "type": "string"
+        },
+        "ItemTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "PrimitiveItemType": {
+          "type": "string"
+        },
+        "PrimitiveItemTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "PrimitiveType": {
+          "type": "string"
+        },
+        "PrimitiveTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "Type": {
+          "type": "string"
+        },
+        "Types": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         }
       },
       "type": "object"

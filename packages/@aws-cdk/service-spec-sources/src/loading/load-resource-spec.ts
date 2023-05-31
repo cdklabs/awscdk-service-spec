@@ -11,14 +11,13 @@ export async function loadDefaultResourceSpecification(
   });
 
   const cfnSpecDir = path.join(__dirname, '../../../../../sources/CloudFormationResourceSpecification');
-  const usEast1 = applyPatchSet(path.join(cfnSpecDir, 'us-east-1', '000_cloudformation'));
-  const usWest2 = applyPatchSet(path.join(cfnSpecDir, 'us-west-2', '000_cloudformation'));
+  const usEast1 = await applyPatchSet(path.join(cfnSpecDir, 'us-east-1', '000_cloudformation'));
+  const usWest2 = await applyPatchSet(path.join(cfnSpecDir, 'us-west-2', '000_cloudformation'));
 
   const usEast1Result = await loader.load(usEast1);
   const usWest2Result = await loader.load(usWest2);
 
   const ret = mapLoadResult(combineLoadResults([usEast1Result, usWest2Result]), mergeSpecs);
-  console.log(ret);
   return ret;
 }
 
