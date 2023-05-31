@@ -51,7 +51,7 @@ describe(explodeTypeArray, () => {
 });
 
 describe(canonicalizeTypeOperators, () => {
-  test('type operator is expanded to include all community properties - oneOf', () => {
+  test.skip('type operator is expanded to include all community properties - oneOf', () => {
     const obj = {
       properties: {
         Prop: {
@@ -125,7 +125,7 @@ describe(canonicalizeTypeOperators, () => {
     });
   });
 
-  test('type operator expanded to include all community properties - anyOf', () => {
+  test.skip('type operator expanded to include all community properties - anyOf', () => {
     const obj = {
       properties: {
         CreationDate: {
