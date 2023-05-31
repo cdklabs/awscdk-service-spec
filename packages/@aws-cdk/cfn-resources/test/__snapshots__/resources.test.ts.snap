@@ -1582,16 +1582,22 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
   public readonly attrArn: string;
 
   /**
+   * The function's SnapStart Response. When set to PublishedVersions, Lambda creates a snapshot of the execution environment when you publish a function version.
+   *
    * @cloudformationAttribute SnapStartResponse
    */
   public readonly attrSnapStartResponse: cdk.IResolvable;
 
   /**
+   * Applying SnapStart setting on function resource type.
+   *
    * @cloudformationAttribute SnapStartResponse.ApplyOn
    */
   public readonly attrSnapStartResponseApplyOn: string;
 
   /**
+   * Indicates whether SnapStart is activated for the specified function version.
+   *
    * @cloudformationAttribute SnapStartResponse.OptimizationStatus
    */
   public readonly attrSnapStartResponseOptimizationStatus: string;
@@ -1814,43 +1820,6 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
 
 export namespace CfnFunction {
   /**
-   * Configuration values that override the container image Dockerfile settings.
-   *
-   * For more information, see [Container image settings](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-parms) .
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-imageconfig.html
-   */
-  export interface ImageConfigProperty {
-    /**
-     * Specifies parameters that you want to pass in with ENTRYPOINT.
-     *
-     * You can specify a maximum of 1,500 parameters in the list.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-imageconfig.html#cfn-lambda-function-imageconfig-command
-     */
-    readonly command?: Array<string>;
-
-    /**
-     * Specifies the entry point to their application, which is typically the location of the runtime executable.
-     *
-     * You can specify a maximum of 1,500 string entries in the list.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-imageconfig.html#cfn-lambda-function-imageconfig-entrypoint
-     */
-    readonly entryPoint?: Array<string>;
-
-    /**
-     * Specifies the working directory.
-     *
-     * The length of the directory string cannot exceed 1,000 characters.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-imageconfig.html#cfn-lambda-function-imageconfig-workingdirectory
-     */
-    readonly workingDirectory?: string;
-  }
-
-  /**
    * The function's [AWS X-Ray](https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html) tracing configuration. To sample and record incoming requests, set \`Mode\` to \`Active\` .
    *
    * @struct
@@ -1891,21 +1860,6 @@ export namespace CfnFunction {
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-vpcconfig.html#cfn-lambda-function-vpcconfig-subnetids
      */
     readonly subnetIds?: Array<string>;
-  }
-
-  /**
-   * The [dead-letter queue](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html#dlq) for failed asynchronous invocations.
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-deadletterconfig.html
-   */
-  export interface DeadLetterConfigProperty {
-    /**
-     * The Amazon Resource Name (ARN) of an Amazon SQS queue or Amazon SNS topic.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-deadletterconfig.html#cfn-lambda-function-deadletterconfig-targetarn
-     */
-    readonly targetArn?: string;
   }
 
   /**
@@ -1953,6 +1907,80 @@ export namespace CfnFunction {
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-snapstart.html#cfn-lambda-function-snapstart-applyon
      */
     readonly applyOn: string;
+  }
+
+  /**
+   * Details about the connection between a Lambda function and an [Amazon EFS file system](https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html) .
+   *
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-filesystemconfig.html
+   */
+  export interface FileSystemConfigProperty {
+    /**
+     * The Amazon Resource Name (ARN) of the Amazon EFS access point that provides access to the file system.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-filesystemconfig.html#cfn-lambda-function-filesystemconfig-arn
+     */
+    readonly arn: string;
+
+    /**
+     * The path where the function can access the file system, starting with \`/mnt/\` .
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-filesystemconfig.html#cfn-lambda-function-filesystemconfig-localmountpath
+     */
+    readonly localMountPath: string;
+  }
+
+  /**
+   * Configuration values that override the container image Dockerfile settings.
+   *
+   * For more information, see [Container image settings](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-parms) .
+   *
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-imageconfig.html
+   */
+  export interface ImageConfigProperty {
+    /**
+     * Specifies parameters that you want to pass in with ENTRYPOINT.
+     *
+     * You can specify a maximum of 1,500 parameters in the list.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-imageconfig.html#cfn-lambda-function-imageconfig-command
+     */
+    readonly command?: Array<string>;
+
+    /**
+     * Specifies the entry point to their application, which is typically the location of the runtime executable.
+     *
+     * You can specify a maximum of 1,500 string entries in the list.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-imageconfig.html#cfn-lambda-function-imageconfig-entrypoint
+     */
+    readonly entryPoint?: Array<string>;
+
+    /**
+     * Specifies the working directory.
+     *
+     * The length of the directory string cannot exceed 1,000 characters.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-imageconfig.html#cfn-lambda-function-imageconfig-workingdirectory
+     */
+    readonly workingDirectory?: string;
+  }
+
+  /**
+   * The [dead-letter queue](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html#dlq) for failed asynchronous invocations.
+   *
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-deadletterconfig.html
+   */
+  export interface DeadLetterConfigProperty {
+    /**
+     * The Amazon Resource Name (ARN) of an Amazon SQS queue or Amazon SNS topic.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-deadletterconfig.html#cfn-lambda-function-deadletterconfig-targetarn
+     */
+    readonly targetArn?: string;
   }
 
   /**
@@ -2004,28 +2032,6 @@ export namespace CfnFunction {
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-code.html#cfn-lambda-function-code-zipfile
      */
     readonly zipFile?: string;
-  }
-
-  /**
-   * Details about the connection between a Lambda function and an [Amazon EFS file system](https://docs.aws.amazon.com/lambda/latest/dg/configuration-filesystem.html) .
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-filesystemconfig.html
-   */
-  export interface FileSystemConfigProperty {
-    /**
-     * The Amazon Resource Name (ARN) of the Amazon EFS access point that provides access to the file system.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-filesystemconfig.html#cfn-lambda-function-filesystemconfig-arn
-     */
-    readonly arn: string;
-
-    /**
-     * The path where the function can access the file system, starting with \`/mnt/\` .
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-filesystemconfig.html#cfn-lambda-function-filesystemconfig-localmountpath
-     */
-    readonly localMountPath: string;
   }
 
   /**
@@ -2296,54 +2302,6 @@ export interface CfnFunctionProps {
 }
 
 /**
- * Determine whether the given properties match those of a \`ImageConfigProperty\`
- *
- * @param properties - the TypeScript properties of a \`ImageConfigProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnFunctionImageConfigPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("command", cdk.listValidator(cdk.validateString))(properties.command));
-  errors.collect(cdk.propertyValidator("entryPoint", cdk.listValidator(cdk.validateString))(properties.entryPoint));
-  errors.collect(cdk.propertyValidator("workingDirectory", cdk.validateString)(properties.workingDirectory));
-  return errors.wrap("supplied properties not correct for \\"ImageConfigProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnFunctionImageConfigPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnFunctionImageConfigPropertyValidator(properties).assertSuccess();
-  return {
-    "Command": cdk.listMapper(cdk.stringToCloudFormation)(properties.command),
-    "EntryPoint": cdk.listMapper(cdk.stringToCloudFormation)(properties.entryPoint),
-    "WorkingDirectory": cdk.stringToCloudFormation(properties.workingDirectory)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnFunctionImageConfigPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnFunction.ImageConfigProperty | cdk.IResolvable> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.ImageConfigProperty>();
-  ret.addPropertyResult("command", "Command", (properties.Command != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.Command) : undefined));
-  ret.addPropertyResult("entryPoint", "EntryPoint", (properties.EntryPoint != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.EntryPoint) : undefined));
-  ret.addPropertyResult("workingDirectory", "WorkingDirectory", (properties.WorkingDirectory != null ? cfn_parse.FromCloudFormation.getString(properties.WorkingDirectory) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
  * Determine whether the given properties match those of a \`TracingConfigProperty\`
  *
  * @param properties - the TypeScript properties of a \`TracingConfigProperty\`
@@ -2426,48 +2384,6 @@ function CfnFunctionVpcConfigPropertyFromCloudFormation(properties: any): cfn_pa
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.VpcConfigProperty>();
   ret.addPropertyResult("securityGroupIds", "SecurityGroupIds", (properties.SecurityGroupIds != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.SecurityGroupIds) : undefined));
   ret.addPropertyResult("subnetIds", "SubnetIds", (properties.SubnetIds != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.SubnetIds) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
- * Determine whether the given properties match those of a \`DeadLetterConfigProperty\`
- *
- * @param properties - the TypeScript properties of a \`DeadLetterConfigProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnFunctionDeadLetterConfigPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("targetArn", cdk.validateString)(properties.targetArn));
-  return errors.wrap("supplied properties not correct for \\"DeadLetterConfigProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnFunctionDeadLetterConfigPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnFunctionDeadLetterConfigPropertyValidator(properties).assertSuccess();
-  return {
-    "TargetArn": cdk.stringToCloudFormation(properties.targetArn)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnFunctionDeadLetterConfigPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnFunction.DeadLetterConfigProperty | cdk.IResolvable> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.DeadLetterConfigProperty>();
-  ret.addPropertyResult("targetArn", "TargetArn", (properties.TargetArn != null ? cfn_parse.FromCloudFormation.getString(properties.TargetArn) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -2562,6 +2478,143 @@ function CfnFunctionSnapStartPropertyFromCloudFormation(properties: any): cfn_pa
 }
 
 /**
+ * Determine whether the given properties match those of a \`FileSystemConfigProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`FileSystemConfigProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnFunctionFileSystemConfigPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("arn", cdk.requiredValidator)(properties.arn));
+  errors.collect(cdk.propertyValidator("arn", cdk.validateString)(properties.arn));
+  errors.collect(cdk.propertyValidator("localMountPath", cdk.requiredValidator)(properties.localMountPath));
+  errors.collect(cdk.propertyValidator("localMountPath", cdk.validateString)(properties.localMountPath));
+  return errors.wrap("supplied properties not correct for \\"FileSystemConfigProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnFunctionFileSystemConfigPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnFunctionFileSystemConfigPropertyValidator(properties).assertSuccess();
+  return {
+    "Arn": cdk.stringToCloudFormation(properties.arn),
+    "LocalMountPath": cdk.stringToCloudFormation(properties.localMountPath)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnFunctionFileSystemConfigPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnFunction.FileSystemConfigProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.FileSystemConfigProperty>();
+  ret.addPropertyResult("arn", "Arn", (properties.Arn != null ? cfn_parse.FromCloudFormation.getString(properties.Arn) : undefined));
+  ret.addPropertyResult("localMountPath", "LocalMountPath", (properties.LocalMountPath != null ? cfn_parse.FromCloudFormation.getString(properties.LocalMountPath) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
+}
+
+/**
+ * Determine whether the given properties match those of a \`ImageConfigProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`ImageConfigProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnFunctionImageConfigPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("command", cdk.listValidator(cdk.validateString))(properties.command));
+  errors.collect(cdk.propertyValidator("entryPoint", cdk.listValidator(cdk.validateString))(properties.entryPoint));
+  errors.collect(cdk.propertyValidator("workingDirectory", cdk.validateString)(properties.workingDirectory));
+  return errors.wrap("supplied properties not correct for \\"ImageConfigProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnFunctionImageConfigPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnFunctionImageConfigPropertyValidator(properties).assertSuccess();
+  return {
+    "Command": cdk.listMapper(cdk.stringToCloudFormation)(properties.command),
+    "EntryPoint": cdk.listMapper(cdk.stringToCloudFormation)(properties.entryPoint),
+    "WorkingDirectory": cdk.stringToCloudFormation(properties.workingDirectory)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnFunctionImageConfigPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnFunction.ImageConfigProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.ImageConfigProperty>();
+  ret.addPropertyResult("command", "Command", (properties.Command != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.Command) : undefined));
+  ret.addPropertyResult("entryPoint", "EntryPoint", (properties.EntryPoint != null ? cfn_parse.FromCloudFormation.getArray(cfn_parse.FromCloudFormation.getString)(properties.EntryPoint) : undefined));
+  ret.addPropertyResult("workingDirectory", "WorkingDirectory", (properties.WorkingDirectory != null ? cfn_parse.FromCloudFormation.getString(properties.WorkingDirectory) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
+}
+
+/**
+ * Determine whether the given properties match those of a \`DeadLetterConfigProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`DeadLetterConfigProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnFunctionDeadLetterConfigPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("targetArn", cdk.validateString)(properties.targetArn));
+  return errors.wrap("supplied properties not correct for \\"DeadLetterConfigProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnFunctionDeadLetterConfigPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnFunctionDeadLetterConfigPropertyValidator(properties).assertSuccess();
+  return {
+    "TargetArn": cdk.stringToCloudFormation(properties.targetArn)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnFunctionDeadLetterConfigPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnFunction.DeadLetterConfigProperty | cdk.IResolvable> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.DeadLetterConfigProperty>();
+  ret.addPropertyResult("targetArn", "TargetArn", (properties.TargetArn != null ? cfn_parse.FromCloudFormation.getString(properties.TargetArn) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
+}
+
+/**
  * Determine whether the given properties match those of a \`CodeProperty\`
  *
  * @param properties - the TypeScript properties of a \`CodeProperty\`
@@ -2611,53 +2664,6 @@ function CfnFunctionCodePropertyFromCloudFormation(properties: any): cfn_parse.F
   ret.addPropertyResult("s3Key", "S3Key", (properties.S3Key != null ? cfn_parse.FromCloudFormation.getString(properties.S3Key) : undefined));
   ret.addPropertyResult("s3ObjectVersion", "S3ObjectVersion", (properties.S3ObjectVersion != null ? cfn_parse.FromCloudFormation.getString(properties.S3ObjectVersion) : undefined));
   ret.addPropertyResult("zipFile", "ZipFile", (properties.ZipFile != null ? cfn_parse.FromCloudFormation.getString(properties.ZipFile) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
- * Determine whether the given properties match those of a \`FileSystemConfigProperty\`
- *
- * @param properties - the TypeScript properties of a \`FileSystemConfigProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnFunctionFileSystemConfigPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("arn", cdk.requiredValidator)(properties.arn));
-  errors.collect(cdk.propertyValidator("arn", cdk.validateString)(properties.arn));
-  errors.collect(cdk.propertyValidator("localMountPath", cdk.requiredValidator)(properties.localMountPath));
-  errors.collect(cdk.propertyValidator("localMountPath", cdk.validateString)(properties.localMountPath));
-  return errors.wrap("supplied properties not correct for \\"FileSystemConfigProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnFunctionFileSystemConfigPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnFunctionFileSystemConfigPropertyValidator(properties).assertSuccess();
-  return {
-    "Arn": cdk.stringToCloudFormation(properties.arn),
-    "LocalMountPath": cdk.stringToCloudFormation(properties.localMountPath)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnFunctionFileSystemConfigPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnFunction.FileSystemConfigProperty | cdk.IResolvable> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnFunction.FileSystemConfigProperty>();
-  ret.addPropertyResult("arn", "Arn", (properties.Arn != null ? cfn_parse.FromCloudFormation.getString(properties.Arn) : undefined));
-  ret.addPropertyResult("localMountPath", "LocalMountPath", (properties.LocalMountPath != null ? cfn_parse.FromCloudFormation.getString(properties.LocalMountPath) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -3477,6 +3483,11 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
   public readonly attrMasterUserSecretSecretArn: string;
 
   /**
+   * @cloudformationAttribute ReadEndpoint
+   */
+  public readonly attrReadEndpoint: cdk.IResolvable;
+
+  /**
    * The reader endpoint for the DB cluster. For example: \`mystack-mydbcluster-ro-123456789012.us-east-2.rds.amazonaws.com\`
    *
    * @cloudformationAttribute ReadEndpoint.Address
@@ -3770,6 +3781,7 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
     this.attrEndpointAddress = cdk.Token.asString(this.getAtt("Endpoint.Address", cdk.ResolutionTypeHint.STRING));
     this.attrEndpointPort = cdk.Token.asString(this.getAtt("Endpoint.Port", cdk.ResolutionTypeHint.STRING));
     this.attrMasterUserSecretSecretArn = cdk.Token.asString(this.getAtt("MasterUserSecret.SecretArn", cdk.ResolutionTypeHint.STRING));
+    this.attrReadEndpoint = this.getAtt("ReadEndpoint");
     this.attrReadEndpointAddress = cdk.Token.asString(this.getAtt("ReadEndpoint.Address", cdk.ResolutionTypeHint.STRING));
     this.allocatedStorage = props.allocatedStorage;
     this.associatedRoles = props.associatedRoles;
@@ -3909,6 +3921,54 @@ export class CfnDBCluster extends cdk.CfnResource implements cdk.IInspectable, c
 
 export namespace CfnDBCluster {
   /**
+   * Describes an AWS Identity and Access Management (IAM) role that is associated with a DB cluster.
+   *
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-dbclusterrole.html
+   */
+  export interface DBClusterRoleProperty {
+    /**
+     * The name of the feature associated with the AWS Identity and Access Management (IAM) role.
+     *
+     * IAM roles that are associated with a DB cluster grant permission for the DB cluster to access other AWS services on your behalf. For the list of supported feature names, see the \`SupportedFeatureNames\` description in [DBEngineVersion](https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_DBEngineVersion.html) in the *Amazon RDS API Reference* .
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-dbclusterrole.html#cfn-rds-dbcluster-dbclusterrole-featurename
+     */
+    readonly featureName?: string;
+
+    /**
+     * The Amazon Resource Name (ARN) of the IAM role that is associated with the DB cluster.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-dbclusterrole.html#cfn-rds-dbcluster-dbclusterrole-rolearn
+     */
+    readonly roleArn: string;
+  }
+
+  /**
+   * The \`MasterUserSecret\` return value specifies the secret managed by RDS in AWS Secrets Manager for the master user password.
+   *
+   * For more information, see [Password management with AWS Secrets Manager](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-secrets-manager.html) in the *Amazon RDS User Guide* and [Password management with AWS Secrets Manager](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/rds-secrets-manager.html) in the *Amazon Aurora User Guide.*
+   *
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-masterusersecret.html
+   */
+  export interface MasterUserSecretProperty {
+    /**
+     * The AWS KMS key identifier that is used to encrypt the secret.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-masterusersecret.html#cfn-rds-dbcluster-masterusersecret-kmskeyid
+     */
+    readonly kmsKeyId?: string;
+
+    /**
+     * The Amazon Resource Name (ARN) of the secret.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-masterusersecret.html#cfn-rds-dbcluster-masterusersecret-secretarn
+     */
+    readonly secretArn?: string;
+  }
+
+  /**
    * The \`ServerlessV2ScalingConfiguration\` property type specifies the scaling configuration of an Aurora Serverless V2 DB cluster.
    *
    * For more information, see [Using Amazon Aurora Serverless v2](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.html) in the *Amazon Aurora User Guide* .
@@ -3940,30 +4000,6 @@ export namespace CfnDBCluster {
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-serverlessv2scalingconfiguration.html#cfn-rds-dbcluster-serverlessv2scalingconfiguration-mincapacity
      */
     readonly minCapacity?: number;
-  }
-
-  /**
-   * The \`MasterUserSecret\` return value specifies the secret managed by RDS in AWS Secrets Manager for the master user password.
-   *
-   * For more information, see [Password management with AWS Secrets Manager](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-secrets-manager.html) in the *Amazon RDS User Guide* and [Password management with AWS Secrets Manager](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/rds-secrets-manager.html) in the *Amazon Aurora User Guide.*
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-masterusersecret.html
-   */
-  export interface MasterUserSecretProperty {
-    /**
-     * The AWS KMS key identifier that is used to encrypt the secret.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-masterusersecret.html#cfn-rds-dbcluster-masterusersecret-kmskeyid
-     */
-    readonly kmsKeyId?: string;
-
-    /**
-     * The Amazon Resource Name (ARN) of the secret.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-masterusersecret.html#cfn-rds-dbcluster-masterusersecret-secretarn
-     */
-    readonly secretArn?: string;
   }
 
   /**
@@ -4053,30 +4089,6 @@ export namespace CfnDBCluster {
   }
 
   /**
-   * Describes an AWS Identity and Access Management (IAM) role that is associated with a DB cluster.
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-dbclusterrole.html
-   */
-  export interface DBClusterRoleProperty {
-    /**
-     * The name of the feature associated with the AWS Identity and Access Management (IAM) role.
-     *
-     * IAM roles that are associated with a DB cluster grant permission for the DB cluster to access other AWS services on your behalf. For the list of supported feature names, see the \`SupportedFeatureNames\` description in [DBEngineVersion](https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_DBEngineVersion.html) in the *Amazon RDS API Reference* .
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-dbclusterrole.html#cfn-rds-dbcluster-dbclusterrole-featurename
-     */
-    readonly featureName?: string;
-
-    /**
-     * The Amazon Resource Name (ARN) of the IAM role that is associated with the DB cluster.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-dbclusterrole.html#cfn-rds-dbcluster-dbclusterrole-rolearn
-     */
-    readonly roleArn: string;
-  }
-
-  /**
    * Specifies the connection endpoint for the primary instance of the DB cluster.
    *
    * @struct
@@ -4096,6 +4108,27 @@ export namespace CfnDBCluster {
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-endpoint.html#cfn-rds-dbcluster-endpoint-port
      */
     readonly port?: string;
+  }
+
+  /**
+   * The \`ReadEndpoint\` return value specifies the reader endpoint for the DB cluster.
+   *
+   * The reader endpoint for a DB cluster load-balances connections across the Aurora Replicas that are available in a DB cluster. As clients request new connections to the reader endpoint, Aurora distributes the connection requests among the Aurora Replicas in the DB cluster. This functionality can help balance your read workload across multiple Aurora Replicas in your DB cluster.
+   *
+   * If a failover occurs, and the Aurora Replica that you are connected to is promoted to be the primary instance, your connection is dropped. To continue sending your read workload to other Aurora Replicas in the cluster, you can then reconnect to the reader endpoint.
+   *
+   * For more information about Aurora endpoints, see [Amazon Aurora connection management](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Endpoints.html) in the *Amazon Aurora User Guide* .
+   *
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-readendpoint.html
+   */
+  export interface ReadEndpointProperty {
+    /**
+     * The host address of the reader endpoint.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-dbcluster-readendpoint.html#cfn-rds-dbcluster-readendpoint-address
+     */
+    readonly address?: string;
   }
 }
 
@@ -4164,6 +4197,7 @@ export interface CfnDBClusterProps {
    *
    * Valid for: Aurora MySQL DB clusters only
    *
+   * @default - 0
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-backtrackwindow
    */
   readonly backtrackWindow?: number;
@@ -4179,6 +4213,7 @@ export interface CfnDBClusterProps {
    *
    * Valid for: Aurora DB clusters and Multi-AZ DB clusters
    *
+   * @default - 1
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-backupretentionperiod
    */
   readonly backupRetentionPeriod?: number;
@@ -4248,6 +4283,7 @@ export interface CfnDBClusterProps {
    *
    * Valid for: Aurora DB clusters and Multi-AZ DB clusters
    *
+   * @default - "default.aurora5.6"
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-dbclusterparametergroupname
    */
   readonly dbClusterParameterGroupName?: string;
@@ -4531,6 +4567,7 @@ export interface CfnDBClusterProps {
    *
    * Valid for: Multi-AZ DB clusters only
    *
+   * @default - 0
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-monitoringinterval
    */
   readonly monitoringInterval?: number;
@@ -4732,6 +4769,7 @@ export interface CfnDBClusterProps {
    *
    * Valid for: Aurora DB clusters and Multi-AZ DB clusters
    *
+   * @default - "full-copy"
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbcluster.html#cfn-rds-dbcluster-restoretype
    */
   readonly restoreType?: string;
@@ -4878,36 +4916,37 @@ export interface CfnDBClusterProps {
 }
 
 /**
- * Determine whether the given properties match those of a \`ServerlessV2ScalingConfigurationProperty\`
+ * Determine whether the given properties match those of a \`DBClusterRoleProperty\`
  *
- * @param properties - the TypeScript properties of a \`ServerlessV2ScalingConfigurationProperty\`
+ * @param properties - the TypeScript properties of a \`DBClusterRoleProperty\`
  *
  * @returns the result of the validation.
  */
 // @ts-ignore TS6133
-function CfnDBClusterServerlessV2ScalingConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+function CfnDBClusterDBClusterRolePropertyValidator(properties: any): cdk.ValidationResult {
   if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
   const errors = new cdk.ValidationResults();
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
-  errors.collect(cdk.propertyValidator("maxCapacity", cdk.validateNumber)(properties.maxCapacity));
-  errors.collect(cdk.propertyValidator("minCapacity", cdk.validateNumber)(properties.minCapacity));
-  return errors.wrap("supplied properties not correct for \\"ServerlessV2ScalingConfigurationProperty\\"");
+  errors.collect(cdk.propertyValidator("featureName", cdk.validateString)(properties.featureName));
+  errors.collect(cdk.propertyValidator("roleArn", cdk.requiredValidator)(properties.roleArn));
+  errors.collect(cdk.propertyValidator("roleArn", cdk.validateString)(properties.roleArn));
+  return errors.wrap("supplied properties not correct for \\"DBClusterRoleProperty\\"");
 }
 
 // @ts-ignore TS6133
-function convertCfnDBClusterServerlessV2ScalingConfigurationPropertyToCloudFormation(properties: any): any {
+function convertCfnDBClusterDBClusterRolePropertyToCloudFormation(properties: any): any {
   if (!cdk.canInspect(properties)) return properties;
-  CfnDBClusterServerlessV2ScalingConfigurationPropertyValidator(properties).assertSuccess();
+  CfnDBClusterDBClusterRolePropertyValidator(properties).assertSuccess();
   return {
-    "MaxCapacity": cdk.numberToCloudFormation(properties.maxCapacity),
-    "MinCapacity": cdk.numberToCloudFormation(properties.minCapacity)
+    "FeatureName": cdk.stringToCloudFormation(properties.featureName),
+    "RoleArn": cdk.stringToCloudFormation(properties.roleArn)
   };
 }
 
 // @ts-ignore TS6133
-function CfnDBClusterServerlessV2ScalingConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnDBCluster.ServerlessV2ScalingConfigurationProperty> {
+function CfnDBClusterDBClusterRolePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnDBCluster.DBClusterRoleProperty | cdk.IResolvable> {
   if (cdk.isResolvableObject(properties)) {
     return new cfn_parse.FromCloudFormationResult(properties);
   }
@@ -4915,9 +4954,9 @@ function CfnDBClusterServerlessV2ScalingConfigurationPropertyFromCloudFormation(
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     return new cfn_parse.FromCloudFormationResult(properties);
   }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnDBCluster.ServerlessV2ScalingConfigurationProperty>();
-  ret.addPropertyResult("maxCapacity", "MaxCapacity", (properties.MaxCapacity != null ? cfn_parse.FromCloudFormation.getNumber(properties.MaxCapacity) : undefined));
-  ret.addPropertyResult("minCapacity", "MinCapacity", (properties.MinCapacity != null ? cfn_parse.FromCloudFormation.getNumber(properties.MinCapacity) : undefined));
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnDBCluster.DBClusterRoleProperty>();
+  ret.addPropertyResult("featureName", "FeatureName", (properties.FeatureName != null ? cfn_parse.FromCloudFormation.getString(properties.FeatureName) : undefined));
+  ret.addPropertyResult("roleArn", "RoleArn", (properties.RoleArn != null ? cfn_parse.FromCloudFormation.getString(properties.RoleArn) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -4963,6 +5002,51 @@ function CfnDBClusterMasterUserSecretPropertyFromCloudFormation(properties: any)
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnDBCluster.MasterUserSecretProperty>();
   ret.addPropertyResult("kmsKeyId", "KmsKeyId", (properties.KmsKeyId != null ? cfn_parse.FromCloudFormation.getString(properties.KmsKeyId) : undefined));
   ret.addPropertyResult("secretArn", "SecretArn", (properties.SecretArn != null ? cfn_parse.FromCloudFormation.getString(properties.SecretArn) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
+}
+
+/**
+ * Determine whether the given properties match those of a \`ServerlessV2ScalingConfigurationProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`ServerlessV2ScalingConfigurationProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnDBClusterServerlessV2ScalingConfigurationPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("maxCapacity", cdk.validateNumber)(properties.maxCapacity));
+  errors.collect(cdk.propertyValidator("minCapacity", cdk.validateNumber)(properties.minCapacity));
+  return errors.wrap("supplied properties not correct for \\"ServerlessV2ScalingConfigurationProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnDBClusterServerlessV2ScalingConfigurationPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnDBClusterServerlessV2ScalingConfigurationPropertyValidator(properties).assertSuccess();
+  return {
+    "MaxCapacity": cdk.numberToCloudFormation(properties.maxCapacity),
+    "MinCapacity": cdk.numberToCloudFormation(properties.minCapacity)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnDBClusterServerlessV2ScalingConfigurationPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnDBCluster.ServerlessV2ScalingConfigurationProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnDBCluster.ServerlessV2ScalingConfigurationProperty>();
+  ret.addPropertyResult("maxCapacity", "MaxCapacity", (properties.MaxCapacity != null ? cfn_parse.FromCloudFormation.getNumber(properties.MaxCapacity) : undefined));
+  ret.addPropertyResult("minCapacity", "MinCapacity", (properties.MinCapacity != null ? cfn_parse.FromCloudFormation.getNumber(properties.MinCapacity) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -5025,52 +5109,6 @@ function CfnDBClusterScalingConfigurationPropertyFromCloudFormation(properties: 
 }
 
 /**
- * Determine whether the given properties match those of a \`DBClusterRoleProperty\`
- *
- * @param properties - the TypeScript properties of a \`DBClusterRoleProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnDBClusterDBClusterRolePropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("featureName", cdk.validateString)(properties.featureName));
-  errors.collect(cdk.propertyValidator("roleArn", cdk.requiredValidator)(properties.roleArn));
-  errors.collect(cdk.propertyValidator("roleArn", cdk.validateString)(properties.roleArn));
-  return errors.wrap("supplied properties not correct for \\"DBClusterRoleProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnDBClusterDBClusterRolePropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnDBClusterDBClusterRolePropertyValidator(properties).assertSuccess();
-  return {
-    "FeatureName": cdk.stringToCloudFormation(properties.featureName),
-    "RoleArn": cdk.stringToCloudFormation(properties.roleArn)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnDBClusterDBClusterRolePropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<CfnDBCluster.DBClusterRoleProperty | cdk.IResolvable> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnDBCluster.DBClusterRoleProperty>();
-  ret.addPropertyResult("featureName", "FeatureName", (properties.FeatureName != null ? cfn_parse.FromCloudFormation.getString(properties.FeatureName) : undefined));
-  ret.addPropertyResult("roleArn", "RoleArn", (properties.RoleArn != null ? cfn_parse.FromCloudFormation.getString(properties.RoleArn) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
  * Determine whether the given properties match those of a \`EndpointProperty\`
  *
  * @param properties - the TypeScript properties of a \`EndpointProperty\`
@@ -5111,6 +5149,48 @@ function CfnDBClusterEndpointPropertyFromCloudFormation(properties: any): cfn_pa
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnDBCluster.EndpointProperty>();
   ret.addPropertyResult("address", "Address", (properties.Address != null ? cfn_parse.FromCloudFormation.getString(properties.Address) : undefined));
   ret.addPropertyResult("port", "Port", (properties.Port != null ? cfn_parse.FromCloudFormation.getString(properties.Port) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
+}
+
+/**
+ * Determine whether the given properties match those of a \`ReadEndpointProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`ReadEndpointProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnDBClusterReadEndpointPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("address", cdk.validateString)(properties.address));
+  return errors.wrap("supplied properties not correct for \\"ReadEndpointProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnDBClusterReadEndpointPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnDBClusterReadEndpointPropertyValidator(properties).assertSuccess();
+  return {
+    "Address": cdk.stringToCloudFormation(properties.address)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnDBClusterReadEndpointPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnDBCluster.ReadEndpointProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnDBCluster.ReadEndpointProperty>();
+  ret.addPropertyResult("address", "Address", (properties.Address != null ? cfn_parse.FromCloudFormation.getString(properties.Address) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -5690,6 +5770,28 @@ export namespace CfnBucket {
   }
 
   /**
+   * Specifies tags to use to identify a subset of objects for an Amazon S3 bucket.
+   *
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tagfilter.html
+   */
+  export interface TagFilterProperty {
+    /**
+     * The tag key.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tagfilter.html#cfn-s3-bucket-tagfilter-key
+     */
+    readonly key: string;
+
+    /**
+     * The tag value.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tagfilter.html#cfn-s3-bucket-tagfilter-value
+     */
+    readonly value: string;
+  }
+
+  /**
    * Specifies data related to access patterns to be collected and made available to analyze the tradeoffs between different storage classes for an Amazon S3 bucket.
    *
    * @struct
@@ -5770,28 +5872,6 @@ export namespace CfnBucket {
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-destination.html#cfn-s3-bucket-destination-prefix
      */
     readonly prefix?: string;
-  }
-
-  /**
-   * Specifies tags to use to identify a subset of objects for an Amazon S3 bucket.
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tagfilter.html
-   */
-  export interface TagFilterProperty {
-    /**
-     * The tag key.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tagfilter.html#cfn-s3-bucket-tagfilter-key
-     */
-    readonly key: string;
-
-    /**
-     * The tag value.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-tagfilter.html#cfn-s3-bucket-tagfilter-value
-     */
-    readonly value: string;
   }
 
   /**
@@ -6499,7 +6579,7 @@ export namespace CfnBucket {
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-eventbridgeconfiguration.html#cfn-s3-bucket-eventbridgeconfiguration-eventbridgeenabled
      */
-    readonly eventBridgeEnabled?: boolean | cdk.IResolvable;
+    readonly eventBridgeEnabled: boolean | cdk.IResolvable;
   }
 
   /**
@@ -7284,6 +7364,7 @@ export namespace CfnBucket {
     /**
      * The versioning state of the bucket.
      *
+     * @default - "Suspended"
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-versioningconfiguration.html#cfn-s3-bucket-versioningconfiguration-status
      */
     readonly status: string;
@@ -7325,30 +7406,6 @@ export namespace CfnBucket {
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-websiteconfiguration.html#cfn-s3-bucket-websiteconfiguration-routingrules
      */
     readonly routingRules?: Array<cdk.IResolvable | CfnBucket.RoutingRuleProperty> | cdk.IResolvable;
-  }
-
-  /**
-   * Specifies the redirect behavior of all requests to a website endpoint of an Amazon S3 bucket.
-   *
-   * @struct
-   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-redirectallrequeststo.html
-   */
-  export interface RedirectAllRequestsToProperty {
-    /**
-     * Name of the host where requests are redirected.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-redirectallrequeststo.html#cfn-s3-bucket-redirectallrequeststo-hostname
-     */
-    readonly hostName: string;
-
-    /**
-     * Protocol to use when redirecting requests.
-     *
-     * The default is the protocol that is used in the original request.
-     *
-     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-redirectallrequeststo.html#cfn-s3-bucket-redirectallrequeststo-protocol
-     */
-    readonly protocol?: string;
   }
 
   /**
@@ -7466,6 +7523,30 @@ export namespace CfnBucket {
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-routingrulecondition.html#cfn-s3-bucket-routingrulecondition-keyprefixequals
      */
     readonly keyPrefixEquals?: string;
+  }
+
+  /**
+   * Specifies the redirect behavior of all requests to a website endpoint of an Amazon S3 bucket.
+   *
+   * @struct
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-redirectallrequeststo.html
+   */
+  export interface RedirectAllRequestsToProperty {
+    /**
+     * Name of the host where requests are redirected.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-redirectallrequeststo.html#cfn-s3-bucket-redirectallrequeststo-hostname
+     */
+    readonly hostName: string;
+
+    /**
+     * Protocol to use when redirecting requests.
+     *
+     * The default is the protocol that is used in the original request.
+     *
+     * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-redirectallrequeststo.html#cfn-s3-bucket-redirectallrequeststo-protocol
+     */
+    readonly protocol?: string;
   }
 }
 
@@ -7698,6 +7779,53 @@ function CfnBucketAccelerateConfigurationPropertyFromCloudFormation(properties: 
 }
 
 /**
+ * Determine whether the given properties match those of a \`TagFilterProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`TagFilterProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnBucketTagFilterPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
+  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
+  errors.collect(cdk.propertyValidator("value", cdk.requiredValidator)(properties.value));
+  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
+  return errors.wrap("supplied properties not correct for \\"TagFilterProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnBucketTagFilterPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnBucketTagFilterPropertyValidator(properties).assertSuccess();
+  return {
+    "Key": cdk.stringToCloudFormation(properties.key),
+    "Value": cdk.stringToCloudFormation(properties.value)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnBucketTagFilterPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.TagFilterProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnBucket.TagFilterProperty>();
+  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
+  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
+}
+
+/**
  * Determine whether the given properties match those of a \`DestinationProperty\`
  *
  * @param properties - the TypeScript properties of a \`DestinationProperty\`
@@ -7835,53 +7963,6 @@ function CfnBucketStorageClassAnalysisPropertyFromCloudFormation(properties: any
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnBucket.StorageClassAnalysisProperty>();
   ret.addPropertyResult("dataExport", "DataExport", (properties.DataExport != null ? CfnBucketDataExportPropertyFromCloudFormation(properties.DataExport) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
- * Determine whether the given properties match those of a \`TagFilterProperty\`
- *
- * @param properties - the TypeScript properties of a \`TagFilterProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnBucketTagFilterPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("key", cdk.requiredValidator)(properties.key));
-  errors.collect(cdk.propertyValidator("key", cdk.validateString)(properties.key));
-  errors.collect(cdk.propertyValidator("value", cdk.requiredValidator)(properties.value));
-  errors.collect(cdk.propertyValidator("value", cdk.validateString)(properties.value));
-  return errors.wrap("supplied properties not correct for \\"TagFilterProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnBucketTagFilterPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnBucketTagFilterPropertyValidator(properties).assertSuccess();
-  return {
-    "Key": cdk.stringToCloudFormation(properties.key),
-    "Value": cdk.stringToCloudFormation(properties.value)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnBucketTagFilterPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.TagFilterProperty> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnBucket.TagFilterProperty>();
-  ret.addPropertyResult("key", "Key", (properties.Key != null ? cfn_parse.FromCloudFormation.getString(properties.Key) : undefined));
-  ret.addPropertyResult("value", "Value", (properties.Value != null ? cfn_parse.FromCloudFormation.getString(properties.Value) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -8774,6 +8855,7 @@ function CfnBucketEventBridgeConfigurationPropertyValidator(properties: any): cd
   if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
+  errors.collect(cdk.propertyValidator("eventBridgeEnabled", cdk.requiredValidator)(properties.eventBridgeEnabled));
   errors.collect(cdk.propertyValidator("eventBridgeEnabled", cdk.validateBoolean)(properties.eventBridgeEnabled));
   return errors.wrap("supplied properties not correct for \\"EventBridgeConfigurationProperty\\"");
 }
@@ -10112,52 +10194,6 @@ function CfnBucketVersioningConfigurationPropertyFromCloudFormation(properties: 
 }
 
 /**
- * Determine whether the given properties match those of a \`RedirectAllRequestsToProperty\`
- *
- * @param properties - the TypeScript properties of a \`RedirectAllRequestsToProperty\`
- *
- * @returns the result of the validation.
- */
-// @ts-ignore TS6133
-function CfnBucketRedirectAllRequestsToPropertyValidator(properties: any): cdk.ValidationResult {
-  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
-  const errors = new cdk.ValidationResults();
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
-  }
-  errors.collect(cdk.propertyValidator("hostName", cdk.requiredValidator)(properties.hostName));
-  errors.collect(cdk.propertyValidator("hostName", cdk.validateString)(properties.hostName));
-  errors.collect(cdk.propertyValidator("protocol", cdk.validateString)(properties.protocol));
-  return errors.wrap("supplied properties not correct for \\"RedirectAllRequestsToProperty\\"");
-}
-
-// @ts-ignore TS6133
-function convertCfnBucketRedirectAllRequestsToPropertyToCloudFormation(properties: any): any {
-  if (!cdk.canInspect(properties)) return properties;
-  CfnBucketRedirectAllRequestsToPropertyValidator(properties).assertSuccess();
-  return {
-    "HostName": cdk.stringToCloudFormation(properties.hostName),
-    "Protocol": cdk.stringToCloudFormation(properties.protocol)
-  };
-}
-
-// @ts-ignore TS6133
-function CfnBucketRedirectAllRequestsToPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.RedirectAllRequestsToProperty> {
-  if (cdk.isResolvableObject(properties)) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  properties = ((properties == null) ? {} : properties);
-  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
-    return new cfn_parse.FromCloudFormationResult(properties);
-  }
-  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnBucket.RedirectAllRequestsToProperty>();
-  ret.addPropertyResult("hostName", "HostName", (properties.HostName != null ? cfn_parse.FromCloudFormation.getString(properties.HostName) : undefined));
-  ret.addPropertyResult("protocol", "Protocol", (properties.Protocol != null ? cfn_parse.FromCloudFormation.getString(properties.Protocol) : undefined));
-  ret.addUnrecognizedPropertiesAsExtra(properties);
-  return ret;
-}
-
-/**
  * Determine whether the given properties match those of a \`RedirectRuleProperty\`
  *
  * @param properties - the TypeScript properties of a \`RedirectRuleProperty\`
@@ -10298,6 +10334,52 @@ function CfnBucketRoutingRulePropertyFromCloudFormation(properties: any): cfn_pa
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnBucket.RoutingRuleProperty>();
   ret.addPropertyResult("redirectRule", "RedirectRule", (properties.RedirectRule != null ? CfnBucketRedirectRulePropertyFromCloudFormation(properties.RedirectRule) : undefined));
   ret.addPropertyResult("routingRuleCondition", "RoutingRuleCondition", (properties.RoutingRuleCondition != null ? CfnBucketRoutingRuleConditionPropertyFromCloudFormation(properties.RoutingRuleCondition) : undefined));
+  ret.addUnrecognizedPropertiesAsExtra(properties);
+  return ret;
+}
+
+/**
+ * Determine whether the given properties match those of a \`RedirectAllRequestsToProperty\`
+ *
+ * @param properties - the TypeScript properties of a \`RedirectAllRequestsToProperty\`
+ *
+ * @returns the result of the validation.
+ */
+// @ts-ignore TS6133
+function CfnBucketRedirectAllRequestsToPropertyValidator(properties: any): cdk.ValidationResult {
+  if (!cdk.canInspect(properties)) return cdk.VALIDATION_SUCCESS;
+  const errors = new cdk.ValidationResults();
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
+  }
+  errors.collect(cdk.propertyValidator("hostName", cdk.requiredValidator)(properties.hostName));
+  errors.collect(cdk.propertyValidator("hostName", cdk.validateString)(properties.hostName));
+  errors.collect(cdk.propertyValidator("protocol", cdk.validateString)(properties.protocol));
+  return errors.wrap("supplied properties not correct for \\"RedirectAllRequestsToProperty\\"");
+}
+
+// @ts-ignore TS6133
+function convertCfnBucketRedirectAllRequestsToPropertyToCloudFormation(properties: any): any {
+  if (!cdk.canInspect(properties)) return properties;
+  CfnBucketRedirectAllRequestsToPropertyValidator(properties).assertSuccess();
+  return {
+    "HostName": cdk.stringToCloudFormation(properties.hostName),
+    "Protocol": cdk.stringToCloudFormation(properties.protocol)
+  };
+}
+
+// @ts-ignore TS6133
+function CfnBucketRedirectAllRequestsToPropertyFromCloudFormation(properties: any): cfn_parse.FromCloudFormationResult<cdk.IResolvable | CfnBucket.RedirectAllRequestsToProperty> {
+  if (cdk.isResolvableObject(properties)) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  properties = ((properties == null) ? {} : properties);
+  if (!(properties && typeof properties == 'object' && !Array.isArray(properties))) {
+    return new cfn_parse.FromCloudFormationResult(properties);
+  }
+  const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnBucket.RedirectAllRequestsToProperty>();
+  ret.addPropertyResult("hostName", "HostName", (properties.HostName != null ? cfn_parse.FromCloudFormation.getString(properties.HostName) : undefined));
+  ret.addPropertyResult("protocol", "Protocol", (properties.Protocol != null ? cfn_parse.FromCloudFormation.getString(properties.Protocol) : undefined));
   ret.addUnrecognizedPropertiesAsExtra(properties);
   return ret;
 }
@@ -11329,6 +11411,11 @@ export class CfnSkill extends cdk.CfnResource implements cdk.IInspectable {
   }
 
   /**
+   * @cloudformationAttribute Id
+   */
+  public readonly attrId: string;
+
+  /**
    * Login with Amazon (LWA) configuration used to authenticate with the Alexa service.
    */
   public authenticationConfiguration: CfnSkill.AuthenticationConfigurationProperty | cdk.IResolvable;
@@ -11358,6 +11445,7 @@ export class CfnSkill extends cdk.CfnResource implements cdk.IInspectable {
     cdk.requireProperty(props, "skillPackage", this);
     cdk.requireProperty(props, "vendorId", this);
 
+    this.attrId = cdk.Token.asString(this.getAtt("Id", cdk.ResolutionTypeHint.STRING));
     this.authenticationConfiguration = props.authenticationConfiguration;
     this.skillPackage = props.skillPackage;
     this.vendorId = props.vendorId;

@@ -51,7 +51,7 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
     const res = new RichSpecDatabase(this.db).resourceByType(this.resourceName);
     const resourceSpec = this.specification.ResourceTypes[this.resourceName];
     this.addOrEnrichProperties(resourceSpec.Properties ?? {}, res.properties);
-    this.addOrEnrichAttributes(resourceSpec.Attributes ?? {}, res.properties);
+    this.addOrEnrichAttributes(resourceSpec.Attributes ?? {}, res.attributes);
   }
 
   protected thisResourcePropTypes() {
