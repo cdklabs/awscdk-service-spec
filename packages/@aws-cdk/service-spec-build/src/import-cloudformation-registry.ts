@@ -3,6 +3,7 @@ import {
   PropertyType,
   Resource,
   ResourceProperties,
+  RichPropertyType,
   Service,
   SpecDatabase,
   TagVariant,
@@ -157,10 +158,14 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
           return schemaTypeToModelType(nameHint, jsonschema.setResolvedReference(combinedType, reference), fail);
         }
 
-        const types = inner.map((t) => schemaTypeToModelType(nameHint, resolve(t), fail));
-        report.reportFailure('interpreting', ...types.filter(isFailure));
+        const convertedTypes = inner.map((t) => schemaTypeToModelType(nameHint, resolve(t), fail));
+        report.reportFailure('interpreting', ...convertedTypes.filter(isFailure));
 
-        return { type: 'union', types: types.filter(isSuccess) };
+        // TODO: Simplify union
+        const types = convertedTypes.filter(isSuccess);
+        removeUnionDuplicates(types);
+
+        return { type: 'union', types };
       } else if (jsonschema.isAllOf(resolvedSchema)) {
         // FIXME: Do a proper thing here
         const firstResolved = resolvedSchema.allOf[0];
@@ -208,16 +213,25 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     if (jsonschema.isMapLikeObject(schema)) {
       const innerNameHint = collectionNameHint(nameHint);
 
-      // Map type -- if we have 'additionalProperties', we will use that as the type of everything
-      // (and assume it subsumes patterned types).
-      if (schema.additionalProperties) {
-        return using(schemaTypeToModelType(innerNameHint, resolve(schema.additionalProperties), fail), (element) => ({
-          type: 'map',
-          element,
-        }));
-      } else if (schema.patternProperties) {
+      // Map type. If 'patternProperties' is present we'll have it take precedence, because a lot of 'additionalProperties: true' are unintentially present.
+      if (schema.patternProperties) {
+        if (schema.additionalProperties === true) {
+          report.reportFailure(
+            'interpreting',
+            fail('additionalProperties: true is probably a mistake if patternProperties is also present'),
+          );
+        }
+
         const unifiedPatternProps = fail.locate(
-          locateFailure('patternProperties')(unionSchemas(...Object.values(schema.patternProperties))),
+          locateFailure('patternProperties')(
+            unionSchemas(
+              ...Object.values(schema.patternProperties),
+              // Use additionalProperties schema, but only if it's not 'true'.
+              ...(schema.additionalProperties && schema.additionalProperties !== true
+                ? [schema.additionalProperties]
+                : []),
+            ),
+          ),
         );
 
         return using(unifiedPatternProps, (unifiedType) =>
@@ -226,6 +240,11 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
             element,
           })),
         );
+      } else if (schema.additionalProperties) {
+        return using(schemaTypeToModelType(innerNameHint, resolve(schema.additionalProperties), fail), (element) => ({
+          type: 'map',
+          element,
+        }));
       } else if (!jsonschema.resolvedReference(schema)) {
         // Fully untyped map that's not a type
         // @todo types should probably also just be json since they are useless otherwise. Fix after this package is in use.
@@ -235,6 +254,10 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     }
 
     // Object type
+    if (looksLikeBuiltinTagType(schema)) {
+      return { type: 'tag' };
+    }
+
     const typeKey = resource.typeName + nameHint + JSON.stringify(schema);
     if (!typeDefinitions.has(typeKey)) {
       const typeDef = db.allocate('typeDefinition', {
@@ -258,6 +281,25 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     }
 
     return { type: 'ref', reference: ref(typeDefinitions.get(typeKey)!) };
+  }
+
+  function looksLikeBuiltinTagType(schema: jsonschema.Object): boolean {
+    if (!jsonschema.isRecordLikeObject(schema)) {
+      return false;
+    }
+
+    const eligibleTypeNames = ['Tag', 'Tags'];
+    const expectedStringProperties = ['Key', 'Value'];
+
+    const resolvedProps = expectedStringProperties.map((prop) =>
+      schema.properties[prop] ? resolve(schema.properties[prop]) : undefined,
+    );
+
+    return (
+      Object.keys(schema.properties).length === resolvedProps.length &&
+      resolvedProps.every((x) => x !== undefined && jsonschema.isString(x)) &&
+      eligibleTypeNames.includes(lastWord(jsonschema.resolvedReferenceName(schema) ?? ''))
+    );
   }
 
   function describeDefault(schema: jsonschema.ConcreteSchema): string | undefined {
@@ -510,5 +552,30 @@ function setIntersect<A>(...xs: Set<A>[]): Set<A> {
 function setExtend<A>(ss: Set<A>, ...xs: Set<A>[]): void {
   for (const e of xs.flatMap((x) => Array.from(x))) {
     ss.add(e);
+  }
+}
+
+function removeUnionDuplicates(types: PropertyType[]) {
+  if (types.length === 0) {
+    throw new Error('Union cannot be empty');
+  }
+
+  for (let i = 0; i < types.length; ) {
+    const type = new RichPropertyType(types[i]);
+
+    let dupe = false;
+    for (let j = i + 1; j < types.length; j++) {
+      dupe ||= type.assignableTo(types[j]);
+    }
+
+    if (dupe) {
+      types.splice(i, 1);
+    } else {
+      i += 1;
+    }
+  }
+
+  if (types.length === 0) {
+    throw new Error('Whoopsie, union ended up empty');
   }
 }

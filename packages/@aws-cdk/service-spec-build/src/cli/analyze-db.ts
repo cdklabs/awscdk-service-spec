@@ -57,7 +57,7 @@ const ANALYZERS: Record<string, Analyzer> = {
         if (allTypes.length > 1) {
           const typeEvolution = allTypes.map((t) => new RichPropertyType(t).stringify(db)).join(' -> ');
 
-          if (typeEvolution.includes('Map<string, tag>') && flags?.includes('--no-tags')) {
+          if (typeEvolution.includes('Array<tag>') && flags?.includes('--no-tags')) {
             return;
           }
 

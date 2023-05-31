@@ -140,18 +140,23 @@ export interface Property {
 }
 
 export class RichTypedField {
-  constructor(private readonly field: Pick<Property, 'type' | 'previousTypes'>) {}
+  constructor(private readonly field: Pick<Property, 'type' | 'previousTypes'>) {
+    if (field === undefined) {
+      throw new Error('Field is undefined');
+    }
+  }
 
-  public addPreviousType(type: PropertyType) {
+  public addPreviousType(type: PropertyType): boolean {
     const richType = new RichPropertyType(type);
-    if ([this.field.type, ...(this.field.previousTypes ?? [])].some((t) => richType.equals(t))) {
+    if ([this.field.type, ...(this.field.previousTypes ?? [])].some((t) => richType.assignableTo(t))) {
       // Nothing to do, type is already in there
-      return;
+      return false;
     }
     if (!this.field.previousTypes) {
       this.field.previousTypes = [];
     }
     this.field.previousTypes.unshift(type);
+    return true;
   }
 }
 
@@ -410,6 +415,33 @@ export class RichPropertyType {
     }
   }
 
+  /**
+   * Whether the current type is assignable to the RHS type
+   */
+  public assignableTo(rhs: PropertyType): boolean {
+    if (rhs.type === 'union' && this.type.type !== 'union') {
+      return rhs.types.some((t) => this.assignableTo(t));
+    }
+
+    switch (this.type.type) {
+      case 'integer':
+        // Widening
+        return rhs.type === 'integer' || rhs.type === 'number';
+
+      case 'array':
+      case 'map':
+        return rhs.type === this.type.type && new RichPropertyType(this.type.element).assignableTo(rhs.element);
+
+      case 'union':
+        // Every type in this union needs to be assignable to the RHS
+        return this.type.types.every((t) => new RichPropertyType(t).assignableTo(rhs));
+
+      default:
+        // For anything else, need strict equality
+        return this.equals(rhs);
+    }
+  }
+
   public stringify(db: SpecDatabase): string {
     switch (this.type.type) {
       case 'integer':
@@ -422,12 +454,12 @@ export class RichPropertyType {
       case 'tag':
         return this.type.type;
       case 'array':
-        return `Map<string, ${new RichPropertyType(this.type.element).stringify(db)}>`;
+        return `Array<${new RichPropertyType(this.type.element).stringify(db)}>`;
       case 'map':
-        return `${new RichPropertyType(this.type.element).stringify(db)}[]`;
+        return `Map<string, ${new RichPropertyType(this.type.element).stringify(db)}>`;
       case 'ref':
         const type = db.get('typeDefinition', this.type.reference);
-        return type.name;
+        return `${type.name}(${this.type.reference.$ref})`;
       case 'union':
         return this.type.types.map((t) => new RichPropertyType(t).stringify(db)).join(' | ');
     }

@@ -92,6 +92,9 @@ export function canonicalizeTypeOperators(op: 'oneOf' | 'anyOf' | 'allOf') {
     // Only normalize 'oneOf' if we're not at the root. We make an exception for these.
     // Don't do anything if 'oneOf' appears in the position of a property name, that's valid without
     // invoking its special powers.
+    //
+    // Also: don't normalize if the alternatives have the same 'type' key. That's a common situation
+    // that's complicated if we explode here.
     if (isRoot(lens) || !isInSchemaPosition(lens)) {
       return;
     }
@@ -103,6 +106,12 @@ export function canonicalizeTypeOperators(op: 'oneOf' | 'anyOf' | 'allOf') {
     if (branches.length === 1) {
       const merged = deepMerge(branches[0], restOfObjectWithout(lens.value, [op]));
       return lens.replaceValue(NO_MISTAKE, merged);
+    }
+
+    const types = new Set(branches.map((b) => b.type));
+    if (types.size === 1) {
+      // Do nothing
+      return;
     }
 
     const newBranches = deepDedupe(

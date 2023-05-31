@@ -9,7 +9,6 @@ import {
   importCloudFormationRegistryResource,
   readCloudFormationRegistryServiceFromResource,
 } from './import-cloudformation-registry';
-import { importLegacyInformation } from './import-legacy-information';
 import { ResourceSpecImporter, SAMSpecImporter } from './import-resource-spec';
 import { SamResources } from './import-sam';
 import { Scrutinies } from './import-scrutinies';
@@ -81,8 +80,6 @@ export class DatabaseBuilder {
 
     const samSchema = this.loadResult(await sources.loadSamSchema());
     new SamResources({ db: this.db, samSchema, report: this.report }).import();
-
-    importLegacyInformation(this.db, this.resourceSpec, this.report);
   }
 
   private async importOldTypesFromSpec() {

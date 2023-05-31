@@ -99,6 +99,9 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
         };
       } else {
         // Old-typed property
+        if (this.resourceName === 'AWS::Serverless::StateMachine' && name === 'Properties') {
+          debugger;
+        }
         new RichProperty(existingProp).addPreviousType(this.deriveType(propSpec));
       }
     }
@@ -152,6 +155,13 @@ export class ResourceSpecImporter extends ResourceSpecImporterBase<CloudFormatio
         case 'Tag':
           return { type: 'tag' };
         case 'Tags':
+          const tagsTypeDef = self.typeDefs.get('Tags');
+          // This might be an actual type that actually exists, check for it
+          if (tagsTypeDef) {
+            return { type: 'ref', reference: ref(tagsTypeDef) };
+          }
+          console.log('banaananana');
+          // If not, we'll take it as an alias for Array<tag>
           return { type: 'array', element: { type: 'tag' } };
         case 'List':
           return { type: 'array', element: derive(spec.ItemType, spec.PrimitiveItemType) };
