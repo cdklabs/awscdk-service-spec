@@ -43832,7 +43832,8 @@ export class CfnApi extends cdk.CfnResource implements cdk.IInspectable, cdk.ITa
 
     cdk.requireProperty(props, "stageName", this);
 
-    // Automatically add the required transformthis.stack.addTransform(CfnApi.REQUIRED_TRANSFORM);
+    // Automatically add the required transform
+    this.stack.addTransform(CfnApi.REQUIRED_TRANSFORM);
 
     this.accessLogSetting = props.accessLogSetting;
     this.auth = props.auth;
@@ -44892,7 +44893,8 @@ export class CfnApplication extends cdk.CfnResource implements cdk.IInspectable,
 
     cdk.requireProperty(props, "location", this);
 
-    // Automatically add the required transformthis.stack.addTransform(CfnApplication.REQUIRED_TRANSFORM);
+    // Automatically add the required transform
+    this.stack.addTransform(CfnApplication.REQUIRED_TRANSFORM);
 
     this.location = props.location;
     this.notificationArns = props.notificationArns;
@@ -45206,7 +45208,8 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
       "properties": props
     });
 
-    // Automatically add the required transformthis.stack.addTransform(CfnFunction.REQUIRED_TRANSFORM);
+    // Automatically add the required transform
+    this.stack.addTransform(CfnFunction.REQUIRED_TRANSFORM);
 
     this.architectures = props.architectures;
     this.assumeRolePolicyDocument = props.assumeRolePolicyDocument;
@@ -49580,7 +49583,8 @@ export class CfnHttpApi extends cdk.CfnResource implements cdk.IInspectable, cdk
       "properties": props
     });
 
-    // Automatically add the required transformthis.stack.addTransform(CfnHttpApi.REQUIRED_TRANSFORM);
+    // Automatically add the required transform
+    this.stack.addTransform(CfnHttpApi.REQUIRED_TRANSFORM);
 
     this.accessLogSetting = props.accessLogSetting;
     this.auth = props.auth;
@@ -50482,7 +50486,8 @@ export class CfnLayerVersion extends cdk.CfnResource implements cdk.IInspectable
       "properties": props
     });
 
-    // Automatically add the required transformthis.stack.addTransform(CfnLayerVersion.REQUIRED_TRANSFORM);
+    // Automatically add the required transform
+    this.stack.addTransform(CfnLayerVersion.REQUIRED_TRANSFORM);
 
     this.compatibleRuntimes = props.compatibleRuntimes;
     this.contentUri = props.contentUri;
@@ -50754,7 +50759,8 @@ export class CfnSimpleTable extends cdk.CfnResource implements cdk.IInspectable,
       "properties": props
     });
 
-    // Automatically add the required transformthis.stack.addTransform(CfnSimpleTable.REQUIRED_TRANSFORM);
+    // Automatically add the required transform
+    this.stack.addTransform(CfnSimpleTable.REQUIRED_TRANSFORM);
 
     this.primaryKey = props.primaryKey;
     this.provisionedThroughput = props.provisionedThroughput;
@@ -51139,7 +51145,8 @@ export class CfnStateMachine extends cdk.CfnResource implements cdk.IInspectable
       "properties": props
     });
 
-    // Automatically add the required transformthis.stack.addTransform(CfnStateMachine.REQUIRED_TRANSFORM);
+    // Automatically add the required transform
+    this.stack.addTransform(CfnStateMachine.REQUIRED_TRANSFORM);
 
     this.definition = props.definition;
     this.definitionSubstitutions = props.definitionSubstitutions;
