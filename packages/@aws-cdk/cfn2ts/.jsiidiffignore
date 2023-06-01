@@ -1,0 +1,3 @@
+# AWS::Macie::FindingsFilter - Removed attribute should also be removed in aws-cdk-lib
+removed:aws-cdk-lib.aws_macie.CfnFindingsFilter.FindingsFilterListItemProperty
+removed:aws-cdk-lib.aws_macie.CfnFindingsFilter.attrFindingsFilterListItems
