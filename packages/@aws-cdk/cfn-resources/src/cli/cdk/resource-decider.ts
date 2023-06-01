@@ -131,10 +131,7 @@ export class ResourceDecider {
     const originalName = propertyNameFromCloudFormation(cfnName);
     const rawTagsPropName = `${originalName}Raw`;
 
-    const { type, baseType } =
-      variant === 'map'
-        ? { type: Type.mapOf(Type.STRING), baseType: Type.mapOf(Type.STRING) }
-        : this.legacyCompatiblePropType(cfnName, prop);
+    const { type, baseType } = this.legacyCompatiblePropType(cfnName, prop);
 
     this.propsProperties.push({
       propertySpec: {
@@ -255,8 +252,8 @@ export class ResourceDecider {
     const baseType = this.converter.typeFromProperty(prop);
 
     // Whether or not a property is made `IResolvable` originally depended on
-    // the name of the property. These conditions were probably expected to coincide,
-    // but didn't.
+    // the name of the property. These conditions were probably expected to coincide
+    // with it being a taggable type or not, but they don't always coincide.
     const type = cfnName in NON_RESOLVABLE_PROPERTY_NAMES ? baseType : this.converter.makeTypeResolvable(baseType);
 
     return { type, baseType };
