@@ -1,6 +1,6 @@
 import { asStmt } from './private';
 import { Statement, StatementSeparator } from './statements';
-import { Expression } from '../expression';
+import { Expression } from '../expressions';
 
 export class Block extends Statement {
   public static with(...stmts: Array<Statement | Expression>) {

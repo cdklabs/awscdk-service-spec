@@ -1,20 +1,10 @@
-import { InvokeCallable, ObjectMethodInvoke, ObjectPropertyAccess } from './expressions';
-import { Parameter } from './parameter';
-import { Block, ExpressionStatement, Statement } from './statements';
-import { ThingSymbol } from './symbol';
+import { InvokeCallable, ObjectMethodInvoke, ObjectPropertyAccess } from './';
+import { CommentableImpl, ICommentable } from '../code-fragments';
+import { Parameter } from '../parameter';
+import { Block, ExpressionStatement, Statement } from '../statements';
+import { ThingSymbol } from '../symbol';
 
-export class Expression {
-  public readonly _comments_?: string[];
-
-  /**
-   * Declare a private field to make this type nominally typed
-   */
-  private readonly _isExpression_ = true;
-
-  constructor() {
-    Array.isArray(this._isExpression_);
-  }
-
+export class Expression extends CommentableImpl implements ICommentable {
   public prop(property: string): ObjectPropertyAccess {
     return new ObjectPropertyAccess(this, property);
   }

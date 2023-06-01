@@ -1,22 +1,10 @@
 import { Block } from './block';
 import { asStmt } from './private';
-import { Expression } from '../expression';
+import { CommentableImpl, ICommentable } from '../code-fragments';
+import { Expression } from '../expressions';
 import { Parameter } from '../parameter';
 
-export class Statement {
-  public get comments(): string[] {
-    return this._comments;
-  }
-  private _comments: string[];
-
-  constructor() {
-    this._comments = [];
-  }
-
-  public withComment(...comments: string[]) {
-    this._comments = comments;
-  }
-}
+export class Statement extends CommentableImpl implements ICommentable {}
 
 export class ReturnStatement extends Statement {
   public constructor(public readonly expression?: Expression) {

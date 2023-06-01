@@ -1,5 +1,4 @@
 import { Block } from './block';
-import { asStmt } from './private';
 import {
   AssignmentStatement,
   StatementSeparator,
@@ -12,7 +11,7 @@ import {
   VariableDeclaration,
   ThrowStatement,
 } from './statements';
-import { Expression } from '../expression';
+import { Expression } from '../expressions';
 
 export function ret(e?: Expression): Statement {
   return new ReturnStatement(e);
@@ -52,10 +51,4 @@ export function block(...stmts: Array<Statement | Expression>) {
 
 export function throw_(error: Expression) {
   return new ThrowStatement(error);
-}
-
-export function comment(comments: string[], x: Statement | Expression): Statement {
-  const stmt = asStmt(x);
-  stmt.withComment(...comments);
-  return stmt;
 }

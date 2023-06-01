@@ -1,4 +1,4 @@
-import { Expression } from './expression';
+import { Expression } from './expressions';
 import { NewExpression, ObjectPropertyAccess } from './expressions';
 import * as expr from './expressions/builder';
 import { MemberType } from './member-type';

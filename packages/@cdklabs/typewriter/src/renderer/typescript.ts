@@ -2,7 +2,7 @@ import { Renderer } from './base';
 import { CallableDeclaration, isCallableDeclaration } from '../callable';
 import { ClassType } from '../class';
 import { Documented } from '../documented';
-import { AnonymousInterfaceImplementation, Expression, Lambda, Splat, SymbolReference } from '../expression';
+import { AnonymousInterfaceImplementation, Expression, Lambda, Splat, SymbolReference } from '../expressions';
 import {
   BinOp,
   DestructuringBind,
@@ -430,8 +430,12 @@ export class TypeScriptRenderer extends Renderer {
     this.emitLine(`// ${text}`);
   }
 
+  protected renderInlineComment(text: string) {
+    this.emit(`/* ${text} */ `);
+  }
+
   protected renderStatement(stmnt: Statement) {
-    for (const comment of stmnt.comments) {
+    for (const comment of stmnt._comments_) {
       this.renderComment(comment);
     }
 
@@ -507,6 +511,10 @@ export class TypeScriptRenderer extends Renderer {
   }
 
   protected renderExpression(expr: Expression): void {
+    if (expr._comments_.length) {
+      this.renderInlineComment(expr._comments_.join(', '));
+    }
+
     const success = dispatchType(expr, [
       typeCase(DirectCode, (x) => this.emit(x._code_)),
       typeCase(ObjectLiteral, (x) => this.renderObjectLiteral(x)),

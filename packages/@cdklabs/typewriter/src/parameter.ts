@@ -1,6 +1,5 @@
 import { CallableDeclaration } from './callable';
-import { Expression } from './expression';
-import { Identifier } from './expressions';
+import { Expression, Identifier } from './expressions';
 import { Type } from './type';
 
 export interface ParameterSpec {

@@ -1,6 +1,6 @@
 import * as expr from './builder';
+import { Expression } from './expressions';
 import { NewExpression } from './objects';
-import { Expression } from '../expression';
 import { Type } from '../type';
 
 const isProxy = Symbol();

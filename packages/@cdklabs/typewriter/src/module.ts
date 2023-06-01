@@ -1,5 +1,4 @@
-import { Expression } from './expression';
-import { ObjectPropertyAccess } from './expressions';
+import { Expression, ObjectPropertyAccess } from './expressions';
 import * as expr from './expressions/builder';
 import { Identifier } from './expressions/identifier';
 import { IScope, IScoped, isScoped, ScopeImpl } from './scope';

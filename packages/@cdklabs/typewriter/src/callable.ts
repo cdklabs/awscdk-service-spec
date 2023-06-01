@@ -1,5 +1,5 @@
 import { Documented } from './documented';
-import { Expression } from './expression';
+import { Expression } from './expressions';
 import { Identifier } from './expressions';
 import { Parameter, ParameterSpec } from './parameter';
 import { IScope } from './scope';
