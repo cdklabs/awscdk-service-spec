@@ -1,5 +1,5 @@
-import { Database, entityCollection, fieldIndex, stringCmp } from '@cdklabs/tskb';
 import { promises as fs } from 'fs';
+import { Database, entityCollection, fieldIndex, stringCmp } from '@cdklabs/tskb';
 import { IsAugmentedResource, ResourceAugmentation } from './augmentations';
 import {
   DimensionSet,

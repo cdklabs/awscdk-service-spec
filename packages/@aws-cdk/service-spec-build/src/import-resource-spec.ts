@@ -18,16 +18,39 @@ import { ref } from '@cdklabs/tskb';
 
 //////////////////////////////////////////////////////////////////////
 
+type AnyPropertyType = resourcespec.PropertyType | resourcespec.SAMPropertyType;
+type AnyTypeAlias = resourcespec.SingleTypeAlias | resourcespec.SAMSingleTypeAlias;
+type AnyTypeDefinition = resourcespec.CfnTypeDefinition | resourcespec.SAMTypeDefinition;
+
+/**
+ * Base importer for CFN and SAM (legacy) resource specs
+ *
+ * PropertyType definitions are either object types, or type aliases to something like `Array<Something>`.
+ */
 abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpecification | SAMResourceSpecification> {
   protected readonly typeDefs = new Map<string, TypeDefinition>();
+  protected readonly thisResourcePropTypes = new Map<string, AnyPropertyType>();
+  protected readonly thisPropTypeAliases = new Map<string, AnyTypeAlias>();
 
   protected constructor(
     protected readonly db: SpecDatabase,
     protected readonly specification: Spec,
     protected readonly resourceName: string,
-  ) {}
+  ) {
+    for (const [fqn, spec] of Object.entries(this.specification.PropertyTypes)) {
+      const [typeResourceName, typeDefName] = fqn.split('.');
+      if (this.resourceName !== typeResourceName) {
+        continue;
+      }
+      if (resourcespec.isPropType(spec)) {
+        this.thisResourcePropTypes.set(typeDefName, spec);
+      } else {
+        this.thisPropTypeAliases.set(typeDefName, spec);
+      }
+    }
+  }
 
-  protected abstract deriveType(spec: resourcespec.CfnTypeDefinition | resourcespec.SAMTypeDefinition): PropertyType;
+  protected abstract deriveType(spec: AnyTypeDefinition): PropertyType;
 
   public importResourceOldTypes() {
     this.doTypeDefinitions();
@@ -38,7 +61,7 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
     const res = new RichSpecDatabase(this.db).resourceByType(this.resourceName);
     this.allocateMissingTypeDefs(res);
 
-    for (const [propTypeName, propType] of this.thisResourcePropTypes()) {
+    for (const [propTypeName, propType] of this.thisResourcePropTypes.entries()) {
       const typeDef = this.typeDefs.get(propTypeName);
       if (!typeDef) {
         throw new Error(`Missing typeDef for ${propTypeName}`);
@@ -54,22 +77,12 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
     this.addOrEnrichAttributes(resourceSpec.Attributes ?? {}, res.attributes);
   }
 
-  protected thisResourcePropTypes() {
-    return Object.entries(this.specification.PropertyTypes).flatMap(([fqn, spec]) => {
-      const [typeResourceName, typeDefName] = fqn.split('.');
-      if (this.resourceName !== typeResourceName) {
-        return [];
-      }
-      return [[typeDefName, spec]];
-    });
-  }
-
   protected allocateMissingTypeDefs(resource: Resource) {
     for (const td of new RichSpecDatabase(this.db).resourceTypeDefs(this.resourceName)) {
       this.typeDefs.set(td.name, td);
     }
 
-    for (const [typeDefName, _] of this.thisResourcePropTypes()) {
+    for (const [typeDefName, _] of this.thisResourcePropTypes.entries()) {
       if (this.typeDefs.has(typeDefName)) {
         continue;
       }
@@ -146,7 +159,7 @@ export class ResourceSpecImporter extends ResourceSpecImporterBase<CloudFormatio
     super(options.db, options.specification, resourceName);
   }
 
-  protected deriveType(spec: resourcespec.Property | resourcespec.Attribute): PropertyType {
+  protected deriveType(spec: resourcespec.CfnTypeDefinition): PropertyType {
     const self = this;
     return derive(spec.Type, spec.PrimitiveType);
 
@@ -160,7 +173,6 @@ export class ResourceSpecImporter extends ResourceSpecImporterBase<CloudFormatio
           if (tagsTypeDef) {
             return { type: 'ref', reference: ref(tagsTypeDef) };
           }
-          console.log('banaananana');
           // If not, we'll take it as an alias for Array<tag>
           return { type: 'array', element: { type: 'tag' } };
         case 'List':
@@ -171,6 +183,12 @@ export class ResourceSpecImporter extends ResourceSpecImporterBase<CloudFormatio
           // Fallthrough for PrimitiveType
           break;
         default:
+          // Either an alias or a PropType
+          const alias = self.thisPropTypeAliases.get(type);
+          if (alias) {
+            return self.deriveType(alias);
+          }
+
           const typeDef = self.typeDefs.get(type);
           if (!typeDef) {
             throw new Error(`Unrecognized type: ${self.resourceName}.${type}`);
@@ -221,7 +239,7 @@ export class SAMSpecImporter extends ResourceSpecImporterBase<SAMResourceSpecifi
     super(options.db, options.specification, resourceName);
   }
 
-  protected deriveType(spec: resourcespec.SAMProperty): PropertyType {
+  protected deriveType(spec: resourcespec.SAMTypeDefinition): PropertyType {
     const self = this;
 
     return maybeUnion([
@@ -256,6 +274,12 @@ export class SAMSpecImporter extends ResourceSpecImporterBase<SAMResourceSpecifi
           // Json should be a primitive type, but occasionally occurs as a Type
           return { type: 'json' };
         default:
+          // Either an alias or a PropType
+          const alias = self.thisPropTypeAliases.get(type);
+          if (alias) {
+            return self.deriveType(alias);
+          }
+
           const typeDef = self.typeDefs.get(type);
           if (!typeDef) {
             throw new Error(`Unrecognized type: ${self.resourceName}.${type}`);
