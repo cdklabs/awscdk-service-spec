@@ -5,9 +5,7 @@ import {
   ResourceProperties,
   RichAttribute,
   RichProperty,
-  RichPropertyType,
   RichSpecDatabase,
-  RichTypedField,
   SpecDatabase,
   TypeDefinition,
 } from '@aws-cdk/service-spec';
@@ -85,13 +83,16 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
     }
 
     for (const [typeDefName, _] of this.thisResourcePropTypes.entries()) {
-      if (this.typeDefs.has(typeDefName)) {
+      const existing = this.typeDefs.get(typeDefName);
+      if (existing) {
+        existing.mustRenderForBwCompat = true;
         continue;
       }
 
       const typeDef = this.db.allocate('typeDefinition', {
         name: typeDefName,
         properties: {},
+        mustRenderForBwCompat: true,
       });
 
       this.db.link('usesType', resource, typeDef);
@@ -114,29 +115,8 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
           required: propSpec.Required,
         };
       } else {
-        if (this.resourceName === 'AWS::ApiGatewayV2::DomainName' && name === 'Tags') {
-          console.log(
-            'current',
-            new RichTypedField(existingProp)
-              .types()
-              .map((t) => new RichPropertyType(t).stringify(this.db))
-              .join(' >> '),
-          );
-          console.log('old', new RichPropertyType(type).stringify(this.db));
-        }
-
         // Old-typed property
         new RichProperty(existingProp).addPreviousType(type);
-
-        if (this.resourceName === 'AWS::ApiGatewayV2::DomainName' && name === 'Tags') {
-          console.log(
-            'after',
-            new RichTypedField(existingProp)
-              .types()
-              .map((t) => new RichPropertyType(t).stringify(this.db))
-              .join(' >> '),
-          );
-        }
       }
     }
   }

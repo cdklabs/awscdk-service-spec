@@ -111,7 +111,7 @@ export class TypeConverter {
         return Type.mapOf(this.typeFromSpecType(type.element));
       case 'ref':
         const ref = this.db.get('typeDefinition', type.reference.$ref);
-        return this.obtainTypeDefinitionType(ref).type;
+        return this.convertTypeDefinitionType(ref).type;
       case 'tag':
         return CDK_CORE.CfnTag;
       case 'union':
@@ -125,7 +125,7 @@ export class TypeConverter {
     }
   }
 
-  private obtainTypeDefinitionType(ref: TypeDefinition): TypeDeclaration {
+  public convertTypeDefinitionType(ref: TypeDefinition): TypeDeclaration {
     const existing = this.typeDefCache.get(ref);
     if (existing) {
       return existing;

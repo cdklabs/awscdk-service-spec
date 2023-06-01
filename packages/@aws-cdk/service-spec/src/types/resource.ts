@@ -87,6 +87,11 @@ export interface TypeDefinition extends Entity {
   readonly name: string;
   documentation?: string;
   readonly properties: ResourceProperties;
+
+  /**
+   * If true, render this type even if it is unused.
+   */
+  mustRenderForBwCompat?: boolean;
 }
 
 export interface Property {
