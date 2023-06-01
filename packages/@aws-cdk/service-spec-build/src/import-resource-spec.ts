@@ -124,14 +124,14 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
   protected addOrEnrichAttributes(source: Record<string, resourcespec.Attribute>, into: Record<string, Attribute>) {
     for (const [name, attrSpec] of Object.entries(source)) {
       const existingAttr = into[name];
+      const type = this.deriveType(attrSpec);
+
       if (!existingAttr) {
         // Fully missing attr
-        into[name] = {
-          type: this.deriveType(attrSpec),
-        };
+        into[name] = { type };
       } else {
         // Old-typed attr
-        new RichAttribute(existingAttr).addPreviousType(this.deriveType(attrSpec));
+        new RichAttribute(existingAttr).addPreviousType(type);
       }
     }
   }
