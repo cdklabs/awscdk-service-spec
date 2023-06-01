@@ -4,37 +4,33 @@ import { Expression } from '../expression';
 import { Parameter } from '../parameter';
 
 export class Statement {
-  readonly comments?: string[];
-
-  /**
-   * Declare a private field to make this type nominally typed
-   */
-  private readonly isStatement = true;
+  public get comments(): string[] {
+    return this._comments;
+  }
+  private _comments: string[];
 
   constructor() {
-    Array.isArray(this.isStatement);
+    this._comments = [];
+  }
+
+  public withComment(...comments: string[]) {
+    this._comments = comments;
   }
 }
 
 export class ReturnStatement extends Statement {
-  readonly comments?: string[];
-
   public constructor(public readonly expression?: Expression) {
     super();
   }
 }
 
 export class ExpressionStatement extends Statement {
-  readonly comments?: string[];
-
   public constructor(public readonly expression: Expression) {
     super();
   }
 }
 
 export class AssignmentStatement extends Statement {
-  readonly comments?: string[];
-
   public constructor(public readonly lhs: Expression, public readonly rhs: Expression) {
     super();
   }
@@ -46,16 +42,12 @@ export enum Mut {
 }
 
 export class VariableDeclaration extends Statement {
-  readonly comments?: string[];
-
   public constructor(public readonly mut: Mut, public readonly varName: Expression, public readonly rhs: Expression) {
     super();
   }
 }
 
 export class IfThenElse extends Statement {
-  readonly comments?: string[];
-
   public thenStatement?: Statement;
   public elseStatement?: Statement;
 

@@ -1,4 +1,5 @@
 import { Block } from './block';
+import { asStmt } from './private';
 import {
   AssignmentStatement,
   StatementSeparator,
@@ -51,4 +52,10 @@ export function block(...stmts: Array<Statement | Expression>) {
 
 export function throw_(error: Expression) {
   return new ThrowStatement(error);
+}
+
+export function comment(comments: string[], x: Statement | Expression): Statement {
+  const stmt = asStmt(x);
+  stmt.withComment(...comments);
+  return stmt;
 }

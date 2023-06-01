@@ -9,8 +9,6 @@ export class Block extends Statement {
     return ret;
   }
 
-  public readonly comments?: string[];
-
   private readonly _statements: Statement[] = [];
 
   public add(...stmts: Statement[]) {

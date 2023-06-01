@@ -426,8 +426,15 @@ export class TypeScriptRenderer extends Renderer {
     }
   }
 
+  protected renderComment(text: string) {
+    this.emitLine(`// ${text}`);
+  }
+
   protected renderStatement(stmnt: Statement) {
-    // FIXME: Comments
+    for (const comment of stmnt.comments) {
+      this.renderComment(comment);
+    }
+
     const success = dispatchType(stmnt, [
       typeCase(SuperInitializer, (x) => {
         this.emit('super');
