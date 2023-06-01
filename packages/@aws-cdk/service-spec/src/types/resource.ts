@@ -152,8 +152,13 @@ export class RichTypedField {
 
   public addPreviousType(type: PropertyType): boolean {
     const richType = new RichPropertyType(type);
+
+    // Only add this type if we don't already have it. We are only doing comparisons where 'integer' and 'number'
+    // are treated the same, for all other types we need strict equality. We used to use 'assignableTo' as a
+    // condition, but these types will be rendered in both co- and contravariant positions, and so we really can't
+    // do much better than full equality.
     if (this.types().some((t) => richType.javascriptEquals(t))) {
-      // Nothing to do, type is already in there
+      // Nothing to do, type is already in there.
       return false;
     }
     if (!this.field.previousTypes) {
