@@ -168,14 +168,6 @@ export class ResourceSpecImporter extends ResourceSpecImporterBase<CloudFormatio
       switch (type) {
         case 'Tag':
           return { type: 'tag' };
-        case 'Tags':
-          const tagsTypeDef = self.typeDefs.get('Tags');
-          // This might be an actual type that actually exists, check for it
-          if (tagsTypeDef) {
-            return { type: 'ref', reference: ref(tagsTypeDef) };
-          }
-          // If not, we'll take it as an alias for Array<tag>
-          return { type: 'array', element: { type: 'tag' } };
         case 'List':
           return { type: 'array', element: derive(spec.ItemType, spec.PrimitiveItemType) };
         case 'Map':
@@ -265,8 +257,6 @@ export class SAMSpecImporter extends ResourceSpecImporterBase<SAMResourceSpecifi
       switch (type) {
         case 'Tag':
           return { type: 'tag' };
-        case 'Tags':
-          return { type: 'array', element: { type: 'tag' } };
         case 'List':
           return { type: 'array', element: deriveItemTypes() };
         case 'Map':
