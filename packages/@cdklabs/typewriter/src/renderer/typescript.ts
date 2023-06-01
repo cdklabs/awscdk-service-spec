@@ -2,8 +2,12 @@ import { Renderer } from './base';
 import { CallableDeclaration, isCallableDeclaration } from '../callable';
 import { ClassType } from '../class';
 import { Documented } from '../documented';
-import { AnonymousInterfaceImplementation, Expression, Lambda, Splat, SymbolReference } from '../expressions';
 import {
+  AnonymousInterfaceImplementation,
+  Expression,
+  Lambda,
+  Splat,
+  SymbolReference,
   BinOp,
   DestructuringBind,
   DirectCode,

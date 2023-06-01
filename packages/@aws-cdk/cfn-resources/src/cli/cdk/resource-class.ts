@@ -4,6 +4,7 @@ import {
   $T,
   Block,
   ClassType,
+  code,
   expr,
   MemberVisibility,
   IScope,
@@ -247,9 +248,9 @@ export class ResourceClass extends ClassType {
 
     if (this.resource.cloudFormationTransform) {
       init.addBody(
-        stmt.comment(
-          ['Automatically add the required transform'],
+        code.commentOn(
           $this.stack.addTransform($T(this.type)[staticRequiredTransform()]),
+          'Automatically add the required transform',
         ),
         stmt.sep(),
       );
