@@ -146,9 +146,13 @@ export class RichTypedField {
     }
   }
 
+  public types(): PropertyType[] {
+    return [...(this.field.previousTypes ?? []), this.field.type];
+  }
+
   public addPreviousType(type: PropertyType): boolean {
     const richType = new RichPropertyType(type);
-    if ([this.field.type, ...(this.field.previousTypes ?? [])].some((t) => richType.assignableTo(t))) {
+    if (this.types().some((t) => richType.javascriptEquals(t))) {
       // Nothing to do, type is already in there
       return false;
     }
@@ -416,25 +420,27 @@ export class RichPropertyType {
   }
 
   /**
-   * Whether the current type is assignable to the RHS type
+   * Whether the current type is JavaScript-equal to the RHS type
+   *
+   * Same as normal equality, but consider `integer` and `number` the same types.
    */
-  public assignableTo(rhs: PropertyType): boolean {
-    if (rhs.type === 'union' && this.type.type !== 'union') {
-      return rhs.types.some((t) => this.assignableTo(t));
-    }
-
+  public javascriptEquals(rhs: PropertyType): boolean {
     switch (this.type.type) {
+      case 'number':
       case 'integer':
         // Widening
         return rhs.type === 'integer' || rhs.type === 'number';
 
       case 'array':
       case 'map':
-        return rhs.type === this.type.type && new RichPropertyType(this.type.element).assignableTo(rhs.element);
+        return rhs.type === this.type.type && new RichPropertyType(this.type.element).javascriptEquals(rhs.element);
 
       case 'union':
-        // Every type in this union needs to be assignable to the RHS
-        return this.type.types.every((t) => new RichPropertyType(t).assignableTo(rhs));
+        if (rhs.type !== 'union') {
+          return false;
+        }
+        // Every type in this union needs to be equal one type in RHS
+        return this.type.types.every((t1) => rhs.types.some((t2) => new RichPropertyType(t1).javascriptEquals(t2)));
 
       default:
         // For anything else, need strict equality

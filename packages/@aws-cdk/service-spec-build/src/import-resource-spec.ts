@@ -5,7 +5,9 @@ import {
   ResourceProperties,
   RichAttribute,
   RichProperty,
+  RichPropertyType,
   RichSpecDatabase,
+  RichTypedField,
   SpecDatabase,
   TypeDefinition,
 } from '@aws-cdk/service-spec';
@@ -103,19 +105,38 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
   ) {
     for (const [name, propSpec] of Object.entries(source)) {
       const existingProp = into[name];
+      const type = this.deriveType(propSpec);
 
       if (!existingProp) {
         // A fully missing property
         into[name] = {
-          type: this.deriveType(propSpec),
+          type,
           required: propSpec.Required,
         };
       } else {
-        // Old-typed property
-        if (this.resourceName === 'AWS::Serverless::StateMachine' && name === 'Properties') {
-          debugger;
+        if (this.resourceName === 'AWS::ApiGatewayV2::DomainName' && name === 'Tags') {
+          console.log(
+            'current',
+            new RichTypedField(existingProp)
+              .types()
+              .map((t) => new RichPropertyType(t).stringify(this.db))
+              .join(' >> '),
+          );
+          console.log('old', new RichPropertyType(type).stringify(this.db));
         }
-        new RichProperty(existingProp).addPreviousType(this.deriveType(propSpec));
+
+        // Old-typed property
+        new RichProperty(existingProp).addPreviousType(type);
+
+        if (this.resourceName === 'AWS::ApiGatewayV2::DomainName' && name === 'Tags') {
+          console.log(
+            'after',
+            new RichTypedField(existingProp)
+              .types()
+              .map((t) => new RichPropertyType(t).stringify(this.db))
+              .join(' >> '),
+          );
+        }
       }
     }
   }

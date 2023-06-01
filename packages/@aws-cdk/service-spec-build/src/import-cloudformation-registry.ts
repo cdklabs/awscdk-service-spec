@@ -161,7 +161,6 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         const convertedTypes = inner.map((t) => schemaTypeToModelType(nameHint, resolve(t), fail));
         report.reportFailure('interpreting', ...convertedTypes.filter(isFailure));
 
-        // TODO: Simplify union
         const types = convertedTypes.filter(isSuccess);
         removeUnionDuplicates(types);
 
@@ -565,7 +564,7 @@ function removeUnionDuplicates(types: PropertyType[]) {
 
     let dupe = false;
     for (let j = i + 1; j < types.length; j++) {
-      dupe ||= type.assignableTo(types[j]);
+      dupe ||= type.javascriptEquals(types[j]);
     }
 
     if (dupe) {
