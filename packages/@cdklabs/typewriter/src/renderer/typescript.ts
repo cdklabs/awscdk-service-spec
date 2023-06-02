@@ -439,7 +439,7 @@ export class TypeScriptRenderer extends Renderer {
   }
 
   protected renderStatement(stmnt: Statement) {
-    for (const comment of stmnt._comments_) {
+    for (const comment of stmnt.getComments()) {
       this.renderComment(comment);
     }
 
@@ -515,8 +515,8 @@ export class TypeScriptRenderer extends Renderer {
   }
 
   protected renderExpression(expr: Expression): void {
-    if (expr._comments_.length) {
-      this.renderInlineComment(expr._comments_.join(', '));
+    if (expr.getComments().length) {
+      this.renderInlineComment(expr.getComments().join(', '));
     }
 
     const success = dispatchType(expr, [

@@ -41,9 +41,20 @@ const EXPRESSION_HANDLERS: ProxyHandler<Expression> = {
       return true;
     }
     // Function has '.name', but we never want that
-    return key in exp && key !== 'name' ? (exp as any)[key] : $E(exp.prop(String(key)));
+    if (Reflect.has(exp, key) && key !== 'name') {
+      return Reflect.get(exp, key);
+    }
+
+    return $E(exp.prop(String(key)));
   },
-  set: () => false,
+  set: (exp, key, value) => {
+    if (Reflect.has(exp, key)) {
+      Reflect.set(exp, key, value);
+
+      return true;
+    }
+    return false;
+  },
   has: () => true,
 };
 
@@ -83,7 +94,7 @@ const TYPE_HANDLERS: ProxyHandler<Type> = {
     if (key === isProxy) {
       return true;
     }
-    return key in type ? (type as any)[key] : $E(expr.type(type).prop(String(key)));
+    return Reflect.has(type, key) ? Reflect.get(type, key) : $E(expr.type(type).prop(String(key)));
   },
   construct: (type, args) => {
     return $E(new NewExpression(type, ...args));

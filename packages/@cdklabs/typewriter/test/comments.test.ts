@@ -1,4 +1,4 @@
-import { code, FreeFunction, Module, TypeScriptRenderer } from '../src';
+import { $E, code, FreeFunction, Module, TypeScriptRenderer } from '../src';
 
 const renderer = new TypeScriptRenderer();
 let scope: Module;
@@ -63,6 +63,22 @@ describe('expressions', () => {
       // @ts-ignore TS6133
       function freeFunction(): void {
         return ["foo", /* test comment */ "bar", "baz"];
+      }"
+    `);
+  });
+
+  test('can put a comment before an expression proxy', () => {
+    const fn = new FreeFunction(scope, {
+      name: 'freeFunction',
+    });
+
+    fn.addBody(code.stmt.ret(code.commentOn($E(code.expr.lit(1)).convertToString(), 'test comment')));
+
+    expect(renderer.render(scope)).toMatchInlineSnapshot(`
+      "/* eslint-disable prettier/prettier,max-len */
+      // @ts-ignore TS6133
+      function freeFunction(): void {
+        return /* test comment */ 1.convertToString();
       }"
     `);
   });
