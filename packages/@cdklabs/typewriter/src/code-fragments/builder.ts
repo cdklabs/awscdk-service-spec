@@ -1,5 +1,5 @@
-import { EmptyStatement, Statement } from '../statements';
 import { ICommentable } from './commentable';
+import { EmptyStatement, Statement } from '../statements';
 
 export * as expr from '../expressions/builder';
 export * as stmt from '../statements/builder';
