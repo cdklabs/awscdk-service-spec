@@ -249,7 +249,7 @@ export class ResourceClass extends ClassType {
     if (this.resource.cloudFormationTransform) {
       init.addBody(
         code.commentOn(
-          $this.stack.addTransform($T(this.type)[staticRequiredTransform()]),
+          $this.stack.addTransform($T(this.type)[staticRequiredTransform()]).asStmt(),
           'Automatically add the required transform',
         ),
         stmt.sep(),

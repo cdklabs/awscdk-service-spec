@@ -2,7 +2,7 @@ export interface ICommentable {
   /**
    * Ordered list of all comments attached to this code fragment.
    */
-  getComments(): string[];
+  readonly _comments_: string[];
   /**
    * Attach comments to this code fragement
    */
@@ -20,7 +20,7 @@ export class CommentableImpl implements ICommentable {
   /**
    * Ordered list of all comments attached to this code fragment.
    */
-  public getComments(): string[] {
+  public get _comments_(): string[] {
     return this._comments;
   }
 
