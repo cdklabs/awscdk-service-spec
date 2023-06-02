@@ -105,10 +105,6 @@ export abstract class Renderer {
     this.emitter.emit(x);
   }
 
-  protected emitLine(x?: string) {
-    this.emitter.emit((x ?? '') + '\n');
-  }
-
   protected setIndentationSymbol(symbol: number | string = 2): string {
     if (typeof symbol === 'number') {
       return ' '.repeat(symbol ?? 2);

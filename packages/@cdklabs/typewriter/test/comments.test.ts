@@ -8,6 +8,22 @@ beforeEach(() => {
 });
 
 describe('statements', () => {
+  test('can have a standalone comment', () => {
+    const fn = new FreeFunction(scope, {
+      name: 'freeFunction',
+    });
+
+    fn.addBody(code.comment('test comment'));
+
+    expect(renderer.render(scope)).toMatchInlineSnapshot(`
+      "/* eslint-disable prettier/prettier,max-len */
+      // @ts-ignore TS6133
+      function freeFunction(): void {
+        // test comment
+      }"
+    `);
+  });
+
   test('can put a comment before a statement', () => {
     const fn = new FreeFunction(scope, {
       name: 'freeFunction',

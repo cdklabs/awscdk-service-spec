@@ -84,7 +84,8 @@ export class SuperInitializer extends Statement {
   }
 }
 
-export class StatementSeparator extends Statement {}
+export class EmptyStatement extends Statement {}
+export class StatementSeparator extends EmptyStatement {}
 
 export class ThrowStatement extends Statement {
   constructor(public readonly expression: Expression) {

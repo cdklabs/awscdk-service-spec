@@ -47,9 +47,9 @@ import {
   Mut,
   SuperInitializer,
   ForLoop,
-  StatementSeparator,
   ThrowStatement,
   MonkeyPatchMethod,
+  EmptyStatement,
 } from '../statements';
 import { StructType } from '../struct';
 import { ThingSymbol } from '../symbol';
@@ -431,7 +431,7 @@ export class TypeScriptRenderer extends Renderer {
   }
 
   protected renderComment(text: string) {
-    this.emitLine(`// ${text}`);
+    this.emit(`// ${text}`);
   }
 
   protected renderInlineComment(text: string) {
@@ -439,8 +439,15 @@ export class TypeScriptRenderer extends Renderer {
   }
 
   protected renderStatement(stmnt: Statement) {
-    for (const comment of stmnt._comments_) {
-      this.renderComment(comment);
+    this.emitList(stmnt._comments_, '\n', (x) => this.renderComment(x));
+
+    if (stmnt instanceof EmptyStatement) {
+      return;
+    }
+
+    // Ensure comments are in a separate line
+    if (stmnt._comments_.length) {
+      this.emit('\n');
     }
 
     const success = dispatchType(stmnt, [
@@ -485,9 +492,6 @@ export class TypeScriptRenderer extends Renderer {
         } else {
           this.emit('/* @error missing loop body */');
         }
-      }),
-      typeCase(StatementSeparator, () => {
-        this.emit('');
       }),
       typeCase(ThrowStatement, (x) => {
         this.emit('throw ');
