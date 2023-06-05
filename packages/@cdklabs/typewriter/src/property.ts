@@ -1,6 +1,5 @@
 import { DocsSpec, Documented } from './documented';
-import { Expression } from './expression';
-import { ObjectPropertyAccess } from './expressions';
+import { Expression, ObjectPropertyAccess } from './expressions';
 import { MemberType } from './member-type';
 import { Block } from './statements/block';
 import { Type } from './type';

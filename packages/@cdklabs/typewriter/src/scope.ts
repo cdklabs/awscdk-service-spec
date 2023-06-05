@@ -1,5 +1,4 @@
-import { Expression } from './expression';
-import { Identifier } from './expressions';
+import { Expression, Identifier } from './expressions';
 import { ThingSymbol } from './symbol';
 import { TypeDeclaration } from './type-declaration';
 

@@ -1,15 +1,13 @@
-import { Expression, Splat } from '../expression';
+import { Expression, Splat } from './expressions';
 import { Type } from '../type';
 
 export class DirectCode extends Expression {
-  readonly _comments_?: string[];
   public constructor(public readonly _code_: string) {
     super();
   }
 }
 
 export class ObjectPropertyAccess extends Expression {
-  readonly _comments_?: string[];
   public constructor(public readonly _obj_: Expression, public readonly _property_: string) {
     super();
   }

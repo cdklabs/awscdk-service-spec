@@ -1,5 +1,5 @@
 import { ExpressionStatement, Statement } from './statements';
-import { Expression } from '../expression';
+import { Expression } from '../expressions';
 
 export function asStmt(x: Statement | Expression): Statement {
   if (x instanceof Statement) {
