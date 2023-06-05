@@ -4,9 +4,9 @@ export interface ICommentable {
    */
   readonly _comments_: string[];
   /**
-   * Attach comments to this code fragement
+   * Attach comments to this code fragment
    */
-  withComments(...comments: string[]): ICommentable;
+  withComments(...comments: string[]): this;
 }
 
 /**
@@ -25,7 +25,7 @@ export class CommentableImpl implements ICommentable {
   }
 
   /**
-   * Attach comments to this code fragement
+   * Attach comments to this code fragment
    */
   public withComments(...comments: string[]): this {
     this._comments = comments;
