@@ -159,7 +159,7 @@ const cfn2ts = new TypeScriptWorkspace({
   name: '@aws-cdk/cfn2ts',
   description: 'Drop-in replacement for cfn2ts',
   private: true,
-  deps: [cfnResources, serviceSpec, 'yargs', 'fs-extra'],
+  deps: [cfnResources, serviceSpec, awsServiceSpec, 'yargs', 'fs-extra'],
 });
 
 // Add integration test with aws-cdk

@@ -41,6 +41,9 @@
     },
     {
       "path": "../service-spec"
+    },
+    {
+      "path": "../aws-service-spec"
     }
   ]
 }
