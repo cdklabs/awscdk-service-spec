@@ -1,0 +1,37 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_Elasticsearch:
+
+    *** patch ***
+
+us-east-2/aws-elasticsearch-domain.json
+--------------------------------
+/readOnlyProperties: Remove the deprecated attribute DomainArn, as the new preferred attribute Arn maps to the same name in the generated code
+    {
+      "readOnlyProperties": {
+        "0": "/properties/Id"
+[-]     "1": "/properties/DomainArn"
+        "2": "/properties/DomainEndpoint"
+        "3": "/properties/Arn"
+      }
+    }
+us-west-2/aws-elasticsearch-domain.json
+--------------------------------
+/readOnlyProperties: Remove the deprecated attribute DomainArn, as the new preferred attribute Arn maps to the same name in the generated code
+    {
+      "readOnlyProperties": {
+        "0": "/properties/Id"
+[-]     "1": "/properties/DomainArn"
+        "2": "/properties/DomainEndpoint"
+        "3": "/properties/Arn"
+      }
+    }
+us-east-1/aws-elasticsearch-domain.json
+--------------------------------
+/readOnlyProperties: Remove the deprecated attribute DomainArn, as the new preferred attribute Arn maps to the same name in the generated code
+    {
+      "readOnlyProperties": {
+        "0": "/properties/Id"
+[-]     "1": "/properties/DomainArn"
+        "2": "/properties/DomainEndpoint"
+        "3": "/properties/Arn"
+      }
+    }

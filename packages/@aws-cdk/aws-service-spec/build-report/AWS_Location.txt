@@ -1,0 +1,292 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_Location:
+
+    *** patch ***
+
+us-east-2/aws-location-geofencecollection.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Location::GeofenceCollection"
+      "description": "Definition of AWS::Location::GeofenceCollection Resource Type"
+      "definitions": { ... }
+      "properties": { ... }
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "deprecatedProperties": [ ... ]
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "additionalProperties": false
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-location-map.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Location::Map"
+      "description": "Definition of AWS::Location::Map Resource Type"
+      "definitions": { ... }
+      "properties": { ... }
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "additionalProperties": false
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-location-placeindex.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Location::PlaceIndex"
+      "description": "Definition of AWS::Location::PlaceIndex Resource Type"
+      "definitions": { ... }
+      "properties": { ... }
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "additionalProperties": false
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-location-routecalculator.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Location::RouteCalculator"
+      "description": "Definition of AWS::Location::RouteCalculator Resource Type"
+      "definitions": { ... }
+      "properties": { ... }
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "additionalProperties": false
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-location-tracker.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Location::Tracker"
+      "description": "Definition of AWS::Location::Tracker Resource Type"
+      "definitions": { ... }
+      "properties": { ... }
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "deprecatedProperties": [ ... ]
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "additionalProperties": false
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-location-trackerconsumer.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Location::TrackerConsumer"
+      "description": "Definition of AWS::Location::TrackerConsumer Resource Type"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-location-geofencecollection.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Location::GeofenceCollection"
+      "description": "Definition of AWS::Location::GeofenceCollection Resource Type"
+      "definitions": { ... }
+      "properties": { ... }
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "deprecatedProperties": [ ... ]
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "additionalProperties": false
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-location-map.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Location::Map"
+      "description": "Definition of AWS::Location::Map Resource Type"
+      "definitions": { ... }
+      "properties": { ... }
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "additionalProperties": false
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-location-placeindex.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Location::PlaceIndex"
+      "description": "Definition of AWS::Location::PlaceIndex Resource Type"
+      "definitions": { ... }
+      "properties": { ... }
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "additionalProperties": false
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-location-routecalculator.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Location::RouteCalculator"
+      "description": "Definition of AWS::Location::RouteCalculator Resource Type"
+      "definitions": { ... }
+      "properties": { ... }
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "additionalProperties": false
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-location-tracker.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Location::Tracker"
+      "description": "Definition of AWS::Location::Tracker Resource Type"
+      "definitions": { ... }
+      "properties": { ... }
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "deprecatedProperties": [ ... ]
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "additionalProperties": false
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-location-trackerconsumer.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Location::TrackerConsumer"
+      "description": "Definition of AWS::Location::TrackerConsumer Resource Type"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-location-geofencecollection.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Location::GeofenceCollection"
+      "description": "Definition of AWS::Location::GeofenceCollection Resource Type"
+      "definitions": { ... }
+      "properties": { ... }
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "deprecatedProperties": [ ... ]
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "additionalProperties": false
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-location-map.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Location::Map"
+      "description": "Definition of AWS::Location::Map Resource Type"
+      "definitions": { ... }
+      "properties": { ... }
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "additionalProperties": false
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-location-placeindex.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Location::PlaceIndex"
+      "description": "Definition of AWS::Location::PlaceIndex Resource Type"
+      "definitions": { ... }
+      "properties": { ... }
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "additionalProperties": false
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-location-routecalculator.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Location::RouteCalculator"
+      "description": "Definition of AWS::Location::RouteCalculator Resource Type"
+      "definitions": { ... }
+      "properties": { ... }
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "additionalProperties": false
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-location-tracker.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Location::Tracker"
+      "description": "Definition of AWS::Location::Tracker Resource Type"
+      "definitions": { ... }
+      "properties": { ... }
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "deprecatedProperties": [ ... ]
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "additionalProperties": false
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-location-trackerconsumer.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Location::TrackerConsumer"
+      "description": "Definition of AWS::Location::TrackerConsumer Resource Type"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }

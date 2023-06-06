@@ -1,0 +1,30 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_FraudDetector:
+
+    *** interpreting ***
+
+AWS::FraudDetector::Detector: attributes: no definition for: Rules/*/RuleVersion
+AWS::FraudDetector::Detector: attributes: no definition for: Rules/*/Arn
+AWS::FraudDetector::Detector: attributes: no definition for: Rules/*/CreatedTime
+AWS::FraudDetector::Detector: attributes: no definition for: Rules/*/LastUpdatedTime
+AWS::FraudDetector::Detector: attributes: no definition for: Rules/*/Outcomes/*/Arn
+AWS::FraudDetector::Detector: attributes: no definition for: Rules/*/Outcomes/*/CreatedTime
+AWS::FraudDetector::Detector: attributes: no definition for: Rules/*/Outcomes/*/LastUpdatedTime
+AWS::FraudDetector::Detector: attributes: no definition for: EventType/EventVariables/*/Arn
+AWS::FraudDetector::Detector: attributes: no definition for: EventType/EventVariables/*/CreatedTime
+AWS::FraudDetector::Detector: attributes: no definition for: EventType/EventVariables/*/LastUpdatedTime
+AWS::FraudDetector::Detector: attributes: no definition for: EventType/Labels/*/Arn
+AWS::FraudDetector::Detector: attributes: no definition for: EventType/Labels/*/CreatedTime
+AWS::FraudDetector::Detector: attributes: no definition for: EventType/Labels/*/LastUpdatedTime
+AWS::FraudDetector::Detector: attributes: no definition for: EventType/EntityTypes/*/Arn
+AWS::FraudDetector::Detector: attributes: no definition for: EventType/EntityTypes/*/CreatedTime
+AWS::FraudDetector::Detector: attributes: no definition for: EventType/EntityTypes/*/LastUpdatedTime
+AWS::FraudDetector::Detector: attributes: no definition for: AssociatedModels/*/Arn
+AWS::FraudDetector::EventType: attributes: no definition for: EventVariables/*/Arn
+AWS::FraudDetector::EventType: attributes: no definition for: EventVariables/*/CreatedTime
+AWS::FraudDetector::EventType: attributes: no definition for: EventVariables/*/LastUpdatedTime
+AWS::FraudDetector::EventType: attributes: no definition for: Labels/*/Arn
+AWS::FraudDetector::EventType: attributes: no definition for: Labels/*/CreatedTime
+AWS::FraudDetector::EventType: attributes: no definition for: Labels/*/LastUpdatedTime
+AWS::FraudDetector::EventType: attributes: no definition for: EntityTypes/*/Arn
+AWS::FraudDetector::EventType: attributes: no definition for: EntityTypes/*/CreatedTime
+AWS::FraudDetector::EventType: attributes: no definition for: EntityTypes/*/LastUpdatedTime

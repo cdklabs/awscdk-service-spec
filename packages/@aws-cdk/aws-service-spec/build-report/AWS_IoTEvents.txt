@@ -1,0 +1,292 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_IoTEvents:
+
+    *** patch ***
+
+us-east-2/aws-iotevents-alarmmodel.json
+--------------------------------
+/definitions/InitializationConfiguration/properties/DisabledOnInitialization: canonicalize default type
+    {
+      "definitions": {
+        "InitializationConfiguration": {
+          "properties": {
+            "DisabledOnInitialization": {
+              "type": "boolean"
+              "description": "The value must be TRUE or FALSE. If FALSE, all alarm instances created based on the alarm model are activated. The default value is TRUE."
+[-]           "default": "true"
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-iotevents-alarmmodel.json
+--------------------------------
+/definitions/InitializationConfiguration/properties/DisabledOnInitialization: canonicalize default type
+    {
+      "definitions": {
+        "InitializationConfiguration": {
+          "properties": {
+            "DisabledOnInitialization": {
+              "type": "boolean"
+              "description": "The value must be TRUE or FALSE. If FALSE, all alarm instances created based on the alarm model are activated. The default value is TRUE."
+[+]           "default": true
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-iotevents-alarmmodel.json
+--------------------------------
+/definitions/InitializationConfiguration/properties/DisabledOnInitialization: default value for type='boolean' cannot be 'string'
+    {
+      "definitions": {
+        "InitializationConfiguration": {
+          "properties": {
+            "DisabledOnInitialization": {
+              "type": "boolean"
+              "description": "The value must be TRUE or FALSE. If FALSE, all alarm instances created based on the alarm model are activated. The default value is TRUE."
+[-]           "default": "true"
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-iotevents-alarmmodel.json
+--------------------------------
+/definitions/AcknowledgeFlow/properties/Enabled: canonicalize default type
+    {
+      "definitions": {
+        "AcknowledgeFlow": {
+          "properties": {
+            "Enabled": {
+              "type": "boolean"
+              "description": "The value must be TRUE or FALSE. If TRUE, you receive a notification when the alarm state changes. You must choose to acknowledge the notification before the alarm state can return to NORMAL. If FALSE, you won't receive notifications. The alarm automatically changes to the NORMAL state when the input property value returns to the specified range."
+[-]           "default": "true"
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-iotevents-alarmmodel.json
+--------------------------------
+/definitions/AcknowledgeFlow/properties/Enabled: canonicalize default type
+    {
+      "definitions": {
+        "AcknowledgeFlow": {
+          "properties": {
+            "Enabled": {
+              "type": "boolean"
+              "description": "The value must be TRUE or FALSE. If TRUE, you receive a notification when the alarm state changes. You must choose to acknowledge the notification before the alarm state can return to NORMAL. If FALSE, you won't receive notifications. The alarm automatically changes to the NORMAL state when the input property value returns to the specified range."
+[+]           "default": true
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-iotevents-alarmmodel.json
+--------------------------------
+/definitions/AcknowledgeFlow/properties/Enabled: default value for type='boolean' cannot be 'string'
+    {
+      "definitions": {
+        "AcknowledgeFlow": {
+          "properties": {
+            "Enabled": {
+              "type": "boolean"
+              "description": "The value must be TRUE or FALSE. If TRUE, you receive a notification when the alarm state changes. You must choose to acknowledge the notification before the alarm state can return to NORMAL. If FALSE, you won't receive notifications. The alarm automatically changes to the NORMAL state when the input property value returns to the specified range."
+[-]           "default": "true"
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-iotevents-alarmmodel.json
+--------------------------------
+/definitions/InitializationConfiguration/properties/DisabledOnInitialization: canonicalize default type
+    {
+      "definitions": {
+        "InitializationConfiguration": {
+          "properties": {
+            "DisabledOnInitialization": {
+              "type": "boolean"
+              "description": "The value must be TRUE or FALSE. If FALSE, all alarm instances created based on the alarm model are activated. The default value is TRUE."
+[-]           "default": "true"
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-iotevents-alarmmodel.json
+--------------------------------
+/definitions/InitializationConfiguration/properties/DisabledOnInitialization: canonicalize default type
+    {
+      "definitions": {
+        "InitializationConfiguration": {
+          "properties": {
+            "DisabledOnInitialization": {
+              "type": "boolean"
+              "description": "The value must be TRUE or FALSE. If FALSE, all alarm instances created based on the alarm model are activated. The default value is TRUE."
+[+]           "default": true
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-iotevents-alarmmodel.json
+--------------------------------
+/definitions/InitializationConfiguration/properties/DisabledOnInitialization: default value for type='boolean' cannot be 'string'
+    {
+      "definitions": {
+        "InitializationConfiguration": {
+          "properties": {
+            "DisabledOnInitialization": {
+              "type": "boolean"
+              "description": "The value must be TRUE or FALSE. If FALSE, all alarm instances created based on the alarm model are activated. The default value is TRUE."
+[-]           "default": "true"
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-iotevents-alarmmodel.json
+--------------------------------
+/definitions/AcknowledgeFlow/properties/Enabled: canonicalize default type
+    {
+      "definitions": {
+        "AcknowledgeFlow": {
+          "properties": {
+            "Enabled": {
+              "type": "boolean"
+              "description": "The value must be TRUE or FALSE. If TRUE, you receive a notification when the alarm state changes. You must choose to acknowledge the notification before the alarm state can return to NORMAL. If FALSE, you won't receive notifications. The alarm automatically changes to the NORMAL state when the input property value returns to the specified range."
+[-]           "default": "true"
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-iotevents-alarmmodel.json
+--------------------------------
+/definitions/AcknowledgeFlow/properties/Enabled: canonicalize default type
+    {
+      "definitions": {
+        "AcknowledgeFlow": {
+          "properties": {
+            "Enabled": {
+              "type": "boolean"
+              "description": "The value must be TRUE or FALSE. If TRUE, you receive a notification when the alarm state changes. You must choose to acknowledge the notification before the alarm state can return to NORMAL. If FALSE, you won't receive notifications. The alarm automatically changes to the NORMAL state when the input property value returns to the specified range."
+[+]           "default": true
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-iotevents-alarmmodel.json
+--------------------------------
+/definitions/AcknowledgeFlow/properties/Enabled: default value for type='boolean' cannot be 'string'
+    {
+      "definitions": {
+        "AcknowledgeFlow": {
+          "properties": {
+            "Enabled": {
+              "type": "boolean"
+              "description": "The value must be TRUE or FALSE. If TRUE, you receive a notification when the alarm state changes. You must choose to acknowledge the notification before the alarm state can return to NORMAL. If FALSE, you won't receive notifications. The alarm automatically changes to the NORMAL state when the input property value returns to the specified range."
+[-]           "default": "true"
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-iotevents-alarmmodel.json
+--------------------------------
+/definitions/InitializationConfiguration/properties/DisabledOnInitialization: canonicalize default type
+    {
+      "definitions": {
+        "InitializationConfiguration": {
+          "properties": {
+            "DisabledOnInitialization": {
+              "type": "boolean"
+              "description": "The value must be TRUE or FALSE. If FALSE, all alarm instances created based on the alarm model are activated. The default value is TRUE."
+[-]           "default": "true"
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-iotevents-alarmmodel.json
+--------------------------------
+/definitions/InitializationConfiguration/properties/DisabledOnInitialization: canonicalize default type
+    {
+      "definitions": {
+        "InitializationConfiguration": {
+          "properties": {
+            "DisabledOnInitialization": {
+              "type": "boolean"
+              "description": "The value must be TRUE or FALSE. If FALSE, all alarm instances created based on the alarm model are activated. The default value is TRUE."
+[+]           "default": true
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-iotevents-alarmmodel.json
+--------------------------------
+/definitions/InitializationConfiguration/properties/DisabledOnInitialization: default value for type='boolean' cannot be 'string'
+    {
+      "definitions": {
+        "InitializationConfiguration": {
+          "properties": {
+            "DisabledOnInitialization": {
+              "type": "boolean"
+              "description": "The value must be TRUE or FALSE. If FALSE, all alarm instances created based on the alarm model are activated. The default value is TRUE."
+[-]           "default": "true"
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-iotevents-alarmmodel.json
+--------------------------------
+/definitions/AcknowledgeFlow/properties/Enabled: canonicalize default type
+    {
+      "definitions": {
+        "AcknowledgeFlow": {
+          "properties": {
+            "Enabled": {
+              "type": "boolean"
+              "description": "The value must be TRUE or FALSE. If TRUE, you receive a notification when the alarm state changes. You must choose to acknowledge the notification before the alarm state can return to NORMAL. If FALSE, you won't receive notifications. The alarm automatically changes to the NORMAL state when the input property value returns to the specified range."
+[-]           "default": "true"
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-iotevents-alarmmodel.json
+--------------------------------
+/definitions/AcknowledgeFlow/properties/Enabled: canonicalize default type
+    {
+      "definitions": {
+        "AcknowledgeFlow": {
+          "properties": {
+            "Enabled": {
+              "type": "boolean"
+              "description": "The value must be TRUE or FALSE. If TRUE, you receive a notification when the alarm state changes. You must choose to acknowledge the notification before the alarm state can return to NORMAL. If FALSE, you won't receive notifications. The alarm automatically changes to the NORMAL state when the input property value returns to the specified range."
+[+]           "default": true
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-iotevents-alarmmodel.json
+--------------------------------
+/definitions/AcknowledgeFlow/properties/Enabled: default value for type='boolean' cannot be 'string'
+    {
+      "definitions": {
+        "AcknowledgeFlow": {
+          "properties": {
+            "Enabled": {
+              "type": "boolean"
+              "description": "The value must be TRUE or FALSE. If TRUE, you receive a notification when the alarm state changes. You must choose to acknowledge the notification before the alarm state can return to NORMAL. If FALSE, you won't receive notifications. The alarm automatically changes to the NORMAL state when the input property value returns to the specified range."
+[-]           "default": "true"
+            }
+          }
+        }
+      }
+    }

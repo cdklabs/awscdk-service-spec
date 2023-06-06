@@ -1,0 +1,100 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_S3ObjectLambda:
+
+    *** patch ***
+
+us-east-2/aws-s3objectlambda-accesspoint.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::S3ObjectLambda::AccessPoint"
+      "description": "The AWS::S3ObjectLambda::AccessPoint resource is an Amazon S3ObjectLambda resource type that you can use to add computation to S3 actions"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "required": [ ... ]
+      "additionalProperties": false
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-s3objectlambda-accesspointpolicy.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::S3ObjectLambda::AccessPointPolicy"
+      "description": "AWS::S3ObjectLambda::AccessPointPolicy resource is an Amazon S3ObjectLambda policy type that you can use to control permissions for your S3ObjectLambda"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-s3objectlambda-accesspoint.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::S3ObjectLambda::AccessPoint"
+      "description": "The AWS::S3ObjectLambda::AccessPoint resource is an Amazon S3ObjectLambda resource type that you can use to add computation to S3 actions"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "required": [ ... ]
+      "additionalProperties": false
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-s3objectlambda-accesspointpolicy.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::S3ObjectLambda::AccessPointPolicy"
+      "description": "AWS::S3ObjectLambda::AccessPointPolicy resource is an Amazon S3ObjectLambda policy type that you can use to control permissions for your S3ObjectLambda"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-s3objectlambda-accesspoint.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::S3ObjectLambda::AccessPoint"
+      "description": "The AWS::S3ObjectLambda::AccessPoint resource is an Amazon S3ObjectLambda resource type that you can use to add computation to S3 actions"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "required": [ ... ]
+      "additionalProperties": false
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-s3objectlambda-accesspointpolicy.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::S3ObjectLambda::AccessPointPolicy"
+      "description": "AWS::S3ObjectLambda::AccessPointPolicy resource is an Amazon S3ObjectLambda policy type that you can use to control permissions for your S3ObjectLambda"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }

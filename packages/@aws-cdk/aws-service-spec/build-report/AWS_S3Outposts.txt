@@ -1,0 +1,5 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_S3Outposts:
+
+    *** interpreting ***
+
+AWS::S3Outposts::Bucket: property LifecycleConfiguration: typedef LifecycleConfiguration: property Rules: Ref Rule is a union of objects. Merging into a single type.

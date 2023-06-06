@@ -1,0 +1,100 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_Personalize:
+
+    *** patch ***
+
+us-east-2/aws-personalize-datasetgroup.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Personalize::DatasetGroup"
+      "description": "Resource Schema for AWS::Personalize::DatasetGroup."
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-personalize"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-personalize-schema.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Personalize::Schema"
+      "description": "Resource schema for AWS::Personalize::Schema."
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-personalize"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-personalize-datasetgroup.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Personalize::DatasetGroup"
+      "description": "Resource Schema for AWS::Personalize::DatasetGroup."
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-personalize"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-personalize-schema.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Personalize::Schema"
+      "description": "Resource schema for AWS::Personalize::Schema."
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-personalize"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-personalize-datasetgroup.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Personalize::DatasetGroup"
+      "description": "Resource Schema for AWS::Personalize::DatasetGroup."
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-personalize"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-personalize-schema.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Personalize::Schema"
+      "description": "Resource schema for AWS::Personalize::Schema."
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-personalize"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }

@@ -1,0 +1,256 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_MediaConnect:
+
+    *** patch ***
+
+us-east-2/aws-mediaconnect-flow.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::MediaConnect::Flow"
+      "description": "Resource schema for AWS::MediaConnect::Flow"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-mediaconnect.git"
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "additionalProperties": false
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-mediaconnect-flowentitlement.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::MediaConnect::FlowEntitlement"
+      "description": "Resource schema for AWS::MediaConnect::FlowEntitlement"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-mediaconnect.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-mediaconnect-flowoutput.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::MediaConnect::FlowOutput"
+      "description": "Resource schema for AWS::MediaConnect::FlowOutput"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-mediaconnect.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-mediaconnect-flowsource.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::MediaConnect::FlowSource"
+      "description": "Resource schema for AWS::MediaConnect::FlowSource"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-mediaconnect.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-mediaconnect-flowvpcinterface.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::MediaConnect::FlowVpcInterface"
+      "description": "Resource schema for AWS::MediaConnect::FlowVpcInterface"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-mediaconnect.git"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-mediaconnect-flow.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::MediaConnect::Flow"
+      "description": "Resource schema for AWS::MediaConnect::Flow"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-mediaconnect.git"
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "additionalProperties": false
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-mediaconnect-flowentitlement.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::MediaConnect::FlowEntitlement"
+      "description": "Resource schema for AWS::MediaConnect::FlowEntitlement"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-mediaconnect.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-mediaconnect-flowoutput.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::MediaConnect::FlowOutput"
+      "description": "Resource schema for AWS::MediaConnect::FlowOutput"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-mediaconnect.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-mediaconnect-flowsource.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::MediaConnect::FlowSource"
+      "description": "Resource schema for AWS::MediaConnect::FlowSource"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-mediaconnect.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-mediaconnect-flowvpcinterface.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::MediaConnect::FlowVpcInterface"
+      "description": "Resource schema for AWS::MediaConnect::FlowVpcInterface"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-mediaconnect.git"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-mediaconnect-flow.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::MediaConnect::Flow"
+      "description": "Resource schema for AWS::MediaConnect::Flow"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-mediaconnect.git"
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "additionalProperties": false
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-mediaconnect-flowentitlement.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::MediaConnect::FlowEntitlement"
+      "description": "Resource schema for AWS::MediaConnect::FlowEntitlement"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-mediaconnect.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-mediaconnect-flowoutput.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::MediaConnect::FlowOutput"
+      "description": "Resource schema for AWS::MediaConnect::FlowOutput"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-mediaconnect.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-mediaconnect-flowsource.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::MediaConnect::FlowSource"
+      "description": "Resource schema for AWS::MediaConnect::FlowSource"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-mediaconnect.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-mediaconnect-flowvpcinterface.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::MediaConnect::FlowVpcInterface"
+      "description": "Resource schema for AWS::MediaConnect::FlowVpcInterface"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-mediaconnect.git"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }

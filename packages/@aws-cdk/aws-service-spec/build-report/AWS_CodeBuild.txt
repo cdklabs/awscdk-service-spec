@@ -1,0 +1,214 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_CodeBuild:
+
+    *** patch ***
+
+us-east-2/aws-codebuild-project.json
+--------------------------------
+/definitions: [Suspected Data Source Problem] The elements of AWS::CodeBuild::Project.Triggers.FilterGroups used to be well-typed in the Resource Specification. In the Resource Schema it is incorrectly an untyped object.
+    {
+      "definitions": {
+        "ProjectSourceVersion": { ... }
+        "VpcConfig": { ... }
+        "SourceAuth": { ... }
+        "RegistryCredential": { ... }
+        "FilterGroup": { ... }
+        "Source": { ... }
+        "ProjectCache": { ... }
+        "Artifacts": { ... }
+        "LogsConfig": { ... }
+        "BatchRestrictions": { ... }
+        "ProjectBuildBatchConfig": { ... }
+        "CloudWatchLogsConfig": { ... }
+        "Environment": { ... }
+        "EnvironmentVariable": { ... }
+        "ProjectFileSystemLocation": { ... }
+        "Tag": { ... }
+        "ProjectTriggers": { ... }
+        "BuildStatusConfig": { ... }
+        "GitSubmodulesConfig": { ... }
+        "S3LogsConfig": { ... }
+[+]     "WebhookFilter": {"type":"object","properties":{"Pattern":{"type":"string"},"Type":{"type":"string"},"ExcludeMatchedPattern":{"type":"boolean"}},"required":["Pattern","Type"],"additionalProperties":false}
+      }
+    }
+us-east-2/aws-codebuild-project.json
+--------------------------------
+/definitions/FilterGroup: [Suspected Data Source Problem] The elements of AWS::CodeBuild::Project.Triggers.FilterGroups used to be well-typed in the Resource Specification. In the Resource Schema it is incorrectly an untyped object.
+    {
+      "definitions": {
+        "ProjectSourceVersion": { ... }
+        "VpcConfig": { ... }
+        "SourceAuth": { ... }
+        "RegistryCredential": { ... }
+[-]     "FilterGroup": {"type":"object","additionalProperties":false}
+[+]     "FilterGroup": {"type":"array","items":{"$ref":"#/definitions/WebhookFilter"}}
+        "Source": { ... }
+        "ProjectCache": { ... }
+        "Artifacts": { ... }
+        "LogsConfig": { ... }
+        "BatchRestrictions": { ... }
+        "ProjectBuildBatchConfig": { ... }
+        "CloudWatchLogsConfig": { ... }
+        "Environment": { ... }
+        "EnvironmentVariable": { ... }
+        "ProjectFileSystemLocation": { ... }
+        "Tag": { ... }
+        "ProjectTriggers": { ... }
+        "BuildStatusConfig": { ... }
+        "GitSubmodulesConfig": { ... }
+        "S3LogsConfig": { ... }
+      }
+    }
+us-east-2/aws-codebuild-sourcecredential.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::CodeBuild::SourceCredential"
+      "description": "Resource Type definition for AWS::CodeBuild::SourceCredential"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-codebuild-project.json
+--------------------------------
+/definitions: [Suspected Data Source Problem] The elements of AWS::CodeBuild::Project.Triggers.FilterGroups used to be well-typed in the Resource Specification. In the Resource Schema it is incorrectly an untyped object.
+    {
+      "definitions": {
+        "ProjectSourceVersion": { ... }
+        "VpcConfig": { ... }
+        "SourceAuth": { ... }
+        "RegistryCredential": { ... }
+        "FilterGroup": { ... }
+        "Source": { ... }
+        "ProjectCache": { ... }
+        "Artifacts": { ... }
+        "LogsConfig": { ... }
+        "BatchRestrictions": { ... }
+        "ProjectBuildBatchConfig": { ... }
+        "CloudWatchLogsConfig": { ... }
+        "Environment": { ... }
+        "EnvironmentVariable": { ... }
+        "ProjectFileSystemLocation": { ... }
+        "Tag": { ... }
+        "ProjectTriggers": { ... }
+        "BuildStatusConfig": { ... }
+        "GitSubmodulesConfig": { ... }
+        "S3LogsConfig": { ... }
+[+]     "WebhookFilter": {"type":"object","properties":{"Pattern":{"type":"string"},"Type":{"type":"string"},"ExcludeMatchedPattern":{"type":"boolean"}},"required":["Pattern","Type"],"additionalProperties":false}
+      }
+    }
+us-west-2/aws-codebuild-project.json
+--------------------------------
+/definitions/FilterGroup: [Suspected Data Source Problem] The elements of AWS::CodeBuild::Project.Triggers.FilterGroups used to be well-typed in the Resource Specification. In the Resource Schema it is incorrectly an untyped object.
+    {
+      "definitions": {
+        "ProjectSourceVersion": { ... }
+        "VpcConfig": { ... }
+        "SourceAuth": { ... }
+        "RegistryCredential": { ... }
+[-]     "FilterGroup": {"type":"object","additionalProperties":false}
+[+]     "FilterGroup": {"type":"array","items":{"$ref":"#/definitions/WebhookFilter"}}
+        "Source": { ... }
+        "ProjectCache": { ... }
+        "Artifacts": { ... }
+        "LogsConfig": { ... }
+        "BatchRestrictions": { ... }
+        "ProjectBuildBatchConfig": { ... }
+        "CloudWatchLogsConfig": { ... }
+        "Environment": { ... }
+        "EnvironmentVariable": { ... }
+        "ProjectFileSystemLocation": { ... }
+        "Tag": { ... }
+        "ProjectTriggers": { ... }
+        "BuildStatusConfig": { ... }
+        "GitSubmodulesConfig": { ... }
+        "S3LogsConfig": { ... }
+      }
+    }
+us-west-2/aws-codebuild-sourcecredential.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::CodeBuild::SourceCredential"
+      "description": "Resource Type definition for AWS::CodeBuild::SourceCredential"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-codebuild-project.json
+--------------------------------
+/definitions: [Suspected Data Source Problem] The elements of AWS::CodeBuild::Project.Triggers.FilterGroups used to be well-typed in the Resource Specification. In the Resource Schema it is incorrectly an untyped object.
+    {
+      "definitions": {
+        "ProjectSourceVersion": { ... }
+        "VpcConfig": { ... }
+        "SourceAuth": { ... }
+        "RegistryCredential": { ... }
+        "FilterGroup": { ... }
+        "Source": { ... }
+        "ProjectCache": { ... }
+        "Artifacts": { ... }
+        "LogsConfig": { ... }
+        "BatchRestrictions": { ... }
+        "ProjectBuildBatchConfig": { ... }
+        "CloudWatchLogsConfig": { ... }
+        "Environment": { ... }
+        "EnvironmentVariable": { ... }
+        "ProjectFileSystemLocation": { ... }
+        "Tag": { ... }
+        "ProjectTriggers": { ... }
+        "BuildStatusConfig": { ... }
+        "GitSubmodulesConfig": { ... }
+        "S3LogsConfig": { ... }
+[+]     "WebhookFilter": {"type":"object","properties":{"Pattern":{"type":"string"},"Type":{"type":"string"},"ExcludeMatchedPattern":{"type":"boolean"}},"required":["Pattern","Type"],"additionalProperties":false}
+      }
+    }
+us-east-1/aws-codebuild-project.json
+--------------------------------
+/definitions/FilterGroup: [Suspected Data Source Problem] The elements of AWS::CodeBuild::Project.Triggers.FilterGroups used to be well-typed in the Resource Specification. In the Resource Schema it is incorrectly an untyped object.
+    {
+      "definitions": {
+        "ProjectSourceVersion": { ... }
+        "VpcConfig": { ... }
+        "SourceAuth": { ... }
+        "RegistryCredential": { ... }
+[-]     "FilterGroup": {"type":"object","additionalProperties":false}
+[+]     "FilterGroup": {"type":"array","items":{"$ref":"#/definitions/WebhookFilter"}}
+        "Source": { ... }
+        "ProjectCache": { ... }
+        "Artifacts": { ... }
+        "LogsConfig": { ... }
+        "BatchRestrictions": { ... }
+        "ProjectBuildBatchConfig": { ... }
+        "CloudWatchLogsConfig": { ... }
+        "Environment": { ... }
+        "EnvironmentVariable": { ... }
+        "ProjectFileSystemLocation": { ... }
+        "Tag": { ... }
+        "ProjectTriggers": { ... }
+        "BuildStatusConfig": { ... }
+        "GitSubmodulesConfig": { ... }
+        "S3LogsConfig": { ... }
+      }
+    }
+us-east-1/aws-codebuild-sourcecredential.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::CodeBuild::SourceCredential"
+      "description": "Resource Type definition for AWS::CodeBuild::SourceCredential"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }

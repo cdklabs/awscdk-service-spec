@@ -1,0 +1,5 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_IoTSiteWise:
+
+    *** interpreting ***
+
+AWS::IoTSiteWise::Gateway: property GatewayPlatform: Ref GatewayPlatform is a union of objects. Merging into a single type.

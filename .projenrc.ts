@@ -93,13 +93,26 @@ const serviceSpecBuild = new TypeScriptWorkspace({
   devDeps: ['source-map-support'],
   private: true,
 });
-const buildDb = serviceSpecBuild.tasks.addTask('build:db', {
+serviceSpecBuild.tasks.addTask('build:db', {
   exec: 'node -r source-map-support/register lib/cli/build',
 });
-serviceSpecBuild.postCompileTask.spawn(buildDb);
-serviceSpecBuild.gitignore.addPatterns('db.json');
-serviceSpecBuild.gitignore.addPatterns('db-build-report.txt');
-serviceSpecBuild.gitignore.addPatterns('build-report');
+
+const awsServiceSpec = new TypeScriptWorkspace({
+  parent: repo,
+  name: '@aws-cdk/aws-service-spec',
+  description: 'A specification of built-in AWS resources',
+  deps: [tsKb, serviceSpec],
+  devDeps: ['source-map-support', serviceSpecBuild],
+});
+awsServiceSpec.preCompileTask.spawn(
+  awsServiceSpec.tasks.addTask('generate', {
+    exec: `node -e 'require("${serviceSpecBuild.name}/lib/cli/build")'`,
+    receiveArgs: true,
+  }),
+);
+awsServiceSpec.gitignore.addPatterns('db.json');
+awsServiceSpec.gitignore.addPatterns('build-report');
+awsServiceSpec.npmignore?.addPatterns('build-report');
 
 const cfnResources = new TypeScriptWorkspace({
   parent: repo,

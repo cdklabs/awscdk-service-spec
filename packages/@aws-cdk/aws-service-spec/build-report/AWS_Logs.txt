@@ -1,0 +1,190 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_Logs:
+
+    *** loading ***
+
+us-east-2/aws-logs-loggroup.json: .handlers.list
+    {
+      permissions: [ 'logs:DescribeLogGroups', 'logs:ListTagsLogGroup' ],
+      handlerSchema: {
+        properties: {
+          LogGroupName: { '$ref': 'resource-schema.json#/properties/LogGroupName' }
+        },
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-2/aws-logs-logstream.json: .handlers.list
+    {
+      permissions: [ 'logs:DescribeLogStreams' ],
+      handlerSchema: {
+        properties: {
+          LogGroupName: { '$ref': 'resource-schema.json#/properties/LogGroupName' }
+        },
+        required: [ 'LogGroupName' ],
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-2/aws-logs-subscriptionfilter.json: .handlers.list
+    {
+      permissions: [ 'logs:DescribeSubscriptionFilters' ],
+      handlerSchema: {
+        properties: {
+          LogGroupName: { '$ref': 'resource-schema.json#/properties/LogGroupName' }
+        },
+        required: [ 'LogGroupName' ],
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-logs-loggroup.json: .handlers.list
+    {
+      permissions: [ 'logs:DescribeLogGroups', 'logs:ListTagsLogGroup' ],
+      handlerSchema: {
+        properties: {
+          LogGroupName: { '$ref': 'resource-schema.json#/properties/LogGroupName' }
+        },
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-logs-logstream.json: .handlers.list
+    {
+      permissions: [ 'logs:DescribeLogStreams' ],
+      handlerSchema: {
+        properties: {
+          LogGroupName: { '$ref': 'resource-schema.json#/properties/LogGroupName' }
+        },
+        required: [ 'LogGroupName' ],
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-logs-subscriptionfilter.json: .handlers.list
+    {
+      permissions: [ 'logs:DescribeSubscriptionFilters' ],
+      handlerSchema: {
+        properties: {
+          LogGroupName: { '$ref': 'resource-schema.json#/properties/LogGroupName' }
+        },
+        required: [ 'LogGroupName' ],
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-logs-loggroup.json: .handlers.list
+    {
+      permissions: [ 'logs:DescribeLogGroups', 'logs:ListTagsLogGroup' ],
+      handlerSchema: {
+        properties: {
+          LogGroupName: { '$ref': 'resource-schema.json#/properties/LogGroupName' }
+        },
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-logs-logstream.json: .handlers.list
+    {
+      permissions: [ 'logs:DescribeLogStreams' ],
+      handlerSchema: {
+        properties: {
+          LogGroupName: { '$ref': 'resource-schema.json#/properties/LogGroupName' }
+        },
+        required: [ 'LogGroupName' ],
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-logs-subscriptionfilter.json: .handlers.list
+    {
+      permissions: [ 'logs:DescribeSubscriptionFilters' ],
+      handlerSchema: {
+        properties: {
+          LogGroupName: { '$ref': 'resource-schema.json#/properties/LogGroupName' }
+        },
+        required: [ 'LogGroupName' ],
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }

@@ -1,0 +1,160 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_CodeArtifact:
+
+    *** patch ***
+
+us-east-2/aws-codeartifact-domain.json
+--------------------------------
+/properties/PermissionsPolicyDocument: minLength does not apply to type: 'object'
+    {
+      "properties": {
+        "PermissionsPolicyDocument": {
+          "description": "The access control resource policy on the provided domain."
+          "type": "object"
+[-]       "minLength": 2
+          "maxLength": 5120
+        }
+      }
+    }
+us-east-2/aws-codeartifact-domain.json
+--------------------------------
+/properties/PermissionsPolicyDocument: maxLength does not apply to type: 'object'
+    {
+      "properties": {
+        "PermissionsPolicyDocument": {
+          "description": "The access control resource policy on the provided domain."
+          "type": "object"
+          "minLength": 2
+[-]       "maxLength": 5120
+        }
+      }
+    }
+us-east-2/aws-codeartifact-repository.json
+--------------------------------
+/properties/PermissionsPolicyDocument: minLength does not apply to type: 'object'
+    {
+      "properties": {
+        "PermissionsPolicyDocument": {
+          "description": "The access control resource policy on the provided repository."
+          "type": "object"
+[-]       "minLength": 2
+          "maxLength": 5120
+        }
+      }
+    }
+us-east-2/aws-codeartifact-repository.json
+--------------------------------
+/properties/PermissionsPolicyDocument: maxLength does not apply to type: 'object'
+    {
+      "properties": {
+        "PermissionsPolicyDocument": {
+          "description": "The access control resource policy on the provided repository."
+          "type": "object"
+          "minLength": 2
+[-]       "maxLength": 5120
+        }
+      }
+    }
+us-west-2/aws-codeartifact-domain.json
+--------------------------------
+/properties/PermissionsPolicyDocument: minLength does not apply to type: 'object'
+    {
+      "properties": {
+        "PermissionsPolicyDocument": {
+          "description": "The access control resource policy on the provided domain."
+          "type": "object"
+[-]       "minLength": 2
+          "maxLength": 5120
+        }
+      }
+    }
+us-west-2/aws-codeartifact-domain.json
+--------------------------------
+/properties/PermissionsPolicyDocument: maxLength does not apply to type: 'object'
+    {
+      "properties": {
+        "PermissionsPolicyDocument": {
+          "description": "The access control resource policy on the provided domain."
+          "type": "object"
+          "minLength": 2
+[-]       "maxLength": 5120
+        }
+      }
+    }
+us-west-2/aws-codeartifact-repository.json
+--------------------------------
+/properties/PermissionsPolicyDocument: minLength does not apply to type: 'object'
+    {
+      "properties": {
+        "PermissionsPolicyDocument": {
+          "description": "The access control resource policy on the provided repository."
+          "type": "object"
+[-]       "minLength": 2
+          "maxLength": 5120
+        }
+      }
+    }
+us-west-2/aws-codeartifact-repository.json
+--------------------------------
+/properties/PermissionsPolicyDocument: maxLength does not apply to type: 'object'
+    {
+      "properties": {
+        "PermissionsPolicyDocument": {
+          "description": "The access control resource policy on the provided repository."
+          "type": "object"
+          "minLength": 2
+[-]       "maxLength": 5120
+        }
+      }
+    }
+us-east-1/aws-codeartifact-domain.json
+--------------------------------
+/properties/PermissionsPolicyDocument: minLength does not apply to type: 'object'
+    {
+      "properties": {
+        "PermissionsPolicyDocument": {
+          "description": "The access control resource policy on the provided domain."
+          "type": "object"
+[-]       "minLength": 2
+          "maxLength": 5120
+        }
+      }
+    }
+us-east-1/aws-codeartifact-domain.json
+--------------------------------
+/properties/PermissionsPolicyDocument: maxLength does not apply to type: 'object'
+    {
+      "properties": {
+        "PermissionsPolicyDocument": {
+          "description": "The access control resource policy on the provided domain."
+          "type": "object"
+          "minLength": 2
+[-]       "maxLength": 5120
+        }
+      }
+    }
+us-east-1/aws-codeartifact-repository.json
+--------------------------------
+/properties/PermissionsPolicyDocument: minLength does not apply to type: 'object'
+    {
+      "properties": {
+        "PermissionsPolicyDocument": {
+          "description": "The access control resource policy on the provided repository."
+          "type": "object"
+[-]       "minLength": 2
+          "maxLength": 5120
+        }
+      }
+    }
+us-east-1/aws-codeartifact-repository.json
+--------------------------------
+/properties/PermissionsPolicyDocument: maxLength does not apply to type: 'object'
+    {
+      "properties": {
+        "PermissionsPolicyDocument": {
+          "description": "The access control resource policy on the provided repository."
+          "type": "object"
+          "minLength": 2
+[-]       "maxLength": 5120
+        }
+      }
+    }

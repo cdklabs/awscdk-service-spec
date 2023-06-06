@@ -1,0 +1,100 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_Budgets:
+
+    *** patch ***
+
+us-east-2/aws-budgets-budget.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Budgets::Budget"
+      "description": "Resource Type definition for AWS::Budgets::Budget"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-budgets-budgetsaction.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Budgets::BudgetsAction"
+      "description": "An example resource schema demonstrating some basic constructs and validation rules."
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-budgets-budget.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Budgets::Budget"
+      "description": "Resource Type definition for AWS::Budgets::Budget"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-budgets-budgetsaction.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Budgets::BudgetsAction"
+      "description": "An example resource schema demonstrating some basic constructs and validation rules."
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-budgets-budget.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Budgets::Budget"
+      "description": "Resource Type definition for AWS::Budgets::Budget"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-budgets-budgetsaction.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Budgets::BudgetsAction"
+      "description": "An example resource schema demonstrating some basic constructs and validation rules."
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }

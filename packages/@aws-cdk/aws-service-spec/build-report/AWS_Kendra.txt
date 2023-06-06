@@ -1,0 +1,6 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_Kendra:
+
+    *** interpreting ***
+
+AWS::Kendra::DataSource: property DataSourceConfiguration: Ref DataSourceConfiguration is a union of objects. Merging into a single type.
+AWS::Kendra::DataSource: property DataSourceConfiguration: typedef DataSourceConfiguration: property OneDriveConfiguration: typedef OneDriveConfiguration: property OneDriveUsers: Ref OneDriveUsers is a union of objects. Merging into a single type.

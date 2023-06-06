@@ -1,0 +1,5 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_GreengrassV2:
+
+    *** interpreting ***
+
+AWS::GreengrassV2::Deployment: property IotJobConfiguration: typedef DeploymentIoTJobConfiguration: property JobExecutionsRolloutConfig: typedef IoTJobExecutionsRolloutConfig: property ExponentialRate: typedef IoTJobExponentialRolloutRate: property RateIncreaseCriteria: Ref IoTJobRateIncreaseCriteria is a union of objects. Merging into a single type.

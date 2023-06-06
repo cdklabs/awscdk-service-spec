@@ -1,0 +1,139 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_KinesisAnalyticsV2:
+
+    *** patch ***
+
+us-east-2/aws-kinesisanalyticsv2-applicationcloudwatchloggingoption.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::KinesisAnalyticsV2::ApplicationCloudWatchLoggingOption"
+      "description": "Resource Type definition for AWS::KinesisAnalyticsV2::ApplicationCloudWatchLoggingOption"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-kinesisanalyticsv2-applicationoutput.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::KinesisAnalyticsV2::ApplicationOutput"
+      "description": "Resource Type definition for AWS::KinesisAnalyticsV2::ApplicationOutput"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-kinesisanalyticsv2-applicationreferencedatasource.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::KinesisAnalyticsV2::ApplicationReferenceDataSource"
+      "description": "Resource Type definition for AWS::KinesisAnalyticsV2::ApplicationReferenceDataSource"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-kinesisanalyticsv2-applicationcloudwatchloggingoption.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::KinesisAnalyticsV2::ApplicationCloudWatchLoggingOption"
+      "description": "Resource Type definition for AWS::KinesisAnalyticsV2::ApplicationCloudWatchLoggingOption"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-kinesisanalyticsv2-applicationoutput.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::KinesisAnalyticsV2::ApplicationOutput"
+      "description": "Resource Type definition for AWS::KinesisAnalyticsV2::ApplicationOutput"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-kinesisanalyticsv2-applicationreferencedatasource.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::KinesisAnalyticsV2::ApplicationReferenceDataSource"
+      "description": "Resource Type definition for AWS::KinesisAnalyticsV2::ApplicationReferenceDataSource"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-kinesisanalyticsv2-applicationcloudwatchloggingoption.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::KinesisAnalyticsV2::ApplicationCloudWatchLoggingOption"
+      "description": "Resource Type definition for AWS::KinesisAnalyticsV2::ApplicationCloudWatchLoggingOption"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-kinesisanalyticsv2-applicationoutput.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::KinesisAnalyticsV2::ApplicationOutput"
+      "description": "Resource Type definition for AWS::KinesisAnalyticsV2::ApplicationOutput"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-kinesisanalyticsv2-applicationreferencedatasource.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::KinesisAnalyticsV2::ApplicationReferenceDataSource"
+      "description": "Resource Type definition for AWS::KinesisAnalyticsV2::ApplicationReferenceDataSource"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }

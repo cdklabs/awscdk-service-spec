@@ -1,0 +1,7 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_GameLift:
+
+    *** interpreting ***
+
+AWS::GameLift::Alias: property RoutingStrategy: Ref RoutingStrategy is a union of objects. Merging into a single type.
+AWS::GameLift::Alias: marked as taggable, but tagProperty does not exist: Tags
+AWS::GameLift::Fleet: marked as taggable, but tagProperty does not exist: Tags

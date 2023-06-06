@@ -1,0 +1,7 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_Lightsail:
+
+    *** interpreting ***
+
+AWS::Lightsail::Alarm: marked as taggable, but tagProperty does not exist: Tags
+AWS::Lightsail::LoadBalancerTlsCertificate: marked as taggable, but tagProperty does not exist: Tags
+AWS::Lightsail::StaticIp: marked as taggable, but tagProperty does not exist: Tags

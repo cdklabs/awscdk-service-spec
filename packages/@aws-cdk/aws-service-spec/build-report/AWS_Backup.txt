@@ -1,0 +1,58 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_Backup:
+
+    *** interpreting ***
+
+AWS::Backup::BackupVault: marked as taggable, but tagProperty does not exist: Tags
+AWS::Backup::Framework: marked as taggable, but tagProperty does not exist: Tags
+AWS::Backup::ReportPlan: marked as taggable, but tagProperty does not exist: Tags
+
+    *** patch ***
+
+us-east-2/aws-backup-backupplan.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Backup::BackupPlan"
+      "description": "Resource Type definition for AWS::Backup::BackupPlan"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "definitions": { ... }
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-backup-backupplan.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Backup::BackupPlan"
+      "description": "Resource Type definition for AWS::Backup::BackupPlan"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "definitions": { ... }
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-backup-backupplan.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Backup::BackupPlan"
+      "description": "Resource Type definition for AWS::Backup::BackupPlan"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "definitions": { ... }
+      "handlers": { ... }
+[+]   "taggable": false
+    }

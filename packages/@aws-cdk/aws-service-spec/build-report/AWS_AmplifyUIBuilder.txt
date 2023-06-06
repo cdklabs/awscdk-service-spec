@@ -1,0 +1,292 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_AmplifyUIBuilder:
+
+    *** interpreting ***
+
+AWS::AmplifyUIBuilder::Form: property Cta: typedef FormCTA: property Clear: typedef FormButton: property Position: Ref FieldPosition is a union of objects. Merging into a single type.
+AWS::AmplifyUIBuilder::Form: property Fields: typedef FieldConfig: property Position: Ref FieldPosition is a union of objects. Merging into a single type.
+AWS::AmplifyUIBuilder::Form: property SectionalElements: typedef SectionalElement: property Position: Ref FieldPosition is a union of objects. Merging into a single type.
+AWS::AmplifyUIBuilder::Form: property Style: typedef FormStyle: property HorizontalGap: Ref FormStyleConfig is a union of objects. Merging into a single type.
+AWS::AmplifyUIBuilder::Form: property Style: typedef FormStyle: property VerticalGap: Ref FormStyleConfig is a union of objects. Merging into a single type.
+AWS::AmplifyUIBuilder::Form: property Style: typedef FormStyle: property OuterPadding: Ref FormStyleConfig is a union of objects. Merging into a single type.
+
+    *** loading ***
+
+us-east-2/aws-amplifyuibuilder-component.json: .handlers.list
+    {
+      permissions: [ 'amplify:GetApp', 'amplifyuibuilder:ListComponents' ],
+      handlerSchema: {
+        properties: {
+          AppId: { '$ref': 'resource-schema.json#/properties/AppId' },
+          EnvironmentName: { '$ref': 'resource-schema.json#/properties/EnvironmentName' }
+        },
+        required: [ 'AppId', 'EnvironmentName' ],
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-2/aws-amplifyuibuilder-form.json: .handlers.list
+    {
+      permissions: [ 'amplify:GetApp', 'amplifyuibuilder:ListForms' ],
+      handlerSchema: {
+        properties: {
+          AppId: { '$ref': 'resource-schema.json#/properties/AppId' },
+          EnvironmentName: { '$ref': 'resource-schema.json#/properties/EnvironmentName' }
+        },
+        required: [ 'AppId', 'EnvironmentName' ],
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-2/aws-amplifyuibuilder-theme.json: .handlers.list
+    {
+      permissions: [ 'amplifyuibuilder:ListThemes', 'amplify:GetApp' ],
+      handlerSchema: {
+        properties: {
+          AppId: { '$ref': 'resource-schema.json#/properties/AppId' },
+          EnvironmentName: { '$ref': 'resource-schema.json#/properties/EnvironmentName' }
+        },
+        required: [ 'AppId', 'EnvironmentName' ],
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-amplifyuibuilder-component.json: .handlers.list
+    {
+      permissions: [ 'amplify:GetApp', 'amplifyuibuilder:ListComponents' ],
+      handlerSchema: {
+        properties: {
+          AppId: { '$ref': 'resource-schema.json#/properties/AppId' },
+          EnvironmentName: { '$ref': 'resource-schema.json#/properties/EnvironmentName' }
+        },
+        required: [ 'AppId', 'EnvironmentName' ],
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-amplifyuibuilder-form.json: .handlers.list
+    {
+      permissions: [ 'amplify:GetApp', 'amplifyuibuilder:ListForms' ],
+      handlerSchema: {
+        properties: {
+          AppId: { '$ref': 'resource-schema.json#/properties/AppId' },
+          EnvironmentName: { '$ref': 'resource-schema.json#/properties/EnvironmentName' }
+        },
+        required: [ 'AppId', 'EnvironmentName' ],
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-amplifyuibuilder-theme.json: .handlers.list
+    {
+      permissions: [ 'amplifyuibuilder:ListThemes', 'amplify:GetApp' ],
+      handlerSchema: {
+        properties: {
+          AppId: { '$ref': 'resource-schema.json#/properties/AppId' },
+          EnvironmentName: { '$ref': 'resource-schema.json#/properties/EnvironmentName' }
+        },
+        required: [ 'AppId', 'EnvironmentName' ],
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-amplifyuibuilder-component.json: .handlers.list
+    {
+      permissions: [ 'amplify:GetApp', 'amplifyuibuilder:ListComponents' ],
+      handlerSchema: {
+        properties: {
+          AppId: { '$ref': 'resource-schema.json#/properties/AppId' },
+          EnvironmentName: { '$ref': 'resource-schema.json#/properties/EnvironmentName' }
+        },
+        required: [ 'AppId', 'EnvironmentName' ],
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-amplifyuibuilder-form.json: .handlers.list
+    {
+      permissions: [ 'amplify:GetApp', 'amplifyuibuilder:ListForms' ],
+      handlerSchema: {
+        properties: {
+          AppId: { '$ref': 'resource-schema.json#/properties/AppId' },
+          EnvironmentName: { '$ref': 'resource-schema.json#/properties/EnvironmentName' }
+        },
+        required: [ 'AppId', 'EnvironmentName' ],
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-amplifyuibuilder-theme.json: .handlers.list
+    {
+      permissions: [ 'amplifyuibuilder:ListThemes', 'amplify:GetApp' ],
+      handlerSchema: {
+        properties: {
+          AppId: { '$ref': 'resource-schema.json#/properties/AppId' },
+          EnvironmentName: { '$ref': 'resource-schema.json#/properties/EnvironmentName' }
+        },
+        required: [ 'AppId', 'EnvironmentName' ],
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+
+    *** patch ***
+
+us-east-2/aws-amplifyuibuilder-component.json
+--------------------------------
+/tagging: tagProperty should look like "/properties/Tags", not "#/properties/Tags"
+    {
+      "tagging": {
+        "taggable": true
+        "tagOnCreate": true
+        "tagUpdatable": false
+        "cloudFormationSystemTags": false
+[-]     "tagProperty": "#/properties/Tags"
+[+]     "tagProperty": "/properties/Tags"
+      }
+    }
+us-east-2/aws-amplifyuibuilder-form.json
+--------------------------------
+/tagging: tagProperty should look like "/properties/Tags", not "#/properties/Tags"
+    {
+      "tagging": {
+        "taggable": true
+        "tagOnCreate": true
+        "tagUpdatable": false
+        "cloudFormationSystemTags": false
+[-]     "tagProperty": "#/properties/Tags"
+[+]     "tagProperty": "/properties/Tags"
+      }
+    }
+us-west-2/aws-amplifyuibuilder-component.json
+--------------------------------
+/tagging: tagProperty should look like "/properties/Tags", not "#/properties/Tags"
+    {
+      "tagging": {
+        "taggable": true
+        "tagOnCreate": true
+        "tagUpdatable": false
+        "cloudFormationSystemTags": false
+[-]     "tagProperty": "#/properties/Tags"
+[+]     "tagProperty": "/properties/Tags"
+      }
+    }
+us-west-2/aws-amplifyuibuilder-form.json
+--------------------------------
+/tagging: tagProperty should look like "/properties/Tags", not "#/properties/Tags"
+    {
+      "tagging": {
+        "taggable": true
+        "tagOnCreate": true
+        "tagUpdatable": false
+        "cloudFormationSystemTags": false
+[-]     "tagProperty": "#/properties/Tags"
+[+]     "tagProperty": "/properties/Tags"
+      }
+    }
+us-east-1/aws-amplifyuibuilder-component.json
+--------------------------------
+/tagging: tagProperty should look like "/properties/Tags", not "#/properties/Tags"
+    {
+      "tagging": {
+        "taggable": true
+        "tagOnCreate": true
+        "tagUpdatable": false
+        "cloudFormationSystemTags": false
+[-]     "tagProperty": "#/properties/Tags"
+[+]     "tagProperty": "/properties/Tags"
+      }
+    }
+us-east-1/aws-amplifyuibuilder-form.json
+--------------------------------
+/tagging: tagProperty should look like "/properties/Tags", not "#/properties/Tags"
+    {
+      "tagging": {
+        "taggable": true
+        "tagOnCreate": true
+        "tagUpdatable": false
+        "cloudFormationSystemTags": false
+[-]     "tagProperty": "#/properties/Tags"
+[+]     "tagProperty": "/properties/Tags"
+      }
+    }

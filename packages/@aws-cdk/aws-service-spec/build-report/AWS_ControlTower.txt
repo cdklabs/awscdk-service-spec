@@ -1,0 +1,67 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_ControlTower:
+
+    *** loading ***
+
+us-east-2/aws-controltower-enabledcontrol.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          TargetIdentifier: { '$ref': 'resource-schema.json#/properties/TargetIdentifier' }
+        },
+        required: [ 'TargetIdentifier' ],
+        type: 'object'
+      },
+      permissions: [ 'controltower:ListEnabledControls' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-controltower-enabledcontrol.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          TargetIdentifier: { '$ref': 'resource-schema.json#/properties/TargetIdentifier' }
+        },
+        required: [ 'TargetIdentifier' ],
+        type: 'object'
+      },
+      permissions: [ 'controltower:ListEnabledControls' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-controltower-enabledcontrol.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          TargetIdentifier: { '$ref': 'resource-schema.json#/properties/TargetIdentifier' }
+        },
+        required: [ 'TargetIdentifier' ],
+        type: 'object'
+      },
+      permissions: [ 'controltower:ListEnabledControls' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }

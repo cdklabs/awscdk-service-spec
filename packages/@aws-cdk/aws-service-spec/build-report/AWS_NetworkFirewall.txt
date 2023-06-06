@@ -1,0 +1,52 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_NetworkFirewall:
+
+    *** patch ***
+
+us-east-2/aws-networkfirewall-loggingconfiguration.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::NetworkFirewall::LoggingConfiguration"
+      "description": "Resource type definition for AWS::NetworkFirewall::LoggingConfiguration"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-networkfirewall.git"
+      "additionalProperties": false
+      "definitions": { ... }
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-networkfirewall-loggingconfiguration.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::NetworkFirewall::LoggingConfiguration"
+      "description": "Resource type definition for AWS::NetworkFirewall::LoggingConfiguration"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-networkfirewall.git"
+      "additionalProperties": false
+      "definitions": { ... }
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-networkfirewall-loggingconfiguration.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::NetworkFirewall::LoggingConfiguration"
+      "description": "Resource type definition for AWS::NetworkFirewall::LoggingConfiguration"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-networkfirewall.git"
+      "additionalProperties": false
+      "definitions": { ... }
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }

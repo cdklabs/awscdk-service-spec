@@ -1,0 +1,49 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_Signer:
+
+    *** patch ***
+
+us-east-2/aws-signer-profilepermission.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Signer::ProfilePermission"
+      "description": "An example resource schema demonstrating some basic constructs and validation rules."
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-signer-profilepermission.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Signer::ProfilePermission"
+      "description": "An example resource schema demonstrating some basic constructs and validation rules."
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-signer-profilepermission.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Signer::ProfilePermission"
+      "description": "An example resource schema demonstrating some basic constructs and validation rules."
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }

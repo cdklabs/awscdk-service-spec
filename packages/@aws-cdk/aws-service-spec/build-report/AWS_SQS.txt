@@ -1,0 +1,43 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_SQS:
+
+    *** patch ***
+
+us-east-2/aws-sqs-queuepolicy.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::SQS::QueuePolicy"
+      "description": "Resource Type definition for AWS::SQS::QueuePolicy"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-sqs-queuepolicy.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::SQS::QueuePolicy"
+      "description": "Resource Type definition for AWS::SQS::QueuePolicy"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-sqs-queuepolicy.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::SQS::QueuePolicy"
+      "description": "Resource Type definition for AWS::SQS::QueuePolicy"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }

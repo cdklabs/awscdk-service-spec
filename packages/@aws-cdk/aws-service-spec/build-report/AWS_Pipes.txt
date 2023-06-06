@@ -1,0 +1,6 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_Pipes:
+
+    *** interpreting ***
+
+AWS::Pipes::Pipe: property SourceParameters: typedef PipeSourceParameters: property ManagedStreamingKafkaParameters: typedef PipeSourceManagedStreamingKafkaParameters: property Credentials: Ref MSKAccessCredentials is a union of objects. Merging into a single type.
+AWS::Pipes::Pipe: property SourceParameters: typedef PipeSourceParameters: property SelfManagedKafkaParameters: typedef PipeSourceSelfManagedKafkaParameters: property Credentials: Ref SelfManagedKafkaAccessConfigurationCredentials is a union of objects. Merging into a single type.

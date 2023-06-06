@@ -1,0 +1,46 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_AutoScalingPlans:
+
+    *** patch ***
+
+us-east-2/aws-autoscalingplans-scalingplan.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::AutoScalingPlans::ScalingPlan"
+      "description": "Resource Type definition for AWS::AutoScalingPlans::ScalingPlan"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-autoscalingplans-scalingplan.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::AutoScalingPlans::ScalingPlan"
+      "description": "Resource Type definition for AWS::AutoScalingPlans::ScalingPlan"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-autoscalingplans-scalingplan.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::AutoScalingPlans::ScalingPlan"
+      "description": "Resource Type definition for AWS::AutoScalingPlans::ScalingPlan"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+[+]   "taggable": false
+    }

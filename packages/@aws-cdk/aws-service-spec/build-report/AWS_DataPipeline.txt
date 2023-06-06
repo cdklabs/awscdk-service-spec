@@ -1,0 +1,19 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_DataPipeline:
+
+    *** patch ***
+
+us-east-2/aws-datapipeline-pipeline.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::DataPipeline::Pipeline"
+      "description": "Resource Type definition for AWS::DataPipeline::Pipeline"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }

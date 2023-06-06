@@ -1,0 +1,116 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_SSMContacts:
+
+    *** interpreting ***
+
+AWS::SSMContacts::Contact: property Plan: Ref Stage is a union of objects. Merging into a single type.
+AWS::SSMContacts::Contact: property Plan: typedef Stage: property Targets: Ref Targets is a union of objects. Merging into a single type.
+AWS::SSMContacts::Plan: property Stages: typedef Stage: property Targets: Ref Targets is a union of objects. Merging into a single type.
+AWS::SSMContacts::Rotation: property Recurrence: Ref RecurrenceSettings is a union of objects. Merging into a single type.
+
+    *** patch ***
+
+us-east-2/aws-ssmcontacts-contact.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::SSMContacts::Contact"
+      "description": "Resource Type definition for AWS::SSMContacts::Contact"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "writeOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-ssmcontacts-contactchannel.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::SSMContacts::ContactChannel"
+      "description": "Resource Type definition for AWS::SSMContacts::ContactChannel"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "properties": { ... }
+      "additionalProperties": false
+      "oneOf": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "writeOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-ssmcontacts-contact.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::SSMContacts::Contact"
+      "description": "Resource Type definition for AWS::SSMContacts::Contact"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "writeOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-ssmcontacts-contactchannel.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::SSMContacts::ContactChannel"
+      "description": "Resource Type definition for AWS::SSMContacts::ContactChannel"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "properties": { ... }
+      "additionalProperties": false
+      "oneOf": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "writeOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-ssmcontacts-contact.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::SSMContacts::Contact"
+      "description": "Resource Type definition for AWS::SSMContacts::Contact"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "writeOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-ssmcontacts-contactchannel.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::SSMContacts::ContactChannel"
+      "description": "Resource Type definition for AWS::SSMContacts::ContactChannel"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "properties": { ... }
+      "additionalProperties": false
+      "oneOf": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "writeOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }

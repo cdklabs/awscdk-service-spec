@@ -1,0 +1,30 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_VoiceID:
+
+    *** patch ***
+
+us-west-2/aws-voiceid-domain.json
+--------------------------------
+/tagging: tagProperty should look like "/properties/Tags", not "#/properties/Tags"
+    {
+      "tagging": {
+        "taggable": true
+        "tagOnCreate": true
+        "tagUpdatable": true
+        "cloudFormationSystemTags": true
+[-]     "tagProperty": "#/properties/Tags"
+[+]     "tagProperty": "/properties/Tags"
+      }
+    }
+us-east-1/aws-voiceid-domain.json
+--------------------------------
+/tagging: tagProperty should look like "/properties/Tags", not "#/properties/Tags"
+    {
+      "tagging": {
+        "taggable": true
+        "tagOnCreate": true
+        "tagUpdatable": true
+        "cloudFormationSystemTags": true
+[-]     "tagProperty": "#/properties/Tags"
+[+]     "tagProperty": "/properties/Tags"
+      }
+    }

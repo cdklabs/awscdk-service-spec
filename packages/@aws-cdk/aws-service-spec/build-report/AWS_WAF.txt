@@ -1,0 +1,319 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_WAF:
+
+    *** patch ***
+
+us-east-2/aws-waf-bytematchset.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::ByteMatchSet"
+      "description": "Resource Type definition for AWS::WAF::ByteMatchSet"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-waf-ipset.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::IPSet"
+      "description": "Resource Type definition for AWS::WAF::IPSet"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-waf-rule.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::Rule"
+      "description": "Resource Type definition for AWS::WAF::Rule"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-waf-sizeconstraintset.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::SizeConstraintSet"
+      "description": "Resource Type definition for AWS::WAF::SizeConstraintSet"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-waf-sqlinjectionmatchset.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::SqlInjectionMatchSet"
+      "description": "Resource Type definition for AWS::WAF::SqlInjectionMatchSet"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-waf-webacl.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::WebACL"
+      "description": "Resource Type definition for AWS::WAF::WebACL"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-waf-xssmatchset.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::XssMatchSet"
+      "description": "Resource Type definition for AWS::WAF::XssMatchSet"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-waf-bytematchset.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::ByteMatchSet"
+      "description": "Resource Type definition for AWS::WAF::ByteMatchSet"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-waf-ipset.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::IPSet"
+      "description": "Resource Type definition for AWS::WAF::IPSet"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-waf-rule.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::Rule"
+      "description": "Resource Type definition for AWS::WAF::Rule"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-waf-sizeconstraintset.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::SizeConstraintSet"
+      "description": "Resource Type definition for AWS::WAF::SizeConstraintSet"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-waf-sqlinjectionmatchset.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::SqlInjectionMatchSet"
+      "description": "Resource Type definition for AWS::WAF::SqlInjectionMatchSet"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-waf-webacl.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::WebACL"
+      "description": "Resource Type definition for AWS::WAF::WebACL"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-waf-xssmatchset.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::XssMatchSet"
+      "description": "Resource Type definition for AWS::WAF::XssMatchSet"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-waf-bytematchset.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::ByteMatchSet"
+      "description": "Resource Type definition for AWS::WAF::ByteMatchSet"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-waf-ipset.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::IPSet"
+      "description": "Resource Type definition for AWS::WAF::IPSet"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-waf-rule.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::Rule"
+      "description": "Resource Type definition for AWS::WAF::Rule"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-waf-sizeconstraintset.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::SizeConstraintSet"
+      "description": "Resource Type definition for AWS::WAF::SizeConstraintSet"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-waf-sqlinjectionmatchset.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::SqlInjectionMatchSet"
+      "description": "Resource Type definition for AWS::WAF::SqlInjectionMatchSet"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-waf-webacl.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::WebACL"
+      "description": "Resource Type definition for AWS::WAF::WebACL"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-waf-xssmatchset.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::WAF::XssMatchSet"
+      "description": "Resource Type definition for AWS::WAF::XssMatchSet"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }

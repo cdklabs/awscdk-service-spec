@@ -1,0 +1,133 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_DeviceFarm:
+
+    *** loading ***
+
+us-west-2/aws-devicefarm-devicepool.json: .handlers.list
+    {
+      permissions: [ 'devicefarm:ListDevicePools' ],
+      handlerSchema: {
+        properties: {
+          ProjectArn: { '$ref': 'resource-schema.json#/properties/ProjectArn' }
+        },
+        required: [ 'ProjectArn' ],
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-devicefarm-networkprofile.json: .handlers.list
+    {
+      permissions: [ 'devicefarm:ListNetworkProfiles' ],
+      handlerSchema: {
+        properties: {
+          ProjectArn: { '$ref': 'resource-schema.json#/properties/ProjectArn' }
+        },
+        required: [ 'ProjectArn' ],
+        type: 'object'
+      }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+
+    *** patch ***
+
+us-west-2/aws-devicefarm-devicepool.json
+--------------------------------
+/definitions/Tag: insertionOrder does not apply to type: 'object'
+    {
+      "definitions": {
+        "Tag": {
+          "type": "object"
+          "additionalProperties": false
+[-]       "insertionOrder": false
+          "properties": { ... }
+          "required": [ ... ]
+        }
+      }
+    }
+us-west-2/aws-devicefarm-instanceprofile.json
+--------------------------------
+/definitions/Tag: insertionOrder does not apply to type: 'object'
+    {
+      "definitions": {
+        "Tag": {
+          "type": "object"
+          "additionalProperties": false
+[-]       "insertionOrder": false
+          "properties": { ... }
+          "required": [ ... ]
+        }
+      }
+    }
+us-west-2/aws-devicefarm-networkprofile.json
+--------------------------------
+/definitions/Tag: insertionOrder does not apply to type: 'object'
+    {
+      "definitions": {
+        "Tag": {
+          "type": "object"
+          "additionalProperties": false
+[-]       "insertionOrder": false
+          "properties": { ... }
+          "required": [ ... ]
+        }
+      }
+    }
+us-west-2/aws-devicefarm-project.json
+--------------------------------
+/definitions/Tag: insertionOrder does not apply to type: 'object'
+    {
+      "definitions": {
+        "Tag": {
+          "type": "object"
+          "additionalProperties": false
+[-]       "insertionOrder": false
+          "properties": { ... }
+          "required": [ ... ]
+        }
+      }
+    }
+us-west-2/aws-devicefarm-testgridproject.json
+--------------------------------
+/definitions/Tag: insertionOrder does not apply to type: 'object'
+    {
+      "definitions": {
+        "Tag": {
+          "type": "object"
+          "additionalProperties": false
+[-]       "insertionOrder": false
+          "properties": { ... }
+          "required": [ ... ]
+        }
+      }
+    }
+us-west-2/aws-devicefarm-vpceconfiguration.json
+--------------------------------
+/definitions/Tag: insertionOrder does not apply to type: 'object'
+    {
+      "definitions": {
+        "Tag": {
+          "type": "object"
+          "additionalProperties": false
+[-]       "insertionOrder": false
+          "properties": { ... }
+          "required": [ ... ]
+        }
+      }
+    }

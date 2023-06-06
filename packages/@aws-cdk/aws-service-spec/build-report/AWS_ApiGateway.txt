@@ -1,0 +1,875 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_ApiGateway:
+
+    *** interpreting ***
+
+AWS::ApiGateway::Deployment: marked as taggable, but tagProperty does not exist: Tags
+
+    *** loading ***
+
+us-east-2/aws-apigateway-authorizer.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-2/aws-apigateway-basepathmapping.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          DomainName: { '$ref': 'resource-schema.json#/properties/DomainName' }
+        },
+        required: [ 'DomainName' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-2/aws-apigateway-deployment.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-2/aws-apigateway-documentationpart.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-2/aws-apigateway-documentationversion.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-2/aws-apigateway-model.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-2/aws-apigateway-requestvalidator.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-2/aws-apigateway-resource.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-2/aws-apigateway-stage.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-2/aws-apigateway-usageplankey.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          UsagePlanId: { '$ref': 'resource-schema.json#/properties/UsagePlanId' }
+        },
+        required: [ 'UsagePlanId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-apigateway-authorizer.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-apigateway-basepathmapping.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          DomainName: { '$ref': 'resource-schema.json#/properties/DomainName' }
+        },
+        required: [ 'DomainName' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-apigateway-deployment.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-apigateway-documentationpart.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-apigateway-documentationversion.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-apigateway-model.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-apigateway-requestvalidator.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-apigateway-resource.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-apigateway-stage.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-apigateway-usageplankey.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          UsagePlanId: { '$ref': 'resource-schema.json#/properties/UsagePlanId' }
+        },
+        required: [ 'UsagePlanId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-apigateway-authorizer.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-apigateway-basepathmapping.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          DomainName: { '$ref': 'resource-schema.json#/properties/DomainName' }
+        },
+        required: [ 'DomainName' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-apigateway-deployment.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-apigateway-documentationpart.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-apigateway-documentationversion.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-apigateway-model.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-apigateway-requestvalidator.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-apigateway-resource.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-apigateway-stage.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          RestApiId: { '$ref': 'resource-schema.json#/properties/RestApiId' }
+        },
+        required: [ 'RestApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-apigateway-usageplankey.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          UsagePlanId: { '$ref': 'resource-schema.json#/properties/UsagePlanId' }
+        },
+        required: [ 'UsagePlanId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+
+    *** patch ***
+
+us-east-2/aws-apigateway-account.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGateway::Account"
+      "description": "Resource Type definition for AWS::ApiGateway::Account"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway"
+      "additionalProperties": false
+      "properties": { ... }
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-apigateway-documentationpart.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGateway::DocumentationPart"
+      "description": "Resource Type definition for AWS::ApiGateway::DocumentationPart"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-apigateway-documentationversion.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGateway::DocumentationVersion"
+      "description": "A snapshot of the documentation of an API."
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-apigateway-model.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGateway::Model"
+      "description": "Resource Type definition for AWS::ApiGateway::Model"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-apigateway-requestvalidator.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGateway::RequestValidator"
+      "description": "Resource Type definition for AWS::ApiGateway::RequestValidator"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-apigateway-account.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGateway::Account"
+      "description": "Resource Type definition for AWS::ApiGateway::Account"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway"
+      "additionalProperties": false
+      "properties": { ... }
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-apigateway-documentationpart.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGateway::DocumentationPart"
+      "description": "Resource Type definition for AWS::ApiGateway::DocumentationPart"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-apigateway-documentationversion.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGateway::DocumentationVersion"
+      "description": "A snapshot of the documentation of an API."
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-apigateway-model.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGateway::Model"
+      "description": "Resource Type definition for AWS::ApiGateway::Model"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-apigateway-requestvalidator.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGateway::RequestValidator"
+      "description": "Resource Type definition for AWS::ApiGateway::RequestValidator"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-apigateway-account.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGateway::Account"
+      "description": "Resource Type definition for AWS::ApiGateway::Account"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway"
+      "additionalProperties": false
+      "properties": { ... }
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-apigateway-documentationpart.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGateway::DocumentationPart"
+      "description": "Resource Type definition for AWS::ApiGateway::DocumentationPart"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-apigateway-documentationversion.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGateway::DocumentationVersion"
+      "description": "A snapshot of the documentation of an API."
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-apigateway-model.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGateway::Model"
+      "description": "Resource Type definition for AWS::ApiGateway::Model"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-apigateway-requestvalidator.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGateway::RequestValidator"
+      "description": "Resource Type definition for AWS::ApiGateway::RequestValidator"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-apigateway"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }

@@ -1,0 +1,7 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_Evidently:
+
+    *** interpreting ***
+
+AWS::Evidently::Experiment: property RunningStatus: Ref RunningStatusObject is a union of objects. Merging into a single type.
+AWS::Evidently::Feature: property Variations: Ref VariationObject is a union of objects. Merging into a single type.
+AWS::Evidently::Project: property DataDelivery: Ref DataDeliveryObject is a union of objects. Merging into a single type.

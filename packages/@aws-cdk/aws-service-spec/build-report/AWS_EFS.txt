@@ -1,0 +1,157 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_EFS:
+
+    *** patch ***
+
+us-east-2/aws-efs-accesspoint.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::EFS::AccessPoint"
+      "description": "Resource Type definition for AWS::EFS::AccessPoint"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-efs-filesystem.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::EFS::FileSystem"
+      "description": "Resource Type definition for AWS::EFS::FileSystem"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "writeOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "propertyTransform": { ... }
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-efs-mounttarget.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::EFS::MountTarget"
+      "description": "Resource Type definition for AWS::EFS::MountTarget"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-efs-accesspoint.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::EFS::AccessPoint"
+      "description": "Resource Type definition for AWS::EFS::AccessPoint"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-efs-filesystem.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::EFS::FileSystem"
+      "description": "Resource Type definition for AWS::EFS::FileSystem"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "writeOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "propertyTransform": { ... }
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-efs-mounttarget.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::EFS::MountTarget"
+      "description": "Resource Type definition for AWS::EFS::MountTarget"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-efs-accesspoint.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::EFS::AccessPoint"
+      "description": "Resource Type definition for AWS::EFS::AccessPoint"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-efs-filesystem.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::EFS::FileSystem"
+      "description": "Resource Type definition for AWS::EFS::FileSystem"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "writeOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "propertyTransform": { ... }
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-efs-mounttarget.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::EFS::MountTarget"
+      "description": "Resource Type definition for AWS::EFS::MountTarget"
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-rpdk.git"
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }

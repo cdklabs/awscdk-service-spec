@@ -1,0 +1,1681 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_EKS:
+
+    *** loading ***
+
+us-east-2/aws-eks-cluster.json: .properties['EncryptionConfig'].items
+    { '$ref': '#/definitions/EncryptionConfig', maxItems: 1 }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'maxItems' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      '$ref': { type: 'string' },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ '$ref' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      additionalProperties: {
+      |        anyOf: [ [Object], [Object] ],
+      |        default: true,
+      |        description: "additionalProperties validates all keys that aren't otherwise validated by properties or patternProperties"
+      |      },
+      |      description: { type: 'string' },
+      |      maxProperties: { type: 'number' },
+      |      minProperties: { type: 'number' },
+      |      patternProperties: {
+      |        additionalProperties: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'object'
+      |      },
+      |      required: {
+      |        description: 'Required keys in a map\n' +
+      |          '\n' +
+      |          "Doesn't really make a whole lot of sense, but this is used to support mixed map/record types.",
+      |        items: { type: 'string' },
+      |        type: 'array'
+      |      },
+      |      title: { type: 'string' },
+      |      type: { const: 'object', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      additionalProperties: {
+      |        const: false,
+      |        description: 'FIXME: should be required but some service teams have omitted it.',
+      |        type: 'boolean'
+      |      },
+      |      description: { type: 'string' },
+      |      maxProperties: { type: 'number' },
+      |      minProperties: {
+      |        description: 'FIXME: these are weird but oh hey?',
+      |        type: 'number'
+      |      },
+      |      properties: { '$ref': '#/definitions/jsonschema.ObjectProperties' },
+      |      required: { items: { type: 'string' }, type: 'array' },
+      |      title: { type: 'string' },
+      |      type: { const: 'object', type: 'string' }
+      |    },
+      |    required: [ 'type', 'properties' ],
+      |    type: 'object'
+      |  }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.MapLikeObject' },
+      |      { '$ref': '#/definitions/jsonschema.RecordLikeObject' }
+      |    ]
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      const: { type: 'string' },
+      |      default: { type: 'string' },
+      |      description: { type: 'string' },
+      |      enum: { items: { type: 'string' }, type: 'array' },
+      |      examples: { items: { type: 'string' }, type: 'array' },
+      |      format: { enum: [ 'date-time', 'uri', 'timestamp' ], type: 'string' },
+      |      maxLength: { type: 'number' },
+      |      minLength: { type: 'number' },
+      |      pattern: { type: 'string' },
+      |      title: { type: 'string' },
+      |      type: { const: 'string', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      arrayType: {
+      |        description: 'Does this array describe full reality?\n' +
+      |          '\n' +
+      |          '- If `Standard`, real elements must be exactly equal to the given array.\n' +
+      |          '- If `AttributeList`, the real array may be a superset of the given array.',
+      |        enum: [ 'AttributeList', 'Standard' ],
+      |        type: 'string'
+      |      },
+      |      default: { items: {}, type: 'array' },
+      |      description: { type: 'string' },
+      |      examples: { items: {}, type: 'array' },
+      |      insertionOrder: {
+      |        description: 'Whether to treat the order as significant\n' +
+      |          '\n' +
+      |          'In other words, does this array model a "sequence" or a "multiset".\n' +
+      |          '\n' +
+      |          '- `true` (default): order is significant, the array is a sequence.\n' +
+      |          '- `false`: order is insignificant, the array is a set.',
+      |        type: 'boolean'
+      |      },
+      |      items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |      maxItems: { type: 'number' },
+      |      minItems: { type: 'number' },
+      |      title: { type: 'string' },
+      |      type: { const: 'array', type: 'string' },
+      |      uniqueItems: { type: 'boolean' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      default: { type: 'boolean' },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' },
+      |      type: { const: 'boolean', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      default: { type: 'number' },
+      |      description: { type: 'string' },
+      |      enum: { items: { type: 'number' }, type: 'array' },
+      |      format: { enum: [ 'int64', 'double' ], type: 'string' },
+      |      maximum: { type: 'number' },
+      |      minimum: { type: 'number' },
+      |      multipleOf: { type: 'number' },
+      |      title: { type: 'string' },
+      |      type: { enum: [ 'number', 'integer' ], type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' },
+      |      type: { const: 'null', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    type: should be boolean ({ type: 'boolean' })
+      |  { const: true, type: 'boolean' }
+    const: should be equal to constant ({ allowedValue: true })
+      |  { const: true, type: 'boolean' }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.Object' },
+      |      { '$ref': '#/definitions/jsonschema.String' },
+      |      { '$ref': '#/definitions/jsonschema.SchemaArray' },
+      |      { '$ref': '#/definitions/jsonschema.Boolean' },
+      |      { '$ref': '#/definitions/jsonschema.Number' },
+      |      { '$ref': '#/definitions/jsonschema.Null' },
+      |      { '$ref': '#/definitions/jsonschema.AnyType' }
+      |    ]
+      |  }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.Reference' },
+      |      { '$ref': '#/definitions/jsonschema.ConcreteSingletonSchema' }
+      |    ]
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      description: { type: 'string' },
+      |      oneOf: {
+      |        items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'array'
+      |      },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ 'oneOf' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      anyOf: {
+      |        items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'array'
+      |      },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ 'anyOf' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      allOf: {
+      |        items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'array'
+      |      },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ 'allOf' ],
+      |    type: 'object'
+      |  }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.SingletonSchema' },
+      |      { '$ref': '#/definitions/jsonschema.OneOf%3CSchema%3E' },
+      |      { '$ref': '#/definitions/jsonschema.AnyOf%3CSchema%3E' },
+      |      { '$ref': '#/definitions/jsonschema.AllOf%3CSchema%3E' }
+      |    ]
+      |  }
+us-east-2/aws-eks-cluster.json: .properties['EncryptionConfig']
+    {
+      type: 'array',
+      insertionOrder: false,
+      items: { '$ref': '#/definitions/EncryptionConfig', maxItems: 1 }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'type' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      '$ref': { type: 'string' },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ '$ref' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'insertionOrder' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      additionalProperties: {
+      |        anyOf: [ [Object], [Object] ],
+      |        default: true,
+      |        description: "additionalProperties validates all keys that aren't otherwise validated by properties or patternProperties"
+      |      },
+      |      description: { type: 'string' },
+      |      maxProperties: { type: 'number' },
+      |      minProperties: { type: 'number' },
+      |      patternProperties: {
+      |        additionalProperties: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'object'
+      |      },
+      |      required: {
+      |        description: 'Required keys in a map\n' +
+      |          '\n' +
+      |          "Doesn't really make a whole lot of sense, but this is used to support mixed map/record types.",
+      |        items: { type: 'string' },
+      |        type: 'array'
+      |      },
+      |      title: { type: 'string' },
+      |      type: { const: 'object', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'insertionOrder' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      additionalProperties: {
+      |        const: false,
+      |        description: 'FIXME: should be required but some service teams have omitted it.',
+      |        type: 'boolean'
+      |      },
+      |      description: { type: 'string' },
+      |      maxProperties: { type: 'number' },
+      |      minProperties: {
+      |        description: 'FIXME: these are weird but oh hey?',
+      |        type: 'number'
+      |      },
+      |      properties: { '$ref': '#/definitions/jsonschema.ObjectProperties' },
+      |      required: { items: { type: 'string' }, type: 'array' },
+      |      title: { type: 'string' },
+      |      type: { const: 'object', type: 'string' }
+      |    },
+      |    required: [ 'type', 'properties' ],
+      |    type: 'object'
+      |  }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.MapLikeObject' },
+      |      { '$ref': '#/definitions/jsonschema.RecordLikeObject' }
+      |    ]
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'insertionOrder' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      const: { type: 'string' },
+      |      default: { type: 'string' },
+      |      description: { type: 'string' },
+      |      enum: { items: { type: 'string' }, type: 'array' },
+      |      examples: { items: { type: 'string' }, type: 'array' },
+      |      format: { enum: [ 'date-time', 'uri', 'timestamp' ], type: 'string' },
+      |      maxLength: { type: 'number' },
+      |      minLength: { type: 'number' },
+      |      pattern: { type: 'string' },
+      |      title: { type: 'string' },
+      |      type: { const: 'string', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'insertionOrder' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      default: { type: 'boolean' },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' },
+      |      type: { const: 'boolean', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'insertionOrder' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      default: { type: 'number' },
+      |      description: { type: 'string' },
+      |      enum: { items: { type: 'number' }, type: 'array' },
+      |      format: { enum: [ 'int64', 'double' ], type: 'string' },
+      |      maximum: { type: 'number' },
+      |      minimum: { type: 'number' },
+      |      multipleOf: { type: 'number' },
+      |      title: { type: 'string' },
+      |      type: { enum: [ 'number', 'integer' ], type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'insertionOrder' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' },
+      |      type: { const: 'null', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    type: should be boolean ({ type: 'boolean' })
+      |  { const: true, type: 'boolean' }
+    const: should be equal to constant ({ allowedValue: true })
+      |  { const: true, type: 'boolean' }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.Object' },
+      |      { '$ref': '#/definitions/jsonschema.String' },
+      |      { '$ref': '#/definitions/jsonschema.SchemaArray' },
+      |      { '$ref': '#/definitions/jsonschema.Boolean' },
+      |      { '$ref': '#/definitions/jsonschema.Number' },
+      |      { '$ref': '#/definitions/jsonschema.Null' },
+      |      { '$ref': '#/definitions/jsonschema.AnyType' }
+      |    ]
+      |  }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.Reference' },
+      |      { '$ref': '#/definitions/jsonschema.ConcreteSingletonSchema' }
+      |    ]
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'type' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      description: { type: 'string' },
+      |      oneOf: {
+      |        items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'array'
+      |      },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ 'oneOf' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'type' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      anyOf: {
+      |        items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'array'
+      |      },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ 'anyOf' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'type' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      allOf: {
+      |        items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'array'
+      |      },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ 'allOf' ],
+      |    type: 'object'
+      |  }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.SingletonSchema' },
+      |      { '$ref': '#/definitions/jsonschema.OneOf%3CSchema%3E' },
+      |      { '$ref': '#/definitions/jsonschema.AnyOf%3CSchema%3E' },
+      |      { '$ref': '#/definitions/jsonschema.AllOf%3CSchema%3E' }
+      |    ]
+      |  }
+us-east-2/aws-eks-fargateprofile.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          ClusterName: { '$ref': 'resource-schema.json#/properties/ClusterName' }
+        },
+        required: [ 'ClusterName' ],
+        type: 'object'
+      },
+      permissions: [ 'eks:ListFargateProfiles' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-eks-cluster.json: .properties['EncryptionConfig'].items
+    { '$ref': '#/definitions/EncryptionConfig', maxItems: 1 }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'maxItems' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      '$ref': { type: 'string' },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ '$ref' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      additionalProperties: {
+      |        anyOf: [ [Object], [Object] ],
+      |        default: true,
+      |        description: "additionalProperties validates all keys that aren't otherwise validated by properties or patternProperties"
+      |      },
+      |      description: { type: 'string' },
+      |      maxProperties: { type: 'number' },
+      |      minProperties: { type: 'number' },
+      |      patternProperties: {
+      |        additionalProperties: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'object'
+      |      },
+      |      required: {
+      |        description: 'Required keys in a map\n' +
+      |          '\n' +
+      |          "Doesn't really make a whole lot of sense, but this is used to support mixed map/record types.",
+      |        items: { type: 'string' },
+      |        type: 'array'
+      |      },
+      |      title: { type: 'string' },
+      |      type: { const: 'object', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      additionalProperties: {
+      |        const: false,
+      |        description: 'FIXME: should be required but some service teams have omitted it.',
+      |        type: 'boolean'
+      |      },
+      |      description: { type: 'string' },
+      |      maxProperties: { type: 'number' },
+      |      minProperties: {
+      |        description: 'FIXME: these are weird but oh hey?',
+      |        type: 'number'
+      |      },
+      |      properties: { '$ref': '#/definitions/jsonschema.ObjectProperties' },
+      |      required: { items: { type: 'string' }, type: 'array' },
+      |      title: { type: 'string' },
+      |      type: { const: 'object', type: 'string' }
+      |    },
+      |    required: [ 'type', 'properties' ],
+      |    type: 'object'
+      |  }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.MapLikeObject' },
+      |      { '$ref': '#/definitions/jsonschema.RecordLikeObject' }
+      |    ]
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      const: { type: 'string' },
+      |      default: { type: 'string' },
+      |      description: { type: 'string' },
+      |      enum: { items: { type: 'string' }, type: 'array' },
+      |      examples: { items: { type: 'string' }, type: 'array' },
+      |      format: { enum: [ 'date-time', 'uri', 'timestamp' ], type: 'string' },
+      |      maxLength: { type: 'number' },
+      |      minLength: { type: 'number' },
+      |      pattern: { type: 'string' },
+      |      title: { type: 'string' },
+      |      type: { const: 'string', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      arrayType: {
+      |        description: 'Does this array describe full reality?\n' +
+      |          '\n' +
+      |          '- If `Standard`, real elements must be exactly equal to the given array.\n' +
+      |          '- If `AttributeList`, the real array may be a superset of the given array.',
+      |        enum: [ 'AttributeList', 'Standard' ],
+      |        type: 'string'
+      |      },
+      |      default: { items: {}, type: 'array' },
+      |      description: { type: 'string' },
+      |      examples: { items: {}, type: 'array' },
+      |      insertionOrder: {
+      |        description: 'Whether to treat the order as significant\n' +
+      |          '\n' +
+      |          'In other words, does this array model a "sequence" or a "multiset".\n' +
+      |          '\n' +
+      |          '- `true` (default): order is significant, the array is a sequence.\n' +
+      |          '- `false`: order is insignificant, the array is a set.',
+      |        type: 'boolean'
+      |      },
+      |      items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |      maxItems: { type: 'number' },
+      |      minItems: { type: 'number' },
+      |      title: { type: 'string' },
+      |      type: { const: 'array', type: 'string' },
+      |      uniqueItems: { type: 'boolean' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      default: { type: 'boolean' },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' },
+      |      type: { const: 'boolean', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      default: { type: 'number' },
+      |      description: { type: 'string' },
+      |      enum: { items: { type: 'number' }, type: 'array' },
+      |      format: { enum: [ 'int64', 'double' ], type: 'string' },
+      |      maximum: { type: 'number' },
+      |      minimum: { type: 'number' },
+      |      multipleOf: { type: 'number' },
+      |      title: { type: 'string' },
+      |      type: { enum: [ 'number', 'integer' ], type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' },
+      |      type: { const: 'null', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    type: should be boolean ({ type: 'boolean' })
+      |  { const: true, type: 'boolean' }
+    const: should be equal to constant ({ allowedValue: true })
+      |  { const: true, type: 'boolean' }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.Object' },
+      |      { '$ref': '#/definitions/jsonschema.String' },
+      |      { '$ref': '#/definitions/jsonschema.SchemaArray' },
+      |      { '$ref': '#/definitions/jsonschema.Boolean' },
+      |      { '$ref': '#/definitions/jsonschema.Number' },
+      |      { '$ref': '#/definitions/jsonschema.Null' },
+      |      { '$ref': '#/definitions/jsonschema.AnyType' }
+      |    ]
+      |  }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.Reference' },
+      |      { '$ref': '#/definitions/jsonschema.ConcreteSingletonSchema' }
+      |    ]
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      description: { type: 'string' },
+      |      oneOf: {
+      |        items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'array'
+      |      },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ 'oneOf' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      anyOf: {
+      |        items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'array'
+      |      },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ 'anyOf' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      allOf: {
+      |        items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'array'
+      |      },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ 'allOf' ],
+      |    type: 'object'
+      |  }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.SingletonSchema' },
+      |      { '$ref': '#/definitions/jsonschema.OneOf%3CSchema%3E' },
+      |      { '$ref': '#/definitions/jsonschema.AnyOf%3CSchema%3E' },
+      |      { '$ref': '#/definitions/jsonschema.AllOf%3CSchema%3E' }
+      |    ]
+      |  }
+us-west-2/aws-eks-cluster.json: .properties['EncryptionConfig']
+    {
+      type: 'array',
+      insertionOrder: false,
+      items: { '$ref': '#/definitions/EncryptionConfig', maxItems: 1 }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'type' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      '$ref': { type: 'string' },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ '$ref' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'insertionOrder' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      additionalProperties: {
+      |        anyOf: [ [Object], [Object] ],
+      |        default: true,
+      |        description: "additionalProperties validates all keys that aren't otherwise validated by properties or patternProperties"
+      |      },
+      |      description: { type: 'string' },
+      |      maxProperties: { type: 'number' },
+      |      minProperties: { type: 'number' },
+      |      patternProperties: {
+      |        additionalProperties: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'object'
+      |      },
+      |      required: {
+      |        description: 'Required keys in a map\n' +
+      |          '\n' +
+      |          "Doesn't really make a whole lot of sense, but this is used to support mixed map/record types.",
+      |        items: { type: 'string' },
+      |        type: 'array'
+      |      },
+      |      title: { type: 'string' },
+      |      type: { const: 'object', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'insertionOrder' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      additionalProperties: {
+      |        const: false,
+      |        description: 'FIXME: should be required but some service teams have omitted it.',
+      |        type: 'boolean'
+      |      },
+      |      description: { type: 'string' },
+      |      maxProperties: { type: 'number' },
+      |      minProperties: {
+      |        description: 'FIXME: these are weird but oh hey?',
+      |        type: 'number'
+      |      },
+      |      properties: { '$ref': '#/definitions/jsonschema.ObjectProperties' },
+      |      required: { items: { type: 'string' }, type: 'array' },
+      |      title: { type: 'string' },
+      |      type: { const: 'object', type: 'string' }
+      |    },
+      |    required: [ 'type', 'properties' ],
+      |    type: 'object'
+      |  }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.MapLikeObject' },
+      |      { '$ref': '#/definitions/jsonschema.RecordLikeObject' }
+      |    ]
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'insertionOrder' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      const: { type: 'string' },
+      |      default: { type: 'string' },
+      |      description: { type: 'string' },
+      |      enum: { items: { type: 'string' }, type: 'array' },
+      |      examples: { items: { type: 'string' }, type: 'array' },
+      |      format: { enum: [ 'date-time', 'uri', 'timestamp' ], type: 'string' },
+      |      maxLength: { type: 'number' },
+      |      minLength: { type: 'number' },
+      |      pattern: { type: 'string' },
+      |      title: { type: 'string' },
+      |      type: { const: 'string', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'insertionOrder' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      default: { type: 'boolean' },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' },
+      |      type: { const: 'boolean', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'insertionOrder' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      default: { type: 'number' },
+      |      description: { type: 'string' },
+      |      enum: { items: { type: 'number' }, type: 'array' },
+      |      format: { enum: [ 'int64', 'double' ], type: 'string' },
+      |      maximum: { type: 'number' },
+      |      minimum: { type: 'number' },
+      |      multipleOf: { type: 'number' },
+      |      title: { type: 'string' },
+      |      type: { enum: [ 'number', 'integer' ], type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'insertionOrder' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' },
+      |      type: { const: 'null', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    type: should be boolean ({ type: 'boolean' })
+      |  { const: true, type: 'boolean' }
+    const: should be equal to constant ({ allowedValue: true })
+      |  { const: true, type: 'boolean' }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.Object' },
+      |      { '$ref': '#/definitions/jsonschema.String' },
+      |      { '$ref': '#/definitions/jsonschema.SchemaArray' },
+      |      { '$ref': '#/definitions/jsonschema.Boolean' },
+      |      { '$ref': '#/definitions/jsonschema.Number' },
+      |      { '$ref': '#/definitions/jsonschema.Null' },
+      |      { '$ref': '#/definitions/jsonschema.AnyType' }
+      |    ]
+      |  }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.Reference' },
+      |      { '$ref': '#/definitions/jsonschema.ConcreteSingletonSchema' }
+      |    ]
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'type' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      description: { type: 'string' },
+      |      oneOf: {
+      |        items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'array'
+      |      },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ 'oneOf' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'type' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      anyOf: {
+      |        items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'array'
+      |      },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ 'anyOf' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'type' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      allOf: {
+      |        items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'array'
+      |      },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ 'allOf' ],
+      |    type: 'object'
+      |  }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.SingletonSchema' },
+      |      { '$ref': '#/definitions/jsonschema.OneOf%3CSchema%3E' },
+      |      { '$ref': '#/definitions/jsonschema.AnyOf%3CSchema%3E' },
+      |      { '$ref': '#/definitions/jsonschema.AllOf%3CSchema%3E' }
+      |    ]
+      |  }
+us-west-2/aws-eks-fargateprofile.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          ClusterName: { '$ref': 'resource-schema.json#/properties/ClusterName' }
+        },
+        required: [ 'ClusterName' ],
+        type: 'object'
+      },
+      permissions: [ 'eks:ListFargateProfiles' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-eks-cluster.json: .properties['EncryptionConfig'].items
+    { '$ref': '#/definitions/EncryptionConfig', maxItems: 1 }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'maxItems' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      '$ref': { type: 'string' },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ '$ref' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      additionalProperties: {
+      |        anyOf: [ [Object], [Object] ],
+      |        default: true,
+      |        description: "additionalProperties validates all keys that aren't otherwise validated by properties or patternProperties"
+      |      },
+      |      description: { type: 'string' },
+      |      maxProperties: { type: 'number' },
+      |      minProperties: { type: 'number' },
+      |      patternProperties: {
+      |        additionalProperties: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'object'
+      |      },
+      |      required: {
+      |        description: 'Required keys in a map\n' +
+      |          '\n' +
+      |          "Doesn't really make a whole lot of sense, but this is used to support mixed map/record types.",
+      |        items: { type: 'string' },
+      |        type: 'array'
+      |      },
+      |      title: { type: 'string' },
+      |      type: { const: 'object', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      additionalProperties: {
+      |        const: false,
+      |        description: 'FIXME: should be required but some service teams have omitted it.',
+      |        type: 'boolean'
+      |      },
+      |      description: { type: 'string' },
+      |      maxProperties: { type: 'number' },
+      |      minProperties: {
+      |        description: 'FIXME: these are weird but oh hey?',
+      |        type: 'number'
+      |      },
+      |      properties: { '$ref': '#/definitions/jsonschema.ObjectProperties' },
+      |      required: { items: { type: 'string' }, type: 'array' },
+      |      title: { type: 'string' },
+      |      type: { const: 'object', type: 'string' }
+      |    },
+      |    required: [ 'type', 'properties' ],
+      |    type: 'object'
+      |  }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.MapLikeObject' },
+      |      { '$ref': '#/definitions/jsonschema.RecordLikeObject' }
+      |    ]
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      const: { type: 'string' },
+      |      default: { type: 'string' },
+      |      description: { type: 'string' },
+      |      enum: { items: { type: 'string' }, type: 'array' },
+      |      examples: { items: { type: 'string' }, type: 'array' },
+      |      format: { enum: [ 'date-time', 'uri', 'timestamp' ], type: 'string' },
+      |      maxLength: { type: 'number' },
+      |      minLength: { type: 'number' },
+      |      pattern: { type: 'string' },
+      |      title: { type: 'string' },
+      |      type: { const: 'string', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      arrayType: {
+      |        description: 'Does this array describe full reality?\n' +
+      |          '\n' +
+      |          '- If `Standard`, real elements must be exactly equal to the given array.\n' +
+      |          '- If `AttributeList`, the real array may be a superset of the given array.',
+      |        enum: [ 'AttributeList', 'Standard' ],
+      |        type: 'string'
+      |      },
+      |      default: { items: {}, type: 'array' },
+      |      description: { type: 'string' },
+      |      examples: { items: {}, type: 'array' },
+      |      insertionOrder: {
+      |        description: 'Whether to treat the order as significant\n' +
+      |          '\n' +
+      |          'In other words, does this array model a "sequence" or a "multiset".\n' +
+      |          '\n' +
+      |          '- `true` (default): order is significant, the array is a sequence.\n' +
+      |          '- `false`: order is insignificant, the array is a set.',
+      |        type: 'boolean'
+      |      },
+      |      items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |      maxItems: { type: 'number' },
+      |      minItems: { type: 'number' },
+      |      title: { type: 'string' },
+      |      type: { const: 'array', type: 'string' },
+      |      uniqueItems: { type: 'boolean' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      default: { type: 'boolean' },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' },
+      |      type: { const: 'boolean', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      default: { type: 'number' },
+      |      description: { type: 'string' },
+      |      enum: { items: { type: 'number' }, type: 'array' },
+      |      format: { enum: [ 'int64', 'double' ], type: 'string' },
+      |      maximum: { type: 'number' },
+      |      minimum: { type: 'number' },
+      |      multipleOf: { type: 'number' },
+      |      title: { type: 'string' },
+      |      type: { enum: [ 'number', 'integer' ], type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' },
+      |      type: { const: 'null', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    type: should be boolean ({ type: 'boolean' })
+      |  { const: true, type: 'boolean' }
+    const: should be equal to constant ({ allowedValue: true })
+      |  { const: true, type: 'boolean' }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.Object' },
+      |      { '$ref': '#/definitions/jsonschema.String' },
+      |      { '$ref': '#/definitions/jsonschema.SchemaArray' },
+      |      { '$ref': '#/definitions/jsonschema.Boolean' },
+      |      { '$ref': '#/definitions/jsonschema.Number' },
+      |      { '$ref': '#/definitions/jsonschema.Null' },
+      |      { '$ref': '#/definitions/jsonschema.AnyType' }
+      |    ]
+      |  }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.Reference' },
+      |      { '$ref': '#/definitions/jsonschema.ConcreteSingletonSchema' }
+      |    ]
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      description: { type: 'string' },
+      |      oneOf: {
+      |        items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'array'
+      |      },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ 'oneOf' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      anyOf: {
+      |        items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'array'
+      |      },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ 'anyOf' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: '$ref' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      allOf: {
+      |        items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'array'
+      |      },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ 'allOf' ],
+      |    type: 'object'
+      |  }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.SingletonSchema' },
+      |      { '$ref': '#/definitions/jsonschema.OneOf%3CSchema%3E' },
+      |      { '$ref': '#/definitions/jsonschema.AnyOf%3CSchema%3E' },
+      |      { '$ref': '#/definitions/jsonschema.AllOf%3CSchema%3E' }
+      |    ]
+      |  }
+us-east-1/aws-eks-cluster.json: .properties['EncryptionConfig']
+    {
+      type: 'array',
+      insertionOrder: false,
+      items: { '$ref': '#/definitions/EncryptionConfig', maxItems: 1 }
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'type' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      '$ref': { type: 'string' },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ '$ref' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'insertionOrder' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      additionalProperties: {
+      |        anyOf: [ [Object], [Object] ],
+      |        default: true,
+      |        description: "additionalProperties validates all keys that aren't otherwise validated by properties or patternProperties"
+      |      },
+      |      description: { type: 'string' },
+      |      maxProperties: { type: 'number' },
+      |      minProperties: { type: 'number' },
+      |      patternProperties: {
+      |        additionalProperties: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'object'
+      |      },
+      |      required: {
+      |        description: 'Required keys in a map\n' +
+      |          '\n' +
+      |          "Doesn't really make a whole lot of sense, but this is used to support mixed map/record types.",
+      |        items: { type: 'string' },
+      |        type: 'array'
+      |      },
+      |      title: { type: 'string' },
+      |      type: { const: 'object', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'insertionOrder' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      additionalProperties: {
+      |        const: false,
+      |        description: 'FIXME: should be required but some service teams have omitted it.',
+      |        type: 'boolean'
+      |      },
+      |      description: { type: 'string' },
+      |      maxProperties: { type: 'number' },
+      |      minProperties: {
+      |        description: 'FIXME: these are weird but oh hey?',
+      |        type: 'number'
+      |      },
+      |      properties: { '$ref': '#/definitions/jsonschema.ObjectProperties' },
+      |      required: { items: { type: 'string' }, type: 'array' },
+      |      title: { type: 'string' },
+      |      type: { const: 'object', type: 'string' }
+      |    },
+      |    required: [ 'type', 'properties' ],
+      |    type: 'object'
+      |  }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.MapLikeObject' },
+      |      { '$ref': '#/definitions/jsonschema.RecordLikeObject' }
+      |    ]
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'insertionOrder' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      const: { type: 'string' },
+      |      default: { type: 'string' },
+      |      description: { type: 'string' },
+      |      enum: { items: { type: 'string' }, type: 'array' },
+      |      examples: { items: { type: 'string' }, type: 'array' },
+      |      format: { enum: [ 'date-time', 'uri', 'timestamp' ], type: 'string' },
+      |      maxLength: { type: 'number' },
+      |      minLength: { type: 'number' },
+      |      pattern: { type: 'string' },
+      |      title: { type: 'string' },
+      |      type: { const: 'string', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'insertionOrder' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      default: { type: 'boolean' },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' },
+      |      type: { const: 'boolean', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'insertionOrder' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      default: { type: 'number' },
+      |      description: { type: 'string' },
+      |      enum: { items: { type: 'number' }, type: 'array' },
+      |      format: { enum: [ 'int64', 'double' ], type: 'string' },
+      |      maximum: { type: 'number' },
+      |      minimum: { type: 'number' },
+      |      multipleOf: { type: 'number' },
+      |      title: { type: 'string' },
+      |      type: { enum: [ 'number', 'integer' ], type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'insertionOrder' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' },
+      |      type: { const: 'null', type: 'string' }
+      |    },
+      |    required: [ 'type' ],
+      |    type: 'object'
+      |  }
+    type: should be boolean ({ type: 'boolean' })
+      |  { const: true, type: 'boolean' }
+    const: should be equal to constant ({ allowedValue: true })
+      |  { const: true, type: 'boolean' }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.Object' },
+      |      { '$ref': '#/definitions/jsonschema.String' },
+      |      { '$ref': '#/definitions/jsonschema.SchemaArray' },
+      |      { '$ref': '#/definitions/jsonschema.Boolean' },
+      |      { '$ref': '#/definitions/jsonschema.Number' },
+      |      { '$ref': '#/definitions/jsonschema.Null' },
+      |      { '$ref': '#/definitions/jsonschema.AnyType' }
+      |    ]
+      |  }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.Reference' },
+      |      { '$ref': '#/definitions/jsonschema.ConcreteSingletonSchema' }
+      |    ]
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'type' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      description: { type: 'string' },
+      |      oneOf: {
+      |        items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'array'
+      |      },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ 'oneOf' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'type' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      anyOf: {
+      |        items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'array'
+      |      },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ 'anyOf' ],
+      |    type: 'object'
+      |  }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'type' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      '$comment': { type: 'string' },
+      |      allOf: {
+      |        items: { '$ref': '#/definitions/jsonschema.Schema' },
+      |        type: 'array'
+      |      },
+      |      description: { type: 'string' },
+      |      title: { type: 'string' }
+      |    },
+      |    required: [ 'allOf' ],
+      |    type: 'object'
+      |  }
+    anyOf: should match some schema in anyOf ({})
+      |  {
+      |    anyOf: [
+      |      { '$ref': '#/definitions/jsonschema.SingletonSchema' },
+      |      { '$ref': '#/definitions/jsonschema.OneOf%3CSchema%3E' },
+      |      { '$ref': '#/definitions/jsonschema.AnyOf%3CSchema%3E' },
+      |      { '$ref': '#/definitions/jsonschema.AllOf%3CSchema%3E' }
+      |    ]
+      |  }
+us-east-1/aws-eks-fargateprofile.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          ClusterName: { '$ref': 'resource-schema.json#/properties/ClusterName' }
+        },
+        required: [ 'ClusterName' ],
+        type: 'object'
+      },
+      permissions: [ 'eks:ListFargateProfiles' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+
+    *** patch ***
+
+us-east-2/aws-eks-cluster.json
+--------------------------------
+/definitions/ResourcesVpcConfig/properties/PublicAccessCidrs/items: minItems does not apply to type: 'string'
+    {
+      "definitions": {
+        "ResourcesVpcConfig": {
+          "properties": {
+            "PublicAccessCidrs": {
+              "items": {
+                "type": "string"
+[-]             "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-eks-cluster.json
+--------------------------------
+/definitions/ResourcesVpcConfig/properties/SecurityGroupIds/items: minItems does not apply to type: 'string'
+    {
+      "definitions": {
+        "ResourcesVpcConfig": {
+          "properties": {
+            "SecurityGroupIds": {
+              "items": {
+                "type": "string"
+[-]             "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-eks-cluster.json
+--------------------------------
+/definitions/ResourcesVpcConfig/properties/SubnetIds/items: minItems does not apply to type: 'string'
+    {
+      "definitions": {
+        "ResourcesVpcConfig": {
+          "properties": {
+            "SubnetIds": {
+              "items": {
+                "type": "string"
+[-]             "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-eks-cluster.json
+--------------------------------
+/definitions/OutpostConfig/properties/OutpostArns/items: minItems does not apply to type: 'string'
+    {
+      "definitions": {
+        "OutpostConfig": {
+          "properties": {
+            "OutpostArns": {
+              "items": {
+                "type": "string"
+[-]             "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-eks-cluster.json
+--------------------------------
+/definitions/ResourcesVpcConfig/properties/PublicAccessCidrs/items: minItems does not apply to type: 'string'
+    {
+      "definitions": {
+        "ResourcesVpcConfig": {
+          "properties": {
+            "PublicAccessCidrs": {
+              "items": {
+                "type": "string"
+[-]             "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-eks-cluster.json
+--------------------------------
+/definitions/ResourcesVpcConfig/properties/SecurityGroupIds/items: minItems does not apply to type: 'string'
+    {
+      "definitions": {
+        "ResourcesVpcConfig": {
+          "properties": {
+            "SecurityGroupIds": {
+              "items": {
+                "type": "string"
+[-]             "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-eks-cluster.json
+--------------------------------
+/definitions/ResourcesVpcConfig/properties/SubnetIds/items: minItems does not apply to type: 'string'
+    {
+      "definitions": {
+        "ResourcesVpcConfig": {
+          "properties": {
+            "SubnetIds": {
+              "items": {
+                "type": "string"
+[-]             "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-eks-cluster.json
+--------------------------------
+/definitions/OutpostConfig/properties/OutpostArns/items: minItems does not apply to type: 'string'
+    {
+      "definitions": {
+        "OutpostConfig": {
+          "properties": {
+            "OutpostArns": {
+              "items": {
+                "type": "string"
+[-]             "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-eks-cluster.json
+--------------------------------
+/definitions/ResourcesVpcConfig/properties/PublicAccessCidrs/items: minItems does not apply to type: 'string'
+    {
+      "definitions": {
+        "ResourcesVpcConfig": {
+          "properties": {
+            "PublicAccessCidrs": {
+              "items": {
+                "type": "string"
+[-]             "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-eks-cluster.json
+--------------------------------
+/definitions/ResourcesVpcConfig/properties/SecurityGroupIds/items: minItems does not apply to type: 'string'
+    {
+      "definitions": {
+        "ResourcesVpcConfig": {
+          "properties": {
+            "SecurityGroupIds": {
+              "items": {
+                "type": "string"
+[-]             "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-eks-cluster.json
+--------------------------------
+/definitions/ResourcesVpcConfig/properties/SubnetIds/items: minItems does not apply to type: 'string'
+    {
+      "definitions": {
+        "ResourcesVpcConfig": {
+          "properties": {
+            "SubnetIds": {
+              "items": {
+                "type": "string"
+[-]             "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-eks-cluster.json
+--------------------------------
+/definitions/OutpostConfig/properties/OutpostArns/items: minItems does not apply to type: 'string'
+    {
+      "definitions": {
+        "OutpostConfig": {
+          "properties": {
+            "OutpostArns": {
+              "items": {
+                "type": "string"
+[-]             "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    }

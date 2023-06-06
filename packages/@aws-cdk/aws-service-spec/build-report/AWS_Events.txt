@@ -1,0 +1,236 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_Events:
+
+    *** interpreting ***
+
+AWS::Events::Connection: property AuthParameters: Ref AuthParameters is a union of objects. Merging into a single type.
+
+    *** patch ***
+
+us-east-2/aws-events-apidestination.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Events::ApiDestination"
+      "description": "Resource Type definition for AWS::Events::ApiDestination."
+      "properties": { ... }
+      "additionalProperties": false
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-events-archive.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Events::Archive"
+      "description": "Resource Type definition for AWS::Events::Archive"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-events-connection.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Events::Connection"
+      "description": "Resource Type definition for AWS::Events::Connection."
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "writeOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-events-eventbuspolicy.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Events::EventBusPolicy"
+      "description": "Resource Type definition for AWS::Events::EventBusPolicy"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-events-rule.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Events::Rule"
+      "description": "Resource Type definition for AWS::Events::Rule"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-events-apidestination.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Events::ApiDestination"
+      "description": "Resource Type definition for AWS::Events::ApiDestination."
+      "properties": { ... }
+      "additionalProperties": false
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-events-archive.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Events::Archive"
+      "description": "Resource Type definition for AWS::Events::Archive"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-events-connection.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Events::Connection"
+      "description": "Resource Type definition for AWS::Events::Connection."
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "writeOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-events-eventbuspolicy.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Events::EventBusPolicy"
+      "description": "Resource Type definition for AWS::Events::EventBusPolicy"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-events-rule.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Events::Rule"
+      "description": "Resource Type definition for AWS::Events::Rule"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-events-apidestination.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Events::ApiDestination"
+      "description": "Resource Type definition for AWS::Events::ApiDestination."
+      "properties": { ... }
+      "additionalProperties": false
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-events-archive.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Events::Archive"
+      "description": "Resource Type definition for AWS::Events::Archive"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-events-connection.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Events::Connection"
+      "description": "Resource Type definition for AWS::Events::Connection."
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "writeOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-events-eventbuspolicy.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Events::EventBusPolicy"
+      "description": "Resource Type definition for AWS::Events::EventBusPolicy"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-events-rule.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Events::Rule"
+      "description": "Resource Type definition for AWS::Events::Rule"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }

@@ -1,0 +1,499 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_Lambda:
+
+    *** patch ***
+
+us-east-2/aws-lambda-alias.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::Alias"
+      "description": "Resource Type definition for AWS::Lambda::Alias"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-lambda-codesigningconfig.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::CodeSigningConfig"
+      "description": "Resource Type definition for AWS::Lambda::CodeSigningConfig."
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-lambda-eventinvokeconfig.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::EventInvokeConfig"
+      "description": "Resource Type definition for AWS::Lambda::EventInvokeConfig"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-lambda-eventsourcemapping.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::EventSourceMapping"
+      "description": "Resource Type definition for AWS::Lambda::EventSourceMapping"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-2/aws-lambda-eventsourcemapping.json
+--------------------------------
+/properties/FunctionResponseTypes: array lengths are specified using maxItems, not maxLength
+    {
+      "properties": {
+        "FunctionResponseTypes": {
+          "description": "(Streams) A list of response types supported by the function."
+          "type": "array"
+          "uniqueItems": true
+          "items": { ... }
+          "minLength": 0
+[-]       "maxLength": 1
+[+]       "maxItems": 1
+        }
+      }
+    }
+us-east-2/aws-lambda-eventsourcemapping.json
+--------------------------------
+/properties/FunctionResponseTypes: minLength does not apply to type: 'array'
+    {
+      "properties": {
+        "FunctionResponseTypes": {
+          "description": "(Streams) A list of response types supported by the function."
+          "type": "array"
+          "uniqueItems": true
+          "items": { ... }
+[-]       "minLength": 0
+          "maxLength": 1
+        }
+      }
+    }
+us-east-2/aws-lambda-eventsourcemapping.json
+--------------------------------
+/properties/FunctionResponseTypes: maxLength does not apply to type: 'array'
+    {
+      "properties": {
+        "FunctionResponseTypes": {
+          "description": "(Streams) A list of response types supported by the function."
+          "type": "array"
+          "uniqueItems": true
+          "items": { ... }
+          "minLength": 0
+[-]       "maxLength": 1
+        }
+      }
+    }
+us-east-2/aws-lambda-layerversion.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::LayerVersion"
+      "description": "Resource Type definition for AWS::Lambda::LayerVersion"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-lambda-layerversionpermission.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::LayerVersionPermission"
+      "description": "Resource Type definition for AWS::Lambda::LayerVersionPermission"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-lambda-permission.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::Permission"
+      "description": "Resource Type definition for AWS::Lambda::Permission"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-lambda-version.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::Version"
+      "description": "Resource Type definition for AWS::Lambda::Version"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-lambda-alias.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::Alias"
+      "description": "Resource Type definition for AWS::Lambda::Alias"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-lambda-codesigningconfig.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::CodeSigningConfig"
+      "description": "Resource Type definition for AWS::Lambda::CodeSigningConfig."
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-lambda-eventinvokeconfig.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::EventInvokeConfig"
+      "description": "Resource Type definition for AWS::Lambda::EventInvokeConfig"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-lambda-eventsourcemapping.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::EventSourceMapping"
+      "description": "Resource Type definition for AWS::Lambda::EventSourceMapping"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-lambda-eventsourcemapping.json
+--------------------------------
+/properties/FunctionResponseTypes: array lengths are specified using maxItems, not maxLength
+    {
+      "properties": {
+        "FunctionResponseTypes": {
+          "description": "(Streams) A list of response types supported by the function."
+          "type": "array"
+          "uniqueItems": true
+          "items": { ... }
+          "minLength": 0
+[-]       "maxLength": 1
+[+]       "maxItems": 1
+        }
+      }
+    }
+us-west-2/aws-lambda-eventsourcemapping.json
+--------------------------------
+/properties/FunctionResponseTypes: minLength does not apply to type: 'array'
+    {
+      "properties": {
+        "FunctionResponseTypes": {
+          "description": "(Streams) A list of response types supported by the function."
+          "type": "array"
+          "uniqueItems": true
+          "items": { ... }
+[-]       "minLength": 0
+          "maxLength": 1
+        }
+      }
+    }
+us-west-2/aws-lambda-eventsourcemapping.json
+--------------------------------
+/properties/FunctionResponseTypes: maxLength does not apply to type: 'array'
+    {
+      "properties": {
+        "FunctionResponseTypes": {
+          "description": "(Streams) A list of response types supported by the function."
+          "type": "array"
+          "uniqueItems": true
+          "items": { ... }
+          "minLength": 0
+[-]       "maxLength": 1
+        }
+      }
+    }
+us-west-2/aws-lambda-layerversion.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::LayerVersion"
+      "description": "Resource Type definition for AWS::Lambda::LayerVersion"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-lambda-layerversionpermission.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::LayerVersionPermission"
+      "description": "Resource Type definition for AWS::Lambda::LayerVersionPermission"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-lambda-permission.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::Permission"
+      "description": "Resource Type definition for AWS::Lambda::Permission"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-lambda-version.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::Version"
+      "description": "Resource Type definition for AWS::Lambda::Version"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-lambda-alias.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::Alias"
+      "description": "Resource Type definition for AWS::Lambda::Alias"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-lambda-codesigningconfig.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::CodeSigningConfig"
+      "description": "Resource Type definition for AWS::Lambda::CodeSigningConfig."
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-lambda-eventinvokeconfig.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::EventInvokeConfig"
+      "description": "Resource Type definition for AWS::Lambda::EventInvokeConfig"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-lambda-eventsourcemapping.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::EventSourceMapping"
+      "description": "Resource Type definition for AWS::Lambda::EventSourceMapping"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-lambda-eventsourcemapping.json
+--------------------------------
+/properties/FunctionResponseTypes: array lengths are specified using maxItems, not maxLength
+    {
+      "properties": {
+        "FunctionResponseTypes": {
+          "description": "(Streams) A list of response types supported by the function."
+          "type": "array"
+          "uniqueItems": true
+          "items": { ... }
+          "minLength": 0
+[-]       "maxLength": 1
+[+]       "maxItems": 1
+        }
+      }
+    }
+us-east-1/aws-lambda-eventsourcemapping.json
+--------------------------------
+/properties/FunctionResponseTypes: minLength does not apply to type: 'array'
+    {
+      "properties": {
+        "FunctionResponseTypes": {
+          "description": "(Streams) A list of response types supported by the function."
+          "type": "array"
+          "uniqueItems": true
+          "items": { ... }
+[-]       "minLength": 0
+          "maxLength": 1
+        }
+      }
+    }
+us-east-1/aws-lambda-eventsourcemapping.json
+--------------------------------
+/properties/FunctionResponseTypes: maxLength does not apply to type: 'array'
+    {
+      "properties": {
+        "FunctionResponseTypes": {
+          "description": "(Streams) A list of response types supported by the function."
+          "type": "array"
+          "uniqueItems": true
+          "items": { ... }
+          "minLength": 0
+[-]       "maxLength": 1
+        }
+      }
+    }
+us-east-1/aws-lambda-layerversion.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::LayerVersion"
+      "description": "Resource Type definition for AWS::Lambda::LayerVersion"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-lambda-layerversionpermission.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::LayerVersionPermission"
+      "description": "Resource Type definition for AWS::Lambda::LayerVersionPermission"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-lambda-permission.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::Permission"
+      "description": "Resource Type definition for AWS::Lambda::Permission"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-lambda-version.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::Lambda::Version"
+      "description": "Resource Type definition for AWS::Lambda::Version"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }

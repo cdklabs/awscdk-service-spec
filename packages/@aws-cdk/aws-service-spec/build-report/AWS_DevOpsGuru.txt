@@ -1,0 +1,55 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_DevOpsGuru:
+
+    *** patch ***
+
+us-east-2/aws-devopsguru-notificationchannel.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::DevOpsGuru::NotificationChannel"
+      "description": "This resource schema represents the NotificationChannel resource in the Amazon DevOps Guru."
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-devops-guru"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-west-2/aws-devopsguru-notificationchannel.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::DevOpsGuru::NotificationChannel"
+      "description": "This resource schema represents the NotificationChannel resource in the Amazon DevOps Guru."
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-devops-guru"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }
+us-east-1/aws-devopsguru-notificationchannel.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::DevOpsGuru::NotificationChannel"
+      "description": "This resource schema represents the NotificationChannel resource in the Amazon DevOps Guru."
+      "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-devops-guru"
+      "definitions": { ... }
+      "properties": { ... }
+      "additionalProperties": false
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "handlers": { ... }
+[+]   "taggable": false
+    }

@@ -1,0 +1,40 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_SDB:
+
+    *** patch ***
+
+us-east-2/aws-sdb-domain.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::SDB::Domain"
+      "description": "Resource Type definition for AWS::SDB::Domain"
+      "additionalProperties": false
+      "properties": { ... }
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-sdb-domain.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::SDB::Domain"
+      "description": "Resource Type definition for AWS::SDB::Domain"
+      "additionalProperties": false
+      "properties": { ... }
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-sdb-domain.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::SDB::Domain"
+      "description": "Resource Type definition for AWS::SDB::Domain"
+      "additionalProperties": false
+      "properties": { ... }
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }

@@ -1,0 +1,7 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_IoTFleetWise:
+
+    *** interpreting ***
+
+AWS::IoTFleetWise::Campaign: property DataDestinationConfigs: Ref DataDestinationConfig is a union of objects. Merging into a single type.
+AWS::IoTFleetWise::Campaign: property CollectionScheme: Ref CollectionScheme is a union of objects. Merging into a single type.
+AWS::IoTFleetWise::SignalCatalog: property Nodes: Ref Node is a union of objects. Merging into a single type.

@@ -1,10 +1,11 @@
 import path from 'path';
+import { loadAwsServiceSpec } from '@aws-cdk/aws-service-spec';
 import { SpecDatabase } from '@aws-cdk/service-spec';
 import { TypeScriptRenderer } from '@cdklabs/typewriter';
 import * as fs from 'fs-extra';
 import { AstBuilder, ServiceModule } from './cdk/ast';
 import { ModuleImportLocations } from './cdk/cdk';
-import { getAllServices, getServicesByCloudFormationNamespace, loadDatabase } from './db';
+import { getAllServices, getServicesByCloudFormationNamespace } from './db';
 import { debug } from './log';
 import { PatternedString } from './naming/patterned-name';
 import { TsFileWriter } from './ts-file-writer';
@@ -119,7 +120,7 @@ export interface GenerateOutput {
  */
 export async function generate(modules: GenerateModuleMap, options: GenerateOptions) {
   enableDebug(options);
-  const db = await loadDatabase();
+  const db = await loadAwsServiceSpec();
   return generator(db, modules, options);
 }
 
@@ -131,7 +132,7 @@ export async function generate(modules: GenerateModuleMap, options: GenerateOpti
  */
 export async function generateAll(options: GenerateOptions) {
   enableDebug(options);
-  const db = await loadDatabase();
+  const db = await loadAwsServiceSpec();
   const services = await getAllServices(db);
 
   const modules: GenerateModuleMap = {};

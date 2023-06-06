@@ -1,0 +1,112 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_WorkSpaces:
+
+    *** patch ***
+
+us-west-2/aws-workspaces-connectionalias.json
+--------------------------------
+/properties/Associations: array lengths are specified using minItems, not minLength
+    {
+      "properties": {
+        "Associations": {
+          "type": "array"
+          "maxLength": 25
+[-]       "minLength": 1
+[+]       "minItems": 1
+          "items": { ... }
+        }
+      }
+    }
+us-west-2/aws-workspaces-connectionalias.json
+--------------------------------
+/properties/Associations: array lengths are specified using maxItems, not maxLength
+    {
+      "properties": {
+        "Associations": {
+          "type": "array"
+[-]       "maxLength": 25
+[+]       "maxItems": 25
+          "minLength": 1
+          "items": { ... }
+        }
+      }
+    }
+us-west-2/aws-workspaces-connectionalias.json
+--------------------------------
+/properties/Associations: maxLength does not apply to type: 'array'
+    {
+      "properties": {
+        "Associations": {
+          "type": "array"
+[-]       "maxLength": 25
+          "minLength": 1
+          "items": { ... }
+        }
+      }
+    }
+us-west-2/aws-workspaces-connectionalias.json
+--------------------------------
+/properties/Associations: minLength does not apply to type: 'array'
+    {
+      "properties": {
+        "Associations": {
+          "type": "array"
+          "maxLength": 25
+[-]       "minLength": 1
+          "items": { ... }
+        }
+      }
+    }
+us-east-1/aws-workspaces-connectionalias.json
+--------------------------------
+/properties/Associations: array lengths are specified using minItems, not minLength
+    {
+      "properties": {
+        "Associations": {
+          "type": "array"
+          "maxLength": 25
+[-]       "minLength": 1
+[+]       "minItems": 1
+          "items": { ... }
+        }
+      }
+    }
+us-east-1/aws-workspaces-connectionalias.json
+--------------------------------
+/properties/Associations: array lengths are specified using maxItems, not maxLength
+    {
+      "properties": {
+        "Associations": {
+          "type": "array"
+[-]       "maxLength": 25
+[+]       "maxItems": 25
+          "minLength": 1
+          "items": { ... }
+        }
+      }
+    }
+us-east-1/aws-workspaces-connectionalias.json
+--------------------------------
+/properties/Associations: maxLength does not apply to type: 'array'
+    {
+      "properties": {
+        "Associations": {
+          "type": "array"
+[-]       "maxLength": 25
+          "minLength": 1
+          "items": { ... }
+        }
+      }
+    }
+us-east-1/aws-workspaces-connectionalias.json
+--------------------------------
+/properties/Associations: minLength does not apply to type: 'array'
+    {
+      "properties": {
+        "Associations": {
+          "type": "array"
+          "maxLength": 25
+[-]       "minLength": 1
+          "items": { ... }
+        }
+      }
+    }

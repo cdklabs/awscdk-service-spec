@@ -1,0 +1,362 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_IoTTwinMaker:
+
+    *** interpreting ***
+
+AWS::IoTTwinMaker::ComponentType: attributes: no definition for: Status.Error.Message
+AWS::IoTTwinMaker::ComponentType: attributes: no definition for: Status.Error.Code
+AWS::IoTTwinMaker::Entity: attributes: no definition for: Status.Error.Message
+AWS::IoTTwinMaker::Entity: attributes: no definition for: Status.Error.Code
+
+    *** loading ***
+
+us-west-2/aws-iottwinmaker-componenttype.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          WorkspaceId: {
+            type: 'string',
+            '$ref': 'resource-schema.json#/properties/WorkspaceId'
+          }
+        },
+        required: [ 'WorkspaceId' ],
+        type: 'object'
+      },
+      permissions: [
+        'iottwinmaker:GetComponentType',
+        'iottwinmaker:GetWorkspace',
+        'iottwinmaker:ListComponentTypes',
+        'iottwinmaker:ListTagsForResource'
+      ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-iottwinmaker-entity.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          WorkspaceId: {
+            type: 'string',
+            '$ref': 'resource-schema.json#/properties/WorkspaceId'
+          }
+        },
+        required: [ 'WorkspaceId' ],
+        type: 'object'
+      },
+      permissions: [
+        'iottwinmaker:GetWorkspace',
+        'iottwinmaker:ListTagsForResource',
+        'iottwinmaker:GetEntity',
+        'iottwinmaker:ListEntities'
+      ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-iottwinmaker-scene.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          WorkspaceId: {
+            type: 'string',
+            '$ref': 'resource-schema.json#/properties/WorkspaceId'
+          }
+        },
+        required: [ 'WorkspaceId' ],
+        type: 'object'
+      },
+      permissions: [
+        'iottwinmaker:GetWorkspace',
+        'iottwinmaker:ListTagsForResource',
+        'iottwinmaker:ListScenes'
+      ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-iottwinmaker-syncjob.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          WorkspaceId: {
+            type: 'string',
+            '$ref': 'resource-schema.json#/properties/WorkspaceId'
+          }
+        },
+        required: [ 'WorkspaceId' ],
+        type: 'object'
+      },
+      permissions: [
+        'iottwinmaker:GetWorkspace',
+        'iottwinmaker:ListSyncJobs',
+        'iottwinmaker:ListTagsForResource'
+      ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-iottwinmaker-componenttype.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          WorkspaceId: {
+            type: 'string',
+            '$ref': 'resource-schema.json#/properties/WorkspaceId'
+          }
+        },
+        required: [ 'WorkspaceId' ],
+        type: 'object'
+      },
+      permissions: [
+        'iottwinmaker:GetComponentType',
+        'iottwinmaker:GetWorkspace',
+        'iottwinmaker:ListComponentTypes',
+        'iottwinmaker:ListTagsForResource'
+      ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-iottwinmaker-entity.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          WorkspaceId: {
+            type: 'string',
+            '$ref': 'resource-schema.json#/properties/WorkspaceId'
+          }
+        },
+        required: [ 'WorkspaceId' ],
+        type: 'object'
+      },
+      permissions: [
+        'iottwinmaker:GetWorkspace',
+        'iottwinmaker:ListTagsForResource',
+        'iottwinmaker:GetEntity',
+        'iottwinmaker:ListEntities'
+      ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-iottwinmaker-scene.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          WorkspaceId: {
+            type: 'string',
+            '$ref': 'resource-schema.json#/properties/WorkspaceId'
+          }
+        },
+        required: [ 'WorkspaceId' ],
+        type: 'object'
+      },
+      permissions: [
+        'iottwinmaker:GetWorkspace',
+        'iottwinmaker:ListTagsForResource',
+        'iottwinmaker:ListScenes'
+      ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-iottwinmaker-syncjob.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: {
+          WorkspaceId: {
+            type: 'string',
+            '$ref': 'resource-schema.json#/properties/WorkspaceId'
+          }
+        },
+        required: [ 'WorkspaceId' ],
+        type: 'object'
+      },
+      permissions: [
+        'iottwinmaker:GetWorkspace',
+        'iottwinmaker:ListSyncJobs',
+        'iottwinmaker:ListTagsForResource'
+      ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+
+    *** patch ***
+
+us-west-2/aws-iottwinmaker-scene.json
+--------------------------------
+/properties/SceneMetadata: minLength does not apply to type: 'object'
+    {
+      "properties": {
+        "SceneMetadata": {
+          "description": "A key-value pair of scene metadata for the scene."
+          "type": "object"
+          "patternProperties": { ... }
+[-]       "minLength": 0
+          "maxLength": 50
+          "additionalProperties": false
+        }
+      }
+    }
+us-west-2/aws-iottwinmaker-scene.json
+--------------------------------
+/properties/SceneMetadata: maxLength does not apply to type: 'object'
+    {
+      "properties": {
+        "SceneMetadata": {
+          "description": "A key-value pair of scene metadata for the scene."
+          "type": "object"
+          "patternProperties": { ... }
+          "minLength": 0
+[-]       "maxLength": 50
+          "additionalProperties": false
+        }
+      }
+    }
+us-west-2/aws-iottwinmaker-scene.json
+--------------------------------
+/properties/GeneratedSceneMetadata: minLength does not apply to type: 'object'
+    {
+      "properties": {
+        "GeneratedSceneMetadata": {
+          "description": "A key-value pair of generated scene metadata for the scene."
+          "type": "object"
+          "patternProperties": { ... }
+[-]       "minLength": 0
+          "maxLength": 50
+          "additionalProperties": false
+        }
+      }
+    }
+us-west-2/aws-iottwinmaker-scene.json
+--------------------------------
+/properties/GeneratedSceneMetadata: maxLength does not apply to type: 'object'
+    {
+      "properties": {
+        "GeneratedSceneMetadata": {
+          "description": "A key-value pair of generated scene metadata for the scene."
+          "type": "object"
+          "patternProperties": { ... }
+          "minLength": 0
+[-]       "maxLength": 50
+          "additionalProperties": false
+        }
+      }
+    }
+us-east-1/aws-iottwinmaker-scene.json
+--------------------------------
+/properties/SceneMetadata: minLength does not apply to type: 'object'
+    {
+      "properties": {
+        "SceneMetadata": {
+          "description": "A key-value pair of scene metadata for the scene."
+          "type": "object"
+          "patternProperties": { ... }
+[-]       "minLength": 0
+          "maxLength": 50
+          "additionalProperties": false
+        }
+      }
+    }
+us-east-1/aws-iottwinmaker-scene.json
+--------------------------------
+/properties/SceneMetadata: maxLength does not apply to type: 'object'
+    {
+      "properties": {
+        "SceneMetadata": {
+          "description": "A key-value pair of scene metadata for the scene."
+          "type": "object"
+          "patternProperties": { ... }
+          "minLength": 0
+[-]       "maxLength": 50
+          "additionalProperties": false
+        }
+      }
+    }
+us-east-1/aws-iottwinmaker-scene.json
+--------------------------------
+/properties/GeneratedSceneMetadata: minLength does not apply to type: 'object'
+    {
+      "properties": {
+        "GeneratedSceneMetadata": {
+          "description": "A key-value pair of generated scene metadata for the scene."
+          "type": "object"
+          "patternProperties": { ... }
+[-]       "minLength": 0
+          "maxLength": 50
+          "additionalProperties": false
+        }
+      }
+    }
+us-east-1/aws-iottwinmaker-scene.json
+--------------------------------
+/properties/GeneratedSceneMetadata: maxLength does not apply to type: 'object'
+    {
+      "properties": {
+        "GeneratedSceneMetadata": {
+          "description": "A key-value pair of generated scene metadata for the scene."
+          "type": "object"
+          "patternProperties": { ... }
+          "minLength": 0
+[-]       "maxLength": 50
+          "additionalProperties": false
+        }
+      }
+    }

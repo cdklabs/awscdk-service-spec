@@ -1,0 +1,6 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_M2:
+
+    *** interpreting ***
+
+AWS::M2::Application: property Definition: Ref Definition is a union of objects. Merging into a single type.
+AWS::M2::Environment: property StorageConfigurations: Ref StorageConfiguration is a union of objects. Merging into a single type.

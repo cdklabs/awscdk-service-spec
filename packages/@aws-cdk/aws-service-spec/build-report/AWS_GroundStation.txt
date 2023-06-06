@@ -1,0 +1,6 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_GroundStation:
+
+    *** interpreting ***
+
+AWS::GroundStation::DataflowEndpointGroup: property EndpointDetails: Ref EndpointDetails is a union of objects. Merging into a single type.
+AWS::GroundStation::MissionProfile: property StreamsKmsKey: Ref StreamsKmsKey is a union of objects. Merging into a single type.

@@ -1,0 +1,4861 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_QuickSight:
+
+    *** interpreting ***
+
+AWS::QuickSight::Dashboard: attributes: no definition for: DashboardError
+AWS::QuickSight::Template: attributes: no definition for: TemplateError
+AWS::QuickSight::Theme: attributes: no definition for: ThemeError
+
+    *** patch ***
+
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ArcAxisDisplayRange/properties/Min: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcAxisDisplayRange": {
+          "properties": {
+            "Min": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ArcAxisDisplayRange/properties/Max: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcAxisDisplayRange": {
+          "properties": {
+            "Max": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ArcConfiguration/properties/ArcAngle: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcConfiguration": {
+          "properties": {
+            "ArcAngle": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/AxisDisplayMinMaxRange/properties/Minimum: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisDisplayMinMaxRange": {
+          "properties": {
+            "Minimum": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/AxisDisplayMinMaxRange/properties/Maximum: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisDisplayMinMaxRange": {
+          "properties": {
+            "Maximum": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/AxisLinearScale/properties/StepCount: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLinearScale": {
+          "properties": {
+            "StepCount": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/AxisLinearScale/properties/StepSize: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLinearScale": {
+          "properties": {
+            "StepSize": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/AxisLogarithmicScale/properties/Base: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLogarithmicScale": {
+          "properties": {
+            "Base": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/AxisTickLabelOptions/properties/RotationAngle: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisTickLabelOptions": {
+          "properties": {
+            "RotationAngle": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/DataColor/properties/DataValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "DataColor": {
+          "properties": {
+            "DataValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/DecimalValueWhenUnsetConfiguration/properties/CustomValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "DecimalValueWhenUnsetConfiguration": {
+          "properties": {
+            "CustomValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ExcludePeriodConfiguration/properties/Amount: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ExcludePeriodConfiguration": {
+          "properties": {
+            "Amount": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ForecastComputation/properties/UpperBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "UpperBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ForecastComputation/properties/LowerBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "LowerBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ForecastComputation/properties/CustomSeasonalityValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "CustomSeasonalityValue": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 180
+              "minimum": 1
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/GradientStop/properties/DataValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "GradientStop": {
+          "properties": {
+            "DataValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/HistogramBinOptions/properties/StartValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "HistogramBinOptions": {
+          "properties": {
+            "StartValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/IntegerValueWhenUnsetConfiguration/properties/CustomValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "IntegerValueWhenUnsetConfiguration": {
+          "properties": {
+            "CustomValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ItemsLimitConfiguration/properties/ItemsLimit: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ItemsLimitConfiguration": {
+          "properties": {
+            "ItemsLimit": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/NumericEqualityFilter/properties/Value: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "NumericEqualityFilter": {
+          "properties": {
+            "Value": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/NumericRangeFilter/properties/IncludeMinimum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilter": {
+          "properties": {
+            "IncludeMinimum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/NumericRangeFilter/properties/IncludeMaximum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilter": {
+          "properties": {
+            "IncludeMaximum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/NumericRangeFilterValue/properties/StaticValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilterValue": {
+          "properties": {
+            "StaticValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/PaginationConfiguration/properties/PageSize: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PaginationConfiguration": {
+          "properties": {
+            "PageSize": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/PercentVisibleRange/properties/From: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PercentVisibleRange": {
+          "properties": {
+            "From": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 100
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/PercentVisibleRange/properties/To: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PercentVisibleRange": {
+          "properties": {
+            "To": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 100
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/RelativeDatesFilter/properties/RelativeDateValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "RelativeDatesFilter": {
+          "properties": {
+            "RelativeDateValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/TimeBasedForecastProperties/properties/UpperBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TimeBasedForecastProperties": {
+          "properties": {
+            "UpperBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/TimeBasedForecastProperties/properties/LowerBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TimeBasedForecastProperties": {
+          "properties": {
+            "LowerBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/TimeRangeFilter/properties/IncludeMinimum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "TimeRangeFilter": {
+          "properties": {
+            "IncludeMinimum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/TimeRangeFilter/properties/IncludeMaximum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "TimeRangeFilter": {
+          "properties": {
+            "IncludeMaximum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/TopBottomFilter/properties/Limit: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TopBottomFilter": {
+          "properties": {
+            "Limit": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ArcAxisDisplayRange/properties/Min: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcAxisDisplayRange": {
+          "properties": {
+            "Min": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ArcAxisDisplayRange/properties/Max: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcAxisDisplayRange": {
+          "properties": {
+            "Max": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ArcConfiguration/properties/ArcAngle: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcConfiguration": {
+          "properties": {
+            "ArcAngle": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/AxisDisplayMinMaxRange/properties/Minimum: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisDisplayMinMaxRange": {
+          "properties": {
+            "Minimum": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/AxisDisplayMinMaxRange/properties/Maximum: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisDisplayMinMaxRange": {
+          "properties": {
+            "Maximum": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/AxisLinearScale/properties/StepCount: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLinearScale": {
+          "properties": {
+            "StepCount": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/AxisLinearScale/properties/StepSize: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLinearScale": {
+          "properties": {
+            "StepSize": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/AxisLogarithmicScale/properties/Base: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLogarithmicScale": {
+          "properties": {
+            "Base": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/AxisTickLabelOptions/properties/RotationAngle: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisTickLabelOptions": {
+          "properties": {
+            "RotationAngle": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/DataColor/properties/DataValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "DataColor": {
+          "properties": {
+            "DataValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/DecimalValueWhenUnsetConfiguration/properties/CustomValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "DecimalValueWhenUnsetConfiguration": {
+          "properties": {
+            "CustomValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ExcludePeriodConfiguration/properties/Amount: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ExcludePeriodConfiguration": {
+          "properties": {
+            "Amount": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ForecastComputation/properties/UpperBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "UpperBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ForecastComputation/properties/LowerBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "LowerBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ForecastComputation/properties/CustomSeasonalityValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "CustomSeasonalityValue": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 180
+              "minimum": 1
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/GradientStop/properties/DataValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "GradientStop": {
+          "properties": {
+            "DataValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/HistogramBinOptions/properties/StartValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "HistogramBinOptions": {
+          "properties": {
+            "StartValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/IntegerValueWhenUnsetConfiguration/properties/CustomValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "IntegerValueWhenUnsetConfiguration": {
+          "properties": {
+            "CustomValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ItemsLimitConfiguration/properties/ItemsLimit: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ItemsLimitConfiguration": {
+          "properties": {
+            "ItemsLimit": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/NumericEqualityFilter/properties/Value: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "NumericEqualityFilter": {
+          "properties": {
+            "Value": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/NumericRangeFilter/properties/IncludeMinimum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilter": {
+          "properties": {
+            "IncludeMinimum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/NumericRangeFilter/properties/IncludeMaximum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilter": {
+          "properties": {
+            "IncludeMaximum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/NumericRangeFilterValue/properties/StaticValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilterValue": {
+          "properties": {
+            "StaticValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/PaginationConfiguration/properties/PageSize: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PaginationConfiguration": {
+          "properties": {
+            "PageSize": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/PercentVisibleRange/properties/From: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PercentVisibleRange": {
+          "properties": {
+            "From": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 100
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/PercentVisibleRange/properties/To: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PercentVisibleRange": {
+          "properties": {
+            "To": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 100
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/RelativeDatesFilter/properties/RelativeDateValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "RelativeDatesFilter": {
+          "properties": {
+            "RelativeDateValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/TimeBasedForecastProperties/properties/UpperBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TimeBasedForecastProperties": {
+          "properties": {
+            "UpperBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/TimeBasedForecastProperties/properties/LowerBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TimeBasedForecastProperties": {
+          "properties": {
+            "LowerBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/TimeRangeFilter/properties/IncludeMinimum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "TimeRangeFilter": {
+          "properties": {
+            "IncludeMinimum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/TimeRangeFilter/properties/IncludeMaximum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "TimeRangeFilter": {
+          "properties": {
+            "IncludeMaximum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/TopBottomFilter/properties/Limit: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TopBottomFilter": {
+          "properties": {
+            "Limit": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-dataset.json
+--------------------------------
+/properties/CreatedTime: prefer regexes in pattern
+    {
+      "properties": {
+        "CreatedTime": {
+          "type": "string"
+          "description": "<p>The time that this dataset was created.</p>"
+[-]       "format": "string"
+[+]       "pattern": "string"
+        }
+      }
+    }
+us-east-2/aws-quicksight-dataset.json
+--------------------------------
+/properties/CreatedTime: you probably did not mean the literal string "string"
+    {
+      "properties": {
+        "CreatedTime": {
+          "type": "string"
+          "description": "<p>The time that this dataset was created.</p>"
+[-]       "format": "string"
+        }
+      }
+    }
+us-east-2/aws-quicksight-dataset.json
+--------------------------------
+/properties/LastUpdatedTime: prefer regexes in pattern
+    {
+      "properties": {
+        "LastUpdatedTime": {
+          "type": "string"
+          "description": "<p>The last time that this dataset was updated.</p>"
+[-]       "format": "string"
+[+]       "pattern": "string"
+        }
+      }
+    }
+us-east-2/aws-quicksight-dataset.json
+--------------------------------
+/properties/LastUpdatedTime: you probably did not mean the literal string "string"
+    {
+      "properties": {
+        "LastUpdatedTime": {
+          "type": "string"
+          "description": "<p>The last time that this dataset was updated.</p>"
+[-]       "format": "string"
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/ArcAxisDisplayRange/properties/Min: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcAxisDisplayRange": {
+          "properties": {
+            "Min": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/ArcAxisDisplayRange/properties/Max: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcAxisDisplayRange": {
+          "properties": {
+            "Max": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/ArcConfiguration/properties/ArcAngle: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcConfiguration": {
+          "properties": {
+            "ArcAngle": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/AxisDisplayMinMaxRange/properties/Minimum: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisDisplayMinMaxRange": {
+          "properties": {
+            "Minimum": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/AxisDisplayMinMaxRange/properties/Maximum: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisDisplayMinMaxRange": {
+          "properties": {
+            "Maximum": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/AxisLinearScale/properties/StepCount: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLinearScale": {
+          "properties": {
+            "StepCount": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/AxisLinearScale/properties/StepSize: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLinearScale": {
+          "properties": {
+            "StepSize": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/AxisLogarithmicScale/properties/Base: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLogarithmicScale": {
+          "properties": {
+            "Base": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/AxisTickLabelOptions/properties/RotationAngle: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisTickLabelOptions": {
+          "properties": {
+            "RotationAngle": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/DataColor/properties/DataValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "DataColor": {
+          "properties": {
+            "DataValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/DecimalValueWhenUnsetConfiguration/properties/CustomValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "DecimalValueWhenUnsetConfiguration": {
+          "properties": {
+            "CustomValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/ExcludePeriodConfiguration/properties/Amount: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ExcludePeriodConfiguration": {
+          "properties": {
+            "Amount": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/ForecastComputation/properties/UpperBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "UpperBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/ForecastComputation/properties/LowerBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "LowerBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/ForecastComputation/properties/CustomSeasonalityValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "CustomSeasonalityValue": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 180
+              "minimum": 1
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/GradientStop/properties/DataValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "GradientStop": {
+          "properties": {
+            "DataValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/HistogramBinOptions/properties/StartValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "HistogramBinOptions": {
+          "properties": {
+            "StartValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/IntegerValueWhenUnsetConfiguration/properties/CustomValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "IntegerValueWhenUnsetConfiguration": {
+          "properties": {
+            "CustomValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/ItemsLimitConfiguration/properties/ItemsLimit: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ItemsLimitConfiguration": {
+          "properties": {
+            "ItemsLimit": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/NumericEqualityFilter/properties/Value: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "NumericEqualityFilter": {
+          "properties": {
+            "Value": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/NumericRangeFilter/properties/IncludeMinimum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilter": {
+          "properties": {
+            "IncludeMinimum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/NumericRangeFilter/properties/IncludeMaximum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilter": {
+          "properties": {
+            "IncludeMaximum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/NumericRangeFilterValue/properties/StaticValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilterValue": {
+          "properties": {
+            "StaticValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/PaginationConfiguration/properties/PageSize: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PaginationConfiguration": {
+          "properties": {
+            "PageSize": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/PercentVisibleRange/properties/From: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PercentVisibleRange": {
+          "properties": {
+            "From": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 100
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/PercentVisibleRange/properties/To: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PercentVisibleRange": {
+          "properties": {
+            "To": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 100
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/RelativeDatesFilter/properties/RelativeDateValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "RelativeDatesFilter": {
+          "properties": {
+            "RelativeDateValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/TimeBasedForecastProperties/properties/UpperBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TimeBasedForecastProperties": {
+          "properties": {
+            "UpperBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/TimeBasedForecastProperties/properties/LowerBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TimeBasedForecastProperties": {
+          "properties": {
+            "LowerBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/TimeRangeFilter/properties/IncludeMinimum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "TimeRangeFilter": {
+          "properties": {
+            "IncludeMinimum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/TimeRangeFilter/properties/IncludeMaximum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "TimeRangeFilter": {
+          "properties": {
+            "IncludeMaximum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-template.json
+--------------------------------
+/definitions/TopBottomFilter/properties/Limit: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TopBottomFilter": {
+          "properties": {
+            "Limit": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-theme.json
+--------------------------------
+/definitions/ThemeVersion/properties/CreatedTime: prefer regexes in pattern
+    {
+      "definitions": {
+        "ThemeVersion": {
+          "properties": {
+            "CreatedTime": {
+              "type": "string"
+              "description": "<p>The date and time that this theme version was created.</p>"
+[-]           "format": "string"
+[+]           "pattern": "string"
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-theme.json
+--------------------------------
+/definitions/ThemeVersion/properties/CreatedTime: you probably did not mean the literal string "string"
+    {
+      "definitions": {
+        "ThemeVersion": {
+          "properties": {
+            "CreatedTime": {
+              "type": "string"
+              "description": "<p>The date and time that this theme version was created.</p>"
+[-]           "format": "string"
+            }
+          }
+        }
+      }
+    }
+us-east-2/aws-quicksight-theme.json
+--------------------------------
+/properties/CreatedTime: prefer regexes in pattern
+    {
+      "properties": {
+        "CreatedTime": {
+          "type": "string"
+          "description": "<p>The date and time that the theme was created.</p>"
+[-]       "format": "string"
+[+]       "pattern": "string"
+        }
+      }
+    }
+us-east-2/aws-quicksight-theme.json
+--------------------------------
+/properties/CreatedTime: you probably did not mean the literal string "string"
+    {
+      "properties": {
+        "CreatedTime": {
+          "type": "string"
+          "description": "<p>The date and time that the theme was created.</p>"
+[-]       "format": "string"
+        }
+      }
+    }
+us-east-2/aws-quicksight-theme.json
+--------------------------------
+/properties/LastUpdatedTime: prefer regexes in pattern
+    {
+      "properties": {
+        "LastUpdatedTime": {
+          "type": "string"
+          "description": "<p>The date and time that the theme was last updated.</p>"
+[-]       "format": "string"
+[+]       "pattern": "string"
+        }
+      }
+    }
+us-east-2/aws-quicksight-theme.json
+--------------------------------
+/properties/LastUpdatedTime: you probably did not mean the literal string "string"
+    {
+      "properties": {
+        "LastUpdatedTime": {
+          "type": "string"
+          "description": "<p>The date and time that the theme was last updated.</p>"
+[-]       "format": "string"
+        }
+      }
+    }
+us-east-2/aws-quicksight-vpcconnection.json
+--------------------------------
+/definitions/SecurityGroupId: maxItems does not apply to type: 'string'
+    {
+      "definitions": {
+        "SecurityGroupId": {
+          "type": "string"
+          "pattern": "^sg-[0-9a-z]*$"
+[-]       "maxItems": 255
+          "minItems": 1
+        }
+      }
+    }
+us-east-2/aws-quicksight-vpcconnection.json
+--------------------------------
+/definitions/SecurityGroupId: minItems does not apply to type: 'string'
+    {
+      "definitions": {
+        "SecurityGroupId": {
+          "type": "string"
+          "pattern": "^sg-[0-9a-z]*$"
+          "maxItems": 255
+[-]       "minItems": 1
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ArcAxisDisplayRange/properties/Min: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcAxisDisplayRange": {
+          "properties": {
+            "Min": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ArcAxisDisplayRange/properties/Max: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcAxisDisplayRange": {
+          "properties": {
+            "Max": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ArcConfiguration/properties/ArcAngle: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcConfiguration": {
+          "properties": {
+            "ArcAngle": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/AxisDisplayMinMaxRange/properties/Minimum: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisDisplayMinMaxRange": {
+          "properties": {
+            "Minimum": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/AxisDisplayMinMaxRange/properties/Maximum: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisDisplayMinMaxRange": {
+          "properties": {
+            "Maximum": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/AxisLinearScale/properties/StepCount: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLinearScale": {
+          "properties": {
+            "StepCount": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/AxisLinearScale/properties/StepSize: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLinearScale": {
+          "properties": {
+            "StepSize": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/AxisLogarithmicScale/properties/Base: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLogarithmicScale": {
+          "properties": {
+            "Base": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/AxisTickLabelOptions/properties/RotationAngle: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisTickLabelOptions": {
+          "properties": {
+            "RotationAngle": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/DataColor/properties/DataValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "DataColor": {
+          "properties": {
+            "DataValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/DecimalValueWhenUnsetConfiguration/properties/CustomValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "DecimalValueWhenUnsetConfiguration": {
+          "properties": {
+            "CustomValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ExcludePeriodConfiguration/properties/Amount: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ExcludePeriodConfiguration": {
+          "properties": {
+            "Amount": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ForecastComputation/properties/UpperBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "UpperBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ForecastComputation/properties/LowerBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "LowerBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ForecastComputation/properties/CustomSeasonalityValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "CustomSeasonalityValue": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 180
+              "minimum": 1
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/GradientStop/properties/DataValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "GradientStop": {
+          "properties": {
+            "DataValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/HistogramBinOptions/properties/StartValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "HistogramBinOptions": {
+          "properties": {
+            "StartValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/IntegerValueWhenUnsetConfiguration/properties/CustomValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "IntegerValueWhenUnsetConfiguration": {
+          "properties": {
+            "CustomValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ItemsLimitConfiguration/properties/ItemsLimit: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ItemsLimitConfiguration": {
+          "properties": {
+            "ItemsLimit": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/NumericEqualityFilter/properties/Value: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "NumericEqualityFilter": {
+          "properties": {
+            "Value": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/NumericRangeFilter/properties/IncludeMinimum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilter": {
+          "properties": {
+            "IncludeMinimum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/NumericRangeFilter/properties/IncludeMaximum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilter": {
+          "properties": {
+            "IncludeMaximum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/NumericRangeFilterValue/properties/StaticValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilterValue": {
+          "properties": {
+            "StaticValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/PaginationConfiguration/properties/PageSize: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PaginationConfiguration": {
+          "properties": {
+            "PageSize": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/PercentVisibleRange/properties/From: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PercentVisibleRange": {
+          "properties": {
+            "From": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 100
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/PercentVisibleRange/properties/To: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PercentVisibleRange": {
+          "properties": {
+            "To": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 100
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/RelativeDatesFilter/properties/RelativeDateValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "RelativeDatesFilter": {
+          "properties": {
+            "RelativeDateValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/TimeBasedForecastProperties/properties/UpperBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TimeBasedForecastProperties": {
+          "properties": {
+            "UpperBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/TimeBasedForecastProperties/properties/LowerBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TimeBasedForecastProperties": {
+          "properties": {
+            "LowerBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/TimeRangeFilter/properties/IncludeMinimum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "TimeRangeFilter": {
+          "properties": {
+            "IncludeMinimum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/TimeRangeFilter/properties/IncludeMaximum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "TimeRangeFilter": {
+          "properties": {
+            "IncludeMaximum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-analysis.json
+--------------------------------
+/definitions/TopBottomFilter/properties/Limit: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TopBottomFilter": {
+          "properties": {
+            "Limit": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ArcAxisDisplayRange/properties/Min: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcAxisDisplayRange": {
+          "properties": {
+            "Min": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ArcAxisDisplayRange/properties/Max: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcAxisDisplayRange": {
+          "properties": {
+            "Max": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ArcConfiguration/properties/ArcAngle: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcConfiguration": {
+          "properties": {
+            "ArcAngle": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/AxisDisplayMinMaxRange/properties/Minimum: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisDisplayMinMaxRange": {
+          "properties": {
+            "Minimum": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/AxisDisplayMinMaxRange/properties/Maximum: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisDisplayMinMaxRange": {
+          "properties": {
+            "Maximum": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/AxisLinearScale/properties/StepCount: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLinearScale": {
+          "properties": {
+            "StepCount": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/AxisLinearScale/properties/StepSize: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLinearScale": {
+          "properties": {
+            "StepSize": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/AxisLogarithmicScale/properties/Base: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLogarithmicScale": {
+          "properties": {
+            "Base": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/AxisTickLabelOptions/properties/RotationAngle: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisTickLabelOptions": {
+          "properties": {
+            "RotationAngle": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/DataColor/properties/DataValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "DataColor": {
+          "properties": {
+            "DataValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/DecimalValueWhenUnsetConfiguration/properties/CustomValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "DecimalValueWhenUnsetConfiguration": {
+          "properties": {
+            "CustomValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ExcludePeriodConfiguration/properties/Amount: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ExcludePeriodConfiguration": {
+          "properties": {
+            "Amount": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ForecastComputation/properties/UpperBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "UpperBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ForecastComputation/properties/LowerBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "LowerBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ForecastComputation/properties/CustomSeasonalityValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "CustomSeasonalityValue": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 180
+              "minimum": 1
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/GradientStop/properties/DataValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "GradientStop": {
+          "properties": {
+            "DataValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/HistogramBinOptions/properties/StartValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "HistogramBinOptions": {
+          "properties": {
+            "StartValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/IntegerValueWhenUnsetConfiguration/properties/CustomValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "IntegerValueWhenUnsetConfiguration": {
+          "properties": {
+            "CustomValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ItemsLimitConfiguration/properties/ItemsLimit: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ItemsLimitConfiguration": {
+          "properties": {
+            "ItemsLimit": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/NumericEqualityFilter/properties/Value: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "NumericEqualityFilter": {
+          "properties": {
+            "Value": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/NumericRangeFilter/properties/IncludeMinimum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilter": {
+          "properties": {
+            "IncludeMinimum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/NumericRangeFilter/properties/IncludeMaximum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilter": {
+          "properties": {
+            "IncludeMaximum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/NumericRangeFilterValue/properties/StaticValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilterValue": {
+          "properties": {
+            "StaticValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/PaginationConfiguration/properties/PageSize: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PaginationConfiguration": {
+          "properties": {
+            "PageSize": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/PercentVisibleRange/properties/From: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PercentVisibleRange": {
+          "properties": {
+            "From": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 100
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/PercentVisibleRange/properties/To: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PercentVisibleRange": {
+          "properties": {
+            "To": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 100
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/RelativeDatesFilter/properties/RelativeDateValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "RelativeDatesFilter": {
+          "properties": {
+            "RelativeDateValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/TimeBasedForecastProperties/properties/UpperBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TimeBasedForecastProperties": {
+          "properties": {
+            "UpperBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/TimeBasedForecastProperties/properties/LowerBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TimeBasedForecastProperties": {
+          "properties": {
+            "LowerBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/TimeRangeFilter/properties/IncludeMinimum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "TimeRangeFilter": {
+          "properties": {
+            "IncludeMinimum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/TimeRangeFilter/properties/IncludeMaximum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "TimeRangeFilter": {
+          "properties": {
+            "IncludeMaximum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/TopBottomFilter/properties/Limit: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TopBottomFilter": {
+          "properties": {
+            "Limit": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-dataset.json
+--------------------------------
+/properties/CreatedTime: prefer regexes in pattern
+    {
+      "properties": {
+        "CreatedTime": {
+          "type": "string"
+          "description": "<p>The time that this dataset was created.</p>"
+[-]       "format": "string"
+[+]       "pattern": "string"
+        }
+      }
+    }
+us-west-2/aws-quicksight-dataset.json
+--------------------------------
+/properties/CreatedTime: you probably did not mean the literal string "string"
+    {
+      "properties": {
+        "CreatedTime": {
+          "type": "string"
+          "description": "<p>The time that this dataset was created.</p>"
+[-]       "format": "string"
+        }
+      }
+    }
+us-west-2/aws-quicksight-dataset.json
+--------------------------------
+/properties/LastUpdatedTime: prefer regexes in pattern
+    {
+      "properties": {
+        "LastUpdatedTime": {
+          "type": "string"
+          "description": "<p>The last time that this dataset was updated.</p>"
+[-]       "format": "string"
+[+]       "pattern": "string"
+        }
+      }
+    }
+us-west-2/aws-quicksight-dataset.json
+--------------------------------
+/properties/LastUpdatedTime: you probably did not mean the literal string "string"
+    {
+      "properties": {
+        "LastUpdatedTime": {
+          "type": "string"
+          "description": "<p>The last time that this dataset was updated.</p>"
+[-]       "format": "string"
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/ArcAxisDisplayRange/properties/Min: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcAxisDisplayRange": {
+          "properties": {
+            "Min": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/ArcAxisDisplayRange/properties/Max: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcAxisDisplayRange": {
+          "properties": {
+            "Max": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/ArcConfiguration/properties/ArcAngle: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcConfiguration": {
+          "properties": {
+            "ArcAngle": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/AxisDisplayMinMaxRange/properties/Minimum: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisDisplayMinMaxRange": {
+          "properties": {
+            "Minimum": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/AxisDisplayMinMaxRange/properties/Maximum: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisDisplayMinMaxRange": {
+          "properties": {
+            "Maximum": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/AxisLinearScale/properties/StepCount: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLinearScale": {
+          "properties": {
+            "StepCount": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/AxisLinearScale/properties/StepSize: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLinearScale": {
+          "properties": {
+            "StepSize": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/AxisLogarithmicScale/properties/Base: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLogarithmicScale": {
+          "properties": {
+            "Base": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/AxisTickLabelOptions/properties/RotationAngle: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisTickLabelOptions": {
+          "properties": {
+            "RotationAngle": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/DataColor/properties/DataValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "DataColor": {
+          "properties": {
+            "DataValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/DecimalValueWhenUnsetConfiguration/properties/CustomValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "DecimalValueWhenUnsetConfiguration": {
+          "properties": {
+            "CustomValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/ExcludePeriodConfiguration/properties/Amount: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ExcludePeriodConfiguration": {
+          "properties": {
+            "Amount": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/ForecastComputation/properties/UpperBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "UpperBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/ForecastComputation/properties/LowerBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "LowerBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/ForecastComputation/properties/CustomSeasonalityValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "CustomSeasonalityValue": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 180
+              "minimum": 1
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/GradientStop/properties/DataValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "GradientStop": {
+          "properties": {
+            "DataValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/HistogramBinOptions/properties/StartValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "HistogramBinOptions": {
+          "properties": {
+            "StartValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/IntegerValueWhenUnsetConfiguration/properties/CustomValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "IntegerValueWhenUnsetConfiguration": {
+          "properties": {
+            "CustomValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/ItemsLimitConfiguration/properties/ItemsLimit: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ItemsLimitConfiguration": {
+          "properties": {
+            "ItemsLimit": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/NumericEqualityFilter/properties/Value: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "NumericEqualityFilter": {
+          "properties": {
+            "Value": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/NumericRangeFilter/properties/IncludeMinimum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilter": {
+          "properties": {
+            "IncludeMinimum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/NumericRangeFilter/properties/IncludeMaximum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilter": {
+          "properties": {
+            "IncludeMaximum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/NumericRangeFilterValue/properties/StaticValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilterValue": {
+          "properties": {
+            "StaticValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/PaginationConfiguration/properties/PageSize: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PaginationConfiguration": {
+          "properties": {
+            "PageSize": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/PercentVisibleRange/properties/From: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PercentVisibleRange": {
+          "properties": {
+            "From": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 100
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/PercentVisibleRange/properties/To: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PercentVisibleRange": {
+          "properties": {
+            "To": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 100
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/RelativeDatesFilter/properties/RelativeDateValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "RelativeDatesFilter": {
+          "properties": {
+            "RelativeDateValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/TimeBasedForecastProperties/properties/UpperBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TimeBasedForecastProperties": {
+          "properties": {
+            "UpperBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/TimeBasedForecastProperties/properties/LowerBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TimeBasedForecastProperties": {
+          "properties": {
+            "LowerBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/TimeRangeFilter/properties/IncludeMinimum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "TimeRangeFilter": {
+          "properties": {
+            "IncludeMinimum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/TimeRangeFilter/properties/IncludeMaximum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "TimeRangeFilter": {
+          "properties": {
+            "IncludeMaximum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-template.json
+--------------------------------
+/definitions/TopBottomFilter/properties/Limit: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TopBottomFilter": {
+          "properties": {
+            "Limit": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-theme.json
+--------------------------------
+/definitions/ThemeVersion/properties/CreatedTime: prefer regexes in pattern
+    {
+      "definitions": {
+        "ThemeVersion": {
+          "properties": {
+            "CreatedTime": {
+              "type": "string"
+              "description": "<p>The date and time that this theme version was created.</p>"
+[-]           "format": "string"
+[+]           "pattern": "string"
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-theme.json
+--------------------------------
+/definitions/ThemeVersion/properties/CreatedTime: you probably did not mean the literal string "string"
+    {
+      "definitions": {
+        "ThemeVersion": {
+          "properties": {
+            "CreatedTime": {
+              "type": "string"
+              "description": "<p>The date and time that this theme version was created.</p>"
+[-]           "format": "string"
+            }
+          }
+        }
+      }
+    }
+us-west-2/aws-quicksight-theme.json
+--------------------------------
+/properties/CreatedTime: prefer regexes in pattern
+    {
+      "properties": {
+        "CreatedTime": {
+          "type": "string"
+          "description": "<p>The date and time that the theme was created.</p>"
+[-]       "format": "string"
+[+]       "pattern": "string"
+        }
+      }
+    }
+us-west-2/aws-quicksight-theme.json
+--------------------------------
+/properties/CreatedTime: you probably did not mean the literal string "string"
+    {
+      "properties": {
+        "CreatedTime": {
+          "type": "string"
+          "description": "<p>The date and time that the theme was created.</p>"
+[-]       "format": "string"
+        }
+      }
+    }
+us-west-2/aws-quicksight-theme.json
+--------------------------------
+/properties/LastUpdatedTime: prefer regexes in pattern
+    {
+      "properties": {
+        "LastUpdatedTime": {
+          "type": "string"
+          "description": "<p>The date and time that the theme was last updated.</p>"
+[-]       "format": "string"
+[+]       "pattern": "string"
+        }
+      }
+    }
+us-west-2/aws-quicksight-theme.json
+--------------------------------
+/properties/LastUpdatedTime: you probably did not mean the literal string "string"
+    {
+      "properties": {
+        "LastUpdatedTime": {
+          "type": "string"
+          "description": "<p>The date and time that the theme was last updated.</p>"
+[-]       "format": "string"
+        }
+      }
+    }
+us-west-2/aws-quicksight-vpcconnection.json
+--------------------------------
+/definitions/SecurityGroupId: maxItems does not apply to type: 'string'
+    {
+      "definitions": {
+        "SecurityGroupId": {
+          "type": "string"
+          "pattern": "^sg-[0-9a-z]*$"
+[-]       "maxItems": 255
+          "minItems": 1
+        }
+      }
+    }
+us-west-2/aws-quicksight-vpcconnection.json
+--------------------------------
+/definitions/SecurityGroupId: minItems does not apply to type: 'string'
+    {
+      "definitions": {
+        "SecurityGroupId": {
+          "type": "string"
+          "pattern": "^sg-[0-9a-z]*$"
+          "maxItems": 255
+[-]       "minItems": 1
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ArcAxisDisplayRange/properties/Min: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcAxisDisplayRange": {
+          "properties": {
+            "Min": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ArcAxisDisplayRange/properties/Max: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcAxisDisplayRange": {
+          "properties": {
+            "Max": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ArcConfiguration/properties/ArcAngle: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcConfiguration": {
+          "properties": {
+            "ArcAngle": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/AxisDisplayMinMaxRange/properties/Minimum: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisDisplayMinMaxRange": {
+          "properties": {
+            "Minimum": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/AxisDisplayMinMaxRange/properties/Maximum: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisDisplayMinMaxRange": {
+          "properties": {
+            "Maximum": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/AxisLinearScale/properties/StepCount: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLinearScale": {
+          "properties": {
+            "StepCount": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/AxisLinearScale/properties/StepSize: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLinearScale": {
+          "properties": {
+            "StepSize": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/AxisLogarithmicScale/properties/Base: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLogarithmicScale": {
+          "properties": {
+            "Base": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/AxisTickLabelOptions/properties/RotationAngle: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisTickLabelOptions": {
+          "properties": {
+            "RotationAngle": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/DataColor/properties/DataValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "DataColor": {
+          "properties": {
+            "DataValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/DecimalValueWhenUnsetConfiguration/properties/CustomValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "DecimalValueWhenUnsetConfiguration": {
+          "properties": {
+            "CustomValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ExcludePeriodConfiguration/properties/Amount: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ExcludePeriodConfiguration": {
+          "properties": {
+            "Amount": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ForecastComputation/properties/UpperBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "UpperBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ForecastComputation/properties/LowerBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "LowerBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ForecastComputation/properties/CustomSeasonalityValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "CustomSeasonalityValue": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 180
+              "minimum": 1
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/GradientStop/properties/DataValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "GradientStop": {
+          "properties": {
+            "DataValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/HistogramBinOptions/properties/StartValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "HistogramBinOptions": {
+          "properties": {
+            "StartValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/IntegerValueWhenUnsetConfiguration/properties/CustomValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "IntegerValueWhenUnsetConfiguration": {
+          "properties": {
+            "CustomValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/ItemsLimitConfiguration/properties/ItemsLimit: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ItemsLimitConfiguration": {
+          "properties": {
+            "ItemsLimit": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/NumericEqualityFilter/properties/Value: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "NumericEqualityFilter": {
+          "properties": {
+            "Value": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/NumericRangeFilter/properties/IncludeMinimum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilter": {
+          "properties": {
+            "IncludeMinimum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/NumericRangeFilter/properties/IncludeMaximum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilter": {
+          "properties": {
+            "IncludeMaximum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/NumericRangeFilterValue/properties/StaticValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilterValue": {
+          "properties": {
+            "StaticValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/PaginationConfiguration/properties/PageSize: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PaginationConfiguration": {
+          "properties": {
+            "PageSize": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/PercentVisibleRange/properties/From: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PercentVisibleRange": {
+          "properties": {
+            "From": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 100
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/PercentVisibleRange/properties/To: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PercentVisibleRange": {
+          "properties": {
+            "To": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 100
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/RelativeDatesFilter/properties/RelativeDateValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "RelativeDatesFilter": {
+          "properties": {
+            "RelativeDateValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/TimeBasedForecastProperties/properties/UpperBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TimeBasedForecastProperties": {
+          "properties": {
+            "UpperBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/TimeBasedForecastProperties/properties/LowerBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TimeBasedForecastProperties": {
+          "properties": {
+            "LowerBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/TimeRangeFilter/properties/IncludeMinimum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "TimeRangeFilter": {
+          "properties": {
+            "IncludeMinimum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/TimeRangeFilter/properties/IncludeMaximum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "TimeRangeFilter": {
+          "properties": {
+            "IncludeMaximum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-analysis.json
+--------------------------------
+/definitions/TopBottomFilter/properties/Limit: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TopBottomFilter": {
+          "properties": {
+            "Limit": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ArcAxisDisplayRange/properties/Min: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcAxisDisplayRange": {
+          "properties": {
+            "Min": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ArcAxisDisplayRange/properties/Max: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcAxisDisplayRange": {
+          "properties": {
+            "Max": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ArcConfiguration/properties/ArcAngle: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcConfiguration": {
+          "properties": {
+            "ArcAngle": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/AxisDisplayMinMaxRange/properties/Minimum: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisDisplayMinMaxRange": {
+          "properties": {
+            "Minimum": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/AxisDisplayMinMaxRange/properties/Maximum: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisDisplayMinMaxRange": {
+          "properties": {
+            "Maximum": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/AxisLinearScale/properties/StepCount: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLinearScale": {
+          "properties": {
+            "StepCount": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/AxisLinearScale/properties/StepSize: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLinearScale": {
+          "properties": {
+            "StepSize": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/AxisLogarithmicScale/properties/Base: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLogarithmicScale": {
+          "properties": {
+            "Base": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/AxisTickLabelOptions/properties/RotationAngle: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisTickLabelOptions": {
+          "properties": {
+            "RotationAngle": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/DataColor/properties/DataValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "DataColor": {
+          "properties": {
+            "DataValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/DecimalValueWhenUnsetConfiguration/properties/CustomValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "DecimalValueWhenUnsetConfiguration": {
+          "properties": {
+            "CustomValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ExcludePeriodConfiguration/properties/Amount: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ExcludePeriodConfiguration": {
+          "properties": {
+            "Amount": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ForecastComputation/properties/UpperBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "UpperBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ForecastComputation/properties/LowerBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "LowerBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ForecastComputation/properties/CustomSeasonalityValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "CustomSeasonalityValue": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 180
+              "minimum": 1
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/GradientStop/properties/DataValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "GradientStop": {
+          "properties": {
+            "DataValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/HistogramBinOptions/properties/StartValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "HistogramBinOptions": {
+          "properties": {
+            "StartValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/IntegerValueWhenUnsetConfiguration/properties/CustomValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "IntegerValueWhenUnsetConfiguration": {
+          "properties": {
+            "CustomValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/ItemsLimitConfiguration/properties/ItemsLimit: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ItemsLimitConfiguration": {
+          "properties": {
+            "ItemsLimit": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/NumericEqualityFilter/properties/Value: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "NumericEqualityFilter": {
+          "properties": {
+            "Value": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/NumericRangeFilter/properties/IncludeMinimum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilter": {
+          "properties": {
+            "IncludeMinimum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/NumericRangeFilter/properties/IncludeMaximum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilter": {
+          "properties": {
+            "IncludeMaximum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/NumericRangeFilterValue/properties/StaticValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilterValue": {
+          "properties": {
+            "StaticValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/PaginationConfiguration/properties/PageSize: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PaginationConfiguration": {
+          "properties": {
+            "PageSize": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/PercentVisibleRange/properties/From: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PercentVisibleRange": {
+          "properties": {
+            "From": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 100
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/PercentVisibleRange/properties/To: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PercentVisibleRange": {
+          "properties": {
+            "To": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 100
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/RelativeDatesFilter/properties/RelativeDateValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "RelativeDatesFilter": {
+          "properties": {
+            "RelativeDateValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/TimeBasedForecastProperties/properties/UpperBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TimeBasedForecastProperties": {
+          "properties": {
+            "UpperBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/TimeBasedForecastProperties/properties/LowerBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TimeBasedForecastProperties": {
+          "properties": {
+            "LowerBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/TimeRangeFilter/properties/IncludeMinimum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "TimeRangeFilter": {
+          "properties": {
+            "IncludeMinimum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/TimeRangeFilter/properties/IncludeMaximum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "TimeRangeFilter": {
+          "properties": {
+            "IncludeMaximum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dashboard.json
+--------------------------------
+/definitions/TopBottomFilter/properties/Limit: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TopBottomFilter": {
+          "properties": {
+            "Limit": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-dataset.json
+--------------------------------
+/properties/CreatedTime: prefer regexes in pattern
+    {
+      "properties": {
+        "CreatedTime": {
+          "type": "string"
+          "description": "<p>The time that this dataset was created.</p>"
+[-]       "format": "string"
+[+]       "pattern": "string"
+        }
+      }
+    }
+us-east-1/aws-quicksight-dataset.json
+--------------------------------
+/properties/CreatedTime: you probably did not mean the literal string "string"
+    {
+      "properties": {
+        "CreatedTime": {
+          "type": "string"
+          "description": "<p>The time that this dataset was created.</p>"
+[-]       "format": "string"
+        }
+      }
+    }
+us-east-1/aws-quicksight-dataset.json
+--------------------------------
+/properties/LastUpdatedTime: prefer regexes in pattern
+    {
+      "properties": {
+        "LastUpdatedTime": {
+          "type": "string"
+          "description": "<p>The last time that this dataset was updated.</p>"
+[-]       "format": "string"
+[+]       "pattern": "string"
+        }
+      }
+    }
+us-east-1/aws-quicksight-dataset.json
+--------------------------------
+/properties/LastUpdatedTime: you probably did not mean the literal string "string"
+    {
+      "properties": {
+        "LastUpdatedTime": {
+          "type": "string"
+          "description": "<p>The last time that this dataset was updated.</p>"
+[-]       "format": "string"
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/ArcAxisDisplayRange/properties/Min: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcAxisDisplayRange": {
+          "properties": {
+            "Min": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/ArcAxisDisplayRange/properties/Max: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcAxisDisplayRange": {
+          "properties": {
+            "Max": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/ArcConfiguration/properties/ArcAngle: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ArcConfiguration": {
+          "properties": {
+            "ArcAngle": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/AxisDisplayMinMaxRange/properties/Minimum: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisDisplayMinMaxRange": {
+          "properties": {
+            "Minimum": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/AxisDisplayMinMaxRange/properties/Maximum: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisDisplayMinMaxRange": {
+          "properties": {
+            "Maximum": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/AxisLinearScale/properties/StepCount: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLinearScale": {
+          "properties": {
+            "StepCount": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/AxisLinearScale/properties/StepSize: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLinearScale": {
+          "properties": {
+            "StepSize": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/AxisLogarithmicScale/properties/Base: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisLogarithmicScale": {
+          "properties": {
+            "Base": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/AxisTickLabelOptions/properties/RotationAngle: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "AxisTickLabelOptions": {
+          "properties": {
+            "RotationAngle": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/DataColor/properties/DataValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "DataColor": {
+          "properties": {
+            "DataValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/DecimalValueWhenUnsetConfiguration/properties/CustomValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "DecimalValueWhenUnsetConfiguration": {
+          "properties": {
+            "CustomValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/ExcludePeriodConfiguration/properties/Amount: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ExcludePeriodConfiguration": {
+          "properties": {
+            "Amount": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/ForecastComputation/properties/UpperBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "UpperBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/ForecastComputation/properties/LowerBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "LowerBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/ForecastComputation/properties/CustomSeasonalityValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ForecastComputation": {
+          "properties": {
+            "CustomSeasonalityValue": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 180
+              "minimum": 1
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/GradientStop/properties/DataValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "GradientStop": {
+          "properties": {
+            "DataValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/HistogramBinOptions/properties/StartValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "HistogramBinOptions": {
+          "properties": {
+            "StartValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/IntegerValueWhenUnsetConfiguration/properties/CustomValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "IntegerValueWhenUnsetConfiguration": {
+          "properties": {
+            "CustomValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/ItemsLimitConfiguration/properties/ItemsLimit: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "ItemsLimitConfiguration": {
+          "properties": {
+            "ItemsLimit": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/NumericEqualityFilter/properties/Value: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "NumericEqualityFilter": {
+          "properties": {
+            "Value": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/NumericRangeFilter/properties/IncludeMinimum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilter": {
+          "properties": {
+            "IncludeMinimum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/NumericRangeFilter/properties/IncludeMaximum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilter": {
+          "properties": {
+            "IncludeMaximum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/NumericRangeFilterValue/properties/StaticValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "NumericRangeFilterValue": {
+          "properties": {
+            "StaticValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/PaginationConfiguration/properties/PageSize: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PaginationConfiguration": {
+          "properties": {
+            "PageSize": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/PercentVisibleRange/properties/From: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PercentVisibleRange": {
+          "properties": {
+            "From": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 100
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/PercentVisibleRange/properties/To: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "PercentVisibleRange": {
+          "properties": {
+            "To": {
+              "type": "number"
+[-]           "default": null
+              "maximum": 100
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/RelativeDatesFilter/properties/RelativeDateValue: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "RelativeDatesFilter": {
+          "properties": {
+            "RelativeDateValue": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/TimeBasedForecastProperties/properties/UpperBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TimeBasedForecastProperties": {
+          "properties": {
+            "UpperBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/TimeBasedForecastProperties/properties/LowerBoundary: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TimeBasedForecastProperties": {
+          "properties": {
+            "LowerBoundary": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/TimeRangeFilter/properties/IncludeMinimum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "TimeRangeFilter": {
+          "properties": {
+            "IncludeMinimum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/TimeRangeFilter/properties/IncludeMaximum: default value for type='boolean' cannot be 'object'
+    {
+      "definitions": {
+        "TimeRangeFilter": {
+          "properties": {
+            "IncludeMaximum": {
+              "type": "boolean"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-template.json
+--------------------------------
+/definitions/TopBottomFilter/properties/Limit: default value for type='number' cannot be 'object'
+    {
+      "definitions": {
+        "TopBottomFilter": {
+          "properties": {
+            "Limit": {
+              "type": "number"
+[-]           "default": null
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-theme.json
+--------------------------------
+/definitions/ThemeVersion/properties/CreatedTime: prefer regexes in pattern
+    {
+      "definitions": {
+        "ThemeVersion": {
+          "properties": {
+            "CreatedTime": {
+              "type": "string"
+              "description": "<p>The date and time that this theme version was created.</p>"
+[-]           "format": "string"
+[+]           "pattern": "string"
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-theme.json
+--------------------------------
+/definitions/ThemeVersion/properties/CreatedTime: you probably did not mean the literal string "string"
+    {
+      "definitions": {
+        "ThemeVersion": {
+          "properties": {
+            "CreatedTime": {
+              "type": "string"
+              "description": "<p>The date and time that this theme version was created.</p>"
+[-]           "format": "string"
+            }
+          }
+        }
+      }
+    }
+us-east-1/aws-quicksight-theme.json
+--------------------------------
+/properties/CreatedTime: prefer regexes in pattern
+    {
+      "properties": {
+        "CreatedTime": {
+          "type": "string"
+          "description": "<p>The date and time that the theme was created.</p>"
+[-]       "format": "string"
+[+]       "pattern": "string"
+        }
+      }
+    }
+us-east-1/aws-quicksight-theme.json
+--------------------------------
+/properties/CreatedTime: you probably did not mean the literal string "string"
+    {
+      "properties": {
+        "CreatedTime": {
+          "type": "string"
+          "description": "<p>The date and time that the theme was created.</p>"
+[-]       "format": "string"
+        }
+      }
+    }
+us-east-1/aws-quicksight-theme.json
+--------------------------------
+/properties/LastUpdatedTime: prefer regexes in pattern
+    {
+      "properties": {
+        "LastUpdatedTime": {
+          "type": "string"
+          "description": "<p>The date and time that the theme was last updated.</p>"
+[-]       "format": "string"
+[+]       "pattern": "string"
+        }
+      }
+    }
+us-east-1/aws-quicksight-theme.json
+--------------------------------
+/properties/LastUpdatedTime: you probably did not mean the literal string "string"
+    {
+      "properties": {
+        "LastUpdatedTime": {
+          "type": "string"
+          "description": "<p>The date and time that the theme was last updated.</p>"
+[-]       "format": "string"
+        }
+      }
+    }
+us-east-1/aws-quicksight-vpcconnection.json
+--------------------------------
+/definitions/SecurityGroupId: maxItems does not apply to type: 'string'
+    {
+      "definitions": {
+        "SecurityGroupId": {
+          "type": "string"
+          "pattern": "^sg-[0-9a-z]*$"
+[-]       "maxItems": 255
+          "minItems": 1
+        }
+      }
+    }
+us-east-1/aws-quicksight-vpcconnection.json
+--------------------------------
+/definitions/SecurityGroupId: minItems does not apply to type: 'string'
+    {
+      "definitions": {
+        "SecurityGroupId": {
+          "type": "string"
+          "pattern": "^sg-[0-9a-z]*$"
+          "maxItems": 255
+[-]       "minItems": 1
+        }
+      }
+    }

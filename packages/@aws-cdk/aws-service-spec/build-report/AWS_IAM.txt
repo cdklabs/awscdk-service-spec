@@ -1,0 +1,250 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_IAM:
+
+    *** patch ***
+
+us-east-2/aws-iam-accesskey.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::IAM::AccessKey"
+      "description": "Resource Type definition for AWS::IAM::AccessKey"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-iam-group.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::IAM::Group"
+      "description": "Resource Type definition for AWS::IAM::Group"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-iam-managedpolicy.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::IAM::ManagedPolicy"
+      "description": "Resource Type definition for AWS::IAM::ManagedPolicy"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-iam-policy.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::IAM::Policy"
+      "description": "Resource Type definition for AWS::IAM::Policy"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-iam-servicelinkedrole.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::IAM::ServiceLinkedRole"
+      "description": "Resource Type definition for AWS::IAM::ServiceLinkedRole"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-iam-usertogroupaddition.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::IAM::UserToGroupAddition"
+      "description": "Resource Type definition for AWS::IAM::UserToGroupAddition"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-iam-accesskey.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::IAM::AccessKey"
+      "description": "Resource Type definition for AWS::IAM::AccessKey"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-iam-group.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::IAM::Group"
+      "description": "Resource Type definition for AWS::IAM::Group"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-iam-managedpolicy.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::IAM::ManagedPolicy"
+      "description": "Resource Type definition for AWS::IAM::ManagedPolicy"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-iam-policy.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::IAM::Policy"
+      "description": "Resource Type definition for AWS::IAM::Policy"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-iam-servicelinkedrole.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::IAM::ServiceLinkedRole"
+      "description": "Resource Type definition for AWS::IAM::ServiceLinkedRole"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-iam-usertogroupaddition.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::IAM::UserToGroupAddition"
+      "description": "Resource Type definition for AWS::IAM::UserToGroupAddition"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-iam-accesskey.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::IAM::AccessKey"
+      "description": "Resource Type definition for AWS::IAM::AccessKey"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-iam-group.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::IAM::Group"
+      "description": "Resource Type definition for AWS::IAM::Group"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "readOnlyProperties": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-iam-managedpolicy.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::IAM::ManagedPolicy"
+      "description": "Resource Type definition for AWS::IAM::ManagedPolicy"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-iam-policy.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::IAM::Policy"
+      "description": "Resource Type definition for AWS::IAM::Policy"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-iam-servicelinkedrole.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::IAM::ServiceLinkedRole"
+      "description": "Resource Type definition for AWS::IAM::ServiceLinkedRole"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-iam-usertogroupaddition.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::IAM::UserToGroupAddition"
+      "description": "Resource Type definition for AWS::IAM::UserToGroupAddition"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }

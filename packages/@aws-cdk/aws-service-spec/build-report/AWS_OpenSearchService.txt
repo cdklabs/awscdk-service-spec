@@ -1,0 +1,46 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_OpenSearchService:
+
+    *** patch ***
+
+us-east-2/aws-opensearchservice-domain.json
+--------------------------------
+/readOnlyProperties: Remove the DomainArn attribute of AWS::OpenSearchService::Domain resources, as it is unsupported by CloudFormation
+    {
+      "readOnlyProperties": {
+        "0": "/properties/Id"
+        "1": "/properties/Arn"
+[-]     "2": "/properties/DomainArn"
+        "3": "/properties/DomainEndpoint"
+        "4": "/properties/DomainEndpoints"
+        "5": "/properties/ServiceSoftwareOptions"
+        "6": "/properties/AdvancedSecurityOptions/AnonymousAuthDisableDate"
+      }
+    }
+us-west-2/aws-opensearchservice-domain.json
+--------------------------------
+/readOnlyProperties: Remove the DomainArn attribute of AWS::OpenSearchService::Domain resources, as it is unsupported by CloudFormation
+    {
+      "readOnlyProperties": {
+        "0": "/properties/Id"
+        "1": "/properties/Arn"
+[-]     "2": "/properties/DomainArn"
+        "3": "/properties/DomainEndpoint"
+        "4": "/properties/DomainEndpoints"
+        "5": "/properties/ServiceSoftwareOptions"
+        "6": "/properties/AdvancedSecurityOptions/AnonymousAuthDisableDate"
+      }
+    }
+us-east-1/aws-opensearchservice-domain.json
+--------------------------------
+/readOnlyProperties: Remove the DomainArn attribute of AWS::OpenSearchService::Domain resources, as it is unsupported by CloudFormation
+    {
+      "readOnlyProperties": {
+        "0": "/properties/Id"
+        "1": "/properties/Arn"
+[-]     "2": "/properties/DomainArn"
+        "3": "/properties/DomainEndpoint"
+        "4": "/properties/DomainEndpoints"
+        "5": "/properties/ServiceSoftwareOptions"
+        "6": "/properties/AdvancedSecurityOptions/AnonymousAuthDisableDate"
+      }
+    }

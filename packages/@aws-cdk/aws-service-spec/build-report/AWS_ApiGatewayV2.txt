@@ -1,0 +1,357 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_ApiGatewayV2:
+
+    *** loading ***
+
+us-east-2/aws-apigatewayv2-authorizer.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: { ApiId: { '$ref': 'resource-schema.json#/properties/ApiId' } },
+        required: [ 'ApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-2/aws-apigatewayv2-deployment.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: { ApiId: { '$ref': 'resource-schema.json#/properties/ApiId' } },
+        required: [ 'ApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-2/aws-apigatewayv2-model.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: { ApiId: { '$ref': 'resource-schema.json#/properties/ApiId' } },
+        required: [ 'ApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-apigatewayv2-authorizer.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: { ApiId: { '$ref': 'resource-schema.json#/properties/ApiId' } },
+        required: [ 'ApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-apigatewayv2-deployment.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: { ApiId: { '$ref': 'resource-schema.json#/properties/ApiId' } },
+        required: [ 'ApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-west-2/aws-apigatewayv2-model.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: { ApiId: { '$ref': 'resource-schema.json#/properties/ApiId' } },
+        required: [ 'ApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-apigatewayv2-authorizer.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: { ApiId: { '$ref': 'resource-schema.json#/properties/ApiId' } },
+        required: [ 'ApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-apigatewayv2-deployment.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: { ApiId: { '$ref': 'resource-schema.json#/properties/ApiId' } },
+        required: [ 'ApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+us-east-1/aws-apigatewayv2-model.json: .handlers.list
+    {
+      handlerSchema: {
+        properties: { ApiId: { '$ref': 'resource-schema.json#/properties/ApiId' } },
+        required: [ 'ApiId' ],
+        type: 'object'
+      },
+      permissions: [ 'apigateway:GET' ]
+    }
+    additionalProperties: should NOT have additional properties ({ additionalProperty: 'handlerSchema' })
+      |  {
+      |    additionalProperties: false,
+      |    properties: {
+      |      permissions: { items: { type: 'string' }, type: 'array' },
+      |      timeoutInMinutes: { type: 'number' }
+      |    },
+      |    required: [ 'permissions' ],
+      |    type: 'object'
+      |  }
+
+    *** patch ***
+
+us-east-2/aws-apigatewayv2-apigatewaymanagedoverrides.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGatewayV2::ApiGatewayManagedOverrides"
+      "description": "Resource Type definition for AWS::ApiGatewayV2::ApiGatewayManagedOverrides"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-apigatewayv2-apimapping.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGatewayV2::ApiMapping"
+      "description": "Resource Type definition for AWS::ApiGatewayV2::ApiMapping"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-apigatewayv2-integration.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGatewayV2::Integration"
+      "description": "Resource Type definition for AWS::ApiGatewayV2::Integration"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-2/aws-apigatewayv2-route.json
+--------------------------------
+/properties/RequestParameters: items does not apply to type: 'object'
+    {
+      "properties": {
+        "RequestParameters": {
+          "type": "object"
+[-]       "items": {"$ref":"#/definitions/ParameterConstraints"}
+        }
+      }
+    }
+us-east-2/aws-apigatewayv2-routeresponse.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGatewayV2::RouteResponse"
+      "description": "Resource Type definition for AWS::ApiGatewayV2::RouteResponse"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-apigatewayv2-apigatewaymanagedoverrides.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGatewayV2::ApiGatewayManagedOverrides"
+      "description": "Resource Type definition for AWS::ApiGatewayV2::ApiGatewayManagedOverrides"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-apigatewayv2-apimapping.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGatewayV2::ApiMapping"
+      "description": "Resource Type definition for AWS::ApiGatewayV2::ApiMapping"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-apigatewayv2-integration.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGatewayV2::Integration"
+      "description": "Resource Type definition for AWS::ApiGatewayV2::Integration"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-west-2/aws-apigatewayv2-route.json
+--------------------------------
+/properties/RequestParameters: items does not apply to type: 'object'
+    {
+      "properties": {
+        "RequestParameters": {
+          "type": "object"
+[-]       "items": {"$ref":"#/definitions/ParameterConstraints"}
+        }
+      }
+    }
+us-east-1/aws-apigatewayv2-apigatewaymanagedoverrides.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGatewayV2::ApiGatewayManagedOverrides"
+      "description": "Resource Type definition for AWS::ApiGatewayV2::ApiGatewayManagedOverrides"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-apigatewayv2-apimapping.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGatewayV2::ApiMapping"
+      "description": "Resource Type definition for AWS::ApiGatewayV2::ApiMapping"
+      "additionalProperties": false
+      "properties": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-apigatewayv2-integration.json
+--------------------------------
+/taggable: Resource does not have "Tags" property so should be marked non-taggable
+    {
+      "typeName": "AWS::ApiGatewayV2::Integration"
+      "description": "Resource Type definition for AWS::ApiGatewayV2::Integration"
+      "additionalProperties": false
+      "properties": { ... }
+      "definitions": { ... }
+      "required": [ ... ]
+      "createOnlyProperties": [ ... ]
+      "primaryIdentifier": [ ... ]
+      "readOnlyProperties": [ ... ]
+[+]   "taggable": false
+    }
+us-east-1/aws-apigatewayv2-route.json
+--------------------------------
+/properties/RequestParameters: items does not apply to type: 'object'
+    {
+      "properties": {
+        "RequestParameters": {
+          "type": "object"
+[-]       "items": {"$ref":"#/definitions/ParameterConstraints"}
+        }
+      }
+    }

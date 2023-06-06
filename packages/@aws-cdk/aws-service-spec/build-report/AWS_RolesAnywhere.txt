@@ -1,0 +1,5 @@
+CDK found the following issues while trying to read the CloudFormation resource definition for AWS_RolesAnywhere:
+
+    *** interpreting ***
+
+AWS::RolesAnywhere::TrustAnchor: property Source: typedef Source: property SourceData: Ref SourceData is a union of objects. Merging into a single type.

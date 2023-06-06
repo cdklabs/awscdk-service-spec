@@ -49,6 +49,9 @@
       "path": "packages/@aws-cdk/service-spec-build"
     },
     {
+      "path": "packages/@aws-cdk/aws-service-spec"
+    },
+    {
       "path": "packages/@aws-cdk/cfn-resources"
     },
     {
