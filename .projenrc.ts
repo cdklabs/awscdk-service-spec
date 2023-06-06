@@ -96,6 +96,8 @@ const serviceSpecBuild = new TypeScriptWorkspace({
 serviceSpecBuild.tasks.addTask('build:db', {
   exec: 'node -r source-map-support/register lib/cli/build',
 });
+serviceSpecBuild.gitignore.addPatterns('db.json');
+serviceSpecBuild.gitignore.addPatterns('build-report');
 
 const awsServiceSpec = new TypeScriptWorkspace({
   parent: repo,
