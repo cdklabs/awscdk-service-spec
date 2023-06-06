@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@types/node": "^16",
-    "cdklabs-projen-project-types": "^0.1.120",
+    "cdklabs-projen-project-types": "^0.1.123",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
     "node-fetch": "^2",
