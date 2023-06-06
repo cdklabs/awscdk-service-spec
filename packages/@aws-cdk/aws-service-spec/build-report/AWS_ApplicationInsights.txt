@@ -1,5 +1,0 @@
-CDK found the following issues while trying to read the CloudFormation resource definition for AWS_ApplicationInsights:
-
-    *** interpreting ***
-
-AWS::ApplicationInsights::Application: property ComponentMonitoringSettings: Ref ComponentMonitoringSetting is a union of objects. Merging into a single type.

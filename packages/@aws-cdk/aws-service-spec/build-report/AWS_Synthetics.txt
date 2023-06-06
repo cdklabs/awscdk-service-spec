@@ -1,7 +1,0 @@
-CDK found the following issues while trying to read the CloudFormation resource definition for AWS_Synthetics:
-
-    *** interpreting ***
-
-AWS::Synthetics::Canary: property Code: Ref Code is a union of objects. Merging into a single type.
-AWS::Synthetics::Canary: attributes: no definition for: Code/SourceLocationArn
-AWS::Synthetics::Canary: attributes: no definition for: Code.SourceLocationArn

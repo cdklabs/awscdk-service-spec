@@ -1,5 +1,0 @@
-CDK found the following issues while trying to read the CloudFormation resource definition for AWS_Serverless:
-
-    *** interpreting ***
-
-AWS::Serverless::LayerVersion: marked as taggable, but tagProperty does not exist: Tags

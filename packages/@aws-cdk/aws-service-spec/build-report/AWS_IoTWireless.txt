@@ -1,7 +1,0 @@
-CDK found the following issues while trying to read the CloudFormation resource definition for AWS_IoTWireless:
-
-    *** interpreting ***
-
-AWS::IoTWireless::WirelessDevice: property LoRaWAN: Ref LoRaWANDevice is a union of objects. Merging into a single type.
-AWS::IoTWireless::WirelessDeviceImportTask: attributes: no definition for: Sidewalk/DeviceCreationFileList
-AWS::IoTWireless::WirelessDeviceImportTask: attributes: no definition for: Sidewalk.DeviceCreationFileList

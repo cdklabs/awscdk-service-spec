@@ -1,5 +1,0 @@
-CDK found the following issues while trying to read the CloudFormation resource definition for AWS_KafkaConnect:
-
-    *** interpreting ***
-
-AWS::KafkaConnect::Connector: property Capacity: Ref Capacity is a union of objects. Merging into a single type.
