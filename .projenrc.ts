@@ -108,7 +108,7 @@ const awsServiceSpec = new TypeScriptWorkspace({
 });
 awsServiceSpec.preCompileTask.spawn(
   awsServiceSpec.tasks.addTask('generate', {
-    exec: `node -e 'require("${serviceSpecBuild.name}/lib/cli/build")'`,
+    exec: `node -e 'require("${serviceSpecBuild.name}/lib/cli/build")' && gzip db.json`,
     receiveArgs: true,
   }),
 );

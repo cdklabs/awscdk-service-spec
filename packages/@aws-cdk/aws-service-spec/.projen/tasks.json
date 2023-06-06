@@ -76,7 +76,7 @@
       "name": "generate",
       "steps": [
         {
-          "exec": "node -e 'require(\"@aws-cdk/service-spec-build/lib/cli/build\")'",
+          "exec": "node -e 'require(\"@aws-cdk/service-spec-build/lib/cli/build\")' && gzip db.json",
           "receiveArgs": true
         }
       ]
