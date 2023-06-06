@@ -1,40 +1,24 @@
 import { Block } from './block';
 import { asStmt } from './private';
-import { Expression } from '../expression';
+import { CommentableImpl, ICommentable } from '../code-fragments';
+import { Expression } from '../expressions';
 import { Parameter } from '../parameter';
 
-export class Statement {
-  readonly comments?: string[];
-
-  /**
-   * Declare a private field to make this type nominally typed
-   */
-  private readonly isStatement = true;
-
-  constructor() {
-    Array.isArray(this.isStatement);
-  }
-}
+export class Statement extends CommentableImpl implements ICommentable {}
 
 export class ReturnStatement extends Statement {
-  readonly comments?: string[];
-
   public constructor(public readonly expression?: Expression) {
     super();
   }
 }
 
 export class ExpressionStatement extends Statement {
-  readonly comments?: string[];
-
   public constructor(public readonly expression: Expression) {
     super();
   }
 }
 
 export class AssignmentStatement extends Statement {
-  readonly comments?: string[];
-
   public constructor(public readonly lhs: Expression, public readonly rhs: Expression) {
     super();
   }
@@ -46,16 +30,12 @@ export enum Mut {
 }
 
 export class VariableDeclaration extends Statement {
-  readonly comments?: string[];
-
   public constructor(public readonly mut: Mut, public readonly varName: Expression, public readonly rhs: Expression) {
     super();
   }
 }
 
 export class IfThenElse extends Statement {
-  readonly comments?: string[];
-
   public thenStatement?: Statement;
   public elseStatement?: Statement;
 
@@ -104,7 +84,8 @@ export class SuperInitializer extends Statement {
   }
 }
 
-export class StatementSeparator extends Statement {}
+export class EmptyStatement extends Statement {}
+export class StatementSeparator extends EmptyStatement {}
 
 export class ThrowStatement extends Statement {
   constructor(public readonly expression: Expression) {

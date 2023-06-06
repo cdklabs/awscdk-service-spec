@@ -11,7 +11,7 @@ import {
   VariableDeclaration,
   ThrowStatement,
 } from './statements';
-import { Expression } from '../expression';
+import { Expression } from '../expressions';
 
 export function ret(e?: Expression): Statement {
   return new ReturnStatement(e);

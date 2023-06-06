@@ -1,6 +1,6 @@
+import { Expression, Splat, SymbolReference } from './expressions';
 import { Identifier } from './identifier';
 import { InvokeCallable } from './invoke';
-import { Expression, Splat, SymbolReference } from '../expression';
 import {
   BinOp,
   DestructuringBind,

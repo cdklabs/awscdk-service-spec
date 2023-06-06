@@ -1,5 +1,4 @@
-import { Expression } from './expression';
-import { NewExpression } from './expressions';
+import { Expression, NewExpression } from './expressions';
 import { IProperty, PropertySpec } from './property';
 import { AMBIENT_SCOPE, IScope } from './scope';
 import { ThingSymbol } from './symbol';
