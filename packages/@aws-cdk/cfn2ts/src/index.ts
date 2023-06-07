@@ -1,5 +1,5 @@
-import { generate as generateModules } from '@aws-cdk/cfn-resources';
 import { loadAwsServiceSpec } from '@aws-cdk/aws-service-spec';
+import { generate as generateModules } from '@aws-cdk/cfn-resources';
 import { Service } from '@aws-cdk/service-spec';
 import * as fs from 'fs-extra';
 import * as pkglint from './pkglint';
