@@ -52,6 +52,7 @@ jspm_packages/
 !/.github/workflows/auto-merge.yml
 !/.vscode/launch.json
 !/nx.json
+!/.github/workflows/release.yml
 !/.github/workflows/test-aws-cdk-integration.yml
 !/.github/workflows/update-source-documentation.yml
 !/.github/workflows/update-source-resource-spec.yml

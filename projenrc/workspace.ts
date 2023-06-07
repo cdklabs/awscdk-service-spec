@@ -1,5 +1,6 @@
 import { yarn } from 'cdklabs-projen-project-types';
 import { release } from 'projen';
+import { MonorepoReleaseWorkflow } from './monorepo-release';
 
 export class TypeScriptWorkspace extends yarn.TypeScriptWorkspace {
   public constructor(options: yarn.TypeScriptWorkspaceOptions) {
@@ -22,8 +23,9 @@ export class TypeScriptWorkspace extends yarn.TypeScriptWorkspace {
       outFiles: [`\${workspaceFolder}/${this.workspaceDirectory}/${this.libdir}/**/*.js`],
     } as any);
 
-    if (!options.private) {
-      new release.Release(this, {
+    const monoRelease = MonorepoReleaseWorkflow.of(options.parent);
+    if (!options.private && monoRelease) {
+      const rls = new release.Release(this, {
         versionFile: 'package.json', // this is where "version" is set after bump
         task: this.buildTask,
         branch: 'main',
@@ -42,6 +44,8 @@ export class TypeScriptWorkspace extends yarn.TypeScriptWorkspace {
         // versions.
         releaseTagPrefix: `${this.name}-`,
       });
+
+      monoRelease.addMonorepoRelease(this.workspaceDirectory, rls);
     }
   }
 }
