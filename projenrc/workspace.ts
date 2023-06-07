@@ -37,6 +37,10 @@ export class TypeScriptWorkspace extends yarn.TypeScriptWorkspace {
         postBuildSteps: [...(options.postBuildSteps ?? [])],
 
         workflowNodeVersion: this.nodeVersion,
+
+        // This mixes the package name into the tag name, so that we can give packages individual
+        // versions.
+        releaseTagPrefix: `${this.name}-`,
       });
     }
   }
