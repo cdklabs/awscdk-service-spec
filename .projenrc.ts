@@ -106,7 +106,8 @@ const awsServiceSpec = new TypeScriptWorkspace({
   deps: [tsKb, serviceSpec],
   devDeps: ['source-map-support', serviceSpecBuild],
 });
-awsServiceSpec.preCompileTask.spawn(
+// Needs to be added to 'compile' task, because the integ tests will 'compile' everything (but not run the tests and linter).
+awsServiceSpec.compileTask.prependSpawn(
   awsServiceSpec.tasks.addTask('generate', {
     exec: `node -e 'require("${serviceSpecBuild.name}/lib/cli/build")' && gzip db.json`,
     receiveArgs: true,

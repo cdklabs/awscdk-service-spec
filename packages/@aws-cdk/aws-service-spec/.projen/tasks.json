@@ -49,6 +49,9 @@
       "description": "Only compile",
       "steps": [
         {
+          "spawn": "generate"
+        },
+        {
           "exec": "tsc --build",
           "receiveArgs": true
         }
@@ -126,12 +129,7 @@
     },
     "pre-compile": {
       "name": "pre-compile",
-      "description": "Prepare the project for compilation",
-      "steps": [
-        {
-          "spawn": "generate"
-        }
-      ]
+      "description": "Prepare the project for compilation"
     },
     "test": {
       "name": "test",

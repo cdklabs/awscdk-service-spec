@@ -27,7 +27,6 @@ jobs:
         run: |-
           yarn install --frozen-lockfile
           yarn compile
-          yarn workspace @aws-cdk/service-spec-build run build:db
         working-directory: awscdk-service-spec
       - name: Checkout aws/aws-cdk
         uses: actions/checkout@v3
