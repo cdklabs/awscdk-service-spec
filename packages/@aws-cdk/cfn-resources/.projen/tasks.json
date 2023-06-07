@@ -125,6 +125,15 @@
         }
       ]
     },
+    "release": {
+      "name": "release",
+      "description": "Build this private package as part of doing a release",
+      "steps": [
+        {
+          "spawn": "build"
+        }
+      ]
+    },
     "test": {
       "name": "test",
       "description": "Run tests",

@@ -27,6 +27,8 @@ const repo = new YarnMonorepo({
   gitOptions: {
     lfsPatterns: ['sources/**/*.json'],
   },
+
+  release: true,
 });
 
 const tsKb = new TypeScriptWorkspace({

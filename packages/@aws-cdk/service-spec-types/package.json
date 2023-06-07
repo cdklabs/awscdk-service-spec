@@ -3,6 +3,7 @@
   "description": "Types for CloudFormation Service Specifications",
   "scripts": {
     "build": "npx projen build",
+    "bump": "npx projen bump",
     "check-for-updates": "npx projen check-for-updates",
     "compile": "npx projen compile",
     "default": "npx projen default",
@@ -11,8 +12,10 @@
     "package": "npx projen package",
     "post-compile": "npx projen post-compile",
     "pre-compile": "npx projen pre-compile",
+    "release": "npx projen release",
     "test": "npx projen test",
     "test:watch": "npx projen test:watch",
+    "unbump": "npx projen unbump",
     "watch": "npx projen watch",
     "projen": "npx projen"
   },
