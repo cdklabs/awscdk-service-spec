@@ -1,4 +1,5 @@
 import { yarn } from 'cdklabs-projen-project-types';
+import { release } from 'projen';
 
 export class TypeScriptWorkspace extends yarn.TypeScriptWorkspace {
   public constructor(options: yarn.TypeScriptWorkspaceOptions) {
@@ -20,5 +21,23 @@ export class TypeScriptWorkspace extends yarn.TypeScriptWorkspace {
       runtimeArgs: ['projen', 'compile', '--force'],
       outFiles: [`\${workspaceFolder}/${this.workspaceDirectory}/${this.libdir}/**/*.js`],
     } as any);
+
+    if (!options.private) {
+      new release.Release(this, {
+        versionFile: 'package.json', // this is where "version" is set after bump
+        task: this.buildTask,
+        branch: 'main',
+        artifactsDirectory: this.artifactsDirectory,
+        ...options,
+
+        releaseWorkflowSetupSteps: [
+          ...this.renderWorkflowSetup({ mutable: false }),
+          ...(options.releaseWorkflowSetupSteps ?? []),
+        ],
+        postBuildSteps: [...(options.postBuildSteps ?? [])],
+
+        workflowNodeVersion: this.nodeVersion,
+      });
+    }
   }
 }
