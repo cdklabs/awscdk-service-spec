@@ -3,7 +3,7 @@ import { github, release, Component, Project, Task } from 'projen';
 import { BUILD_ARTIFACT_NAME, PERMISSION_BACKUP_FILE } from 'projen/lib/github/constants';
 
 // copied from projen/release.ts
-const BUILD_JOBID = 'release';
+const RELEASE_JOBID = 'release';
 const GIT_REMOTE_STEPID = 'git_remote';
 const LATEST_COMMIT_OUTPUT = 'latest_commit';
 
@@ -26,6 +26,11 @@ export interface MonorepoReleaseWorkflowOptions extends UpstreamReleaseOptions {
    * @default 'main'
    */
   readonly branchName?: string;
+
+  /**
+   * Node version
+   */
+  readonly nodeVersion?: string;
 }
 
 export class MonorepoReleaseWorkflow extends Component {
@@ -87,7 +92,7 @@ export class MonorepoReleaseWorkflow extends Component {
     const noNewCommits = `\${{ steps.${GIT_REMOTE_STEPID}.outputs.${LATEST_COMMIT_OUTPUT} == github.sha }}`;
 
     for (const { workspaceDirectory, release } of this.packagesToRelease) {
-      const job = this.workflow?.getJob('release') as github.workflows.Job | undefined;
+      const job = this.workflow?.getJob(RELEASE_JOBID) as github.workflows.Job | undefined;
       job?.steps.push(
         {
           name: `${release.project.name}: Backup artifact permissions`,
@@ -202,7 +207,7 @@ export class MonorepoReleaseWorkflow extends Component {
 
     this.workflow = new github.TaskWorkflow(this.github, {
       name: workflowName,
-      jobId: BUILD_JOBID,
+      jobId: RELEASE_JOBID,
       outputs: {
         latest_commit: {
           stepId: GIT_REMOTE_STEPID,
@@ -230,6 +235,20 @@ export class MonorepoReleaseWorkflow extends Component {
       postBuildSteps,
       runsOn: this.options.workflowRunsOn,
     });
+    const job = this.workflow?.getJob(RELEASE_JOBID) as github.workflows.Job | undefined;
+    job?.steps.push(
+      {
+        name: 'Setup Node.js',
+        uses: 'actions/setup-node@v3',
+        with: {
+          'node-version': '16.14.0', // FIXME: How get Node version here?
+        },
+      },
+      {
+        name: 'Install dependencies',
+        run: 'yarn install --check-files --frozen-lockfile',
+      },
+    );
   }
 }
 
