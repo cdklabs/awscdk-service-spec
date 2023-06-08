@@ -25,17 +25,17 @@ jobs:
         run: |-
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-      - name: release:all
-        run: npx projen release:all
-      - name: Check for new commits
-        id: git_remote
-        run: echo "latest_commit=$(git ls-remote origin -h ${{ github.ref }} | cut -f1)" >> $GITHUB_OUTPUT
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 16.14.0
       - name: Install dependencies
         run: yarn install --check-files --frozen-lockfile
+      - name: release:all
+        run: npx projen release:all
+      - name: Check for new commits
+        id: git_remote
+        run: echo "latest_commit=$(git ls-remote origin -h ${{ github.ref }} | cut -f1)" >> $GITHUB_OUTPUT
       - name: "@cdklabs/tskb: Backup artifact permissions"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
         run: cd dist && getfacl -R . > permissions-backup.acl

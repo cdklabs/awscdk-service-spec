@@ -194,7 +194,20 @@ export class MonorepoReleaseWorkflow extends Component {
       (['master', 'main'].includes(this.branchName) ? 'release' : `release-${this.branchName}`);
 
     // The arrays are being cloned to avoid accumulating values from previous branches
-    const preBuildSteps = [...(this.options.releaseWorkflowSetupSteps ?? [])];
+    const preBuildSteps = [
+      {
+        name: 'Setup Node.js',
+        uses: 'actions/setup-node@v3',
+        with: {
+          'node-version': (this.project as any).nodeVersion ?? '16.14.0',
+        },
+      },
+      {
+        name: 'Install dependencies',
+        run: 'yarn install --check-files --frozen-lockfile',
+      },
+      ...(this.options.releaseWorkflowSetupSteps ?? []),
+    ];
     const postBuildSteps = [...(this.options.postBuildSteps ?? [])];
 
     // check if new commits were pushed to the repo while we were building.
@@ -235,20 +248,6 @@ export class MonorepoReleaseWorkflow extends Component {
       postBuildSteps,
       runsOn: this.options.workflowRunsOn,
     });
-    const job = this.workflow?.getJob(RELEASE_JOBID) as github.workflows.Job | undefined;
-    job?.steps.push(
-      {
-        name: 'Setup Node.js',
-        uses: 'actions/setup-node@v3',
-        with: {
-          'node-version': (this.project as any).nodeVersion ?? '16.14.0',
-        },
-      },
-      {
-        name: 'Install dependencies',
-        run: 'yarn install --check-files --frozen-lockfile',
-      },
-    );
   }
 }
 
