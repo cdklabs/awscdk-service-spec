@@ -68,8 +68,7 @@ export class MonorepoReleaseWorkflow extends Component {
   }
 
   public addMonorepoRelease(subdir: string, release: release.Release) {
-    const task = this.obtainReleaseAllTask();
-    task.exec('yarn release', { cwd: subdir });
+    this.obtainReleaseAllTask();
     this.packagesToRelease.push({ workspaceDirectory: subdir, release });
     // The rest happens during preSynthesize
   }
@@ -167,6 +166,8 @@ export class MonorepoReleaseWorkflow extends Component {
       description: `Prepare a release from all monorepo packages`,
       env,
     });
+    this.releaseAllTask.exec('yarn workspaces run release');
+
     this.createPublishingMechanism();
     return this.releaseAllTask;
   }

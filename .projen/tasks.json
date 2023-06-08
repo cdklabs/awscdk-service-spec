@@ -111,20 +111,7 @@
       },
       "steps": [
         {
-          "exec": "yarn release",
-          "cwd": "packages/@cdklabs/tskb"
-        },
-        {
-          "exec": "yarn release",
-          "cwd": "packages/@cdklabs/typewriter"
-        },
-        {
-          "exec": "yarn release",
-          "cwd": "packages/@aws-cdk/service-spec"
-        },
-        {
-          "exec": "yarn release",
-          "cwd": "packages/@aws-cdk/cfn-resources"
+          "exec": "yarn workspaces run release"
         },
         {
           "exec": "git diff --ignore-space-at-eol --exit-code"
