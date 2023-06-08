@@ -113,6 +113,7 @@ awsServiceSpec.compileTask.prependSpawn(
     receiveArgs: true,
   }),
 );
+
 awsServiceSpec.gitignore.addPatterns('db.json.gz');
 awsServiceSpec.gitignore.addPatterns('build-report');
 awsServiceSpec.npmignore?.addPatterns('build-report');
