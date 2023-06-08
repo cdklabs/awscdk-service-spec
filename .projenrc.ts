@@ -18,7 +18,7 @@ const repo = new YarnMonorepo({
       trailingComma: pj.javascript.TrailingComma.ALL,
     },
   },
-  workflowRunsOn: ['awscdk-service-spec_ubuntu-latest_32-core'],
+  workflowRunsOn: ['awscdk-service-spec_ubuntu-latest_32-core', 'ubuntu-latest'],
   gitignore: ['.DS_Store'],
   gitOptions: {
     lfsPatterns: ['sources/**/*.json'],
