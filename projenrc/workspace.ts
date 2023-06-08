@@ -44,11 +44,9 @@ export class TypeScriptWorkspace extends yarn.TypeScriptWorkspace {
         // versions.
         releaseTagPrefix: `${this.name}-`,
       });
-      // GitHub Releases comes for free with a `Release` component
-
       monoRelease.addMonorepoRelease(this.workspaceDirectory, rls);
 
-      // NPM must be added independently
+      // GitHub Releases comes for free with a `Release` component, NPM must be added explicitly.
       rls.publisher.publishToNpm({
         registry: this.package.npmRegistry,
         npmTokenSecret: this.package.npmTokenSecret,
