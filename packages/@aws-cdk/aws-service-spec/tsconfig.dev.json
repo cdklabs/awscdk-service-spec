@@ -37,13 +37,13 @@
   ],
   "references": [
     {
-      "path": "../cfn-resources"
+      "path": "../../@cdklabs/tskb"
     },
     {
       "path": "../service-spec"
     },
     {
-      "path": "../aws-service-spec"
+      "path": "../service-spec-build"
     }
   ]
 }

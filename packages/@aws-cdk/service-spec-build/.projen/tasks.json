@@ -113,12 +113,7 @@
     },
     "post-compile": {
       "name": "post-compile",
-      "description": "Runs after successful compilation",
-      "steps": [
-        {
-          "spawn": "build:db"
-        }
-      ]
+      "description": "Runs after successful compilation"
     },
     "pre-compile": {
       "name": "pre-compile",

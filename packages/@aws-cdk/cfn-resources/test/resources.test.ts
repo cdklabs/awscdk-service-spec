@@ -1,13 +1,13 @@
+import { loadAwsServiceSpec } from '@aws-cdk/aws-service-spec';
 import { SpecDatabase } from '@aws-cdk/service-spec';
 import { TypeScriptRenderer } from '@cdklabs/typewriter';
 import { AstBuilder } from '../src/cli/cdk/ast';
-import { loadDatabase } from '../src/cli/db';
 
 const renderer = new TypeScriptRenderer();
 let db: SpecDatabase;
 
 beforeAll(async () => {
-  db = await loadDatabase();
+  db = await loadAwsServiceSpec();
 });
 
 test.each([

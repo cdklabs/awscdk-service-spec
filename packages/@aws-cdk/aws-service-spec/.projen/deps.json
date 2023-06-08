@@ -1,6 +1,10 @@
 {
   "dependencies": [
     {
+      "name": "@aws-cdk/service-spec-build",
+      "type": "build"
+    },
+    {
       "name": "@types/jest",
       "type": "build"
     },
@@ -67,6 +71,10 @@
       "type": "build"
     },
     {
+      "name": "source-map-support",
+      "type": "build"
+    },
+    {
       "name": "ts-jest",
       "type": "build"
     },
@@ -75,23 +83,11 @@
       "type": "build"
     },
     {
-      "name": "@aws-cdk/aws-service-spec",
-      "type": "runtime"
-    },
-    {
-      "name": "@aws-cdk/cfn-resources",
-      "type": "runtime"
-    },
-    {
       "name": "@aws-cdk/service-spec",
       "type": "runtime"
     },
     {
-      "name": "fs-extra",
-      "type": "runtime"
-    },
-    {
-      "name": "yargs",
+      "name": "@cdklabs/tskb",
       "type": "runtime"
     }
   ],

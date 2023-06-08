@@ -54,11 +54,7 @@ export class AwsCdkIntegrationTest extends pj.Component {
         {
           name: `Build ${root.name}`,
           workingDirectory: root.name,
-          run: [
-            'yarn install --frozen-lockfile',
-            'yarn compile',
-            'yarn workspace @aws-cdk/service-spec-build run build:db',
-          ].join('\n'),
+          run: ['yarn install --frozen-lockfile', 'yarn compile'].join('\n'),
         },
         ...checkoutRepository(awsCdkRepo, awsCdkPath),
         ...linkPackage(project, awsCdkPath),

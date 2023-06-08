@@ -1,12 +1,12 @@
+import { loadAwsServiceSpec } from '@aws-cdk/aws-service-spec';
 import { SpecDatabase } from '@aws-cdk/service-spec';
 import { IScope } from '@cdklabs/typewriter';
 import { AstBuilder } from '../src/cli/cdk/ast';
-import { loadDatabase } from '../src/cli/db';
 
 let db: SpecDatabase;
 
 beforeAll(async () => {
-  db = await loadDatabase();
+  db = await loadAwsServiceSpec();
 });
 
 // In the old cfn2ts implementation we render all types into the spec

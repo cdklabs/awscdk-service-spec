@@ -28,19 +28,19 @@
       },
       "steps": [
         {
-          "exec": "npm-check-updates --dep dev --upgrade --target=minor --reject='@aws-cdk/cfn-resources,@aws-cdk/service-spec,@aws-cdk/aws-service-spec'"
+          "exec": "npm-check-updates --dep dev --upgrade --target=minor --reject='@cdklabs/tskb,@aws-cdk/service-spec,@aws-cdk/service-spec-build'"
         },
         {
-          "exec": "npm-check-updates --dep optional --upgrade --target=minor --reject='@aws-cdk/cfn-resources,@aws-cdk/service-spec,@aws-cdk/aws-service-spec'"
+          "exec": "npm-check-updates --dep optional --upgrade --target=minor --reject='@cdklabs/tskb,@aws-cdk/service-spec,@aws-cdk/service-spec-build'"
         },
         {
-          "exec": "npm-check-updates --dep peer --upgrade --target=minor --reject='@aws-cdk/cfn-resources,@aws-cdk/service-spec,@aws-cdk/aws-service-spec'"
+          "exec": "npm-check-updates --dep peer --upgrade --target=minor --reject='@cdklabs/tskb,@aws-cdk/service-spec,@aws-cdk/service-spec-build'"
         },
         {
-          "exec": "npm-check-updates --dep prod --upgrade --target=minor --reject='@aws-cdk/cfn-resources,@aws-cdk/service-spec,@aws-cdk/aws-service-spec'"
+          "exec": "npm-check-updates --dep prod --upgrade --target=minor --reject='@cdklabs/tskb,@aws-cdk/service-spec,@aws-cdk/service-spec-build'"
         },
         {
-          "exec": "npm-check-updates --dep bundle --upgrade --target=minor --reject='@aws-cdk/cfn-resources,@aws-cdk/service-spec,@aws-cdk/aws-service-spec'"
+          "exec": "npm-check-updates --dep bundle --upgrade --target=minor --reject='@cdklabs/tskb,@aws-cdk/service-spec,@aws-cdk/service-spec-build'"
         }
       ]
     },
@@ -48,6 +48,9 @@
       "name": "compile",
       "description": "Only compile",
       "steps": [
+        {
+          "spawn": "generate"
+        },
         {
           "exec": "tsc --build",
           "receiveArgs": true
@@ -69,6 +72,15 @@
       "steps": [
         {
           "exec": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern src test build-tools"
+        }
+      ]
+    },
+    "generate": {
+      "name": "generate",
+      "steps": [
+        {
+          "exec": "node -e 'require(\"@aws-cdk/service-spec-build/lib/cli/build\")' && gzip db.json",
+          "receiveArgs": true
         }
       ]
     },
@@ -101,7 +113,15 @@
     },
     "package": {
       "name": "package",
-      "description": "Creates the distribution package"
+      "description": "Creates the distribution package",
+      "steps": [
+        {
+          "exec": "mkdir -p dist/js"
+        },
+        {
+          "exec": "mv $(npm pack) dist/js/"
+        }
+      ]
     },
     "post-compile": {
       "name": "post-compile",

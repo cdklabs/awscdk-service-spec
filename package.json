@@ -45,6 +45,7 @@
       "packages/@aws-cdk/service-spec-sources",
       "packages/@aws-cdk/service-spec",
       "packages/@aws-cdk/service-spec-build",
+      "packages/@aws-cdk/aws-service-spec",
       "packages/@aws-cdk/cfn-resources",
       "packages/@aws-cdk/cfn2ts"
     ]
@@ -56,6 +57,7 @@
       "<rootDir>/packages/@aws-cdk/service-spec-sources",
       "<rootDir>/packages/@aws-cdk/service-spec",
       "<rootDir>/packages/@aws-cdk/service-spec-build",
+      "<rootDir>/packages/@aws-cdk/aws-service-spec",
       "<rootDir>/packages/@aws-cdk/cfn-resources",
       "<rootDir>/packages/@aws-cdk/cfn2ts"
     ]

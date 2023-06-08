@@ -97,13 +97,30 @@ const serviceSpecBuild = new TypeScriptWorkspace({
   devDeps: ['source-map-support'],
   private: true,
 });
-const buildDb = serviceSpecBuild.tasks.addTask('build:db', {
+serviceSpecBuild.tasks.addTask('build:db', {
   exec: 'node -r source-map-support/register lib/cli/build',
 });
-serviceSpecBuild.postCompileTask.spawn(buildDb);
 serviceSpecBuild.gitignore.addPatterns('db.json');
-serviceSpecBuild.gitignore.addPatterns('db-build-report.txt');
 serviceSpecBuild.gitignore.addPatterns('build-report');
+
+const awsServiceSpec = new TypeScriptWorkspace({
+  parent: repo,
+  name: '@aws-cdk/aws-service-spec',
+  description: 'A specification of built-in AWS resources',
+  deps: [tsKb, serviceSpec],
+  devDeps: ['source-map-support', serviceSpecBuild],
+});
+// Needs to be added to 'compile' task, because the integ tests will 'compile' everything (but not run the tests and linter).
+awsServiceSpec.compileTask.prependSpawn(
+  awsServiceSpec.tasks.addTask('generate', {
+    exec: `node -e 'require("${serviceSpecBuild.name}/lib/cli/build")' && gzip db.json`,
+    receiveArgs: true,
+  }),
+);
+
+awsServiceSpec.gitignore.addPatterns('db.json.gz');
+awsServiceSpec.gitignore.addPatterns('build-report');
+awsServiceSpec.npmignore?.addPatterns('build-report');
 
 const cfnResources = new TypeScriptWorkspace({
   parent: repo,
@@ -148,7 +165,7 @@ const cfn2ts = new TypeScriptWorkspace({
   name: '@aws-cdk/cfn2ts',
   description: 'Drop-in replacement for cfn2ts',
   private: true,
-  deps: [cfnResources, serviceSpec, 'yargs', 'fs-extra'],
+  deps: [cfnResources, serviceSpec, awsServiceSpec, 'yargs', 'fs-extra'],
 });
 
 // Add integration test with aws-cdk
