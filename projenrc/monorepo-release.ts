@@ -241,7 +241,7 @@ export class MonorepoReleaseWorkflow extends Component {
         name: 'Setup Node.js',
         uses: 'actions/setup-node@v3',
         with: {
-          'node-version': '16.14.0', // FIXME: How get Node version here?
+          'node-version': (this.project as any).nodeVersion ?? '16.14.0',
         },
       },
       {
