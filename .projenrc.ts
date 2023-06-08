@@ -2,6 +2,10 @@ import * as pj from 'projen';
 import { AwsCdkIntegrationTest, TypeScriptWorkspace, YarnMonorepo } from './projenrc';
 import { RegionalSource, Role, SingleSource, SourceProcessing } from './projenrc/update-sources';
 
+// These are temporarily not available, skip them for now
+// const workflowRunsOn = ['awscdk-service-spec_ubuntu-latest_32-core'];
+const workflowRunsOn = ['ubuntu-latest'];
+
 const repo = new YarnMonorepo({
   name: 'awscdk-service-spec',
   description: "Monorepo for the AWS CDK's service spec",
@@ -18,7 +22,7 @@ const repo = new YarnMonorepo({
       trailingComma: pj.javascript.TrailingComma.ALL,
     },
   },
-  workflowRunsOn: ['awscdk-service-spec_ubuntu-latest_32-core'],
+  workflowRunsOn,
   gitignore: ['.DS_Store'],
   gitOptions: {
     lfsPatterns: ['sources/**/*.json'],
@@ -150,7 +154,9 @@ const cfn2ts = new TypeScriptWorkspace({
 });
 
 // Add integration test with aws-cdk
-new AwsCdkIntegrationTest(cfn2ts);
+new AwsCdkIntegrationTest(cfn2ts, {
+  workflowRunsOn,
+});
 
 // Update sources
 new SingleSource(repo, {
