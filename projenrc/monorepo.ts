@@ -13,7 +13,7 @@ export interface YarnMonoRepoOptions extends yarn.CdkLabsMonorepoOptions {
   /**
    * Options for the release job
    */
-  readonly releaseOptions?: MonorepoReleaseWorkflowOptions;
+  readonly releaseOptions?: Omit<MonorepoReleaseWorkflowOptions, 'workflowRunsOn'>;
 }
 
 export class YarnMonorepo extends yarn.CdkLabsMonorepo {
