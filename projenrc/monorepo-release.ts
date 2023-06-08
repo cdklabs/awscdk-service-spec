@@ -1,3 +1,4 @@
+import * as path from 'path';
 import { github, release, Component, Project, Task } from 'projen';
 import { BUILD_ARTIFACT_NAME, PERMISSION_BACKUP_FILE } from 'projen/lib/github/constants';
 
@@ -41,7 +42,10 @@ export class MonorepoReleaseWorkflow extends Component {
   private readonly branchName: string;
   private readonly github: github.GitHub;
   private readonly releaseTrigger: release.ReleaseTrigger;
-  private readonly releases = new Array<release.Release>();
+  private readonly packagesToRelease = new Array<{
+    readonly workspaceDirectory: string;
+    readonly release: release.Release;
+  }>();
 
   private workflow?: github.TaskWorkflow;
   private releaseAllTask?: Task;
@@ -61,7 +65,7 @@ export class MonorepoReleaseWorkflow extends Component {
   public addMonorepoRelease(subdir: string, release: release.Release) {
     const task = this.obtainReleaseAllTask();
     task.exec('yarn release', { cwd: subdir });
-    this.releases.push(release);
+    this.packagesToRelease.push({ workspaceDirectory: subdir, release });
     // The rest happens during preSynthesize
   }
 
@@ -82,22 +86,24 @@ export class MonorepoReleaseWorkflow extends Component {
   private renderPackageUploads() {
     const noNewCommits = `\${{ steps.${GIT_REMOTE_STEPID}.outputs.${LATEST_COMMIT_OUTPUT} == github.sha }}`;
 
-    for (const release of this.releases) {
-      const job = this.workflow?.getJob('build') as github.workflows.Job | undefined;
+    for (const { workspaceDirectory, release } of this.packagesToRelease) {
+      const job = this.workflow?.getJob('release') as github.workflows.Job | undefined;
       job?.steps.push(
         {
-          name: 'Backup artifact permissions',
+          name: `${release.project.name}: Backup artifact permissions`,
           if: noNewCommits,
           continueOnError: true,
           run: `cd ${release.artifactsDirectory} && getfacl -R . > ${PERMISSION_BACKUP_FILE}`,
+          workingDirectory: workspaceDirectory,
         },
         {
-          name: 'Upload artifact',
+          name: `${release.project.name}: Upload artifact`,
           if: noNewCommits,
           uses: 'actions/upload-artifact@v3',
           with: {
-            name: BUILD_ARTIFACT_NAME,
-            path: release.artifactsDirectory,
+            // Every artifact must have a unique name
+            name: buildArtifactName(release.project),
+            path: path.join(workspaceDirectory, release.artifactsDirectory),
           },
         },
       );
@@ -105,14 +111,33 @@ export class MonorepoReleaseWorkflow extends Component {
   }
 
   private renderPublishJobs() {
-    for (const release of this.releases) {
+    for (const { workspaceDirectory, release } of this.packagesToRelease) {
+      const packagePublishJobs = release.publisher._renderJobsForBranch(this.branchName, {
+        majorVersion: this.options.majorVersion,
+        minMajorVersion: this.options.minMajorVersion,
+        npmDistTag: this.options.npmDistTag,
+        prerelease: this.options.prerelease,
+      });
+
+      for (const job of Object.values(packagePublishJobs)) {
+        job.steps.unshift({
+          name: `Navigate to ${release.project.name}`,
+          run: `cd ${workspaceDirectory}`,
+        });
+
+        // Find the 'download-artifact' job and replace the build artifact name with the unique per-project one
+        const downloadStep = job.steps.find((job) => job.uses === 'actions/download-artifact@v3');
+        if (!downloadStep) {
+          throw new Error(`Could not find downloadStep among steps: ${JSON.stringify(job.steps, undefined, 2)}`);
+        }
+        (downloadStep.with ?? {}).name = buildArtifactName(release.project);
+      }
+
+      // Make the job names unique
       this.workflow?.addJobs(
-        release.publisher._renderJobsForBranch(this.branchName, {
-          majorVersion: this.options.majorVersion,
-          minMajorVersion: this.options.minMajorVersion,
-          npmDistTag: this.options.npmDistTag,
-          prerelease: this.options.prerelease,
-        }),
+        Object.fromEntries(
+          Object.entries(packagePublishJobs).map(([key, job]) => [slugify(`${release.project.name}_${key}`), job]),
+        ),
       );
     }
   }
@@ -206,4 +231,12 @@ export class MonorepoReleaseWorkflow extends Component {
       runsOn: this.options.workflowRunsOn,
     });
   }
+}
+
+function slugify(x: string): string {
+  return x.replace(/[^a-zA-Z0-9_-]/g, '-').replace(/^[0-9-]+/, '');
+}
+
+function buildArtifactName(project: Project) {
+  return slugify(`${project.name}_${BUILD_ARTIFACT_NAME}`);
 }

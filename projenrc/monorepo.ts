@@ -66,7 +66,10 @@ export class YarnMonorepo extends yarn.CdkLabsMonorepo {
     });
 
     if (options.release) {
-      new MonorepoReleaseWorkflow(this, options.releaseOptions);
+      new MonorepoReleaseWorkflow(this, {
+        workflowRunsOn: options.workflowRunsOn,
+        ...options.releaseOptions,
+      });
     }
   }
 }
