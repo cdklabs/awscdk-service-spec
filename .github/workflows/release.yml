@@ -91,8 +91,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
-      - name: Navigate to @cdklabs/tskb
-        run: cd packages/@cdklabs/tskb
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
@@ -118,8 +116,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
-      - name: Navigate to @cdklabs/tskb
-        run: cd packages/@cdklabs/tskb
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
@@ -145,8 +141,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
-      - name: Navigate to @cdklabs/typewriter
-        run: cd packages/@cdklabs/typewriter
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
@@ -172,8 +166,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
-      - name: Navigate to @cdklabs/typewriter
-        run: cd packages/@cdklabs/typewriter
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
@@ -199,8 +191,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
-      - name: Navigate to @aws-cdk/service-spec
-        run: cd packages/@aws-cdk/service-spec
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
@@ -226,8 +216,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
-      - name: Navigate to @aws-cdk/service-spec
-        run: cd packages/@aws-cdk/service-spec
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
@@ -253,8 +241,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
-      - name: Navigate to @aws-cdk/cfn-resources
-        run: cd packages/@aws-cdk/cfn-resources
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
@@ -280,8 +266,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
-      - name: Navigate to @aws-cdk/cfn-resources
-        run: cd packages/@aws-cdk/cfn-resources
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:

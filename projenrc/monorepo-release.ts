@@ -116,7 +116,7 @@ export class MonorepoReleaseWorkflow extends Component {
   }
 
   private renderPublishJobs() {
-    for (const { workspaceDirectory, release } of this.packagesToRelease) {
+    for (const { release } of this.packagesToRelease) {
       const packagePublishJobs = release.publisher._renderJobsForBranch(this.branchName, {
         majorVersion: this.options.majorVersion,
         minMajorVersion: this.options.minMajorVersion,
@@ -125,11 +125,6 @@ export class MonorepoReleaseWorkflow extends Component {
       });
 
       for (const job of Object.values(packagePublishJobs)) {
-        job.steps.unshift({
-          name: `Navigate to ${release.project.name}`,
-          run: `cd ${workspaceDirectory}`,
-        });
-
         // Find the 'download-artifact' job and replace the build artifact name with the unique per-project one
         const downloadStep = job.steps.find((job) => job.uses === 'actions/download-artifact@v3');
         if (!downloadStep) {
