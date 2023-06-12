@@ -42720,6 +42720,11 @@ export class CfnSequenceStore extends cdk.CfnResource implements cdk.IInspectabl
   public description?: string;
 
   /**
+   * An S3 URI representing the bucket and folder to store failed read set uploads.
+   */
+  public fallbackLocation?: string;
+
+  /**
    * A name for the store.
    */
   public name: string;
@@ -42756,6 +42761,7 @@ export class CfnSequenceStore extends cdk.CfnResource implements cdk.IInspectabl
     this.attrCreationTime = cdk.Token.asString(this.getAtt("CreationTime", cdk.ResolutionTypeHint.STRING));
     this.attrSequenceStoreId = cdk.Token.asString(this.getAtt("SequenceStoreId", cdk.ResolutionTypeHint.STRING));
     this.description = props.description;
+    this.fallbackLocation = props.fallbackLocation;
     this.name = props.name;
     this.sseConfig = props.sseConfig;
     this.tags = new cdk.TagManager(cdk.TagType.MAP, "AWS::Omics::SequenceStore", props.tags, {
@@ -42767,6 +42773,7 @@ export class CfnSequenceStore extends cdk.CfnResource implements cdk.IInspectabl
   protected get cfnProperties(): Record<string, any> {
     return {
       "description": this.description,
+      "fallbackLocation": this.fallbackLocation,
       "name": this.name,
       "sseConfig": this.sseConfig,
       "tags": this.tags.renderTags()
@@ -42826,6 +42833,13 @@ export interface CfnSequenceStoreProps {
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-omics-sequencestore.html#cfn-omics-sequencestore-description
    */
   readonly description?: string;
+
+  /**
+   * An S3 URI representing the bucket and folder to store failed read set uploads.
+   *
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-omics-sequencestore.html#cfn-omics-sequencestore-fallbacklocation
+   */
+  readonly fallbackLocation?: string;
 
   /**
    * A name for the store.
@@ -42910,6 +42924,7 @@ function CfnSequenceStorePropsValidator(properties: any): cdk.ValidationResult {
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
   errors.collect(cdk.propertyValidator("description", cdk.validateString)(properties.description));
+  errors.collect(cdk.propertyValidator("fallbackLocation", cdk.validateString)(properties.fallbackLocation));
   errors.collect(cdk.propertyValidator("name", cdk.requiredValidator)(properties.name));
   errors.collect(cdk.propertyValidator("name", cdk.validateString)(properties.name));
   errors.collect(cdk.propertyValidator("sseConfig", CfnSequenceStoreSseConfigPropertyValidator)(properties.sseConfig));
@@ -42923,6 +42938,7 @@ function convertCfnSequenceStorePropsToCloudFormation(properties: any): any {
   CfnSequenceStorePropsValidator(properties).assertSuccess();
   return {
     "Description": cdk.stringToCloudFormation(properties.description),
+    "FallbackLocation": cdk.stringToCloudFormation(properties.fallbackLocation),
     "Name": cdk.stringToCloudFormation(properties.name),
     "SseConfig": convertCfnSequenceStoreSseConfigPropertyToCloudFormation(properties.sseConfig),
     "Tags": cdk.hashMapper(cdk.stringToCloudFormation)(properties.tags)
@@ -42940,6 +42956,7 @@ function CfnSequenceStorePropsFromCloudFormation(properties: any): cfn_parse.Fro
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSequenceStoreProps>();
   ret.addPropertyResult("description", "Description", (properties.Description != null ? cfn_parse.FromCloudFormation.getString(properties.Description) : undefined));
+  ret.addPropertyResult("fallbackLocation", "FallbackLocation", (properties.FallbackLocation != null ? cfn_parse.FromCloudFormation.getString(properties.FallbackLocation) : undefined));
   ret.addPropertyResult("name", "Name", (properties.Name != null ? cfn_parse.FromCloudFormation.getString(properties.Name) : undefined));
   ret.addPropertyResult("sseConfig", "SseConfig", (properties.SseConfig != null ? CfnSequenceStoreSseConfigPropertyFromCloudFormation(properties.SseConfig) : undefined));
   ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString)(properties.Tags) : undefined));
