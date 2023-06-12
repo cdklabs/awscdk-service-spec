@@ -1,5 +1,5 @@
+import { loadAwsServiceSpec } from '@aws-cdk/aws-service-spec';
 import { generate as generateModules } from '@aws-cdk/cfn-resources';
-import { loadDatabase } from '@aws-cdk/cfn-resources/src/cli/db';
 import { Service } from '@aws-cdk/service-spec';
 import * as fs from 'fs-extra';
 import * as pkglint from './pkglint';
@@ -16,7 +16,7 @@ let serviceCache: Service[];
 
 async function getAllScopes(field: keyof Service = 'name') {
   if (!serviceCache) {
-    const db = await loadDatabase();
+    const db = await loadAwsServiceSpec();
     serviceCache = db.all('service');
   }
 

@@ -3,8 +3,12 @@ import { yarn } from 'cdklabs-projen-project-types';
 import path from 'path';
 import { JobPermission } from 'projen/lib/github/workflows-model';
 
+export interface AwsCdkIntegrationTestOptions {
+  readonly workflowRunsOn: string[];
+}
+
 export class AwsCdkIntegrationTest extends pj.Component {
-  public constructor(project: yarn.TypeScriptWorkspace) {
+  public constructor(project: yarn.TypeScriptWorkspace, options: AwsCdkIntegrationTestOptions) {
     super(project);
 
     const root = project.root as yarn.Monorepo;
@@ -22,7 +26,7 @@ export class AwsCdkIntegrationTest extends pj.Component {
       },
     });
 
-    const runsOn = ['awscdk-service-spec_ubuntu-latest_32-core'];
+    const runsOn = options.workflowRunsOn;
     const awsCdkRepo = 'aws/aws-cdk';
     const awsCdkPath = 'aws-cdk';
     const candidateSpec = 'aws-cdk-lib-candidate';
@@ -50,11 +54,7 @@ export class AwsCdkIntegrationTest extends pj.Component {
         {
           name: `Build ${root.name}`,
           workingDirectory: root.name,
-          run: [
-            'yarn install --frozen-lockfile',
-            'yarn compile',
-            'yarn workspace @aws-cdk/service-spec-build run build:db',
-          ].join('\n'),
+          run: ['yarn install --frozen-lockfile', 'yarn compile'].join('\n'),
         },
         ...checkoutRepository(awsCdkRepo, awsCdkPath),
         ...linkPackage(project, awsCdkPath),
