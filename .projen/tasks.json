@@ -111,7 +111,16 @@
       },
       "steps": [
         {
-          "exec": "yarn workspaces run release"
+          "exec": "yarn workspaces run bump"
+        },
+        {
+          "exec": "yarn workspaces run build"
+        },
+        {
+          "exec": "yarn workspaces run unbump"
+        },
+        {
+          "exec": "git diff --ignore-space-at-eol --exit-code"
         },
         {
           "exec": "git diff --ignore-space-at-eol --exit-code"
