@@ -1,6 +1,6 @@
 import { asStmt } from './private';
 import { Statement, StatementSeparator } from './statements';
-import { Expression } from '../expression';
+import { Expression } from '../expressions';
 
 export class Block extends Statement {
   public static with(...stmts: Array<Statement | Expression>) {
@@ -8,8 +8,6 @@ export class Block extends Statement {
     ret.add(...stmts.map(asStmt));
     return ret;
   }
-
-  public readonly comments?: string[];
 
   private readonly _statements: Statement[] = [];
 

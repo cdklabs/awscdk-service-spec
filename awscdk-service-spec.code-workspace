@@ -2,6 +2,9 @@
 {
   "folders": [
     {
+      "path": "packages/@aws-cdk/aws-service-spec"
+    },
+    {
       "path": "packages/@aws-cdk/cfn-resources"
     },
     {

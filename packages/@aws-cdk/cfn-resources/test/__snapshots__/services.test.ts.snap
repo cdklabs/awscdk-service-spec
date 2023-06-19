@@ -12226,28 +12226,28 @@ export class CfnIPAM extends cdk.CfnResource implements cdk.IInspectable, cdk.IT
   public readonly attrIpamId: string;
 
   /**
-   * The ID of the IPAM's default private scope.
+   * The ID of the default private scope.
    *
    * @cloudformationAttribute PrivateDefaultScopeId
    */
   public readonly attrPrivateDefaultScopeId: string;
 
   /**
-   * The ID of the IPAM's default public scope.
+   * The ID of the default public scope.
    *
    * @cloudformationAttribute PublicDefaultScopeId
    */
   public readonly attrPublicDefaultScopeId: string;
 
   /**
-   * The count of resource discoveries associated with this IPAM.
+   * The number of resource discovery associations.
    *
    * @cloudformationAttribute ResourceDiscoveryAssociationCount
    */
   public readonly attrResourceDiscoveryAssociationCount: number;
 
   /**
-   * The number of scopes in the IPAM. The scope quota is 5.
+   * The number of scopes.
    *
    * @cloudformationAttribute ScopeCount
    */
@@ -39267,15 +39267,15 @@ function CfnVPCDHCPOptionsAssociationPropsFromCloudFormation(properties: any): c
 }
 
 /**
- * Specifies a VPC endpoint for a service.
+ * Specifies a VPC endpoint.
  *
- * An endpoint enables you to create a private connection between your VPC and the service. The service may be provided by AWS , an AWS Marketplace Partner, or another AWS account. For more information, see the [AWS PrivateLink User Guide](https://docs.aws.amazon.com/vpc/latest/privatelink/) .
+ * A VPC endpoint provides a private connection between your VPC and an endpoint service. You can use an endpoint service provided by AWS , an AWS Marketplace Partner, or another AWS accounts in your organization. For more information, see the [AWS PrivateLink User Guide](https://docs.aws.amazon.com/vpc/latest/privatelink/) .
  *
- * An interface endpoint establishes connections between the subnets in your VPC and an AWS service, your own service, or a service hosted by another AWS account . You can specify the subnets in which to create the endpoint and the security groups to associate with the endpoint network interface.
+ * An endpoint of type \`Interface\` establishes connections between the subnets in your VPC and an AWS service , your own service, or a service hosted by another AWS account . With an interface VPC endpoint, you specify the subnets in which to create the endpoint and the security groups to associate with the endpoint network interfaces.
  *
- * A gateway endpoint serves as a target for a route in your route table for traffic destined for Amazon S3 or Amazon DynamoDB. You can specify an endpoint policy for the endpoint, which controls access to the service from your VPC. You can also specify the VPC route tables that use the endpoint. For information about connectivity to Amazon S3, see [Why can’t I connect to an S3 bucket using a gateway VPC endpoint?](https://docs.aws.amazon.com/premiumsupport/knowledge-center/connect-s3-vpc-endpoint)
+ * An endpoint of type \`gateway\` serves as a target for a route in your route table for traffic destined for Amazon S3 or DynamoDB . You can specify an endpoint policy for the endpoint, which controls access to the service from your VPC. You can also specify the VPC route tables that use the endpoint. For more information about connectivity to Amazon S3 , see [Why can't I connect to an S3 bucket using a gateway VPC endpoint?](https://docs.aws.amazon.com/premiumsupport/knowledge-center/connect-s3-vpc-endpoint)
  *
- * A Gateway Load Balancer endpoint provides private connectivity between your VPC and virtual appliances from a service provider.
+ * An endpoint of type \`GatewayLoadBalancer\` provides private connectivity between your VPC and virtual appliances from a service provider.
  *
  * @stability external
  * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpcendpoint.html
@@ -39345,7 +39345,7 @@ export class CfnVPCEndpoint extends cdk.CfnResource implements cdk.IInspectable 
   public readonly attrNetworkInterfaceIds: Array<string>;
 
   /**
-   * A policy that controls access to the service from the VPC.
+   * An endpoint policy, which controls access to the service from the VPC.
    */
   public policyDocument?: any | cdk.IResolvable;
 
@@ -39365,7 +39365,7 @@ export class CfnVPCEndpoint extends cdk.CfnResource implements cdk.IInspectable 
   public securityGroupIds?: Array<string>;
 
   /**
-   * The service name.
+   * The name of the endpoint service.
    */
   public serviceName: string;
 
@@ -39380,7 +39380,7 @@ export class CfnVPCEndpoint extends cdk.CfnResource implements cdk.IInspectable 
   public vpcEndpointType?: string;
 
   /**
-   * The ID of the VPC for the endpoint.
+   * The ID of the VPC.
    */
   public vpcId: string;
 
@@ -39449,9 +39449,9 @@ export class CfnVPCEndpoint extends cdk.CfnResource implements cdk.IInspectable 
  */
 export interface CfnVPCEndpointProps {
   /**
-   * A policy that controls access to the service from the VPC.
+   * An endpoint policy, which controls access to the service from the VPC.
    *
-   * If this parameter is not specified, the default policy allows full access to the service. Endpoint policies are supported only for gateway and interface endpoints.
+   * The default endpoint policy allows full access to the service. Endpoint policies are supported only for gateway and interface endpoints.
    *
    * For CloudFormation templates in YAML, you can provide the policy in JSON or YAML format. AWS CloudFormation converts YAML policies to JSON format before calling the API to create or modify the VPC endpoint.
    *
@@ -39493,7 +39493,7 @@ export interface CfnVPCEndpointProps {
   readonly securityGroupIds?: Array<string>;
 
   /**
-   * The service name.
+   * The name of the endpoint service.
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpcendpoint.html#cfn-ec2-vpcendpoint-servicename
    */
@@ -39518,7 +39518,7 @@ export interface CfnVPCEndpointProps {
   readonly vpcEndpointType?: string;
 
   /**
-   * The ID of the VPC for the endpoint.
+   * The ID of the VPC.
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpcendpoint.html#cfn-ec2-vpcendpoint-vpcid
    */
@@ -39848,7 +39848,7 @@ export class CfnVPCEndpointService extends cdk.CfnResource implements cdk.IInspe
   public acceptanceRequired?: boolean | cdk.IResolvable;
 
   /**
-   * Indicates whether to enable the built-in Contributor Insights rules.
+   * Indicates whether to enable the built-in Contributor Insights rules provided by AWS PrivateLink .
    */
   public contributorInsightsEnabled?: boolean | cdk.IResolvable;
 
@@ -39927,7 +39927,7 @@ export interface CfnVPCEndpointServiceProps {
   readonly acceptanceRequired?: boolean | cdk.IResolvable;
 
   /**
-   * Indicates whether to enable the built-in Contributor Insights rules.
+   * Indicates whether to enable the built-in Contributor Insights rules provided by AWS PrivateLink .
    *
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpcendpointservice.html#cfn-ec2-vpcendpointservice-contributorinsightsenabled
    */
@@ -40050,7 +40050,7 @@ export class CfnVPCEndpointServicePermissions extends cdk.CfnResource implements
   }
 
   /**
-   * The Amazon Resource Names (ARN) of one or more principals (users, IAM roles, and AWS accounts).
+   * The Amazon Resource Names (ARN) of one or more principals (for example, users, IAM roles, and AWS accounts ).
    */
   public allowedPrincipals?: Array<string>;
 
@@ -40107,7 +40107,7 @@ export class CfnVPCEndpointServicePermissions extends cdk.CfnResource implements
  */
 export interface CfnVPCEndpointServicePermissionsProps {
   /**
-   * The Amazon Resource Names (ARN) of one or more principals (users, IAM roles, and AWS accounts).
+   * The Amazon Resource Names (ARN) of one or more principals (for example, users, IAM roles, and AWS accounts ).
    *
    * Permissions are granted to the principals in this list. To grant permissions to all principals, specify an asterisk (*). Permissions are revoked for principals not in this list. If the list is empty, then all permissions are revoked.
    *
@@ -42647,6 +42647,11 @@ export class CfnSequenceStore extends cdk.CfnResource implements cdk.IInspectabl
   public description?: string;
 
   /**
+   * An S3 URI representing the bucket and folder to store failed read set uploads.
+   */
+  public fallbackLocation?: string;
+
+  /**
    * A name for the store.
    */
   public name: string;
@@ -42683,6 +42688,7 @@ export class CfnSequenceStore extends cdk.CfnResource implements cdk.IInspectabl
     this.attrCreationTime = cdk.Token.asString(this.getAtt("CreationTime", cdk.ResolutionTypeHint.STRING));
     this.attrSequenceStoreId = cdk.Token.asString(this.getAtt("SequenceStoreId", cdk.ResolutionTypeHint.STRING));
     this.description = props.description;
+    this.fallbackLocation = props.fallbackLocation;
     this.name = props.name;
     this.sseConfig = props.sseConfig;
     this.tags = new cdk.TagManager(cdk.TagType.MAP, "AWS::Omics::SequenceStore", props.tags, {
@@ -42694,6 +42700,7 @@ export class CfnSequenceStore extends cdk.CfnResource implements cdk.IInspectabl
   protected get cfnProperties(): Record<string, any> {
     return {
       "description": this.description,
+      "fallbackLocation": this.fallbackLocation,
       "name": this.name,
       "sseConfig": this.sseConfig,
       "tags": this.tags.renderTags()
@@ -42753,6 +42760,13 @@ export interface CfnSequenceStoreProps {
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-omics-sequencestore.html#cfn-omics-sequencestore-description
    */
   readonly description?: string;
+
+  /**
+   * An S3 URI representing the bucket and folder to store failed read set uploads.
+   *
+   * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-omics-sequencestore.html#cfn-omics-sequencestore-fallbacklocation
+   */
+  readonly fallbackLocation?: string;
 
   /**
    * A name for the store.
@@ -42837,6 +42851,7 @@ function CfnSequenceStorePropsValidator(properties: any): cdk.ValidationResult {
     errors.collect(new cdk.ValidationResult("Expected an object, but received: " + JSON.stringify(properties)));
   }
   errors.collect(cdk.propertyValidator("description", cdk.validateString)(properties.description));
+  errors.collect(cdk.propertyValidator("fallbackLocation", cdk.validateString)(properties.fallbackLocation));
   errors.collect(cdk.propertyValidator("name", cdk.requiredValidator)(properties.name));
   errors.collect(cdk.propertyValidator("name", cdk.validateString)(properties.name));
   errors.collect(cdk.propertyValidator("sseConfig", CfnSequenceStoreSseConfigPropertyValidator)(properties.sseConfig));
@@ -42850,6 +42865,7 @@ function convertCfnSequenceStorePropsToCloudFormation(properties: any): any {
   CfnSequenceStorePropsValidator(properties).assertSuccess();
   return {
     "Description": cdk.stringToCloudFormation(properties.description),
+    "FallbackLocation": cdk.stringToCloudFormation(properties.fallbackLocation),
     "Name": cdk.stringToCloudFormation(properties.name),
     "SseConfig": convertCfnSequenceStoreSseConfigPropertyToCloudFormation(properties.sseConfig),
     "Tags": cdk.hashMapper(cdk.stringToCloudFormation)(properties.tags)
@@ -42867,6 +42883,7 @@ function CfnSequenceStorePropsFromCloudFormation(properties: any): cfn_parse.Fro
   }
   const ret = new cfn_parse.FromCloudFormationPropertyObject<CfnSequenceStoreProps>();
   ret.addPropertyResult("description", "Description", (properties.Description != null ? cfn_parse.FromCloudFormation.getString(properties.Description) : undefined));
+  ret.addPropertyResult("fallbackLocation", "FallbackLocation", (properties.FallbackLocation != null ? cfn_parse.FromCloudFormation.getString(properties.FallbackLocation) : undefined));
   ret.addPropertyResult("name", "Name", (properties.Name != null ? cfn_parse.FromCloudFormation.getString(properties.Name) : undefined));
   ret.addPropertyResult("sseConfig", "SseConfig", (properties.SseConfig != null ? CfnSequenceStoreSseConfigPropertyFromCloudFormation(properties.SseConfig) : undefined));
   ret.addPropertyResult("tags", "Tags", (properties.Tags != null ? cfn_parse.FromCloudFormation.getMap(cfn_parse.FromCloudFormation.getString)(properties.Tags) : undefined));
@@ -43759,6 +43776,7 @@ export class CfnApi extends cdk.CfnResource implements cdk.IInspectable, cdk.ITa
 
     cdk.requireProperty(props, "stageName", this);
 
+    // Automatically add the required transform
     this.stack.addTransform(CfnApi.REQUIRED_TRANSFORM);
 
     this.accessLogSetting = props.accessLogSetting;
@@ -44819,6 +44837,7 @@ export class CfnApplication extends cdk.CfnResource implements cdk.IInspectable,
 
     cdk.requireProperty(props, "location", this);
 
+    // Automatically add the required transform
     this.stack.addTransform(CfnApplication.REQUIRED_TRANSFORM);
 
     this.location = props.location;
@@ -45133,6 +45152,7 @@ export class CfnFunction extends cdk.CfnResource implements cdk.IInspectable, cd
       "properties": props
     });
 
+    // Automatically add the required transform
     this.stack.addTransform(CfnFunction.REQUIRED_TRANSFORM);
 
     this.architectures = props.architectures;
@@ -49507,6 +49527,7 @@ export class CfnHttpApi extends cdk.CfnResource implements cdk.IInspectable, cdk
       "properties": props
     });
 
+    // Automatically add the required transform
     this.stack.addTransform(CfnHttpApi.REQUIRED_TRANSFORM);
 
     this.accessLogSetting = props.accessLogSetting;
@@ -50409,6 +50430,7 @@ export class CfnLayerVersion extends cdk.CfnResource implements cdk.IInspectable
       "properties": props
     });
 
+    // Automatically add the required transform
     this.stack.addTransform(CfnLayerVersion.REQUIRED_TRANSFORM);
 
     this.compatibleRuntimes = props.compatibleRuntimes;
@@ -50681,6 +50703,7 @@ export class CfnSimpleTable extends cdk.CfnResource implements cdk.IInspectable,
       "properties": props
     });
 
+    // Automatically add the required transform
     this.stack.addTransform(CfnSimpleTable.REQUIRED_TRANSFORM);
 
     this.primaryKey = props.primaryKey;
@@ -51066,6 +51089,7 @@ export class CfnStateMachine extends cdk.CfnResource implements cdk.IInspectable
       "properties": props
     });
 
+    // Automatically add the required transform
     this.stack.addTransform(CfnStateMachine.REQUIRED_TRANSFORM);
 
     this.definition = props.definition;

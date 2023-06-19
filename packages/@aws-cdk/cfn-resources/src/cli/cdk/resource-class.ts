@@ -4,6 +4,7 @@ import {
   $T,
   Block,
   ClassType,
+  code,
   expr,
   MemberVisibility,
   IScope,
@@ -254,7 +255,11 @@ export class ResourceClass extends ClassType {
     );
 
     if (this.resource.cloudFormationTransform) {
-      init.addBody($this.stack.addTransform($T(this.type)[staticRequiredTransform()]), stmt.sep());
+      init.addBody(
+        code.comment('Automatically add the required transform'),
+        $this.stack.addTransform($T(this.type)[staticRequiredTransform()]),
+        stmt.sep(),
+      );
     }
 
     init.addBody(

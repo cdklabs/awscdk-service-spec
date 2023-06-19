@@ -9,7 +9,7 @@ async function main() {
   });
 
   console.log('Saving db.json');
-  await fs.writeFile('db.json', JSON.stringify(db.save(), undefined, 1), { encoding: 'utf-8' });
+  await fs.writeFile('db.json', JSON.stringify(db.save()), { encoding: 'utf-8' });
 
   await report.write('build-report');
   console.log('Problems encountered (see build-report/ directory)');

@@ -2,6 +2,10 @@ import * as pj from 'projen';
 import { AwsCdkIntegrationTest, TypeScriptWorkspace, YarnMonorepo } from './projenrc';
 import { RegionalSource, Role, SingleSource, SourceProcessing } from './projenrc/update-sources';
 
+// These are temporarily not available, skip them for now
+// const workflowRunsOn = ['awscdk-service-spec_ubuntu-latest_32-core'];
+const workflowRunsOn = ['ubuntu-latest'];
+
 const repo = new YarnMonorepo({
   name: 'awscdk-service-spec',
   description: "Monorepo for the AWS CDK's service spec",
@@ -18,7 +22,7 @@ const repo = new YarnMonorepo({
       trailingComma: pj.javascript.TrailingComma.ALL,
     },
   },
-  workflowRunsOn: ['awscdk-service-spec_ubuntu-latest_32-core'],
+  workflowRunsOn,
   gitignore: ['.DS_Store'],
   gitOptions: {
     lfsPatterns: ['sources/**/*.json'],
@@ -103,8 +107,26 @@ serviceSpecBuild.tasks.addTask('analyze:db', {
   receiveArgs: true,
 });
 serviceSpecBuild.gitignore.addPatterns('db.json');
-serviceSpecBuild.gitignore.addPatterns('db-build-report.txt');
 serviceSpecBuild.gitignore.addPatterns('build-report');
+
+const awsServiceSpec = new TypeScriptWorkspace({
+  parent: repo,
+  name: '@aws-cdk/aws-service-spec',
+  description: 'A specification of built-in AWS resources',
+  deps: [tsKb, serviceSpec],
+  devDeps: ['source-map-support', serviceSpecBuild],
+});
+// Needs to be added to 'compile' task, because the integ tests will 'compile' everything (but not run the tests and linter).
+awsServiceSpec.compileTask.prependSpawn(
+  awsServiceSpec.tasks.addTask('generate', {
+    exec: `node -e 'require("${serviceSpecBuild.name}/lib/cli/build")' && gzip db.json`,
+    receiveArgs: true,
+  }),
+);
+
+awsServiceSpec.gitignore.addPatterns('db.json.gz');
+awsServiceSpec.gitignore.addPatterns('build-report');
+awsServiceSpec.npmignore?.addPatterns('build-report');
 
 const cfnResources = new TypeScriptWorkspace({
   parent: repo,
@@ -149,11 +171,13 @@ const cfn2ts = new TypeScriptWorkspace({
   name: '@aws-cdk/cfn2ts',
   description: 'Drop-in replacement for cfn2ts',
   private: true,
-  deps: [cfnResources, serviceSpec, 'yargs', 'fs-extra'],
+  deps: [cfnResources, serviceSpec, awsServiceSpec, 'yargs', 'fs-extra'],
 });
 
 // Add integration test with aws-cdk
-new AwsCdkIntegrationTest(cfn2ts);
+new AwsCdkIntegrationTest(cfn2ts, {
+  workflowRunsOn,
+});
 
 // Update sources
 new SingleSource(repo, {
