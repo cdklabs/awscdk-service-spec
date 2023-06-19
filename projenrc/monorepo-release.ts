@@ -166,7 +166,12 @@ export class MonorepoReleaseWorkflow extends Component {
       description: `Prepare a release from all monorepo packages`,
       env,
     });
-    this.releaseAllTask.exec('yarn workspaces run release');
+    // Unroll out the 'release' task, and do all the phases for each individual package. We need to 'bump' at the same
+    // time so that the dependency versions in all 'package.json's are correct.
+    this.releaseAllTask.exec('yarn workspaces run bump');
+    this.releaseAllTask.exec('yarn workspaces run build');
+    this.releaseAllTask.exec('yarn workspaces run unbump');
+    this.releaseAllTask.exec('git diff --ignore-space-at-eol --exit-code');
 
     this.createPublishingMechanism();
     return this.releaseAllTask;
