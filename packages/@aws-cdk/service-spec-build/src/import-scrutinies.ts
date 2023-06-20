@@ -5,7 +5,7 @@ import {
   ResourceScrutinyType,
   RichSpecDatabase,
   SpecDatabase,
-} from '@aws-cdk/service-spec';
+} from '@aws-cdk/service-spec-types';
 
 /**
  * Auto-detect common properties to apply scrutiny to by using heuristics

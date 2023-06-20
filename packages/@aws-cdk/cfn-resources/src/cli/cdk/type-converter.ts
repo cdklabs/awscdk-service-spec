@@ -1,4 +1,4 @@
-import { SpecDatabase, PropertyType, Resource, TypeDefinition, Property, RichProperty } from '@aws-cdk/service-spec';
+import { SpecDatabase, PropertyType, Resource, TypeDefinition, Property, RichProperty } from '@aws-cdk/service-spec-types';
 import { ClassType, Module, PrimitiveType, RichScope, StructType, Type, TypeDeclaration } from '@cdklabs/typewriter';
 import { CDK_CORE } from './cdk';
 import { TypeDefinitionStruct } from './typedefinition-struct';

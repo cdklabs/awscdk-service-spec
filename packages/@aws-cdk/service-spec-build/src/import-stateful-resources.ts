@@ -1,4 +1,4 @@
-import { SpecDatabase } from '@aws-cdk/service-spec';
+import { SpecDatabase } from '@aws-cdk/service-spec-types';
 import { StatefulResources } from '@aws-cdk/service-spec-sources';
 
 export function importStatefulResources(db: SpecDatabase, stateful: StatefulResources) {

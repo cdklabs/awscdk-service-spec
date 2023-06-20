@@ -1,4 +1,4 @@
-import { emptyDatabase } from '@aws-cdk/service-spec';
+import { emptyDatabase } from '@aws-cdk/service-spec-types';
 import { ProblemReport, SamTemplateSchema, jsonschema } from '@aws-cdk/service-spec-sources';
 import { SamResources } from '../src/import-sam';
 

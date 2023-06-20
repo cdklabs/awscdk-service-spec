@@ -1,5 +1,5 @@
 import { loadAwsServiceSpec } from '@aws-cdk/aws-service-spec';
-import { SpecDatabase } from '@aws-cdk/service-spec';
+import { SpecDatabase } from '@aws-cdk/service-spec-types';
 import { IScope } from '@cdklabs/typewriter';
 import { AstBuilder } from '../src/cli/cdk/ast';
 

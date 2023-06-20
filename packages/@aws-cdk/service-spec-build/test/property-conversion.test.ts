@@ -1,4 +1,4 @@
-import { DefinitionReference, emptyDatabase } from '@aws-cdk/service-spec';
+import { DefinitionReference, emptyDatabase } from '@aws-cdk/service-spec-types';
 import { ProblemReport } from '@aws-cdk/service-spec-sources';
 import { importCloudFormationRegistryResource } from '../src/import-cloudformation-registry';
 

@@ -1,4 +1,4 @@
-import { Property, Resource, TypeDefinition } from '@aws-cdk/service-spec';
+import { Property, Resource, TypeDefinition } from '@aws-cdk/service-spec-types';
 import { PropertySpec, Type } from '@cdklabs/typewriter';
 import { deprecationMessage } from './resource-decider';
 import { NON_RESOLVABLE_PROPERTY_NAMES } from './tagging';

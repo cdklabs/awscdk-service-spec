@@ -8,7 +8,7 @@ import {
   SpecDatabase,
   TagVariant,
   TypeDefinition,
-} from '@aws-cdk/service-spec';
+} from '@aws-cdk/service-spec-types';
 import {
   CloudFormationRegistryResource,
   ImplicitJsonSchemaRecord,

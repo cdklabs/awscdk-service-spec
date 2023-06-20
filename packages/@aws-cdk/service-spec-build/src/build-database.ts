@@ -1,4 +1,4 @@
-import { emptyDatabase } from '@aws-cdk/service-spec';
+import { emptyDatabase } from '@aws-cdk/service-spec-types';
 import * as sources from '@aws-cdk/service-spec-sources';
 import { LoadResult, ProblemReport } from '@aws-cdk/service-spec-sources';
 import { assertSuccess, Result } from '@cdklabs/tskb';

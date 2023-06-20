@@ -1,4 +1,4 @@
-import { Resource, ResourceAugmentation, ResourceMetric, SpecDatabase } from '@aws-cdk/service-spec';
+import { Resource, ResourceAugmentation, ResourceMetric, SpecDatabase } from '@aws-cdk/service-spec-types';
 import {
   $E,
   ClassType,

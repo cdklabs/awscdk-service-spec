@@ -1,4 +1,4 @@
-import { Deprecation, Property, Resource, RichProperty, TagVariant } from '@aws-cdk/service-spec';
+import { Deprecation, Property, Resource, RichProperty, TagVariant } from '@aws-cdk/service-spec-types';
 import { $E, $T, Expression, PropertySpec, Type, expr } from '@cdklabs/typewriter';
 import { CDK_CORE } from './cdk';
 import { NON_RESOLVABLE_PROPERTY_NAMES, TaggabilityStyle, resourceTaggabilityStyle } from './tagging';

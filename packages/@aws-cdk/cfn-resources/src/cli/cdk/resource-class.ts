@@ -1,4 +1,4 @@
-import { PropertyType, Resource, SpecDatabase } from '@aws-cdk/service-spec';
+import { PropertyType, Resource, SpecDatabase } from '@aws-cdk/service-spec-types';
 import {
   $E,
   $T,

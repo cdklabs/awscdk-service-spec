@@ -1,4 +1,4 @@
-import { Region, Service, SpecDatabase } from '@aws-cdk/service-spec';
+import { Region, Service, SpecDatabase } from '@aws-cdk/service-spec-types';
 import {
   CloudFormationRegistryResource,
   jsonschema,

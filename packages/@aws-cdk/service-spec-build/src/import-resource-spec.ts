@@ -8,7 +8,7 @@ import {
   RichSpecDatabase,
   SpecDatabase,
   TypeDefinition,
-} from '@aws-cdk/service-spec';
+} from '@aws-cdk/service-spec-types';
 import {
   CloudFormationResourceSpecification,
   SAMResourceSpecification,

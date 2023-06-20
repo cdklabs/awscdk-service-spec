@@ -1,5 +1,5 @@
 import { createHash } from 'crypto';
-import { SpecDatabase } from '@aws-cdk/service-spec';
+import { SpecDatabase } from '@aws-cdk/service-spec-types';
 import { CloudWatchConsoleServiceDirectory, ProblemReport, ReportAudience } from '@aws-cdk/service-spec-sources';
 import { Entity, failure, Plain } from '@cdklabs/tskb';
 

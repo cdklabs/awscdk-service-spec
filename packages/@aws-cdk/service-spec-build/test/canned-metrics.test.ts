@@ -1,4 +1,4 @@
-import { emptyDatabase } from '@aws-cdk/service-spec';
+import { emptyDatabase } from '@aws-cdk/service-spec-types';
 import { ProblemReport } from '@aws-cdk/service-spec-sources';
 import { importCannedMetrics } from '../src/import-canned-metrics';
 
