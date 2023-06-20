@@ -1,7 +1,13 @@
 import { yarn } from 'cdklabs-projen-project-types';
 import { Nx } from './nx';
+import { TypeScriptWorkspace } from './workspace';
 
 export class YarnMonorepo extends yarn.CdkLabsMonorepo {
+  get subprojects(): TypeScriptWorkspace[] {
+    // @ts-ignore
+    return [...this.projects];
+  }
+
   public constructor(options: yarn.CdkLabsMonorepoOptions) {
     super(options);
 
