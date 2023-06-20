@@ -37,7 +37,7 @@
       "path": "../cfn-resources"
     },
     {
-      "path": "../service-spec"
+      "path": "../service-spec-types"
     },
     {
       "path": "../aws-service-spec"

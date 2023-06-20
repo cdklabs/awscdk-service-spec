@@ -1,6 +1,6 @@
 {
-  "name": "@aws-cdk/service-spec",
-  "description": "AWS CDK Service spec",
+  "name": "@aws-cdk/service-spec-types",
+  "description": "Types for CloudFormation Service Specifications",
   "scripts": {
     "build": "npx projen build",
     "check-for-updates": "npx projen check-for-updates",
