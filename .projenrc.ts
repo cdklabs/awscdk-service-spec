@@ -131,6 +131,7 @@ awsServiceSpec.npmignore?.addPatterns('build-report');
 const cfnResources = new TypeScriptWorkspace({
   parent: repo,
   name: '@aws-cdk/cfn-resources',
+  private: true,
   description: 'L1 constructs for all CloudFormation Resources',
   deps: [],
   peerDeps: ['aws-cdk-lib@^2', 'constructs@^10.0.0'],
