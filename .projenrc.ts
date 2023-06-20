@@ -46,7 +46,7 @@ const serviceSpecSources = new TypeScriptWorkspace({
   parent: repo,
   name: '@aws-cdk/service-spec-sources',
   description: 'Sources for the service spec',
-  deps: ['ajv', 'glob', tsKb, 'fast-json-patch', 'canonicalize'],
+  deps: ['ajv', 'glob', tsKb, 'fast-json-patch', 'canonicalize', 'fs-extra', 'sort-json'],
   devDeps: ['ts-json-schema-generator', '@types/glob', 'ajv-cli'],
   private: true,
 });
@@ -58,6 +58,7 @@ const serviceSpecSchemaTask = serviceSpecSources.addTask('gen-schemas', {
   steps: [
     'CloudFormationRegistryResource',
     'CloudFormationResourceSpecification',
+    'SAMResourceSpecification',
     'CloudFormationDocumentation',
     'StatefulResources',
     'SamTemplateSchema',
@@ -97,8 +98,13 @@ const serviceSpecBuild = new TypeScriptWorkspace({
   devDeps: ['source-map-support'],
   private: true,
 });
-serviceSpecBuild.tasks.addTask('build:db', {
+const buildDb = serviceSpecBuild.tasks.addTask('build:db', {
   exec: 'node -r source-map-support/register lib/cli/build',
+});
+serviceSpecBuild.postCompileTask.spawn(buildDb);
+serviceSpecBuild.tasks.addTask('analyze:db', {
+  exec: 'ts-node src/cli/analyze-db',
+  receiveArgs: true,
 });
 serviceSpecBuild.gitignore.addPatterns('db.json');
 serviceSpecBuild.gitignore.addPatterns('build-report');
@@ -192,6 +198,13 @@ new RegionalSource(repo, {
   sources: {
     'us-east-1': 'https://d1uauaxba7bl26.cloudfront.net/latest/gzip/CloudFormationResourceSpecification.json',
   },
+  fileName: '000_cloudformation/000_CloudFormationResourceSpecification.json',
+});
+new SingleSource(repo, {
+  name: 'sam-spec',
+  dir: 'sources/CloudFormationResourceSpecification/us-east-1/100_sam/000_official',
+  source: 'https://raw.githubusercontent.com/awslabs/goformation/master/generate/sam-2016-10-31.json',
+  fileName: 'spec.json',
 });
 new RegionalSource(repo, {
   name: 'cfn-schema',

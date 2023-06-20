@@ -45,7 +45,9 @@
     "ajv": "^6.12.6",
     "canonicalize": "^1.0.8",
     "fast-json-patch": "^3.1.1",
-    "glob": "^7.2.3"
+    "fs-extra": "^11.1.1",
+    "glob": "^7.2.3",
+    "sort-json": "^2.0.1"
   },
   "main": "lib/index.js",
   "license": "Apache-2.0",

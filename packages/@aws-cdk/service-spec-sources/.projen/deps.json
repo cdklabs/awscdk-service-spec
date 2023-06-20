@@ -103,7 +103,15 @@
       "type": "runtime"
     },
     {
+      "name": "fs-extra",
+      "type": "runtime"
+    },
+    {
       "name": "glob",
+      "type": "runtime"
+    },
+    {
+      "name": "sort-json",
       "type": "runtime"
     }
   ],

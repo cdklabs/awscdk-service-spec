@@ -1,9 +1,9 @@
 import { promises as fs } from 'fs';
-import { buildDatabase } from '../index';
+import { DatabaseBuilder } from '../build-database';
 
 async function main() {
   console.log('Building...');
-  const { db, report } = await buildDatabase({
+  const { db, report } = await DatabaseBuilder.buildDatabase({
     // FIXME: Switch this to 'true' at some point
     mustValidate: false,
   });

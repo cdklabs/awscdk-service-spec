@@ -12,7 +12,7 @@
                 "$ref": "#/definitions/resourcespec.PropertyType"
               },
               {
-                "$ref": "#/definitions/resourcespec.Property"
+                "$ref": "#/definitions/resourcespec.SingleTypeAlias"
               }
             ]
           },
@@ -107,11 +107,26 @@
         "Documentation": {
           "type": "string"
         },
+        "DuplicatesAllowed": {
+          "type": "boolean"
+        },
+        "ItemType": {
+          "type": "string"
+        },
+        "PrimitiveItemType": {
+          "type": "string"
+        },
+        "PrimitiveType": {
+          "type": "string"
+        },
         "Properties": {
           "additionalProperties": {
             "$ref": "#/definitions/resourcespec.Property"
           },
           "type": "object"
+        },
+        "Type": {
+          "type": "string"
         }
       },
       "type": "object"
@@ -136,6 +151,31 @@
             "$ref": "#/definitions/resourcespec.Property"
           },
           "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "resourcespec.SingleTypeAlias": {
+      "additionalProperties": false,
+      "description": "Used for PropertyTypes that alias a single other type (usually Json)",
+      "properties": {
+        "Documentation": {
+          "type": "string"
+        },
+        "DuplicatesAllowed": {
+          "type": "boolean"
+        },
+        "ItemType": {
+          "type": "string"
+        },
+        "PrimitiveItemType": {
+          "type": "string"
+        },
+        "PrimitiveType": {
+          "type": "string"
+        },
+        "Type": {
+          "type": "string"
         }
       },
       "type": "object"

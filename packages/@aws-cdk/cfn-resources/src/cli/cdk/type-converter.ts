@@ -1,4 +1,4 @@
-import { SpecDatabase, PropertyType, Resource, TypeDefinition, Property } from '@aws-cdk/service-spec';
+import { SpecDatabase, PropertyType, Resource, TypeDefinition, Property, RichProperty } from '@aws-cdk/service-spec';
 import { ClassType, Module, PrimitiveType, RichScope, StructType, Type, TypeDeclaration } from '@cdklabs/typewriter';
 import { CDK_CORE } from './cdk';
 import { TypeDefinitionStruct } from './typedefinition-struct';
@@ -91,7 +91,7 @@ export class TypeConverter {
    */
   public typeHistoryFromProperty(property: Property): PropertyType[] {
     // For backwards compatibility reasons we always have to use the original type
-    return [...(property.previousTypes ?? []), property.type];
+    return new RichProperty(property).types();
   }
 
   public typeFromSpecType(type: PropertyType): Type {
@@ -111,7 +111,9 @@ export class TypeConverter {
         return Type.mapOf(this.typeFromSpecType(type.element));
       case 'ref':
         const ref = this.db.get('typeDefinition', type.reference.$ref);
-        return this.obtainTypeDefinitionType(ref).type;
+        return this.convertTypeDefinitionType(ref).type;
+      case 'tag':
+        return CDK_CORE.CfnTag;
       case 'union':
         return Type.unionOf(...type.types.map((t) => this.typeFromSpecType(t)));
       case 'null':
@@ -123,7 +125,7 @@ export class TypeConverter {
     }
   }
 
-  private obtainTypeDefinitionType(ref: TypeDefinition): TypeDeclaration {
+  public convertTypeDefinitionType(ref: TypeDefinition): TypeDeclaration {
     const existing = this.typeDefCache.get(ref);
     if (existing) {
       return existing;

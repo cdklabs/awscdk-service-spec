@@ -177,6 +177,14 @@ export function combineLoadResults<A>(xs: Result<LoadResult<A>>[]): LoadResult<A
   }, ret);
 }
 
+export function mapLoadResult<A, B>(x: LoadResult<A>, fn: (x: A) => B): LoadResult<B> {
+  return {
+    patchesApplied: x.patchesApplied,
+    warnings: x.warnings,
+    value: fn(x.value),
+  };
+}
+
 /**
  * Group AJV errors by dataPath and format them in a way that it's clear which validations
  * we tried to apply to every object and why they failed.

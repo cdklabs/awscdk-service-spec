@@ -147,7 +147,7 @@
       "name": "update-source:resource-spec",
       "steps": [
         {
-          "exec": "node ./scripts/download.task.js https://d1uauaxba7bl26.cloudfront.net/latest/gzip/CloudFormationResourceSpecification.json sources/CloudFormationResourceSpecification/us-east-1/CloudFormationResourceSpecification.json"
+          "exec": "node ./scripts/download.task.js https://d1uauaxba7bl26.cloudfront.net/latest/gzip/CloudFormationResourceSpecification.json sources/CloudFormationResourceSpecification/us-east-1/000_cloudformation/000_CloudFormationResourceSpecification.json"
         }
       ]
     },
@@ -156,6 +156,14 @@
       "steps": [
         {
           "exec": "node ./scripts/download.task.js https://raw.githubusercontent.com/awslabs/goformation/master/schema/sam.schema.json sources/SAMSpec/sam.schema.json"
+        }
+      ]
+    },
+    "update-source:sam-spec": {
+      "name": "update-source:sam-spec",
+      "steps": [
+        {
+          "exec": "node ./scripts/download.task.js https://raw.githubusercontent.com/awslabs/goformation/master/generate/sam-2016-10-31.json sources/CloudFormationResourceSpecification/us-east-1/100_sam/000_official/spec.json"
         }
       ]
     },
@@ -175,6 +183,9 @@
         },
         {
           "spawn": "update-source:resource-spec"
+        },
+        {
+          "spawn": "update-source:sam-spec"
         },
         {
           "spawn": "update-source:cfn-schema"

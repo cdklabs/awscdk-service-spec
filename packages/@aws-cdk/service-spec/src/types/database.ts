@@ -1,3 +1,4 @@
+import { promises as fs } from 'fs';
 import { Database, entityCollection, fieldIndex, stringCmp } from '@cdklabs/tskb';
 import { IsAugmentedResource, ResourceAugmentation } from './augmentations';
 import {
@@ -58,6 +59,12 @@ export function emptyDatabase() {
   );
 }
 
+export async function loadDatabase(pathToDb: string) {
+  const db = emptyDatabase();
+  db.load(JSON.parse(await fs.readFile(pathToDb, { encoding: 'utf-8' })));
+  return db;
+}
+
 export type SpecDatabase = ReturnType<typeof emptyDatabase>;
 
 /**
@@ -69,8 +76,20 @@ export class RichSpecDatabase {
   /**
    * Find all resources of a given type
    */
-  public resourcesByType(cfnType: string): readonly Resource[] {
-    return this.db.lookup('resource', 'cloudFormationType', 'equals', cfnType);
+  public resourceByType(cfnType: string, operation = 'resourceByType'): Resource {
+    const res = this.db.lookup('resource', 'cloudFormationType', 'equals', cfnType);
+    if (res.length === 0) {
+      throw new Error(`${operation}: no such resource: ${cfnType}`);
+    }
+    return res[0];
+  }
+
+  /**
+   * All type definitions used by a certain resource
+   */
+  public resourceTypeDefs(cfnType: string): readonly TypeDefinition[] {
+    const resource = this.db.lookup('resource', 'cloudFormationType', 'equals', cfnType).only();
+    return this.db.follow('usesType', resource).map((x) => x.entity);
   }
 
   /**

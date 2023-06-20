@@ -2,6 +2,7 @@
   "name": "@aws-cdk/service-spec-build",
   "description": "Build the service spec from service-spec-sources to service-spec",
   "scripts": {
+    "analyze:db": "npx projen analyze:db",
     "build": "npx projen build",
     "build:db": "npx projen build:db",
     "check-for-updates": "npx projen check-for-updates",

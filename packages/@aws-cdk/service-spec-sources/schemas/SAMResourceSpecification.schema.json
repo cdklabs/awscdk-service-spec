@@ -1,0 +1,228 @@
+{
+  "$ref": "#/definitions/SAMResourceSpecification",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "SAMResourceSpecification": {
+      "additionalProperties": false,
+      "description": "SAM has defined a custom extension to the CFN resource specification",
+      "properties": {
+        "Globals": {
+          "additionalProperties": {},
+          "type": "object"
+        },
+        "PropertyTypes": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/resourcespec.SAMPropertyType"
+              },
+              {
+                "$ref": "#/definitions/resourcespec.SAMSingleTypeAlias"
+              }
+            ]
+          },
+          "description": "Not really valid for this to be a plain property, but it happens in practice anyway",
+          "type": "object"
+        },
+        "ResourceSpecificationTransform": {
+          "type": "string"
+        },
+        "ResourceSpecificationVersion": {
+          "type": "string"
+        },
+        "ResourceTypes": {
+          "additionalProperties": {
+            "$ref": "#/definitions/resourcespec.SAMResourceType"
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "ResourceSpecificationTransform",
+        "ResourceSpecificationVersion",
+        "ResourceTypes",
+        "PropertyTypes"
+      ],
+      "type": "object"
+    },
+    "resourcespec.SAMProperty": {
+      "additionalProperties": false,
+      "properties": {
+        "Documentation": {
+          "type": "string"
+        },
+        "DuplicatesAllowed": {
+          "type": "boolean"
+        },
+        "InclusiveItemPattern": {
+          "type": "boolean"
+        },
+        "InclusiveItemTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "InclusivePrimitiveItemTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "ItemType": {
+          "type": "string"
+        },
+        "ItemTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "PrimitiveItemType": {
+          "type": "string"
+        },
+        "PrimitiveItemTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "PrimitiveType": {
+          "type": "string"
+        },
+        "PrimitiveTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "Required": {
+          "type": "boolean"
+        },
+        "Type": {
+          "type": "string"
+        },
+        "Types": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "UpdateType": {
+          "enum": [
+            "Mutable",
+            "Immutable",
+            "Conditional"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "UpdateType"
+      ],
+      "type": "object"
+    },
+    "resourcespec.SAMPropertyType": {
+      "additionalProperties": false,
+      "properties": {
+        "Documentation": {
+          "type": "string"
+        },
+        "Properties": {
+          "additionalProperties": {
+            "$ref": "#/definitions/resourcespec.SAMProperty"
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "resourcespec.SAMResourceType": {
+      "additionalProperties": false,
+      "properties": {
+        "AdditionalProperties": {
+          "type": "boolean"
+        },
+        "Attributes": {
+          "additionalProperties": {
+            "$ref": "#/definitions/resourcespec.SAMProperty"
+          },
+          "type": "object"
+        },
+        "Documentation": {
+          "type": "string"
+        },
+        "Properties": {
+          "additionalProperties": {
+            "$ref": "#/definitions/resourcespec.SAMProperty"
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "resourcespec.SAMSingleTypeAlias": {
+      "additionalProperties": false,
+      "properties": {
+        "Documentation": {
+          "type": "string"
+        },
+        "DuplicatesAllowed": {
+          "type": "boolean"
+        },
+        "InclusiveItemPattern": {
+          "type": "boolean"
+        },
+        "InclusiveItemTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "InclusivePrimitiveItemTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "ItemType": {
+          "type": "string"
+        },
+        "ItemTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "PrimitiveItemType": {
+          "type": "string"
+        },
+        "PrimitiveItemTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "PrimitiveType": {
+          "type": "string"
+        },
+        "PrimitiveTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "Type": {
+          "type": "string"
+        },
+        "Types": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    }
+  }
+}

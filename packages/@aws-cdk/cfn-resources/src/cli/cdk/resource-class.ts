@@ -46,9 +46,15 @@ const $this = $E(expr.this_());
 export class ResourceClass extends ClassType {
   private readonly propsType: StructType;
   private readonly decider: ResourceDecider;
+  private readonly converter: TypeConverter;
   private readonly module: Module;
 
-  constructor(scope: IScope, db: SpecDatabase, private readonly resource: Resource, private readonly suffix?: string) {
+  constructor(
+    scope: IScope,
+    private readonly db: SpecDatabase,
+    private readonly resource: Resource,
+    private readonly suffix?: string,
+  ) {
     super(scope, {
       export: true,
       name: classNameFromResource(resource, suffix),
@@ -77,13 +83,13 @@ export class ResourceClass extends ClassType {
       },
     });
 
-    const converter = TypeConverter.forResource({
+    this.converter = TypeConverter.forResource({
       db: db,
       resource: this.resource,
       resourceClass: this,
     });
 
-    this.decider = new ResourceDecider(this.resource, converter);
+    this.decider = new ResourceDecider(this.resource, this.converter);
   }
 
   /**
@@ -142,6 +148,8 @@ export class ResourceClass extends ClassType {
     // Make converter functions for the props type
     cfnMapping.makeCfnProducer(this.module, this.propsType);
     cfnMapping.makeCfnParser(this.module, this.propsType);
+
+    this.makeMustRenderStructs();
   }
 
   private makeFromCloudFormationFactory() {
@@ -366,5 +374,17 @@ export class ResourceClass extends ClassType {
         .if_(expr.binOp(new IsNotNullish($this.node.scope), '&&', CDK_CORE.Resource.isResource($this.node.scope)))
         .then(Block.with($this.node.addValidation(validator))),
     );
+  }
+
+  /**
+   * Render the structs that are unused, but have to exist for backwards compatibility reasons
+   */
+  private makeMustRenderStructs() {
+    for (const typeDef of this.db
+      .follow('usesType', this.resource)
+      .map((t) => t.entity)
+      .filter((t) => t.mustRenderForBwCompat)) {
+      this.converter.convertTypeDefinitionType(typeDef);
+    }
   }
 }

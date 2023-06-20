@@ -95,32 +95,18 @@ export class Scrutinies {
   }
 
   private setResourceScrutiny(cfnType: string, scrutiny: ResourceScrutinyType) {
-    const ress = new RichSpecDatabase(this.db).resourcesByType(cfnType);
-    if (ress.length === 0) {
-      // Typo protection
-      throw new Error(`setResourceScrutiny: no such resource ${cfnType}`);
-    }
-
-    for (const res of ress) {
-      res.scrutinizable = scrutiny;
-    }
+    const res = new RichSpecDatabase(this.db).resourceByType(cfnType, 'setResourceScrutiny');
+    res.scrutinizable = scrutiny;
   }
 
   private setPropertyScrutiny(cfnType: string, propName: string, scrutiny: PropertyScrutinyType) {
-    const ress = new RichSpecDatabase(this.db).resourcesByType(cfnType);
-    if (ress.length === 0) {
+    const res = new RichSpecDatabase(this.db).resourceByType(cfnType, 'setPropertyScrutiny');
+    const prop = res.properties[propName];
+    if (!prop) {
       // Typo protection
-      throw new Error(`setPropertyScrutiny: no such resource ${cfnType}`);
+      throw new Error(`setPropertyScrutiny: no such property ${cfnType}.${propName}`);
     }
-
-    for (const res of ress) {
-      const prop = res.properties[propName];
-      if (!prop) {
-        // Typo protection
-        throw new Error(`setPropertyScrutiny: no such property ${cfnType}.${propName}`);
-      }
-      prop.scrutinizable = scrutiny;
-    }
+    prop.scrutinizable = scrutiny;
   }
 }
 

@@ -1,4 +1,4 @@
-import { Deprecation, Property, Resource, TagVariant } from '@aws-cdk/service-spec';
+import { Deprecation, Property, Resource, RichProperty, TagVariant } from '@aws-cdk/service-spec';
 import { $E, $T, Expression, PropertySpec, Type, expr } from '@cdklabs/typewriter';
 import { CDK_CORE } from './cdk';
 import { NON_RESOLVABLE_PROPERTY_NAMES, TaggabilityStyle, resourceTaggabilityStyle } from './tagging';
@@ -131,10 +131,7 @@ export class ResourceDecider {
     const originalName = propertyNameFromCloudFormation(cfnName);
     const rawTagsPropName = `${originalName}Raw`;
 
-    const { type, baseType } =
-      variant === 'map'
-        ? { type: Type.mapOf(Type.STRING), baseType: Type.mapOf(Type.STRING) }
-        : this.legacyCompatiblePropType(cfnName, prop);
+    const { type, baseType } = this.legacyCompatiblePropType(cfnName, prop);
 
     this.propsProperties.push({
       propertySpec: {
@@ -255,8 +252,8 @@ export class ResourceDecider {
     const baseType = this.converter.typeFromProperty(prop);
 
     // Whether or not a property is made `IResolvable` originally depended on
-    // the name of the property. These conditions were probably expected to coincide,
-    // but didn't.
+    // the name of the property. These conditions were probably expected to coincide
+    // with it being a taggable type or not, but they don't always coincide.
     const type = cfnName in NON_RESOLVABLE_PROPERTY_NAMES ? baseType : this.converter.makeTypeResolvable(baseType);
 
     return { type, baseType };
@@ -266,25 +263,28 @@ export class ResourceDecider {
     const $ResolutionTypeHint = $T(CDK_CORE.ResolutionTypeHint);
 
     for (const [attrName, attr] of Object.entries(this.resource.attributes)) {
+      // Just use the oldest type for now
+      const specType = new RichProperty(attr).types()[0];
+
       let type: Type;
       let initializer: Expression;
 
-      if (attr.type.type === 'string') {
+      if (specType.type === 'string') {
         type = Type.STRING;
         initializer = CDK_CORE.tokenAsString($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.STRING));
-      } else if (attr.type.type === 'integer') {
+      } else if (specType.type === 'integer') {
         type = Type.NUMBER;
         initializer = CDK_CORE.tokenAsNumber($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.NUMBER));
-      } else if (attr.type.type === 'number') {
+      } else if (specType.type === 'number') {
         // COMPAT: Although numbers/doubles could be represented as numbers, historically in cfn2ts they were represented as IResolvable.
         type = CDK_CORE.IResolvable;
         initializer = $this.getAtt(expr.lit(attrName), $ResolutionTypeHint.NUMBER);
-      } else if (attr.type.type === 'array' && attr.type.element.type === 'string') {
+      } else if (specType.type === 'array' && specType.element.type === 'string') {
         type = Type.arrayOf(Type.STRING);
         initializer = CDK_CORE.tokenAsList($this.getAtt(expr.lit(attrName), $ResolutionTypeHint.STRING_LIST));
       } else {
         // This may reference a type we need to generate, so call this function because of its side effect
-        this.converter.typeFromSpecType(attr.type);
+        this.converter.typeFromSpecType(specType);
         type = CDK_CORE.IResolvable;
         initializer = $this.getAtt(expr.lit(attrName));
       }

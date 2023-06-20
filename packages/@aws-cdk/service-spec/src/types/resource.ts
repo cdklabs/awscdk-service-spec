@@ -1,4 +1,6 @@
 import { Entity, Reference, Relationship } from '@cdklabs/tskb';
+import { SpecDatabase } from './database';
+import { sortKeyComparator } from '../util/sorting';
 
 export interface Partition extends Entity {
   readonly partition: string;
@@ -85,6 +87,11 @@ export interface TypeDefinition extends Entity {
   readonly name: string;
   documentation?: string;
   readonly properties: ResourceProperties;
+
+  /**
+   * If true, render this type even if it is unused.
+   */
+  mustRenderForBwCompat?: boolean;
 }
 
 export interface Property {
@@ -137,21 +144,57 @@ export interface Property {
   scrutinizable?: PropertyScrutinyType;
 }
 
-export class RichProperty {
-  constructor(private readonly property: Property) {}
-
-  public addPreviousType(type: PropertyType) {
-    if (!this.property.previousTypes) {
-      this.property.previousTypes = [];
+export class RichTypedField {
+  constructor(private readonly field: Pick<Property, 'type' | 'previousTypes'>) {
+    if (field === undefined) {
+      throw new Error('Field is undefined');
     }
-    this.property.previousTypes.unshift(type);
+  }
+
+  public types(): PropertyType[] {
+    return [...(this.field.previousTypes ?? []), this.field.type];
+  }
+
+  public addPreviousType(type: PropertyType): boolean {
+    const richType = new RichPropertyType(type);
+
+    // Only add this type if we don't already have it. We are only doing comparisons where 'integer' and 'number'
+    // are treated the same, for all other types we need strict equality. We used to use 'assignableTo' as a
+    // condition, but these types will be rendered in both co- and contravariant positions, and so we really can't
+    // do much better than full equality.
+    if (this.types().some((t) => richType.javascriptEquals(t))) {
+      // Nothing to do, type is already in there.
+      return false;
+    }
+    if (!this.field.previousTypes) {
+      this.field.previousTypes = [];
+    }
+    this.field.previousTypes.unshift(type);
+    return true;
+  }
+}
+
+export class RichProperty extends RichTypedField {
+  constructor(property: Property) {
+    super(property);
+  }
+}
+
+export class RichAttribute extends RichTypedField {
+  constructor(attr: Attribute) {
+    super(attr);
   }
 }
 
 export interface Attribute {
   documentation?: string;
   type: PropertyType;
-  typeHistory?: PropertyType[];
+  /**
+   * An ordered list of previous types of this property in ascending order
+   *
+   * Does not include the current type, use `type` for this.
+   */
+  previousTypes?: PropertyType[];
 }
 
 export enum Deprecation {
@@ -181,7 +224,15 @@ export type PropertyType =
   | MapType<PropertyType>
   | TypeUnion<PropertyType>;
 
-export type PrimitiveType = StringType | NumberType | IntegerType | BooleanType | JsonType | DateTimeType | NullType;
+export type PrimitiveType =
+  | StringType
+  | NumberType
+  | IntegerType
+  | BooleanType
+  | JsonType
+  | DateTimeType
+  | NullType
+  | BuiltinTagType;
 
 export function isCollectionType(x: PropertyType): x is ArrayType<any> | MapType<any> {
   return x.type === 'array' || x.type === 'map';
@@ -203,6 +254,9 @@ export type TagVariant = 'standard' | 'asg' | 'map';
 
 export interface StringType {
   readonly type: 'string';
+}
+export interface BuiltinTagType {
+  readonly type: 'tag';
 }
 
 export interface NumberType {
@@ -347,4 +401,106 @@ export enum PropertyScrutinyType {
    * A set of egress rules (on a security group)
    */
   EgressRules = 'EgressRules',
+}
+
+export class RichPropertyType {
+  constructor(private readonly type: PropertyType) {}
+
+  public equals(rhs: PropertyType): boolean {
+    switch (this.type.type) {
+      case 'integer':
+      case 'boolean':
+      case 'date-time':
+      case 'json':
+      case 'null':
+      case 'number':
+      case 'string':
+      case 'tag':
+        return rhs.type === this.type.type;
+      case 'array':
+      case 'map':
+        return rhs.type === this.type.type && new RichPropertyType(this.type.element).equals(rhs.element);
+      case 'ref':
+        return rhs.type === 'ref' && this.type.reference.$ref === rhs.reference.$ref;
+      case 'union':
+        const lhsKey = this.sortKey();
+        const rhsKey = new RichPropertyType(rhs).sortKey();
+        return lhsKey.length === rhsKey.length && lhsKey.every((l, i) => l === rhsKey[i]);
+    }
+  }
+
+  /**
+   * Whether the current type is JavaScript-equal to the RHS type
+   *
+   * Same as normal equality, but consider `integer` and `number` the same types.
+   */
+  public javascriptEquals(rhs: PropertyType): boolean {
+    switch (this.type.type) {
+      case 'number':
+      case 'integer':
+        // Widening
+        return rhs.type === 'integer' || rhs.type === 'number';
+
+      case 'array':
+      case 'map':
+        return rhs.type === this.type.type && new RichPropertyType(this.type.element).javascriptEquals(rhs.element);
+
+      case 'union':
+        if (rhs.type !== 'union') {
+          return false;
+        }
+        // Every type in this union needs to be equal one type in RHS
+        return this.type.types.every((t1) => rhs.types.some((t2) => new RichPropertyType(t1).javascriptEquals(t2)));
+
+      default:
+        // For anything else, need strict equality
+        return this.equals(rhs);
+    }
+  }
+
+  public stringify(db: SpecDatabase): string {
+    switch (this.type.type) {
+      case 'integer':
+      case 'boolean':
+      case 'date-time':
+      case 'json':
+      case 'null':
+      case 'number':
+      case 'string':
+      case 'tag':
+        return this.type.type;
+      case 'array':
+        return `Array<${new RichPropertyType(this.type.element).stringify(db)}>`;
+      case 'map':
+        return `Map<string, ${new RichPropertyType(this.type.element).stringify(db)}>`;
+      case 'ref':
+        const type = db.get('typeDefinition', this.type.reference);
+        return `${type.name}(${this.type.reference.$ref})`;
+      case 'union':
+        return this.type.types.map((t) => new RichPropertyType(t).stringify(db)).join(' | ');
+    }
+  }
+
+  public sortKey(): string[] {
+    switch (this.type.type) {
+      case 'integer':
+      case 'boolean':
+      case 'date-time':
+      case 'json':
+      case 'null':
+      case 'number':
+      case 'string':
+      case 'tag':
+        return [this.type.type];
+      case 'array':
+      case 'map':
+        return [this.type.type, ...new RichPropertyType(this.type.element).sortKey()];
+      case 'ref':
+        return [this.type.type, this.type.reference.$ref];
+      case 'union':
+        const typeKeys = this.type.types.map((t) => new RichPropertyType(t).sortKey());
+        typeKeys.sort(sortKeyComparator((x) => x));
+        return [this.type.type, ...typeKeys.flatMap((x) => x)];
+    }
+  }
 }
