@@ -39,8 +39,8 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "@aws-cdk/service-spec": "^0.0.0",
     "@aws-cdk/service-spec-sources": "^0.0.0",
+    "@aws-cdk/service-spec-types": "^0.0.0",
     "@cdklabs/tskb": "^0.0.0"
   },
   "main": "lib/index.js",

@@ -11,13 +11,13 @@
       "path": "packages/@aws-cdk/cfn2ts"
     },
     {
-      "path": "packages/@aws-cdk/service-spec"
-    },
-    {
       "path": "packages/@aws-cdk/service-spec-build"
     },
     {
       "path": "packages/@aws-cdk/service-spec-sources"
+    },
+    {
+      "path": "packages/@aws-cdk/service-spec-types"
     },
     {
       "path": "packages/@cdklabs/tskb"

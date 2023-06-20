@@ -79,11 +79,11 @@
       "type": "build"
     },
     {
-      "name": "@aws-cdk/service-spec",
+      "name": "@aws-cdk/service-spec-sources",
       "type": "runtime"
     },
     {
-      "name": "@aws-cdk/service-spec-sources",
+      "name": "@aws-cdk/service-spec-types",
       "type": "runtime"
     },
     {

@@ -43,7 +43,7 @@
       "path": "packages/@aws-cdk/service-spec-sources"
     },
     {
-      "path": "packages/@aws-cdk/service-spec"
+      "path": "packages/@aws-cdk/service-spec-types"
     },
     {
       "path": "packages/@aws-cdk/service-spec-build"

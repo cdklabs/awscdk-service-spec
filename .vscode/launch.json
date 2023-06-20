@@ -75,11 +75,11 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "@aws-cdk/service-spec: compile --force",
+      "name": "@aws-cdk/service-spec-types: compile --force",
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "cwd": "${workspaceFolder}/packages/@aws-cdk/service-spec",
+      "cwd": "${workspaceFolder}/packages/@aws-cdk/service-spec-types",
       "runtimeExecutable": "npx",
       "runtimeArgs": [
         "projen",
@@ -87,7 +87,7 @@
         "--force"
       ],
       "outFiles": [
-        "${workspaceFolder}/packages/@aws-cdk/service-spec/lib/**/*.js"
+        "${workspaceFolder}/packages/@aws-cdk/service-spec-types/lib/**/*.js"
       ]
     },
     {

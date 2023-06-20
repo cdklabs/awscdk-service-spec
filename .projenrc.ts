@@ -83,10 +83,10 @@ serviceSpecSources.addTask('validate-specs', {
 
 serviceSpecSources.compileTask.prependSpawn(serviceSpecSchemaTask);
 
-const serviceSpec = new TypeScriptWorkspace({
+const serviceSpecTypes = new TypeScriptWorkspace({
   parent: repo,
-  name: '@aws-cdk/service-spec',
-  description: 'AWS CDK Service spec',
+  name: '@aws-cdk/service-spec-types',
+  description: 'Types for CloudFormation Service Specifications',
   deps: [tsKb],
 });
 
@@ -94,7 +94,7 @@ const serviceSpecBuild = new TypeScriptWorkspace({
   parent: repo,
   name: '@aws-cdk/service-spec-build',
   description: 'Build the service spec from service-spec-sources to service-spec',
-  deps: [tsKb, serviceSpecSources, serviceSpec],
+  deps: [tsKb, serviceSpecSources, serviceSpecTypes],
   devDeps: ['source-map-support'],
   private: true,
 });
@@ -113,7 +113,7 @@ const awsServiceSpec = new TypeScriptWorkspace({
   parent: repo,
   name: '@aws-cdk/aws-service-spec',
   description: 'A specification of built-in AWS resources',
-  deps: [tsKb, serviceSpec],
+  deps: [tsKb, serviceSpecTypes],
   devDeps: ['source-map-support', serviceSpecBuild],
 });
 // Needs to be added to 'compile' task, because the integ tests will 'compile' everything (but not run the tests and linter).
@@ -139,7 +139,7 @@ const cfnResources = new TypeScriptWorkspace({
     pinnedDevDependency: false,
   },
   devDeps: [
-    serviceSpec,
+    serviceSpecTypes,
     serviceSpecBuild,
     tsKb,
     typewriter,
@@ -172,7 +172,7 @@ const cfn2ts = new TypeScriptWorkspace({
   name: '@aws-cdk/cfn2ts',
   description: 'Drop-in replacement for cfn2ts',
   private: true,
-  deps: [cfnResources, serviceSpec, awsServiceSpec, 'yargs', 'fs-extra'],
+  deps: [cfnResources, serviceSpecTypes, awsServiceSpec, 'yargs', 'fs-extra'],
 });
 
 // Add integration test with aws-cdk

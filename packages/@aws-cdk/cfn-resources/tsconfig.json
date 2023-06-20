@@ -34,7 +34,7 @@
   "exclude": [],
   "references": [
     {
-      "path": "../service-spec"
+      "path": "../service-spec-types"
     },
     {
       "path": "../service-spec-build"

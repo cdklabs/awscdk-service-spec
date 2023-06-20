@@ -1,4 +1,4 @@
-import { Resource, TypeDefinition } from '@aws-cdk/service-spec';
+import { Resource, TypeDefinition } from '@aws-cdk/service-spec-types';
 import { ClassType, Module, StructType } from '@cdklabs/typewriter';
 import { TypeConverter } from './type-converter';
 import { TypeDefinitionDecider } from './typedefinition-decider';

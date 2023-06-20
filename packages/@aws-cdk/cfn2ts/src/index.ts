@@ -1,6 +1,6 @@
 import { loadAwsServiceSpec } from '@aws-cdk/aws-service-spec';
 import { generate as generateModules } from '@aws-cdk/cfn-resources';
-import { Service } from '@aws-cdk/service-spec';
+import { Service } from '@aws-cdk/service-spec-types';
 import * as fs from 'fs-extra';
 import * as pkglint from './pkglint';
 import { CodeGeneratorOptions, GenerateAllOptions, ModuleMap } from './types';

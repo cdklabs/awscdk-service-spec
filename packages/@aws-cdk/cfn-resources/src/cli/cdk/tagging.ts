@@ -1,4 +1,4 @@
-import { Resource, TagInformation, TagVariant } from '@aws-cdk/service-spec';
+import { Resource, TagInformation, TagVariant } from '@aws-cdk/service-spec-types';
 
 /**
  * Property names that were not extended with the IResolvable type because they were considered to be tags

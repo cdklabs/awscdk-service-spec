@@ -1,6 +1,6 @@
 import path from 'path';
 import { loadAwsServiceSpec } from '@aws-cdk/aws-service-spec';
-import { SpecDatabase } from '@aws-cdk/service-spec';
+import { SpecDatabase } from '@aws-cdk/service-spec-types';
 import { TypeScriptRenderer } from '@cdklabs/typewriter';
 import * as fs from 'fs-extra';
 import { AstBuilder, ServiceModule } from './cdk/ast';

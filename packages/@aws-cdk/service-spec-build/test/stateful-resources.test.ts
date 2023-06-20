@@ -1,4 +1,4 @@
-import { emptyDatabase } from '@aws-cdk/service-spec';
+import { emptyDatabase } from '@aws-cdk/service-spec-types';
 import { importStatefulResources } from '../src/import-stateful-resources';
 
 let db: ReturnType<typeof emptyDatabase>;

@@ -1,4 +1,4 @@
-import { SpecDatabase, Resource, Service } from '@aws-cdk/service-spec';
+import { SpecDatabase, Resource, Service } from '@aws-cdk/service-spec-types';
 import { Module } from '@cdklabs/typewriter';
 import { AugmentationsModule } from './augmentation-generator';
 import { CannedMetricsModule } from './canned-metrics';

@@ -1,4 +1,4 @@
-import { emptyDatabase, Resource } from '@aws-cdk/service-spec';
+import { emptyDatabase, Resource } from '@aws-cdk/service-spec-types';
 import { importCloudFormationDocumentation } from '../src/import-cloudformation-docs';
 
 let db: ReturnType<typeof emptyDatabase>;

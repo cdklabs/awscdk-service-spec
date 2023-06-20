@@ -1,10 +1,10 @@
-import { Region, Service, SpecDatabase } from '@aws-cdk/service-spec';
 import {
   CloudFormationRegistryResource,
   jsonschema,
   ProblemReport,
   SamTemplateSchema,
 } from '@aws-cdk/service-spec-sources';
+import { Region, Service, SpecDatabase } from '@aws-cdk/service-spec-types';
 import { chain, failure, liftUndefined, unpackOr } from '@cdklabs/tskb';
 import { importCloudFormationRegistryResource } from './import-cloudformation-registry';
 

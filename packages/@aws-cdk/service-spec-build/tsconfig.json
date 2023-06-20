@@ -40,7 +40,7 @@
       "path": "../service-spec-sources"
     },
     {
-      "path": "../service-spec"
+      "path": "../service-spec-types"
     }
   ]
 }

@@ -1,4 +1,4 @@
-import { Property, RichPropertyType, RichSpecDatabase, SpecDatabase, loadDatabase } from '@aws-cdk/service-spec';
+import { Property, RichPropertyType, RichSpecDatabase, SpecDatabase, loadDatabase } from '@aws-cdk/service-spec-types';
 
 async function main() {
   const db = await loadDatabase('db.json');

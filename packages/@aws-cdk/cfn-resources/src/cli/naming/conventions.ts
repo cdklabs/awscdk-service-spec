@@ -1,4 +1,4 @@
-import { Metric, Resource, TypeDefinition } from '@aws-cdk/service-spec';
+import { Metric, Resource, TypeDefinition } from '@aws-cdk/service-spec-types';
 import { ClassType, TypeDeclaration } from '@cdklabs/typewriter';
 import camelcase from 'camelcase';
 

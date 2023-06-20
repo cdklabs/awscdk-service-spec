@@ -1,4 +1,4 @@
-import { SpecDatabase } from '@aws-cdk/service-spec';
+import { SpecDatabase } from '@aws-cdk/service-spec-types';
 
 export function getAllServices(db: SpecDatabase) {
   return db.all('service');
