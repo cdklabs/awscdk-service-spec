@@ -1,4 +1,9 @@
 import {
+  CloudFormationResourceSpecification,
+  SAMResourceSpecification,
+  resourcespec,
+} from '@aws-cdk/service-spec-sources';
+import {
   Attribute,
   PropertyType,
   Resource,
@@ -9,11 +14,6 @@ import {
   SpecDatabase,
   TypeDefinition,
 } from '@aws-cdk/service-spec-types';
-import {
-  CloudFormationResourceSpecification,
-  SAMResourceSpecification,
-  resourcespec,
-} from '@aws-cdk/service-spec-sources';
 import { ref } from '@cdklabs/tskb';
 
 //////////////////////////////////////////////////////////////////////

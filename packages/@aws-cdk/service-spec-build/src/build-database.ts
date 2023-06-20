@@ -1,6 +1,6 @@
-import { emptyDatabase } from '@aws-cdk/service-spec-types';
 import * as sources from '@aws-cdk/service-spec-sources';
 import { LoadResult, ProblemReport } from '@aws-cdk/service-spec-sources';
+import { emptyDatabase } from '@aws-cdk/service-spec-types';
 import { assertSuccess, Result } from '@cdklabs/tskb';
 import { Augmentations } from './import-augmentations';
 import { importCannedMetrics } from './import-canned-metrics';

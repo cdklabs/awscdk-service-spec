@@ -1,4 +1,14 @@
 import {
+  CloudFormationRegistryResource,
+  ImplicitJsonSchemaRecord,
+  jsonschema,
+  simplePropNameFromJsonPtr,
+  resourcespec,
+  unionSchemas,
+  ProblemReport,
+  ReportAudience,
+} from '@aws-cdk/service-spec-sources';
+import {
   Deprecation,
   PropertyType,
   Resource,
@@ -9,16 +19,6 @@ import {
   TagVariant,
   TypeDefinition,
 } from '@aws-cdk/service-spec-types';
-import {
-  CloudFormationRegistryResource,
-  ImplicitJsonSchemaRecord,
-  jsonschema,
-  simplePropNameFromJsonPtr,
-  resourcespec,
-  unionSchemas,
-  ProblemReport,
-  ReportAudience,
-} from '@aws-cdk/service-spec-sources';
 import { locateFailure, Fail, failure, isFailure, Result, tryCatch, using, ref, isSuccess } from '@cdklabs/tskb';
 
 export interface LoadCloudFormationRegistryResourceOptions {

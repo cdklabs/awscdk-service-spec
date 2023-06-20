@@ -1,5 +1,4 @@
-import { SpecDatabase } from '@aws-cdk/service-spec-types';
-import { ResourceMetric, ResourceMetricAugmentations } from '@aws-cdk/service-spec-types';
+import { ResourceMetric, ResourceMetricAugmentations, SpecDatabase } from '@aws-cdk/service-spec-types';
 
 export class Augmentations {
   constructor(private readonly db: SpecDatabase) {}
