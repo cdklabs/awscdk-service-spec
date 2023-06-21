@@ -44,5 +44,6 @@ junit.xml
 /dist/
 !/.eslintrc.json
 !/.eslintrc.js
+db.json
 db.json.gz
 build-report

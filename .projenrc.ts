@@ -119,11 +119,12 @@ const awsServiceSpec = new TypeScriptWorkspace({
 // Needs to be added to 'compile' task, because the integ tests will 'compile' everything (but not run the tests and linter).
 awsServiceSpec.compileTask.prependSpawn(
   awsServiceSpec.tasks.addTask('generate', {
-    exec: `node -e 'require("${serviceSpecBuild.name}/lib/cli/build")' && gzip db.json`,
+    exec: `node -e 'require("${serviceSpecBuild.name}/lib/cli/build")' && gzip db.json -f`,
     receiveArgs: true,
   }),
 );
 
+awsServiceSpec.gitignore.addPatterns('db.json');
 awsServiceSpec.gitignore.addPatterns('db.json.gz');
 awsServiceSpec.gitignore.addPatterns('build-report');
 awsServiceSpec.npmignore?.addPatterns('build-report');
