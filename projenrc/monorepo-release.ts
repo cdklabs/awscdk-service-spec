@@ -1,6 +1,8 @@
 import * as path from 'path';
 import { github, release, Component, Project, Task } from 'projen';
 import { BUILD_ARTIFACT_NAME, PERMISSION_BACKUP_FILE } from 'projen/lib/github/constants';
+import { WorkspaceRelease, WorkspaceReleaseOptions } from './workspace-release';
+import { TypeScriptWorkspace } from './workspace';
 
 // copied from projen/release.ts
 const RELEASE_JOBID = 'release';
@@ -19,7 +21,7 @@ type UpstreamReleaseOptions = Omit<
   | 'publishTasks'
 >;
 
-export interface MonorepoReleaseWorkflowOptions extends UpstreamReleaseOptions {
+export interface MonorepoReleaseOptions extends UpstreamReleaseOptions {
   /**
    * Branch name to release from
    *
@@ -33,14 +35,13 @@ export interface MonorepoReleaseWorkflowOptions extends UpstreamReleaseOptions {
   readonly nodeVersion?: string;
 }
 
-export class MonorepoReleaseWorkflow extends Component {
+export class MonorepoRelease extends Component {
   /**
    * Returns the `MonorepoReleaseWorkflow` component of a project or `undefined` if the project
    * does not have a MonorepoReleaseWorkflow component.
    */
-  public static of(project: Project): MonorepoReleaseWorkflow | undefined {
-    const isMonorepoReleaseWorkflow = (c: Component): c is MonorepoReleaseWorkflow =>
-      c instanceof MonorepoReleaseWorkflow;
+  public static of(project: Project): MonorepoRelease | undefined {
+    const isMonorepoReleaseWorkflow = (c: Component): c is MonorepoRelease => c instanceof MonorepoRelease;
     return project.components.find(isMonorepoReleaseWorkflow);
   }
 
@@ -55,7 +56,7 @@ export class MonorepoReleaseWorkflow extends Component {
   private workflow?: github.TaskWorkflow;
   private releaseAllTask?: Task;
 
-  constructor(project: Project, private readonly options: MonorepoReleaseWorkflowOptions = {}) {
+  constructor(project: Project, private readonly options: MonorepoReleaseOptions = {}) {
     super(project);
 
     this.branchName = options.branchName ?? 'main';
@@ -67,10 +68,16 @@ export class MonorepoReleaseWorkflow extends Component {
     this.releaseTrigger = options.releaseTrigger ?? release.ReleaseTrigger.continuous();
   }
 
-  public addMonorepoRelease(subdir: string, release: release.Release) {
-    this.obtainReleaseAllTask();
-    this.packagesToRelease.push({ workspaceDirectory: subdir, release });
-    // The rest happens during preSynthesize
+  public addWorkspace(project: TypeScriptWorkspace, options: WorkspaceReleaseOptions) {
+    const workspaceRelease = new WorkspaceRelease(project, options);
+    if (!options.private && workspaceRelease.release) {
+      this.obtainReleaseAllTask();
+
+      this.packagesToRelease.push({
+        workspaceDirectory: project.workspaceDirectory,
+        release: workspaceRelease.release,
+      });
+    }
   }
 
   public preSynthesize() {
@@ -78,10 +85,6 @@ export class MonorepoReleaseWorkflow extends Component {
       // We didn't end up adding any packages
       return;
     }
-
-    // anti-tamper check (fails if there were changes to committed files)
-    // this will identify any non-committed files generated during build (e.g. test snapshots)
-    this.releaseAllTask.exec(release.Release.ANTI_TAMPER_CMD);
 
     this.renderPackageUploads();
     this.renderPublishJobs();
@@ -168,10 +171,13 @@ export class MonorepoReleaseWorkflow extends Component {
     });
     // Unroll out the 'release' task, and do all the phases for each individual package. We need to 'bump' at the same
     // time so that the dependency versions in all 'package.json's are correct.
+    this.releaseAllTask.exec('yarn workspaces run shx rm -rf dist');
     this.releaseAllTask.exec('yarn workspaces run bump');
     this.releaseAllTask.exec('yarn workspaces run build');
     this.releaseAllTask.exec('yarn workspaces run unbump');
-    this.releaseAllTask.exec('git diff --ignore-space-at-eol --exit-code');
+    // anti-tamper check (fails if there were changes to committed files)
+    // this will identify any non-committed files generated during build (e.g. test snapshots)
+    this.releaseAllTask.exec(release.Release.ANTI_TAMPER_CMD);
 
     this.createPublishingMechanism();
     return this.releaseAllTask;

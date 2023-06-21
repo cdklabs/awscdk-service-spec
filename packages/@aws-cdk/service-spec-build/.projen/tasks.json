@@ -38,6 +38,15 @@
         }
       ]
     },
+    "bump": {
+      "name": "bump",
+      "description": "Bumps versions of local dependencies",
+      "steps": [
+        {
+          "spawn": "gather-versions"
+        }
+      ]
+    },
     "check-for-updates": {
       "name": "check-for-updates",
       "env": {
@@ -89,6 +98,15 @@
         }
       ]
     },
+    "gather-versions": {
+      "name": "gather-versions",
+      "steps": [
+        {
+          "exec": "ts-node ../../../projenrc/gather-versions.exec.ts @aws-cdk/service-spec-build MAJOR --deps @cdklabs/tskb @aws-cdk/service-spec-sources @aws-cdk/service-spec-types",
+          "receiveArgs": true
+        }
+      ]
+    },
     "install": {
       "name": "install",
       "description": "Install project dependencies and update lockfile (non-frozen)",
@@ -133,15 +151,6 @@
       "name": "pre-compile",
       "description": "Prepare the project for compilation"
     },
-    "release": {
-      "name": "release",
-      "description": "Build this private package as part of doing a release",
-      "steps": [
-        {
-          "spawn": "build"
-        }
-      ]
-    },
     "test": {
       "name": "test",
       "description": "Run tests",
@@ -161,6 +170,15 @@
       "steps": [
         {
           "exec": "jest --watch"
+        }
+      ]
+    },
+    "unbump": {
+      "name": "unbump",
+      "description": "Resets versions of local dependencies to 0.0.0",
+      "steps": [
+        {
+          "spawn": "gather-versions"
         }
       ]
     },

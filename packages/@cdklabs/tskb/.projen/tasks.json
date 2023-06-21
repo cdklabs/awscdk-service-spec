@@ -33,6 +33,9 @@
       },
       "steps": [
         {
+          "spawn": "gather-versions"
+        },
+        {
           "builtin": "release/bump-version"
         }
       ],
@@ -89,6 +92,15 @@
         }
       ]
     },
+    "gather-versions": {
+      "name": "gather-versions",
+      "steps": [
+        {
+          "exec": "ts-node ../../../projenrc/gather-versions.exec.ts @cdklabs/tskb MAJOR --deps ",
+          "receiveArgs": true
+        }
+      ]
+    },
     "install": {
       "name": "install",
       "description": "Install project dependencies and update lockfile (non-frozen)",
@@ -136,31 +148,6 @@
       "name": "pre-compile",
       "description": "Prepare the project for compilation"
     },
-    "release": {
-      "name": "release",
-      "description": "Prepare a release from \"main\" branch",
-      "env": {
-        "RELEASE": "true",
-        "RELEASE_TAG_PREFIX": "@cdklabs/tskb@"
-      },
-      "steps": [
-        {
-          "exec": "rm -fr dist"
-        },
-        {
-          "spawn": "bump"
-        },
-        {
-          "spawn": "build"
-        },
-        {
-          "spawn": "unbump"
-        },
-        {
-          "exec": "git diff --ignore-space-at-eol --exit-code"
-        }
-      ]
-    },
     "test": {
       "name": "test",
       "description": "Run tests",
@@ -196,6 +183,9 @@
       "steps": [
         {
           "builtin": "release/reset-version"
+        },
+        {
+          "spawn": "gather-versions"
         }
       ]
     },

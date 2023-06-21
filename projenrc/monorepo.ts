@@ -1,5 +1,5 @@
 import { yarn } from 'cdklabs-projen-project-types';
-import { MonorepoReleaseWorkflow, MonorepoReleaseWorkflowOptions } from './monorepo-release';
+import { MonorepoRelease, MonorepoReleaseOptions } from './monorepo-release';
 import { Nx } from './nx';
 import { TypeScriptWorkspace } from './workspace';
 
@@ -14,10 +14,12 @@ export interface YarnMonoRepoOptions extends yarn.CdkLabsMonorepoOptions {
   /**
    * Options for the release job
    */
-  readonly releaseOptions?: Omit<MonorepoReleaseWorkflowOptions, 'workflowRunsOn'>;
+  readonly releaseOptions?: Omit<MonorepoReleaseOptions, 'workflowRunsOn'>;
 }
 
 export class YarnMonorepo extends yarn.CdkLabsMonorepo {
+  public readonly monorepoRelease?: MonorepoRelease;
+
   get subprojects(): TypeScriptWorkspace[] {
     // @ts-ignore
     return [...this.projects];
@@ -72,7 +74,7 @@ export class YarnMonorepo extends yarn.CdkLabsMonorepo {
     });
 
     if (options.release) {
-      new MonorepoReleaseWorkflow(this, {
+      this.monorepoRelease = new MonorepoRelease(this, {
         workflowRunsOn: options.workflowRunsOn,
         ...options.releaseOptions,
       });

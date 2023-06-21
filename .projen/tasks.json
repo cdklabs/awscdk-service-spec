@@ -111,6 +111,9 @@
       },
       "steps": [
         {
+          "exec": "yarn workspaces run shx rm -rf dist"
+        },
+        {
           "exec": "yarn workspaces run bump"
         },
         {
@@ -118,9 +121,6 @@
         },
         {
           "exec": "yarn workspaces run unbump"
-        },
-        {
-          "exec": "git diff --ignore-space-at-eol --exit-code"
         },
         {
           "exec": "git diff --ignore-space-at-eol --exit-code"

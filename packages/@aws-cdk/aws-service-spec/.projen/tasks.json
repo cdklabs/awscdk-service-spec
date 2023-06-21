@@ -33,6 +33,9 @@
       },
       "steps": [
         {
+          "spawn": "gather-versions"
+        },
+        {
           "builtin": "release/bump-version"
         }
       ],
@@ -92,6 +95,15 @@
         }
       ]
     },
+    "gather-versions": {
+      "name": "gather-versions",
+      "steps": [
+        {
+          "exec": "ts-node ../../../projenrc/gather-versions.exec.ts @aws-cdk/aws-service-spec MAJOR --deps @cdklabs/tskb @aws-cdk/service-spec-types @aws-cdk/service-spec-build",
+          "receiveArgs": true
+        }
+      ]
+    },
     "generate": {
       "name": "generate",
       "steps": [
@@ -148,31 +160,6 @@
       "name": "pre-compile",
       "description": "Prepare the project for compilation"
     },
-    "release": {
-      "name": "release",
-      "description": "Prepare a release from \"main\" branch",
-      "env": {
-        "RELEASE": "true",
-        "RELEASE_TAG_PREFIX": "@aws-cdk/aws-service-spec@"
-      },
-      "steps": [
-        {
-          "exec": "rm -fr dist"
-        },
-        {
-          "spawn": "bump"
-        },
-        {
-          "spawn": "build"
-        },
-        {
-          "spawn": "unbump"
-        },
-        {
-          "exec": "git diff --ignore-space-at-eol --exit-code"
-        }
-      ]
-    },
     "test": {
       "name": "test",
       "description": "Run tests",
@@ -208,6 +195,9 @@
       "steps": [
         {
           "builtin": "release/reset-version"
+        },
+        {
+          "spawn": "gather-versions"
         }
       ]
     },
