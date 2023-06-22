@@ -103,8 +103,8 @@
       "name": "post-upgrade",
       "description": "Runs after upgrading dependencies"
     },
-    "release:all": {
-      "name": "release:all",
+    "release": {
+      "name": "release",
       "description": "Prepare a release from all monorepo packages",
       "env": {
         "RELEASE": "true"

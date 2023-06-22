@@ -54,7 +54,7 @@ export class MonorepoRelease extends Component {
   }>();
 
   private workflow?: github.TaskWorkflow;
-  private releaseAllTask?: Task;
+  private releaseTask?: Task;
 
   constructor(project: Project, private readonly options: MonorepoReleaseOptions = {}) {
     super(project);
@@ -71,7 +71,7 @@ export class MonorepoRelease extends Component {
   public addWorkspace(project: TypeScriptWorkspace, options: WorkspaceReleaseOptions) {
     const workspaceRelease = new WorkspaceRelease(project, options);
     if (!options.private && workspaceRelease.release) {
-      this.obtainReleaseAllTask();
+      this.obtainReleaseTask();
 
       this.packagesToRelease.push({
         workspaceDirectory: project.workspaceDirectory,
@@ -81,7 +81,7 @@ export class MonorepoRelease extends Component {
   }
 
   public preSynthesize() {
-    if (!this.releaseAllTask) {
+    if (!this.releaseTask) {
       // We didn't end up adding any packages
       return;
     }
@@ -144,9 +144,9 @@ export class MonorepoRelease extends Component {
     }
   }
 
-  private obtainReleaseAllTask(): Task {
-    if (this.releaseAllTask) {
-      return this.releaseAllTask;
+  private obtainReleaseTask(): Task {
+    if (this.releaseTask) {
+      return this.releaseTask;
     }
 
     const env: Record<string, string> = {
@@ -165,22 +165,22 @@ export class MonorepoRelease extends Component {
       env.MIN_MAJOR = this.options.minMajorVersion.toString();
     }
 
-    this.releaseAllTask = this.project.addTask('release:all', {
+    this.releaseTask = this.project.addTask('release', {
       description: `Prepare a release from all monorepo packages`,
       env,
     });
     // Unroll out the 'release' task, and do all the phases for each individual package. We need to 'bump' at the same
     // time so that the dependency versions in all 'package.json's are correct.
-    this.releaseAllTask.exec('yarn workspaces run shx rm -rf dist');
-    this.releaseAllTask.exec('yarn workspaces run bump');
-    this.releaseAllTask.exec('yarn workspaces run build');
-    this.releaseAllTask.exec('yarn workspaces run unbump');
+    this.releaseTask.exec('yarn workspaces run shx rm -rf dist');
+    this.releaseTask.exec('yarn workspaces run bump');
+    this.releaseTask.exec('yarn workspaces run build');
+    this.releaseTask.exec('yarn workspaces run unbump');
     // anti-tamper check (fails if there were changes to committed files)
     // this will identify any non-committed files generated during build (e.g. test snapshots)
-    this.releaseAllTask.exec(release.Release.ANTI_TAMPER_CMD);
+    this.releaseTask.exec(release.Release.ANTI_TAMPER_CMD);
 
     this.createPublishingMechanism();
-    return this.releaseAllTask;
+    return this.releaseTask;
   }
 
   private createPublishingMechanism() {
@@ -251,7 +251,7 @@ export class MonorepoRelease extends Component {
         'fetch-depth': 0,
       },
       preBuildSteps,
-      task: this.releaseAllTask!,
+      task: this.releaseTask!,
       postBuildSteps,
       runsOn: this.options.workflowRunsOn,
     });
