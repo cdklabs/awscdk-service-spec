@@ -29,7 +29,8 @@
         "CHANGELOG": "dist/changelog.md",
         "BUMPFILE": "dist/version.txt",
         "RELEASETAG": "dist/releasetag.txt",
-        "RELEASE_TAG_PREFIX": "@aws-cdk/service-spec-types@"
+        "RELEASE_TAG_PREFIX": "@aws-cdk/service-spec-types@",
+        "VERSIONRCOPTIONS": "{\"path\":\".\"}"
       },
       "steps": [
         {
@@ -178,7 +179,8 @@
         "CHANGELOG": "dist/changelog.md",
         "BUMPFILE": "dist/version.txt",
         "RELEASETAG": "dist/releasetag.txt",
-        "RELEASE_TAG_PREFIX": "@aws-cdk/service-spec-types@"
+        "RELEASE_TAG_PREFIX": "@aws-cdk/service-spec-types@",
+        "VERSIONRCOPTIONS": "{\"path\":\".\"}"
       },
       "steps": [
         {

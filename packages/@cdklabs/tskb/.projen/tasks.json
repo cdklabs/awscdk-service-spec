@@ -29,7 +29,8 @@
         "CHANGELOG": "dist/changelog.md",
         "BUMPFILE": "dist/version.txt",
         "RELEASETAG": "dist/releasetag.txt",
-        "RELEASE_TAG_PREFIX": "@cdklabs/tskb@"
+        "RELEASE_TAG_PREFIX": "@cdklabs/tskb@",
+        "VERSIONRCOPTIONS": "{\"path\":\".\"}"
       },
       "steps": [
         {
@@ -178,7 +179,8 @@
         "CHANGELOG": "dist/changelog.md",
         "BUMPFILE": "dist/version.txt",
         "RELEASETAG": "dist/releasetag.txt",
-        "RELEASE_TAG_PREFIX": "@cdklabs/tskb@"
+        "RELEASE_TAG_PREFIX": "@cdklabs/tskb@",
+        "VERSIONRCOPTIONS": "{\"path\":\".\"}"
       },
       "steps": [
         {

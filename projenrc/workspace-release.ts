@@ -38,6 +38,11 @@ export class WorkspaceRelease extends Component {
         // so that we can give packages individual versions.
         // Tags end up looking like this: @scope/package@v1.2.3
         releaseTagPrefix: `${project.name}@`,
+
+        // In a monorepo, we want standard-version to only consider the directory of the workspace
+        versionrcOptions: {
+          path: '.',
+        },
       });
 
       // Only releasing at the monorepo level is supported
