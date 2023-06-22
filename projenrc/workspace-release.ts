@@ -64,10 +64,19 @@ export class WorkspaceRelease extends Component {
       steps: [new GatherVersions(project, VersionMatch.MAJOR)],
     });
     this.obtainBumpTask().prependSpawn(gatherVersions);
-    // Reset local dependency versions to 0.0.0
+
+    // After we have unbumped package versions back to 0.0.0,
+    // we can run the gather-versions task again which will now replace the to-be-release versions with 0.0.0
     this.obtainUnbumpTask().spawn(gatherVersions);
   }
 
+  /**
+   * Get the bump version task
+   *
+   * If this is a private package, it won't have a bump task yet.
+   * So instead we create an empty one that can be called from the monorepo root
+   * and serve as a container for other steps that need to occur as part of the release
+   */
   private obtainBumpTask(): Task {
     return (
       this.project.tasks.tryFind('bump') ??
@@ -77,6 +86,13 @@ export class WorkspaceRelease extends Component {
     );
   }
 
+  /**
+   * Get the unbump version task
+   *.
+   * If this is a private package, it won't have a bump task yet
+   * So instead we create an empty one that can be called from the monorepo root
+   * and serve as a container for other steps that need to occur as part of the release
+   */
   private obtainUnbumpTask(): Task {
     return (
       this.project.tasks.tryFind('unbump') ??
