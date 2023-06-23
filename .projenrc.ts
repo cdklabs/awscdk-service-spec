@@ -29,6 +29,13 @@ const repo = new YarnMonorepo({
   },
 
   release: true,
+  releaseOptions: {
+    publishToNpm: false,
+    releaseTrigger: {
+      isContinuous: false,
+      isManual: false,
+    },
+  },
 });
 
 const tsKb = new TypeScriptWorkspace({

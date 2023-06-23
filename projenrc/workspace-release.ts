@@ -7,6 +7,7 @@ export interface WorkspaceReleaseOptions {
   readonly workflowNodeVersion?: string;
   readonly releaseWorkflowSetupSteps?: Array<github.workflows.JobStep>;
   readonly postBuildSteps?: Array<github.workflows.JobStep>;
+  readonly publishToNpm?: boolean;
 }
 
 export class WorkspaceRelease extends Component {
@@ -48,12 +49,13 @@ export class WorkspaceRelease extends Component {
       // Only releasing at the monorepo level is supported
       project.tasks.removeTask('release');
 
-      // Add later
-      // GitHub Releases comes for free with a `Release` component, NPM must be added explicitly.
-      //   rls.publisher.publishToNpm({
-      //     registry: project.package.npmRegistry,
-      //     npmTokenSecret: project.package.npmTokenSecret,
-      //   });
+      // GitHub Releases comes for free with a `Release` component, NPM must be added explicitly
+      if (options.publishToNpm ?? true) {
+        this.release.publisher.publishToNpm({
+          registry: project.package.npmRegistry,
+          npmTokenSecret: project.package.npmTokenSecret,
+        });
+      }
     }
 
     // This tasks sets all local dependencies to their current version

@@ -33,6 +33,12 @@ export interface MonorepoReleaseOptions extends UpstreamReleaseOptions {
    * Node version
    */
   readonly nodeVersion?: string;
+
+  /**
+   * Publish packages to npm
+   * @default true
+   */
+  readonly publishToNpm?: boolean;
 }
 
 export class MonorepoRelease extends Component {
@@ -69,7 +75,10 @@ export class MonorepoRelease extends Component {
   }
 
   public addWorkspace(project: TypeScriptWorkspace, options: WorkspaceReleaseOptions) {
-    const workspaceRelease = new WorkspaceRelease(project, options);
+    const workspaceRelease = new WorkspaceRelease(project, {
+      publishToNpm: this.options.publishToNpm,
+      ...options,
+    });
     if (!options.private && workspaceRelease.release) {
       this.obtainReleaseTask();
 
