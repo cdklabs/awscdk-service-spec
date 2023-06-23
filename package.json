@@ -9,6 +9,7 @@
     "fmt": "npx projen fmt",
     "package": "npx projen package",
     "post-upgrade": "npx projen post-upgrade",
+    "release": "npx projen release",
     "run": "npx projen run",
     "test": "npx projen test",
     "update-source:cfn-schema": "npx projen update-source:cfn-schema",

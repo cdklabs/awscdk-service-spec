@@ -3,10 +3,12 @@
   "description": "A specification of built-in AWS resources",
   "scripts": {
     "build": "npx projen build",
+    "bump": "npx projen bump",
     "check-for-updates": "npx projen check-for-updates",
     "compile": "npx projen compile",
     "default": "npx projen default",
     "eslint": "npx projen eslint",
+    "gather-versions": "npx projen gather-versions",
     "generate": "npx projen generate",
     "nx": "npx projen nx",
     "package": "npx projen package",
@@ -14,6 +16,7 @@
     "pre-compile": "npx projen pre-compile",
     "test": "npx projen test",
     "test:watch": "npx projen test:watch",
+    "unbump": "npx projen unbump",
     "watch": "npx projen watch",
     "projen": "npx projen"
   },

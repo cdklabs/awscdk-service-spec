@@ -21,6 +21,15 @@
         }
       ]
     },
+    "bump": {
+      "name": "bump",
+      "description": "Bumps versions of local dependencies",
+      "steps": [
+        {
+          "spawn": "gather-versions"
+        }
+      ]
+    },
     "check-for-updates": {
       "name": "check-for-updates",
       "env": {
@@ -69,6 +78,15 @@
       "steps": [
         {
           "exec": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern src test build-tools"
+        }
+      ]
+    },
+    "gather-versions": {
+      "name": "gather-versions",
+      "steps": [
+        {
+          "exec": "ts-node ../../../projenrc/gather-versions.exec.ts @aws-cdk/cfn-resources MAJOR --deps @cdklabs/tskb @cdklabs/typewriter @aws-cdk/service-spec-types @aws-cdk/service-spec-build",
+          "receiveArgs": true
         }
       ]
     },
@@ -144,6 +162,15 @@
       "steps": [
         {
           "exec": "jest --watch"
+        }
+      ]
+    },
+    "unbump": {
+      "name": "unbump",
+      "description": "Resets versions of local dependencies to 0.0.0",
+      "steps": [
+        {
+          "spawn": "gather-versions"
         }
       ]
     },

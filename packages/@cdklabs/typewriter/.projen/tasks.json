@@ -21,6 +21,27 @@
         }
       ]
     },
+    "bump": {
+      "name": "bump",
+      "description": "Bumps version based on latest git tag and generates a changelog entry",
+      "env": {
+        "OUTFILE": "package.json",
+        "CHANGELOG": "dist/changelog.md",
+        "BUMPFILE": "dist/version.txt",
+        "RELEASETAG": "dist/releasetag.txt",
+        "RELEASE_TAG_PREFIX": "@cdklabs/typewriter@",
+        "VERSIONRCOPTIONS": "{\"path\":\".\"}"
+      },
+      "steps": [
+        {
+          "spawn": "gather-versions"
+        },
+        {
+          "builtin": "release/bump-version"
+        }
+      ],
+      "condition": "! git log --oneline -1 | grep -q \"chore(release):\""
+    },
     "check-for-updates": {
       "name": "check-for-updates",
       "env": {
@@ -69,6 +90,15 @@
       "steps": [
         {
           "exec": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern src test build-tools"
+        }
+      ]
+    },
+    "gather-versions": {
+      "name": "gather-versions",
+      "steps": [
+        {
+          "exec": "ts-node ../../../projenrc/gather-versions.exec.ts @cdklabs/typewriter MAJOR --deps ",
+          "receiveArgs": true
         }
       ]
     },
@@ -138,6 +168,26 @@
       "steps": [
         {
           "exec": "jest --watch"
+        }
+      ]
+    },
+    "unbump": {
+      "name": "unbump",
+      "description": "Restores version to 0.0.0",
+      "env": {
+        "OUTFILE": "package.json",
+        "CHANGELOG": "dist/changelog.md",
+        "BUMPFILE": "dist/version.txt",
+        "RELEASETAG": "dist/releasetag.txt",
+        "RELEASE_TAG_PREFIX": "@cdklabs/typewriter@",
+        "VERSIONRCOPTIONS": "{\"path\":\".\"}"
+      },
+      "steps": [
+        {
+          "builtin": "release/reset-version"
+        },
+        {
+          "spawn": "gather-versions"
         }
       ]
     },

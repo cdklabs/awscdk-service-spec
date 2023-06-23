@@ -103,6 +103,30 @@
       "name": "post-upgrade",
       "description": "Runs after upgrading dependencies"
     },
+    "release": {
+      "name": "release",
+      "description": "Prepare a release from all monorepo packages",
+      "env": {
+        "RELEASE": "true"
+      },
+      "steps": [
+        {
+          "exec": "yarn workspaces run shx rm -rf dist"
+        },
+        {
+          "exec": "yarn workspaces run bump"
+        },
+        {
+          "exec": "yarn workspaces run build"
+        },
+        {
+          "exec": "yarn workspaces run unbump"
+        },
+        {
+          "exec": "git diff --ignore-space-at-eol --exit-code"
+        }
+      ]
+    },
     "run": {
       "name": "run",
       "steps": [

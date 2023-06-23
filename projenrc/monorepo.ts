@@ -1,14 +1,31 @@
 import { yarn } from 'cdklabs-projen-project-types';
+import { MonorepoRelease, MonorepoReleaseOptions } from './monorepo-release';
 import { Nx } from './nx';
 import { TypeScriptWorkspace } from './workspace';
 
+export interface YarnMonoRepoOptions extends yarn.CdkLabsMonorepoOptions {
+  /**
+   * Whether or not to renable release workflows for this repository
+   *
+   * @default - No releasing
+   */
+  readonly release?: boolean;
+
+  /**
+   * Options for the release job
+   */
+  readonly releaseOptions?: Omit<MonorepoReleaseOptions, 'workflowRunsOn'>;
+}
+
 export class YarnMonorepo extends yarn.CdkLabsMonorepo {
+  public readonly monorepoRelease?: MonorepoRelease;
+
   get subprojects(): TypeScriptWorkspace[] {
     // @ts-ignore
     return [...this.projects];
   }
 
-  public constructor(options: yarn.CdkLabsMonorepoOptions) {
+  public constructor(options: YarnMonoRepoOptions) {
     super(options);
 
     // Hide generated config files in VSCode
@@ -55,5 +72,12 @@ export class YarnMonorepo extends yarn.CdkLabsMonorepo {
     new Nx(this, {
       defaultBase: options.defaultReleaseBranch,
     });
+
+    if (options.release) {
+      this.monorepoRelease = new MonorepoRelease(this, {
+        workflowRunsOn: options.workflowRunsOn,
+        ...options.releaseOptions,
+      });
+    }
   }
 }

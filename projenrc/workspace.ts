@@ -13,7 +13,7 @@ export class TypeScriptWorkspace extends yarn.TypeScriptWorkspace {
 
     // If the package is public, all local deps and peer deps must also be public
     if (!this.isPrivatePackage) {
-      const illegalPrivateDeps = this.localDeps([DependencyType.RUNTIME, DependencyType.PEER])?.filter(
+      const illegalPrivateDeps = this.localDependencies([DependencyType.RUNTIME, DependencyType.PEER])?.filter(
         (dep) => dep.isPrivatePackage,
       );
       if (illegalPrivateDeps.length) {
@@ -41,13 +41,20 @@ export class TypeScriptWorkspace extends yarn.TypeScriptWorkspace {
       runtimeArgs: ['projen', 'compile', '--force'],
       outFiles: [`\${workspaceFolder}/${this.workspaceDirectory}/${this.libdir}/**/*.js`],
     } as any);
+
+    this.monorepo.monorepoRelease?.addWorkspace(this, {
+      private: this.isPrivatePackage,
+      workflowNodeVersion: this.nodeVersion,
+      releaseWorkflowSetupSteps: options.releaseWorkflowSetupSteps,
+      postBuildSteps: options.postBuildSteps,
+    });
   }
 
   /**
    * Return all dependencies that are local to the monorepo
    * Optionally filter by dependency type.
    */
-  private localDeps(types?: DependencyType[]): TypeScriptWorkspace[] {
+  public localDependencies(types?: DependencyType[]): TypeScriptWorkspace[] {
     return this.monorepo.subprojects.filter((sibling) =>
       this.deps.all.some((d) => d.name === sibling.name && (!types || types.includes(d.type))),
     );
