@@ -2,9 +2,10 @@ import * as pj from 'projen';
 import { AwsCdkIntegrationTest, TypeScriptWorkspace, YarnMonorepo } from './projenrc';
 import { RegionalSource, Role, SingleSource, SourceProcessing } from './projenrc/update-sources';
 
-// These are temporarily not available, skip them for now
-// const workflowRunsOn = ['awscdk-service-spec_ubuntu-latest_32-core'];
-const workflowRunsOn = ['ubuntu-latest'];
+const workflowRunsOn = [
+  // 'ubuntu-latest',
+  'awscdk-service-spec_ubuntu-latest_32-core',
+];
 
 const repo = new YarnMonorepo({
   name: 'awscdk-service-spec',

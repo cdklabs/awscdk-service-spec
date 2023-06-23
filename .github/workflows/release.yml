@@ -5,7 +5,7 @@ on:
   workflow_dispatch: {}
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: awscdk-service-spec_ubuntu-latest_32-core
     permissions:
       contents: write
     outputs:

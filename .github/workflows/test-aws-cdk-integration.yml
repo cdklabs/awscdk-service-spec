@@ -9,7 +9,7 @@ on:
       - main
 jobs:
   test-with-new-codegen:
-    runs-on: ubuntu-latest
+    runs-on: awscdk-service-spec_ubuntu-latest_32-core
     permissions:
       contents: read
     env:
@@ -62,7 +62,7 @@ jobs:
             ${{ runner.temp }}/.jsii.gz
   jsii-diff:
     needs: test-with-new-codegen
-    runs-on: ubuntu-latest
+    runs-on: awscdk-service-spec_ubuntu-latest_32-core
     permissions:
       contents: read
     env:
