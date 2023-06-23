@@ -147,7 +147,13 @@ export class MonorepoRelease extends Component {
       // Make the job names unique
       this.workflow?.addJobs(
         Object.fromEntries(
-          Object.entries(packagePublishJobs).map(([key, job]) => [slugify(`${release.project.name}_${key}`), job]),
+          Object.entries(packagePublishJobs).map(([key, job]) => [
+            slugify(`${release.project.name}_${key}`),
+            {
+              ...job,
+              name: `${release.project.name}: ${job.name}`,
+            },
+          ]),
         ),
       );
     }

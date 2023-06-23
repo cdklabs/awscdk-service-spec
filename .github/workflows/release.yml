@@ -78,7 +78,7 @@ jobs:
           name: aws-cdk-aws-service-spec_build-artifact
           path: packages/@aws-cdk/aws-service-spec/dist
   cdklabs-tskb_release_github:
-    name: Publish to GitHub Releases
+    name: "@cdklabs/tskb: Publish to GitHub Releases"
     needs: release
     runs-on: ubuntu-latest
     permissions:
@@ -103,7 +103,7 @@ jobs:
           GITHUB_REF: ${{ github.ref }}
         run: errout=$(mktemp); gh release create $(cat dist/releasetag.txt) -R $GITHUB_REPOSITORY -F dist/changelog.md -t $(cat dist/releasetag.txt) --target $GITHUB_REF 2> $errout && true; exitcode=$?; if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" $errout; then cat $errout; exit $exitcode; fi
   cdklabs-typewriter_release_github:
-    name: Publish to GitHub Releases
+    name: "@cdklabs/typewriter: Publish to GitHub Releases"
     needs: release
     runs-on: ubuntu-latest
     permissions:
@@ -128,7 +128,7 @@ jobs:
           GITHUB_REF: ${{ github.ref }}
         run: errout=$(mktemp); gh release create $(cat dist/releasetag.txt) -R $GITHUB_REPOSITORY -F dist/changelog.md -t $(cat dist/releasetag.txt) --target $GITHUB_REF 2> $errout && true; exitcode=$?; if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" $errout; then cat $errout; exit $exitcode; fi
   aws-cdk-service-spec-types_release_github:
-    name: Publish to GitHub Releases
+    name: "@aws-cdk/service-spec-types: Publish to GitHub Releases"
     needs: release
     runs-on: ubuntu-latest
     permissions:
@@ -153,7 +153,7 @@ jobs:
           GITHUB_REF: ${{ github.ref }}
         run: errout=$(mktemp); gh release create $(cat dist/releasetag.txt) -R $GITHUB_REPOSITORY -F dist/changelog.md -t $(cat dist/releasetag.txt) --target $GITHUB_REF 2> $errout && true; exitcode=$?; if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" $errout; then cat $errout; exit $exitcode; fi
   aws-cdk-aws-service-spec_release_github:
-    name: Publish to GitHub Releases
+    name: "@aws-cdk/aws-service-spec: Publish to GitHub Releases"
     needs: release
     runs-on: ubuntu-latest
     permissions:
