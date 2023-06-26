@@ -739,7 +739,7 @@ import * as cfn_parse from "aws-cdk-lib/core/lib/helpers-internal";
 /**
  * Creates a new role for your AWS account .
  *
- * For more information about roles, see [IAM roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/WorkingWithRoles.html) . For information about quotas for role names and the number of roles you can create, see [IAM and AWS STS quotas](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-quotas.html) in the *IAM User Guide* .
+ * For more information about roles, see [IAM roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html) in the *IAM User Guide* . For information about quotas for role names and the number of roles you can create, see [IAM and AWS STS quotas](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-quotas.html) in the *IAM User Guide* .
  *
  * @stability external
  * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
@@ -5868,8 +5868,6 @@ export namespace CfnBucket {
 
     /**
      * Specifies the file format used when exporting data to Amazon S3.
-     *
-     * *Allowed values* : \`CSV\` | \`ORC\` | \`Parquet\`
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-destination.html#cfn-s3-bucket-destination-format
      */

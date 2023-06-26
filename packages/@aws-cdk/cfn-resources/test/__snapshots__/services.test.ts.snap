@@ -10447,7 +10447,7 @@ export namespace CfnInstance {
    */
   export interface HibernationOptionsProperty {
     /**
-     * If you set this parameter to \`true\` , your instance is enabled for hibernation.
+     * Set to \`true\` to enable your instance for hibernation.
      *
      * Default: \`false\`
      *
@@ -10732,7 +10732,7 @@ export interface CfnInstanceProps {
   /**
    * Indicates whether an instance is enabled for hibernation.
    *
-   * For more information, see [Hibernate your instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Hibernate.html) in the *Amazon EC2 User Guide* .
+   * This parameter is valid only if the instance meets the [hibernation prerequisites](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/hibernating-prerequisites.html) . For more information, see [Hibernate your instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Hibernate.html) in the *Amazon EC2 User Guide* .
    *
    * You can't enable hibernation and AWS Nitro Enclaves on the same instance.
    *
@@ -19813,8 +19813,6 @@ export class CfnNetworkAclEntry extends cdk.CfnResource implements cdk.IInspecta
   }
 
   /**
-   * The ID of the network ACL entry.
-   *
    * @cloudformationAttribute Id
    */
   public readonly attrId: string;
@@ -31260,7 +31258,7 @@ export class CfnSubnetNetworkAclAssociation extends cdk.CfnResource implements c
   }
 
   /**
-   * Returns the value of this object's [SubnetId](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-subnet-network-acl-assoc.html) property.
+   * Returns the value of this object's AssociationId property.
    *
    * @cloudformationAttribute AssociationId
    */
@@ -36971,7 +36969,7 @@ export namespace CfnVerifiedAccessInstance {
   }
 
   /**
-   * Describes the destinations for Verified Access logs.
+   * Describes the options for Verified Access logs.
    *
    * @struct
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-verifiedaccessinstance-verifiedaccesslogs.html
@@ -41354,8 +41352,6 @@ export class CfnVPNGatewayRoutePropagation extends cdk.CfnResource implements cd
   }
 
   /**
-   * The ID of the VPN gateway.
-   *
    * @cloudformationAttribute Id
    */
   public readonly attrId: string;
