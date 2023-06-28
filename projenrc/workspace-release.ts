@@ -1,4 +1,4 @@
-import { Component, Task, github, release } from 'projen';
+import { Component, ReleasableCommits, Task, github, release } from 'projen';
 import { TypeScriptWorkspace } from './workspace';
 import { GatherVersions, VersionMatch } from './gather-versions.task';
 
@@ -44,6 +44,10 @@ export class WorkspaceRelease extends Component {
         versionrcOptions: {
           path: '.',
         },
+
+        // In a monorepo, only consider changes relevant to the subproject
+        // Path is relative to the subproject outdir, so '.' is what we want here
+        releasableCommits: ReleasableCommits.everyCommit('.'),
       });
 
       // Only releasing at the monorepo level is supported

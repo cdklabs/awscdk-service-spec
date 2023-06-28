@@ -30,7 +30,8 @@
         "BUMPFILE": "dist/version.txt",
         "RELEASETAG": "dist/releasetag.txt",
         "RELEASE_TAG_PREFIX": "@cdklabs/tskb@",
-        "VERSIONRCOPTIONS": "{\"path\":\".\"}"
+        "VERSIONRCOPTIONS": "{\"path\":\".\"}",
+        "RELEASABLE_COMMITS": "git log --oneline $LATEST_TAG..HEAD -- ."
       },
       "steps": [
         {
@@ -180,7 +181,8 @@
         "BUMPFILE": "dist/version.txt",
         "RELEASETAG": "dist/releasetag.txt",
         "RELEASE_TAG_PREFIX": "@cdklabs/tskb@",
-        "VERSIONRCOPTIONS": "{\"path\":\".\"}"
+        "VERSIONRCOPTIONS": "{\"path\":\".\"}",
+        "RELEASABLE_COMMITS": "git log --oneline $LATEST_TAG..HEAD -- ."
       },
       "steps": [
         {
