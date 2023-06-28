@@ -43,6 +43,8 @@ const tsKb = new TypeScriptWorkspace({
   parent: repo,
   name: '@cdklabs/tskb',
   description: 'Using TypeScript as a knowledge base',
+  deps: [],
+  releasableCommits: pj.ReleasableCommits.featuresAndFixes('.'),
 });
 
 const typewriter = new TypeScriptWorkspace({
@@ -50,6 +52,7 @@ const typewriter = new TypeScriptWorkspace({
   name: '@cdklabs/typewriter',
   description: 'Write typed code for jsii',
   deps: [],
+  releasableCommits: pj.ReleasableCommits.featuresAndFixes('.'),
 });
 
 const serviceSpecSources = new TypeScriptWorkspace({
@@ -98,6 +101,8 @@ const serviceSpecTypes = new TypeScriptWorkspace({
   name: '@aws-cdk/service-spec-types',
   description: 'Types for CloudFormation Service Specifications',
   deps: [tsKb],
+  // Also include changes to sources
+  releasableCommits: pj.ReleasableCommits.featuresAndFixes('. ../../../sources'),
 });
 
 const serviceSpecBuild = new TypeScriptWorkspace({
@@ -125,6 +130,8 @@ const awsServiceSpec = new TypeScriptWorkspace({
   description: 'A specification of built-in AWS resources',
   deps: [tsKb, serviceSpecTypes],
   devDeps: ['source-map-support', serviceSpecBuild],
+  // Also include changes to types and sources
+  releasableCommits: pj.ReleasableCommits.featuresAndFixes('. ../service-spec-types ../../../sources'),
 });
 // Needs to be added to 'compile' task, because the integ tests will 'compile' everything (but not run the tests and linter).
 awsServiceSpec.compileTask.prependSpawn(

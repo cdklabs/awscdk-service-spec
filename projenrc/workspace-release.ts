@@ -8,6 +8,7 @@ export interface WorkspaceReleaseOptions {
   readonly releaseWorkflowSetupSteps?: Array<github.workflows.JobStep>;
   readonly postBuildSteps?: Array<github.workflows.JobStep>;
   readonly publishToNpm?: boolean;
+  readonly releasableCommits?: ReleasableCommits;
 }
 
 export class WorkspaceRelease extends Component {
@@ -47,7 +48,7 @@ export class WorkspaceRelease extends Component {
 
         // In a monorepo, only consider changes relevant to the subproject
         // Path is relative to the subproject outdir, so '.' is what we want here
-        releasableCommits: ReleasableCommits.everyCommit('.'),
+        releasableCommits: options.releasableCommits ?? ReleasableCommits.everyCommit('.'),
       });
 
       // Only releasing at the monorepo level is supported

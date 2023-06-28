@@ -31,7 +31,7 @@
         "RELEASETAG": "dist/releasetag.txt",
         "RELEASE_TAG_PREFIX": "@cdklabs/typewriter@",
         "VERSIONRCOPTIONS": "{\"path\":\".\"}",
-        "RELEASABLE_COMMITS": "git log --oneline $LATEST_TAG..HEAD -- ."
+        "RELEASABLE_COMMITS": "git log --no-merges --oneline $LATEST_TAG..HEAD -E --grep '^(feat|fix){1}(\\([^()\\r\\n]+\\))?(!)?:[^\\S\\r\\n]+.+' -- ."
       },
       "steps": [
         {
@@ -182,7 +182,7 @@
         "RELEASETAG": "dist/releasetag.txt",
         "RELEASE_TAG_PREFIX": "@cdklabs/typewriter@",
         "VERSIONRCOPTIONS": "{\"path\":\".\"}",
-        "RELEASABLE_COMMITS": "git log --oneline $LATEST_TAG..HEAD -- ."
+        "RELEASABLE_COMMITS": "git log --no-merges --oneline $LATEST_TAG..HEAD -E --grep '^(feat|fix){1}(\\([^()\\r\\n]+\\))?(!)?:[^\\S\\r\\n]+.+' -- ."
       },
       "steps": [
         {
