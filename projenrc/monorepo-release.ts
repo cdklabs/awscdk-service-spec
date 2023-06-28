@@ -95,6 +95,7 @@ export class MonorepoRelease extends Component {
       return;
     }
 
+    this.createPublishingMechanism();
     this.renderPackageUploads();
     this.renderPublishJobs();
   }
@@ -151,6 +152,9 @@ export class MonorepoRelease extends Component {
             slugify(`${release.project.name}_${key}`),
             {
               ...job,
+              if: `\${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.${publishProjectOutputId(
+                release.project,
+              )} == 'true' }}`,
               name: `${release.project.name}: ${job.name}`,
             },
           ]),
@@ -194,7 +198,6 @@ export class MonorepoRelease extends Component {
     // this will identify any non-committed files generated during build (e.g. test snapshots)
     this.releaseTask.exec(release.Release.ANTI_TAMPER_CMD);
 
-    this.createPublishingMechanism();
     return this.releaseTask;
   }
 
@@ -232,6 +235,29 @@ export class MonorepoRelease extends Component {
     ];
     const postBuildSteps = [...(this.options.postBuildSteps ?? [])];
 
+    // Add an output to the job to indicate if a certain package needs publishing
+    const shouldPublishOutputs = Object.fromEntries(
+      this.packagesToRelease.map(({ release }) => {
+        return [
+          publishProjectOutputId(release.project),
+          {
+            stepId: shouldPublishProjectStepId(release.project),
+            outputName: 'publish',
+          },
+        ];
+      }),
+    );
+
+    // Check if the proposed release tag already exists
+    // Only if it doesn't exist yet should we publish
+    for (const { workspaceDirectory, release } of this.packagesToRelease) {
+      postBuildSteps.push({
+        id: shouldPublishProjectStepId(release.project),
+        workingDirectory: workspaceDirectory,
+        run: `(git ls-remote -q --exit-code --tags origin $(cat dist/releasetag.txt) && (echo "publish=false" >> $GITHUB_OUTPUT)) || echo "publish=true" >> $GITHUB_OUTPUT`,
+      });
+    }
+
     // check if new commits were pushed to the repo while we were building.
     // if new commits have been pushed, we will cancel this release
     postBuildSteps.push({
@@ -248,6 +274,7 @@ export class MonorepoRelease extends Component {
           stepId: GIT_REMOTE_STEPID,
           outputName: LATEST_COMMIT_OUTPUT,
         },
+        ...shouldPublishOutputs,
       },
       triggers: {
         schedule: this.releaseTrigger.schedule ? [{ cron: this.releaseTrigger.schedule }] : undefined,
@@ -279,4 +306,12 @@ function slugify(x: string): string {
 
 function buildArtifactName(project: Project) {
   return slugify(`${project.name}_${BUILD_ARTIFACT_NAME}`);
+}
+
+function publishProjectOutputId(project: Project) {
+  return `publish-${slugify(project.name)}`;
+}
+
+function shouldPublishProjectStepId(project: Project) {
+  return `check-${publishProjectOutputId(project)}`;
 }
