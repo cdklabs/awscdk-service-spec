@@ -36,10 +36,10 @@
     "jest-junit": "^15",
     "npm-check-updates": "^16",
     "prettier": "^2.8.8",
-    "projen": "^0.71.113",
+    "projen": "^0.71.115",
     "source-map-support": "^0.5.21",
     "ts-jest": "^29.1.0",
-    "typescript": "^5.1.5"
+    "typescript": "^5.1.6"
   },
   "dependencies": {
     "@aws-cdk/service-spec-types": "^0.0.0",
