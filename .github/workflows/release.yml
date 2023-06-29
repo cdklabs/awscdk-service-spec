@@ -118,6 +118,31 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_REF: ${{ github.ref }}
         run: errout=$(mktemp); gh release create $(cat dist/releasetag.txt) -R $GITHUB_REPOSITORY -F dist/changelog.md -t $(cat dist/releasetag.txt) --target $GITHUB_REF 2> $errout && true; exitcode=$?; if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" $errout; then cat $errout; exit $exitcode; fi
+  cdklabs-tskb_release_npm:
+    name: "@cdklabs/tskb: Publish to npm"
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-cdklabs-tskb == 'true' }}
+    steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: cdklabs-tskb_build-artifact
+          path: dist
+      - name: Restore build artifact permissions
+        run: cd dist && setfacl --restore=permissions-backup.acl
+        continue-on-error: true
+      - name: Release
+        env:
+          NPM_DIST_TAG: latest
+          NPM_REGISTRY: registry.npmjs.org
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npx -p publib@latest publib-npm
   cdklabs-typewriter_release_github:
     name: "@cdklabs/typewriter: Publish to GitHub Releases"
     needs: release
@@ -143,6 +168,31 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_REF: ${{ github.ref }}
         run: errout=$(mktemp); gh release create $(cat dist/releasetag.txt) -R $GITHUB_REPOSITORY -F dist/changelog.md -t $(cat dist/releasetag.txt) --target $GITHUB_REF 2> $errout && true; exitcode=$?; if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" $errout; then cat $errout; exit $exitcode; fi
+  cdklabs-typewriter_release_npm:
+    name: "@cdklabs/typewriter: Publish to npm"
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-cdklabs-typewriter == 'true' }}
+    steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: cdklabs-typewriter_build-artifact
+          path: dist
+      - name: Restore build artifact permissions
+        run: cd dist && setfacl --restore=permissions-backup.acl
+        continue-on-error: true
+      - name: Release
+        env:
+          NPM_DIST_TAG: latest
+          NPM_REGISTRY: registry.npmjs.org
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npx -p publib@latest publib-npm
   aws-cdk-service-spec-types_release_github:
     name: "@aws-cdk/service-spec-types: Publish to GitHub Releases"
     needs: release
@@ -168,6 +218,31 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_REF: ${{ github.ref }}
         run: errout=$(mktemp); gh release create $(cat dist/releasetag.txt) -R $GITHUB_REPOSITORY -F dist/changelog.md -t $(cat dist/releasetag.txt) --target $GITHUB_REF 2> $errout && true; exitcode=$?; if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" $errout; then cat $errout; exit $exitcode; fi
+  aws-cdk-service-spec-types_release_npm:
+    name: "@aws-cdk/service-spec-types: Publish to npm"
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-service-spec-types == 'true' }}
+    steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: aws-cdk-service-spec-types_build-artifact
+          path: dist
+      - name: Restore build artifact permissions
+        run: cd dist && setfacl --restore=permissions-backup.acl
+        continue-on-error: true
+      - name: Release
+        env:
+          NPM_DIST_TAG: latest
+          NPM_REGISTRY: registry.npmjs.org
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npx -p publib@latest publib-npm
   aws-cdk-aws-service-spec_release_github:
     name: "@aws-cdk/aws-service-spec: Publish to GitHub Releases"
     needs: release
@@ -193,3 +268,28 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_REF: ${{ github.ref }}
         run: errout=$(mktemp); gh release create $(cat dist/releasetag.txt) -R $GITHUB_REPOSITORY -F dist/changelog.md -t $(cat dist/releasetag.txt) --target $GITHUB_REF 2> $errout && true; exitcode=$?; if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" $errout; then cat $errout; exit $exitcode; fi
+  aws-cdk-aws-service-spec_release_npm:
+    name: "@aws-cdk/aws-service-spec: Publish to npm"
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-aws-service-spec == 'true' }}
+    steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: aws-cdk-aws-service-spec_build-artifact
+          path: dist
+      - name: Restore build artifact permissions
+        run: cd dist && setfacl --restore=permissions-backup.acl
+        continue-on-error: true
+      - name: Release
+        env:
+          NPM_DIST_TAG: latest
+          NPM_REGISTRY: registry.npmjs.org
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npx -p publib@latest publib-npm
