@@ -93,19 +93,36 @@ abstract class SourceUpdate extends Component {
       postBuildSteps: [
         ...github.WorkflowActions.createPullRequest({
           pullRequestTitle: `feat(sources): update ${options.name}`,
-          pullRequestDescription: `Updates the ${options.name} source from upstream`,
+
+          pullRequestDescription: [
+            '> ⚠️ This Pull Request updates daily and will overwrite **all** manual changes pushed to the branch',
+            '',
+            `Updates the ${options.name} source from upstream`,
+          ].join('\n'),
           workflowName,
           credentials: project.github.projenCredentials,
           labels: ['auto-approve'],
           baseBranch: 'main',
           branchName: `update-source/${options.name}`,
         }),
+        {
+          name: 'add-instructions',
+          run: `gh pr comment \${{ steps.create-pr.outputs.pull-request-number }} --body "${[
+            'To work on this PR, please create a new branch and PR. This prevents your work from being deleted by the automation.',
+            'Run the following commands inside the repo:',
+            '```console',
+            'gh co {{ steps.create-pr.outputs.pull-request-number }}',
+            'git switch -c fix-pr-{{ steps.create-pr.outputs.pull-request-number }} && git push -u origin HEAD',
+            'gh pr create -t "fix: pr#{{ steps.create-pr.outputs.pull-request-number }}" --body "Fixes {{ steps.create-pr.outputs.pull-request-url }}"',
+            '```',
+          ].join('\n')}"`,
+        },
       ],
     });
 
     this.workflow.on({
       workflowDispatch: {},
-      schedule: [{ cron: options.schedule ?? '11 3 * * 1' }],
+      schedule: [{ cron: options.schedule ?? '11 3 * * 1-5' }],
     });
   }
 
