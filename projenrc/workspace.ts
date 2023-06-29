@@ -1,12 +1,16 @@
 import { yarn } from 'cdklabs-projen-project-types';
-import { DependencyType } from 'projen';
+import { DependencyType, ReleasableCommits } from 'projen';
 import { YarnMonorepo } from './monorepo';
+
+export interface TypeScriptWorkspaceOptions extends yarn.TypeScriptWorkspaceOptions {
+  readonly releasableCommits?: ReleasableCommits;
+}
 
 export class TypeScriptWorkspace extends yarn.TypeScriptWorkspace {
   private isPrivatePackage: boolean;
   private monorepo: YarnMonorepo;
 
-  public constructor(options: yarn.TypeScriptWorkspaceOptions) {
+  public constructor(options: TypeScriptWorkspaceOptions) {
     super(options);
     this.monorepo = options.parent as YarnMonorepo;
     this.isPrivatePackage = options.private ?? false;
@@ -47,6 +51,7 @@ export class TypeScriptWorkspace extends yarn.TypeScriptWorkspace {
       workflowNodeVersion: this.nodeVersion,
       releaseWorkflowSetupSteps: options.releaseWorkflowSetupSteps,
       postBuildSteps: options.postBuildSteps,
+      releasableCommits: options.releasableCommits,
     });
   }
 

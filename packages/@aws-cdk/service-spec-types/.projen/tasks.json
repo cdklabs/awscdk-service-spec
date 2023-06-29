@@ -30,7 +30,8 @@
         "BUMPFILE": "dist/version.txt",
         "RELEASETAG": "dist/releasetag.txt",
         "RELEASE_TAG_PREFIX": "@aws-cdk/service-spec-types@",
-        "VERSIONRCOPTIONS": "{\"path\":\".\"}"
+        "VERSIONRCOPTIONS": "{\"path\":\".\"}",
+        "RELEASABLE_COMMITS": "git log --no-merges --oneline $LATEST_TAG..HEAD -E --grep '^(feat|fix){1}(\\([^()[:space:]]+\\))?(!)?:[[:blank:]]+.+' -- . ../../../sources"
       },
       "steps": [
         {
@@ -180,7 +181,8 @@
         "BUMPFILE": "dist/version.txt",
         "RELEASETAG": "dist/releasetag.txt",
         "RELEASE_TAG_PREFIX": "@aws-cdk/service-spec-types@",
-        "VERSIONRCOPTIONS": "{\"path\":\".\"}"
+        "VERSIONRCOPTIONS": "{\"path\":\".\"}",
+        "RELEASABLE_COMMITS": "git log --no-merges --oneline $LATEST_TAG..HEAD -E --grep '^(feat|fix){1}(\\([^()[:space:]]+\\))?(!)?:[[:blank:]]+.+' -- . ../../../sources"
       },
       "steps": [
         {
