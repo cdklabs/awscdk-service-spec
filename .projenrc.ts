@@ -31,7 +31,7 @@ const repo = new YarnMonorepo({
 
   release: true,
   releaseOptions: {
-    publishToNpm: false,
+    publishToNpm: true,
     releaseTrigger: {
       isContinuous: false,
       isManual: false,
