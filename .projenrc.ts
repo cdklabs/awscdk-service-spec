@@ -29,6 +29,10 @@ const repo = new YarnMonorepo({
     lfsPatterns: ['sources/**/*.json'],
   },
 
+  autoApproveOptions: {
+    allowedUsernames: ['aws-cdk-automation', 'dependabot[bot]'],
+  },
+
   release: true,
   releaseOptions: {
     publishToNpm: true,
