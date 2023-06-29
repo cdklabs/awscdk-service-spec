@@ -1,18 +1,30 @@
 import { yarn } from 'cdklabs-projen-project-types';
-import { DependencyType, ReleasableCommits } from 'projen';
+import { DependencyType, ReleasableCommits, javascript } from 'projen';
 import { YarnMonorepo } from './monorepo';
 
 export interface TypeScriptWorkspaceOptions extends yarn.TypeScriptWorkspaceOptions {
   readonly releasableCommits?: ReleasableCommits;
 }
 
+type Mutable<T> = {
+  -readonly [K in keyof T]: T[K];
+};
+
 export class TypeScriptWorkspace extends yarn.TypeScriptWorkspace {
   private isPrivatePackage: boolean;
   private monorepo: YarnMonorepo;
 
   public constructor(options: TypeScriptWorkspaceOptions) {
-    super(options);
-    this.monorepo = options.parent as YarnMonorepo;
+    const monorepo = options.parent as YarnMonorepo;
+    const defaultOptions: Partial<Mutable<TypeScriptWorkspaceOptions>> = {};
+    if (monorepo.monorepoRelease && !options.private) {
+      defaultOptions.npmAccess = javascript.NpmAccess.PUBLIC;
+    }
+    super({
+      ...defaultOptions,
+      ...options,
+    });
+    this.monorepo = monorepo;
     this.isPrivatePackage = options.private ?? false;
 
     // If the package is public, all local deps and peer deps must also be public
