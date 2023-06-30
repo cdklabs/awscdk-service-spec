@@ -30630,6 +30630,16 @@ export class CfnSubnet extends cdk.CfnResource implements cdk.IInspectable, cdk.
   public readonly attrAvailabilityZone: string;
 
   /**
+   * @cloudformationAttribute AvailabilityZoneId
+   */
+  public readonly attrAvailabilityZoneId: string;
+
+  /**
+   * @cloudformationAttribute CidrBlock
+   */
+  public readonly attrCidrBlock: string;
+
+  /**
    * The IPv6 CIDR blocks that are associated with the subnet, such as \`[ 2001:db8:1234:1a00::/64 ]\` .
    *
    * @cloudformationAttribute Ipv6CidrBlocks
@@ -30743,6 +30753,8 @@ export class CfnSubnet extends cdk.CfnResource implements cdk.IInspectable, cdk.
     cdk.requireProperty(props, "vpcId", this);
 
     this.attrAvailabilityZone = cdk.Token.asString(this.getAtt("AvailabilityZone", cdk.ResolutionTypeHint.STRING));
+    this.attrAvailabilityZoneId = cdk.Token.asString(this.getAtt("AvailabilityZoneId", cdk.ResolutionTypeHint.STRING));
+    this.attrCidrBlock = cdk.Token.asString(this.getAtt("CidrBlock", cdk.ResolutionTypeHint.STRING));
     this.attrIpv6CidrBlocks = cdk.Token.asList(this.getAtt("Ipv6CidrBlocks", cdk.ResolutionTypeHint.STRING_LIST));
     this.attrNetworkAclAssociationId = cdk.Token.asString(this.getAtt("NetworkAclAssociationId", cdk.ResolutionTypeHint.STRING));
     this.attrOutpostArn = cdk.Token.asString(this.getAtt("OutpostArn", cdk.ResolutionTypeHint.STRING));
