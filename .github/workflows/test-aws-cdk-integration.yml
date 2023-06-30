@@ -54,45 +54,7 @@ jobs:
       - name: Build aws/aws-cdk
         run: npx lerna run build --no-bail --scope aws-cdk-lib --include-dependencies
         working-directory: aws-cdk
-      - name: Prepare artifacts
-        run: |-
-          jq 'del(.devDependencies)' packages/aws-cdk-lib/package.json > ${{ runner.temp }}/package.json
-          cp packages/aws-cdk-lib/.jsii ${{ runner.temp }}/.jsii
-          cp packages/aws-cdk-lib/.jsii.gz ${{ runner.temp }}/.jsii.gz
-        working-directory: aws-cdk
-      - name: Upload spec
-        uses: actions/upload-artifact@v3
-        with:
-          name: aws-cdk-lib-candidate
-          if-no-files-found: error
-          path: |-
-            ${{ runner.temp }}/package.json
-            ${{ runner.temp }}/.jsii
-            ${{ runner.temp }}/.jsii.gz
-  jsii-diff:
-    needs: test-with-new-codegen
-    runs-on: awscdk-service-spec_ubuntu-latest_32-core
-    permissions:
-      contents: read
-    env:
-      CI: "1"
-      NODE_OPTIONS: --max-old-space-size=8196
-    steps:
-      - name: Checkout awscdk-service-spec
-        uses: actions/checkout@v3
-        with:
-          path: awscdk-service-spec
-          ref: ${{ github.event.pull_request.head.ref }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-      - name: Download aws-cdk-lib-candidate
-        uses: actions/download-artifact@v3
-        with:
-          name: aws-cdk-lib-candidate
-          path: aws-cdk-lib-candidate
-      - name: Prepare dependency closure
-        run: npm install
-        working-directory: aws-cdk-lib-candidate
       - name: Install jsii-diff
-        run: npm install jsii-diff
+        run: npm install -g jsii-diff
       - name: Compare current and candidate spec
-        run: npx jsii-diff --verbose --keys --ignore-file=awscdk-service-spec/packages/@aws-cdk/aws-service-spec/.jsiidiffignore --error-on=non-experimental npm:aws-cdk-lib@latest aws-cdk-lib-candidate
+        run: npx jsii-diff --verbose --keys --ignore-file=awscdk-service-spec/packages/@aws-cdk/aws-service-spec/.jsiidiffignore --error-on=non-experimental npm:aws-cdk-lib@latest aws-cdk/packages/aws-cdk-lib
