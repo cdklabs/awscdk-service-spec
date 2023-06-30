@@ -106,16 +106,21 @@ abstract class SourceUpdate extends Component {
           branchName: `update-source/${options.name}`,
         }),
         {
+          env: {
+            GH_TOKEN: '${{ github.token }}',
+          },
           name: 'add-instructions',
-          run: `gh pr comment \${{ steps.create-pr.outputs.pull-request-number }} --body "${[
-            'To work on this PR, please create a new branch and PR. This prevents your work from being deleted by the automation.',
-            'Run the following commands inside the repo:',
-            '```console',
-            'gh co {{ steps.create-pr.outputs.pull-request-number }}',
-            'git switch -c fix-pr-{{ steps.create-pr.outputs.pull-request-number }} && git push -u origin HEAD',
-            'gh pr create -t "fix: pr#{{ steps.create-pr.outputs.pull-request-number }}" --body "Fixes {{ steps.create-pr.outputs.pull-request-url }}"',
-            '```',
-          ].join('\n')}"`,
+          run:
+            `echo "${[
+              '**To work on this Pull Request, please create a new branch and PR. This prevents your work from being deleted by the automation.**',
+              '',
+              'Run the following commands inside the repo:',
+              '\\`\\`\\`console',
+              'gh co ${{ steps.create-pr.outputs.pull-request-number }}',
+              'git switch -c fix-pr-${{ steps.create-pr.outputs.pull-request-number }} && git push -u origin HEAD',
+              'gh pr create -t \\"fix: PR #${{ steps.create-pr.outputs.pull-request-number }}\\" --body \\"Fixes ${{ steps.create-pr.outputs.pull-request-url }}\\"',
+              '\\`\\`\\`',
+            ].join('\\n')}"` + '| gh pr comment ${{ steps.create-pr.outputs.pull-request-number }} -F-',
         },
       ],
     });
