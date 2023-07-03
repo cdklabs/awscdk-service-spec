@@ -71,6 +71,7 @@ abstract class SourceUpdate extends Component {
       permissions: {
         contents: github.workflows.JobPermission.READ,
         idToken: needsS3Access ? github.workflows.JobPermission.WRITE : github.workflows.JobPermission.NONE,
+        pullRequests: github.workflows.JobPermission.WRITE,
       },
       task: this.task,
       preBuildSteps: [
