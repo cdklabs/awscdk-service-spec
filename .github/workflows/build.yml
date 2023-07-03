@@ -15,4 +15,4 @@ jobs:
       - name: add-instructions
         env:
           GH_TOKEN: ${{ github.token }}
-        run: 'echo "**To work on this Pull Request, please create a new branch and PR. This prevents your work from being deleted by the automation.**\n\nRun the following commands inside the repo:\n\`\`\`console\ngh co 369\ngit switch -c fix-pr-369 && git push -u origin HEAD\ngh pr create -t \"fix: PR #369\" --body \"Fixes #369\"\n\`\`\`"| gh pr comment 369 -F-'
+        run: 'echo -e "**To work on this Pull Request, please create a new branch and PR. This prevents your work from being deleted by the automation.**\n\nRun the following commands inside the repo:\n\`\`\`console\ngh co 369\ngit switch -c fix-pr-369 && git push -u origin HEAD\ngh pr create -t \"fix: PR #369\" --body \"Fixes #369\"\n\`\`\`"| gh pr comment 369 -F-'
