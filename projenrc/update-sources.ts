@@ -107,6 +107,7 @@ abstract class SourceUpdate extends Component {
           branchName: `update-source/${options.name}`,
         }),
         {
+          if: '${{ steps.create-pr.outputs.pull-request-number }}',
           env: {
             GH_TOKEN: '${{ github.token }}',
           },
