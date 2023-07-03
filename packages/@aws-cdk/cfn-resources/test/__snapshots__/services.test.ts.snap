@@ -14313,7 +14313,7 @@ export class CfnKeyPair extends cdk.CfnResource implements cdk.IInspectable, cdk
   public readonly attrKeyPairId: string;
 
   /**
-   * The format of the private key.
+   * The format of the key pair.
    */
   public keyFormat?: string;
 
@@ -14401,7 +14401,9 @@ export class CfnKeyPair extends cdk.CfnResource implements cdk.IInspectable, cdk
  */
 export interface CfnKeyPairProps {
   /**
-   * The format of the private key.
+   * The format of the key pair.
+   *
+   * Default: \`pem\`
    *
    * @default - "pem"
    * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-keypair.html#cfn-ec2-keypair-keyformat
@@ -37015,7 +37017,7 @@ export namespace CfnVerifiedAccessInstance {
     readonly cloudWatchLogs?: CfnVerifiedAccessInstance.CloudWatchLogsProperty | cdk.IResolvable;
 
     /**
-     * Include claims from trust providers in Verified Access logs.
+     * Include trust data sent by trust providers into the logs.
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-verifiedaccessinstance-verifiedaccesslogs.html#cfn-ec2-verifiedaccessinstance-verifiedaccesslogs-includetrustcontext
      */
@@ -37029,7 +37031,9 @@ export namespace CfnVerifiedAccessInstance {
     readonly kinesisDataFirehose?: cdk.IResolvable | CfnVerifiedAccessInstance.KinesisDataFirehoseProperty;
 
     /**
-     * Select log version for Verified Access logs.
+     * The logging version to use.
+     *
+     * Valid values: \`ocsf-0.1\` | \`ocsf-1.0.0-rc.2\`
      *
      * @see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-verifiedaccessinstance-verifiedaccesslogs.html#cfn-ec2-verifiedaccessinstance-verifiedaccesslogs-logversion
      */
