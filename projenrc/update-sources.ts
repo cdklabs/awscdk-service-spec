@@ -113,7 +113,7 @@ abstract class SourceUpdate extends Component {
           },
           name: 'add-instructions',
           run:
-            `echo "${[
+            `echo -e "${[
               '**To work on this Pull Request, please create a new branch and PR. This prevents your work from being deleted by the automation.**',
               '',
               'Run the following commands inside the repo:',
