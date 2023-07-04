@@ -1,3 +1,3 @@
 # @cdklabs/tskb
 
-Using TypeScript as a knowledge base
+Using TypeScript as a knowledge base.
