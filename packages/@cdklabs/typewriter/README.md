@@ -1,6 +1,6 @@
 # @cdklabs/typewriter
 
-Write typed code.
+Write code with an AST builder instead of string concatenation.
 
 ## Example
 
@@ -23,7 +23,7 @@ const renderer = new TypeScriptRenderer();
 console.log(renderer.render(scope));
 /**
  * Prints:
- * 
+ *
  * function myFunction(): void {
  *   return 1;
  * }
