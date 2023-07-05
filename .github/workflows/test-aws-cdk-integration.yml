@@ -33,11 +33,17 @@ jobs:
         with:
           path: aws-cdk
           repository: aws/aws-cdk
-      - name: Register drop-in @aws-cdk/cfn2ts replacement
+      - name: Register drop-in @aws-cdk/aws-service-spec replacement
         run: yarn link
-        working-directory: awscdk-service-spec/packages/@aws-cdk/cfn2ts
-      - name: Link drop-in @aws-cdk/cfn2ts replacement
-        run: yarn link "@aws-cdk/cfn2ts"
+        working-directory: awscdk-service-spec/packages/@aws-cdk/aws-service-spec
+      - name: Link drop-in @aws-cdk/aws-service-spec replacement
+        run: yarn link "@aws-cdk/aws-service-spec"
+        working-directory: aws-cdk
+      - name: Register drop-in @aws-cdk/service-spec-types replacement
+        run: yarn link
+        working-directory: awscdk-service-spec/packages/@aws-cdk/service-spec-types
+      - name: Link drop-in @aws-cdk/service-spec-types replacement
+        run: yarn link "@aws-cdk/service-spec-types"
         working-directory: aws-cdk
       - name: Setup aws/aws-cdk
         run: yarn install
@@ -86,4 +92,4 @@ jobs:
       - name: Install jsii-diff
         run: npm install jsii-diff
       - name: Compare current and candidate spec
-        run: npx jsii-diff --verbose --keys --ignore-file=awscdk-service-spec/packages/@aws-cdk/cfn2ts/.jsiidiffignore --error-on=non-experimental npm:aws-cdk-lib@latest aws-cdk-lib-candidate
+        run: npx jsii-diff --verbose --keys --ignore-file=awscdk-service-spec/packages/@aws-cdk/aws-service-spec/.jsiidiffignore --error-on=non-experimental npm:aws-cdk-lib@latest aws-cdk-lib-candidate

@@ -51,6 +51,7 @@ const tsKb = new TypeScriptWorkspace({
   releasableCommits: pj.ReleasableCommits.featuresAndFixes('.'),
 });
 
+// @ts-ignore TS6133 'typewriter' is declared but its value is never read.
 const typewriter = new TypeScriptWorkspace({
   parent: repo,
   name: '@cdklabs/typewriter',
@@ -150,56 +151,11 @@ awsServiceSpec.gitignore.addPatterns('db.json.gz');
 awsServiceSpec.gitignore.addPatterns('build-report');
 awsServiceSpec.npmignore?.addPatterns('build-report');
 
-const cfnResources = new TypeScriptWorkspace({
-  parent: repo,
-  name: '@aws-cdk/cfn-resources',
-  private: true,
-  description: 'L1 constructs for all CloudFormation Resources',
-  deps: [],
-  peerDeps: ['aws-cdk-lib@^2', 'constructs@^10.0.0'],
-  peerDependencyOptions: {
-    pinnedDevDependency: false,
-  },
-  devDeps: [
-    serviceSpecTypes,
-    serviceSpecBuild,
-    tsKb,
-    typewriter,
-    '@swc/core',
-    '@types/fs-extra@^9',
-    'aws-cdk-lib',
-    'camelcase',
-    'constructs',
-    'fs-extra',
-    'ts-node',
-  ],
-});
-cfnResources.eslint?.addOverride({
-  files: ['src/cli/**/*.ts', 'test/**/*.ts'],
-  rules: {
-    'import/no-extraneous-dependencies': 'off',
-  },
-});
-cfnResources.addGitIgnore('src/services/**');
-cfnResources.tsconfigDev.file.addOverride('ts-node.swc', true);
-cfnResources.preCompileTask.spawn(
-  cfnResources.tasks.addTask('generate', {
-    exec: 'ts-node --project tsconfig.dev.json src/cli/main.ts --augmentations-support',
-    receiveArgs: true,
-  }),
-);
-
-const cfn2ts = new TypeScriptWorkspace({
-  parent: repo,
-  name: '@aws-cdk/cfn2ts',
-  description: 'Drop-in replacement for cfn2ts',
-  private: true,
-  deps: [cfnResources, serviceSpecTypes, awsServiceSpec, 'yargs', 'fs-extra'],
-});
-
 // Add integration test with aws-cdk
-new AwsCdkIntegrationTest(cfn2ts, {
+new AwsCdkIntegrationTest(repo, {
   workflowRunsOn,
+  serviceSpec: awsServiceSpec,
+  serviceSpecTypes,
 });
 
 // Update sources

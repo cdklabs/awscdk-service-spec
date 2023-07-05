@@ -5,18 +5,19 @@ import { JobPermission } from 'projen/lib/github/workflows-model';
 
 export interface AwsCdkIntegrationTestOptions {
   readonly workflowRunsOn: string[];
+  readonly serviceSpec: yarn.TypeScriptWorkspace;
+  readonly serviceSpecTypes: yarn.TypeScriptWorkspace;
 }
 
 export class AwsCdkIntegrationTest extends pj.Component {
-  public constructor(project: yarn.TypeScriptWorkspace, options: AwsCdkIntegrationTestOptions) {
-    super(project);
+  public constructor(root: yarn.Monorepo, options: AwsCdkIntegrationTestOptions) {
+    super(root);
 
-    const root = project.root as yarn.Monorepo;
-    if (!root.github || project.name !== '@aws-cdk/cfn2ts') {
-      throw 'Error: Can add AwsCdkIntgrationTest only to @aws-cdk/cfn2ts';
-    }
+    // if (!root.github || project.name !== '@aws-cdk/cfn2ts') {
+    //   throw 'Error: Can add AwsCdkIntgrationTest only to @aws-cdk/cfn2ts';
+    // }
 
-    const workflow = new pj.github.GithubWorkflow(root.github, 'test-aws-cdk-integration');
+    const workflow = new pj.github.GithubWorkflow(root.github!, 'test-aws-cdk-integration');
 
     workflow.on({
       workflowDispatch: {},
@@ -57,7 +58,8 @@ export class AwsCdkIntegrationTest extends pj.Component {
           run: ['yarn install --frozen-lockfile', 'yarn compile'].join('\n'),
         },
         ...checkoutRepository(awsCdkRepo, awsCdkPath),
-        ...linkPackage(project, awsCdkPath),
+        ...linkPackage(options.serviceSpec, awsCdkPath),
+        ...linkPackage(options.serviceSpecTypes, awsCdkPath),
         ...buildAwsCdkLib(awsCdkRepo, awsCdkPath),
         ...uploadSpec(candidateSpec, awsCdkPath),
       ],
@@ -67,11 +69,14 @@ export class AwsCdkIntegrationTest extends pj.Component {
      * @TODO Separate job for now because this it is failing
      * Once it passes, this should be merged with the main job above
      */
+    const jsiiDiffIgnore = '.jsiidiffignore';
     const diffIgnoreFile = path.join(
-      project.root.name,
-      path.relative(project.root.outdir, project.outdir),
-      '.jsiidiffignore',
+      root.name,
+      path.relative(options.serviceSpec.root.outdir, options.serviceSpec.outdir),
+      jsiiDiffIgnore,
     );
+    options.serviceSpec.addPackageIgnore(jsiiDiffIgnore);
+
     workflow.addJob('jsii-diff', {
       needs: [candidateSpecJobName],
       runsOn,
