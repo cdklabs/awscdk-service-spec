@@ -46,7 +46,7 @@ jobs:
         run: yarn link "@aws-cdk/service-spec-types"
         working-directory: aws-cdk
       - name: Use spec2cdk
-        run: echo "export * from '@aws-cdk/spec2cdk';" > packages/aws-cdk-lib/scripts/codegen.ts
+        run: echo "export * from '@aws-cdk/spec2cdk/lib/cfn2ts';" > packages/aws-cdk-lib/scripts/codegen.ts
         working-directory: aws-cdk
       - name: Setup aws/aws-cdk
         run: yarn install

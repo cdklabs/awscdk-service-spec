@@ -148,7 +148,7 @@ function useSpec2Cdk(path: string): pj.github.workflows.Step[] {
     {
       name: `Use spec2cdk`,
       workingDirectory: path,
-      run: `echo "export * from '@aws-cdk/spec2cdk';" > packages/aws-cdk-lib/scripts/codegen.ts`,
+      run: `echo "export * from '@aws-cdk/spec2cdk/lib/cfn2ts';" > packages/aws-cdk-lib/scripts/codegen.ts`,
     },
   ];
 }
