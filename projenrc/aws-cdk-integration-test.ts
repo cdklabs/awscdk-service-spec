@@ -60,6 +60,7 @@ export class AwsCdkIntegrationTest extends pj.Component {
         ...checkoutRepository(awsCdkRepo, awsCdkPath),
         ...linkPackage(options.serviceSpec, awsCdkPath),
         ...linkPackage(options.serviceSpecTypes, awsCdkPath),
+        ...useSpec2Cdk(awsCdkPath),
         ...buildAwsCdkLib(awsCdkRepo, awsCdkPath),
         ...uploadSpec(candidateSpec, awsCdkPath),
       ],
@@ -142,6 +143,16 @@ function linkPackage(project: pj.Project, targetPath: string): pj.github.workflo
       name: `Link drop-in ${project.name} replacement`,
       workingDirectory: targetPath,
       run: `yarn link "${project.name}"`,
+    },
+  ];
+}
+
+function useSpec2Cdk(path: string): pj.github.workflows.Step[] {
+  return [
+    {
+      name: `Use spec2cdk`,
+      workingDirectory: path,
+      run: `echo "export * from '@aws-cdk/spec2cdk';" > packages/aws-cdk-lib/scripts/codegen.ts`,
     },
   ];
 }
