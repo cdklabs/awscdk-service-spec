@@ -13,10 +13,6 @@ export class AwsCdkIntegrationTest extends pj.Component {
   public constructor(root: yarn.Monorepo, options: AwsCdkIntegrationTestOptions) {
     super(root);
 
-    // if (!root.github || project.name !== '@aws-cdk/cfn2ts') {
-    //   throw 'Error: Can add AwsCdkIntgrationTest only to @aws-cdk/cfn2ts';
-    // }
-
     const workflow = new pj.github.GithubWorkflow(root.github!, 'test-aws-cdk-integration');
 
     workflow.on({

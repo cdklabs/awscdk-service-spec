@@ -1,6 +1,10 @@
 {
   "dependencies": [
     {
+      "name": "@types/fs-extra",
+      "type": "build"
+    },
+    {
       "name": "@types/glob",
       "type": "build"
     },
