@@ -1,7 +1,6 @@
 import * as pj from 'projen';
 import { yarn } from 'cdklabs-projen-project-types';
 import path from 'path';
-import { JobPermission } from 'projen/lib/github/workflows-model';
 
 export interface AwsCdkIntegrationTestOptions {
   readonly workflowRunsOn: string[];
@@ -26,8 +25,15 @@ export class AwsCdkIntegrationTest extends pj.Component {
     const runsOn = options.workflowRunsOn;
     const awsCdkRepo = 'aws/aws-cdk';
     const awsCdkPath = 'aws-cdk';
-    const candidateSpec = 'aws-cdk-lib-candidate';
+    const candidateSpec = path.join(awsCdkPath, 'packages', 'aws-cdk-lib');
     const candidateSpecJobName = 'test-with-new-codegen';
+    const jsiiDiffIgnore = '.jsiidiffignore';
+    const diffIgnoreFile = path.join(
+      root.name,
+      path.relative(options.serviceSpec.root.outdir, options.serviceSpec.outdir),
+      jsiiDiffIgnore,
+    );
+    options.serviceSpec.addPackageIgnore(jsiiDiffIgnore);
 
     workflow.addJob(candidateSpecJobName, {
       runsOn,
@@ -58,50 +64,7 @@ export class AwsCdkIntegrationTest extends pj.Component {
         ...linkPackage(options.serviceSpecTypes, awsCdkPath),
         ...useSpec2Cdk(awsCdkPath),
         ...buildAwsCdkLib(awsCdkRepo, awsCdkPath),
-        ...uploadSpec(candidateSpec, awsCdkPath),
-      ],
-    });
-
-    /**
-     * @TODO Separate job for now because this it is failing
-     * Once it passes, this should be merged with the main job above
-     */
-    const jsiiDiffIgnore = '.jsiidiffignore';
-    const diffIgnoreFile = path.join(
-      root.name,
-      path.relative(options.serviceSpec.root.outdir, options.serviceSpec.outdir),
-      jsiiDiffIgnore,
-    );
-    options.serviceSpec.addPackageIgnore(jsiiDiffIgnore);
-
-    workflow.addJob('jsii-diff', {
-      needs: [candidateSpecJobName],
-      runsOn,
-      env: {
-        ...awsCdkLibEnv(),
-      },
-      permissions: {
-        contents: JobPermission.READ,
-      },
-      steps: [
-        {
-          name: `Checkout ${root.name}`,
-          uses: 'actions/checkout@v3',
-          with: {
-            path: root.name,
-            ref: '${{ github.event.pull_request.head.ref }}',
-            repository: '${{ github.event.pull_request.head.repo.full_name }}',
-          },
-        },
-        ...specFromArtifact(candidateSpec),
-        {
-          name: `Install jsii-diff`,
-          run: 'npm install jsii-diff',
-        },
-        {
-          name: `Compare current and candidate spec`,
-          run: `npx jsii-diff --verbose --keys --ignore-file=${diffIgnoreFile} --error-on=non-experimental npm:aws-cdk-lib@latest ${candidateSpec}`,
-        },
+        ...runJsiiDiff(candidateSpec, diffIgnoreFile),
       ],
     });
   }
@@ -168,43 +131,15 @@ function buildAwsCdkLib(repository: string, path: string): pj.github.workflows.S
   ];
 }
 
-function uploadSpec(artifactName: string, workingDir: string): pj.github.workflows.Step[] {
+function runJsiiDiff(specPath: string, ignoreFilePath: string): pj.github.workflows.Step[] {
   return [
     {
-      name: `Prepare artifacts`,
-      workingDirectory: workingDir,
-      run: [
-        `jq 'del(.devDependencies)' packages/aws-cdk-lib/package.json > \${{ runner.temp }}/package.json`,
-        `cp packages/aws-cdk-lib/.jsii \${{ runner.temp }}/.jsii`,
-        `cp packages/aws-cdk-lib/.jsii.gz \${{ runner.temp }}/.jsii.gz`,
-      ].join('\n'),
+      name: `Install jsii-diff`,
+      run: 'npm install -g jsii-diff',
     },
     {
-      name: `Upload spec`,
-      uses: 'actions/upload-artifact@v3',
-      with: {
-        name: artifactName,
-        'if-no-files-found': 'error',
-        path: ['${{ runner.temp }}/package.json', '${{ runner.temp }}/.jsii', '${{ runner.temp }}/.jsii.gz'].join('\n'),
-      },
-    },
-  ];
-}
-
-function specFromArtifact(name: string): pj.github.workflows.Step[] {
-  return [
-    {
-      name: `Download ${name}`,
-      uses: 'actions/download-artifact@v3',
-      with: {
-        name: name,
-        path: name,
-      },
-    },
-    {
-      name: `Prepare dependency closure`,
-      workingDirectory: name,
-      run: 'npm install',
+      name: `Compare current and candidate spec`,
+      run: `npx jsii-diff --verbose --keys --ignore-file=${ignoreFilePath} --error-on=non-experimental npm:aws-cdk-lib@latest ${specPath}`,
     },
   ];
 }
