@@ -36,10 +36,9 @@ const repo = new YarnMonorepo({
   release: true,
   releaseOptions: {
     publishToNpm: true,
-    releaseTrigger: {
-      isContinuous: false,
-      isManual: false,
-    },
+    releaseTrigger: pj.release.ReleaseTrigger.scheduled({
+      schedule: '11 8 * * 5',
+    }),
   },
 });
 
