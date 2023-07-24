@@ -1,6 +1,8 @@
 # AWS::Macie::FindingsFilter - Removed attribute should also be removed in aws-cdk-lib
 removed:aws-cdk-lib.aws_macie.CfnFindingsFilter.FindingsFilterListItemProperty
 removed:aws-cdk-lib.aws_macie.CfnFindingsFilter.attrFindingsFilterListItems
+
+# Ignored as part of move to new spec
 changed-type:aws-cdk-lib.aws_apprunner.CfnAutoScalingConfiguration.tags
 changed-type:aws-cdk-lib.aws_appstream.CfnAppBlockBuilder.tags
 changed-type:aws-cdk-lib.aws_athena.CfnCapacityReservation.tags
@@ -30,3 +32,7 @@ removed:aws-cdk-lib.aws_sagemaker.CfnPipeline.PipelineDefinitionProperty.pipelin
 strengthened:aws-cdk-lib.aws_sam.CfnFunction.CognitoEventProperty
 weakened:aws-cdk-lib.aws_sam.CfnFunction.DeploymentPreferenceProperty
 strengthened:aws-cdk-lib.aws_sam.CfnFunction.S3EventProperty
+
+# Introduction of a new feature
+# Previously only BlueGreenUpdatePolicy could be set, now BlueGreenUpdatePolicy or new RollingUpdatePolicy can be provided
+weakened:aws-cdk-lib.aws_sagemaker.CfnEndpoint.DeploymentConfigProperty
