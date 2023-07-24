@@ -33,6 +33,11 @@ strengthened:aws-cdk-lib.aws_sam.CfnFunction.CognitoEventProperty
 weakened:aws-cdk-lib.aws_sam.CfnFunction.DeploymentPreferenceProperty
 strengthened:aws-cdk-lib.aws_sam.CfnFunction.S3EventProperty
 
+# Fix for non-working property
+# loadBalancerName is used to idenitfy a Classic Load Balancer
+# However TaskSet only works with modern Application or Network LBs
+removed:aws-cdk-lib.aws_ecs.CfnTaskSet.LoadBalancerProperty.loadBalancerName
+
 # Introduction of a new feature
 # Previously only BlueGreenUpdatePolicy could be set, now BlueGreenUpdatePolicy or new RollingUpdatePolicy can be provided
 weakened:aws-cdk-lib.aws_sagemaker.CfnEndpoint.DeploymentConfigProperty
