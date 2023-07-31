@@ -33,7 +33,6 @@ export class AwsCdkIntegrationTest extends pj.Component {
       path.relative(options.serviceSpec.root.outdir, options.serviceSpec.outdir),
       jsiiDiffIgnore,
     );
-    options.serviceSpec.addPackageIgnore(jsiiDiffIgnore);
 
     workflow.addJob(candidateSpecJobName, {
       runsOn,

@@ -20,4 +20,3 @@ tsconfig.tsbuildinfo
 /dist/changelog.md
 /dist/version.txt
 build-report
-.jsiidiffignore
