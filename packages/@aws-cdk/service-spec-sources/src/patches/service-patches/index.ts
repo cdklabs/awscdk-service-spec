@@ -17,6 +17,7 @@ import './batch';
 import './codebuild';
 import './cognito';
 import './config';
+import './dms';
 import './elasticsearch';
 import './iot1click';
 import './opensearch';
