@@ -14,6 +14,7 @@ export { SERVICE_PATCHERS as EXCEPTIONS_PATCHERS } from './core';
 // Services
 import './autoscaling';
 import './batch';
+import './cloudformation';
 import './codebuild';
 import './cognito';
 import './config';
