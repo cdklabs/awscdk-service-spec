@@ -72,8 +72,9 @@ const serverlessFunction: Patcher<JsonObjectLens> = (lens) => {
       },
       additionalProperties: false,
       type: 'object',
+      required: ['SkillId'],
     },
-    Reason.sourceIssue('does not work'),
+    Reason.sourceIssue('SAM docs claim this is optional, but it is the only possible property'),
   )(lens);
 };
 
