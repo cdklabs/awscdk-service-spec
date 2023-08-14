@@ -45,3 +45,9 @@ weakened:aws-cdk-lib.aws_sagemaker.CfnEndpoint.DeploymentConfigProperty
 # Removal of separate attribute for primiary identifier
 # ID is available via Ref
 removed:aws-cdk-lib.aws_ec2.CfnRoute.attrId
+
+# Fix for non-working property.
+# Previously AlexaSkill had Variables, which is wrong
+# Spec was updated to use the correct property, SkillId, but left it optional
+# Make it required so our union type code will use it - it is also the only possible property
+strengthened:aws-cdk-lib.aws_sam.CfnFunction.AlexaSkillEventProperty
