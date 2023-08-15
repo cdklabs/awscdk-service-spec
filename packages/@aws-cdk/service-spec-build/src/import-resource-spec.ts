@@ -53,12 +53,17 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
   protected abstract deriveType(spec: AnyTypeDefinition): PropertyType;
 
   public importResourceOldTypes() {
-    this.doTypeDefinitions();
-    this.doResource();
+    const res = this.db.lookup('resource', 'cloudFormationType', 'equals', this.resourceName);
+    if (res.length === 0) {
+      console.log(`Cannot patch ${this.resourceName}: not in CloudFormation Schema`);
+      return;
+    }
+
+    this.doTypeDefinitions(res.only());
+    this.doResource(res.only());
   }
 
-  protected doTypeDefinitions() {
-    const res = new RichSpecDatabase(this.db).resourceByType(this.resourceName);
+  protected doTypeDefinitions(res: Resource) {
     this.allocateMissingTypeDefs(res);
 
     for (const [propTypeName, propType] of this.thisResourcePropTypes.entries()) {
@@ -70,8 +75,7 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
     }
   }
 
-  protected doResource() {
-    const res = new RichSpecDatabase(this.db).resourceByType(this.resourceName);
+  protected doResource(res: Resource) {
     const resourceSpec = this.specification.ResourceTypes[this.resourceName];
     this.addOrEnrichProperties(resourceSpec.Properties ?? {}, res.properties);
     this.addOrEnrichAttributes(resourceSpec.Attributes ?? {}, res.attributes);
