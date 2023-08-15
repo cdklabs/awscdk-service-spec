@@ -46,6 +46,9 @@ weakened:aws-cdk-lib.aws_sagemaker.CfnEndpoint.DeploymentConfigProperty
 # ID is available via Ref
 removed:aws-cdk-lib.aws_ec2.CfnRoute.attrId
 
+# Removed from SAM
+removed:aws-cdk-lib.aws_sam.CfnFunction.AlexaSkillEventProperty.variables
+
 # Breaking changes to CFN spec
 removed:aws-cdk-lib.aws_cloudwatch.CfnAlarm.attrId
 removed:aws-cdk-lib.aws_ec2.CfnNetworkInterface.enablePrimaryIpv6
