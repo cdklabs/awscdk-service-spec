@@ -1,5 +1,5 @@
 import { normalizeJsonSchema } from './json-schema-patches';
-import { addDefinitions, replaceDefinitionProperty } from './service-patches/core';
+import { addDefinitions, replaceDefinition, replaceDefinitionProperty } from './service-patches/core';
 import { JsonObjectLens, JsonObjectPatcher, Patcher, Reason, makeCompositePatcher, onlyObjects } from '../patching';
 import { jsonschema } from '../types';
 
@@ -62,6 +62,19 @@ const serverlessFunction: Patcher<JsonObjectLens> = (lens) => {
     Reason.backwardsCompat(
       'This was once typed as Json, and adding types now is a breaking change. Keep them as Json forever',
     ),
+  )(lens);
+
+  replaceDefinition(
+    'AWS::Serverless::Function.AlexaSkillEvent',
+    {
+      properties: {
+        SkillId: { type: 'string' },
+      },
+      additionalProperties: false,
+      type: 'object',
+      required: ['SkillId'],
+    },
+    Reason.sourceIssue('SAM docs claim this is optional, but it is the only possible property'),
   )(lens);
 };
 
