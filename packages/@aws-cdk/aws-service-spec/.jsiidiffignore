@@ -48,3 +48,12 @@ removed:aws-cdk-lib.aws_ec2.CfnRoute.attrId
 
 # Removed from SAM
 removed:aws-cdk-lib.aws_sam.CfnFunction.AlexaSkillEventProperty.variables
+
+# Breaking changes to CFN spec
+removed:aws-cdk-lib.aws_cloudwatch.CfnAlarm.attrId
+removed:aws-cdk-lib.aws_ec2.CfnNetworkInterface.enablePrimaryIpv6
+removed:aws-cdk-lib.aws_ec2.CfnNetworkInterfaceAttachment.attrId
+removed:aws-cdk-lib.aws_ec2.CfnNetworkInterfaceProps.enablePrimaryIpv6
+weakened:aws-cdk-lib.aws_events.CfnRule.RedshiftDataParametersProperty
+weakened:aws-cdk-lib.aws_ivs.CfnRecordingConfiguration.DestinationConfigurationProperty
+weakened:aws-cdk-lib.aws_ivs.CfnRecordingConfiguration.ThumbnailConfigurationProperty
