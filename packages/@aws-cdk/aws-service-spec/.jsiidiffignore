@@ -45,3 +45,6 @@ weakened:aws-cdk-lib.aws_sagemaker.CfnEndpoint.DeploymentConfigProperty
 # Removal of separate attribute for primiary identifier
 # ID is available via Ref
 removed:aws-cdk-lib.aws_ec2.CfnRoute.attrId
+
+# Removed from SAM
+removed:aws-cdk-lib.aws_sam.CfnFunction.AlexaSkillEventProperty.variables
