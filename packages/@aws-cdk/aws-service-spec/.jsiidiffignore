@@ -64,3 +64,6 @@ removed:aws-cdk-lib.aws_ec2.CfnNetworkInterfaceProps.enablePrimaryIpv6
 weakened:aws-cdk-lib.aws_events.CfnRule.RedshiftDataParametersProperty
 weakened:aws-cdk-lib.aws_ivs.CfnRecordingConfiguration.DestinationConfigurationProperty
 weakened:aws-cdk-lib.aws_ivs.CfnRecordingConfiguration.ThumbnailConfigurationProperty
+
+# Property was previously required but could be an empty object, now the prop is optional
+changed-type:aws-cdk-lib.aws_events.CfnConnection.authParameters
