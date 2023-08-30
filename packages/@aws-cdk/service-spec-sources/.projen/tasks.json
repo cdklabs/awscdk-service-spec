@@ -37,7 +37,7 @@
       },
       "steps": [
         {
-          "exec": "npm-check-updates --upgrade --target=minor --filter=@types/fs-extra,@types/glob,@types/jest,@types/node,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,ajv-cli,eslint-config-prettier,eslint-import-resolver-node,eslint-import-resolver-typescript,eslint-plugin-import,eslint-plugin-prettier,eslint,jest,jest-junit,npm-check-updates,prettier,projen,ts-jest,ts-json-schema-generator,typescript,ajv,canonicalize,fast-json-patch,fs-extra,glob,sort-json"
+          "exec": "npm-check-updates --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/fs-extra,@types/glob,@types/jest,@types/node,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,ajv-cli,eslint-config-prettier,eslint-import-resolver-node,eslint-import-resolver-typescript,eslint-plugin-import,eslint-plugin-prettier,eslint,jest,jest-junit,npm-check-updates,prettier,projen,ts-jest,ts-json-schema-generator,typescript,ajv,canonicalize,fast-json-patch,fs-extra,glob,sort-json"
         }
       ]
     },
