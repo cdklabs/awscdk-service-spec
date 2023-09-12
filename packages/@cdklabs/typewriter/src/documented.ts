@@ -86,6 +86,12 @@ export interface DocsSpec {
    */
   see?: string;
   /**
+   * The `@cloudformationResource` string for Cfn resource classes
+   *
+   * @default none
+   */
+  cloudformationResource?: string;
+  /**
    * Description of the default
    *
    * @default none
