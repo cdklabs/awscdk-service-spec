@@ -67,3 +67,44 @@ weakened:aws-cdk-lib.aws_ivs.CfnRecordingConfiguration.ThumbnailConfigurationPro
 
 # Property was previously required but could be an empty object, now the prop is optional
 changed-type:aws-cdk-lib.aws_events.CfnConnection.authParameters
+
+# Breaking changes to CFN spec
+removed:aws-cdk-lib.CfnStack.attrId
+removed:aws-cdk-lib.aws_cloudformation.CfnStack.attrId
+removed:aws-cdk-lib.aws_ec2.CfnTransitGatewayRouteTable.attrId
+removed:aws-cdk-lib.aws_iam.CfnManagedPolicy.attrId
+removed:aws-cdk-lib.aws_iotwireless.CfnServiceProfile.attrLoRaWanPrAllowed
+removed:aws-cdk-lib.aws_iotwireless.CfnServiceProfile.attrLoRaWanRaAllowed
+weakened:aws-cdk-lib.aws_appstream.CfnFleet.ComputeCapacityProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnAnalysis.ForecastComputationProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnAnalysis.GrowthRateComputationProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnAnalysis.MaximumMinimumComputationProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnAnalysis.MetricComparisonComputationProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnAnalysis.PeriodOverPeriodComputationProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnAnalysis.PeriodToDateComputationProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnAnalysis.TopBottomMoversComputationProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnAnalysis.TopBottomRankedComputationProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnAnalysis.TotalAggregationComputationProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnAnalysis.UniqueValuesComputationProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnTemplate.ForecastComputationProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnTemplate.GrowthRateComputationProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnTemplate.MaximumMinimumComputationProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnTemplate.MetricComparisonComputationProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnTemplate.PeriodOverPeriodComputationProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnTemplate.PeriodToDateComputationProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnTemplate.TopBottomMoversComputationProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnTemplate.TopBottomRankedComputationProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnTemplate.TotalAggregationComputationProperty
+weakened:aws-cdk-lib.aws_quicksight.CfnTemplate.UniqueValuesComputationProperty
+weakened:aws-cdk-lib.aws_vpclattice.CfnTargetGroup.TargetGroupConfigProperty
+
+# Property changed from string type to Optional<string>
+changed-type:aws-cdk-lib.CfnStack.templateUrl
+changed-type:aws-cdk-lib.aws_cloudformation.CfnStack.templateUrl
+changed-type:aws-cdk-lib.aws_events.CfnConnection.authorizationType
+changed-type:aws-cdk-lib.aws_iotwireless.CfnDestination.roleArn
+
+# Required props used to be optional
+strengthened:aws-cdk-lib.aws_guardduty.CfnDetector.CFNKubernetesAuditLogsConfigurationProperty
+strengthened:aws-cdk-lib.aws_guardduty.CfnDetector.CFNKubernetesConfigurationProperty
+strengthened:aws-cdk-lib.aws_guardduty.CfnDetector.CFNS3LogsConfigurationProperty
