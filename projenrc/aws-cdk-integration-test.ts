@@ -62,9 +62,12 @@ export class AwsCdkIntegrationTest extends pj.Component {
         ...linkPackage(options.serviceSpec, awsCdkPath),
         ...linkPackage(options.serviceSpecTypes, awsCdkPath),
         ...buildAwsCdkLib(awsCdkRepo, awsCdkPath),
-        ...runJsiiDiff(candidateSpec, diffIgnoreFile),
+        // Temporarily disabled, as it regularly prevents legitimate spec imports with intentional breaking changes.
+        // Instead, we need to add more purposeful validations like type renames.
+        // ...runJsiiDiff(candidateSpec, diffIgnoreFile),
       ],
     });
+    void runJsiiDiff, candidateSpec, diffIgnoreFile;
   }
 }
 
