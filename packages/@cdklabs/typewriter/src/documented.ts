@@ -86,11 +86,11 @@ export interface DocsSpec {
    */
   see?: string;
   /**
-   * The `@cloudformationResource` string for Cfn resource classes
+   * A map of document tags where the key represents the tag name.
    *
    * @default none
    */
-  cloudformationResource?: string;
+  docTags?: Map<string, string>;
   /**
    * Description of the default
    *

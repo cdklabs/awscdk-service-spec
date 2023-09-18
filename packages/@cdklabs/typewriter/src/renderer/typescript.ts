@@ -714,8 +714,13 @@ export class TypeScriptRenderer extends Renderer {
     if (options?.forceStruct) {
       line('@struct');
     }
+
     tagged('deprecated', el.docs?.deprecated);
-    tagged('cloudformationResource', el.docs?.cloudformationResource);
+
+    for (const [key, value] of Object.entries(el.docs?.docTags || {})) {
+      tagged(key, value);
+    }
+
     tagged('stability', el.docs?.stability);
     tagged('default -', el.docs?.default);
     tagged('returns', el.docs?.returns);
