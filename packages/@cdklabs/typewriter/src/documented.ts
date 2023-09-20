@@ -90,7 +90,7 @@ export interface DocsSpec {
    *
    * @default none
    */
-  docTags?: Map<string, string>;
+  docTags?: Record<string, string>;
   /**
    * Description of the default
    *

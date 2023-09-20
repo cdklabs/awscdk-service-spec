@@ -717,8 +717,8 @@ export class TypeScriptRenderer extends Renderer {
 
     tagged('deprecated', el.docs?.deprecated);
 
-    for (const [key, value] of el.docs?.docTags || new Map()) {
-      tagged(key, value);
+    for (const key in el.docs?.docTags) {
+      tagged(key, el.docs?.docTags[key]);
     }
 
     tagged('stability', el.docs?.stability);
