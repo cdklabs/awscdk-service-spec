@@ -86,6 +86,12 @@ export interface DocsSpec {
    */
   see?: string;
   /**
+   * A map of document tags where the key represents the tag name.
+   *
+   * @default none
+   */
+  docTags?: Record<string, string>;
+  /**
    * Description of the default
    *
    * @default none
