@@ -37,10 +37,10 @@
       "path": "../../@cdklabs/tskb"
     },
     {
-      "path": "../service-spec-sources"
+      "path": "../service-spec-types"
     },
     {
-      "path": "../service-spec-types"
+      "path": "../service-spec-sources"
     }
   ]
 }
