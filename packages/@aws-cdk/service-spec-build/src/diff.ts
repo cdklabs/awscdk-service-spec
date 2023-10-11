@@ -4,12 +4,14 @@ export class DbDiff {
   private result: SpecDatabaseDiff = {
     resources: { added: [], removed: [], updated: [] },
     services: { added: [], removed: [], updated: [] },
-    typeDefinitions: { added: [], removed: [], updated: [] }
+    typeDefinitions: { added: [], removed: [], updated: [] },
   };
 
-  constructor(private readonly db1: SpecDatabase, private readonly db2: SpecDatabase) {}
+  constructor(private readonly db1: SpecDatabase, private readonly db2: SpecDatabase) {
+    console.log(this.db1.id, this.db2.id);
+  }
 
   public diff() {
-    for(cont
+    console.log(JSON.stringify(this.result));
   }
 }
