@@ -77,6 +77,15 @@
         }
       ]
     },
+    "diff:db": {
+      "name": "diff:db",
+      "steps": [
+        {
+          "exec": "ts-node src/cli/diff-db",
+          "receiveArgs": true
+        }
+      ]
+    },
     "eslint": {
       "name": "eslint",
       "description": "Runs eslint against the codebase",

@@ -125,6 +125,10 @@ serviceSpecBuild.tasks.addTask('analyze:db', {
   exec: 'ts-node src/cli/analyze-db',
   receiveArgs: true,
 });
+serviceSpecBuild.tasks.addTask('diff:db', {
+  exec: 'ts-node src/cli/diff-db',
+  receiveArgs: true,
+});
 serviceSpecBuild.gitignore.addPatterns('db.json');
 serviceSpecBuild.gitignore.addPatterns('build-report');
 
