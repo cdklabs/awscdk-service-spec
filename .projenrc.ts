@@ -40,6 +40,14 @@ const repo = new YarnMonorepo({
       schedule: '11 8 * * 5',
     }),
   },
+
+  githubOptions: {
+    pullRequestLintOptions: {
+      semanticTitleOptions: {
+        types: ['feat', 'fix', 'chore', 'refactor'],
+      },
+    },
+  },
 });
 
 const tsKb = new TypeScriptWorkspace({
