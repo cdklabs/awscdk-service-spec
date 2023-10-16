@@ -120,12 +120,18 @@ export class ResourceBuilder extends PropertyBagBuilder {
    *
    * These can be simple property names ('Foo', 'Bar'), but they can also be compound
    * property names ('Foo/Bar').
+   *
+   * All attributes must be passed in one go.
    */
-  public markAsAttributes(...props: string[]) {
+  public markAsAttributes(props: string[]) {
+    // Since the same top-level property may occur multiple times in case of deep properties,
+    // we delete at the end.
+    const propertiesToDelete = new Array<string>();
+
     for (const propName of props) {
       if (this.resource.properties[propName]) {
         this.resource.attributes[propName] = this.resource.properties[propName];
-        delete this.resource.properties[propName];
+        propertiesToDelete.push(propName);
         continue;
       }
 
@@ -133,7 +139,7 @@ export class ResourceBuilder extends PropertyBagBuilder {
       const sanitizedName = attributeNameToPropertyName(propName);
       if (this.resource.properties[sanitizedName]) {
         this.resource.attributes[sanitizedName] = this.resource.properties[sanitizedName];
-        delete this.resource.properties[sanitizedName];
+        propertiesToDelete.push(sanitizedName);
         continue;
       }
 
@@ -141,13 +147,26 @@ export class ResourceBuilder extends PropertyBagBuilder {
       // In the Registry spec, compound attributes will look like 'Container/Prop'.
       // In the legacy spec they will look like 'Container.Prop'.
       // Some Registry resources incorrectly use '.' as well.
-      // We accept both here.
+      // We accept both here, but turn them both into '.'-separated.
+      //
+      // Sometimes this contains a `*`, to indicate that it could be any element in an array.
+      // We can't currently support those, so we drop them (ex: `Subscribers/*/Status`).
       //
       // We don't remove the top-level properties from the resource, we just add the attributes.
-      const prop = this.propertyDeep(...propName.split(/[\.\/]/));
-      if (prop) {
-        this.resource.attributes[sanitizedName] = prop;
+      const propPath = propName.split(/[\.\/]/);
+      if (propPath.includes('*')) {
+        // Skip unrepresentable
+        continue;
       }
+
+      const prop = this.propertyDeep(...propPath);
+      if (prop) {
+        this.resource.attributes[propPath.join('.')] = prop;
+      }
+    }
+
+    for (const prop of propertiesToDelete) {
+      delete this.resource.properties[prop];
     }
   }
 

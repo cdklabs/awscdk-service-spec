@@ -33,7 +33,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
   recurseProperties(resource, resourceBuilder, resourceFailure);
 
   resourceBuilder.markDeprecatedProperties(...(resource.deprecatedProperties ?? []).map(simplePropNameFromJsonPtr));
-  resourceBuilder.markAsAttributes(...findAttributes(resource).map(simplePropNameFromJsonPtr));
+  resourceBuilder.markAsAttributes(findAttributes(resource).map(simplePropNameFromJsonPtr));
 
   handleFailure(handleTags(resourceFailure));
   return resourceBuilder.resource;
@@ -47,18 +47,6 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
     for (const [name, property] of Object.entries(source.properties)) {
       let resolvedSchema = resolve(property);
-
-      /*
-      if (spec?.Properties?.[name]?.PrimitiveType === 'Timestamp') {
-        resolvedSchema = jsonschema.setResolvedReference(
-          {
-            type: 'string',
-            format: 'timestamp',
-          },
-          jsonschema.resolvedReference(resolvedSchema),
-        );
-      }
-      */
 
       withResult(schemaTypeToModelType(name, resolvedSchema, fail.in(`property ${name}`)), (type) => {
         target.setProperty(name, {

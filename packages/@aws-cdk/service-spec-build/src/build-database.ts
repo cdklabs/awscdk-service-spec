@@ -44,7 +44,7 @@ export class DatabaseBuilder {
   private async importCloudFormationResourceSpec() {
     const resourceSpec = this.loadResult(await sources.loadDefaultResourceSpecification(this.options.mustValidate));
 
-    ResourceSpecImporter.importOldTypes({
+    ResourceSpecImporter.importTypes({
       db: this.db,
       specification: resourceSpec,
     });
@@ -55,7 +55,7 @@ export class DatabaseBuilder {
    */
   private async importSamResourceSpec() {
     const samSpec = this.loadResult(await sources.loadSamSpec(this.options.mustValidate));
-    SAMSpecImporter.importOldTypes({
+    SAMSpecImporter.importTypes({
       db: this.db,
       specification: samSpec,
     });

@@ -123,7 +123,7 @@ export interface ImportResourceSpecOptions {
  * The types get added to the "previous types" of properties.
  */
 export class ResourceSpecImporter extends ResourceSpecImporterBase<CloudFormationResourceSpecification> {
-  public static importOldTypes(options: ImportResourceSpecOptions) {
+  public static importTypes(options: ImportResourceSpecOptions) {
     for (const resourceName of Object.keys(options.specification.ResourceTypes)) {
       new ResourceSpecImporter(resourceName, options).importResource();
     }
@@ -186,7 +186,7 @@ export interface ImportSAMSpecOptions {
  * Load the (legacy) resource specification into the database
  */
 export class SAMSpecImporter extends ResourceSpecImporterBase<SAMResourceSpecification> {
-  public static importOldTypes(options: ImportSAMSpecOptions) {
+  public static importTypes(options: ImportSAMSpecOptions) {
     for (const resourceName of Object.keys(options.specification.ResourceTypes)) {
       new SAMSpecImporter(resourceName, options).importResource();
     }
