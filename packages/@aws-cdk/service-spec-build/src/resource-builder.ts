@@ -88,15 +88,33 @@ export class PropertyBagBuilder {
 
   public setProperty(name: string, prop: Property) {
     if (this._propertyBag.properties[name]) {
-      this.mergeProperties(this._propertyBag.properties[name], prop);
+      this.mergeProperty(this._propertyBag.properties[name], prop);
     } else {
       this._propertyBag.properties[name] = prop;
     }
   }
 
-  protected mergeProperties(prop: Property, updates: Property) {
-    // FIXME: Must consider incompatible type updates
-    Object.assign(prop, updates);
+  protected mergeProperty(prop: Property, updates: Property) {
+    copyIfDef('defaultValue');
+    copyIfDef('documentation');
+    copyIfDef('deprecated');
+    copyIfDef('scrutinizable');
+    // FIXME: Might treat this as "incompatible change" ?
+    copyIfDef('required');
+
+    if (!new RichPropertyType(updates.type).javascriptEquals(prop.type)) {
+      if (!prop.previousTypes) {
+        prop.previousTypes = [];
+      }
+      prop.previousTypes.push(prop.type);
+      prop.type = updates.type;
+    }
+
+    function copyIfDef<A extends keyof Property>(key: A) {
+      if (updates[key] !== undefined) {
+        prop[key] = updates[key];
+      }
+    }
   }
 }
 
@@ -109,7 +127,7 @@ export class ResourceBuilder extends PropertyBagBuilder {
 
   public setAttribute(name: string, attr: Attribute) {
     if (this.resource.attributes[name]) {
-      this.mergeProperties(this.resource.attributes[name], attr);
+      this.mergeProperty(this.resource.attributes[name], attr);
     } else {
       this.resource.attributes[name] = attr;
     }
@@ -130,7 +148,7 @@ export class ResourceBuilder extends PropertyBagBuilder {
 
     for (const propName of props) {
       if (this.resource.properties[propName]) {
-        this.resource.attributes[propName] = this.resource.properties[propName];
+        this.setAttribute(propName, this.resource.properties[propName]);
         propertiesToDelete.push(propName);
         continue;
       }
@@ -138,7 +156,7 @@ export class ResourceBuilder extends PropertyBagBuilder {
       // The property might also exist with a name that has any `.` stripped.
       const sanitizedName = attributeNameToPropertyName(propName);
       if (this.resource.properties[sanitizedName]) {
-        this.resource.attributes[sanitizedName] = this.resource.properties[sanitizedName];
+        this.setAttribute(sanitizedName, this.resource.properties[sanitizedName]);
         propertiesToDelete.push(sanitizedName);
         continue;
       }

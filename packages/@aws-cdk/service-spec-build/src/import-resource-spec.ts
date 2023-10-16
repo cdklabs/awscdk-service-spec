@@ -104,7 +104,6 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
   protected handleAttributes(source: Record<string, resourcespec.Attribute>) {
     for (const [name, attrSpec] of Object.entries(source)) {
       const type = this.deriveType(attrSpec);
-
       this.resourceBuilder.setAttribute(name, { type });
     }
   }
