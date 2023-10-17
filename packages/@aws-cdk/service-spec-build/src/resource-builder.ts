@@ -119,10 +119,11 @@ export class PropertyBagBuilder {
 }
 
 export class ResourceBuilder extends PropertyBagBuilder {
-  private typeDefinitions = new Map<string, TypeDefinitionBuilder>();
+  private typeDefinitions = new Map<string, TypeDefinition>();
 
   constructor(public readonly db: SpecDatabase, public readonly resource: Resource) {
     super(resource);
+    this.indexExistingTypeDefinitions();
   }
 
   public setAttribute(name: string, attr: Attribute) {
@@ -224,10 +225,10 @@ export class ResourceBuilder extends PropertyBagBuilder {
     const existing = this.typeDefinitions.get(typeName);
 
     if (existing) {
-      if (!existing.typeDef.documentation && description) {
-        existing.typeDef.documentation = description;
+      if (!existing.documentation && description) {
+        existing.documentation = description;
       }
-      return { typeDefinitionBuilder: existing, fresh: false };
+      return { typeDefinitionBuilder: new TypeDefinitionBuilder(this.db, existing), fresh: false };
     }
 
     const typeDef = this.db.allocate('typeDefinition', {
@@ -236,10 +237,19 @@ export class ResourceBuilder extends PropertyBagBuilder {
       properties: {},
     });
     this.db.link('usesType', this.resource, typeDef);
+    this.typeDefinitions.set(typeName, typeDef);
 
     const builder = new TypeDefinitionBuilder(this.db, typeDef);
-    this.typeDefinitions.set(typeName, builder);
     return { typeDefinitionBuilder: builder, fresh: true };
+  }
+
+  /**
+   * Index the existing type definitions currently in the DB
+   */
+  private indexExistingTypeDefinitions() {
+    for (const { entity: typeDef } of this.db.follow('usesType', this.resource)) {
+      this.typeDefinitions.set(typeDef.name, typeDef);
+    }
   }
 }
 
