@@ -121,9 +121,24 @@ export class PropertyBagBuilder {
 export class ResourceBuilder extends PropertyBagBuilder {
   private typeDefinitions = new Map<string, TypeDefinition>();
 
+  /**
+   * We maintain this for markAsAttributes: so we can look up property
+   * definitions for properties that may have been removed from
+   * `this.resource.properties` already.
+   */
+  private originalProperties: ResourceProperties = {};
+
   constructor(public readonly db: SpecDatabase, public readonly resource: Resource) {
     super(resource);
     this.indexExistingTypeDefinitions();
+    Object.assign(this.originalProperties, resource.properties);
+  }
+
+  public setProperty(name: string, prop: Property) {
+    super.setProperty(name, prop);
+
+    // Keep a copy in 'originalProperties' as well.
+    this.originalProperties[name] = this.resource.properties[name];
   }
 
   public setAttribute(name: string, attr: Attribute) {
@@ -137,28 +152,36 @@ export class ResourceBuilder extends PropertyBagBuilder {
   /**
    * Mark the given properties as attributes instead
    *
-   * These can be simple property names ('Foo', 'Bar'), but they can also be compound
-   * property names ('Foo/Bar').
+   * These can be simple property names (`Foo`, `Bar`), but they can also be
+   * compound property names (`Foo/Bar`), and the compound property names can
+   * contain array wildcards (`Foo/*­/Bar`).
    *
-   * All attributes must be passed in one go.
+   * In the CloudFormation resource spec, compound property names are separated
+   * by periods (`Foo.Bar`).
+   *
+   * In upconverted CloudFormation resource specs -> registry specs, the compound
+   * property name references may contain a period, while the actual property name
+   * in the properties bag has the periods stripped: attributeName is `Foo.Bar`,
+   * but the actual property name is `FooBar`.
+   *
+   * The same deep property name may occur multiple times (`Foo`, `Foo/Bar`, `Foo/Baz`).
    */
   public markAsAttributes(props: string[]) {
-    // Since the same top-level property may occur multiple times in case of deep properties,
-    // we delete at the end.
-    const propertiesToDelete = new Array<string>();
-
     for (const propName of props) {
-      if (this.resource.properties[propName]) {
-        this.setAttribute(propName, this.resource.properties[propName]);
-        propertiesToDelete.push(propName);
+      if (this.originalProperties[propName]) {
+        this.setAttribute(propName, this.originalProperties[propName]);
+        delete this.resource.properties[propName];
         continue;
       }
 
-      // The property might also exist with a name that has any `.` stripped.
-      const sanitizedName = attributeNameToPropertyName(propName);
-      if (this.resource.properties[sanitizedName]) {
-        this.setAttribute(sanitizedName, this.resource.properties[sanitizedName]);
-        propertiesToDelete.push(sanitizedName);
+      // In case of a half-upconverted legacy spec, the property might also
+      // exist with a name that has any `.` stripped.
+      const strippedName = stripPeriods(propName);
+      if (this.originalProperties[strippedName]) {
+        // The ACTUAL name is still the name with '.' in it, but we copy the type
+        // from the stripped name.
+        this.setAttribute(propName, this.originalProperties[strippedName]);
+        delete this.resource.properties[strippedName];
         continue;
       }
 
@@ -173,6 +196,7 @@ export class ResourceBuilder extends PropertyBagBuilder {
       //
       // We don't remove the top-level properties from the resource, we just add the attributes.
       const propPath = propName.split(/[\.\/]/);
+      const propWithPeriods = propPath.join('.');
       if (propPath.includes('*')) {
         // Skip unrepresentable
         continue;
@@ -180,12 +204,11 @@ export class ResourceBuilder extends PropertyBagBuilder {
 
       const prop = this.propertyDeep(...propPath);
       if (prop) {
-        this.resource.attributes[propPath.join('.')] = prop;
-      }
-    }
+        this.setAttribute(propWithPeriods, prop);
 
-    for (const prop of propertiesToDelete) {
-      delete this.resource.properties[prop];
+        // FIXME: not sure if we need to delete property `Foo` if the only
+        // attribute reference we got is `Foo/Bar`. Let's not for now.
+      }
     }
   }
 
@@ -200,12 +223,15 @@ export class ResourceBuilder extends PropertyBagBuilder {
   }
 
   public propertyDeep(...fieldPath: string[]): Property | undefined {
-    let current: Resource | TypeDefinition = this.resource;
+    // The property bag we're searching in. Start by searching 'originalProperties', not
+    // the final set of resource props (as markAsAttributes may have deleted some of them)
+    let currentBag: ResourceProperties = this.originalProperties;
+
     for (let i = 0; i < fieldPath.length - 1; i++) {
-      const prop = current.properties[fieldPath[i]];
+      const prop = currentBag[fieldPath[i]];
       if (!prop) {
         throw new Error(
-          `${this.resource.cloudFormationType}: no definition for: ${fieldPath.slice(0, i + 1).join('/')}`,
+          `${this.resource.cloudFormationType}: no definition for property: ${fieldPath.slice(0, i + 1).join('/')}`,
         );
       }
       if (prop.type.type !== 'ref') {
@@ -215,10 +241,12 @@ export class ResourceBuilder extends PropertyBagBuilder {
             .join('/')} is a ${new RichPropertyType(prop.type).stringify(this.db)}`,
         );
       }
-      current = this.db.get('typeDefinition', prop.type.reference);
+
+      const typeDef = this.db.get('typeDefinition', prop.type.reference);
+      currentBag = typeDef.properties;
     }
 
-    return current.properties[fieldPath[fieldPath.length - 1]];
+    return currentBag[fieldPath[fieldPath.length - 1]];
   }
 
   public typeDefinitionBuilder(typeName: string, description?: string) {
@@ -267,6 +295,6 @@ function last<A>(xs: A[]): A {
  * Turns a compound name into its property equivalent
  * Compliance.Type -> ComplianceType
  */
-function attributeNameToPropertyName(name: string) {
+function stripPeriods(name: string) {
   return name.split('.').join('');
 }
