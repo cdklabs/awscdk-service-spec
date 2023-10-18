@@ -17,24 +17,17 @@ import {
   UpdatedTypeDefinition,
 } from '@aws-cdk/service-spec-types';
 import chalk from 'chalk';
+import { TreeEmitter } from './tree-emitter';
 
 const ADDITION = '[+]';
 const UPDATE = '[~]';
 const REMOVAL = '[-]';
 const META_INDENT = '      ';
 
-type Colorizer = (x: string) => string;
-
 const [OLD_DB, NEW_DB] = [0, 1];
 
-function ident(x: string) {
-  return x;
-}
-
 export class DiffFormatter {
-  private readonly buffer = new Array<string>();
-  private readonly prefix = new Array<string>();
-  private readonly colors: Colorizer[] = [ident];
+  private readonly tree = new TreeEmitter();
   private readonly dbs: SpecDatabase[];
 
   constructor(db1: SpecDatabase, db2: SpecDatabase) {
@@ -42,7 +35,7 @@ export class DiffFormatter {
   }
 
   public format(diff: SpecDatabaseDiff): string {
-    this.buffer.splice(0, this.buffer.length);
+    this.tree.clear();
 
     this.renderMapDiff(
       'service',
@@ -51,19 +44,19 @@ export class DiffFormatter {
       (u) => this.renderUpdatedService(u),
     );
 
-    return this.buffer.join('');
+    return this.tree.toString();
   }
 
   private renderService(s: Service, db: number) {
-    this.plainStringBlock(
+    this.tree.plainStringBlock(
       META_INDENT,
       listFromProps(s, ['capitalized', 'cloudFormationNamespace', 'name', 'shortName']),
     );
 
-    this.emitList(
+    this.tree.emitList(
       this.dbs[db].follow('hasResource', s).map((x) => x.entity),
       (resource, last) =>
-        this.withBullet(last, () => {
+        this.tree.withBullet(last, () => {
           this.renderResource(resource, db);
         }),
     );
@@ -71,7 +64,7 @@ export class DiffFormatter {
 
   private renderUpdatedService(s: UpdatedService) {
     const d = pick(s, ['capitalized', 'cloudFormationNamespace', 'name', 'shortName']);
-    this.plainStringBlock(META_INDENT, listFromDiffs(d));
+    this.tree.plainStringBlock(META_INDENT, listFromDiffs(d));
 
     this.renderMapDiff(
       'resource',
@@ -82,7 +75,7 @@ export class DiffFormatter {
   }
 
   private renderResource(r: Resource, db: number) {
-    this.plainStringBlock(
+    this.tree.plainStringBlock(
       META_INDENT,
       listFromProps(r, [
         'name',
@@ -99,10 +92,10 @@ export class DiffFormatter {
 
     // FIXME: props, attributes
 
-    this.emitList(
+    this.tree.emitList(
       this.dbs[db].follow('usesType', r).map((x) => x.entity),
       (typeDef, last) =>
-        this.withBullet(last, () => {
+        this.tree.withBullet(last, () => {
           this.renderTypeDefinition(typeDef, db);
         }),
     );
@@ -120,11 +113,11 @@ export class DiffFormatter {
       'scrutinizable',
       'tagInformation',
     ]);
-    this.plainStringBlock(META_INDENT, listFromDiffs(d));
+    this.tree.plainStringBlock(META_INDENT, listFromDiffs(d));
 
-    this.withPrefix(META_INDENT, () => {
+    this.tree.withPrefix(META_INDENT, () => {
       if (s.properties) {
-        this.emit('properties\n');
+        this.tree.emit('properties\n');
         this.renderMapDiff(
           'prop',
           s.properties,
@@ -134,7 +127,7 @@ export class DiffFormatter {
       }
 
       if (s.attributes) {
-        this.emit('attributes\n');
+        this.tree.emit('attributes\n');
         this.renderMapDiff(
           'attr',
           s.attributes,
@@ -153,12 +146,12 @@ export class DiffFormatter {
   }
 
   private renderTypeDefinition(r: TypeDefinition, db: number) {
-    this.plainStringBlock(META_INDENT, listFromProps(r, ['documentation', 'mustRenderForBwCompat', 'name']));
+    this.tree.plainStringBlock(META_INDENT, listFromProps(r, ['documentation', 'mustRenderForBwCompat', 'name']));
 
     // Properties
-    this.emitList(Object.entries(r.properties), ([name, p], last) => {
-      this.withBullet(last, () => {
-        this.emit(`${name}: `);
+    this.tree.emitList(Object.entries(r.properties), ([name, p], last) => {
+      this.tree.withBullet(last, () => {
+        this.tree.emit(`${name}: `);
         this.renderProperty(p, db);
       });
     });
@@ -166,9 +159,9 @@ export class DiffFormatter {
 
   private renderUpdatedTypeDefinition(t: UpdatedTypeDefinition) {
     const d = pick(t, ['documentation', 'mustRenderForBwCompat', 'name']);
-    this.plainStringBlock(META_INDENT, listFromDiffs(d));
+    this.tree.plainStringBlock(META_INDENT, listFromDiffs(d));
 
-    this.withPrefix('  ', () => {
+    this.tree.withPrefix('  ', () => {
       this.renderMapDiff(
         'prop',
         t.properties,
@@ -180,7 +173,7 @@ export class DiffFormatter {
 
   private renderProperty(p: Property, db: number) {
     const types = [p.type, ...(p.previousTypes ?? []).reverse()];
-    this.emit(types.map((type) => new RichPropertyType(type).stringify(this.dbs[db], false)).join(' ⇐ '));
+    this.tree.emit(types.map((type) => new RichPropertyType(type).stringify(this.dbs[db], false)).join(' ⇐ '));
 
     const attributes = [];
     if (p.defaultValue) {
@@ -192,31 +185,31 @@ export class DiffFormatter {
     // FIXME: Documentation?
 
     if (attributes.length) {
-      this.emit(` (${attributes.join(', ')})`);
+      this.tree.emit(` (${attributes.join(', ')})`);
     }
   }
 
   private renderUpdatedProperty(t: UpdatedProperty) {
-    this.withColor(chalk.red, () => {
+    this.tree.withColor(chalk.red, () => {
       this.renderProperty(t.old, OLD_DB);
     });
-    this.emit('\n');
-    this.withColor(chalk.green, () => {
+    this.tree.emit('\n');
+    this.tree.withColor(chalk.green, () => {
       this.renderProperty(t.new, NEW_DB);
     });
   }
 
   private renderAttribute(a: Attribute, db: number) {
     const types = [a.type, ...(a.previousTypes ?? []).reverse()];
-    this.emit(types.map((type) => new RichPropertyType(type).stringify(this.dbs[db], false)).join(' ⇐ '));
+    this.tree.emit(types.map((type) => new RichPropertyType(type).stringify(this.dbs[db], false)).join(' ⇐ '));
   }
 
   private renderUpdatedAttribute(t: UpdatedAttribute) {
-    this.withColor(chalk.red, () => {
+    this.tree.withColor(chalk.red, () => {
       this.renderAttribute(t.old, OLD_DB);
     });
-    this.emit('\n');
-    this.withColor(chalk.green, () => {
+    this.tree.emit('\n');
+    this.tree.withColor(chalk.green, () => {
       this.renderAttribute(t.new, NEW_DB);
     });
   }
@@ -241,113 +234,31 @@ export class DiffFormatter {
     );
     keys.sort((a, b) => a.localeCompare(b));
 
-    this.emitList(keys, (key, last) => {
+    this.tree.emitList(keys, (key, last) => {
       if (diff.added?.[key]) {
-        this.withColor(chalk.green, () =>
-          this.withBullet(last, () => {
-            this.emit(ADDITION);
-            this.emit(` ${type} ${key}\n`);
+        this.tree.withColor(chalk.green, () =>
+          this.tree.withBullet(last, () => {
+            this.tree.emit(ADDITION);
+            this.tree.emit(` ${type} ${key}\n`);
             renderEl(diff.added?.[key]!, NEW_DB);
           }),
         );
       } else if (diff.removed?.[key]) {
-        this.withColor(chalk.green, () =>
-          this.withBullet(last, () => {
-            this.emit(REMOVAL);
-            this.emit(` ${type} ${key}\n`);
+        this.tree.withColor(chalk.green, () =>
+          this.tree.withBullet(last, () => {
+            this.tree.emit(REMOVAL);
+            this.tree.emit(` ${type} ${key}\n`);
             renderEl(diff.removed?.[key]!, OLD_DB);
           }),
         );
       } else if (diff.updated?.[key]) {
-        this.withBullet(last, () => {
-          this.emit(chalk.yellow(UPDATE));
-          this.emit(` ${type} ${key}\n`);
+        this.tree.withBullet(last, () => {
+          this.tree.emit(chalk.yellow(UPDATE));
+          this.tree.emit(` ${type} ${key}\n`);
           renderUpdated(diff.updated?.[key]!);
         });
       }
     });
-  }
-
-  private emitList<A>(as: A[], block: (a: A, last: boolean) => void) {
-    for (let i = 0; i < as.length; i++) {
-      if (i > 0) {
-        this.emit('\n');
-      }
-      const last = i === as.length - 1;
-      block(as[i], last);
-    }
-  }
-
-  private withBullet(last: boolean, block: () => void): void;
-  private withBullet(last: boolean, additionalIndent: string, block: () => void): void;
-  private withBullet(last: boolean, blockOrIndent: string | (() => void), block?: () => void) {
-    const header = last ? '└' : '├';
-    const indent = (last ? ' ' : '│') + (typeof blockOrIndent === 'string' ? blockOrIndent : ' ');
-    const theBlock = typeof blockOrIndent === 'function' ? blockOrIndent : block;
-
-    this.emit(header);
-    this.withPrefix(indent, theBlock!);
-  }
-
-  private withHeader(header: string, indent: string, block: () => void) {
-    this.emit(header);
-    this.withPrefix(indent, block);
-  }
-
-  private plainStringBlock(indent: string, as: string[]) {
-    if (as.length === 0) {
-      return;
-    }
-
-    this.withHeader(indent, indent, () => {
-      this.emitList(as, (a) => {
-        this.emit(a);
-      });
-    });
-  }
-
-  private emit(x: string) {
-    if (this.buffer.length && this.buffer[this.buffer.length - 1].endsWith('\n')) {
-      this.buffer.push(this.currentPrefix);
-    }
-
-    // Replace newlines with the prefix, except if the string ends in one
-    const parts = x.split('\n');
-    for (let i = 0; i < parts.length; i++) {
-      if (i > 0) {
-        this.buffer.push('\n');
-        if (i < parts.length || parts[i] !== '') {
-          this.buffer.push(this.currentPrefix);
-        }
-      }
-      this.buffer.push(this.currentColor(parts[i]));
-    }
-  }
-
-  private get currentPrefix() {
-    return this.prefix.join('');
-  }
-
-  private get currentColor() {
-    return this.colors[this.colors.length - 1];
-  }
-
-  private withPrefix(x: string, block: () => void) {
-    this.prefix.push(this.currentColor(x));
-    try {
-      block();
-    } finally {
-      this.prefix.pop();
-    }
-  }
-
-  private withColor(col: Colorizer, block: () => void) {
-    this.colors.push(col);
-    try {
-      block();
-    } finally {
-      this.colors.pop();
-    }
   }
 }
 
