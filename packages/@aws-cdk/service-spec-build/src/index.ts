@@ -1,2 +1,2 @@
 export * from './build-database';
-export * from './diff';
+export * from './db-diff';

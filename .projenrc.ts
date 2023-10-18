@@ -113,8 +113,8 @@ const serviceSpecBuild = new TypeScriptWorkspace({
   parent: repo,
   name: '@aws-cdk/service-spec-build',
   description: 'Build the service spec from service-spec-sources to service-spec',
-  deps: [tsKb, serviceSpecTypes],
-  devDeps: ['source-map-support', serviceSpecSources],
+  deps: [tsKb, serviceSpecTypes, 'commander', 'chalk@^4', serviceSpecSources],
+  devDeps: ['source-map-support'],
   private: true,
 });
 const buildDb = serviceSpecBuild.tasks.addTask('build:db', {

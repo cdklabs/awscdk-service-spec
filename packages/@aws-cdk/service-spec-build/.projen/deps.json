@@ -1,10 +1,6 @@
 {
   "dependencies": [
     {
-      "name": "@aws-cdk/service-spec-sources",
-      "type": "build"
-    },
-    {
       "name": "@types/jest",
       "type": "build"
     },
@@ -83,11 +79,24 @@
       "type": "build"
     },
     {
+      "name": "@aws-cdk/service-spec-sources",
+      "type": "runtime"
+    },
+    {
       "name": "@aws-cdk/service-spec-types",
       "type": "runtime"
     },
     {
       "name": "@cdklabs/tskb",
+      "type": "runtime"
+    },
+    {
+      "name": "chalk",
+      "version": "^4",
+      "type": "runtime"
+    },
+    {
+      "name": "commander",
       "type": "runtime"
     }
   ],

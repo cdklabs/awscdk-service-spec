@@ -1,4 +1,5 @@
 import { promises as fs } from 'fs';
+import { gunzipSync } from 'zlib';
 import { Database, entityCollection, fieldIndex, stringCmp } from '@cdklabs/tskb';
 import { IsAugmentedResource, ResourceAugmentation } from './augmentations';
 import {
@@ -61,7 +62,9 @@ export function emptyDatabase() {
 
 export async function loadDatabase(pathToDb: string) {
   const db = emptyDatabase();
-  db.load(JSON.parse(await fs.readFile(pathToDb, { encoding: 'utf-8' })));
+  const contents = await fs.readFile(pathToDb);
+  const json = pathToDb.endsWith('.gz') ? gunzipSync(contents).toString('utf-8') : contents.toString('utf-8');
+  db.load(JSON.parse(json));
   return db;
 }
 

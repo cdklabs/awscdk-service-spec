@@ -23,7 +23,6 @@
     "projen": "npx projen"
   },
   "devDependencies": {
-    "@aws-cdk/service-spec-sources": "^0.0.0",
     "@types/jest": "^29.5.5",
     "@types/node": "^16",
     "@typescript-eslint/eslint-plugin": "^6",
@@ -44,8 +43,11 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
+    "@aws-cdk/service-spec-sources": "^0.0.0",
     "@aws-cdk/service-spec-types": "^0.0.0",
-    "@cdklabs/tskb": "^0.0.0"
+    "@cdklabs/tskb": "^0.0.0",
+    "chalk": "^4",
+    "commander": "^11.1.0"
   },
   "main": "lib/index.js",
   "license": "Apache-2.0",
