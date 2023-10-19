@@ -28,7 +28,6 @@ jobs:
             feat
             fix
             chore
-            refactor
           requireScope: false
           githubBaseUrl: ${{ github.api_url }}
     if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
