@@ -208,49 +208,64 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
   function schemaObjectToModelType(nameHint: string, schema: jsonschema.Object, fail: Fail): Result<PropertyType> {
     if (jsonschema.isMapLikeObject(schema)) {
-      const innerNameHint = collectionNameHint(nameHint);
+      return mapLikeSchemaToModelType(nameHint, schema, fail);
+    } else {
+      return objectLikeSchemaToModelType(nameHint, schema, fail);
+    }
+  }
 
-      // Map type. If 'patternProperties' is present we'll have it take precedence, because a lot of 'additionalProperties: true' are unintentially present.
-      if (schema.patternProperties) {
-        if (schema.additionalProperties === true) {
-          report.reportFailure(
-            'interpreting',
-            fail('additionalProperties: true is probably a mistake if patternProperties is also present'),
-          );
-        }
+  function mapLikeSchemaToModelType(
+    nameHint: string,
+    schema: jsonschema.MapLikeObject,
+    fail: Fail,
+  ): Result<PropertyType> {
+    const innerNameHint = collectionNameHint(nameHint);
 
-        const unifiedPatternProps = fail.locate(
-          locateFailure('patternProperties')(
-            unionSchemas(
-              ...Object.values(schema.patternProperties),
-              // Use additionalProperties schema, but only if it's not 'true'.
-              ...(schema.additionalProperties && schema.additionalProperties !== true
-                ? [schema.additionalProperties]
-                : []),
-            ),
+    // Map type. If 'patternProperties' is present we'll have it take precedence, because a lot of 'additionalProperties: true' are unintentially present.
+    if (schema.patternProperties) {
+      if (schema.additionalProperties === true) {
+        report.reportFailure(
+          'interpreting',
+          fail('additionalProperties: true is probably a mistake if patternProperties is also present'),
+        );
+      }
+
+      const unifiedPatternProps = fail.locate(
+        locateFailure('patternProperties')(
+          unionSchemas(
+            ...Object.values(schema.patternProperties),
+            // Use additionalProperties schema, but only if it's not 'true'.
+            ...(schema.additionalProperties && schema.additionalProperties !== true
+              ? [schema.additionalProperties]
+              : []),
           ),
-        );
+        ),
+      );
 
-        return using(unifiedPatternProps, (unifiedType) =>
-          using(schemaTypeToModelType(innerNameHint, resolve(unifiedType), fail), (element) => ({
-            type: 'map',
-            element,
-          })),
-        );
-      } else if (schema.additionalProperties) {
-        return using(schemaTypeToModelType(innerNameHint, resolve(schema.additionalProperties), fail), (element) => ({
+      return using(unifiedPatternProps, (unifiedType) =>
+        using(schemaTypeToModelType(innerNameHint, resolve(unifiedType), fail), (element) => ({
           type: 'map',
           element,
-        }));
-      } else if (!jsonschema.resolvedReference(schema)) {
-        // Fully untyped map that's not a type
-        // @todo types should probably also just be json since they are useless otherwise. Fix after this package is in use.
-        // FIXME: is 'json' really a primitive type, or do we mean `Map<unknown>` or `Map<any>` ?
-        return { type: 'json' };
-      }
+        })),
+      );
+    } else if (schema.additionalProperties) {
+      return using(schemaTypeToModelType(innerNameHint, resolve(schema.additionalProperties), fail), (element) => ({
+        type: 'map',
+        element,
+      }));
     }
 
-    // Object type
+    // Fully untyped map that's not a type
+    // @todo types should probably also just be json since they are useless otherwise. Fix after this package is in use.
+    // FIXME: is 'json' really a primitive type, or do we mean `Map<unknown>` or `Map<any>` ?
+    return { type: 'json' };
+  }
+
+  function objectLikeSchemaToModelType(
+    nameHint: string,
+    schema: jsonschema.MapLikeObject,
+    fail: Fail,
+  ): Result<PropertyType> {
     if (looksLikeBuiltinTagType(schema)) {
       return { type: 'tag' };
     }
