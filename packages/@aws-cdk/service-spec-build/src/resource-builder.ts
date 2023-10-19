@@ -11,13 +11,19 @@ import {
   TypeDefinition,
 } from '@aws-cdk/service-spec-types';
 
+export interface ResourceBuilderOptions {
+  description?: string;
+  region?: string;
+  primaryIdentifier?: string[];
+}
+
 /**
  * Adds resources and types to a spec database
  */
 export class SpecBuilder {
   constructor(public readonly db: SpecDatabase) {}
 
-  public resourceBuilder(typeName: string, options: { description?: string; region?: string } = {}) {
+  public resourceBuilder(typeName: string, options: ResourceBuilderOptions = {}) {
     const existing = this.db.lookup('resource', 'cloudFormationType', 'equals', typeName);
 
     if (existing.length > 0) {
@@ -32,6 +38,7 @@ export class SpecBuilder {
       cloudFormationType: typeName,
       documentation: options.description,
       name: last(typeName.split('::')),
+      primaryIdentifier: options.primaryIdentifier,
       attributes: {},
       properties: {},
     });
