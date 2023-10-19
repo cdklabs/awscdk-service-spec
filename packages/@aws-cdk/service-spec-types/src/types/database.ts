@@ -29,7 +29,9 @@ export function emptyDatabase() {
       resource: entityCollection<Resource>().index({
         cloudFormationType: fieldIndex('cloudFormationType', stringCmp),
       }),
-      region: entityCollection<Region>(),
+      region: entityCollection<Region>().index({
+        name: fieldIndex('name', stringCmp),
+      }),
       service: entityCollection<Service>().index({
         name: fieldIndex('name', stringCmp),
         cloudFormationNamespace: fieldIndex('cloudFormationNamespace', stringCmp),

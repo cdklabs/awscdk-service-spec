@@ -3,96 +3,57 @@ import {
   ImplicitJsonSchemaRecord,
   jsonschema,
   simplePropNameFromJsonPtr,
-  resourcespec,
   unionSchemas,
   ProblemReport,
   ReportAudience,
 } from '@aws-cdk/service-spec-sources';
-import {
-  Deprecation,
-  PropertyType,
-  Resource,
-  ResourceProperties,
-  RichPropertyType,
-  Service,
-  SpecDatabase,
-  TagVariant,
-  TypeDefinition,
-} from '@aws-cdk/service-spec-types';
+import { PropertyType, RichPropertyType, SpecDatabase, TagVariant } from '@aws-cdk/service-spec-types';
 import { locateFailure, Fail, failure, isFailure, Result, tryCatch, using, ref, isSuccess } from '@cdklabs/tskb';
+import { PropertyBagBuilder, SpecBuilder } from './resource-builder';
 
 export interface LoadCloudFormationRegistryResourceOptions {
   readonly db: SpecDatabase;
   readonly resource: CloudFormationRegistryResource;
   readonly report: ProblemReport;
-  readonly resourceSpec?: {
-    spec?: resourcespec.ResourceType;
-    types?: Record<string, resourcespec.PropertyType>;
-  };
+  readonly region?: string;
 }
-export interface LoadCloudFormationRegistryServiceFromResourceOptions {
-  readonly db: SpecDatabase;
-  readonly resource: { readonly typeName: string };
-  readonly resourceTypeNameSeparator?: string;
-}
-
 export function importCloudFormationRegistryResource(options: LoadCloudFormationRegistryResourceOptions) {
   const { db, resource } = options;
   const report = options.report.forAudience(ReportAudience.fromCloudFormationResource(resource.typeName));
 
-  const typeDefinitions = new Map<string, TypeDefinition>();
-
   const resolve = jsonschema.makeResolver(resource);
 
-  const existing = db.lookup('resource', 'cloudFormationType', 'equals', resource.typeName);
+  const specBuilder = new SpecBuilder(db);
+  const resourceBuilder = specBuilder.resourceBuilder(resource.typeName, {
+    description: resource.description,
+    region: options.region,
+  });
+  const resourceFailure = failure.in(resource.typeName);
 
-  if (existing.length > 0) {
-    // FIXME: Probably recurse into the properties to see if they are different...
-    return existing[0];
-  }
+  // Before we start adding properties, collect the set of property names that
+  // are also attribute names.
+  const conflictingAttributesAndPropNames = new Set(
+    Object.keys(resourceBuilder.resource.properties).filter(
+      (p) => resourceBuilder.resource.attributes[p] !== undefined,
+    ),
+  );
 
-  let res: Resource; // Closed over by many of the functions here
-  return allocateNewResource();
+  recurseProperties(resource, resourceBuilder, resourceFailure);
 
-  function allocateNewResource() {
-    const resourceFailure = failure.in(resource.typeName);
+  resourceBuilder.markDeprecatedProperties(...(resource.deprecatedProperties ?? []).map(simplePropNameFromJsonPtr));
 
-    res = db.allocate('resource', {
-      cloudFormationType: resource.typeName,
-      documentation: resource.description,
-      name: last(resource.typeName.split('::')),
-      attributes: {},
-      properties: {},
-    });
+  // Mark everything 'readOnlyProperties` as attributes. However, in the old spec it is possible
+  // that properties and attributes have the same names, with different types. If that happens (by
+  // virtue of the property and attribute both existing), we need to retain
+  // both, so don't move the property to attributes.
+  const attributeNames = findAttributes(resource).map(simplePropNameFromJsonPtr);
+  const safeAttributeNames = attributeNames.filter((a) => !conflictingAttributesAndPropNames.has(a));
+  resourceBuilder.markAsAttributes(safeAttributeNames);
 
-    recurseProperties(resource, res.properties, resourceFailure, options.resourceSpec?.spec);
-    // Every property that's a "readonly" property, remove it again from the `properties` collection.
-    for (const propPtr of findAttributes(resource)) {
-      const attrName = simplePropNameFromJsonPtr(propPtr);
-      // A property might exists as exactly the attribute name
-      delete res.properties[attrName];
-      // or as a version with "."s removed
-      delete res.properties[attributeNameToPropertyName(attrName)];
-    }
+  handleFailure(handleTags(resourceFailure));
+  return resourceBuilder.resource;
 
-    for (const propPtr of resource.deprecatedProperties ?? []) {
-      const propName = simplePropNameFromJsonPtr(propPtr);
-      (res.properties[propName] ?? {}).deprecated = Deprecation.WARN;
-    }
-
-    copyAttributes(resource, res.attributes, resourceFailure.in('attributes'));
-
-    handleFailure(handleTags(resourceFailure));
-
-    return res;
-  }
-
-  function recurseProperties(
-    source: ImplicitJsonSchemaRecord,
-    target: ResourceProperties,
-    fail: Fail,
-    spec?: resourcespec.PropertyType,
-  ) {
+  function recurseProperties(source: ImplicitJsonSchemaRecord, target: PropertyBagBuilder, fail: Fail) {
     if (!source.properties) {
       throw new Error(`Not an object type with properties: ${JSON.stringify(source)}`);
     }
@@ -102,23 +63,13 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     for (const [name, property] of Object.entries(source.properties)) {
       let resolvedSchema = resolve(property);
 
-      if (spec?.Properties?.[name]?.PrimitiveType === 'Timestamp') {
-        resolvedSchema = jsonschema.setResolvedReference(
-          {
-            type: 'string',
-            format: 'timestamp',
-          },
-          jsonschema.resolvedReference(resolvedSchema),
-        );
-      }
-
       withResult(schemaTypeToModelType(name, resolvedSchema, fail.in(`property ${name}`)), (type) => {
-        target[name] = {
+        target.setProperty(name, {
           type,
           documentation: descriptionOf(resolvedSchema),
           required: ifTrue(required.has(name)),
           defaultValue: describeDefault(resolvedSchema),
-        };
+        });
       });
     }
   }
@@ -270,29 +221,20 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       return { type: 'tag' };
     }
 
-    const typeKey = resource.typeName + nameHint + JSON.stringify(schema);
-    if (!typeDefinitions.has(typeKey)) {
-      const typeDef = db.allocate('typeDefinition', {
-        name: nameHint,
-        documentation: schema.description,
-        properties: {},
-      });
-      db.link('usesType', res, typeDef);
-      typeDefinitions.set(typeKey, typeDef);
+    const { typeDefinitionBuilder, freshInSession } = resourceBuilder.typeDefinitionBuilder(nameHint);
 
-      // If the type has no props, it's not a RecordLikeObject and we don't need to recurse
-      // @todo The type should probably also just be json since they are useless otherwise. Fix after this package is in use.
+    // If the type has no props, it's not a RecordLikeObject and we don't need to recurse
+    // @todo The type should probably also just be json since they are useless otherwise. Fix after this package is in use.
+    if (freshInSession) {
+      if (schema.description) {
+        typeDefinitionBuilder.typeDef.documentation = schema.description;
+      }
       if (jsonschema.isRecordLikeObject(schema)) {
-        recurseProperties(
-          schema,
-          typeDef.properties,
-          fail.in(`typedef ${nameHint}`),
-          options.resourceSpec?.types?.[typeDef.name],
-        );
+        recurseProperties(schema, typeDefinitionBuilder, fail.in(`typedef ${nameHint}`));
       }
     }
 
-    return { type: 'ref', reference: ref(typeDefinitions.get(typeKey)!) };
+    return { type: 'ref', reference: ref(typeDefinitionBuilder.typeDef) };
   }
 
   function looksLikeBuiltinTagType(schema: jsonschema.Object): boolean {
@@ -335,38 +277,6 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     return undefined;
   }
 
-  function copyAttributes(source: CloudFormationRegistryResource, target: ResourceProperties, fail: Fail) {
-    // The attributes are (currently) in `readOnlyResources`. Because of a representation issue, this doesn't cover
-    // everything, so also look for the legacy spec.
-
-    const attributeNames = Array.from(
-      new Set([
-        ...findAttributes(source).map(simplePropNameFromJsonPtr),
-        ...Object.keys(options.resourceSpec?.spec?.Attributes ?? {}),
-      ]),
-    );
-
-    for (const name of attributeNames) {
-      try {
-        const resolvedSchema = resolvePropertySchema(source, name);
-
-        // Convert compound names into user-friendly names in dot-notation.
-        // This is how they are publicized in the docs as well.
-        const attributeName = name.split('/').join('.');
-
-        withResult(schemaTypeToModelType(name, resolvedSchema, fail.in(`attribute ${name}`)), (type) => {
-          target[attributeName] = {
-            type,
-            documentation: descriptionOf(resolvedSchema),
-            required: ifTrue((source.required ?? []).includes(name)),
-          };
-        });
-      } catch {
-        report.reportFailure('interpreting', fail(`no definition for: ${name}`));
-      }
-    }
-  }
-
   function handleTags(fail: Fail) {
     return tryCatch(fail, () => {
       const taggable = resource?.tagging?.taggable ?? resource.taggable ?? true;
@@ -379,16 +289,16 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
           const resolvedType = resolve(tagType);
 
           let variant: TagVariant = 'standard';
-          if (res.cloudFormationType === 'AWS::AutoScaling::AutoScalingGroup') {
+          if (resourceBuilder.resource.cloudFormationType === 'AWS::AutoScaling::AutoScalingGroup') {
             variant = 'asg';
           } else if (jsonschema.isObject(resolvedType) && jsonschema.isMapLikeObject(resolvedType)) {
             variant = 'map';
           }
 
-          res.tagInformation = {
+          resourceBuilder.setTagInformation({
             tagPropertyName: tagProp,
             variant,
-          };
+          });
         }
       }
     });
@@ -428,72 +338,6 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
   }
 }
 
-function resolvePropertySchema(root: CloudFormationRegistryResource, name: string): jsonschema.ResolvedSchema {
-  const resolve = jsonschema.makeResolver(root);
-
-  // If a property exists with exactly that name (including . or /) then we use that property
-  if (root.properties[name]) {
-    return resolve(root.properties[name]);
-  }
-
-  // The property might also exist with a name that has any `.` stripped.
-  const sanitizedName = attributeNameToPropertyName(name);
-  if (root.properties[sanitizedName]) {
-    return resolve(root.properties[sanitizedName]);
-  }
-
-  // Otherwise assume the name represents a compound attribute
-  // In the Registry spec, compound attributes will look like 'Container/Prop'.
-  // In the legacy spec they will look like 'Container.Prop'.
-  // Some Registry resources incorrectly use '.' as well.
-  // We accept both here.
-  return name.split(/[\.\/]/).reduce((schema: jsonschema.ResolvedSchema, current: string) => {
-    if (
-      !(
-        jsonschema.isConcreteSingleton(schema) &&
-        !jsonschema.isAnyType(schema) &&
-        'properties' in schema &&
-        schema.properties[current]
-      )
-    ) {
-      throw new Error(`no definition for: ${name}`);
-    }
-
-    return resolve(schema.properties[current]);
-  }, root as any);
-}
-
-export function readCloudFormationRegistryServiceFromResource(
-  options: LoadCloudFormationRegistryServiceFromResourceOptions,
-): Service {
-  const { db, resource, resourceTypeNameSeparator = '::' } = options;
-  const parts = resource.typeName.split(resourceTypeNameSeparator);
-
-  const name = `${parts[0]}-${parts[1]}`.toLowerCase();
-  const capitalized = parts[1];
-  const shortName = capitalized.toLowerCase();
-  const cloudFormationNamespace = `${parts[0]}${resourceTypeNameSeparator}${parts[1]}`;
-
-  const existing = db.lookup('service', 'name', 'equals', name);
-
-  if (existing.length !== 0) {
-    return existing[0];
-  }
-
-  const service = db.allocate('service', {
-    name,
-    shortName,
-    capitalized,
-    cloudFormationNamespace,
-  });
-
-  return service;
-}
-
-function last<A>(xs: A[]): A {
-  return xs[xs.length - 1];
-}
-
 function ifTrue(x: boolean | undefined) {
   return x ? x : undefined;
 }
@@ -506,19 +350,16 @@ function lastWord(x: string): string {
   return x.match(/([a-zA-Z0-9]+)$/)?.[1] ?? x;
 }
 
+/**
+ * Return the names of properties in the Registry Spec that are actually attributes
+ */
 function findAttributes(resource: CloudFormationRegistryResource): string[] {
   const candidates = new Set(resource.readOnlyProperties ?? []);
+
+  // FIXME: I think this might be incorrect
   const exclusions = resource.createOnlyProperties ?? [];
 
   return Array.from(new Set([...candidates].filter((a) => !exclusions.includes(a))));
-}
-
-/**
- * Turns a compound name into its property equivalent
- * Compliance.Type -> ComplianceType
- */
-function attributeNameToPropertyName(name: string) {
-  return name.split('.').join('');
 }
 
 /**

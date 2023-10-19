@@ -5,10 +5,7 @@ import { assertSuccess, Result } from '@cdklabs/tskb';
 import { Augmentations } from './import-augmentations';
 import { importCannedMetrics } from './import-canned-metrics';
 import { importCloudFormationDocumentation } from './import-cloudformation-docs';
-import {
-  importCloudFormationRegistryResource,
-  readCloudFormationRegistryServiceFromResource,
-} from './import-cloudformation-registry';
+import { importCloudFormationRegistryResource } from './import-cloudformation-registry';
 import { ResourceSpecImporter, SAMSpecImporter } from './import-resource-spec';
 import { SamResources } from './import-sam';
 import { Scrutinies } from './import-scrutinies';
@@ -25,17 +22,14 @@ export class DatabaseBuilder {
 
   public readonly db = emptyDatabase();
   public readonly report = new ProblemReport();
-  private resourceSpec!: sources.CloudFormationResourceSpecification;
 
   constructor(private readonly options: BuildDatabaseOptions) {}
 
   public async build() {
-    this.resourceSpec = this.loadResult(await sources.loadDefaultResourceSpecification(this.options.mustValidate));
-
-    await this.importRegistryResources();
-
-    await this.importOldTypesFromSpec();
-
+    await this.importCloudFormationResourceSpec();
+    await this.importSamResourceSpec();
+    await this.importCloudFormationRegistryResources();
+    await this.importSamJsonSchema();
     await this.importEnhancements();
 
     return {
@@ -44,58 +38,57 @@ export class DatabaseBuilder {
     };
   }
 
-  private async importRegistryResources() {
-    for (const regions of await sources.loadDefaultCloudFormationRegistryResources(
-      this.report,
-      this.options.mustValidate,
-    )) {
-      const region = this.db.allocate('region', {
-        name: regions.regionName,
-      });
+  /**
+   * Import the (legacy) resource spec
+   */
+  private async importCloudFormationResourceSpec() {
+    const resourceSpec = this.loadResult(await sources.loadDefaultResourceSpecification(this.options.mustValidate));
 
-      for (const resource of regions.resources) {
-        const res = importCloudFormationRegistryResource({
-          db: this.db,
-          resource,
-          report: this.report,
-          resourceSpec: {
-            spec: this.resourceSpec.ResourceTypes[resource.typeName],
-            types: Object.fromEntries(
-              Object.entries(this.resourceSpec.PropertyTypes)
-                .filter(([typeName]) => typeName.startsWith(resource.typeName))
-                .map(([typeName, typeDef]) => [typeName.split('.').splice(1).join('.'), typeDef]),
-            ),
-          },
-        });
-        this.db.link('regionHasResource', region, res);
-
-        const service = readCloudFormationRegistryServiceFromResource({
-          db: this.db,
-          resource,
-        });
-        this.db.link('regionHasService', region, service);
-        this.db.link('hasResource', service, res);
-      }
-    }
-
-    const samSchema = this.loadResult(await sources.loadSamSchema());
-    new SamResources({ db: this.db, samSchema, report: this.report }).import();
+    ResourceSpecImporter.importTypes({
+      db: this.db,
+      specification: resourceSpec,
+    });
   }
 
-  private async importOldTypesFromSpec() {
-    ResourceSpecImporter.importOldTypes({
-      db: this.db,
-      specification: this.resourceSpec,
-    });
-
+  /**
+   * Import the (legacy) resource spec for SAM, from GoFormation
+   */
+  private async importSamResourceSpec() {
     const samSpec = this.loadResult(await sources.loadSamSpec(this.options.mustValidate));
-
-    SAMSpecImporter.importOldTypes({
+    SAMSpecImporter.importTypes({
       db: this.db,
       specification: samSpec,
     });
   }
 
+  /**
+   * Import the (modern) registry spec from CloudFormation
+   */
+  private async importCloudFormationRegistryResources() {
+    const regions = await sources.loadDefaultCloudFormationRegistryResources(this.report, this.options.mustValidate);
+    for (const region of regions) {
+      for (const resource of region.resources) {
+        importCloudFormationRegistryResource({
+          db: this.db,
+          resource,
+          report: this.report,
+          region: region.regionName,
+        });
+      }
+    }
+  }
+
+  /**
+   * Import the (modern) JSON schema spec from SAM
+   */
+  private async importSamJsonSchema() {
+    const samSchema = this.loadResult(await sources.loadSamSchema());
+    new SamResources({ db: this.db, samSchema, report: this.report }).import();
+  }
+
+  /**
+   * Import various additions on top of the base specs
+   */
   private async importEnhancements() {
     const docs = await sources.loadDefaultCloudFormationDocs(this.report);
     importCloudFormationDocumentation(this.db, docs);

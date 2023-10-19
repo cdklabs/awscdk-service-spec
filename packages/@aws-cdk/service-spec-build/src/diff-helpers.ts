@@ -112,10 +112,11 @@ export function diffScalar<A extends object, K extends keyof A>(
   a: A,
   b: A,
   k: K,
+  defaultValue?: A[K],
 ): A[K] extends string | number | boolean | undefined ? ScalarDiff<NonNullable<A[K]>> | undefined : void {
   // Complex return type makes it so that the === comparison only works on scalars, and for other types
   // the user must use diffField with a custom equality function
-  return diffField(a, b, k, tripleEq) as any;
+  return diffField(a, b, k, tripleEq, defaultValue) as any;
 }
 
 export function diffField<A extends object, K extends keyof A>(
@@ -123,8 +124,9 @@ export function diffField<A extends object, K extends keyof A>(
   b: A,
   k: K,
   eq: Eq<A[K]>,
+  defaultValue?: A[K],
 ): ScalarDiff<NonNullable<A[K]>> | undefined {
-  if (eq(a[k], b[k])) {
+  if (eq(a[k] ?? defaultValue ?? a[k], b[k] ?? defaultValue ?? b[k])) {
     return undefined;
   }
   return {
