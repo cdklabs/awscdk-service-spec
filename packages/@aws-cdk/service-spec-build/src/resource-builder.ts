@@ -11,6 +11,9 @@ import {
   TypeDefinition,
 } from '@aws-cdk/service-spec-types';
 
+/**
+ * Options for the resourceBuilder API
+ */
 export interface ResourceBuilderOptions {
   description?: string;
   region?: string;
@@ -31,6 +34,10 @@ export class SpecBuilder {
       if (!resource.documentation && options.description) {
         resource.documentation = options.description;
       }
+      if (!resource.primaryIdentifier) {
+        resource.primaryIdentifier = options.primaryIdentifier;
+      }
+
       return new ResourceBuilder(this.db, resource);
     }
 

@@ -26,6 +26,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
   const specBuilder = new SpecBuilder(db);
   const resourceBuilder = specBuilder.resourceBuilder(resource.typeName, {
     description: resource.description,
+    primaryIdentifier: resource.primaryIdentifier,
     region: options.region,
   });
   const resourceFailure = failure.in(resource.typeName);
