@@ -458,7 +458,7 @@ export class RichPropertyType {
     }
   }
 
-  public stringify(db: SpecDatabase): string {
+  public stringify(db: SpecDatabase, withId = true): string {
     switch (this.type.type) {
       case 'integer':
       case 'boolean':
@@ -470,14 +470,14 @@ export class RichPropertyType {
       case 'tag':
         return this.type.type;
       case 'array':
-        return `Array<${new RichPropertyType(this.type.element).stringify(db)}>`;
+        return `Array<${new RichPropertyType(this.type.element).stringify(db, withId)}>`;
       case 'map':
-        return `Map<string, ${new RichPropertyType(this.type.element).stringify(db)}>`;
+        return `Map<string, ${new RichPropertyType(this.type.element).stringify(db, withId)}>`;
       case 'ref':
         const type = db.get('typeDefinition', this.type.reference);
-        return `${type.name}(${this.type.reference.$ref})`;
+        return withId ? `${type.name}(${this.type.reference.$ref})` : type.name;
       case 'union':
-        return this.type.types.map((t) => new RichPropertyType(t).stringify(db)).join(' | ');
+        return this.type.types.map((t) => new RichPropertyType(t).stringify(db, withId)).join(' | ');
     }
   }
 

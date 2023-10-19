@@ -121,7 +121,7 @@ const serviceSpecBuild = new TypeScriptWorkspace({
   parent: repo,
   name: '@aws-cdk/service-spec-build',
   description: 'Build the service spec from service-spec-sources to service-spec',
-  deps: [tsKb, serviceSpecSources, serviceSpecTypes],
+  deps: [tsKb, serviceSpecTypes, 'commander', 'chalk@^4', serviceSpecSources],
   devDeps: ['source-map-support'],
   private: true,
 });
@@ -131,6 +131,10 @@ const buildDb = serviceSpecBuild.tasks.addTask('build:db', {
 serviceSpecBuild.postCompileTask.spawn(buildDb);
 serviceSpecBuild.tasks.addTask('analyze:db', {
   exec: 'ts-node src/cli/analyze-db',
+  receiveArgs: true,
+});
+serviceSpecBuild.tasks.addTask('diff:db', {
+  exec: 'ts-node src/cli/diff-db',
   receiveArgs: true,
 });
 serviceSpecBuild.gitignore.addPatterns('db.json');

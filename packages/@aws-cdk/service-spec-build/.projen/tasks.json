@@ -54,7 +54,7 @@
       },
       "steps": [
         {
-          "exec": "npm-check-updates --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/jest,@types/node,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,eslint-config-prettier,eslint-import-resolver-node,eslint-import-resolver-typescript,eslint-plugin-import,eslint-plugin-prettier,eslint,jest,jest-junit,npm-check-updates,prettier,projen,source-map-support,ts-jest,typescript"
+          "exec": "npm-check-updates --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/jest,@types/node,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,eslint-config-prettier,eslint-import-resolver-node,eslint-import-resolver-typescript,eslint-plugin-import,eslint-plugin-prettier,eslint,jest,jest-junit,npm-check-updates,prettier,projen,source-map-support,ts-jest,typescript,chalk,commander"
         }
       ]
     },
@@ -74,6 +74,15 @@
       "steps": [
         {
           "exec": "cd ../../.. && npx projen default"
+        }
+      ]
+    },
+    "diff:db": {
+      "name": "diff:db",
+      "steps": [
+        {
+          "exec": "ts-node src/cli/diff-db",
+          "receiveArgs": true
         }
       ]
     },
