@@ -1,5 +1,5 @@
 import { ProblemReport } from '@aws-cdk/service-spec-sources';
-import { emptyDatabase } from '@aws-cdk/service-spec-types';
+import { PropertyType, emptyDatabase } from '@aws-cdk/service-spec-types';
 import { importCloudFormationRegistryResource } from '../src/import-cloudformation-registry';
 
 let db: ReturnType<typeof emptyDatabase>;
@@ -230,4 +230,38 @@ test('read required properties from allOf/anyOf', () => {
     .filter(([_, value]) => value.required)
     .map(([name, _]) => name);
   expect(requiredProps).toContain('InBoth');
+});
+
+test('only object types get type definitions', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::Test::Resource',
+      description: 'Test resource',
+      properties: {
+        Prop1: { $ref: '#/definitions/Type1' },
+        Prop2: { $ref: '#/definitions/Type2' },
+        Prop3: { $ref: '#/definitions/Type3' },
+      },
+      additionalProperties: false,
+      definitions: {
+        Type1: { type: 'array', items: { type: 'string' } },
+        Type2: { type: 'object' },
+        Type3: {
+          type: 'object',
+          properties: {
+            field: { type: 'string' },
+          },
+          additionalProperties: false,
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Test::Resource').only();
+  const typeNames = db.follow('usesType', resource).map((e) => e.entity.name);
+  expect(typeNames).toEqual(['Type3']);
+  expect(resource.properties.Prop1.type).toEqual({ type: 'array', element: { type: 'string' } } satisfies PropertyType);
+  expect(resource.properties.Prop2.type).toEqual({ type: 'json' });
 });
