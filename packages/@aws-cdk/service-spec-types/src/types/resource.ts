@@ -167,7 +167,7 @@ export class RichTypedField {
     // are treated the same, for all other types we need strict equality. We used to use 'assignableTo' as a
     // condition, but these types will be rendered in both co- and contravariant positions, and so we really can't
     // do much better than full equality.
-    if (this.types().some((t) => richType.javascriptEquals(t))) {
+    if (this.types().some((t) => richType.equals(t))) {
       // Nothing to do, type is already in there.
       return false;
     }
