@@ -3,9 +3,18 @@ import {
   SAMResourceSpecification,
   resourcespec,
 } from '@aws-cdk/service-spec-sources';
-import { PropertyType, SpecDatabase, TypeDefinition } from '@aws-cdk/service-spec-types';
+import {
+  Attribute,
+  PropertyType,
+  Resource,
+  ResourceProperties,
+  RichAttribute,
+  RichProperty,
+  RichSpecDatabase,
+  SpecDatabase,
+  TypeDefinition,
+} from '@aws-cdk/service-spec-types';
 import { ref } from '@cdklabs/tskb';
-import { PropertyBagBuilder, ResourceBuilder, SpecBuilder } from './resource-builder';
 
 //////////////////////////////////////////////////////////////////////
 
@@ -22,18 +31,12 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
   protected readonly typeDefs = new Map<string, TypeDefinition>();
   protected readonly thisResourcePropTypes = new Map<string, AnyPropertyType>();
   protected readonly thisPropTypeAliases = new Map<string, AnyTypeAlias>();
-  protected readonly resourceBuilder: ResourceBuilder;
 
   protected constructor(
     protected readonly db: SpecDatabase,
     protected readonly specification: Spec,
     protected readonly resourceName: string,
   ) {
-    const specBuilder = new SpecBuilder(db);
-    this.resourceBuilder = specBuilder.resourceBuilder(resourceName, {
-      description: specification.ResourceTypes[resourceName].Documentation,
-    });
-
     for (const [fqn, spec] of Object.entries(this.specification.PropertyTypes)) {
       const [typeResourceName, typeDefName] = fqn.split('.');
       if (this.resourceName !== typeResourceName) {
@@ -49,62 +52,91 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
 
   protected abstract deriveType(spec: AnyTypeDefinition): PropertyType;
 
-  public importResource() {
+  public importResourceOldTypes() {
+    const res = this.db.lookup('resource', 'cloudFormationType', 'equals', this.resourceName);
+    if (res.length === 0) {
+      console.log(`Cannot patch ${this.resourceName}: not in CloudFormation Schema`);
+      return;
+    }
+
+    this.doTypeDefinitions(res.only());
+    this.doResource(res.only());
+  }
+
+  protected doTypeDefinitions(res: Resource) {
+    this.allocateMissingTypeDefs(res);
+
+    for (const [propTypeName, propType] of this.thisResourcePropTypes.entries()) {
+      const typeDef = this.typeDefs.get(propTypeName);
+      if (!typeDef) {
+        throw new Error(`Missing typeDef for ${propTypeName}`);
+      }
+      this.addOrEnrichProperties(propType.Properties ?? {}, typeDef.properties);
+    }
+  }
+
+  protected doResource(res: Resource) {
     const resourceSpec = this.specification.ResourceTypes[this.resourceName];
-    this.recurseProperties(resourceSpec.Properties ?? {}, this.resourceBuilder);
-    this.handleAttributes(resourceSpec.Attributes ?? {});
+    this.addOrEnrichProperties(resourceSpec.Properties ?? {}, res.properties);
+    this.addOrEnrichAttributes(resourceSpec.Attributes ?? {}, res.attributes);
   }
 
-  /**
-   * Return the type reference for a named type
-   *
-   * This usually identifies a type definition (which is a record with
-   * properties), but sometimes it's just a named alias for a type like
-   * `Array<Record>`.
-   */
-  protected namedType(typeName: string): PropertyType {
-    const typeKey = `${this.resourceName}.${typeName}`;
-    const typeSpec = this.specification.PropertyTypes[typeKey];
-    if (!typeSpec) {
-      throw new Error(`No such type: ${typeKey}`);
+  protected allocateMissingTypeDefs(resource: Resource) {
+    for (const td of new RichSpecDatabase(this.db).resourceTypeDefs(this.resourceName)) {
+      this.typeDefs.set(td.name, td);
     }
 
-    if (resourcespec.isPropType(typeSpec)) {
-      return this.typeDefinition(typeName, typeSpec);
-    } else {
-      // Otherwise treat like an alias
-      return this.deriveType(typeSpec);
+    for (const [typeDefName, _] of this.thisResourcePropTypes.entries()) {
+      const existing = this.typeDefs.get(typeDefName);
+      if (existing) {
+        existing.mustRenderForBwCompat = true;
+        continue;
+      }
+
+      const typeDef = this.db.allocate('typeDefinition', {
+        name: typeDefName,
+        properties: {},
+        mustRenderForBwCompat: true,
+      });
+
+      this.db.link('usesType', resource, typeDef);
+      this.typeDefs.set(typeDefName, typeDef);
     }
   }
 
-  private typeDefinition(typeName: string, spec: AnyPropertyType): PropertyType {
-    const { typeDefinitionBuilder, fresh } = this.resourceBuilder.typeDefinitionBuilder(typeName);
-
-    if (fresh) {
-      this.recurseProperties(spec.Properties ?? {}, typeDefinitionBuilder);
-    }
-
-    return { type: 'ref', reference: ref(typeDefinitionBuilder.typeDef) };
-  }
-
-  protected recurseProperties(
+  protected addOrEnrichProperties(
     source: Record<string, resourcespec.Property | resourcespec.SAMProperty>,
-    into: PropertyBagBuilder,
+    into: ResourceProperties,
   ) {
     for (const [name, propSpec] of Object.entries(source)) {
+      const existingProp = into[name];
       const type = this.deriveType(propSpec);
 
-      into.setProperty(name, {
-        type,
-        required: propSpec.Required,
-      });
+      if (!existingProp) {
+        // A fully missing property
+        into[name] = {
+          type,
+          required: propSpec.Required,
+        };
+      } else {
+        // Old-typed property
+        new RichProperty(existingProp).addPreviousType(type);
+      }
     }
   }
 
-  protected handleAttributes(source: Record<string, resourcespec.Attribute>) {
+  protected addOrEnrichAttributes(source: Record<string, resourcespec.Attribute>, into: Record<string, Attribute>) {
     for (const [name, attrSpec] of Object.entries(source)) {
+      const existingAttr = into[name];
       const type = this.deriveType(attrSpec);
-      this.resourceBuilder.setAttribute(name, { type });
+
+      if (!existingAttr) {
+        // Fully missing attr
+        into[name] = { type };
+      } else {
+        // Old-typed attr
+        new RichAttribute(existingAttr).addPreviousType(type);
+      }
     }
   }
 }
@@ -122,9 +154,9 @@ export interface ImportResourceSpecOptions {
  * The types get added to the "previous types" of properties.
  */
 export class ResourceSpecImporter extends ResourceSpecImporterBase<CloudFormationResourceSpecification> {
-  public static importTypes(options: ImportResourceSpecOptions) {
+  public static importOldTypes(options: ImportResourceSpecOptions) {
     for (const resourceName of Object.keys(options.specification.ResourceTypes)) {
-      new ResourceSpecImporter(resourceName, options).importResource();
+      new ResourceSpecImporter(resourceName, options).importResourceOldTypes();
     }
   }
 
@@ -149,7 +181,16 @@ export class ResourceSpecImporter extends ResourceSpecImporterBase<CloudFormatio
           break;
         default:
           // Either an alias or a PropType
-          return self.namedType(type);
+          const alias = self.thisPropTypeAliases.get(type);
+          if (alias) {
+            return self.deriveType(alias);
+          }
+
+          const typeDef = self.typeDefs.get(type);
+          if (!typeDef) {
+            throw new Error(`Unrecognized type: ${self.resourceName}.${type}`);
+          }
+          return { type: 'ref', reference: ref(typeDef) };
       }
 
       switch (primitiveType) {
@@ -185,9 +226,9 @@ export interface ImportSAMSpecOptions {
  * Load the (legacy) resource specification into the database
  */
 export class SAMSpecImporter extends ResourceSpecImporterBase<SAMResourceSpecification> {
-  public static importTypes(options: ImportSAMSpecOptions) {
+  public static importOldTypes(options: ImportSAMSpecOptions) {
     for (const resourceName of Object.keys(options.specification.ResourceTypes)) {
-      new SAMSpecImporter(resourceName, options).importResource();
+      new SAMSpecImporter(resourceName, options).importResourceOldTypes();
     }
   }
 
@@ -228,7 +269,17 @@ export class SAMSpecImporter extends ResourceSpecImporterBase<SAMResourceSpecifi
           // Json should be a primitive type, but occasionally occurs as a Type
           return { type: 'json' };
         default:
-          return self.namedType(type);
+          // Either an alias or a PropType
+          const alias = self.thisPropTypeAliases.get(type);
+          if (alias) {
+            return self.deriveType(alias);
+          }
+
+          const typeDef = self.typeDefs.get(type);
+          if (!typeDef) {
+            throw new Error(`Unrecognized type: ${self.resourceName}.${type}`);
+          }
+          return { type: 'ref', reference: ref(typeDef) };
       }
     }
 
