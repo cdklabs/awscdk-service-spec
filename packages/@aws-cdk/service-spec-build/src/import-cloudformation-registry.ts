@@ -60,6 +60,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     res = db.allocate('resource', {
       cloudFormationType: resource.typeName,
       documentation: resource.description,
+      primaryIdentifier: resource.primaryIdentifier ?? [],
       name: last(resource.typeName.split('::')),
       attributes: {},
       properties: {},
