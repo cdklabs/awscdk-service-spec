@@ -23,12 +23,15 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
   protected readonly thisResourcePropTypes = new Map<string, AnyPropertyType>();
   protected readonly thisPropTypeAliases = new Map<string, AnyTypeAlias>();
   protected readonly resourceBuilder: ResourceBuilder;
+  private renderingUnusedTypes = false;
 
   protected constructor(
     protected readonly db: SpecDatabase,
     protected readonly specification: Spec,
     protected readonly resourceName: string,
   ) {
+    this.renderingUnusedTypes = true; // FIXME: DON'T COMMIT, just for testing
+
     const specBuilder = new SpecBuilder(db);
     this.resourceBuilder = specBuilder.resourceBuilder(resourceName, {
       description: specification.ResourceTypes[resourceName].Documentation,
@@ -53,6 +56,8 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
     const resourceSpec = this.specification.ResourceTypes[this.resourceName];
     this.recurseProperties(resourceSpec.Properties ?? {}, this.resourceBuilder);
     this.handleAttributes(resourceSpec.Attributes ?? {});
+
+    this.handleUnusedTypes();
   }
 
   /**
@@ -78,9 +83,14 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
   }
 
   private typeDefinition(typeName: string, spec: AnyPropertyType): PropertyType {
-    const { typeDefinitionBuilder, fresh } = this.resourceBuilder.typeDefinitionBuilder(typeName);
+    const { typeDefinitionBuilder, freshInDb, freshInSession } = this.resourceBuilder.typeDefinitionBuilder(typeName);
 
-    if (fresh) {
+    if (freshInDb && this.renderingUnusedTypes) {
+      typeDefinitionBuilder.typeDef.mustRenderForBwCompat = true;
+    }
+
+    if (freshInSession) {
+      // Avoid recursion
       this.recurseProperties(spec.Properties ?? {}, typeDefinitionBuilder);
     }
 
@@ -105,6 +115,22 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
     for (const [name, attrSpec] of Object.entries(source)) {
       const type = this.deriveType(attrSpec);
       this.resourceBuilder.setAttribute(name, { type });
+    }
+  }
+
+  /**
+   * Go over all type definitions we haven't used yet by recursing through all
+   * properties, and emit them with a special flag
+   */
+  private handleUnusedTypes() {
+    this.renderingUnusedTypes = true;
+    const typePrefix = `${this.resourceName}.`;
+    for (const fullName of Object.keys(this.specification.PropertyTypes ?? {}).filter((name) =>
+      name.startsWith(typePrefix),
+    )) {
+      const typeName = fullName.substring(typePrefix.length);
+      // Execute this for its side effect
+      void this.namedType(typeName);
     }
   }
 }
@@ -156,7 +182,7 @@ export class ResourceSpecImporter extends ResourceSpecImporterBase<CloudFormatio
         case 'String':
           return { type: 'string' };
         case 'Long':
-          return { type: 'number' };
+          return { type: 'integer' };
         case 'Integer':
           return { type: 'integer' };
         case 'Double':
@@ -237,7 +263,7 @@ export class SAMSpecImporter extends ResourceSpecImporterBase<SAMResourceSpecifi
         case 'String':
           return { type: 'string' };
         case 'Long':
-          return { type: 'number' };
+          return { type: 'integer' };
         case 'Integer':
           return { type: 'integer' };
         case 'Double':

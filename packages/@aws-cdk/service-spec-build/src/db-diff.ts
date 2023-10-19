@@ -101,7 +101,7 @@ export class DbDiff {
       documentation: diffScalar(a, b, 'documentation'),
       defaultValue: diffScalar(a, b, 'defaultValue'),
       deprecated: diffScalar(a, b, 'deprecated'),
-      required: diffScalar(a, b, 'required'),
+      required: diffScalar(a, b, 'required', false),
       scrutinizable: diffScalar(a, b, 'scrutinizable'),
       previousTypes: collapseEmptyDiff(diffList(a.previousTypes ?? [], b.previousTypes ?? [], eqType)),
       type: diffField(a, b, 'type', eqType),

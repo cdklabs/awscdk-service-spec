@@ -4,6 +4,7 @@ import {
   Property,
   Resource,
   ResourceProperties,
+  RichProperty,
   RichPropertyType,
   SpecDatabase,
   TagInformation,
@@ -50,6 +51,11 @@ export class SpecBuilder {
   private allocateService(resourceTypeName: string, resourceTypeNameSeparator = '::') {
     const parts = resourceTypeName.split(resourceTypeNameSeparator);
 
+    // Name hack for legacy reasons
+    if (parts[0] === 'AWS' && parts[1] === 'Serverless') {
+      parts[1] = 'SAM';
+    }
+
     const name = `${parts[0]}-${parts[1]}`.toLowerCase();
     const capitalized = parts[1];
     const shortName = capitalized.toLowerCase();
@@ -92,6 +98,7 @@ export class PropertyBagBuilder {
     } else {
       this._propertyBag.properties[name] = prop;
     }
+    this.simplifyProperty(this._propertyBag.properties[name]);
   }
 
   protected mergeProperty(prop: Property, updates: Property) {
@@ -99,16 +106,9 @@ export class PropertyBagBuilder {
     copyIfDef('documentation');
     copyIfDef('deprecated');
     copyIfDef('scrutinizable');
-    // FIXME: Might treat this as "incompatible change" ?
     copyIfDef('required');
 
-    if (!new RichPropertyType(updates.type).javascriptEquals(prop.type)) {
-      if (!prop.previousTypes) {
-        prop.previousTypes = [];
-      }
-      prop.previousTypes.push(prop.type);
-      prop.type = updates.type;
-    }
+    new RichProperty(prop).updateType(updates.type);
 
     function copyIfDef<A extends keyof Property>(key: A) {
       if (updates[key] !== undefined) {
@@ -116,10 +116,20 @@ export class PropertyBagBuilder {
       }
     }
   }
+
+  /**
+   * Remove settings that are equal to their defaults
+   */
+  protected simplifyProperty(prop: Property) {
+    if (!prop.required) {
+      delete prop.required;
+    }
+  }
 }
 
 export class ResourceBuilder extends PropertyBagBuilder {
   private typeDefinitions = new Map<string, TypeDefinition>();
+  private typesCreatedHere = new Set<string>();
 
   /**
    * We maintain this for markAsAttributes: so we can look up property
@@ -147,6 +157,7 @@ export class ResourceBuilder extends PropertyBagBuilder {
     } else {
       this.resource.attributes[name] = attr;
     }
+    this.simplifyProperty(this.resource.attributes[name]);
   }
 
   /**
@@ -251,12 +262,18 @@ export class ResourceBuilder extends PropertyBagBuilder {
 
   public typeDefinitionBuilder(typeName: string, description?: string) {
     const existing = this.typeDefinitions.get(typeName);
+    const freshInSession = !this.typesCreatedHere.has(typeName);
+    this.typesCreatedHere.add(typeName);
 
     if (existing) {
       if (!existing.documentation && description) {
         existing.documentation = description;
       }
-      return { typeDefinitionBuilder: new TypeDefinitionBuilder(this.db, existing), fresh: false };
+      return {
+        typeDefinitionBuilder: new TypeDefinitionBuilder(this.db, existing),
+        freshInDb: false,
+        freshInSession,
+      };
     }
 
     const typeDef = this.db.allocate('typeDefinition', {
@@ -268,7 +285,7 @@ export class ResourceBuilder extends PropertyBagBuilder {
     this.typeDefinitions.set(typeName, typeDef);
 
     const builder = new TypeDefinitionBuilder(this.db, typeDef);
-    return { typeDefinitionBuilder: builder, fresh: true };
+    return { typeDefinitionBuilder: builder, freshInDb: true, freshInSession };
   }
 
   /**

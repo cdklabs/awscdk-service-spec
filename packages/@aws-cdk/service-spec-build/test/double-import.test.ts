@@ -71,7 +71,7 @@ test('importing properties of incompatible types leads to previousTypes', () => 
   const resource = importBoth({
     spec: {
       Properties: {
-        Prop1: { PrimitiveType: 'Timestamp', UpdateType: 'Mutable' },
+        Prop1: { PrimitiveType: 'Integer', UpdateType: 'Mutable' },
       },
     },
     registry: {
@@ -84,7 +84,28 @@ test('importing properties of incompatible types leads to previousTypes', () => 
   expect(resource.properties.Prop1).toEqual(
     expect.objectContaining({
       type: { type: 'string' },
-      previousTypes: [{ type: 'date-time' }],
+      previousTypes: [{ type: 'integer' }],
+    } satisfies Partial<Property>),
+  );
+});
+
+test('importing string on top of date-time does nothing', () => {
+  const resource = importBoth({
+    spec: {
+      Properties: {
+        Prop1: { PrimitiveType: 'Timestamp', UpdateType: 'Mutable' },
+      },
+    },
+    registry: {
+      properties: {
+        Prop1: { type: 'string' },
+      },
+    },
+  });
+
+  expect(resource.properties.Prop1).toEqual(
+    expect.objectContaining({
+      type: { type: 'date-time' },
     } satisfies Partial<Property>),
   );
 });
@@ -93,7 +114,7 @@ test('importing attributes of incompatible types leads to previousTypes', () => 
   const resource = importBoth({
     spec: {
       Attributes: {
-        Attr1: { PrimitiveType: 'Timestamp' },
+        Attr1: { PrimitiveType: 'Integer' },
       },
     },
     registry: {
@@ -107,8 +128,39 @@ test('importing attributes of incompatible types leads to previousTypes', () => 
   expect(resource.attributes.Attr1).toEqual(
     expect.objectContaining({
       type: { type: 'string' },
-      previousTypes: [{ type: 'date-time' }],
+      previousTypes: [{ type: 'integer' }],
     } satisfies Partial<Property>),
+  );
+});
+
+test('a prop+attr of the same name will not be overwritten', () => {
+  const resource = importBoth({
+    spec: {
+      Properties: {
+        Something: { PrimitiveType: 'String', UpdateType: 'Mutable' },
+      },
+      Attributes: {
+        Something: { PrimitiveType: 'Integer' },
+      },
+    },
+    registry: {
+      properties: {
+        Something: { type: 'object' },
+      },
+      readOnlyProperties: ['/properties/Something'],
+    },
+  });
+
+  expect(resource.attributes.Something).toEqual(
+    expect.objectContaining({
+      type: { type: 'integer' },
+    }),
+  );
+  expect(resource.properties.Something).toEqual(
+    expect.objectContaining({
+      type: { type: 'json' },
+      previousTypes: [{ type: 'string' }],
+    }),
   );
 });
 

@@ -30,10 +30,25 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
   });
   const resourceFailure = failure.in(resource.typeName);
 
+  // Before we start adding properties, collect the set of property names that
+  // are also attribute names.
+  const conflictingAttributesAndPropNames = new Set(
+    Object.keys(resourceBuilder.resource.properties).filter(
+      (p) => resourceBuilder.resource.attributes[p] !== undefined,
+    ),
+  );
+
   recurseProperties(resource, resourceBuilder, resourceFailure);
 
   resourceBuilder.markDeprecatedProperties(...(resource.deprecatedProperties ?? []).map(simplePropNameFromJsonPtr));
-  resourceBuilder.markAsAttributes(findAttributes(resource).map(simplePropNameFromJsonPtr));
+
+  // Mark everything 'readOnlyProperties` as attributes. However, in the old spec it is possible
+  // that properties and attributes have the same names, with different types. If that happens (by
+  // virtue of the property and attribute both existing), we need to retain
+  // both, so don't move the property to attributes.
+  const attributeNames = findAttributes(resource).map(simplePropNameFromJsonPtr);
+  const safeAttributeNames = attributeNames.filter((a) => !conflictingAttributesAndPropNames.has(a));
+  resourceBuilder.markAsAttributes(safeAttributeNames);
 
   handleFailure(handleTags(resourceFailure));
   return resourceBuilder.resource;
@@ -191,12 +206,17 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       return { type: 'tag' };
     }
 
-    const { typeDefinitionBuilder, fresh } = resourceBuilder.typeDefinitionBuilder(nameHint);
+    const { typeDefinitionBuilder, freshInSession } = resourceBuilder.typeDefinitionBuilder(nameHint);
 
     // If the type has no props, it's not a RecordLikeObject and we don't need to recurse
     // @todo The type should probably also just be json since they are useless otherwise. Fix after this package is in use.
-    if (fresh && jsonschema.isRecordLikeObject(schema)) {
-      recurseProperties(schema, typeDefinitionBuilder, fail.in(`typedef ${nameHint}`));
+    if (freshInSession) {
+      if (schema.description) {
+        typeDefinitionBuilder.typeDef.documentation = schema.description;
+      }
+      if (jsonschema.isRecordLikeObject(schema)) {
+        recurseProperties(schema, typeDefinitionBuilder, fail.in(`typedef ${nameHint}`));
+      }
     }
 
     return { type: 'ref', reference: ref(typeDefinitionBuilder.typeDef) };
@@ -320,6 +340,8 @@ function lastWord(x: string): string {
  */
 function findAttributes(resource: CloudFormationRegistryResource): string[] {
   const candidates = new Set(resource.readOnlyProperties ?? []);
+
+  // FIXME: I think this might be incorrect
   const exclusions = resource.createOnlyProperties ?? [];
 
   return Array.from(new Set([...candidates].filter((a) => !exclusions.includes(a))));
