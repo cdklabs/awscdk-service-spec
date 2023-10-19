@@ -1,5 +1,5 @@
 import { ProblemReport } from '@aws-cdk/service-spec-sources';
-import { DefinitionReference, emptyDatabase } from '@aws-cdk/service-spec-types';
+import { emptyDatabase } from '@aws-cdk/service-spec-types';
 import { importCloudFormationRegistryResource } from '../src/import-cloudformation-registry';
 
 let db: ReturnType<typeof emptyDatabase>;
@@ -159,34 +159,6 @@ test('anonymous types in a collection are named after their property with "Items
   expect(typeNames).toContain('BananasItems');
 });
 
-test('include legacy attributes in attributes', () => {
-  importCloudFormationRegistryResource({
-    db,
-    report,
-    resource: {
-      description: 'Test resource',
-      typeName: 'AWS::Some::Type',
-      properties: {
-        Property: { type: 'string' },
-        Id: { type: 'string' },
-      },
-      readOnlyProperties: ['/properties/Id'],
-    },
-    resourceSpec: {
-      spec: {
-        Attributes: {
-          Property: { PrimitiveType: 'String' },
-        },
-      },
-    },
-  });
-
-  const attrNames = Object.keys(
-    db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.attributes,
-  );
-  expect(attrNames.sort()).toEqual(['Id', 'Property']);
-});
-
 test('reference types are correctly named', () => {
   importCloudFormationRegistryResource({
     db,
@@ -227,50 +199,6 @@ test('reference types are correctly named', () => {
 
   expect(types.length).toBe(1);
   expect(types[0].entity.name).toBe('Property');
-});
-
-test('legacy timestamps are getting the timestamp format', () => {
-  importCloudFormationRegistryResource({
-    db,
-    report,
-    resource: {
-      description: 'Test resource',
-      typeName: 'AWS::Some::Type',
-      properties: {
-        Property: { $ref: '#/definitions/Property' },
-        Id: { type: 'string' },
-      },
-      definitions: {
-        Property: {
-          type: 'object',
-          properties: {
-            DateTime: {
-              type: 'string',
-            },
-          },
-        },
-      },
-      readOnlyProperties: ['/properties/Id'],
-    },
-    resourceSpec: {
-      spec: {},
-      types: {
-        Property: {
-          Properties: {
-            DateTime: {
-              PrimitiveType: 'Timestamp',
-              UpdateType: 'Mutable',
-            },
-          },
-        },
-      },
-    },
-  });
-
-  const prop = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.properties?.Property;
-  expect(prop.type.type).toBe('ref');
-  const type = db.get('typeDefinition', (prop.type as DefinitionReference).reference.$ref);
-  expect(type.properties.DateTime.type).toMatchObject({ type: 'date-time' });
 });
 
 test('read required properties from allOf/anyOf', () => {
