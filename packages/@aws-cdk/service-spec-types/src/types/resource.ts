@@ -156,21 +156,34 @@ export class RichTypedField {
     return [...(this.field.previousTypes ?? []), this.field.type];
   }
 
-  public addPreviousType(type: PropertyType): boolean {
+  /**
+   * Update the type of this property with a new type
+   *
+   * Only if it's not in the set of types already.
+   */
+  public updateType(type: PropertyType): boolean {
     const richType = new RichPropertyType(type);
 
     // Only add this type if we don't already have it. We are only doing comparisons where 'integer' and 'number'
     // are treated the same, for all other types we need strict equality. We used to use 'assignableTo' as a
     // condition, but these types will be rendered in both co- and contravariant positions, and so we really can't
     // do much better than full equality.
-    if (this.types().some((t) => richType.javascriptEquals(t))) {
+    if (this.types().some((t) => richType.equals(t))) {
       // Nothing to do, type is already in there.
       return false;
     }
+
+    // Special case: if the new type is `string` and the old type is `date-time`, we assume this is
+    // the same type but we dropped some formatting information. No need to make this a separate type.
+    if (type.type === 'string' && this.types().some((t) => t.type === 'date-time')) {
+      return false;
+    }
+
     if (!this.field.previousTypes) {
       this.field.previousTypes = [];
     }
-    this.field.previousTypes.unshift(type);
+    this.field.previousTypes.push(this.field.type);
+    this.field.type = type;
     return true;
   }
 }
@@ -459,7 +472,7 @@ export class RichPropertyType {
     }
   }
 
-  public stringify(db: SpecDatabase): string {
+  public stringify(db: SpecDatabase, withId = true): string {
     switch (this.type.type) {
       case 'integer':
       case 'boolean':
@@ -471,14 +484,14 @@ export class RichPropertyType {
       case 'tag':
         return this.type.type;
       case 'array':
-        return `Array<${new RichPropertyType(this.type.element).stringify(db)}>`;
+        return `Array<${new RichPropertyType(this.type.element).stringify(db, withId)}>`;
       case 'map':
-        return `Map<string, ${new RichPropertyType(this.type.element).stringify(db)}>`;
+        return `Map<string, ${new RichPropertyType(this.type.element).stringify(db, withId)}>`;
       case 'ref':
         const type = db.get('typeDefinition', this.type.reference);
-        return `${type.name}(${this.type.reference.$ref})`;
+        return withId ? `${type.name}(${this.type.reference.$ref})` : type.name;
       case 'union':
-        return this.type.types.map((t) => new RichPropertyType(t).stringify(db)).join(' | ');
+        return this.type.types.map((t) => new RichPropertyType(t).stringify(db, withId)).join(' | ');
     }
   }
 
