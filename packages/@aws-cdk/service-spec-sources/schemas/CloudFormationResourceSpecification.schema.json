@@ -146,12 +146,6 @@
         "Documentation": {
           "type": "string"
         },
-        "PrimaryIdentifier": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
         "Properties": {
           "additionalProperties": {
             "$ref": "#/definitions/resourcespec.Property"
