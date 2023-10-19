@@ -60,7 +60,7 @@ export interface Resource extends Entity {
    */
   cloudFormationTransform?: string;
   documentation?: string;
-  readonly primaryIdentifier: string[];
+  readonly primaryIdentifier?: string[];
   readonly properties: ResourceProperties;
   readonly attributes: Record<string, Attribute>;
   readonly validations?: unknown;
