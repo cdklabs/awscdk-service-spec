@@ -150,13 +150,18 @@ export class DiffFormatter {
     ret.emit(types.map((type) => new RichPropertyType(type).stringify(this.dbs[db], false)).join(' ⇐ '));
 
     const attributes = [];
+    if (p.required) {
+      attributes.push('required');
+    }
+
     if (p.defaultValue) {
       attributes.push(`default=${render(p.defaultValue)}`);
     }
     if (p.deprecated && p.deprecated !== Deprecation.NONE) {
       attributes.push(`deprecated=${p.deprecated}`);
     }
-    // FIXME: Documentation?
+
+    // Documentation changes are rendered outside, they'll be too large
 
     if (attributes.length) {
       ret.emit(` (${attributes.join(', ')})`);
@@ -228,12 +233,18 @@ export class DiffFormatter {
           this.renderProperty(diff.removed?.[key]!, OLD_DB).prefix([chalk.red(REMOVAL), ...header], [' ', ...rest]),
         ];
       } else if (diff.updated?.[key]) {
-        const old = this.renderProperty(diff.updated?.[key]!.old, OLD_DB).prefix(['- ']).colorize(chalk.red);
-        const noo = this.renderProperty(diff.updated?.[key]!.new, NEW_DB).prefix(['+ ']).colorize(chalk.green);
+        const pu = diff.updated?.[key]!;
+        const old = this.renderProperty(pu.old, OLD_DB);
+        const noo = this.renderProperty(pu.new, NEW_DB);
 
         const ret = new PrintableTree();
-        ret.addTree(old);
-        ret.addTree(noo);
+        if (old.toString() !== noo.toString()) {
+          ret.addTree(old.prefix(['- ']).colorize(chalk.red));
+          ret.addTree(noo.prefix(['+ ']).colorize(chalk.green));
+        }
+        if (pu.old.documentation !== pu.new.documentation) {
+          ret.addTree(new PrintableTree('(documentation changed)'));
+        }
         return ret.prefix([` ${key}: `]);
       }
       return new PrintableTree();
