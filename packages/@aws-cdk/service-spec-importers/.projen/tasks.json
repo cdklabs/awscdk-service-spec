@@ -1,5 +1,14 @@
 {
   "tasks": {
+    "analyze:db": {
+      "name": "analyze:db",
+      "steps": [
+        {
+          "exec": "ts-node src/cli/analyze-db",
+          "receiveArgs": true
+        }
+      ]
+    },
     "build": {
       "name": "build",
       "description": "Full release build",
@@ -21,27 +30,22 @@
         }
       ]
     },
+    "build:db": {
+      "name": "build:db",
+      "steps": [
+        {
+          "exec": "node -r source-map-support/register lib/cli/build"
+        }
+      ]
+    },
     "bump": {
       "name": "bump",
-      "description": "Bumps version based on latest git tag and generates a changelog entry",
-      "env": {
-        "OUTFILE": "package.json",
-        "CHANGELOG": "dist/changelog.md",
-        "BUMPFILE": "dist/version.txt",
-        "RELEASETAG": "dist/releasetag.txt",
-        "RELEASE_TAG_PREFIX": "@aws-cdk/aws-service-spec@",
-        "VERSIONRCOPTIONS": "{\"path\":\".\"}",
-        "RELEASABLE_COMMITS": "git log --no-merges --oneline $LATEST_TAG..HEAD -E --grep '^(feat|fix){1}(\\([^()[:space:]]+\\))?(!)?:[[:blank:]]+.+' -- . ../service-spec-types ../../../sources"
-      },
+      "description": "Bumps versions of local dependencies",
       "steps": [
         {
           "spawn": "gather-versions"
-        },
-        {
-          "builtin": "release/bump-version"
         }
-      ],
-      "condition": "! git log --oneline -1 | grep -q \"chore(release):\""
+      ]
     },
     "check-for-updates": {
       "name": "check-for-updates",
@@ -50,7 +54,7 @@
       },
       "steps": [
         {
-          "exec": "npm-check-updates --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/jest,@types/node,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,eslint-config-prettier,eslint-import-resolver-node,eslint-import-resolver-typescript,eslint-plugin-import,eslint-plugin-prettier,eslint,jest,jest-junit,npm-check-updates,prettier,projen,source-map-support,ts-jest,typescript"
+          "exec": "npm-check-updates --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/fs-extra,@types/glob,@types/jest,@types/node,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,ajv-cli,eslint-config-prettier,eslint-import-resolver-node,eslint-import-resolver-typescript,eslint-plugin-import,eslint-plugin-prettier,eslint,jest,jest-junit,npm-check-updates,prettier,projen,source-map-support,ts-jest,ts-json-schema-generator,typescript,ajv,canonicalize,chalk,commander,fast-json-patch,fs-extra,glob,sort-json"
         }
       ]
     },
@@ -59,7 +63,7 @@
       "description": "Only compile",
       "steps": [
         {
-          "spawn": "generate"
+          "spawn": "gen-schemas"
         },
         {
           "exec": "tsc --build",
@@ -76,6 +80,15 @@
         }
       ]
     },
+    "diff:db": {
+      "name": "diff:db",
+      "steps": [
+        {
+          "exec": "ts-node src/cli/diff-db",
+          "receiveArgs": true
+        }
+      ]
+    },
     "eslint": {
       "name": "eslint",
       "description": "Runs eslint against the codebase",
@@ -89,17 +102,34 @@
       "name": "gather-versions",
       "steps": [
         {
-          "exec": "ts-node ../../../projenrc/gather-versions.exec.ts @aws-cdk/aws-service-spec MAJOR --deps @cdklabs/tskb @aws-cdk/service-spec-types @aws-cdk/service-spec-importers",
+          "exec": "ts-node ../../../projenrc/gather-versions.exec.ts @aws-cdk/service-spec-importers MAJOR --deps @cdklabs/tskb @aws-cdk/service-spec-types",
           "receiveArgs": true
         }
       ]
     },
-    "generate": {
-      "name": "generate",
+    "gen-schemas": {
+      "name": "gen-schemas",
       "steps": [
         {
-          "exec": "node -e 'require(\"@aws-cdk/service-spec-importers/lib/cli/build\")' && gzip db.json -f",
-          "receiveArgs": true
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudFormationRegistryResource --out schemas/CloudFormationRegistryResource.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudFormationResourceSpecification --out schemas/CloudFormationResourceSpecification.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type SAMResourceSpecification --out schemas/SAMResourceSpecification.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudFormationDocumentation --out schemas/CloudFormationDocumentation.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type StatefulResources --out schemas/StatefulResources.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type SamTemplateSchema --out schemas/SamTemplateSchema.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudWatchConsoleServiceDirectory --out schemas/CloudWatchConsoleServiceDirectory.schema.json"
         }
       ]
     },
@@ -132,19 +162,16 @@
     },
     "package": {
       "name": "package",
-      "description": "Creates the distribution package",
-      "steps": [
-        {
-          "exec": "mkdir -p dist/js"
-        },
-        {
-          "exec": "mv $(npm pack) dist/js/"
-        }
-      ]
+      "description": "Creates the distribution package"
     },
     "post-compile": {
       "name": "post-compile",
-      "description": "Runs after successful compilation"
+      "description": "Runs after successful compilation",
+      "steps": [
+        {
+          "spawn": "build:db"
+        }
+      ]
     },
     "pre-compile": {
       "name": "pre-compile",
@@ -174,20 +201,8 @@
     },
     "unbump": {
       "name": "unbump",
-      "description": "Restores version to 0.0.0",
-      "env": {
-        "OUTFILE": "package.json",
-        "CHANGELOG": "dist/changelog.md",
-        "BUMPFILE": "dist/version.txt",
-        "RELEASETAG": "dist/releasetag.txt",
-        "RELEASE_TAG_PREFIX": "@aws-cdk/aws-service-spec@",
-        "VERSIONRCOPTIONS": "{\"path\":\".\"}",
-        "RELEASABLE_COMMITS": "git log --no-merges --oneline $LATEST_TAG..HEAD -E --grep '^(feat|fix){1}(\\([^()[:space:]]+\\))?(!)?:[[:blank:]]+.+' -- . ../service-spec-types ../../../sources"
-      },
+      "description": "Resets versions of local dependencies to 0.0.0",
       "steps": [
-        {
-          "builtin": "release/reset-version"
-        },
         {
           "spawn": "gather-versions"
         }

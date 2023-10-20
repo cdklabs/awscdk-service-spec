@@ -5,10 +5,7 @@
       "path": "packages/@aws-cdk/aws-service-spec"
     },
     {
-      "path": "packages/@aws-cdk/service-spec-build"
-    },
-    {
-      "path": "packages/@aws-cdk/service-spec-sources"
+      "path": "packages/@aws-cdk/service-spec-importers"
     },
     {
       "path": "packages/@aws-cdk/service-spec-types"
