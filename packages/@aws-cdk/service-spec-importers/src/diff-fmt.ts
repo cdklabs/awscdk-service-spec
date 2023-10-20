@@ -160,6 +160,12 @@ export class DiffFormatter {
     if (p.deprecated && p.deprecated !== Deprecation.NONE) {
       attributes.push(`deprecated=${p.deprecated}`);
     }
+    if (p.causesReplacement === 'yes') {
+      attributes.push('immutable');
+    }
+    if (p.causesReplacement === 'maybe') {
+      attributes.push('immutable?');
+    }
 
     // Documentation changes are rendered outside, they'll be too large
 
