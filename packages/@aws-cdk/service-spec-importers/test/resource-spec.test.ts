@@ -1,5 +1,5 @@
 import { DefinitionReference, emptyDatabase } from '@aws-cdk/service-spec-types';
-import { ResourceSpecImporter } from '../src/import-resource-spec';
+import { ResourceSpecImporter } from '../src/importers/import-resource-spec';
 
 let db: ReturnType<typeof emptyDatabase>;
 beforeEach(() => {

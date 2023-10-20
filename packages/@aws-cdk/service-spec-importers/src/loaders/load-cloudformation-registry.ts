@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as util from 'util';
 import { isSuccess, Result } from '@cdklabs/tskb';
 import * as _glob from 'glob';
-import { Loader, LoadResult } from './loader';
+import { Loader, LoadResult, LoadSourceOptions } from './loader';
 import { patchCloudFormationRegistry } from '../patches/registry-patches';
 import { ProblemReport, ReportAudience } from '../report';
 import { CloudFormationRegistryResource } from '../types';
@@ -34,20 +34,15 @@ export interface CloudFormationRegistryResources {
 }
 
 export async function loadDefaultCloudFormationRegistryResources(
+  schemaDir: string,
   report: ProblemReport,
-  mustValidate = true,
+  options: LoadSourceOptions = {},
 ): Promise<CloudFormationRegistryResources[]> {
-  const errorRootDirectory = path.join(__dirname, '../../../../../sources/CloudFormationSchema');
-  const files = await glob(`${errorRootDirectory}/*`);
+  const files = await glob(`${schemaDir}/*`);
   return Promise.all(
     files.map(async (directoryName) => {
       const regionName = path.basename(directoryName);
-      const resources = await loadCloudFormationRegistryDirectory(
-        directoryName,
-        report,
-        mustValidate,
-        errorRootDirectory,
-      );
+      const resources = await loadCloudFormationRegistryDirectory(directoryName, report, options.validate, schemaDir);
 
       return { regionName, resources };
     }),

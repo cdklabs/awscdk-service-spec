@@ -4,6 +4,35 @@ Imports various service specification sources into a service database.
 
 ## Usage
 
+### Programmatic
+
+```ts
+declare const db: SpecDatabase;
+
+new DatabaseBuilder(db, options)
+  // Import (modern) CloudFormation Registry Resources from a directory structure: <region>/<resource>.json
+  .importCloudFormationRegistryResources('data/CloudFormationSchema/')
+
+  // Import the (modern) JSON schema spec from SAM
+  .importSamJsonSchema('data/sam.schema.json')
+
+  // Import (legacy) CloudFormation Resource Specification from a directory structure containing a patch set: <region>/000_cloudformation/*.json
+  .importCloudFormationResourceSpec('data/CloudFormationResourceSpecification/')
+
+  // Import (legacy) SAM Resource Specification from a directory structure containing a patch set: *.json
+  .importSamResourceSpec('data/SAMResourceSpecification/')
+
+  // Import various model enhancements
+  .importCloudFormationDocs('data/CloudFormationDocumentation.json')
+  .importStatefulResources('data/StatefulResources/StatefulResources.json')
+  .importCannedMetrics('data/CloudWatchConsoleServiceDirectory.json'),
+  .importScrutinies()
+  .importAugmentations()
+
+  // Apply the imports to the database
+  .build();
+```
+
 ### CLI
 
 ```console
