@@ -139,7 +139,12 @@ export function diffField<A extends object, K extends keyof A>(
  * Return the object if it has any defined fields, otherwise undefined
  */
 export function collapseUndefined<A extends object>(x: A): A | undefined {
-  return Object.keys(x).some((key) => (x as any)[key] !== undefined) ? x : undefined;
+  for (const key of Object.keys(x)) {
+    if ((x as any)[key] === undefined) {
+      delete (x as any)[key];
+    }
+  }
+  return Object.keys(x).length > 0 ? x : undefined;
 }
 
 export function collapseEmptyDiff<A extends ListDiff<any, any> | MapDiff<any, any>>(x: A): A | undefined {
@@ -150,3 +155,4 @@ export function collapseEmptyDiff<A extends ListDiff<any, any> | MapDiff<any, an
 }
 
 export type Eq<A> = (x: A, y: A) => boolean;
+export type AllFieldsGiven<A extends object> = { [k in keyof Required<A>]: A[k] };

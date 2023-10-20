@@ -265,3 +265,88 @@ test('only object types get type definitions', () => {
   expect(resource.properties.Prop1.type).toEqual({ type: 'array', element: { type: 'string' } } satisfies PropertyType);
   expect(resource.properties.Prop2.type).toEqual({ type: 'json' });
 });
+
+test('import immutability', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::Test::Resource',
+      description: 'Test resource',
+      properties: {
+        Prop1: { type: 'string' },
+        Prop2: { $ref: '#/definitions/Type1' },
+        Prop3: {
+          type: 'array',
+          items: { $ref: '#/definitions/Type2' },
+        },
+      },
+      additionalProperties: false,
+      definitions: {
+        Type1: {
+          type: 'object',
+          properties: {
+            ImmutableField: { type: 'string' },
+          },
+          additionalProperties: false,
+        },
+        Type2: {
+          type: 'object',
+          properties: {
+            ImmutableField: { type: 'string' },
+          },
+          additionalProperties: false,
+        },
+      },
+      createOnlyProperties: [
+        '/properties/Prop1',
+        '/properties/Prop2/ImmutableField',
+        '/properties/Prop3/*/ImmutableField',
+      ],
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Test::Resource').only();
+  const types = db.follow('usesType', resource).map((e) => e.entity);
+
+  expect(resource.properties.Prop1.causesReplacement).toEqual('yes');
+  for (const type of types) {
+    expect(type.properties.ImmutableField.causesReplacement).toEqual('yes');
+  }
+});
+
+test('import immutability on tags', () => {
+  // Doesn't go on the type definition, but goes onto the resource instead
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::Test::Resource',
+      description: 'Test resource',
+      properties: {
+        Tags: {
+          type: 'array',
+          items: {
+            $ref: '#/definitions/Tag',
+          },
+        },
+      },
+      additionalProperties: false,
+      definitions: {
+        Tag: {
+          type: 'object',
+          properties: {
+            Key: { type: 'string' },
+            Value: { type: 'string' },
+          },
+          required: ['Key', 'Value'],
+          additionalProperties: false,
+        },
+      },
+      createOnlyProperties: ['/properties/Tags/*/Key'],
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Test::Resource').only();
+  expect(resource.additionalReplacementProperties).toEqual([['Tags', '*', 'Key']]);
+});

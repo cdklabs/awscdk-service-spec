@@ -49,6 +49,9 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
   const safeAttributeNames = attributeNames.filter((a) => !conflictingAttributesAndPropNames.has(a));
   resourceBuilder.markAsAttributes(safeAttributeNames);
 
+  // Mark all 'createOnlyProperties' as immutable.
+  resourceBuilder.markAsImmutable((resource.createOnlyProperties ?? []).map(simplePropNameFromJsonPtr));
+
   handleFailure(handleTags(resourceFailure));
   return resourceBuilder.resource;
 

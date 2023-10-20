@@ -103,6 +103,8 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
       into.setProperty(name, {
         type,
         required: propSpec.Required,
+        causesReplacement:
+          propSpec.UpdateType === 'Immutable' ? 'yes' : propSpec.UpdateType === 'Conditional' ? 'maybe' : 'no',
       });
     }
   }
