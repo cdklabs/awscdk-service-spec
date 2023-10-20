@@ -1,18 +1,14 @@
-# Service Spec Build
+# Service Spec Importers
 
-Read the `service-spec-sources` and convert them into our service database.
+Imports various service specification sources into a service database.
 
-Not sure about the long-term organization of this code, but this will do for now.
+## Usage
 
-## How to exercise
+### Code
 
-```console
-npx projen build
-```
 
-Or individually:
+### CLI
 
-```console
-npx projen compile
-npx projen build:db
-```
+```bash
+
+````

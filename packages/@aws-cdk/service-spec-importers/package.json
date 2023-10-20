@@ -1,6 +1,11 @@
 {
   "name": "@aws-cdk/service-spec-importers",
   "description": "Build the service spec from service-spec-sources to service-spec",
+  "bin": {
+    "analyze-db": "bin/analyze-db",
+    "diff-db": "bin/diff-db",
+    "import-db": "bin/import-db"
+  },
   "scripts": {
     "analyze:db": "npx projen analyze:db",
     "build": "npx projen build",

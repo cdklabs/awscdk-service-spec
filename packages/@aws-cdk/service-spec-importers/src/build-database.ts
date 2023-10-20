@@ -1,4 +1,4 @@
-import { emptyDatabase } from '@aws-cdk/service-spec-types';
+import { emptyDatabase, SpecDatabase } from '@aws-cdk/service-spec-types';
 import { assertSuccess, Result } from '@cdklabs/tskb';
 import { Augmentations } from './import-augmentations';
 import { importCannedMetrics } from './import-canned-metrics';
@@ -22,17 +22,16 @@ import { ProblemReport, ReportAudience } from './report';
 
 export interface BuildDatabaseOptions {
   readonly mustValidate?: boolean;
+  readonly quiet?: boolean;
 }
 
 export class DatabaseBuilder {
-  public static buildDatabase(options: BuildDatabaseOptions) {
-    return new DatabaseBuilder(options).build();
+  public static buildDatabase(db: SpecDatabase = emptyDatabase(), options: BuildDatabaseOptions) {
+    return new DatabaseBuilder(db, options).build();
   }
-
-  public readonly db = emptyDatabase();
   public readonly report = new ProblemReport();
 
-  constructor(private readonly options: BuildDatabaseOptions) {}
+  constructor(public readonly db: SpecDatabase, private readonly options: BuildDatabaseOptions) {}
 
   public async build() {
     await this.importCloudFormationResourceSpec();
@@ -51,7 +50,9 @@ export class DatabaseBuilder {
    * Import the (legacy) resource spec
    */
   private async importCloudFormationResourceSpec() {
-    const resourceSpec = this.loadResult(await loadDefaultResourceSpecification(this.options.mustValidate));
+    const resourceSpec = this.loadResult(
+      await loadDefaultResourceSpecification(this.options.mustValidate, this.options.quiet),
+    );
 
     ResourceSpecImporter.importTypes({
       db: this.db,
@@ -63,7 +64,7 @@ export class DatabaseBuilder {
    * Import the (legacy) resource spec for SAM, from GoFormation
    */
   private async importSamResourceSpec() {
-    const samSpec = this.loadResult(await loadSamSpec(this.options.mustValidate));
+    const samSpec = this.loadResult(await loadSamSpec(this.options.mustValidate, this.options.quiet));
     SAMSpecImporter.importTypes({
       db: this.db,
       specification: samSpec,

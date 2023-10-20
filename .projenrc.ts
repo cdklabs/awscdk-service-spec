@@ -132,7 +132,7 @@ const serviceSpecSchemaTask = serviceSpecImporters.addTask('gen-schemas', {
 serviceSpecImporters.compileTask.prependSpawn(serviceSpecSchemaTask);
 
 const buildDb = serviceSpecImporters.tasks.addTask('build:db', {
-  exec: 'node -r source-map-support/register lib/cli/build',
+  exec: 'ts-node src/cli/import-db --force',
 });
 serviceSpecImporters.postCompileTask.spawn(buildDb);
 serviceSpecImporters.tasks.addTask('analyze:db', {
@@ -158,7 +158,7 @@ const awsServiceSpec = new TypeScriptWorkspace({
 // Needs to be added to 'compile' task, because the integ tests will 'compile' everything (but not run the tests and linter).
 awsServiceSpec.compileTask.prependSpawn(
   awsServiceSpec.tasks.addTask('generate', {
-    exec: `node -e 'require("${serviceSpecImporters.name}/lib/cli/build")' && gzip db.json -f`,
+    exec: `import-db db.json.gz --force`,
     receiveArgs: true,
   }),
 );
