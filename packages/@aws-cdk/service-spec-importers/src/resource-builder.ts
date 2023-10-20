@@ -141,7 +141,7 @@ export class PropertyBagBuilder {
     if (!prop.required) {
       delete prop.required;
     }
-    if (!prop.causesReplacement) {
+    if (prop.causesReplacement === 'no') {
       delete prop.causesReplacement;
     }
   }
@@ -254,7 +254,7 @@ export class ResourceBuilder extends PropertyBagBuilder {
       const propPath = propName.split(/\//);
       const prop = this.propertyDeep(...propPath);
       if (prop) {
-        prop.causesReplacement = true;
+        prop.causesReplacement = 'yes';
       }
     }
   }
@@ -281,15 +281,32 @@ export class ResourceBuilder extends PropertyBagBuilder {
           `${this.resource.cloudFormationType}: no definition for property: ${fieldPath.slice(0, i + 1).join('/')}`,
         );
       }
-      if (prop.type.type !== 'ref') {
+
+      let propType = prop.type;
+
+      // Handle '*'s
+      while (fieldPath[i + 1] === '*') {
+        if (propType.type !== 'array' && propType.type !== 'map') {
+          throw new Error(
+            `${this.resource.cloudFormationType}: expected array for ${fieldPath.join('/')} but ${fieldPath
+              .slice(0, i + 1)
+              .join('/')} is a ${new RichPropertyType(propType).stringify(this.db)}`,
+          );
+        }
+
+        propType = propType.element;
+        i += 1;
+      }
+
+      if (propType.type !== 'ref') {
         throw new Error(
           `${this.resource.cloudFormationType}: expected reference for ${fieldPath.join('/')} but ${fieldPath
             .slice(0, i + 1)
-            .join('/')} is a ${new RichPropertyType(prop.type).stringify(this.db)}`,
+            .join('/')} is a ${new RichPropertyType(propType).stringify(this.db)}`,
         );
       }
 
-      const typeDef = this.db.get('typeDefinition', prop.type.reference);
+      const typeDef = this.db.get('typeDefinition', propType.reference);
       currentBag = typeDef.properties;
     }
 

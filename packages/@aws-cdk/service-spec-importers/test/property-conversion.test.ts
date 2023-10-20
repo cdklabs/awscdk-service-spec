@@ -276,24 +276,41 @@ test('import immutability', () => {
       properties: {
         Prop1: { type: 'string' },
         Prop2: { $ref: '#/definitions/Type1' },
+        Prop3: {
+          type: 'array',
+          items: { $ref: '#/definitions/Type2' },
+        },
       },
       additionalProperties: false,
       definitions: {
         Type1: {
           type: 'object',
           properties: {
-            field: { type: 'string' },
+            ImmutableField: { type: 'string' },
+          },
+          additionalProperties: false,
+        },
+        Type2: {
+          type: 'object',
+          properties: {
+            ImmutableField: { type: 'string' },
           },
           additionalProperties: false,
         },
       },
-      createOnlyProperties: ['/properties/Prop1', '/properties/Prop2/field'],
+      createOnlyProperties: [
+        '/properties/Prop1',
+        '/properties/Prop2/ImmutableField',
+        '/properties/Prop3/*/ImmutableField',
+      ],
     },
   });
 
   const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Test::Resource').only();
-  const type = db.follow('usesType', resource).only().entity;
+  const types = db.follow('usesType', resource).map((e) => e.entity);
 
-  expect(resource.properties.Prop1.causesReplacement).toEqual(true);
-  expect(type.properties.field.causesReplacement).toEqual(true);
+  expect(resource.properties.Prop1.causesReplacement).toEqual('yes');
+  for (const type of types) {
+    expect(type.properties.ImmutableField.causesReplacement).toEqual('yes');
+  }
 });

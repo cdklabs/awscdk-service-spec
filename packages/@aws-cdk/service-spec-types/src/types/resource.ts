@@ -146,9 +146,9 @@ export interface Property {
   /**
    * Whether the containing resource will be replaced if this property is changed
    *
-   * @default false
+   * @default 'no'
    */
-  causesReplacement?: boolean | 'maybe';
+  causesReplacement?: 'yes' | 'no' | 'maybe';
 }
 
 export class RichTypedField {

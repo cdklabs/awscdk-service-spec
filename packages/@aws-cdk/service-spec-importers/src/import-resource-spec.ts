@@ -104,7 +104,7 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
         type,
         required: propSpec.Required,
         causesReplacement:
-          propSpec.UpdateType === 'Immutable' ? true : propSpec.UpdateType === 'Conditional' ? 'maybe' : false,
+          propSpec.UpdateType === 'Immutable' ? 'yes' : propSpec.UpdateType === 'Conditional' ? 'maybe' : 'no',
       });
     }
   }

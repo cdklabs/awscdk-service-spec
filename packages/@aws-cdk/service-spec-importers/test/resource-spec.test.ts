@@ -111,7 +111,7 @@ test('import immutability', () => {
   const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type').only();
 
   expect(resource.properties.Prop1.causesReplacement).toEqual('maybe');
-  expect(resource.properties.Prop2.causesReplacement).toEqual(true);
+  expect(resource.properties.Prop2.causesReplacement).toEqual('yes');
 
   const type = db.follow('usesType', resource).only().entity;
   expect(type.properties.Prop1.causesReplacement).toEqual('maybe');
