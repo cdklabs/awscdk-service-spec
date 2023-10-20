@@ -59,10 +59,10 @@ async function main() {
   }
 }
 
-async function writeDatabase(db: SpecDatabase, file: string, gzip = false) {
+async function writeDatabase(db: SpecDatabase, file: string, compress = false) {
   const data = JSON.stringify(db.save());
 
-  if (gzip) {
+  if (compress) {
     const gzip = zlib.createGzip();
     gzip.pipe(createWriteStream(file));
     gzip.write(data);
