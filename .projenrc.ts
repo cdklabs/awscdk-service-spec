@@ -182,14 +182,6 @@ new SingleSource(repo, {
     roleDurationSeconds: 900,
   },
 });
-new RegionalSource(repo, {
-  name: 'resource-spec',
-  dir: 'sources/CloudFormationResourceSpecification',
-  sources: {
-    'us-east-1': 'https://d1uauaxba7bl26.cloudfront.net/latest/gzip/CloudFormationResourceSpecification.json',
-  },
-  fileName: '000_cloudformation/000_CloudFormationResourceSpecification.json',
-});
 new SingleSource(repo, {
   name: 'sam-spec',
   dir: 'sources/CloudFormationResourceSpecification/us-east-1/100_sam/000_official',

@@ -12,7 +12,6 @@
 /.github/workflows/test-aws-cdk-integration.yml linguist-generated
 /.github/workflows/update-source-cfn-schema.yml linguist-generated
 /.github/workflows/update-source-documentation.yml linguist-generated
-/.github/workflows/update-source-resource-spec.yml linguist-generated
 /.github/workflows/update-source-sam-spec.yml linguist-generated
 /.github/workflows/update-source-sam.yml linguist-generated
 /.github/workflows/update-source-stateful-resources.yml linguist-generated
