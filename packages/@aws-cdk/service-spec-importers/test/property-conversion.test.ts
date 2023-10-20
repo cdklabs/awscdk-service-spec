@@ -314,3 +314,39 @@ test('import immutability', () => {
     expect(type.properties.ImmutableField.causesReplacement).toEqual('yes');
   }
 });
+
+test('import immutability on tags', () => {
+  // Doesn't go on the type definition, but goes onto the resource instead
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::Test::Resource',
+      description: 'Test resource',
+      properties: {
+        Tags: {
+          type: 'array',
+          items: {
+            $ref: '#/definitions/Tag',
+          },
+        },
+      },
+      additionalProperties: false,
+      definitions: {
+        Tag: {
+          type: 'object',
+          properties: {
+            Key: { type: 'string' },
+            Value: { type: 'string' },
+          },
+          required: ['Key', 'Value'],
+          additionalProperties: false,
+        },
+      },
+      createOnlyProperties: ['/properties/Tags/*/Key'],
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Test::Resource').only();
+  expect(resource.additionalReplacementProperties).toEqual([['Tags', '*', 'Key']]);
+});

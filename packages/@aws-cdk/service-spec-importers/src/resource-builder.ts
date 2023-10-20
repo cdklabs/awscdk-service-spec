@@ -252,9 +252,17 @@ export class ResourceBuilder extends PropertyBagBuilder {
   public markAsImmutable(props: string[]) {
     for (const propName of props) {
       const propPath = propName.split(/\//);
-      const prop = this.propertyDeep(...propPath);
-      if (prop) {
-        prop.causesReplacement = 'yes';
+
+      try {
+        const prop = this.propertyDeep(...propPath);
+        if (prop) {
+          prop.causesReplacement = 'yes';
+        }
+      } catch {
+        if (!this.resource.additionalReplacementProperties) {
+          this.resource.additionalReplacementProperties = [];
+        }
+        this.resource.additionalReplacementProperties.push(propPath);
       }
     }
   }
@@ -288,7 +296,7 @@ export class ResourceBuilder extends PropertyBagBuilder {
       while (fieldPath[i + 1] === '*') {
         if (propType.type !== 'array' && propType.type !== 'map') {
           throw new Error(
-            `${this.resource.cloudFormationType}: expected array for ${fieldPath.join('/')} but ${fieldPath
+            `${this.resource.cloudFormationType}: ${fieldPath.join('/')}: expected array but ${fieldPath
               .slice(0, i + 1)
               .join('/')} is a ${new RichPropertyType(propType).stringify(this.db)}`,
           );
@@ -300,7 +308,7 @@ export class ResourceBuilder extends PropertyBagBuilder {
 
       if (propType.type !== 'ref') {
         throw new Error(
-          `${this.resource.cloudFormationType}: expected reference for ${fieldPath.join('/')} but ${fieldPath
+          `${this.resource.cloudFormationType}: ${fieldPath.join('/')}: expected type definition but ${fieldPath
             .slice(0, i + 1)
             .join('/')} is a ${new RichPropertyType(propType).stringify(this.db)}`,
         );
