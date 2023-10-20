@@ -98,7 +98,7 @@
       "name": "generate",
       "steps": [
         {
-          "exec": "node -e 'require(\"@aws-cdk/service-spec-importers/lib/cli/build\")' && gzip db.json -f",
+          "exec": "import-db db.json.gz --force",
           "receiveArgs": true
         }
       ]

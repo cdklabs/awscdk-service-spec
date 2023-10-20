@@ -7,13 +7,13 @@ import { SAMResourceSpecification } from '../types';
 /**
  * Load the old SAM spec (CloudFormation spec + extensions)
  */
-export async function loadSamSpec(mustValidate = true): Promise<LoadResult<SAMResourceSpecification>> {
+export async function loadSamSpec(mustValidate = true, quiet = false): Promise<LoadResult<SAMResourceSpecification>> {
   const loader = await Loader.fromSchemaFile<SAMResourceSpecification>('SAMResourceSpecification.schema.json', {
     mustValidate,
   });
 
   const cfnSpecDir = path.join(__dirname, '../../../../../sources/CloudFormationResourceSpecification');
-  const usEast1 = await applyPatchSet(path.join(cfnSpecDir, 'us-east-1', '100_sam'));
+  const usEast1 = await applyPatchSet(path.join(cfnSpecDir, 'us-east-1', '100_sam'), { quiet });
 
   const usEast1Result = await loader.load(usEast1);
   assertSuccess(usEast1Result);
