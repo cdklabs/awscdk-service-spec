@@ -89,7 +89,7 @@
       "name": "gather-versions",
       "steps": [
         {
-          "exec": "ts-node ../../../projenrc/gather-versions.exec.ts @aws-cdk/aws-service-spec MAJOR --deps @cdklabs/tskb @aws-cdk/service-spec-types @aws-cdk/service-spec-build",
+          "exec": "ts-node ../../../projenrc/gather-versions.exec.ts @aws-cdk/aws-service-spec MAJOR --deps @cdklabs/tskb @aws-cdk/service-spec-types @aws-cdk/service-spec-importers",
           "receiveArgs": true
         }
       ]
@@ -98,7 +98,7 @@
       "name": "generate",
       "steps": [
         {
-          "exec": "node -e 'require(\"@aws-cdk/service-spec-build/lib/cli/build\")' && gzip db.json -f",
+          "exec": "node -e 'require(\"@aws-cdk/service-spec-importers/lib/cli/build\")' && gzip db.json -f",
           "receiveArgs": true
         }
       ]

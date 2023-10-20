@@ -38,6 +38,9 @@
   ],
   "references": [
     {
+      "path": "../service-spec-types"
+    },
+    {
       "path": "../../@cdklabs/tskb"
     }
   ]

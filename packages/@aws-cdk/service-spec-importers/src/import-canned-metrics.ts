@@ -1,7 +1,8 @@
 import { createHash } from 'crypto';
-import { CloudWatchConsoleServiceDirectory, ProblemReport, ReportAudience } from '@aws-cdk/service-spec-sources';
 import { SpecDatabase } from '@aws-cdk/service-spec-types';
 import { Entity, failure, Plain } from '@cdklabs/tskb';
+import { ProblemReport, ReportAudience } from './report';
+import { CloudWatchConsoleServiceDirectory } from './types';
 
 /**
  * Returns a deduplicatable entity

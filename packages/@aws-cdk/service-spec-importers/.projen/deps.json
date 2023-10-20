@@ -1,6 +1,15 @@
 {
   "dependencies": [
     {
+      "name": "@types/fs-extra",
+      "type": "build"
+    },
+    {
+      "name": "@types/glob",
+      "version": "^8",
+      "type": "build"
+    },
+    {
       "name": "@types/jest",
       "type": "build"
     },
@@ -17,6 +26,11 @@
     {
       "name": "@typescript-eslint/parser",
       "version": "^6",
+      "type": "build"
+    },
+    {
+      "name": "ajv-cli",
+      "version": "^5",
       "type": "build"
     },
     {
@@ -75,12 +89,12 @@
       "type": "build"
     },
     {
-      "name": "typescript",
+      "name": "ts-json-schema-generator",
       "type": "build"
     },
     {
-      "name": "@aws-cdk/service-spec-sources",
-      "type": "runtime"
+      "name": "typescript",
+      "type": "build"
     },
     {
       "name": "@aws-cdk/service-spec-types",
@@ -91,12 +105,38 @@
       "type": "runtime"
     },
     {
+      "name": "ajv",
+      "version": "^6",
+      "type": "runtime"
+    },
+    {
+      "name": "canonicalize",
+      "type": "runtime"
+    },
+    {
       "name": "chalk",
       "version": "^4",
       "type": "runtime"
     },
     {
       "name": "commander",
+      "type": "runtime"
+    },
+    {
+      "name": "fast-json-patch",
+      "type": "runtime"
+    },
+    {
+      "name": "fs-extra",
+      "type": "runtime"
+    },
+    {
+      "name": "glob",
+      "version": "^8",
+      "type": "runtime"
+    },
+    {
+      "name": "sort-json",
       "type": "runtime"
     }
   ],

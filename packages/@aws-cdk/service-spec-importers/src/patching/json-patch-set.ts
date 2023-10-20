@@ -3,9 +3,9 @@
  *
  * The sources can be taken from one or more directories.
  */
+import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as fastJsonPatch from 'fast-json-patch';
-import * as fs from 'fs-extra';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const sortJson = require('sort-json');
@@ -47,7 +47,7 @@ export async function loadPatchSet(sourceDirectory: string, relativeTo = process
     } else if (file.endsWith('.json')) {
       ret[relName] = {
         type: file.indexOf('patch') === -1 ? 'fragment' : 'patch',
-        data: await fs.readJson(fullFile),
+        data: JSON.parse(await fs.readFile(fullFile, { encoding: 'utf8' })),
       };
     }
   }
@@ -104,8 +104,8 @@ export async function applyAndWrite(targetFile: string, sourceDirectory: string,
 }
 
 export async function writeSorted(targetFile: string, data: any) {
-  await fs.mkdirp(path.dirname(targetFile));
-  await fs.writeJson(targetFile, sortJson(data), { spaces: 2 });
+  await fs.mkdir(path.dirname(targetFile), { recursive: true });
+  await fs.writeFile(targetFile, JSON.stringify(sortJson(data), null, 2));
 }
 
 function printSorted(data: any) {
