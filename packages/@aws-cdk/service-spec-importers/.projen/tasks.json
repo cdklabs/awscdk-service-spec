@@ -1,0 +1,225 @@
+{
+  "tasks": {
+    "analyze:db": {
+      "name": "analyze:db",
+      "steps": [
+        {
+          "exec": "ts-node src/cli/analyze-db",
+          "receiveArgs": true
+        }
+      ]
+    },
+    "build": {
+      "name": "build",
+      "description": "Full release build",
+      "steps": [
+        {
+          "spawn": "pre-compile"
+        },
+        {
+          "spawn": "compile"
+        },
+        {
+          "spawn": "post-compile"
+        },
+        {
+          "spawn": "test"
+        },
+        {
+          "spawn": "package"
+        }
+      ]
+    },
+    "build:db": {
+      "name": "build:db",
+      "steps": [
+        {
+          "exec": "ts-node src/cli/import-db --force"
+        }
+      ]
+    },
+    "bump": {
+      "name": "bump",
+      "description": "Bumps versions of local dependencies",
+      "steps": [
+        {
+          "spawn": "gather-versions"
+        }
+      ]
+    },
+    "check-for-updates": {
+      "name": "check-for-updates",
+      "env": {
+        "CI": "0"
+      },
+      "steps": [
+        {
+          "exec": "npm-check-updates --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/fs-extra,@types/glob,@types/jest,@types/node,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,ajv-cli,eslint-config-prettier,eslint-import-resolver-node,eslint-import-resolver-typescript,eslint-plugin-import,eslint-plugin-prettier,eslint,jest,jest-junit,npm-check-updates,prettier,projen,source-map-support,ts-jest,ts-json-schema-generator,typescript,ajv,canonicalize,chalk,commander,fast-json-patch,fs-extra,glob,sort-json"
+        }
+      ]
+    },
+    "compile": {
+      "name": "compile",
+      "description": "Only compile",
+      "steps": [
+        {
+          "spawn": "gen-schemas"
+        },
+        {
+          "exec": "tsc --build",
+          "receiveArgs": true
+        }
+      ]
+    },
+    "default": {
+      "name": "default",
+      "description": "Synthesize project files",
+      "steps": [
+        {
+          "exec": "cd ../../.. && npx projen default"
+        }
+      ]
+    },
+    "diff:db": {
+      "name": "diff:db",
+      "steps": [
+        {
+          "exec": "ts-node src/cli/diff-db",
+          "receiveArgs": true
+        }
+      ]
+    },
+    "eslint": {
+      "name": "eslint",
+      "description": "Runs eslint against the codebase",
+      "steps": [
+        {
+          "exec": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern src test build-tools"
+        }
+      ]
+    },
+    "gather-versions": {
+      "name": "gather-versions",
+      "steps": [
+        {
+          "exec": "ts-node ../../../projenrc/gather-versions.exec.ts @aws-cdk/service-spec-importers MAJOR --deps @cdklabs/tskb @aws-cdk/service-spec-types",
+          "receiveArgs": true
+        }
+      ]
+    },
+    "gen-schemas": {
+      "name": "gen-schemas",
+      "steps": [
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudFormationRegistryResource --out schemas/CloudFormationRegistryResource.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudFormationResourceSpecification --out schemas/CloudFormationResourceSpecification.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type SAMResourceSpecification --out schemas/SAMResourceSpecification.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudFormationDocumentation --out schemas/CloudFormationDocumentation.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type StatefulResources --out schemas/StatefulResources.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type SamTemplateSchema --out schemas/SamTemplateSchema.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudWatchConsoleServiceDirectory --out schemas/CloudWatchConsoleServiceDirectory.schema.json"
+        }
+      ]
+    },
+    "install": {
+      "name": "install",
+      "description": "Install project dependencies and update lockfile (non-frozen)",
+      "steps": [
+        {
+          "exec": "yarn install --check-files"
+        }
+      ]
+    },
+    "install:ci": {
+      "name": "install:ci",
+      "description": "Install project dependencies using frozen lockfile",
+      "steps": [
+        {
+          "exec": "yarn install --check-files --frozen-lockfile"
+        }
+      ]
+    },
+    "nx": {
+      "name": "nx",
+      "steps": [
+        {
+          "exec": "nx run",
+          "receiveArgs": true
+        }
+      ]
+    },
+    "package": {
+      "name": "package",
+      "description": "Creates the distribution package"
+    },
+    "post-compile": {
+      "name": "post-compile",
+      "description": "Runs after successful compilation",
+      "steps": [
+        {
+          "spawn": "build:db"
+        }
+      ]
+    },
+    "pre-compile": {
+      "name": "pre-compile",
+      "description": "Prepare the project for compilation"
+    },
+    "test": {
+      "name": "test",
+      "description": "Run tests",
+      "steps": [
+        {
+          "exec": "jest --passWithNoTests --updateSnapshot",
+          "receiveArgs": true
+        },
+        {
+          "spawn": "eslint"
+        }
+      ]
+    },
+    "test:watch": {
+      "name": "test:watch",
+      "description": "Run jest in watch mode",
+      "steps": [
+        {
+          "exec": "jest --watch"
+        }
+      ]
+    },
+    "unbump": {
+      "name": "unbump",
+      "description": "Resets versions of local dependencies to 0.0.0",
+      "steps": [
+        {
+          "spawn": "gather-versions"
+        }
+      ]
+    },
+    "watch": {
+      "name": "watch",
+      "description": "Watch & compile in the background",
+      "steps": [
+        {
+          "exec": "tsc --build -w"
+        }
+      ]
+    }
+  },
+  "env": {
+    "PATH": "$(npx -c \"node --print process.env.PATH\")"
+  },
+  "//": "~~ Generated by projen. To modify, edit .projenrc.js and run \"npx projen\"."
+}

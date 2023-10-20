@@ -167,14 +167,6 @@
         }
       ]
     },
-    "update-source:resource-spec": {
-      "name": "update-source:resource-spec",
-      "steps": [
-        {
-          "exec": "node ./scripts/download.task.js https://d1uauaxba7bl26.cloudfront.net/latest/gzip/CloudFormationResourceSpecification.json sources/CloudFormationResourceSpecification/us-east-1/000_cloudformation/000_CloudFormationResourceSpecification.json"
-        }
-      ]
-    },
     "update-source:sam": {
       "name": "update-source:sam",
       "steps": [
@@ -204,9 +196,6 @@
       "steps": [
         {
           "spawn": "update-source:documentation"
-        },
-        {
-          "spawn": "update-source:resource-spec"
         },
         {
           "spawn": "update-source:sam-spec"

@@ -57,24 +57,6 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "@aws-cdk/service-spec-sources: compile --force",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "cwd": "${workspaceFolder}/packages/@aws-cdk/service-spec-sources",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": [
-        "projen",
-        "compile",
-        "--force"
-      ],
-      "outFiles": [
-        "${workspaceFolder}/packages/@aws-cdk/service-spec-sources/lib/**/*.js"
-      ]
-    },
-    {
-      "type": "node",
-      "request": "launch",
       "name": "@aws-cdk/service-spec-types: compile --force",
       "skipFiles": [
         "<node_internals>/**"
@@ -93,11 +75,11 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "@aws-cdk/service-spec-build: compile --force",
+      "name": "@aws-cdk/service-spec-importers: compile --force",
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "cwd": "${workspaceFolder}/packages/@aws-cdk/service-spec-build",
+      "cwd": "${workspaceFolder}/packages/@aws-cdk/service-spec-importers",
       "runtimeExecutable": "npx",
       "runtimeArgs": [
         "projen",
@@ -105,7 +87,7 @@
         "--force"
       ],
       "outFiles": [
-        "${workspaceFolder}/packages/@aws-cdk/service-spec-build/lib/**/*.js"
+        "${workspaceFolder}/packages/@aws-cdk/service-spec-importers/lib/**/*.js"
       ]
     },
     {

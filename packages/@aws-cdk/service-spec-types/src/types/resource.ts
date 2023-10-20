@@ -80,6 +80,21 @@ export interface Resource extends Entity {
    * @default ResourceScrutinyType.NONE
    */
   scrutinizable?: ResourceScrutinyType;
+
+  /**
+   * Additional paths to properties that also cause replacement.
+   *
+   * This is to indicate that certain property paths into this resource
+   * will cause replacement; only replacements that cannot be represented
+   * by tagging the property in a type definition will be included here
+   * (for example, because the tagged property would be in a predefined
+   * type like `tag`).
+   *
+   * All properties in this list should be treated as `causesReplacement: 'yes'`.
+   *
+   * @default -
+   */
+  additionalReplacementProperties?: string[][];
 }
 
 export type ResourceProperties = Record<string, Property>;
@@ -143,6 +158,13 @@ export interface Property {
    * @default PropertyScrutinyType.NONE
    */
   scrutinizable?: PropertyScrutinyType;
+
+  /**
+   * Whether the containing resource will be replaced if this property is changed
+   *
+   * @default 'no'
+   */
+  causesReplacement?: 'yes' | 'no' | 'maybe';
 }
 
 export class RichTypedField {

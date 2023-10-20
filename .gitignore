@@ -54,7 +54,6 @@ jspm_packages/
 !/nx.json
 !/.github/workflows/test-aws-cdk-integration.yml
 !/.github/workflows/update-source-documentation.yml
-!/.github/workflows/update-source-resource-spec.yml
 !/.github/workflows/update-source-sam-spec.yml
 !/.github/workflows/update-source-cfn-schema.yml
 !/.github/workflows/update-source-sam.yml
