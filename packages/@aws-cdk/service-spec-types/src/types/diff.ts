@@ -36,6 +36,7 @@ export interface UpdatedResource {
   readonly tagInformation?: ScalarDiff<Resource['tagInformation']>;
   readonly scrutinizable?: ScalarDiff<Resource['scrutinizable']>;
   readonly typeDefinitionDiff?: MapDiff<TypeDefinition, UpdatedTypeDefinition>;
+  readonly primaryIdentifier?: ListDiff<string, void>;
 }
 
 export interface UpdatedProperty {
