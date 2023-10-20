@@ -6,6 +6,7 @@
     },
     {
       "name": "@types/glob",
+      "version": "^8",
       "type": "build"
     },
     {
@@ -29,6 +30,7 @@
     },
     {
       "name": "ajv-cli",
+      "version": "^5",
       "type": "build"
     },
     {
@@ -104,6 +106,7 @@
     },
     {
       "name": "ajv",
+      "version": "^6",
       "type": "runtime"
     },
     {
@@ -129,6 +132,7 @@
     },
     {
       "name": "glob",
+      "version": "^8",
       "type": "runtime"
     },
     {

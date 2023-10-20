@@ -12,7 +12,14 @@ const repo = new YarnMonorepo({
   description: "Monorepo for the AWS CDK's service spec",
 
   defaultReleaseBranch: 'main',
-  devDeps: ['cdklabs-projen-project-types', 'node-fetch@^2'],
+  devDeps: [
+    'cdklabs-projen-project-types',
+    'node-fetch@^2',
+    'eslint',
+    '@typescript-eslint/parser@^6',
+    '@typescript-eslint/eslint-plugin@^6',
+    'eslint-plugin-import',
+  ],
   vscodeWorkspace: true,
 
   prettier: true,
@@ -81,18 +88,18 @@ const serviceSpecImporters = new TypeScriptWorkspace({
   name: '@aws-cdk/service-spec-importers',
   description: 'Build the service spec from service-spec-sources to service-spec',
   deps: [
-    'ajv',
+    'ajv@^6',
     'canonicalize',
     'chalk@^4',
     'commander',
     'fast-json-patch',
     'fs-extra',
-    'glob',
+    'glob@^8',
     serviceSpecTypes,
     'sort-json',
     tsKb,
   ],
-  devDeps: ['@types/fs-extra', '@types/glob', 'ajv-cli', 'source-map-support', 'ts-json-schema-generator'],
+  devDeps: ['@types/fs-extra', '@types/glob@^8', 'ajv-cli@^5', 'source-map-support', 'ts-json-schema-generator'],
   private: true,
 });
 
