@@ -1,5 +1,13 @@
 import { emptyDatabase } from '@aws-cdk/service-spec-types';
 import { assertSuccess, Result } from '@cdklabs/tskb';
+import { Augmentations } from './import-augmentations';
+import { importCannedMetrics } from './import-canned-metrics';
+import { importCloudFormationDocumentation } from './import-cloudformation-docs';
+import { importCloudFormationRegistryResource } from './import-cloudformation-registry';
+import { ResourceSpecImporter, SAMSpecImporter } from './import-resource-spec';
+import { SamResources } from './import-sam';
+import { Scrutinies } from './import-scrutinies';
+import { importStatefulResources } from './import-stateful-resources';
 import {
   loadDefaultCloudFormationDocs,
   loadDefaultCloudFormationRegistryResources,
@@ -10,14 +18,6 @@ import {
   loadSamSchema,
   loadSamSpec,
 } from './loading';
-import { Augmentations } from './import-augmentations';
-import { importCannedMetrics } from './import-canned-metrics';
-import { importCloudFormationDocumentation } from './import-cloudformation-docs';
-import { importCloudFormationRegistryResource } from './import-cloudformation-registry';
-import { ResourceSpecImporter, SAMSpecImporter } from './import-resource-spec';
-import { SamResources } from './import-sam';
-import { Scrutinies } from './import-scrutinies';
-import { importStatefulResources } from './import-stateful-resources';
 import { ProblemReport, ReportAudience } from './report';
 
 export interface BuildDatabaseOptions {

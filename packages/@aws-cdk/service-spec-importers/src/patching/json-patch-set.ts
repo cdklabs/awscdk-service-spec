@@ -3,9 +3,9 @@
  *
  * The sources can be taken from one or more directories.
  */
+import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as fastJsonPatch from 'fast-json-patch';
-import * as fs from 'fs/promises';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const sortJson = require('sort-json');

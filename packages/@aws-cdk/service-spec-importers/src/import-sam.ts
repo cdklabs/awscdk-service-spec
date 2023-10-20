@@ -1,8 +1,8 @@
 import { Region, Service, SpecDatabase } from '@aws-cdk/service-spec-types';
 import { chain, failure, liftUndefined, unpackOr } from '@cdklabs/tskb';
 import { importCloudFormationRegistryResource } from './import-cloudformation-registry';
-import { CloudFormationRegistryResource, SamTemplateSchema, jsonschema } from './types';
 import { ProblemReport } from './report';
+import { CloudFormationRegistryResource, SamTemplateSchema, jsonschema } from './types';
 
 export interface SamResourcesOptions {
   readonly db: SpecDatabase;
