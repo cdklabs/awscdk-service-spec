@@ -26,8 +26,6 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
     protected readonly specification: Spec,
     protected readonly resourceName: string,
   ) {
-    this.renderingUnusedTypes = true; // FIXME: DON'T COMMIT, just for testing
-
     const specBuilder = new SpecBuilder(db);
     this.resourceBuilder = specBuilder.resourceBuilder(resourceName, {
       description: specification.ResourceTypes[resourceName].Documentation,
