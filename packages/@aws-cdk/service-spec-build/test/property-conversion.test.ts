@@ -265,3 +265,35 @@ test('only object types get type definitions', () => {
   expect(resource.properties.Prop1.type).toEqual({ type: 'array', element: { type: 'string' } } satisfies PropertyType);
   expect(resource.properties.Prop2.type).toEqual({ type: 'json' });
 });
+
+test('import immutability', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::Test::Resource',
+      description: 'Test resource',
+      properties: {
+        Prop1: { type: 'string' },
+        Prop2: { $ref: '#/definitions/Type1' },
+      },
+      additionalProperties: false,
+      definitions: {
+        Type1: {
+          type: 'object',
+          properties: {
+            field: { type: 'string' },
+          },
+          additionalProperties: false,
+        },
+      },
+      createOnlyProperties: ['/properties/Prop1', '/properties/Prop2/field'],
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Test::Resource').only();
+  const type = db.follow('usesType', resource).only().entity;
+
+  expect(resource.properties.Prop1.causesReplacement).toEqual(true);
+  expect(type.properties.field.causesReplacement).toEqual(true);
+});

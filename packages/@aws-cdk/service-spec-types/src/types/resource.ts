@@ -142,6 +142,13 @@ export interface Property {
    * @default PropertyScrutinyType.NONE
    */
   scrutinizable?: PropertyScrutinyType;
+
+  /**
+   * Whether the containing resource will be replaced if this property is changed
+   *
+   * @default false
+   */
+  causesReplacement?: boolean | 'maybe';
 }
 
 export class RichTypedField {

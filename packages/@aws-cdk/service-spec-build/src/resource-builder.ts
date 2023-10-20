@@ -10,6 +10,7 @@ import {
   TagInformation,
   TypeDefinition,
 } from '@aws-cdk/service-spec-types';
+import { AllFieldsGiven } from './diff-helpers';
 
 /**
  * Adds resources and types to a spec database
@@ -102,17 +103,33 @@ export class PropertyBagBuilder {
   }
 
   protected mergeProperty(prop: Property, updates: Property) {
-    copyIfDef('defaultValue');
-    copyIfDef('documentation');
-    copyIfDef('deprecated');
-    copyIfDef('scrutinizable');
-    copyIfDef('required');
+    // This handles merges that are trivial scalar overwrites. All
+    // fields must be represented, if you have special code to handle
+    // a field, put it in here as 'undefined' and add code to handle it below.
+    copyDefined({
+      causesReplacement: updates.causesReplacement,
+      defaultValue: updates.defaultValue,
+      deprecated: updates.deprecated,
+      documentation: updates.documentation,
+      required: updates.required,
+      scrutinizable: updates.scrutinizable,
 
+      // These will be handled specially below
+      previousTypes: undefined,
+      type: undefined,
+    });
+
+    // Special field handling
+    for (const type of updates.previousTypes ?? []) {
+      new RichProperty(prop).updateType(type);
+    }
     new RichProperty(prop).updateType(updates.type);
 
-    function copyIfDef<A extends keyof Property>(key: A) {
-      if (updates[key] !== undefined) {
-        prop[key] = updates[key];
+    function copyDefined(upds: AllFieldsGiven<Partial<Property>>) {
+      for (const [key, value] of Object.entries(upds)) {
+        if (value !== undefined) {
+          (prop as any)[key] = value;
+        }
       }
     }
   }
@@ -123,6 +140,9 @@ export class PropertyBagBuilder {
   protected simplifyProperty(prop: Property) {
     if (!prop.required) {
       delete prop.required;
+    }
+    if (!prop.causesReplacement) {
+      delete prop.causesReplacement;
     }
   }
 }
@@ -219,6 +239,22 @@ export class ResourceBuilder extends PropertyBagBuilder {
 
         // FIXME: not sure if we need to delete property `Foo` if the only
         // attribute reference we got is `Foo/Bar`. Let's not for now.
+      }
+    }
+  }
+
+  /**
+   * Mark the given properties as immutable
+   *
+   * This be a top-level property reference, or a deep property reference, like `Foo` or
+   * `Foo/Bar`.
+   */
+  public markAsImmutable(props: string[]) {
+    for (const propName of props) {
+      const propPath = propName.split(/\//);
+      const prop = this.propertyDeep(...propPath);
+      if (prop) {
+        prop.causesReplacement = true;
       }
     }
   }

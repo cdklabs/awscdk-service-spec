@@ -84,3 +84,35 @@ describe('with a type definition using time stamps', () => {
     expect(type.properties.DateTime.type).toMatchObject({ type: 'date-time' });
   });
 });
+
+test('import immutability', () => {
+  ResourceSpecImporter.importTypes({
+    db,
+    specification: {
+      ResourceSpecificationVersion: '0',
+      ResourceTypes: {
+        'AWS::Some::Type': {
+          Properties: {
+            Prop1: { PrimitiveType: 'String', UpdateType: 'Conditional' },
+            Prop2: { PrimitiveType: 'String', UpdateType: 'Immutable' },
+          },
+        },
+      },
+      PropertyTypes: {
+        'AWS::Some::Type.Type1': {
+          Properties: {
+            Prop1: { PrimitiveType: 'String', UpdateType: 'Conditional' },
+          },
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type').only();
+
+  expect(resource.properties.Prop1.causesReplacement).toEqual('maybe');
+  expect(resource.properties.Prop2.causesReplacement).toEqual(true);
+
+  const type = db.follow('usesType', resource).only().entity;
+  expect(type.properties.Prop1.causesReplacement).toEqual('maybe');
+});
