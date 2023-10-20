@@ -1,6 +1,6 @@
-import { DbDiff } from '../src/db-diff';
-import { ref } from '@cdklabs/tskb';
 import { emptyDatabase, SpecDatabase } from '@aws-cdk/service-spec-types';
+import { ref } from '@cdklabs/tskb';
+import { DbDiff } from '../src/db-diff';
 
 let db1: SpecDatabase;
 let db2: SpecDatabase;
