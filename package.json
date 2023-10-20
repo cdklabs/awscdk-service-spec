@@ -45,7 +45,7 @@
       "packages/@cdklabs/tskb",
       "packages/@cdklabs/typewriter",
       "packages/@aws-cdk/service-spec-types",
-      "packages/@aws-cdk/service-spec-build",
+      "packages/@aws-cdk/service-spec-importers",
       "packages/@aws-cdk/aws-service-spec"
     ]
   },
@@ -54,7 +54,7 @@
       "<rootDir>/packages/@cdklabs/tskb",
       "<rootDir>/packages/@cdklabs/typewriter",
       "<rootDir>/packages/@aws-cdk/service-spec-types",
-      "<rootDir>/packages/@aws-cdk/service-spec-build",
+      "<rootDir>/packages/@aws-cdk/service-spec-importers",
       "<rootDir>/packages/@aws-cdk/aws-service-spec"
     ]
   },

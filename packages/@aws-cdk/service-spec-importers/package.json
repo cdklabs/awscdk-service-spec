@@ -1,5 +1,5 @@
 {
-  "name": "@aws-cdk/service-spec-build",
+  "name": "@aws-cdk/service-spec-importers",
   "description": "Build the service spec from service-spec-sources to service-spec",
   "scripts": {
     "analyze:db": "npx projen analyze:db",

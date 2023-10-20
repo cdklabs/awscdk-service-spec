@@ -76,9 +76,9 @@ const serviceSpecTypes = new TypeScriptWorkspace({
   releasableCommits: pj.ReleasableCommits.featuresAndFixes('. ../../../sources'),
 });
 
-const serviceSpecBuild = new TypeScriptWorkspace({
+const serviceSpecImporters = new TypeScriptWorkspace({
   parent: repo,
-  name: '@aws-cdk/service-spec-build',
+  name: '@aws-cdk/service-spec-importers',
   description: 'Build the service spec from service-spec-sources to service-spec',
   deps: [
     'ajv',
@@ -96,11 +96,11 @@ const serviceSpecBuild = new TypeScriptWorkspace({
   private: true,
 });
 
-for (const tsconfig of [serviceSpecBuild.tsconfig, serviceSpecBuild.tsconfigDev]) {
+for (const tsconfig of [serviceSpecImporters.tsconfig, serviceSpecImporters.tsconfigDev]) {
   tsconfig?.addInclude('src/**/*.json');
 }
 
-const serviceSpecSchemaTask = serviceSpecBuild.addTask('gen-schemas', {
+const serviceSpecSchemaTask = serviceSpecImporters.addTask('gen-schemas', {
   steps: [
     'CloudFormationRegistryResource',
     'CloudFormationResourceSpecification',
@@ -122,36 +122,36 @@ const serviceSpecSchemaTask = serviceSpecBuild.addTask('gen-schemas', {
   })),
 });
 
-serviceSpecBuild.compileTask.prependSpawn(serviceSpecSchemaTask);
+serviceSpecImporters.compileTask.prependSpawn(serviceSpecSchemaTask);
 
-const buildDb = serviceSpecBuild.tasks.addTask('build:db', {
+const buildDb = serviceSpecImporters.tasks.addTask('build:db', {
   exec: 'node -r source-map-support/register lib/cli/build',
 });
-serviceSpecBuild.postCompileTask.spawn(buildDb);
-serviceSpecBuild.tasks.addTask('analyze:db', {
+serviceSpecImporters.postCompileTask.spawn(buildDb);
+serviceSpecImporters.tasks.addTask('analyze:db', {
   exec: 'ts-node src/cli/analyze-db',
   receiveArgs: true,
 });
-serviceSpecBuild.tasks.addTask('diff:db', {
+serviceSpecImporters.tasks.addTask('diff:db', {
   exec: 'ts-node src/cli/diff-db',
   receiveArgs: true,
 });
-serviceSpecBuild.gitignore.addPatterns('db.json');
-serviceSpecBuild.gitignore.addPatterns('build-report');
+serviceSpecImporters.gitignore.addPatterns('db.json');
+serviceSpecImporters.gitignore.addPatterns('build-report');
 
 const awsServiceSpec = new TypeScriptWorkspace({
   parent: repo,
   name: '@aws-cdk/aws-service-spec',
   description: 'A specification of built-in AWS resources',
   deps: [tsKb, serviceSpecTypes],
-  devDeps: ['source-map-support', serviceSpecBuild],
+  devDeps: ['source-map-support', serviceSpecImporters],
   // Also include changes to types and sources
   releasableCommits: pj.ReleasableCommits.featuresAndFixes('. ../service-spec-types ../../../sources'),
 });
 // Needs to be added to 'compile' task, because the integ tests will 'compile' everything (but not run the tests and linter).
 awsServiceSpec.compileTask.prependSpawn(
   awsServiceSpec.tasks.addTask('generate', {
-    exec: `node -e 'require("${serviceSpecBuild.name}/lib/cli/build")' && gzip db.json -f`,
+    exec: `node -e 'require("${serviceSpecImporters.name}/lib/cli/build")' && gzip db.json -f`,
     receiveArgs: true,
   }),
 );

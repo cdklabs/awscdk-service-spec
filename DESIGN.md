@@ -27,15 +27,3 @@ CONNECTIONS
 
 - Queries like:
   - property named 'bucketArn' -> search for resource named "bucket"
-
-
-PACKAGES
-
-- packages/@cdklabs/tskb                <- build tools, query tools, validation mechanism
-- packages/@cdklabs/data-sources/sources/CloudFormation/us-east-1/aws_s3_bucket.json (private)
-- packages/@cdklabs/service-spec-build  <- processInput / saveModel (private)
-                                      /history/states.json (wasOnceJson, unique identifier counters, ...)
-- packages/@aws-cdk/service-spec/gen/model.json
-                                 lib/query.ts   <- loadModel / forEach()+filter()+...
-                                                <- export interface Resource
-- packages/@cdklabs/tskb-q              <- potentially public

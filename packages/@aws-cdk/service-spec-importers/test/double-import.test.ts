@@ -1,10 +1,11 @@
-import { ProblemReport, resourcespec } from '@aws-cdk/service-spec-sources';
 import { emptyDatabase, Property, PropertyType } from '@aws-cdk/service-spec-types';
 import {
   importCloudFormationRegistryResource,
   LoadCloudFormationRegistryResourceOptions,
 } from '../src/import-cloudformation-registry';
 import { ResourceSpecImporter } from '../src/import-resource-spec';
+import { ProblemReport } from '../src/report';
+import { resourcespec } from '../src/types';
 
 let db: ReturnType<typeof emptyDatabase>;
 let report: ProblemReport;
