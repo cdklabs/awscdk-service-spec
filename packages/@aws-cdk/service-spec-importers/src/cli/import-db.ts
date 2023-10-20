@@ -1,10 +1,10 @@
-import { SpecDatabase, emptyDatabase, loadDatabase } from '@aws-cdk/service-spec-types';
-import { writeFile } from 'node:fs/promises';
 import { createWriteStream, existsSync } from 'node:fs';
+import { writeFile } from 'node:fs/promises';
 import * as zlib from 'node:zlib';
+import { SpecDatabase, emptyDatabase, loadDatabase } from '@aws-cdk/service-spec-types';
 import { Command } from 'commander';
-import { DatabaseBuilder } from '../build-database';
 import { CliError, handleFailure } from './util';
+import { DatabaseBuilder } from '../build-database';
 import { ProblemReport } from '../report';
 
 async function main() {
