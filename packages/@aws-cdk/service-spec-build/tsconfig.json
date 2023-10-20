@@ -29,18 +29,16 @@
     "composite": true
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "src/**/*.json"
   ],
   "exclude": [],
   "references": [
     {
-      "path": "../../@cdklabs/tskb"
-    },
-    {
       "path": "../service-spec-types"
     },
     {
-      "path": "../service-spec-sources"
+      "path": "../../@cdklabs/tskb"
     }
   ]
 }

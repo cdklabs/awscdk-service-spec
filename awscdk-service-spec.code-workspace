@@ -8,9 +8,6 @@
       "path": "packages/@aws-cdk/service-spec-build"
     },
     {
-      "path": "packages/@aws-cdk/service-spec-sources"
-    },
-    {
       "path": "packages/@aws-cdk/service-spec-types"
     },
     {

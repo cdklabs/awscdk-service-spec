@@ -67,19 +67,40 @@ const typewriter = new TypeScriptWorkspace({
   releasableCommits: pj.ReleasableCommits.featuresAndFixes('.'),
 });
 
-const serviceSpecSources = new TypeScriptWorkspace({
+const serviceSpecTypes = new TypeScriptWorkspace({
   parent: repo,
-  name: '@aws-cdk/service-spec-sources',
-  description: 'Sources for the service spec',
-  deps: ['ajv', 'glob', tsKb, 'fast-json-patch', 'canonicalize', 'fs-extra', 'sort-json'],
-  devDeps: ['ts-json-schema-generator', '@types/glob', '@types/fs-extra', 'ajv-cli'],
+  name: '@aws-cdk/service-spec-types',
+  description: 'Types for CloudFormation Service Specifications',
+  deps: [tsKb],
+  // Also include changes to sources
+  releasableCommits: pj.ReleasableCommits.featuresAndFixes('. ../../../sources'),
+});
+
+const serviceSpecBuild = new TypeScriptWorkspace({
+  parent: repo,
+  name: '@aws-cdk/service-spec-build',
+  description: 'Build the service spec from service-spec-sources to service-spec',
+  deps: [
+    'ajv',
+    'canonicalize',
+    'chalk@^4',
+    'commander',
+    'fast-json-patch',
+    'fs-extra',
+    'glob',
+    serviceSpecTypes,
+    'sort-json',
+    tsKb,
+  ],
+  devDeps: ['@types/fs-extra', '@types/glob', 'ajv-cli', 'source-map-support', 'ts-json-schema-generator'],
   private: true,
 });
-for (const tsconfig of [serviceSpecSources.tsconfig, serviceSpecSources.tsconfigDev]) {
+
+for (const tsconfig of [serviceSpecBuild.tsconfig, serviceSpecBuild.tsconfigDev]) {
   tsconfig?.addInclude('src/**/*.json');
 }
 
-const serviceSpecSchemaTask = serviceSpecSources.addTask('gen-schemas', {
+const serviceSpecSchemaTask = serviceSpecBuild.addTask('gen-schemas', {
   steps: [
     'CloudFormationRegistryResource',
     'CloudFormationResourceSpecification',
@@ -101,30 +122,8 @@ const serviceSpecSchemaTask = serviceSpecSources.addTask('gen-schemas', {
   })),
 });
 
-// FIXME: Needs to automatically run, but not yet because not everything validates yet
-serviceSpecSources.addTask('validate-specs', {
-  steps: [{ exec: 'node ./lib/build-tools/validate-resources.js' }],
-});
+serviceSpecBuild.compileTask.prependSpawn(serviceSpecSchemaTask);
 
-serviceSpecSources.compileTask.prependSpawn(serviceSpecSchemaTask);
-
-const serviceSpecTypes = new TypeScriptWorkspace({
-  parent: repo,
-  name: '@aws-cdk/service-spec-types',
-  description: 'Types for CloudFormation Service Specifications',
-  deps: [tsKb],
-  // Also include changes to sources
-  releasableCommits: pj.ReleasableCommits.featuresAndFixes('. ../../../sources'),
-});
-
-const serviceSpecBuild = new TypeScriptWorkspace({
-  parent: repo,
-  name: '@aws-cdk/service-spec-build',
-  description: 'Build the service spec from service-spec-sources to service-spec',
-  deps: [tsKb, serviceSpecTypes, 'commander', 'chalk@^4', serviceSpecSources],
-  devDeps: ['source-map-support'],
-  private: true,
-});
 const buildDb = serviceSpecBuild.tasks.addTask('build:db', {
   exec: 'node -r source-map-support/register lib/cli/build',
 });

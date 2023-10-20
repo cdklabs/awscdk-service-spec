@@ -30,20 +30,18 @@
   "include": [
     ".projenrc.js",
     "src/**/*.ts",
-    "test/**/*.ts"
+    "test/**/*.ts",
+    "src/**/*.json"
   ],
   "exclude": [
     "node_modules"
   ],
   "references": [
     {
-      "path": "../../@cdklabs/tskb"
-    },
-    {
       "path": "../service-spec-types"
     },
     {
-      "path": "../service-spec-sources"
+      "path": "../../@cdklabs/tskb"
     }
   ]
 }

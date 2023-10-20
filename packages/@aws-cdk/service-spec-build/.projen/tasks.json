@@ -54,7 +54,7 @@
       },
       "steps": [
         {
-          "exec": "npm-check-updates --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/jest,@types/node,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,eslint-config-prettier,eslint-import-resolver-node,eslint-import-resolver-typescript,eslint-plugin-import,eslint-plugin-prettier,eslint,jest,jest-junit,npm-check-updates,prettier,projen,source-map-support,ts-jest,typescript,chalk,commander"
+          "exec": "npm-check-updates --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/fs-extra,@types/glob,@types/jest,@types/node,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,ajv-cli,eslint-config-prettier,eslint-import-resolver-node,eslint-import-resolver-typescript,eslint-plugin-import,eslint-plugin-prettier,eslint,jest,jest-junit,npm-check-updates,prettier,projen,source-map-support,ts-jest,ts-json-schema-generator,typescript,ajv,canonicalize,chalk,commander,fast-json-patch,fs-extra,glob,sort-json"
         }
       ]
     },
@@ -62,6 +62,9 @@
       "name": "compile",
       "description": "Only compile",
       "steps": [
+        {
+          "spawn": "gen-schemas"
+        },
         {
           "exec": "tsc --build",
           "receiveArgs": true
@@ -99,8 +102,34 @@
       "name": "gather-versions",
       "steps": [
         {
-          "exec": "ts-node ../../../projenrc/gather-versions.exec.ts @aws-cdk/service-spec-build MAJOR --deps @cdklabs/tskb @aws-cdk/service-spec-sources @aws-cdk/service-spec-types",
+          "exec": "ts-node ../../../projenrc/gather-versions.exec.ts @aws-cdk/service-spec-build MAJOR --deps @cdklabs/tskb @aws-cdk/service-spec-types",
           "receiveArgs": true
+        }
+      ]
+    },
+    "gen-schemas": {
+      "name": "gen-schemas",
+      "steps": [
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudFormationRegistryResource --out schemas/CloudFormationRegistryResource.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudFormationResourceSpecification --out schemas/CloudFormationResourceSpecification.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type SAMResourceSpecification --out schemas/SAMResourceSpecification.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudFormationDocumentation --out schemas/CloudFormationDocumentation.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type StatefulResources --out schemas/StatefulResources.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type SamTemplateSchema --out schemas/SamTemplateSchema.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudWatchConsoleServiceDirectory --out schemas/CloudWatchConsoleServiceDirectory.schema.json"
         }
       ]
     },

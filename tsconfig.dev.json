@@ -40,9 +40,6 @@
       "path": "packages/@cdklabs/typewriter"
     },
     {
-      "path": "packages/@aws-cdk/service-spec-sources"
-    },
-    {
       "path": "packages/@aws-cdk/service-spec-types"
     },
     {
