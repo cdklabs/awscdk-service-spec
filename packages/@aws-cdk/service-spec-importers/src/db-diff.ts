@@ -23,6 +23,7 @@ import {
   diffMap,
   diffList,
   diffField,
+  AllFieldsGiven,
 } from './diff-helpers';
 
 export class DbDiff {
@@ -46,7 +47,7 @@ export class DbDiff {
       name: diffScalar(a, b, 'name'),
       shortName: diffScalar(a, b, 'shortName'),
       resourceDiff: this.diffServiceResources(a, b),
-    });
+    } satisfies AllFieldsGiven<UpdatedService>);
   }
 
   private diffServiceResources(a: Service, b: Service): UpdatedService['resourceDiff'] {
@@ -76,7 +77,7 @@ export class DbDiff {
       attributes: collapseEmptyDiff(diffMap(a.attributes, b.attributes, (x, y) => this.diffAttribute(x, y))),
       properties: collapseEmptyDiff(diffMap(a.properties, b.properties, (x, y) => this.diffProperty(x, y))),
       typeDefinitionDiff: this.diffResourceTypeDefinitions(a, b),
-    });
+    } satisfies AllFieldsGiven<UpdatedResource>);
   }
 
   private diffAttribute(a: Attribute, b: Attribute): UpdatedAttribute | undefined {
@@ -86,7 +87,7 @@ export class DbDiff {
       documentation: diffScalar(a, b, 'documentation'),
       previousTypes: collapseEmptyDiff(diffList(a.previousTypes ?? [], b.previousTypes ?? [], eqType)),
       type: diffField(a, b, 'type', eqType),
-    });
+    } satisfies DontCareAboutTypes<AllFieldsGiven<Attribute>>);
 
     if (anyDiffs) {
       return { old: a, new: b };
@@ -105,7 +106,8 @@ export class DbDiff {
       scrutinizable: diffScalar(a, b, 'scrutinizable'),
       previousTypes: collapseEmptyDiff(diffList(a.previousTypes ?? [], b.previousTypes ?? [], eqType)),
       type: diffField(a, b, 'type', eqType),
-    });
+      causesReplacement: diffScalar(a, b, 'causesReplacement'),
+    } satisfies DontCareAboutTypes<AllFieldsGiven<Property>>);
 
     if (anyDiffs) {
       return { old: a, new: b };
@@ -133,7 +135,7 @@ export class DbDiff {
       name: diffScalar(a, b, 'name'),
       mustRenderForBwCompat: diffScalar(a, b, 'mustRenderForBwCompat'),
       properties: collapseEmptyDiff(diffMap(a.properties, b.properties, (x, y) => this.diffProperty(x, y))),
-    });
+    } satisfies AllFieldsGiven<UpdatedTypeDefinition>);
   }
 
   /**
@@ -148,3 +150,5 @@ export class DbDiff {
     return s1 === s2;
   }
 }
+
+export type DontCareAboutTypes<A extends object> = { [k in keyof A]: unknown };

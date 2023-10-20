@@ -34,7 +34,7 @@
       "name": "build:db",
       "steps": [
         {
-          "exec": "node -r source-map-support/register lib/cli/build"
+          "exec": "ts-node src/cli/import-db --force"
         }
       ]
     },

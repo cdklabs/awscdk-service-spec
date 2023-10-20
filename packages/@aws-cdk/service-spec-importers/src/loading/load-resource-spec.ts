@@ -5,14 +5,15 @@ import { CloudFormationResourceSpecification } from '../types';
 
 export async function loadDefaultResourceSpecification(
   mustValidate = true,
+  quiet = false,
 ): Promise<LoadResult<CloudFormationResourceSpecification>> {
   const loader = await Loader.fromSchemaFile<CloudFormationResourceSpecification>('ResourceSpecification.schema.json', {
     mustValidate,
   });
 
   const cfnSpecDir = path.join(__dirname, '../../../../../sources/CloudFormationResourceSpecification');
-  const usEast1 = await applyPatchSet(path.join(cfnSpecDir, 'us-east-1', '000_cloudformation'));
-  const usWest2 = await applyPatchSet(path.join(cfnSpecDir, 'us-west-2', '000_cloudformation'));
+  const usEast1 = await applyPatchSet(path.join(cfnSpecDir, 'us-east-1', '000_cloudformation'), { quiet });
+  const usWest2 = await applyPatchSet(path.join(cfnSpecDir, 'us-west-2', '000_cloudformation'), { quiet });
 
   const usEast1Result = await loader.load(usEast1);
   const usWest2Result = await loader.load(usWest2);
