@@ -1,5 +1,4 @@
 import {
-  Attribute,
   Deprecation,
   MapDiff,
   Property,
@@ -10,24 +9,22 @@ import {
   SpecDatabase,
   SpecDatabaseDiff,
   TypeDefinition,
-  UpdatedAttribute,
   UpdatedProperty,
   UpdatedResource,
   UpdatedService,
   UpdatedTypeDefinition,
 } from '@aws-cdk/service-spec-types';
 import chalk from 'chalk';
-import { TreeEmitter } from './tree-emitter';
+import { PrintableTree } from './printable-tree';
 
 const ADDITION = '[+]';
 const UPDATE = '[~]';
 const REMOVAL = '[-]';
-const META_INDENT = '      ';
+const META_INDENT = 2;
 
 const [OLD_DB, NEW_DB] = [0, 1];
 
 export class DiffFormatter {
-  private readonly tree = new TreeEmitter();
   private readonly dbs: SpecDatabase[];
 
   constructor(db1: SpecDatabase, db2: SpecDatabase) {
@@ -35,74 +32,76 @@ export class DiffFormatter {
   }
 
   public format(diff: SpecDatabaseDiff): string {
-    this.tree.clear();
+    const tree = new PrintableTree();
 
-    this.renderMapDiff(
-      'service',
-      diff.services,
-      (s, db) => this.renderService(s, db),
-      (u) => this.renderUpdatedService(u),
+    tree.addBullets(
+      this.renderMapDiff(
+        diff.services,
+        (s, db) => this.renderService(s, db),
+        (k, u) => this.renderUpdatedService(k, u),
+      ),
     );
 
-    return this.tree.toString();
+    return tree.toString();
   }
 
-  private renderService(s: Service, db: number) {
-    this.tree.plainStringBlock(
-      META_INDENT,
-      listFromProps(s, ['capitalized', 'cloudFormationNamespace', 'name', 'shortName']),
-    );
-
-    this.tree.emitList(
-      this.dbs[db].follow('hasResource', s).map((x) => x.entity),
-      (resource, last) =>
-        this.tree.withBullet(last, () => {
-          this.renderResource(resource, db);
-        }),
-    );
+  private renderService(s: Service, db: number): PrintableTree {
+    return new PrintableTree(`service ${s.name}`).addBullets([
+      new PrintableTree(...listFromProps(s, ['capitalized', 'cloudFormationNamespace', 'name', 'shortName'])).indent(
+        META_INDENT,
+      ),
+      listWithCaption(
+        'resources',
+        this.dbs[db].follow('hasResource', s).map((e) => this.renderResource(e.entity, db)),
+      ),
+    ]);
   }
 
-  private renderUpdatedService(s: UpdatedService) {
+  private renderUpdatedService(key: string, s: UpdatedService): PrintableTree {
     const d = pick(s, ['capitalized', 'cloudFormationNamespace', 'name', 'shortName']);
-    this.tree.plainStringBlock(META_INDENT, listFromDiffs(d));
 
-    this.renderMapDiff(
-      'resource',
-      s.resourceDiff,
-      (r, db) => this.renderResource(r, db),
-      (u) => this.renderUpdatedResource(u),
-    );
+    const bullets = [
+      new PrintableTree(...listFromDiffs(d)).indent(META_INDENT),
+      listWithCaption(
+        'resources',
+        this.renderMapDiff(
+          s.resourceDiff,
+          (r, db) => this.renderResource(r, db),
+          (k, u) => this.renderUpdatedResource(k, u),
+        ),
+      ),
+    ];
+
+    const ret = new PrintableTree(`service ${key}`).addBullets(bullets);
+    return ret;
   }
 
-  private renderResource(r: Resource, db: number) {
-    this.tree.plainStringBlock(
-      META_INDENT,
-      listFromProps(r, [
-        'name',
-        'identifier',
-        'cloudFormationType',
-        'cloudFormationTransform',
-        'documentation',
-        'identifier',
-        'isStateful',
-        'scrutinizable',
-        'tagInformation',
-      ]),
-    );
-
-    // FIXME: props, attributes
-
-    this.tree.emitList(
-      this.dbs[db].follow('usesType', r).map((x) => x.entity),
-      (typeDef, last) =>
-        this.tree.withBullet(last, () => {
-          this.renderTypeDefinition(typeDef, db);
-        }),
-    );
+  private renderResource(r: Resource, db: number): PrintableTree {
+    return new PrintableTree(`resource ${r.cloudFormationType}`).addBullets([
+      new PrintableTree(
+        ...listFromProps(r, [
+          'name',
+          'identifier',
+          'cloudFormationType',
+          'cloudFormationTransform',
+          'documentation',
+          'identifier',
+          'isStateful',
+          'scrutinizable',
+          'tagInformation',
+        ]),
+      ).indent(META_INDENT),
+      listWithCaption('properties', this.renderProperties(r.properties, db)),
+      listWithCaption('attributes', this.renderProperties(r.attributes, db)),
+      listWithCaption(
+        'types',
+        this.dbs[db].follow('usesType', r).map((e) => this.renderTypeDefinition(e.entity, db)),
+      ),
+    ]);
   }
 
-  private renderUpdatedResource(s: UpdatedResource) {
-    const d = pick(s, [
+  private renderUpdatedResource(key: string, r: UpdatedResource): PrintableTree {
+    const d = pick(r, [
       'name',
       'identifier',
       'cloudFormationType',
@@ -113,67 +112,42 @@ export class DiffFormatter {
       'scrutinizable',
       'tagInformation',
     ]);
-    this.tree.plainStringBlock(META_INDENT, listFromDiffs(d));
 
-    this.tree.withPrefix(META_INDENT, () => {
-      if (s.properties) {
-        this.tree.emit('properties\n');
+    return new PrintableTree(`resource ${key}`).addBullets([
+      new PrintableTree(...listFromDiffs(d)).indent(META_INDENT),
+      listWithCaption('properties', this.renderPropertyDiff(r.properties)),
+      listWithCaption('attributes', this.renderPropertyDiff(r.attributes)),
+      listWithCaption(
+        'types',
         this.renderMapDiff(
-          'prop',
-          s.properties,
-          (p, db) => this.renderProperty(p, db),
-          (u) => this.renderUpdatedProperty(u),
-        );
-      }
-
-      if (s.attributes) {
-        this.tree.emit('attributes\n');
-        this.renderMapDiff(
-          'attr',
-          s.attributes,
-          (p, db) => this.renderAttribute(p, db),
-          (u) => this.renderUpdatedAttribute(u),
-        );
-      }
-    });
-
-    this.renderMapDiff(
-      'type',
-      s.typeDefinitionDiff,
-      (p, db) => this.renderTypeDefinition(p, db),
-      (u) => this.renderUpdatedTypeDefinition(u),
-    );
+          r.typeDefinitionDiff,
+          (t, db) => this.renderTypeDefinition(t, db),
+          (k, u) => this.renderUpdatedTypeDefinition(k, u),
+        ),
+      ),
+    ]);
   }
 
-  private renderTypeDefinition(r: TypeDefinition, db: number) {
-    this.tree.plainStringBlock(META_INDENT, listFromProps(r, ['documentation', 'mustRenderForBwCompat', 'name']));
-
-    // Properties
-    this.tree.emitList(Object.entries(r.properties), ([name, p], last) => {
-      this.tree.withBullet(last, () => {
-        this.tree.emit(`${name}: `);
-        this.renderProperty(p, db);
-      });
-    });
+  private renderTypeDefinition(t: TypeDefinition, db: number): PrintableTree {
+    return new PrintableTree(`type ${t.name}`).addBullets([
+      new PrintableTree(...listFromProps(t, ['documentation', 'mustRenderForBwCompat', 'name'])).indent(META_INDENT),
+      listWithCaption('properties', this.renderProperties(t.properties, db)),
+    ]);
   }
 
-  private renderUpdatedTypeDefinition(t: UpdatedTypeDefinition) {
+  private renderUpdatedTypeDefinition(key: string, t: UpdatedTypeDefinition): PrintableTree {
     const d = pick(t, ['documentation', 'mustRenderForBwCompat', 'name']);
-    this.tree.plainStringBlock(META_INDENT, listFromDiffs(d));
-
-    this.tree.withPrefix('  ', () => {
-      this.renderMapDiff(
-        'prop',
-        t.properties,
-        (p, db) => this.renderProperty(p, db),
-        (u) => this.renderUpdatedProperty(u),
-      );
-    });
+    return new PrintableTree(`type ${key}`).addBullets([
+      new PrintableTree(...listFromDiffs(d)).indent(META_INDENT),
+      listWithCaption('properties', this.renderPropertyDiff(t.properties)),
+    ]);
   }
 
-  private renderProperty(p: Property, db: number) {
+  private renderProperty(p: Property, db: number): PrintableTree {
+    const ret = new PrintableTree();
+
     const types = [p.type, ...(p.previousTypes ?? []).reverse()];
-    this.tree.emit(types.map((type) => new RichPropertyType(type).stringify(this.dbs[db], false)).join(' ⇐ '));
+    ret.emit(types.map((type) => new RichPropertyType(type).stringify(this.dbs[db], false)).join(' ⇐ '));
 
     const attributes = [];
     if (p.defaultValue) {
@@ -185,43 +159,23 @@ export class DiffFormatter {
     // FIXME: Documentation?
 
     if (attributes.length) {
-      this.tree.emit(` (${attributes.join(', ')})`);
+      ret.emit(` (${attributes.join(', ')})`);
     }
+
+    return ret;
   }
 
-  private renderUpdatedProperty(t: UpdatedProperty) {
-    this.tree.withColor(chalk.red, () => {
-      this.renderProperty(t.old, OLD_DB);
-    });
-    this.tree.emit('\n');
-    this.tree.withColor(chalk.green, () => {
-      this.renderProperty(t.new, NEW_DB);
-    });
-  }
-
-  private renderAttribute(a: Attribute, db: number) {
-    const types = [a.type, ...(a.previousTypes ?? []).reverse()];
-    this.tree.emit(types.map((type) => new RichPropertyType(type).stringify(this.dbs[db], false)).join(' ⇐ '));
-  }
-
-  private renderUpdatedAttribute(t: UpdatedAttribute) {
-    this.tree.withColor(chalk.red, () => {
-      this.renderAttribute(t.old, OLD_DB);
-    });
-    this.tree.emit('\n');
-    this.tree.withColor(chalk.green, () => {
-      this.renderAttribute(t.new, NEW_DB);
-    });
+  private renderProperties(ps: Record<string, Property>, db: number): PrintableTree[] {
+    return Object.entries(ps).map(([name, p]) => this.renderProperty(p, db).prefix([`${name}: `]));
   }
 
   private renderMapDiff<E, U>(
-    type: string,
     diff: MapDiff<E, U> | undefined,
-    renderEl: (x: E, dbI: number) => void,
-    renderUpdated: (x: U) => void,
-  ) {
+    renderEl: (x: E, dbI: number) => PrintableTree,
+    renderUpdated: (key: string, x: U) => PrintableTree,
+  ): PrintableTree[] {
     if (!diff) {
-      return;
+      return [];
     }
 
     // Turn the lists into maps
@@ -234,30 +188,55 @@ export class DiffFormatter {
     );
     keys.sort((a, b) => a.localeCompare(b));
 
-    this.tree.emitList(keys, (key, last) => {
+    return keys.map((key) => {
       if (diff.added?.[key]) {
-        this.tree.withColor(chalk.green, () =>
-          this.tree.withBullet(last, () => {
-            this.tree.emit(ADDITION);
-            this.tree.emit(` ${type} ${key}\n`);
-            renderEl(diff.added?.[key]!, NEW_DB);
-          }),
-        );
+        return renderEl(diff.added?.[key]!, NEW_DB).prefix([chalk.green(ADDITION), ' '], [' ']);
       } else if (diff.removed?.[key]) {
-        this.tree.withColor(chalk.green, () =>
-          this.tree.withBullet(last, () => {
-            this.tree.emit(REMOVAL);
-            this.tree.emit(` ${type} ${key}\n`);
-            renderEl(diff.removed?.[key]!, OLD_DB);
-          }),
-        );
+        return renderEl(diff.removed?.[key]!, OLD_DB).prefix([chalk.red(REMOVAL), ' '], [' ']);
       } else if (diff.updated?.[key]) {
-        this.tree.withBullet(last, () => {
-          this.tree.emit(chalk.yellow(UPDATE));
-          this.tree.emit(` ${type} ${key}\n`);
-          renderUpdated(diff.updated?.[key]!);
-        });
+        return renderUpdated(key, diff.updated?.[key]!).prefix([chalk.yellow(UPDATE), ' '], [' ']);
       }
+      return new PrintableTree();
+    });
+  }
+
+  private renderPropertyDiff(diff: MapDiff<Property, UpdatedProperty> | undefined): PrintableTree[] {
+    if (!diff) {
+      return [];
+    }
+
+    // Turn the lists into maps
+    const keys = Array.from(
+      new Set([
+        ...Object.keys(diff.added ?? {}),
+        ...Object.keys(diff.removed ?? {}),
+        ...Object.keys(diff.updated ?? {}),
+      ]),
+    );
+    keys.sort((a, b) => a.localeCompare(b));
+
+    return keys.flatMap((key) => {
+      const header = [' ', key, ': '];
+      const rest = [' ', ' '.repeat(key.length), '  '];
+
+      if (diff.added?.[key]) {
+        return [
+          this.renderProperty(diff.added?.[key]!, NEW_DB).prefix([chalk.green(ADDITION), ...header], [' ', ...rest]),
+        ];
+      } else if (diff.removed?.[key]) {
+        return [
+          this.renderProperty(diff.removed?.[key]!, OLD_DB).prefix([chalk.red(REMOVAL), ...header], [' ', ...rest]),
+        ];
+      } else if (diff.updated?.[key]) {
+        const old = this.renderProperty(diff.updated?.[key]!.old, OLD_DB).prefix(['- ']).colorize(chalk.red);
+        const noo = this.renderProperty(diff.updated?.[key]!.new, NEW_DB).prefix(['+ ']).colorize(chalk.green);
+
+        const ret = new PrintableTree();
+        ret.addTree(old);
+        ret.addTree(noo);
+        return ret.prefix([` ${key}: `]);
+      }
+      return new PrintableTree();
     });
   }
 }
@@ -276,9 +255,22 @@ function pick<A extends object, K extends keyof A>(a: A, ks: K[]): Pick<A, K> {
 }
 
 function listFromDiffs(xs: Record<string, ScalarDiff<any> | undefined>): string[] {
-  return Object.entries(xs).map(([key, diff]) => `${String(key)}: ${render(diff?.old)} → ${render(diff?.new)}`);
+  return Object.entries(xs).flatMap(([key, diff]) => [
+    chalk.red(`- ${String(key)}: ${render(diff?.old)}`),
+    chalk.green(`+ ${String(key)}: ${render(diff?.new)}`),
+  ]);
 }
 
 function render(x: unknown) {
   return typeof x === 'object' ? JSON.stringify(x) : `${x}`;
+}
+
+function listWithCaption(caption: string, trees: PrintableTree[]) {
+  trees = trees.filter((t) => !t.empty);
+  if (trees.length === 0) {
+    return new PrintableTree();
+  }
+  const ret = new PrintableTree(`${caption}`);
+  ret.addBullets(trees);
+  return ret.prefix([' '], ['  ']);
 }
