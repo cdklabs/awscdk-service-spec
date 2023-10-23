@@ -102,4 +102,13 @@ test('import SAM types by recognizing the Type field that accepts a constant', (
   expect(type).toBeTruthy();
 
   db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Serverless::OtherThing').only();
+
+  const service = db.all('service');
+  expect(service).toEqual([
+    expect.objectContaining({
+      name: 'aws-sam',
+      capitalized: 'SAM',
+      cloudFormationNamespace: 'AWS::Serverless',
+    }),
+  ]);
 });

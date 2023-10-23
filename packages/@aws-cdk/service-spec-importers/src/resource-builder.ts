@@ -65,8 +65,9 @@ export class SpecBuilder {
 
   private allocateService(resourceTypeName: string, resourceTypeNameSeparator = '::') {
     const parts = resourceTypeName.split(resourceTypeNameSeparator);
+    const cloudFormationNamespace = `${parts[0]}${resourceTypeNameSeparator}${parts[1]}`;
 
-    // Name hack for legacy reasons
+    // Name hack for legacy reasons (only affects names, not cloudFormationNamespace)
     if (parts[0] === 'AWS' && parts[1] === 'Serverless') {
       parts[1] = 'SAM';
     }
@@ -74,7 +75,6 @@ export class SpecBuilder {
     const name = `${parts[0]}-${parts[1]}`.toLowerCase();
     const capitalized = parts[1];
     const shortName = capitalized.toLowerCase();
-    const cloudFormationNamespace = `${parts[0]}${resourceTypeNameSeparator}${parts[1]}`;
 
     const existing = this.db.lookup('service', 'name', 'equals', name);
 
