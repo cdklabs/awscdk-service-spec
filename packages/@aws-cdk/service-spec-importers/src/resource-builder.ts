@@ -13,12 +13,21 @@ import {
 import { AllFieldsGiven } from './diff-helpers';
 
 /**
+ * Options for the resourceBuilder API
+ */
+export interface ResourceBuilderOptions {
+  description?: string;
+  region?: string;
+  primaryIdentifier?: string[];
+}
+
+/**
  * Adds resources and types to a spec database
  */
 export class SpecBuilder {
   constructor(public readonly db: SpecDatabase) {}
 
-  public resourceBuilder(typeName: string, options: { description?: string; region?: string } = {}) {
+  public resourceBuilder(typeName: string, options: ResourceBuilderOptions = {}) {
     const existing = this.db.lookup('resource', 'cloudFormationType', 'equals', typeName);
 
     if (existing.length > 0) {
@@ -26,6 +35,10 @@ export class SpecBuilder {
       if (!resource.documentation && options.description) {
         resource.documentation = options.description;
       }
+      if (!resource.primaryIdentifier) {
+        resource.primaryIdentifier = options.primaryIdentifier;
+      }
+
       return new ResourceBuilder(this.db, resource);
     }
 
@@ -33,6 +46,7 @@ export class SpecBuilder {
       cloudFormationType: typeName,
       documentation: options.description,
       name: last(typeName.split('::')),
+      primaryIdentifier: options.primaryIdentifier,
       attributes: {},
       properties: {},
     });

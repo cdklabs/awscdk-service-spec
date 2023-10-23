@@ -16,6 +16,7 @@ export interface LoadCloudFormationRegistryResourceOptions {
   readonly report: ProblemReport;
   readonly region?: string;
 }
+
 export function importCloudFormationRegistryResource(options: LoadCloudFormationRegistryResourceOptions) {
   const { db, resource } = options;
   const report = options.report.forAudience(ReportAudience.fromCloudFormationResource(resource.typeName));
@@ -25,6 +26,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
   const specBuilder = new SpecBuilder(db);
   const resourceBuilder = specBuilder.resourceBuilder(resource.typeName, {
     description: resource.description,
+    primaryIdentifier: resource.primaryIdentifier?.map((id) => id.slice(12)), // remove "/properties/" that reliably is included in each identifier
     region: options.region,
   });
   const resourceFailure = failure.in(resource.typeName);
