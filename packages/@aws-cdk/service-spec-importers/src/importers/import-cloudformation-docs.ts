@@ -1,5 +1,5 @@
 import { SpecDatabase } from '@aws-cdk/service-spec-types';
-import { CloudFormationDocumentation, cfndocs } from './types';
+import { CloudFormationDocumentation, cfndocs } from '../types';
 
 export function importCloudFormationDocumentation(db: SpecDatabase, docs: CloudFormationDocumentation) {
   for (const [typeName, typeDocs] of Object.entries(docs.Types)) {

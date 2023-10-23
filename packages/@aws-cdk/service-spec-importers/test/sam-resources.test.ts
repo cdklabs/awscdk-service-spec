@@ -1,5 +1,5 @@
 import { emptyDatabase } from '@aws-cdk/service-spec-types';
-import { SamResources } from '../src/import-sam';
+import { SamResources } from '../src/importers/import-sam';
 import { ProblemReport } from '../src/report';
 import { SamTemplateSchema, jsonschema } from '../src/types';
 

@@ -1,19 +1,19 @@
 import * as path from 'path';
-import { combineLoadResults, Loader, LoadResult, mapLoadResult } from './loader';
+import { combineLoadResults, Loader, LoadResult, LoadSourceOptions, mapLoadResult } from './loader';
 import { applyPatchSet } from '../patching/json-patch-set';
 import { CloudFormationResourceSpecification } from '../types';
 
 export async function loadDefaultResourceSpecification(
-  mustValidate = true,
-  quiet = false,
+  specDir: string,
+  options: LoadSourceOptions = {},
 ): Promise<LoadResult<CloudFormationResourceSpecification>> {
   const loader = await Loader.fromSchemaFile<CloudFormationResourceSpecification>('ResourceSpecification.schema.json', {
-    mustValidate,
+    mustValidate: options.validate,
   });
+  const quiet = !options.debug;
 
-  const cfnSpecDir = path.join(__dirname, '../../../../../sources/CloudFormationResourceSpecification');
-  const usEast1 = await applyPatchSet(path.join(cfnSpecDir, 'us-east-1', '000_cloudformation'), { quiet });
-  const usWest2 = await applyPatchSet(path.join(cfnSpecDir, 'us-west-2', '000_cloudformation'), { quiet });
+  const usEast1 = await applyPatchSet(path.join(specDir, 'us-east-1', '000_cloudformation'), { quiet });
+  const usWest2 = await applyPatchSet(path.join(specDir, 'us-west-2', '000_cloudformation'), { quiet });
 
   const usEast1Result = await loader.load(usEast1);
   const usWest2Result = await loader.load(usWest2);

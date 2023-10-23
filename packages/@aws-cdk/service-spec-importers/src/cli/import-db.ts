@@ -4,7 +4,7 @@ import * as zlib from 'node:zlib';
 import { SpecDatabase, emptyDatabase, loadDatabase } from '@aws-cdk/service-spec-types';
 import { Command } from 'commander';
 import { CliError, handleFailure } from './util';
-import { DatabaseBuilder } from '../build-database';
+import { FullDatabase } from '../full-database';
 import { ProblemReport } from '../report';
 
 async function main() {
@@ -34,10 +34,10 @@ async function main() {
   const baseDb = await database(options.input);
 
   process.stdout.write('Importing sources... ');
-  const { db, report } = await DatabaseBuilder.buildDatabase(baseDb, {
+  const { db, report } = await FullDatabase.buildDatabase(baseDb, {
     // FIXME: Switch this to 'true' at some point
-    mustValidate: false,
-    quiet: !options.debug,
+    validate: false,
+    debug: options.debug,
   });
 
   const numProblems = countProblems(report);

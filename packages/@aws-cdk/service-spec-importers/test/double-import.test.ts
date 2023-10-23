@@ -2,8 +2,8 @@ import { emptyDatabase, Property, PropertyType } from '@aws-cdk/service-spec-typ
 import {
   importCloudFormationRegistryResource,
   LoadCloudFormationRegistryResourceOptions,
-} from '../src/import-cloudformation-registry';
-import { ResourceSpecImporter } from '../src/import-resource-spec';
+} from '../src/importers/import-cloudformation-registry';
+import { ResourceSpecImporter } from '../src/importers/import-resource-spec';
 import { ProblemReport } from '../src/report';
 import { resourcespec } from '../src/types';
 

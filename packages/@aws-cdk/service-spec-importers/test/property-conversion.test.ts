@@ -1,5 +1,5 @@
 import { PropertyType, emptyDatabase } from '@aws-cdk/service-spec-types';
-import { importCloudFormationRegistryResource } from '../src/import-cloudformation-registry';
+import { importCloudFormationRegistryResource } from '../src/importers/import-cloudformation-registry';
 import { ProblemReport } from '../src/report';
 
 let db: ReturnType<typeof emptyDatabase>;

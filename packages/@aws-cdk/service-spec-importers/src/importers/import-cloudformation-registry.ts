@@ -1,14 +1,14 @@
 import { PropertyType, RichPropertyType, SpecDatabase, TagVariant } from '@aws-cdk/service-spec-types';
 import { locateFailure, Fail, failure, isFailure, Result, tryCatch, using, ref, isSuccess } from '@cdklabs/tskb';
-import { ProblemReport, ReportAudience } from './report';
-import { PropertyBagBuilder, SpecBuilder } from './resource-builder';
-import { unionSchemas } from './schema-manipulation/unify-schemas';
+import { ProblemReport, ReportAudience } from '../report';
+import { PropertyBagBuilder, SpecBuilder } from '../resource-builder';
+import { unionSchemas } from '../schema-manipulation/unify-schemas';
 import {
   CloudFormationRegistryResource,
   ImplicitJsonSchemaRecord,
   jsonschema,
   simplePropNameFromJsonPtr,
-} from './types';
+} from '../types';
 
 export interface LoadCloudFormationRegistryResourceOptions {
   readonly db: SpecDatabase;

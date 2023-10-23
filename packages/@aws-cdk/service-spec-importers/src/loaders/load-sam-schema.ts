@@ -1,19 +1,21 @@
-import * as path from 'path';
 import { assertSuccess } from '@cdklabs/tskb';
-import { Loader, LoadResult } from './loader';
+import { Loader, LoadResult, LoadSourceOptions } from './loader';
 import { patchSamTemplateSpec } from '../patches/sam-patches';
 import { SamTemplateSchema } from '../types';
 
 /**
  * Load the new SAM (json) schema
  */
-export async function loadSamSchema(mustValidate = true): Promise<LoadResult<SamTemplateSchema>> {
+export async function loadSamSchema(
+  filePath: string,
+  options: LoadSourceOptions = {},
+): Promise<LoadResult<SamTemplateSchema>> {
   const loader = await Loader.fromSchemaFile<SamTemplateSchema>('SamTemplateSchema.schema.json', {
-    mustValidate,
+    mustValidate: options.validate,
     patcher: patchSamTemplateSpec,
   });
 
-  const result = await loader.loadFile(path.join(__dirname, '../../../../../sources/SAMSpec/sam.schema.json'));
+  const result = await loader.loadFile(filePath);
   assertSuccess(result);
   return result;
 }

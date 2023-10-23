@@ -10,7 +10,12 @@ import * as _glob from 'glob';
 import { applyPatcher, JsonLensPatcher, PatchReport } from '../patching';
 import { BoundProblemReport } from '../report';
 
-export interface LoadOptions {
+export interface LoadSourceOptions {
+  readonly validate?: boolean;
+  readonly debug?: boolean;
+}
+
+export interface LoaderOptions {
   /**
    * Fail if we detect schema validations with the data source
    *
@@ -35,7 +40,7 @@ export interface LoadOptions {
 }
 
 export class Loader<A> {
-  public static async fromSchemaFile<A>(fileName: string, options: LoadOptions): Promise<Loader<A>> {
+  public static async fromSchemaFile<A>(fileName: string, options: LoaderOptions): Promise<Loader<A>> {
     const ajv = new Ajv({ verbose: true });
     const cfnSchemaJson = JSON.parse(
       await fs.readFile(path.join(__dirname, `../../schemas/${fileName}`), { encoding: 'utf-8' }),
@@ -44,7 +49,7 @@ export class Loader<A> {
     return new Loader(validator, options);
   }
 
-  private constructor(private readonly validator: Ajv.ValidateFunction, private readonly options: LoadOptions) {}
+  private constructor(private readonly validator: Ajv.ValidateFunction, private readonly options: LoaderOptions) {}
 
   /**
    * Validate the given object

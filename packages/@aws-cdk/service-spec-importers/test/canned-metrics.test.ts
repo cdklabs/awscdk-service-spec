@@ -1,5 +1,5 @@
 import { emptyDatabase } from '@aws-cdk/service-spec-types';
-import { importCannedMetrics } from '../src/import-canned-metrics';
+import { importCannedMetrics } from '../src/importers/import-canned-metrics';
 import { ProblemReport } from '../src/report';
 
 let db: ReturnType<typeof emptyDatabase>;

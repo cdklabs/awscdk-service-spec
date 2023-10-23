@@ -1,22 +1,17 @@
-import * as path from 'path';
 import { assertSuccess } from '@cdklabs/tskb';
-import { Loader, LoadResult } from './loader';
+import { Loader, LoadResult, LoadSourceOptions } from './loader';
 import { CloudWatchConsoleServiceDirectory } from '../types';
 
 export async function loadDefaultCloudWatchConsoleServiceDirectory(
-  mustValidate = true,
+  filePath: string,
+  options: LoadSourceOptions = {},
 ): Promise<LoadResult<CloudWatchConsoleServiceDirectory>> {
   const loader = await Loader.fromSchemaFile<CloudWatchConsoleServiceDirectory>(
     'CloudWatchConsoleServiceDirectory.schema.json',
-    { mustValidate },
+    { mustValidate: options.validate },
   );
 
-  const result = await loader.loadFile(
-    path.join(
-      __dirname,
-      '../../../../../sources/CloudWatchConsoleServiceDirectory/CloudWatchConsoleServiceDirectory.json',
-    ),
-  );
+  const result = await loader.loadFile(filePath);
   assertSuccess(result);
   return result;
 }
