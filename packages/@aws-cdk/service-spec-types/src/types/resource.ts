@@ -494,6 +494,31 @@ export class RichPropertyType {
     }
   }
 
+  /**
+   * Return a version of this type, but with all type unions in a regularized order
+   */
+  public normalize(db: SpecDatabase): RichPropertyType {
+    switch (this.type.type) {
+      case 'array':
+      case 'map':
+        return new RichPropertyType({
+          type: this.type.type,
+          element: new RichPropertyType(this.type.element).normalize(db).type,
+        });
+      case 'union':
+        const types = this.type.types
+          .map((t) => new RichPropertyType(t).normalize(db))
+          .map((t) => [t, t.sortKey(db)] as const);
+        types.sort(sortKeyComparator(([_, sortKey]) => sortKey));
+        return new RichPropertyType({
+          type: 'union',
+          types: types.map(([t, _]) => t.type),
+        });
+      default:
+        return this;
+    }
+  }
+
   public stringify(db: SpecDatabase, withId = true): string {
     switch (this.type.type) {
       case 'integer':
@@ -517,7 +542,13 @@ export class RichPropertyType {
     }
   }
 
-  public sortKey(): string[] {
+  /**
+   * Return a sortable key based on this type
+   *
+   * If a database is given, type definitions will be sorted based on type name,
+   * otherwise on identifier
+   */
+  public sortKey(db?: SpecDatabase): string[] {
     switch (this.type.type) {
       case 'integer':
       case 'boolean':
@@ -527,16 +558,16 @@ export class RichPropertyType {
       case 'number':
       case 'string':
       case 'tag':
-        return [this.type.type];
+        return ['0', this.type.type];
       case 'array':
       case 'map':
-        return [this.type.type, ...new RichPropertyType(this.type.element).sortKey()];
+        return ['1', this.type.type, ...new RichPropertyType(this.type.element).sortKey(db)];
       case 'ref':
-        return [this.type.type, this.type.reference.$ref];
+        return ['2', this.type.type, db?.get('typeDefinition', this.type.reference)?.name ?? this.type.reference.$ref];
       case 'union':
-        const typeKeys = this.type.types.map((t) => new RichPropertyType(t).sortKey());
+        const typeKeys = this.type.types.map((t) => new RichPropertyType(t).sortKey(db));
         typeKeys.sort(sortKeyComparator((x) => x));
-        return [this.type.type, ...typeKeys.flatMap((x) => x)];
+        return ['3', this.type.type, ...typeKeys.flatMap((x) => x)];
     }
   }
 }

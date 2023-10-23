@@ -40,7 +40,7 @@ export class DbDiff {
     };
   }
 
-  private diffService(a: Service, b: Service): UpdatedService | undefined {
+  public diffService(a: Service, b: Service): UpdatedService | undefined {
     return collapseUndefined({
       capitalized: diffScalar(a, b, 'capitalized'),
       cloudFormationNamespace: diffScalar(a, b, 'cloudFormationNamespace'),
@@ -50,7 +50,7 @@ export class DbDiff {
     } satisfies AllFieldsGiven<UpdatedService>);
   }
 
-  private diffServiceResources(a: Service, b: Service): UpdatedService['resourceDiff'] {
+  public diffServiceResources(a: Service, b: Service): UpdatedService['resourceDiff'] {
     const aRes = this.db1.follow('hasResource', a).map((r) => r.entity);
     const bRes = this.db2.follow('hasResource', b).map((r) => r.entity);
 
@@ -64,7 +64,7 @@ export class DbDiff {
     );
   }
 
-  private diffResource(a: Resource, b: Resource): UpdatedResource | undefined {
+  public diffResource(a: Resource, b: Resource): UpdatedResource | undefined {
     return collapseUndefined({
       cloudFormationTransform: diffScalar(a, b, 'cloudFormationTransform'),
       documentation: diffScalar(a, b, 'documentation'),
@@ -83,7 +83,7 @@ export class DbDiff {
     } satisfies AllFieldsGiven<UpdatedResource>);
   }
 
-  private diffAttribute(a: Attribute, b: Attribute): UpdatedAttribute | undefined {
+  public diffAttribute(a: Attribute, b: Attribute): UpdatedAttribute | undefined {
     const eqType = this.eqType.bind(this);
 
     const anyDiffs = collapseUndefined({
@@ -98,7 +98,7 @@ export class DbDiff {
     return undefined;
   }
 
-  private diffProperty(a: Property, b: Property): UpdatedProperty | undefined {
+  public diffProperty(a: Property, b: Property): UpdatedProperty | undefined {
     const eqType = this.eqType.bind(this);
 
     const anyDiffs = collapseUndefined({
@@ -118,7 +118,7 @@ export class DbDiff {
     return undefined;
   }
 
-  private diffResourceTypeDefinitions(a: Resource, b: Resource): UpdatedResource['typeDefinitionDiff'] {
+  public diffResourceTypeDefinitions(a: Resource, b: Resource): UpdatedResource['typeDefinitionDiff'] {
     const aTypes = this.db1.follow('usesType', a).map((r) => r.entity);
     const bTypes = this.db2.follow('usesType', b).map((r) => r.entity);
 
@@ -132,7 +132,7 @@ export class DbDiff {
     );
   }
 
-  private diffTypeDefinition(a: TypeDefinition, b: TypeDefinition): UpdatedTypeDefinition | undefined {
+  public diffTypeDefinition(a: TypeDefinition, b: TypeDefinition): UpdatedTypeDefinition | undefined {
     return collapseUndefined({
       documentation: diffScalar(a, b, 'documentation'),
       name: diffScalar(a, b, 'name'),
@@ -148,8 +148,8 @@ export class DbDiff {
    * Solve it by doing a string-render and comparing those (for now).
    */
   private eqType(a: PropertyType, b: PropertyType): boolean {
-    const s1 = new RichPropertyType(a).stringify(this.db1, false);
-    const s2 = new RichPropertyType(b).stringify(this.db2, false);
+    const s1 = new RichPropertyType(a).normalize(this.db1).stringify(this.db1, false);
+    const s2 = new RichPropertyType(b).normalize(this.db2).stringify(this.db2, false);
     return s1 === s2;
   }
 }
