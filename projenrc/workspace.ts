@@ -65,6 +65,12 @@ export class TypeScriptWorkspace extends yarn.TypeScriptWorkspace {
       postBuildSteps: options.postBuildSteps,
       releasableCommits: options.releasableCommits,
     });
+
+    // Exclude files from package
+    this.npmignore?.addPatterns('/.eslintrc.js');
+    this.npmignore?.addPatterns('/.gitattributes');
+    this.npmignore?.addPatterns('/.prettierignore');
+    this.npmignore?.addPatterns('/.prettierrc.json');
   }
 
   /**

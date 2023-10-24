@@ -19,4 +19,9 @@ tsconfig.tsbuildinfo
 /.eslintrc.json
 /dist/changelog.md
 /dist/version.txt
+/.eslintrc.js
+/.gitattributes
+/.prettierignore
+/.prettierrc.json
 build-report
+/scripts/

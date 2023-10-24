@@ -21,6 +21,14 @@
         }
       ]
     },
+    "build:db": {
+      "name": "build:db",
+      "steps": [
+        {
+          "exec": "ts-node scripts/build-db.ts"
+        }
+      ]
+    },
     "bump": {
       "name": "bump",
       "description": "Bumps version based on latest git tag and generates a changelog entry",
@@ -59,7 +67,7 @@
       "description": "Only compile",
       "steps": [
         {
-          "spawn": "generate"
+          "spawn": "build:db"
         },
         {
           "exec": "tsc --build",
@@ -90,15 +98,6 @@
       "steps": [
         {
           "exec": "ts-node ../../../projenrc/gather-versions.exec.ts @aws-cdk/aws-service-spec MAJOR --deps @cdklabs/tskb @aws-cdk/service-spec-types @aws-cdk/service-spec-importers",
-          "receiveArgs": true
-        }
-      ]
-    },
-    "generate": {
-      "name": "generate",
-      "steps": [
-        {
-          "exec": "import-db db.json.gz --force",
           "receiveArgs": true
         }
       ]

@@ -1,5 +1,5 @@
 import * as pj from 'projen';
-import { AwsCdkIntegrationTest, TypeScriptWorkspace, YarnMonorepo } from './projenrc';
+import { AwsCdkIntegrationTest, DiffDb, TypeScriptWorkspace, YarnMonorepo } from './projenrc';
 import { RegionalSource, Role, SingleSource, SourceProcessing } from './projenrc/update-sources';
 
 const workflowRunsOn = [
@@ -155,11 +155,13 @@ const awsServiceSpec = new TypeScriptWorkspace({
   // Also include changes to types and sources
   releasableCommits: pj.ReleasableCommits.featuresAndFixes('. ../service-spec-types ../../../sources'),
 });
+
+awsServiceSpec.tsconfigDev.addInclude('scripts');
+
 // Needs to be added to 'compile' task, because the integ tests will 'compile' everything (but not run the tests and linter).
 awsServiceSpec.compileTask.prependSpawn(
-  awsServiceSpec.tasks.addTask('generate', {
-    exec: `import-db db.json.gz --force`,
-    receiveArgs: true,
+  awsServiceSpec.tasks.addTask('build:db', {
+    exec: `ts-node scripts/build-db.ts`,
   }),
 );
 
@@ -167,12 +169,20 @@ awsServiceSpec.gitignore.addPatterns('db.json');
 awsServiceSpec.gitignore.addPatterns('db.json.gz');
 awsServiceSpec.gitignore.addPatterns('build-report');
 awsServiceSpec.npmignore?.addPatterns('build-report');
+awsServiceSpec.npmignore?.addPatterns('/scripts/');
 
 // Add integration test with aws-cdk
 new AwsCdkIntegrationTest(repo, {
   workflowRunsOn,
   serviceSpec: awsServiceSpec,
   serviceSpecTypes,
+});
+
+// Post diff of database
+new DiffDb(repo, {
+  workflowRunsOn,
+  serviceSpec: awsServiceSpec,
+  serviceSpecImporters,
 });
 
 // Update sources

@@ -1,12 +1,10 @@
 import { emptyDatabase, SpecDatabase } from '@aws-cdk/service-spec-types';
 import { assertSuccess, Result } from '@cdklabs/tskb';
-import { Augmentations } from './importers/import-augmentations';
 import { importCannedMetrics } from './importers/import-canned-metrics';
 import { importCloudFormationDocumentation } from './importers/import-cloudformation-docs';
 import { importCloudFormationRegistryResource } from './importers/import-cloudformation-registry';
 import { ResourceSpecImporter, SAMSpecImporter } from './importers/import-resource-spec';
 import { SamResources } from './importers/import-sam';
-import { Scrutinies } from './importers/import-scrutinies';
 import { importStatefulResources } from './importers/import-stateful-resources';
 import {
   loadDefaultCloudFormationDocs,
@@ -37,6 +35,14 @@ export interface DatabaseBuilderOptions {
 export type SourceImporter = (db: SpecDatabase, report: ProblemReport) => Promise<void>;
 
 export class DatabaseBuilder {
+  /**
+   * The default grouping for any non-specific import problems
+   */
+  public readonly defaultProblemGrouping = new ReportAudience('__ImportProblems');
+
+  /**
+   * Stack of importers
+   */
   private readonly sourceImporters = new Array<SourceImporter>();
 
   constructor(
@@ -47,7 +53,7 @@ export class DatabaseBuilder {
   /**
    * Add a SourceImporter to the database builder
    */
-  public addSourceImporter(sourceImporter: SourceImporter): DatabaseBuilder {
+  public addSourceImporter(sourceImporter: SourceImporter): this {
     this.sourceImporters.push(sourceImporter);
     return this;
   }
@@ -103,7 +109,11 @@ export class DatabaseBuilder {
    */
   public importCloudFormationRegistryResources(schemaDirectory: string) {
     return this.addSourceImporter(async (db, report) => {
-      const regions = await loadDefaultCloudFormationRegistryResources(schemaDirectory, report, this.options);
+      const regions = await loadDefaultCloudFormationRegistryResources(schemaDirectory, {
+        ...this.options,
+        report,
+        failureAudience: this.defaultProblemGrouping,
+      });
       for (const region of regions) {
         for (const resource of region.resources) {
           importCloudFormationRegistryResource({
@@ -161,27 +171,13 @@ export class DatabaseBuilder {
   }
 
   /**
-   * Import Augmentations
-   */
-  public importAugmentations() {
-    return this.addSourceImporter(async (db) => new Augmentations(db).import());
-  }
-
-  /**
-   * Import Scrutinies
-   */
-  public importScrutinies() {
-    return this.addSourceImporter(async (db) => new Scrutinies(db).import());
-  }
-
-  /**
    * Look at a load result and report problems
    */
-  private loadResult<A>(result: Result<LoadResult<A>>, report: ProblemReport): A {
+  protected loadResult<A>(result: Result<LoadResult<A>>, report: ProblemReport): A {
     assertSuccess(result);
 
-    report.reportFailure(ReportAudience.cdkTeam(), 'loading', ...result.warnings);
-    report.reportPatch(ReportAudience.cdkTeam(), ...result.patchesApplied);
+    report.reportFailure(this.defaultProblemGrouping, 'loading', ...result.warnings);
+    report.reportPatch(this.defaultProblemGrouping, ...result.patchesApplied);
 
     return result.value;
   }

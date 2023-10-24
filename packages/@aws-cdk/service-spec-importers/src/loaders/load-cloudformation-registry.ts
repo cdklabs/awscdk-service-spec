@@ -9,23 +9,27 @@ import { CloudFormationRegistryResource } from '../types';
 
 const glob = util.promisify(_glob.glob);
 
-export async function loadCloudFormationRegistryDirectory(
-  directory: string,
-  report: ProblemReport,
-  mustValidate = true,
-  errorRootDirectory?: string,
-): Promise<CloudFormationRegistryResource[]> {
-  const loader = await Loader.fromSchemaFile<CloudFormationRegistryResource>(
-    'CloudFormationRegistryResource.schema.json',
-    {
-      mustValidate,
-      patcher: patchCloudFormationRegistry,
-      errorRootDirectory,
-    },
-  );
+interface LoadCloudFormationRegistrySourceOptions extends LoadSourceOptions {
+  readonly report: ProblemReport;
+  readonly failureAudience: ReportAudience;
+}
 
-  const files = await glob(path.join(directory, '*.json'));
-  return loader.loadFiles(files, problemReportCombiner(report));
+export function loadCloudFormationRegistryDirectory(
+  baseDir: string,
+): (directory: string, options: LoadCloudFormationRegistrySourceOptions) => Promise<CloudFormationRegistryResource[]> {
+  return async (directory, options) => {
+    const loader = await Loader.fromSchemaFile<CloudFormationRegistryResource>(
+      'CloudFormationRegistryResource.schema.json',
+      {
+        mustValidate: options.validate,
+        patcher: patchCloudFormationRegistry,
+        errorRootDirectory: baseDir,
+      },
+    );
+
+    const files = await glob(path.join(directory, '*.json'));
+    return loader.loadFiles(files, problemReportCombiner(options.report, options.failureAudience));
+  };
 }
 
 export interface CloudFormationRegistryResources {
@@ -35,21 +39,20 @@ export interface CloudFormationRegistryResources {
 
 export async function loadDefaultCloudFormationRegistryResources(
   schemaDir: string,
-  report: ProblemReport,
-  options: LoadSourceOptions = {},
+  options: LoadCloudFormationRegistrySourceOptions,
 ): Promise<CloudFormationRegistryResources[]> {
   const files = await glob(`${schemaDir}/*`);
   return Promise.all(
     files.map(async (directoryName) => {
       const regionName = path.basename(directoryName);
-      const resources = await loadCloudFormationRegistryDirectory(directoryName, report, options.validate, schemaDir);
+      const resources = await loadCloudFormationRegistryDirectory(schemaDir)(directoryName, options);
 
       return { regionName, resources };
     }),
   );
 }
 
-function problemReportCombiner(report: ProblemReport) {
+function problemReportCombiner(report: ProblemReport, failureAudience: ReportAudience) {
   return (results: Result<LoadResult<CloudFormationRegistryResource>>[]): CloudFormationRegistryResource[] => {
     for (const r of results) {
       if (isSuccess(r)) {
@@ -57,7 +60,7 @@ function problemReportCombiner(report: ProblemReport) {
         report.reportFailure(audience, 'loading', ...r.warnings);
         report.reportPatch(audience, ...r.patchesApplied);
       } else {
-        report.reportFailure(ReportAudience.cdkTeam(), 'loading', r);
+        report.reportFailure(failureAudience, 'loading', r);
       }
     }
 

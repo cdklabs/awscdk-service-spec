@@ -26,8 +26,6 @@ new DatabaseBuilder(db, options)
   .importCloudFormationDocs('data/CloudFormationDocumentation.json')
   .importStatefulResources('data/StatefulResources/StatefulResources.json')
   .importCannedMetrics('data/CloudWatchConsoleServiceDirectory.json'),
-  .importScrutinies()
-  .importAugmentations()
 
   // Apply the imports to the database
   .build();
@@ -36,18 +34,19 @@ new DatabaseBuilder(db, options)
 ### CLI
 
 ```console
-Usage: import-db [options] [db]
+Usage: import-db [options] [database]
 
 Import service specification sources into a service model database
 
 Arguments:
-  db                         The database file (default: "db.json")
+  database                         The database file (default: "db.json")
 
 Options:
-  -i, --input <db-file>      Load an existing database as base, imported sources are additive.
-  -c, --gzip                 Compress the database file using gzip
-  -f, --force                Force overwriting an existing file (default: false)
-  -d, --debug                Print additional debug output during import (default: false)
-  -r, --report <report-dir>  Create a detailed build report in the specified directory
-  -h, --help                 display help for command
+  -i, --input <database>           Load an existing database as base, imported sources are additive.
+  -c, --gzip                       Compress the database file using gzip
+  -f, --force                      Force overwriting an existing file (default: false)
+  -d, --debug                      Print additional debug output during import (default: false)
+  -r, --report <report-directory>  Create a detailed build report in the specified directory
+  -v, --validate                   Validate imported sources and fail if any data is invalid (default: false)
+  -h, --help                       display help for command
 ````

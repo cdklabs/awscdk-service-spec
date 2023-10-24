@@ -1,4 +1,5 @@
 import { Property, RichPropertyType, RichSpecDatabase, SpecDatabase, loadDatabase } from '@aws-cdk/service-spec-types';
+import { handleFailure } from './util';
 
 async function main() {
   const db = await loadDatabase('db.json');
@@ -68,7 +69,4 @@ const ANALYZERS: Record<string, Analyzer> = {
   },
 };
 
-main().catch((e) => {
-  console.error(e);
-  process.exitCode = 1;
-});
+main().catch(handleFailure);

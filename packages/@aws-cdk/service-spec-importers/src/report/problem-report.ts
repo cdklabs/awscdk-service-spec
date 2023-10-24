@@ -14,6 +14,10 @@ interface Report {
  * A class to build a problem report for issues encountered during the spec import
  */
 export class ProblemReport {
+  public get totalCount(): number {
+    return Object.values(this.counts).reduce((total, current) => total + current, 0);
+  }
+
   public readonly counts: Record<ReportType, number> = {
     interpreting: 0,
     loading: 0,
@@ -96,10 +100,6 @@ export class ReportAudience {
   public static fromCloudFormationResource(res: string) {
     const parts = res.split('::');
     return new ReportAudience(`AWS_${parts[1]}`);
-  }
-
-  public static cdkTeam() {
-    return new ReportAudience('CDK_Team');
   }
 
   constructor(public readonly id: string) {}

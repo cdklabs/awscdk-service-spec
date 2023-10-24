@@ -77,9 +77,9 @@ export function importCannedMetrics(
 
   for (const r of Array.from(skippedResources).sort()) {
     report.reportFailure(
-      ReportAudience.cdkTeam(),
+      new ReportAudience('CloudWatchConsoleServiceDirectory'),
       'interpreting',
-      failure.in('CloudWatchConsoleServiceDirectory').in(r)('skipping resource type not in db'),
+      failure.in(r)('skipping resource type not in db'),
     );
   }
 }
