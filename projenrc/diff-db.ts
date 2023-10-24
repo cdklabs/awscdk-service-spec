@@ -138,7 +138,7 @@ export class DiffDb extends pj.Component {
           name: 'Create PR.md',
           if: 'steps.diff-db.outputs.diff-result',
           run: [
-            "echo 'Model database diff detected:' >> PR.md",
+            `echo '**${this.serviceSpec.name}**: Model database diff detected' >> PR.md`,
             "echo '```' >> PR.md",
             'cat DIFF >> PR.md',
             "echo '```' >> PR.md",
@@ -160,7 +160,7 @@ export class DiffDb extends pj.Component {
           uses: 'thollander/actions-comment-pull-request@v2',
           with: {
             comment_tag: 'diff-db',
-            message: 'No model change detected',
+            message: `**${this.serviceSpec.name}**: No model change detected`,
             mode: 'upsert',
           },
         },
