@@ -1,5 +1,5 @@
 import * as pj from 'projen';
-import { AwsCdkIntegrationTest, TypeScriptWorkspace, YarnMonorepo } from './projenrc';
+import { AwsCdkIntegrationTest, DiffDb, TypeScriptWorkspace, YarnMonorepo } from './projenrc';
 import { RegionalSource, Role, SingleSource, SourceProcessing } from './projenrc/update-sources';
 
 const workflowRunsOn = [
@@ -176,6 +176,13 @@ new AwsCdkIntegrationTest(repo, {
   workflowRunsOn,
   serviceSpec: awsServiceSpec,
   serviceSpecTypes,
+});
+
+// Post diff of database
+new DiffDb(repo, {
+  workflowRunsOn,
+  serviceSpec: awsServiceSpec,
+  serviceSpecImporters,
 });
 
 // Update sources
