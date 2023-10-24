@@ -220,6 +220,18 @@ export class SAMSpecImporter extends ResourceSpecImporterBase<SAMResourceSpecifi
   protected deriveType(spec: resourcespec.SAMTypeDefinition): PropertyType {
     const self = this;
 
+    // Slight interpretation hack: if `Inclusive[Primitive]ItemTypes` are present,
+    // we need to honor them even if "List" is not present in the types. So
+    // if we detect them, add "List" to the `Types` array.
+    if (spec.InclusiveItemTypes || spec.InclusivePrimitiveItemTypes) {
+      if (spec.Type !== 'List' && !(spec.Types ?? []).includes('List')) {
+        spec = {
+          ...spec,
+          Types: [...(spec.Types ?? []), 'List'],
+        };
+      }
+    }
+
     return maybeUnion([
       ...(spec.PrimitiveTypes ?? []).map(primitiveType),
       ...(spec.Type ? [namedType(spec.Type)] : []),
