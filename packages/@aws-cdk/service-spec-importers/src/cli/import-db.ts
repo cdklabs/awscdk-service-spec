@@ -1,11 +1,10 @@
-import { createWriteStream, existsSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import * as zlib from 'node:zlib';
 import { SpecDatabase, emptyDatabase, loadDatabase } from '@aws-cdk/service-spec-types';
 import { Command } from 'commander';
 import { CliError, handleFailure } from './util';
-import { FullDatabase } from '../full-database';
-import { ProblemReport } from '../report';
+import { DatabaseBuilder } from '../db-builder';
 
 async function main() {
   const program = new Command();
@@ -13,43 +12,42 @@ async function main() {
   program
     .name('import-db')
     .description('Import service specification sources into a service model database')
-    .argument('[db]', 'The database file', 'db.json')
-    .option('-i, --input <db-file>', 'Load an existing database as base, imported sources are additive.')
+    .argument('[database]', 'The database file', 'db.json')
+    .option('-i, --input <database>', 'Load an existing database as base, imported sources are additive.')
     .option('-c, --gzip', 'Compress the database file using gzip')
     .option('-f, --force', 'Force overwriting an existing file', false)
     .option('-d, --debug', 'Print additional debug output during import', false)
-    .option('-r, --report <report-dir>', 'Create a detailed build report in the specified directory')
+    .option('-r, --report <report-directory>', 'Create a detailed build report in the specified directory')
+    .option('-v, --validate', 'Validate imported sources and fail if any data is invalid', false)
     .parse();
 
   const outputFile = program.args[0] ?? 'db.json';
   const options = program.opts();
-  options.gzip = options.gzip ?? outputFile.endsWith('.gz');
+  const compress = options.gzip ?? outputFile.endsWith('.gz');
 
   if (existsSync(outputFile) && !options.force) {
     throw new CliError(
-      `Database file ${outputFile} already exists. Please use '--force' to overwrite the existing file.`,
+      `Database file at ${outputFile} already exists. Please use '--force' to overwrite the existing file.`,
     );
   }
 
   const baseDb = await database(options.input);
 
   process.stdout.write('Importing sources... ');
-  const { db, report } = await FullDatabase.buildDatabase(baseDb, {
-    // FIXME: Switch this to 'true' at some point
-    validate: false,
-    debug: options.debug,
-  });
+  const { db, report } = await new DatabaseBuilder(baseDb, {
+    validate: options.validate ?? false,
+    debug: options.debug ?? false,
+  }).build();
 
-  const numProblems = countProblems(report);
-  const problemHint = ` (${numProblems} problems encountered)`;
-  process.stdout.write(`OK${numProblems ? problemHint : ''}\n`);
-  if (numProblems && !options.report) {
-    process.stdout.write('💡 Hint: Run with --report <report-directory> for further details.\n');
+  const importResult = report.totalCount ? `WARN (${report.totalCount} problems encountered)` : 'OK';
+  process.stdout.write(`${importResult}\n`);
+  if (report.totalCount && !options.report) {
+    process.stdout.write('💡 Hint: Run with --report <report-directory> for details.\n');
   }
   process.stdout.write(`\n`);
 
   process.stdout.write(`Writing database to file ${outputFile}... `);
-  await writeDatabase(db, outputFile, options.gzip);
+  await writeDatabase(db, outputFile, compress);
   process.stdout.write('OK\n\n');
 
   if (options.report) {
@@ -63,18 +61,10 @@ async function writeDatabase(db: SpecDatabase, file: string, compress = false) {
   const data = JSON.stringify(db.save());
 
   if (compress) {
-    const gzip = zlib.createGzip();
-    gzip.pipe(createWriteStream(file));
-    gzip.write(data);
-    gzip.end();
-    return;
+    return writeFile(file, zlib.gzipSync(data), { encoding: 'binary' });
   }
 
-  await writeFile(file, data, { encoding: 'utf-8' });
-}
-
-function countProblems(report: ProblemReport): number {
-  return Object.values(report.counts).reduce((total, current) => total + current, 0);
+  return writeFile(file, data, { encoding: 'utf-8' });
 }
 
 async function database(input?: string) {

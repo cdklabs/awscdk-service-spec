@@ -1,5 +1,6 @@
 import { loadDatabase } from '@aws-cdk/service-spec-types';
 import { Command } from 'commander';
+import { handleFailure } from './util';
 import { DbDiff } from '../db-diff';
 import { DiffFormatter } from '../diff-fmt';
 
@@ -36,7 +37,4 @@ async function main() {
   process.exitCode = hasChanges ? 1 : 0;
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exitCode = 1;
-});
+main().catch(handleFailure);

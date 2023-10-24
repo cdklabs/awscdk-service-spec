@@ -1,6 +1,6 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import { gunzipSync } from 'zlib';
+import { promises as fs } from 'node:fs';
+import * as path from 'node:path';
+import { gunzipSync } from 'node:zlib';
 import { emptyDatabase, SpecDatabase } from '@aws-cdk/service-spec-types';
 
 const DB_COMPRESSED = 'db.json.gz';
