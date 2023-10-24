@@ -160,7 +160,8 @@ export class DiffDb extends pj.Component {
           uses: 'thollander/actions-comment-pull-request@v2',
           with: {
             comment_tag: 'diff-db',
-            mode: 'delete',
+            message: 'No model change detected',
+            mode: 'upsert',
           },
         },
       ],
