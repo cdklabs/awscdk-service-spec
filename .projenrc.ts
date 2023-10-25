@@ -156,12 +156,12 @@ const awsServiceSpec = new TypeScriptWorkspace({
   releasableCommits: pj.ReleasableCommits.featuresAndFixes('. ../service-spec-types ../../../sources'),
 });
 
-awsServiceSpec.tsconfigDev.addInclude('scripts');
+awsServiceSpec.tsconfigDev.addInclude('build');
 
 // Needs to be added to 'compile' task, because the integ tests will 'compile' everything (but not run the tests and linter).
 awsServiceSpec.compileTask.prependSpawn(
   awsServiceSpec.tasks.addTask('build:db', {
-    exec: `ts-node scripts/build-db.ts`,
+    exec: `ts-node build/build-db.ts`,
   }),
 );
 
@@ -169,7 +169,7 @@ awsServiceSpec.gitignore.addPatterns('db.json');
 awsServiceSpec.gitignore.addPatterns('db.json.gz');
 awsServiceSpec.gitignore.addPatterns('build-report');
 awsServiceSpec.npmignore?.addPatterns('build-report');
-awsServiceSpec.npmignore?.addPatterns('/scripts/');
+awsServiceSpec.npmignore?.addPatterns('/build/');
 
 // Add integration test with aws-cdk
 new AwsCdkIntegrationTest(repo, {
