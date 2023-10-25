@@ -70,7 +70,7 @@ CLI: `cfnSchemaDir`\
 Code: `importCloudFormationRegistryResources(schemaDir: string)`
 
 Import (modern) CloudFormation Registry Resources from a directory structure.
-The directory MUST contain a directory for per region, each containing a Registry Schema file per resource.
+The directory MUST contain a directory for per region, each containing a registry schema file per resource.
 
 ```txt
 CloudFormationSchema/
