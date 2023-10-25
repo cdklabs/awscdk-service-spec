@@ -1,7 +1,7 @@
 import { forResource, registerServicePatches, removeResourceProperty } from './core';
-import { Reason } from '../../patching';
+import { patching } from '@aws-cdk/service-spec-importers';
 
-const reason = Reason.sourceIssue('Property is only supported by the CCAPI');
+const reason = patching.Reason.sourceIssue('Property is only supported by the CCAPI');
 
 registerServicePatches(
   forResource('AWS::CloudFormation::Stack', (lens) => {

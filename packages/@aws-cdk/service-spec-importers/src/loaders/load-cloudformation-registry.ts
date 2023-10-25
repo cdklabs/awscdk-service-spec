@@ -3,15 +3,16 @@ import * as util from 'util';
 import { isSuccess, Result } from '@cdklabs/tskb';
 import * as _glob from 'glob';
 import { Loader, LoadResult, LoadSourceOptions } from './loader';
-import { patchCloudFormationRegistry } from '../patches/registry-patches';
 import { ProblemReport, ReportAudience } from '../report';
 import { CloudFormationRegistryResource } from '../types';
+import { JsonLensPatcher } from '../patching';
 
 const glob = util.promisify(_glob.glob);
 
 interface LoadCloudFormationRegistrySourceOptions extends LoadSourceOptions {
   readonly report: ProblemReport;
   readonly failureAudience: ReportAudience;
+  readonly patcher?: JsonLensPatcher;
 }
 
 export function loadCloudFormationRegistryDirectory(
@@ -22,7 +23,7 @@ export function loadCloudFormationRegistryDirectory(
       'CloudFormationRegistryResource.schema.json',
       {
         mustValidate: options.validate,
-        patcher: patchCloudFormationRegistry,
+        patcher: options.patcher,
         errorRootDirectory: baseDir,
       },
     );

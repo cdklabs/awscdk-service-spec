@@ -1,5 +1,5 @@
 import { addDefinitions, forResource, registerServicePatches, replaceResourceProperty } from './core';
-import { Reason } from '../../patching';
+import { patching } from '@aws-cdk/service-spec-importers';
 
 /**
  * Make the use of the AWS::Cognito::IdentityPoolRoleAttachment.RoleMapings property safer
@@ -19,7 +19,7 @@ registerServicePatches(
         type: 'object',
         additionalProperties: { $ref: '#/definitions/RoleMapping' },
       },
-      Reason.other('Make the use of RoleMappings more type safe'),
+      patching.Reason.other('Make the use of RoleMappings more type safe'),
     )(lens);
 
     addDefinitions(
@@ -67,7 +67,7 @@ registerServicePatches(
         },
       },
 
-      Reason.other('Make the use of RoleMappings more type safe'),
+      patching.Reason.other('Make the use of RoleMappings more type safe'),
     )(lens);
   }),
 );

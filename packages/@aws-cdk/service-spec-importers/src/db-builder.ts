@@ -17,6 +17,7 @@ import {
   loadSamSpec,
 } from './loaders';
 import { ProblemReport, ReportAudience } from './report';
+import { JsonLensPatcher } from './patching';
 
 export interface DatabaseBuilderOptions {
   /**
@@ -107,12 +108,13 @@ export class DatabaseBuilder {
   /**
    * Import the (modern) registry spec from CloudFormation
    */
-  public importCloudFormationRegistryResources(schemaDirectory: string) {
+  public importCloudFormationRegistryResources(schemaDirectory: string, patcher?: JsonLensPatcher) {
     return this.addSourceImporter(async (db, report) => {
       const regions = await loadDefaultCloudFormationRegistryResources(schemaDirectory, {
         ...this.options,
         report,
         failureAudience: this.defaultProblemGrouping,
+        patcher,
       });
       for (const region of regions) {
         for (const resource of region.resources) {
@@ -130,9 +132,15 @@ export class DatabaseBuilder {
   /**
    * Import the (modern) JSON schema spec from SAM
    */
-  public importSamJsonSchema(filePath: string) {
+  public importSamJsonSchema(filePath: string, patcher?: JsonLensPatcher) {
     return this.addSourceImporter(async (db, report) => {
-      const samSchema = this.loadResult(await loadSamSchema(filePath, this.options), report);
+      const samSchema = this.loadResult(
+        await loadSamSchema(filePath, {
+          ...this.options,
+          patcher,
+        }),
+        report,
+      );
       new SamResources({ db, samSchema, report }).import();
     });
   }

@@ -1,12 +1,12 @@
-import { JsonLens, JsonLensPatcher, JsonObjectPatcher, Patcher, Reason, fp as fun, isRoot } from '../../patching';
-import { CloudFormationRegistryResource, jsonschema } from '../../types';
+// import { JsonLens, patching.JsonLensPatcher, patching.JsonObjectPatcher, Patcher, Reason, fp as fun, isRoot } from '../../patching';
+import { patching, types } from '@aws-cdk/service-spec-importers';
 
-export const SERVICE_PATCHERS: Array<JsonLensPatcher> = [];
+export const SERVICE_PATCHERS: Array<patching.JsonLensPatcher> = [];
 
 /**
  * Register an unnamed exception patcher
  */
-export function registerServicePatches(...patcher: JsonLensPatcher[]) {
+export function registerServicePatches(...patcher: patching.JsonLensPatcher[]) {
   SERVICE_PATCHERS.push(...patcher);
 }
 
@@ -15,13 +15,13 @@ export function registerServicePatches(...patcher: JsonLensPatcher[]) {
  *
  * It will still be invoked at every JSON node in that document.
  */
-export function forResource(resource: string, patcher: JsonObjectPatcher): JsonLensPatcher {
+export function forResource(resource: string, patcher: patching.JsonObjectPatcher): patching.JsonLensPatcher {
   return (lens) => {
     const root = lens.rootPath[0];
     if (
       lens.isJsonObject() &&
       root.isJsonObject() &&
-      (root.value as unknown as CloudFormationRegistryResource).typeName === resource
+      (root.value as unknown as types.CloudFormationRegistryResource).typeName === resource
     ) {
       patcher(lens);
     }
@@ -35,9 +35,9 @@ export function forResource(resource: string, patcher: JsonObjectPatcher): JsonL
  */
 export function replaceResourceProperty(
   propertyName: string,
-  newSchema: jsonschema.Schema,
-  reason: Reason,
-): JsonObjectPatcher {
+  newSchema: types.jsonschema.Schema,
+  reason: patching.Reason,
+): patching.JsonObjectPatcher {
   return (lens) => {
     if (lens.jsonPointer === `/properties/${propertyName}`) {
       lens.replaceValue(reason.reason, newSchema);
@@ -50,7 +50,7 @@ export function replaceResourceProperty(
  *
  * NOTE: returns a new patcher. Still needs to be applied to a lens.
  */
-export function removeResourceProperty(propertyName: string, reason: Reason): JsonObjectPatcher {
+export function removeResourceProperty(propertyName: string, reason: patching.Reason): patching.JsonObjectPatcher {
   return (lens) => {
     if (lens.jsonPointer === `/properties`) {
       lens.removeProperty(reason.reason, propertyName);
@@ -66,9 +66,9 @@ export function removeResourceProperty(propertyName: string, reason: Reason): Js
 export function replaceDefinitionProperty(
   definitionName: string,
   propertyName: string,
-  newSchema: jsonschema.Schema,
-  reason: Reason,
-): JsonObjectPatcher {
+  newSchema: types.jsonschema.Schema,
+  reason: patching.Reason,
+): patching.JsonObjectPatcher {
   return (lens) => {
     if (lens.jsonPointer === `/definitions/${definitionName}/properties/${propertyName}`) {
       lens.replaceValue(reason.reason, newSchema);
@@ -81,7 +81,11 @@ export function replaceDefinitionProperty(
  *
  * NOTE: returns a new patcher. Still needs to be applied to a lens.
  */
-export function renameDefinition(oldName: string, newName: string, reason: Reason): JsonObjectPatcher {
+export function renameDefinition(
+  oldName: string,
+  newName: string,
+  reason: patching.Reason,
+): patching.JsonObjectPatcher {
   return (lens) => {
     if (lens.jsonPointer === `/definitions`) {
       lens.renameProperty(reason.reason, oldName, newName);
@@ -104,7 +108,11 @@ export function renameDefinition(oldName: string, newName: string, reason: Reaso
  *
  * NOTE: returns a new patcher. Still needs to be applied to a lens.
  */
-export function replaceDefinition(definition: string, schema: jsonschema.Schema, reason: Reason): JsonObjectPatcher {
+export function replaceDefinition(
+  definition: string,
+  schema: types.jsonschema.Schema,
+  reason: patching.Reason,
+): patching.JsonObjectPatcher {
   return (lens) => {
     if (lens.jsonPointer === `/definitions/${definition}`) {
       lens.replaceValue(reason.reason, schema);
@@ -117,9 +125,12 @@ export function replaceDefinition(definition: string, schema: jsonschema.Schema,
  *
  * NOTE: returns a new patcher. Still needs to be applied to a lens.
  */
-export function addDefinitions(definitions: Record<string, jsonschema.Schema>, reason: Reason): JsonObjectPatcher {
+export function addDefinitions(
+  definitions: Record<string, types.jsonschema.Schema>,
+  reason: patching.Reason,
+): patching.JsonObjectPatcher {
   return (lens) => {
-    if (isRoot(lens) && lens.value.definitions === undefined) {
+    if (patching.isRoot(lens) && lens.value.definitions === undefined) {
       // No '/definitions' in this type
       lens.addProperty(reason.reason, 'definitions', definitions);
     } else if (lens.jsonPointer === '/definitions') {
@@ -143,13 +154,13 @@ export namespace fp {
   export function patchResourceAt<Tree, TypeName extends string = string>(
     resource: TypeName,
     pointer: string,
-    reason: Reason,
-    patch: fun.Patch<Tree>,
-  ): Patcher<JsonLens> {
+    reason: patching.Reason,
+    patch: patching.fp.Patch<Tree>,
+  ): patching.Patcher<patching.JsonLens> {
     return (lens) => {
       const root = lens.rootPath[0];
-      if ((root.value as unknown as CloudFormationRegistryResource).typeName === resource) {
-        fun.patchAt(pointer, reason, patch)(lens);
+      if ((root.value as unknown as types.CloudFormationRegistryResource).typeName === resource) {
+        patching.fp.patchAt(pointer, reason, patch)(lens);
       }
     };
   }
@@ -158,11 +169,11 @@ export namespace fp {
    * Patch a resource at the root
    */
   export function patchResource<
-    Tree extends CloudFormationRegistryResource & {
+    Tree extends types.CloudFormationRegistryResource & {
       typeName: TypeName;
     },
     TypeName extends string = string,
-  >(resource: TypeName, reason: Reason, patch: fun.Patch<Tree>): Patcher<JsonLens> {
+  >(resource: TypeName, reason: patching.Reason, patch: patching.fp.Patch<Tree>): patching.Patcher<patching.JsonLens> {
     return patchResourceAt(resource, '', reason, patch);
   }
 
@@ -173,9 +184,9 @@ export namespace fp {
   export function removeFromReadOnlyProperties<TypeName extends string = string>(
     resource: TypeName,
     remove: string[],
-    reason: Reason,
-  ): Patcher<JsonLens> {
-    return patchResourceAt<CloudFormationRegistryResource['readOnlyProperties']>(
+    reason: patching.Reason,
+  ): patching.Patcher<patching.JsonLens> {
+    return patchResourceAt<types.CloudFormationRegistryResource['readOnlyProperties']>(
       resource,
       '/readOnlyProperties',
       reason,
@@ -198,9 +209,9 @@ export namespace fp {
   export function addReadOnlyProperties<TypeName extends string = string>(
     resource: TypeName,
     additional: string[],
-    reason: Reason,
-  ): Patcher<JsonLens> {
-    return patchResourceAt<CloudFormationRegistryResource['readOnlyProperties']>(
+    reason: patching.Reason,
+  ): patching.Patcher<patching.JsonLens> {
+    return patchResourceAt<types.CloudFormationRegistryResource['readOnlyProperties']>(
       resource,
       '/readOnlyProperties',
       reason,
@@ -224,9 +235,9 @@ export namespace fp {
     replace: {
       [oldName: string]: string;
     },
-    reason: Reason,
-  ): Patcher<JsonLens> {
-    return patchResourceAt<CloudFormationRegistryResource['readOnlyProperties']>(
+    reason: patching.Reason,
+  ): patching.Patcher<patching.JsonLens> {
+    return patchResourceAt<types.CloudFormationRegistryResource['readOnlyProperties']>(
       resource,
       '/readOnlyProperties',
       reason,
@@ -250,12 +261,12 @@ export namespace fp {
     rename: {
       [oldName: string]: string;
     },
-    reason: Reason,
-  ): Patcher<JsonLens> {
+    reason: patching.Reason,
+  ): patching.Patcher<patching.JsonLens> {
     return (lens) => {
       const root = lens.rootPath[0];
       if (
-        (root.value as unknown as CloudFormationRegistryResource).typeName === resource &&
+        (root.value as unknown as types.CloudFormationRegistryResource).typeName === resource &&
         lens.jsonPointer === '/properties' &&
         lens.isJsonObject()
       ) {

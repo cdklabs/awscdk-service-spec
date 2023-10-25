@@ -5,7 +5,6 @@
  */
 import canonicalize from 'canonicalize';
 import { normalizeJsonSchema } from './json-schema-patches';
-import { EXCEPTIONS_PATCHERS } from './service-patches';
 import {
   TypeKeyWitness,
   STRING_KEY_WITNESS,
@@ -23,26 +22,22 @@ import {
 /**
  * Patchers that apply to the CloudFormation Registry source files
  */
-export const patchCloudFormationRegistry = makeCompositePatcher(
-  onlyObjects(
-    makeCompositePatcher(
-      normalizeJsonSchema,
-      replaceArrayLengthProps,
-      removeBooleanPatterns,
-      canonicalizeDefaultOnBoolean,
-      patchMinLengthOnInteger,
-      canonicalizeRegexInFormat,
-      markAsNonTaggable,
-      incorrectTagPropertyFormat,
-      noIncorrectDefaultType,
-      removeSuspiciousPatterns,
-      dropRedundantTypeOperatorsInMetricStream,
-      minMaxItemsOnObject,
-      makeKeywordDropper(),
-    ),
+export const patchCloudFormationRegistry = onlyObjects(
+  makeCompositePatcher(
+    normalizeJsonSchema,
+    replaceArrayLengthProps,
+    removeBooleanPatterns,
+    canonicalizeDefaultOnBoolean,
+    patchMinLengthOnInteger,
+    canonicalizeRegexInFormat,
+    markAsNonTaggable,
+    incorrectTagPropertyFormat,
+    noIncorrectDefaultType,
+    removeSuspiciousPatterns,
+    dropRedundantTypeOperatorsInMetricStream,
+    minMaxItemsOnObject,
+    makeKeywordDropper(),
   ),
-  // Service patches might have to change arrays
-  ...EXCEPTIONS_PATCHERS,
 );
 
 /**

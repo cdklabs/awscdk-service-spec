@@ -1,9 +1,9 @@
 import { addDefinitions, forResource, registerServicePatches, replaceDefinitionProperty } from './core';
-import { Reason } from '../../patching';
+import { patching } from '@aws-cdk/service-spec-importers';
 
 registerServicePatches(
   forResource('AWS::SageMaker::ModelCard', (lens) => {
-    const reason = Reason.upstreamTypeNameChange('Was a single type, is now multiple XOR types.');
+    const reason = patching.Reason.upstreamTypeNameChange('Was a single type, is now multiple XOR types.');
 
     replaceDefinitionProperty(
       'MetricGroup',

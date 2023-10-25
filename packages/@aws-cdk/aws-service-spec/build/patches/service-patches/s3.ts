@@ -1,7 +1,7 @@
 import { forResource, registerServicePatches, replaceDefinitionProperty } from './core';
-import { Reason } from '../../patching';
+import { patching } from '@aws-cdk/service-spec-importers';
 
-const reason = Reason.sourceIssue('Integer property incorrectly defined as string that only allows number characters');
+const reason = patching.Reason.sourceIssue('Integer property incorrectly defined as string that only allows number characters');
 
 registerServicePatches(
   forResource('AWS::S3::Bucket', (lens) => {
