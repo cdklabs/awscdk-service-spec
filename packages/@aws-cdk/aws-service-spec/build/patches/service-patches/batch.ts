@@ -1,9 +1,9 @@
 import { forResource, registerServicePatches, renameDefinition } from './core';
-import { Reason } from '../../patching';
+import { patching } from '@aws-cdk/service-spec-importers';
 
 registerServicePatches(
   forResource('AWS::Batch::JobDefinition', (lens) => {
-    const reason = Reason.upstreamTypeNameChange();
+    const reason = patching.Reason.upstreamTypeNameChange();
 
     renameDefinition('EksEmptyDir', 'EmptyDir', reason)(lens);
     renameDefinition('EksHostPath', 'HostPath', reason)(lens);

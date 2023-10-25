@@ -1,12 +1,12 @@
 import { addDefinitions, forResource, registerServicePatches, replaceDefinition } from './core';
-import { Reason } from '../../patching';
+import { patching } from '@aws-cdk/service-spec-importers';
 
 /**
  * Add missing types for AWS::CodeBuild::Project
  */
 registerServicePatches(
   forResource('AWS::CodeBuild::Project', (lens) => {
-    const reason = Reason.sourceIssue(
+    const reason = patching.Reason.sourceIssue(
       'The elements of AWS::CodeBuild::Project.Triggers.FilterGroups used to be well-typed in the Resource Specification. In the Resource Schema it is incorrectly an untyped object.',
     );
 

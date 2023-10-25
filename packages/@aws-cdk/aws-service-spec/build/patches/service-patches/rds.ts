@@ -1,10 +1,10 @@
 import { fp, registerServicePatches } from './core';
-import { Reason } from '../../patching';
+import { patching } from '@aws-cdk/service-spec-importers';
 
 registerServicePatches(
   fp.addReadOnlyProperties(
     'AWS::RDS::DBCluster',
     ['ReadEndpoint'],
-    Reason.sourceIssue('ReadEndpoint should be listed in readOnlyProperties.'),
+    patching.Reason.sourceIssue('ReadEndpoint should be listed in readOnlyProperties.'),
   ),
 );

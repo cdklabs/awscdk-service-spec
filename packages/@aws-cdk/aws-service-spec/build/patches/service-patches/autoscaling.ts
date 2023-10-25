@@ -1,7 +1,7 @@
 import { forResource, fp, registerServicePatches, removeResourceProperty } from './core';
-import { Reason } from '../../patching';
+import { patching } from '@aws-cdk/service-spec-importers';
 
-const reason = Reason.sourceIssue('Remove (presumed wrongly included) autoscaling group attribute');
+const reason = patching.Reason.sourceIssue('Remove (presumed wrongly included) autoscaling group attribute');
 
 registerServicePatches(
   fp.removeFromReadOnlyProperties('AWS::AutoScaling::AutoScalingGroup', ['LaunchTemplateSpecification'], reason),

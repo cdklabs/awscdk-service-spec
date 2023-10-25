@@ -24,4 +24,4 @@ tsconfig.tsbuildinfo
 /.prettierignore
 /.prettierrc.json
 build-report
-/scripts/
+/build/

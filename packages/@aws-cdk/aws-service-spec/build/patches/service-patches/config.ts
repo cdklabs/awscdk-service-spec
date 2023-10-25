@@ -1,9 +1,9 @@
 import { addDefinitions, forResource, registerServicePatches, replaceResourceProperty } from './core';
-import { Reason } from '../../patching';
+import { patching } from '@aws-cdk/service-spec-importers';
 
 registerServicePatches(
   forResource('AWS::Config::RemediationConfiguration', (lens) => {
-    const reason = Reason.sourceIssue('Unused property type in Spec, now missing in Schema');
+    const reason = patching.Reason.sourceIssue('Unused property type in Spec, now missing in Schema');
     replaceResourceProperty(
       'Parameters',
       {

@@ -1,11 +1,11 @@
 import { fp, registerServicePatches } from './core';
-import { Reason } from '../../patching';
+import { patching } from '@aws-cdk/service-spec-importers';
 
 registerServicePatches(
   fp.removeFromReadOnlyProperties(
     'AWS::Elasticsearch::Domain',
     ['DomainArn'],
-    Reason.other(
+    patching.Reason.other(
       'Remove the deprecated attribute DomainArn, as the new preferred attribute Arn maps to the same name in the generated code',
     ),
   ),

@@ -3,6 +3,8 @@ import { SpecDatabase } from '@aws-cdk/service-spec-types';
 import { DatabaseBuilder, DatabaseBuilderOptions, ReportAudience } from '@aws-cdk/service-spec-importers';
 import { Augmentations } from './augmentations';
 import { Scrutinies } from './scrutinies';
+import { patchSamTemplateSpec } from './patches/sam-patches';
+import { patchCloudFormationRegistry } from './patches/registry-patches';
 
 const SOURCES = path.join(__dirname, '../../../../sources');
 
@@ -14,8 +16,8 @@ export class FullDatabase extends DatabaseBuilder {
 
     this.importCloudFormationResourceSpec(path.join(SOURCES, 'CloudFormationResourceSpecification'))
       .importSamResourceSpec(path.join(SOURCES, 'CloudFormationResourceSpecification/us-east-1/100_sam'))
-      .importCloudFormationRegistryResources(path.join(SOURCES, 'CloudFormationSchema'))
-      .importSamJsonSchema(path.join(SOURCES, 'SAMSpec/sam.schema.json'))
+      .importCloudFormationRegistryResources(path.join(SOURCES, 'CloudFormationSchema'), patchCloudFormationRegistry)
+      .importSamJsonSchema(path.join(SOURCES, 'SAMSpec/sam.schema.json'), patchSamTemplateSpec)
       .importCloudFormationDocs(path.join(SOURCES, 'CloudFormationDocumentation/CloudFormationDocumentation.json'))
       .importStatefulResources(path.join(SOURCES, 'StatefulResources/StatefulResources.json'))
       .importCannedMetrics(

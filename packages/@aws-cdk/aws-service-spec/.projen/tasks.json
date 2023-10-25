@@ -25,7 +25,7 @@
       "name": "build:db",
       "steps": [
         {
-          "exec": "ts-node scripts/build-db.ts"
+          "exec": "ts-node build/build-db.ts"
         }
       ]
     },
