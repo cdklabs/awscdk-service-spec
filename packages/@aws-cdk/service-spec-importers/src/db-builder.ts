@@ -16,8 +16,8 @@ import {
   loadSamSchema,
   loadSamSpec,
 } from './loaders';
-import { ProblemReport, ReportAudience } from './report';
 import { JsonLensPatcher } from './patching';
+import { ProblemReport, ReportAudience } from './report';
 
 export interface DatabaseBuilderOptions {
   /**

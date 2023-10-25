@@ -3,9 +3,9 @@ import * as util from 'util';
 import { isSuccess, Result } from '@cdklabs/tskb';
 import * as _glob from 'glob';
 import { Loader, LoadResult, LoadSourceOptions } from './loader';
+import { JsonLensPatcher } from '../patching';
 import { ProblemReport, ReportAudience } from '../report';
 import { CloudFormationRegistryResource } from '../types';
-import { JsonLensPatcher } from '../patching';
 
 const glob = util.promisify(_glob.glob);
 

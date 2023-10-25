@@ -1,8 +1,8 @@
 import { assertSuccess } from '@cdklabs/tskb';
 import { Loader, LoadResult, LoadSourceOptions } from './loader';
 // import { patchSamTemplateSpec } from '../../../aws-service-spec/build/patches/sam-patches';
-import { SamTemplateSchema } from '../types';
 import { JsonLensPatcher } from '../patching';
+import { SamTemplateSchema } from '../types';
 
 interface LoadSamSchemaSourceOptions extends LoadSourceOptions {
   readonly patcher?: JsonLensPatcher;
