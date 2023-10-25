@@ -31,7 +31,7 @@
     ".projenrc.js",
     "src/**/*.ts",
     "test/**/*.ts",
-    "scripts"
+    "build"
   ],
   "exclude": [
     "node_modules"

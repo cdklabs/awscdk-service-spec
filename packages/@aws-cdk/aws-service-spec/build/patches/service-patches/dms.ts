@@ -1,12 +1,11 @@
 import { fp, registerServicePatches } from './core';
-import { Reason } from '../../patching';
-import { CloudFormationRegistryResource } from '../../types';
+import { patching, types } from '@aws-cdk/service-spec-importers';
 
 registerServicePatches(
-  fp.patchResourceAt<CloudFormationRegistryResource['readOnlyProperties']>(
+  fp.patchResourceAt<types.CloudFormationRegistryResource['readOnlyProperties']>(
     'AWS::DMS::ReplicationConfig',
     '/readOnlyProperties',
-    Reason.sourceIssue('Incorrect case. Got upper case `/Properties` instead of `/properties'),
+    patching.Reason.sourceIssue('Incorrect case. Got upper case `/Properties` instead of `/properties'),
     (readOnlyProperties = []) => {
       for (const [idx, prop] of readOnlyProperties.entries()) {
         if (prop.startsWith('/Properties')) {
