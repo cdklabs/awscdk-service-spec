@@ -6,6 +6,16 @@ import { Command } from 'commander';
 import { CliError, handleFailure } from './util';
 import { DatabaseBuilder } from '../db-builder';
 
+const AVAILABLE_SOURCES: Record<string, keyof DatabaseBuilder> = {
+  cfnSchemaDir: 'importCloudFormationRegistryResources',
+  samSchema: 'importSamJsonSchema',
+  cfnSpecDir: 'importCloudFormationResourceSpec',
+  samSpec: 'importSamResourceSpec',
+  cfnDocs: 'importCloudFormationDocs',
+  statefulResources: 'importStatefulResources',
+  cannedMetrics: 'importCannedMetrics',
+};
+
 async function main() {
   const program = new Command();
 
@@ -13,7 +23,15 @@ async function main() {
     .name('import-db')
     .description('Import service specification sources into a service model database')
     .argument('[database]', 'The database file', 'db.json')
-    .option('-i, --input <database>', 'Load an existing database as base, imported sources are additive.')
+
+    .option(
+      '-s, --source <definition...>',
+      `Import sources into the database. Use the format <source>:<path> to define sources. Imports are ordered. See documentation for details.\nAvailable sources: ${Object.keys(
+        AVAILABLE_SOURCES,
+      ).join(', ')}`,
+    )
+
+    .option('-l, --load <database>', 'Load an existing database as base, imported sources become additive')
     .option('-c, --gzip', 'Compress the database file using gzip')
     .option('-f, --force', 'Force overwriting an existing file', false)
     .option('-d, --debug', 'Print additional debug output during import', false)
@@ -31,13 +49,25 @@ async function main() {
     );
   }
 
-  const baseDb = await database(options.input);
+  const baseDb = await database(options.load);
 
   process.stdout.write('Importing sources... ');
-  const { db, report } = await new DatabaseBuilder(baseDb, {
+  const builder = new DatabaseBuilder(baseDb, {
     validate: options.validate ?? false,
     debug: options.debug ?? false,
-  }).build();
+  });
+
+  try {
+    for (const source of options.source) {
+      const [method, args] = sourceInstructions(source);
+      (builder[method] as CallableFunction)(...args);
+    }
+  } catch (error) {
+    process.stdout.write('FAIL');
+    throw error;
+  }
+
+  const { db, report } = await builder.build();
 
   const importResult = report.totalCount ? `WARN (${report.totalCount} problems encountered)` : 'OK';
   process.stdout.write(`${importResult}\n`);
@@ -57,6 +87,20 @@ async function main() {
   }
 }
 
+function sourceInstructions(source: string): [keyof DatabaseBuilder, any[]] {
+  const [type, path] = source.split(':', 2);
+
+  if (!type || !path) {
+    throw new CliError(`Invalid source format. Expected <source>:<path>, got: ${source}`);
+  }
+
+  if (!AVAILABLE_SOURCES[type]) {
+    throw new CliError(`Unknown source provided: ${source}`);
+  }
+
+  return [AVAILABLE_SOURCES[type], [path]];
+}
+
 async function writeDatabase(db: SpecDatabase, file: string, compress = false) {
   const data = JSON.stringify(db.save());
 
@@ -67,10 +111,10 @@ async function writeDatabase(db: SpecDatabase, file: string, compress = false) {
   return writeFile(file, data, { encoding: 'utf-8' });
 }
 
-async function database(input?: string) {
-  if (input) {
-    process.stdout.write(`Loading existing database at ${input}... `);
-    const db = loadDatabase(input);
+async function database(baseDb?: string) {
+  if (baseDb) {
+    process.stdout.write(`Loading existing database at ${baseDb}... `);
+    const db = loadDatabase(baseDb);
     process.stdout.write('OK\n\n');
     return db;
   }

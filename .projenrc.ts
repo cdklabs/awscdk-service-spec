@@ -131,10 +131,10 @@ const serviceSpecSchemaTask = serviceSpecImporters.addTask('gen-schemas', {
 
 serviceSpecImporters.compileTask.prependSpawn(serviceSpecSchemaTask);
 
-const buildDb = serviceSpecImporters.tasks.addTask('build:db', {
-  exec: 'ts-node src/cli/import-db --force',
+serviceSpecImporters.tasks.addTask('build:db', {
+  exec: 'ts-node src/cli/import-db',
+  receiveArgs: true,
 });
-serviceSpecImporters.postCompileTask.spawn(buildDb);
 serviceSpecImporters.tasks.addTask('analyze:db', {
   exec: 'ts-node src/cli/analyze-db',
   receiveArgs: true,
