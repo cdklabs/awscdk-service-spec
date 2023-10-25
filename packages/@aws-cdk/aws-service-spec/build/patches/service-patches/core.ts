@@ -1,4 +1,3 @@
-// import { JsonLens, patching.JsonLensPatcher, patching.JsonObjectPatcher, Patcher, Reason, fp as fun, isRoot } from '../../patching';
 import { patching, types } from '@aws-cdk/service-spec-importers';
 
 export const SERVICE_PATCHERS: Array<patching.JsonLensPatcher> = [];
