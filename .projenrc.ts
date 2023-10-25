@@ -86,7 +86,7 @@ const serviceSpecTypes = new TypeScriptWorkspace({
 const serviceSpecImporters = new TypeScriptWorkspace({
   parent: repo,
   name: '@aws-cdk/service-spec-importers',
-  description: 'Build the service spec from service-spec-sources to service-spec',
+  description: 'Import service sources into a service model database',
   deps: [
     'ajv@^6',
     'canonicalize',
@@ -100,7 +100,7 @@ const serviceSpecImporters = new TypeScriptWorkspace({
     tsKb,
   ],
   devDeps: ['@types/fs-extra', '@types/glob@^8', 'ajv-cli@^5', 'source-map-support', 'ts-json-schema-generator'],
-  private: true,
+  private: false,
 });
 
 for (const tsconfig of [serviceSpecImporters.tsconfig, serviceSpecImporters.tsconfigDev]) {

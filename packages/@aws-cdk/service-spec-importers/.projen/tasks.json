@@ -41,12 +41,25 @@
     },
     "bump": {
       "name": "bump",
-      "description": "Bumps versions of local dependencies",
+      "description": "Bumps version based on latest git tag and generates a changelog entry",
+      "env": {
+        "OUTFILE": "package.json",
+        "CHANGELOG": "dist/changelog.md",
+        "BUMPFILE": "dist/version.txt",
+        "RELEASETAG": "dist/releasetag.txt",
+        "RELEASE_TAG_PREFIX": "@aws-cdk/service-spec-importers@",
+        "VERSIONRCOPTIONS": "{\"path\":\".\"}",
+        "RELEASABLE_COMMITS": "git log --oneline $LATEST_TAG..HEAD -- ."
+      },
       "steps": [
         {
           "spawn": "gather-versions"
+        },
+        {
+          "builtin": "release/bump-version"
         }
-      ]
+      ],
+      "condition": "! git log --oneline -1 | grep -q \"chore(release):\""
     },
     "check-for-updates": {
       "name": "check-for-updates",
@@ -163,7 +176,15 @@
     },
     "package": {
       "name": "package",
-      "description": "Creates the distribution package"
+      "description": "Creates the distribution package",
+      "steps": [
+        {
+          "exec": "mkdir -p dist/js"
+        },
+        {
+          "exec": "mv $(npm pack) dist/js/"
+        }
+      ]
     },
     "post-compile": {
       "name": "post-compile",
@@ -197,8 +218,20 @@
     },
     "unbump": {
       "name": "unbump",
-      "description": "Resets versions of local dependencies to 0.0.0",
+      "description": "Restores version to 0.0.0",
+      "env": {
+        "OUTFILE": "package.json",
+        "CHANGELOG": "dist/changelog.md",
+        "BUMPFILE": "dist/version.txt",
+        "RELEASETAG": "dist/releasetag.txt",
+        "RELEASE_TAG_PREFIX": "@aws-cdk/service-spec-importers@",
+        "VERSIONRCOPTIONS": "{\"path\":\".\"}",
+        "RELEASABLE_COMMITS": "git log --oneline $LATEST_TAG..HEAD -- ."
+      },
       "steps": [
+        {
+          "builtin": "release/reset-version"
+        },
         {
           "spawn": "gather-versions"
         }
