@@ -3,6 +3,7 @@ import * as util from 'util';
 import { isSuccess, Result } from '@cdklabs/tskb';
 import * as _glob from 'glob';
 import { Loader, LoadResult, LoadSourceOptions } from './loader';
+import { patchCloudFormationRegistry } from '../patches';
 import { JsonLensPatcher } from '../patching';
 import { ProblemReport, ReportAudience } from '../report';
 import { CloudFormationRegistryResource } from '../types';
@@ -23,7 +24,7 @@ export function loadCloudFormationRegistryDirectory(
       'CloudFormationRegistryResource.schema.json',
       {
         mustValidate: options.validate,
-        patcher: options.patcher,
+        patcher: options.patcher ?? patchCloudFormationRegistry,
         errorRootDirectory: baseDir,
       },
     );

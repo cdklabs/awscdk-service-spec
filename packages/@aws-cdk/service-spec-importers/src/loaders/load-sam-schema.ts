@@ -1,6 +1,6 @@
 import { assertSuccess } from '@cdklabs/tskb';
 import { Loader, LoadResult, LoadSourceOptions } from './loader';
-// import { patchSamTemplateSpec } from '../../../aws-service-spec/build/patches/sam-patches';
+import { normalizeJsonSchema } from '../patches';
 import { JsonLensPatcher } from '../patching';
 import { SamTemplateSchema } from '../types';
 
@@ -17,7 +17,7 @@ export async function loadSamSchema(
 ): Promise<LoadResult<SamTemplateSchema>> {
   const loader = await Loader.fromSchemaFile<SamTemplateSchema>('SamTemplateSchema.schema.json', {
     mustValidate: options.validate,
-    patcher: options.patcher,
+    patcher: options.patcher ?? normalizeJsonSchema,
   });
 
   const result = await loader.loadFile(filePath);
