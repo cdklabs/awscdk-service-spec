@@ -101,6 +101,11 @@ const serviceSpecImporters = new TypeScriptWorkspace({
   ],
   devDeps: ['@types/fs-extra', '@types/glob@^8', 'ajv-cli@^5', 'source-map-support', 'ts-json-schema-generator'],
   private: false,
+  tsconfig: {
+    compilerOptions: {
+      skipLibCheck: true,
+    },
+  },
 });
 
 for (const tsconfig of [serviceSpecImporters.tsconfig, serviceSpecImporters.tsconfigDev]) {
