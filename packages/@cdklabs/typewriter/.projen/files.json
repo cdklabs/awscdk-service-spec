@@ -5,7 +5,6 @@
     ".gitattributes",
     ".gitignore",
     ".npmignore",
-    ".npmrc",
     ".prettierignore",
     ".prettierrc.json",
     ".projen/deps.json",
