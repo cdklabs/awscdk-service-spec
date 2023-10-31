@@ -41,7 +41,11 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
   recurseProperties(resource, resourceBuilder, resourceFailure);
 
-  resourceBuilder.markDeprecatedProperties(...(resource.deprecatedProperties ?? []).map(simplePropNameFromJsonPtr));
+  // AWS::CloudFront::ContinuousDeploymentPolicy recently introduced a change where they're marking deprecatedProperties
+  // as `/definitions/<Type>/properties/<Prop>` instead of `/properties/<Prop1>/<Prop2>/<Prop3>`. Ignore those, as it's
+  // out-of-spec
+  const deprecatedProperties = (resource.deprecatedProperties ?? []).filter((p) => p.startsWith('/properties/'));
+  resourceBuilder.markDeprecatedProperties(...deprecatedProperties);
 
   // Mark everything 'readOnlyProperties` as attributes. However, in the old spec it is possible
   // that properties and attributes have the same names, with different types. If that happens (by
