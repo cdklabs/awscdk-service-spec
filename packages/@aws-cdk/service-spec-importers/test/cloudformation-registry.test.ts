@@ -35,3 +35,51 @@ test('include primaryIdentifier in database', () => {
   const primaryIdentifier = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0]?.primaryIdentifier;
   expect(primaryIdentifier).toEqual(['id', 'secondId']);
 });
+
+test('deprecated properties', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::Some::Type',
+      description: 'resource with PrimaryIdentifier',
+      properties: {
+        id: {
+          type: 'string',
+        },
+      },
+      deprecatedProperties: ['/properties/id'],
+    },
+  });
+
+  // eslint-disable-next-line prettier/prettier
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type').only();
+  expect(resource.properties.id.deprecated).toBeDefined();
+});
+
+test('type definitions in deprecated properties do not fail', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::Some::Type',
+      description: 'resource with PrimaryIdentifier',
+      properties: {
+        id: { $ref: '#/definitions/Type' },
+      },
+      definitions: {
+        Type: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+            },
+          },
+        },
+      },
+      deprecatedProperties: ['/definitions/Type/properties/id'],
+    },
+  });
+
+  // THEN: no failure
+});
