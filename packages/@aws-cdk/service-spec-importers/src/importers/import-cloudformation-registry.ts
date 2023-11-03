@@ -77,7 +77,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         target.setProperty(name, {
           type,
           documentation: descriptionOf(resolvedSchema),
-          required: ifTrue(required.has(name)),
+          required: required.has(name),
           defaultValue: describeDefault(resolvedSchema),
         });
       });
@@ -346,10 +346,6 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       report.reportFailure('interpreting', x);
     }
   }
-}
-
-function ifTrue(x: boolean | undefined) {
-  return x ? x : undefined;
 }
 
 function descriptionOf(x: jsonschema.ConcreteSchema) {
