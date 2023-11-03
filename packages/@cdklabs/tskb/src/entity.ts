@@ -52,7 +52,11 @@ export interface EntityIndex<A extends Entity, IndexType> {
 /**
  * Map a type the types of lookups we can do on that type
  */
-export type IndexLookups<P> = P extends string ? StringIndexLookups : {};
+export type IndexLookups<P> = [P] extends [string]
+  ? StringIndexLookups
+  : [P] extends [string | undefined]
+  ? OptionalStringIndexLookups
+  : {};
 
 /**
  * All the lookups on 'string' types
@@ -61,6 +65,13 @@ export type IndexLookups<P> = P extends string ? StringIndexLookups : {};
  */
 export interface StringIndexLookups {
   equals(x: string): string[];
+}
+
+/**
+ * All the lookups on 'string | undefined' types
+ */
+export interface OptionalStringIndexLookups {
+  equals(x: string | undefined): string[];
 }
 
 export function entityCollection<A extends Entity>(): EntityCollection<A, {}> {
@@ -151,6 +162,37 @@ export function ref<E extends Entity>(x: E | string): Reference<E> {
   return typeof x === 'string' ? { $ref: x } : { $ref: x.$id };
 }
 
-export function stringCmp(a: string, b: string) {
+/**
+ * Determines whether two strings are equivalent in the current or specified locale.
+ */
+export function stringCmp(a: string, b: string): number {
   return a.localeCompare(b);
+}
+
+/**
+ * Determines whether two numbers are equivalent.
+ */
+export function numberCmp(a: number, b: number): number {
+  return a - b;
+}
+
+/**
+ * Creates a comparator to determine equivalent of two values, using a given comparator, but allows values to be optional.
+ *
+ * @param frontOrder If `true`, returns so that undefined values are ordered at the front. If `false`, undefined values are ordered at the back.
+ */
+export function optionalCmp<A>(cmp: (a: A, b: A) => number, frontOrder = true) {
+  return (a: A | undefined, b: A | undefined) => {
+    if (a == undefined && b != undefined) {
+      return frontOrder ? -1 : 1;
+    }
+    if (a != undefined && b == undefined) {
+      return frontOrder ? 1 : -1;
+    }
+    if (a == undefined && b == undefined) {
+      return 0;
+    }
+
+    return cmp(a!, b!);
+  };
 }

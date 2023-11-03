@@ -1,4 +1,4 @@
-import { calculatedIndex, Database, Entity, entityCollection, fieldIndex, stringCmp } from '../src';
+import { calculatedIndex, Database, Entity, entityCollection, fieldIndex, optionalCmp, stringCmp } from '../src';
 
 interface Thing extends Entity {
   readonly name: string;
@@ -12,6 +12,7 @@ function emptyDatabase() {
     thing: entityCollection<Thing>().index({
       name: fieldIndex('name', stringCmp),
       lowercaseName: calculatedIndex((x) => x.name.toLowerCase(), stringCmp),
+      value: fieldIndex('value', optionalCmp(stringCmp)),
     }),
   });
 }
@@ -64,6 +65,68 @@ describe.each([false, true])('database is filled with one item (saveAndLoad: %p)
         name: 'A',
         value: 'A',
       }),
+    );
+  });
+});
+
+describe.each([false, true])('database is filled with multiple items (saveAndLoad: %p)', (saveAndLoad) => {
+  beforeEach(() => {
+    db.allocate('thing', {
+      name: 'A',
+      value: 'Data',
+    });
+    db.allocate('thing', {
+      name: 'B',
+    });
+    db.allocate('thing', {
+      name: 'C',
+      value: 'Data',
+    });
+    db.allocate('thing', {
+      name: 'D',
+    });
+
+    if (saveAndLoad) {
+      const serialized = db.save();
+      const fresh = emptyDatabase();
+      fresh.load(serialized);
+      db = fresh;
+    }
+  });
+
+  test('can lookup by unset field', () => {
+    const found = db.lookup('thing', 'value', 'equals', undefined);
+
+    expect(found).toEqual(
+      expect.arrayContaining([
+        {
+          $id: '1',
+          name: 'B',
+        },
+        {
+          $id: '3',
+          name: 'D',
+        },
+      ]),
+    );
+  });
+
+  test('can lookup by set field', () => {
+    const found = db.lookup('thing', 'value', 'equals', 'Data');
+
+    expect(found).toEqual(
+      expect.arrayContaining([
+        {
+          $id: '0',
+          name: 'A',
+          value: 'Data',
+        },
+        {
+          $id: '2',
+          name: 'C',
+          value: 'Data',
+        },
+      ]),
     );
   });
 });

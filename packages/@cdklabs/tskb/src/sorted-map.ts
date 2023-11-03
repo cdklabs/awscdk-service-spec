@@ -10,12 +10,12 @@ export namespace sortedMap {
   export type Comparator<A> = (a: A, b: A) => number;
 
   export function add<A, B>(map: SortedMultiMap<A, B>, cmp: Comparator<A>, key: A, value: B) {
-    const i = firstNotBefore(map, cmp, key);
+    const i = lowerBound(map, cmp, key);
     map.splice(i, 0, [key, value]);
   }
 
   export function find<A, B>(map: SortedMultiMap<A, B>, cmp: Comparator<A>, key: A): B | undefined {
-    const i = firstNotBefore(map, cmp, key);
+    const i = lowerBound(map, cmp, key);
     if (i === map.length) {
       return undefined;
     }
@@ -25,7 +25,7 @@ export namespace sortedMap {
   }
 
   export function findAll<A, B>(map: SortedMultiMap<A, B>, cmp: Comparator<A>, key: A): B[] {
-    let i = firstNotBefore(map, cmp, key);
+    let i = lowerBound(map, cmp, key);
 
     const ret = [];
     while (i < map.length && cmp(map[i][0], key) === 0) {
@@ -37,29 +37,27 @@ export namespace sortedMap {
   }
 
   /**
-   * Return the first index that doesn't come fully before key
+   * Return the index to the first element in the the sorted map
    *
-   * It is either key itself, or a something after key
+   * @see https://en.cppreference.com/w/cpp/algorithm/lower_bound#Version_2
    */
-  function firstNotBefore<A, B>(map: SortedMultiMap<A, B>, cmp: Comparator<A>, key: A): number {
-    let lo = 0;
-    let hi = map.length;
+  function lowerBound<A, B>(map: SortedMultiMap<A, B>, cmp: Comparator<A>, key: A): number {
+    let first = 0;
+    let count = map.length;
 
-    while (lo < hi) {
-      const mid = lo + Math.floor((hi - lo) / 2);
+    while (count > 0) {
+      let it = first;
+      let step = Math.floor(count / 2);
+      it += step;
 
-      const c = cmp(key, map[mid][0]);
-
-      if (c < 0) {
-        hi = mid;
-      } else if (c > 0) {
-        lo = mid + 1;
+      if (cmp(map[it][0], key) < 0) {
+        first = ++it;
+        count -= step + 1;
       } else {
-        // Found it exactly
-        return mid;
+        count = step;
       }
     }
 
-    return lo;
+    return first;
   }
 }
