@@ -134,6 +134,23 @@ test('importing attributes of incompatible types leads to previousTypes', () => 
   );
 });
 
+test('required property can be made optional', () => {
+  const resource = importBoth({
+    spec: {
+      Properties: {
+        Prop1: { PrimitiveType: 'Integer', Required: true, UpdateType: 'Mutable' },
+      },
+    },
+    registry: {
+      properties: {
+        Prop1: { type: 'string' },
+      },
+    },
+  });
+
+  expect(resource.properties.Prop1.required).toBeUndefined();
+});
+
 test('a prop+attr of the same name will not be overwritten', () => {
   const resource = importBoth({
     spec: {
