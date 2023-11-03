@@ -127,6 +127,14 @@ export function fieldIndex<A extends Entity, P extends keyof A>(
   return calculatedIndex((x) => x[propName], comparator);
 }
 
+export function fieldIndexWithDefault<A extends Entity, P extends keyof A>(
+  propName: P,
+  comparator: sortedMap.Comparator<NonNullable<A[P]>>,
+  defaultValue: NonNullable<A[P]>,
+): EntityIndex<A, A[P]> {
+  return calculatedIndex((x) => x[propName] ?? defaultValue!, comparator);
+}
+
 /**
  * An index that is calculated based on a function applied to an entity
  */

@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import { gunzipSync } from 'zlib';
-import { Database, entityCollection, fieldIndex, stringCmp } from '@cdklabs/tskb';
+import { Database, entityCollection, fieldIndex, fieldIndexWithDefault, stringCmp } from '@cdklabs/tskb';
 import { IsAugmentedResource, ResourceAugmentation } from './augmentations';
 import {
   DimensionSet,
@@ -21,6 +21,7 @@ import {
   RegionHasResource,
   RegionHasService,
   UsesType,
+  ResourceScrutinyType,
 } from './resource';
 
 export function emptyDatabase() {
@@ -28,6 +29,7 @@ export function emptyDatabase() {
     {
       resource: entityCollection<Resource>().index({
         cloudFormationType: fieldIndex('cloudFormationType', stringCmp),
+        scrutinizable: fieldIndexWithDefault('scrutinizable', stringCmp, ResourceScrutinyType.None),
       }),
       region: entityCollection<Region>().index({
         name: fieldIndex('name', stringCmp),
