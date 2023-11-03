@@ -497,14 +497,20 @@ export class RichPropertyType {
   /**
    * Whether the current type is assignable to the RHS type.
    *
-   * This is the same as normal equality, except when the RHS type is a union and the LHS is not a union.
+   * This is means every type member of the LHS must be present in the RHS type
    */
   public assignableTo(rhs: PropertyType): boolean {
-    if (this.type.type != 'union' && rhs.type === 'union') {
-      return rhs.types.some((t) => this.equals(t));
+    const extractMembers = (type: PropertyType): PropertyType[] => (type.type == 'union' ? type.types : [type]);
+    const asRichType = (type: PropertyType): RichPropertyType => new RichPropertyType(type);
+
+    const rhsMembers = extractMembers(rhs);
+    for (const lhsMember of extractMembers(this.type).map(asRichType)) {
+      if (!rhsMembers.some((type) => lhsMember.equals(type))) {
+        return false;
+      }
     }
 
-    return this.equals(rhs);
+    return true;
   }
 
   /**
