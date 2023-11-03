@@ -29,15 +29,15 @@ Sources are read in this order:
 
 | What | Description | Updates |
 |------|-------------|--------------------
-| Resource Spec | This is the original CloudFormation Resource Specification, which is being replaced by the Registry Schema. Imported in order from `us-east-1`, `us-west-2`. | Frozen in time at version `144.0.0`, Oct 13, 2023, for historical compatibility. |
-| SAM Resource Spec | This is the unofficial SAM resource spec as voluntarily maintained by the GoFormation project | Updated daily | 
-| Registry Schema | This is the new CloudFormation Registry Schema, replacing the old Resource Spec. It is more expressive than the old spec. Imported in order: `us-east-1, `us-east-2`, `us-west-2`. | Updated daily |
-| SAM JSON Schema | This is the newer version of the unofficial SAM specification, expressed in JSON Schema. | Updated daily |
+| Resource Spec | This is the original [CloudFormation Resource Specification](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-resource-specification.html), which is being replaced by the Registry Schema. Imported in order from `us-east-1`, `us-west-2`. | Frozen at version `144.0.0` (Oct 13, 2023). |
+| SAM Resource Spec | This is the unofficial SAM resource spec as voluntarily maintained by the [GoFormation](https://github.com/awslabs/goformation) project | Updated daily | 
+| Registry Schema | This is the new [CloudFormation Resource Provider Schema](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resource-type-schemas.html), replacing the old Resource Spec. It is more expressive than the old spec. Imported in order: `us-east-1, `us-east-2`, `us-west-2`. | Updated daily |
+| SAM JSON Schema | This is the newer version of the unofficial [GoFormation](https://github.com/awslabs/goformation) SAM specification, expressed in JSON Schema. | Updated daily |
 | CloudFormation Docs | A JSON rendering of the AWS CloudFormation Resource Reference. | Updated weekly |
-| Stateful Resources | An import of a single configuration file of cfn-lint, which indicates resources that are stateful | Updated weekly |
-| Canned Metrics | An import of an inventory of metrics for various resource types, built by the AWS CloudWatch team for their console | Updated manually |
-| Scrutinies | A classification of a number of properties to indicate whether they contain IAM Policies or not | Updated manually |
-| Augmentations | A manual declaration of a set of metrics which are used in CDK code generation | Updated manually |
+| Stateful Resources | An import of a single configuration file of [cfn-lint](https://github.com/aws-cloudformation/cfn-lint), containing resources that should be considered stateful | Weekly |
+| Canned Metrics | An import of an inventory of metrics for various resource types, built by the AWS CloudWatch team for their console | Manual |
+| Scrutinies | A classification of a number of resources and resource properties, indicating whether they contain IAM Policies or not | Manual |
+| Augmentations | A manual declaration of a set of resource-related metrics, used in CDK code generation | Manual |
 
 ## Contributing
 
