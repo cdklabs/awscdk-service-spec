@@ -11,6 +11,34 @@ Source of truth for CDK code generation.
 - `@aws-cdk/service-spec-types` - loading, saving, querying and diffing a db
 - `@aws-cdk/aws-service-spec` - the actual db file
 
+## Data Sources
+
+The data is read iteratively from various sources. Information from later sources adds on to, or replaces, information
+from older sources. 
+
+* **Properties are added**: new properties are added into existing resources and type definitions. Existing properties (and attributes)
+  will never be removed.
+* **Property type information is added**: when a new type is found, the old type is moved to the `previousTypes` array.
+  However, for backwards compatibility reasons, CDK will currently (only) render the oldest type it can find. Newer types can
+  be also rendered in the future, but are not right now. In a model diff, type history is rendered with a `⇐` between them, in order
+  from new to old. If you see `type1 ⇐ type2 ⇐ type3`, then `type3` is the oldest and is the one that will be used by CDK.
+* **Other property attributes are overwritten**: things like documentation, optionality, etc. are overwritten, so newer specifications
+  fully overwrite the information from older specifications.
+
+Sources are read in this order:
+
+| What | Description | Updates |
+|------|-------------|--------------------
+| Resource Spec | This is the original CloudFormation Resource Specification, which is being replaced by the Registry Schema. Imported in order from `us-east-1`, `us-west-2`. | Frozen in time at version `144.0.0`, Oct 13, 2023, for historical compatibility. |
+| SAM Resource Spec | This is the unofficial SAM resource spec as voluntarily maintained by the GoFormation project | Updated daily | 
+| Registry Schema | This is the new CloudFormation Registry Schema, replacing the old Resource Spec. It is more expressive than the old spec. Imported in order: `us-east-1, `us-east-2`, `us-west-2`. | Updated daily |
+| SAM JSON Schema | This is the newer version of the unofficial SAM specification, expressed in JSON Schema. | Updated daily |
+| CloudFormation Docs | A JSON rendering of the AWS CloudFormation Resource Reference. | Updated weekly |
+| Stateful Resources | An import of a single configuration file of cfn-lint, which indicates resources that are stateful | Updated weekly |
+| Canned Metrics | An import of an inventory of metrics for various resource types, built by the AWS CloudWatch team for their console | Updated manually |
+| Scrutinies | A classification of a number of properties to indicate whether they contain IAM Policies or not | Updated manually |
+| Augmentations | A manual declaration of a set of metrics which are used in CDK code generation | Updated manually |
+
 ## Contributing
 
 This repository uses [Git LFS](https://git-lfs.com/). Before you clone this repository, run the following commands
