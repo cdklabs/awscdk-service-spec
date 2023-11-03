@@ -3,6 +3,7 @@ import {
   PropertyScrutinyType,
   Resource,
   ResourceScrutinyType,
+  RichPropertyType,
   RichSpecDatabase,
   SpecDatabase,
 } from '@aws-cdk/service-spec-types';
@@ -125,9 +126,9 @@ function isIamType(typeName: string) {
  */
 function isPolicyDocumentProperty(propertyName: string, property: Property) {
   const nameContainsPolicy = propertyName.indexOf('Policy') > -1;
-  const isJson = property.type.type === 'json';
+  const jsonType = new RichPropertyType({ type: 'json' });
 
-  return nameContainsPolicy && isJson;
+  return nameContainsPolicy && jsonType.assignableTo(property.type);
 }
 
 /**

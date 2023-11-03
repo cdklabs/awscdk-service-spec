@@ -495,6 +495,19 @@ export class RichPropertyType {
   }
 
   /**
+   * Whether the current type is assignable to the RHS type.
+   *
+   * This is the same as normal equality, except when the RHS type is a union and the LHS is not a union.
+   */
+  public assignableTo(rhs: PropertyType): boolean {
+    if (this.type.type != 'union' && rhs.type === 'union') {
+      return rhs.types.some((t) => this.equals(t));
+    }
+
+    return this.equals(rhs);
+  }
+
+  /**
    * Return a version of this type, but with all type unions in a regularized order
    */
   public normalize(db: SpecDatabase): RichPropertyType {
