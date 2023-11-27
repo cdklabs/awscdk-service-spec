@@ -47,7 +47,12 @@
       "name": "check-for-updates",
       "env": {
         "CI": "0"
-      }
+      },
+      "steps": [
+        {
+          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/jest,@types/node,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,constructs,eslint-config-prettier,eslint-import-resolver-typescript,eslint-plugin-import,eslint-plugin-prettier,eslint,jest,jest-junit,prettier,projen,ts-jest,typescript"
+        }
+      ]
     },
     "compile": {
       "name": "compile",
