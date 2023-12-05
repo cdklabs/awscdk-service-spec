@@ -83,3 +83,22 @@ test('type definitions in deprecated properties do not fail', () => {
 
   // THEN: no failure
 });
+
+test('empty objects are treated as "any"', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::Some::Type',
+      description: 'resource with PrimaryIdentifier',
+      properties: {
+        id: { type: 'string' },
+        data: {},
+      },
+    },
+  });
+
+  // THEN:
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type').only();
+  expect(resource.properties.data.type).toEqual({ type: 'json' });
+});
