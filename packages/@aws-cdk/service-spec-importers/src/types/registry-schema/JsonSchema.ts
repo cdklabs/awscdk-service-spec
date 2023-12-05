@@ -11,10 +11,16 @@ export namespace jsonschema {
 
   export type ConcreteSingletonSchema = Object | String | SchemaArray | Boolean | Number | Null | AnyType;
 
-  export type AnyType = true;
+  export type AnyType = true | EmptyObject;
+
+  export type EmptyObject = Record<string, never>;
 
   export function isAnyType(x: Schema): x is AnyType {
-    return x === true;
+    return x === true || isEmptyObject(x);
+  }
+
+  function isEmptyObject(x: any) {
+    return x && typeof x === 'object' && !Array.isArray(x) && Object.keys(x).length === 0;
   }
 
   export interface Annotatable {

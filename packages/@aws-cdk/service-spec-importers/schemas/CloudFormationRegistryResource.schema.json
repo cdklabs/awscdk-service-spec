@@ -393,8 +393,15 @@
       "type": "object"
     },
     "jsonschema.AnyType": {
-      "const": true,
-      "type": "boolean"
+      "anyOf": [
+        {
+          "const": true,
+          "type": "boolean"
+        },
+        {
+          "$ref": "#/definitions/jsonschema.EmptyObject"
+        }
+      ]
     },
     "jsonschema.Boolean": {
       "additionalProperties": false,
@@ -445,6 +452,12 @@
           "$ref": "#/definitions/jsonschema.AnyType"
         }
       ]
+    },
+    "jsonschema.EmptyObject": {
+      "additionalProperties": {
+        "not": {}
+      },
+      "type": "object"
     },
     "jsonschema.MapLikeObject": {
       "additionalProperties": false,
