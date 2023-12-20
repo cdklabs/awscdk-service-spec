@@ -86,6 +86,7 @@ jobs:
     permissions: {}
     env:
       CI: "true"
+    if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -114,7 +115,7 @@ jobs:
       pull-requests: write
     env:
       CI: "true"
-    if: "!(needs.build.outputs.self_mutation_happened)"
+    if: "!(needs.build.outputs.self_mutation_happened) && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
