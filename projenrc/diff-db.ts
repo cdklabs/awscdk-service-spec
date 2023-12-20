@@ -49,6 +49,7 @@ export class DiffDb extends pj.Component {
       runsOn: this.workflowRunsOn,
       env: { CI: 'true' },
       permissions: {},
+      if: "github.event_name == 'pull_request' || github.event_name == 'pull_request_target'",
       steps: [
         {
           name: 'Checkout',
@@ -83,7 +84,7 @@ export class DiffDb extends pj.Component {
   private diffDatabase() {
     this.workflow.addJob('diff-db', {
       needs: ['build', 'base-database'],
-      if: '!(needs.build.outputs.self_mutation_happened)',
+      if: "!(needs.build.outputs.self_mutation_happened) && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')",
       runsOn: this.workflowRunsOn,
       env: { CI: 'true' },
       permissions: {
