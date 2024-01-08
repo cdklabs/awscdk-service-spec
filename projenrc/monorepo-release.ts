@@ -56,7 +56,10 @@ export class MonorepoRelease extends Component {
   private readonly releaseTrigger: release.ReleaseTrigger;
   private readonly packagesToRelease = new Array<{
     readonly workspaceDirectory: string;
-    readonly release: release.Release;
+    readonly release: {
+      readonly project: TypeScriptWorkspace;
+      readonly publisher: release.Publisher;
+    };
   }>();
 
   private workflow?: github.TaskWorkflow;
@@ -79,12 +82,15 @@ export class MonorepoRelease extends Component {
       publishToNpm: this.options.publishToNpm,
       ...options,
     });
-    if (!options.private && workspaceRelease.release) {
+    if (!options.private && workspaceRelease.publisher) {
       this.obtainReleaseTask();
 
       this.packagesToRelease.push({
         workspaceDirectory: project.workspaceDirectory,
-        release: workspaceRelease.release,
+        release: {
+          project: workspaceRelease.project,
+          publisher: workspaceRelease.publisher,
+        },
       });
     }
   }
@@ -110,7 +116,7 @@ export class MonorepoRelease extends Component {
           name: `${release.project.name}: Backup artifact permissions`,
           if: noNewCommits,
           continueOnError: true,
-          run: `cd ${release.artifactsDirectory} && getfacl -R . > ${PERMISSION_BACKUP_FILE}`,
+          run: `cd ${release.project.artifactsDirectory} && getfacl -R . > ${PERMISSION_BACKUP_FILE}`,
           workingDirectory: workspaceDirectory,
         },
         {
@@ -120,7 +126,7 @@ export class MonorepoRelease extends Component {
           with: {
             // Every artifact must have a unique name
             name: buildArtifactName(release.project),
-            path: path.join(workspaceDirectory, release.artifactsDirectory),
+            path: path.join(workspaceDirectory, release.project.artifactsDirectory),
           },
         },
       );
@@ -290,7 +296,7 @@ export class MonorepoRelease extends Component {
       checkoutWith: {
         // we must use 'fetch-depth=0' in order to fetch all tags
         // otherwise tags are not checked out
-        'fetch-depth': 0,
+        fetchDepth: 0,
       },
       preBuildSteps,
       task: this.releaseTask!,

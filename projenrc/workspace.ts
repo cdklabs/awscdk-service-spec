@@ -61,8 +61,6 @@ export class TypeScriptWorkspace extends yarn.TypeScriptWorkspace {
     this.monorepo.monorepoRelease?.addWorkspace(this, {
       private: this.isPrivatePackage,
       workflowNodeVersion: this.nodeVersion,
-      releaseWorkflowSetupSteps: options.releaseWorkflowSetupSteps,
-      postBuildSteps: options.postBuildSteps,
       releasableCommits: options.releasableCommits,
     });
 

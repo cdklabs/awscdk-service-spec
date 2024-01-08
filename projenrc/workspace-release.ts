@@ -1,62 +1,60 @@
-import { Component, ReleasableCommits, Task, github, release } from 'projen';
+import path from 'node:path';
+import { Component, ReleasableCommits, Task, Version, release } from 'projen';
 import { TypeScriptWorkspace } from './workspace';
 import { GatherVersions, VersionMatch } from './gather-versions.task';
 
 export interface WorkspaceReleaseOptions {
   readonly private: boolean;
   readonly workflowNodeVersion?: string;
-  readonly releaseWorkflowSetupSteps?: Array<github.workflows.JobStep>;
-  readonly postBuildSteps?: Array<github.workflows.JobStep>;
   readonly publishToNpm?: boolean;
   readonly releasableCommits?: ReleasableCommits;
 }
 
 export class WorkspaceRelease extends Component {
-  public release?: release.Release;
+  public publisher?: release.Publisher;
+  public version?: Version;
+  public project: TypeScriptWorkspace;
 
   public constructor(project: TypeScriptWorkspace, options: WorkspaceReleaseOptions) {
     super(project);
+    this.project = project;
 
     // The root package is release-aware. Either we create a proper
     // 'yarn release' task here, or we create a fake one that just does
     // a 'build' (will be run in dependency order by the parent release task).
     if (!options.private) {
-      this.release = new release.Release(project, {
-        versionFile: 'package.json', // this is where "version" is set after bump
-        task: project.buildTask,
-        branch: 'main',
+      this.version = new Version(this.project, {
+        versionInputFile: 'package.json', // this is where "version" is set after bump
         artifactsDirectory: project.artifactsDirectory,
-        ...options,
-
-        releaseWorkflowSetupSteps: [
-          ...project.renderWorkflowSetup({ mutable: false }),
-          ...(options.releaseWorkflowSetupSteps ?? []),
-        ],
-        postBuildSteps: [...(options.postBuildSteps ?? [])],
-
-        workflowNodeVersion: options.workflowNodeVersion,
-
+        versionrcOptions: {
+          path: '.', // In a monorepo, we want standard-version to only consider the directory of the workspace
+        },
         // This mixes the package name into the tag name,
         // so that we can give packages individual versions.
         // Tags end up looking like this: @scope/package@v1.2.3
-        releaseTagPrefix: `${project.name}@`,
-
-        // In a monorepo, we want standard-version to only consider the directory of the workspace
-        versionrcOptions: {
-          path: '.',
-        },
+        tagPrefix: `${project.name}@`,
 
         // In a monorepo, only consider changes relevant to the subproject
         // Path is relative to the subproject outdir, so '.' is what we want here
         releasableCommits: options.releasableCommits ?? ReleasableCommits.everyCommit('.'),
       });
 
-      // Only releasing at the monorepo level is supported
-      project.tasks.removeTask('release');
+      this.publisher = new release.Publisher(this.project, {
+        artifactName: project.artifactsDirectory,
+        condition: `needs.release.outputs.latest_commit == github.sha`,
+        buildJobId: 'release',
+        workflowNodeVersion: options.workflowNodeVersion,
+      });
+
+      this.publisher.publishToGitHubReleases({
+        changelogFile: path.posix.join(project.artifactsDirectory, this.version.changelogFileName),
+        versionFile: path.posix.join(project.artifactsDirectory, this.version.versionFileName),
+        releaseTagFile: path.posix.join(project.artifactsDirectory, this.version.releaseTagFileName),
+      });
 
       // GitHub Releases comes for free with a `Release` component, NPM must be added explicitly
       if (options.publishToNpm ?? true) {
-        this.release.publisher.publishToNpm({
+        this.publisher.publishToNpm({
           registry: project.package.npmRegistry,
           npmTokenSecret: project.package.npmTokenSecret,
         });
