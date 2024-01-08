@@ -23,8 +23,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          lfs: true
           fetch-depth: 0
+          lfs: true
       - name: Set git identity
         run: |-
           git config user.name "github-actions"
