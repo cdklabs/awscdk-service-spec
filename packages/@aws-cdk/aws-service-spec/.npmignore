@@ -20,8 +20,8 @@ tsconfig.tsbuildinfo
 /dist/changelog.md
 /dist/version.txt
 /.eslintrc.js
-/.gitattributes
 /.prettierignore
 /.prettierrc.json
 build-report
 /build/
+/.gitattributes
