@@ -1,6 +1,11 @@
 {
   "name": "@aws-cdk/service-spec-types",
   "description": "Types for CloudFormation Service Specifications",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cdklabs/awscdk-service-spec",
+    "directory": "packages/@aws-cdk/service-spec-types"
+  },
   "scripts": {
     "build": "npx projen build",
     "bump": "npx projen bump",

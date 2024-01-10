@@ -1,6 +1,10 @@
 {
   "name": "awscdk-service-spec",
   "description": "Monorepo for the AWS CDK's service spec",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cdklabs/awscdk-service-spec"
+  },
   "scripts": {
     "build": "npx projen build",
     "clobber": "npx projen clobber",

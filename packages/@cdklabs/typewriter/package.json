@@ -1,6 +1,11 @@
 {
   "name": "@cdklabs/typewriter",
   "description": "Write typed code for jsii",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cdklabs/awscdk-service-spec",
+    "directory": "packages/@cdklabs/typewriter"
+  },
   "scripts": {
     "build": "npx projen build",
     "bump": "npx projen bump",

@@ -1,6 +1,11 @@
 {
   "name": "@aws-cdk/aws-service-spec",
   "description": "A specification of built-in AWS resources",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cdklabs/awscdk-service-spec",
+    "directory": "packages/@aws-cdk/aws-service-spec"
+  },
   "scripts": {
     "build": "npx projen build",
     "build:db": "npx projen build:db",
