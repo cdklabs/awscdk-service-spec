@@ -10,6 +10,7 @@ const workflowRunsOn = [
 const repo = new YarnMonorepo({
   name: 'awscdk-service-spec',
   description: "Monorepo for the AWS CDK's service spec",
+  repository: 'https://github.com/cdklabs/awscdk-service-spec',
 
   defaultReleaseBranch: 'main',
   devDeps: [

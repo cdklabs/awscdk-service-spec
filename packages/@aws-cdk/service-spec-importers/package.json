@@ -1,6 +1,11 @@
 {
   "name": "@aws-cdk/service-spec-importers",
   "description": "Import service sources into a service model database",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cdklabs/awscdk-service-spec",
+    "directory": "packages/@aws-cdk/service-spec-importers"
+  },
   "bin": {
     "analyze-db": "bin/analyze-db",
     "diff-db": "bin/diff-db",
