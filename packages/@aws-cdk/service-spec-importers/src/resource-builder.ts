@@ -259,7 +259,7 @@ export class ResourceBuilder extends PropertyBagBuilder {
         // We're catching any errors from propertyDeep because CloudFormation allows schemas
         // where attribute properties are not part of the spec anywhere else. Although it is
         // likely a bad schema, CDK forges ahead by just dropping the attribute.
-        // Example: `ProviderDetails` typed as `Map<string,string>` and `"readOnlyProperties: ['/properties/ProviderDetails/Attribute']"
+        // Example: `ProviderDetails` typed as `Map<string,string>` and `"readOnlyProperties: ['/properties/ProviderDetails/Attribute']"`
         console.log(`Attribute cannot be found in the spec. Error returned: ${e}.`);
       }
     }
