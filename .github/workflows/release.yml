@@ -62,10 +62,11 @@ jobs:
         working-directory: packages/@cdklabs/tskb
       - name: "@cdklabs/tskb: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cdklabs-tskb_build-artifact
           path: packages/@cdklabs/tskb/dist
+          overwrite: true
       - name: "@cdklabs/typewriter: Backup artifact permissions"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
         run: cd dist && getfacl -R . > permissions-backup.acl
@@ -73,10 +74,11 @@ jobs:
         working-directory: packages/@cdklabs/typewriter
       - name: "@cdklabs/typewriter: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cdklabs-typewriter_build-artifact
           path: packages/@cdklabs/typewriter/dist
+          overwrite: true
       - name: "@aws-cdk/service-spec-types: Backup artifact permissions"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
         run: cd dist && getfacl -R . > permissions-backup.acl
@@ -84,10 +86,11 @@ jobs:
         working-directory: packages/@aws-cdk/service-spec-types
       - name: "@aws-cdk/service-spec-types: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: aws-cdk-service-spec-types_build-artifact
           path: packages/@aws-cdk/service-spec-types/dist
+          overwrite: true
       - name: "@aws-cdk/service-spec-importers: Backup artifact permissions"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
         run: cd dist && getfacl -R . > permissions-backup.acl
@@ -95,10 +98,11 @@ jobs:
         working-directory: packages/@aws-cdk/service-spec-importers
       - name: "@aws-cdk/service-spec-importers: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: aws-cdk-service-spec-importers_build-artifact
           path: packages/@aws-cdk/service-spec-importers/dist
+          overwrite: true
       - name: "@aws-cdk/aws-service-spec: Backup artifact permissions"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
         run: cd dist && getfacl -R . > permissions-backup.acl
@@ -106,10 +110,11 @@ jobs:
         working-directory: packages/@aws-cdk/aws-service-spec
       - name: "@aws-cdk/aws-service-spec: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: aws-cdk-aws-service-spec_build-artifact
           path: packages/@aws-cdk/aws-service-spec/dist
+          overwrite: true
   cdklabs-tskb_release_github:
     name: "@cdklabs/tskb: Publish to GitHub Releases"
     needs: release

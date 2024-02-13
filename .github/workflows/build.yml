@@ -46,7 +46,7 @@ jobs:
           cat .repo.patch
           exit 1
       - name: Upload head database
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: db.head.json.gz
           path: packages/@aws-cdk/aws-service-spec/db.json.gz
@@ -101,10 +101,11 @@ jobs:
         run: npx projen nx compile
         working-directory: packages/@aws-cdk/aws-service-spec
       - name: Upload base database
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: db.base.json.gz
           path: packages/@aws-cdk/aws-service-spec/db.json.gz
+          overwrite: true
   diff-db:
     needs:
       - build
