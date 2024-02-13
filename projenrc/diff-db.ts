@@ -113,7 +113,7 @@ export class DiffDb extends pj.Component {
         },
         {
           name: 'Download base database',
-          uses: 'actions/download-artifact@v3',
+          uses: 'actions/download-artifact@v4',
           with: {
             name: 'db.base.json.gz',
             path: 'base',
@@ -121,7 +121,7 @@ export class DiffDb extends pj.Component {
         },
         {
           name: 'Download head database',
-          uses: 'actions/download-artifact@v3',
+          uses: 'actions/download-artifact@v4',
           with: {
             name: 'db.head.json.gz',
             path: 'head',
