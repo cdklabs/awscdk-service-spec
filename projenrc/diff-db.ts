@@ -110,22 +110,20 @@ export class DiffDb extends pj.Component {
           workingDirectory: this.path(this.importers.outdir),
           run: 'npx projen nx compile',
         },
-        {
+        pj.github.WorkflowSteps.downloadArtifact({
           name: 'Download base database',
-          uses: 'actions/download-artifact@v4',
           with: {
             name: 'db.base.json.gz',
             path: 'base',
           },
-        },
-        {
+        }),
+        pj.github.WorkflowSteps.downloadArtifact({
           name: 'Download head database',
-          uses: 'actions/download-artifact@v4',
           with: {
             name: 'db.head.json.gz',
             path: 'head',
           },
-        },
+        }),
         {
           name: 'Diff databases',
           id: 'diff-db',
