@@ -119,16 +119,15 @@ export class MonorepoRelease extends Component {
           run: `cd ${release.project.artifactsDirectory} && getfacl -R . > ${PERMISSION_BACKUP_FILE}`,
           workingDirectory: workspaceDirectory,
         },
-        {
+        github.WorkflowSteps.uploadArtifact({
           name: `${release.project.name}: Upload artifact`,
           if: noNewCommits,
-          uses: 'actions/upload-artifact@v3',
           with: {
             // Every artifact must have a unique name
             name: buildArtifactName(release.project),
             path: path.join(workspaceDirectory, release.project.artifactsDirectory),
           },
-        },
+        }),
       );
     }
   }
@@ -144,7 +143,7 @@ export class MonorepoRelease extends Component {
 
       for (const job of Object.values(packagePublishJobs)) {
         // Find the 'download-artifact' job and replace the build artifact name with the unique per-project one
-        const downloadStep = job.steps.find((job) => job.uses === 'actions/download-artifact@v3');
+        const downloadStep = job.steps.find((job) => job.uses?.startsWith('actions/download-artifact@'));
         if (!downloadStep) {
           throw new Error(`Could not find downloadStep among steps: ${JSON.stringify(job.steps, undefined, 2)}`);
         }

@@ -33,14 +33,16 @@ export class DiffDb extends pj.Component {
 
   private uploadHeadDatabase() {
     this.workflow.file?.patch(
-      pj.JsonPatch.add('/jobs/build/steps/-', {
-        name: 'Upload head database',
-        uses: 'actions/upload-artifact@v3',
-        with: {
-          name: 'db.head.json.gz',
-          path: this.path(this.serviceSpec.outdir + '/db.json.gz'),
-        },
-      }),
+      pj.JsonPatch.add(
+        '/jobs/build/steps/-',
+        pj.github.WorkflowSteps.uploadArtifact({
+          name: 'Upload head database',
+          with: {
+            name: 'db.head.json.gz',
+            path: this.path(this.serviceSpec.outdir + '/db.json.gz'),
+          },
+        }),
+      ),
     );
   }
 
@@ -69,14 +71,13 @@ export class DiffDb extends pj.Component {
           workingDirectory: this.path(this.serviceSpec.outdir),
           run: 'npx projen nx compile',
         },
-        {
+        pj.github.WorkflowSteps.uploadArtifact({
           name: 'Upload base database',
-          uses: 'actions/upload-artifact@v3',
           with: {
             name: 'db.base.json.gz',
             path: this.path(this.serviceSpec.outdir + '/db.json.gz'),
           },
-        },
+        }),
       ],
     });
   }
@@ -111,22 +112,20 @@ export class DiffDb extends pj.Component {
           workingDirectory: this.path(this.importers.outdir),
           run: 'npx projen nx compile',
         },
-        {
+        pj.github.WorkflowSteps.downloadArtifact({
           name: 'Download base database',
-          uses: 'actions/download-artifact@v3',
           with: {
             name: 'db.base.json.gz',
             path: 'base',
           },
-        },
-        {
+        }),
+        pj.github.WorkflowSteps.downloadArtifact({
           name: 'Download head database',
-          uses: 'actions/download-artifact@v3',
           with: {
             name: 'db.head.json.gz',
             path: 'head',
           },
-        },
+        }),
         {
           name: 'Diff databases',
           id: 'diff-db',
