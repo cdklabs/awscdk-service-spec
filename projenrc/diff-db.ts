@@ -33,14 +33,16 @@ export class DiffDb extends pj.Component {
 
   private uploadHeadDatabase() {
     this.workflow.file?.patch(
-      pj.JsonPatch.add('/jobs/build/steps/-', {
-        name: 'Upload head database',
-        uses: 'actions/upload-artifact@v4',
-        with: {
-          name: 'db.head.json.gz',
-          path: this.path(this.serviceSpec.outdir + '/db.json.gz'),
-        },
-      }),
+      pj.JsonPatch.add(
+        '/jobs/build/steps/-',
+        pj.github.WorkflowSteps.uploadArtifact({
+          name: 'Upload head database',
+          with: {
+            name: 'db.head.json.gz',
+            path: this.path(this.serviceSpec.outdir + '/db.json.gz'),
+          },
+        }),
+      ),
     );
   }
 

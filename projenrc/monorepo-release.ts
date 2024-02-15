@@ -143,7 +143,7 @@ export class MonorepoRelease extends Component {
 
       for (const job of Object.values(packagePublishJobs)) {
         // Find the 'download-artifact' job and replace the build artifact name with the unique per-project one
-        const downloadStep = job.steps.find((job) => job.uses === 'actions/download-artifact@v4');
+        const downloadStep = job.steps.find((job) => job.uses?.startsWith('actions/download-artifact@'));
         if (!downloadStep) {
           throw new Error(`Could not find downloadStep among steps: ${JSON.stringify(job.steps, undefined, 2)}`);
         }

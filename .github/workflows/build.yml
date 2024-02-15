@@ -50,6 +50,7 @@ jobs:
         with:
           name: db.head.json.gz
           path: packages/@aws-cdk/aws-service-spec/db.json.gz
+          overwrite: true
   self-mutation:
     needs: build
     runs-on: awscdk-service-spec_ubuntu-latest_32-core
