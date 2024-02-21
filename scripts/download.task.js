@@ -11,8 +11,18 @@ const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sources-'));
 const tmpDest = path.join(tmpDir, 'data');
 const tmpExtract = path.join(tmpDir, 'extract');
 
+
+const reqHeaders = new Headers();
+reqHeaders.append('pragma', 'no-cache');
+reqHeaders.append('cache-control', 'no-cache');
+
+var reqOptions = {
+  method: 'GET',
+  headers: reqHeaders,
+};
+
 const file = fs.createWriteStream(tmpDest);
-fetch(url).then((res) => {
+fetch(url, reqOptions).then((res) => {
   res.body.pipe(file);
   file
     .on('finish', () => {
