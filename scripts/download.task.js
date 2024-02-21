@@ -20,9 +20,11 @@ fetch(url).then((res) => {
       console.log('Download completed');
       
       // Print a hash of the downloaded file that can be used for inspection
-      child_process.spawnSync('sha256sum', [tmpDest], {
+      console.log('SHA 256:');
+      child_process.spawnSync('shasum', ['-a', '256', tmpDest], {
         cwd: process.cwd(),
-      });      
+        stdio: 'inherit',
+      });
 
       if (shouldExtract) {
         fs.mkdirSync(tmpExtract, { recursive: true });
