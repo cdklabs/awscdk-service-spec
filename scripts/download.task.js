@@ -18,6 +18,11 @@ fetch(url).then((res) => {
     .on('finish', () => {
       file.close();
       console.log('Download completed');
+      
+      // Print a hash of the downloaded file that can be used for inspection
+      child_process.spawnSync('sha256sum', [tmpDest], {
+        cwd: process.cwd(),
+      });      
 
       if (shouldExtract) {
         fs.mkdirSync(tmpExtract, { recursive: true });
