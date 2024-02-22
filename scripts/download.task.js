@@ -11,13 +11,30 @@ const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sources-'));
 const tmpDest = path.join(tmpDir, 'data');
 const tmpExtract = path.join(tmpDir, 'extract');
 
+
+const reqHeaders = new Headers();
+reqHeaders.append('pragma', 'no-cache');
+reqHeaders.append('cache-control', 'no-cache');
+
+var reqOptions = {
+  method: 'GET',
+  headers: reqHeaders,
+};
+
 const file = fs.createWriteStream(tmpDest);
-fetch(url).then((res) => {
+fetch(url, reqOptions).then((res) => {
   res.body.pipe(file);
   file
     .on('finish', () => {
       file.close();
       console.log('Download completed');
+      
+      // Print a hash of the downloaded file that can be used for inspection
+      console.log('SHA 256:');
+      child_process.spawnSync('shasum', ['-a', '256', tmpDest], {
+        cwd: process.cwd(),
+        stdio: 'inherit',
+      });
 
       if (shouldExtract) {
         fs.mkdirSync(tmpExtract, { recursive: true });
