@@ -23,6 +23,7 @@ import './elasticsearch';
 import './iot1click';
 import './opensearch';
 import './rds';
+import './resiliencehub';
 import './s3';
 import './sagemaker';
 import './wafv2';
