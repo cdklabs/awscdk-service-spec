@@ -4,8 +4,6 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-// Write a function that fetches files from CFN_LINT_URL into a temporary directory
-// and returns the path to the temporary directory.
 
 const REGIONS = {
     'us_east_1': 'enriched-us-east-1',
@@ -22,12 +20,67 @@ const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), `cfn-lint-`));
 const tmpDest = path.join(tmpDir, 'data');
 const tmpExtract = path.join(tmpDir, 'extract');
 
-function addEnumsToSchema(sourceRegion, destRegion) {
-    const sourcePath = path.join([tmpExtract, CFN_LINT_SCHEMA_PATH, sourceRegion]);
-    const destPath = path.join([CLOUDFORMATION_SCHEMA_FOLDER_PATH, destRegion]);
+function enrichCfnSchema(sourceRegion, destRegion) {
+    const sourceDir = path.join(tmpExtract, CFN_LINT_SCHEMA_PATH, sourceRegion);
+    const destDir = path.join(CLOUDFORMATION_SCHEMA_FOLDER_PATH, destRegion);
+
+    const sourceFiles = fs.readdirSync(sourceDir);
+    sourceFiles.forEach((file) => {
+        if (file.endsWith('.json')) {
+            const sourceFilePath = path.join(sourceDir, file);
+            const destFilePath = path.join(destDir, file);
+            if (fs.existsSync(sourceFilePath) && fs.existsSync(destFilePath)) {
+                const sourceContent = fs.readFileSync(sourceFilePath, 'utf8');
+                const destContent = fs.readFileSync(destFilePath, 'utf8');
+                
+                const sourceData = JSON.parse(sourceContent);
+                const destData = JSON.parse(destContent);
+    
+                addEnumsFromSourceToDest(sourceData, destData);
+    
+                fs.writeFileSync(destFilePath, JSON.stringify(destData, null, 2));
+            }
+        }
+    });
 }
 
-function fetchCfnLintSchema(tmpDir, tmpDest, tmpExtract) {
+function addEnumsFromSourceToDest(source, dest) {
+    const sourceProperties = source.properties;
+    const destProperties = dest.properties;
+    const sourceDefinitions = source.definitions;
+    const destDefinitions = dest.definitions;
+
+    if (sourceProperties && destProperties) {
+        addPropertyEnums(sourceProperties, destProperties);
+    } 
+
+    if (sourceDefinitions && destDefinitions) {
+        Object.keys(sourceDefinitions).forEach((definitionName) => {
+            const sourceDefinition = sourceDefinitions[definitionName];
+            const destDefinition = destDefinitions[definitionName];
+
+            const sourceProperties = sourceDefinition?.properties;
+            const destProperties = destDefinition?.properties;
+            
+            if (sourceProperties && destProperties) {
+                addPropertyEnums(sourceProperties, destProperties);
+            }
+        });
+    }
+}
+
+function addPropertyEnums(sourceProperties, destProperties) {
+    Object.keys(sourceProperties).forEach((propertyName) => {
+        const sourceProperty = sourceProperties[propertyName];
+        const destProperty = destProperties[propertyName];
+
+        if (destProperty && sourceProperty.enum && !destProperty.enum) {
+            destProperty.enum = sourceProperty.enum;
+        }
+    });
+}
+
+async function fetchCfnLintSchema(tmpDir, tmpDest, tmpExtract) {
     const file = fs.createWriteStream(tmpDest);
     fetch(CFN_LINT_URL).then((res) => {
         res.body.pipe(file);
@@ -46,22 +99,16 @@ function fetchCfnLintSchema(tmpDir, tmpDest, tmpExtract) {
                     console.error('Extraction failed');
                     return;
                 }
-            
-                // fs.rmSync(destination, { recursive: true, force: true });
-                // fs.mkdirSync(destination, { recursive: true });
-                // fs.cpSync(tmpExtract, destination, { recursive: true });
 
                 // Enrich each region CloudFormation schema with us-east-1 from cfn-lint
                 // Then us-east-2 for us-east-2 and us-west-2 for us-west-2
-                Object.keys(REGIONS).forEach((region) => {
-                    addEnumsToSchema(region, REGIONS[region]);
-                });
-                addEnumsToSchema('us_east_1', REGIONS['us_east_2']);
-                addEnumsToSchema('us_east_1', REGIONS['us_west_2']);
+                enrichCfnSchema('us_east_1', 'enriched-us-east-1');
+                enrichCfnSchema('us_east_1', 'enriched-us-east-2');
+                enrichCfnSchema('us_east_1', 'enriched-us-west-2');
+                enrichCfnSchema('us_east_2', 'enriched-us-east-2');
+                enrichCfnSchema('us_west_2', 'enriched-us-west-2');
 
                 fs.rmSync(tmpDir, { recursive: true, force: true });
-                console.log(tmpExtract);
-                console.log(`${tmpExtract}/${CFN_LINT_SCHEMA_PATH}`);
                 console.log('Extraction completed');
             })
             .on('error', (err) => {
@@ -71,5 +118,4 @@ function fetchCfnLintSchema(tmpDir, tmpDest, tmpExtract) {
     });
 }
 
-
-fetchCfnLintSchema(tmpDest, tmpDir, tmpExtract);
+fetchCfnLintSchema(tmpDir, tmpDest, tmpExtract);
