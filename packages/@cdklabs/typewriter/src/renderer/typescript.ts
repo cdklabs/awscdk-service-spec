@@ -104,10 +104,51 @@ export class TypeScriptRenderer extends Renderer {
     this.renderDocs(structType, { forceStruct: true });
     this.emit(`${modifiers}interface ${structType.name}`);
     this.renderTypeParameters(structType.typeParameters);
+    let resourceName = structType.name;
     this.emitBlock(' ', () => {
       const props = Array.from(structType.properties.values()).filter((p) => p.visibility === MemberVisibility.Public);
+      if (resourceName.endsWith('Props')) {
+        resourceName = resourceName.slice(0, resourceName.length - 5);
+      }
+      this.emitList(props, '\n\n', (p) => this.renderProperty(p, 'interface', resourceName));
+    });
+    if (structType.properties && resourceName.endsWith('Property')) {
+      this.emit(`\n${structType.exported ? 'export ' : ''}namespace ${resourceName}`);
+      this.emitBlock(' ', () => {
+        this.emitList(structType.properties, '', (t) => {
+          if (t.enum) {
+            this.renderEnumType(t.enum, t.name);
+            this.emit('\n');
+          }
+        });
+      });
+    }
+    // this.emitBlock(`${structType.exported ? 'export ' : ''}namespace ${structType.name}`, () => {
+    //   this.emitList(structType.properties, '', (t) => {
+    //     if (t.enum) {
+    //       this.renderEnumType(t.enum, t.name);
+    //     }
+    //   });
+    //   // Nested type declarations in TypeScript are done by following the class declaration with a 'namespace' declaration
+    //   // if (classType.nestedDeclarations.length > 0) {
+    //   //   this.emitList(classType.nestedDeclarations, '\n\n', (t) => this.renderDeclaration(t));
+    //   // }
+    // });
+  }
 
-      this.emitList(props, '\n\n', (p) => this.renderProperty(p, 'interface'));
+  renderEnumType(enumList: any, name: string) {
+    this.emit('export class ' + name.charAt(0).toUpperCase() + name.slice(1));
+    this.emitBlock(' ', () => {
+      this.emit('public readonly name: string;\n');
+      this.emit('constructor(name: string)');
+      this.emitBlock(' ', () => {
+        this.emit('this.name = name;');
+      });
+      this.emitList(enumList, '', (t) => {
+        this.emit('\npublic static readonly ' + t + ' = new ');
+        this.emit(name.charAt(0).toUpperCase() + name.slice(1));
+        this.emit('("' + t + '");');
+      });
     });
   }
 
@@ -138,17 +179,22 @@ export class TypeScriptRenderer extends Renderer {
       ];
 
       this.emitList(members, '\n\n', (m) =>
-        m instanceof Property ? this.renderProperty(m, 'class') : this.renderMethod(m, 'class'),
+        m instanceof Property ? this.renderProperty(m, 'class', classType.name) : this.renderMethod(m, 'class'),
       );
     });
 
-    // Nested type declarations in TypeScript are done by following the class declaration with a 'namespace' declaration
-    if (classType.nestedDeclarations.length > 0) {
-      this.emit('\n\n');
-      this.emitBlock(`${classType.exported ? 'export ' : ''}namespace ${classType.name}`, () => {
-        this.emitList(classType.nestedDeclarations, '\n\n', (t) => this.renderDeclaration(t));
+    this.emit('\n\n');
+    this.emitBlock(`${classType.exported ? 'export ' : ''}namespace ${classType.name}`, () => {
+      this.emitList(classType.properties, '', (t) => {
+        if (t.enum) {
+          this.renderEnumType(t.enum, t.name);
+        }
       });
-    }
+      // Nested type declarations in TypeScript are done by following the class declaration with a 'namespace' declaration
+      if (classType.nestedDeclarations.length > 0) {
+        this.emitList(classType.nestedDeclarations, '\n\n', (t) => this.renderDeclaration(t));
+      }
+    });
   }
 
   protected renderInterface(interfaceType: InterfaceType) {
@@ -189,15 +235,15 @@ export class TypeScriptRenderer extends Renderer {
     }
   }
 
-  protected renderProperty(property: Property, parent: 'interface' | 'class') {
+  protected renderProperty(property: Property, parent: 'interface' | 'class', className?: string) {
     if (parent === 'class' && property.isGetterSetter && !property.abstract) {
       this.renderGetterSetterProperty(property);
     } else {
-      this.renderRegularProperty(property, parent);
+      this.renderRegularProperty(property, parent, className);
     }
   }
 
-  protected renderRegularProperty(property: IProperty, parent: 'interface' | 'class') {
+  protected renderRegularProperty(property: IProperty, parent: 'interface' | 'class', className?: string) {
     this.renderDocs(property);
     if (property.abstract) {
       this.emit('abstract ');
@@ -221,7 +267,12 @@ export class TypeScriptRenderer extends Renderer {
       this.emit('?');
     }
     this.emit(': ');
-    this.renderType(property.type);
+
+    if (property.enum) {
+      this.emit(className + '.' + property.name.charAt(0).toUpperCase() + property.name.slice(1));
+    } else {
+      this.renderType(property.type);
+    }
 
     if (property.initializer && parent === 'class') {
       this.emit(' = ');

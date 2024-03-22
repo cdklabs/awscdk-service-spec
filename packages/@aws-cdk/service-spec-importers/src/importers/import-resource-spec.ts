@@ -97,12 +97,12 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
   ) {
     for (const [name, propSpec] of Object.entries(source)) {
       const type = this.deriveType(propSpec);
-
       into.setProperty(name, {
         type,
         required: propSpec.Required,
         causesReplacement:
           propSpec.UpdateType === 'Immutable' ? 'yes' : propSpec.UpdateType === 'Conditional' ? 'maybe' : 'no',
+        enum: propSpec.Enum,
       });
     }
   }

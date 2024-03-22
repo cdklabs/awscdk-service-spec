@@ -131,6 +131,7 @@ export class PropertyBagBuilder {
       // These will be handled specially below
       previousTypes: undefined,
       type: undefined,
+      enum: updates.enum,
     });
 
     // Special field handling

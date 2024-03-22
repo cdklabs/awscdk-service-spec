@@ -72,6 +72,12 @@
         "DuplicatesAllowed": {
           "type": "boolean"
         },
+        "Enum": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
         "ItemType": {
           "type": "string"
         },
@@ -109,6 +115,12 @@
         },
         "DuplicatesAllowed": {
           "type": "boolean"
+        },
+        "Enum": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         },
         "ItemType": {
           "type": "string"

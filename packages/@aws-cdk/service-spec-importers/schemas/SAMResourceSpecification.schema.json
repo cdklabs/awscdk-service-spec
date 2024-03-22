@@ -54,6 +54,12 @@
         "DuplicatesAllowed": {
           "type": "boolean"
         },
+        "Enum": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
         "InclusiveItemPattern": {
           "type": "boolean"
         },

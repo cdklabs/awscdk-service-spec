@@ -79,6 +79,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
           documentation: descriptionOf(resolvedSchema),
           required: required.has(name),
           defaultValue: describeDefault(resolvedSchema),
+          enum: describeEnum(resolvedSchema),
         });
       });
     }
@@ -284,6 +285,22 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         return schema.default !== undefined ? JSON.stringify(schema.default) : undefined;
     }
 
+    return undefined;
+  }
+
+  function describeEnum(schema: jsonschema.ConcreteSchema): string[] | undefined {
+    if (
+      jsonschema.isAnyType(schema) ||
+      jsonschema.isAllOf(schema) ||
+      jsonschema.isAnyOf(schema) ||
+      jsonschema.isOneOf(schema)
+    ) {
+      return undefined;
+    }
+
+    if (schema.type === 'string') {
+      return schema.enum;
+    }
     return undefined;
   }
 

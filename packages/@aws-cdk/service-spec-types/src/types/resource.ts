@@ -165,6 +165,8 @@ export interface Property {
    * @default 'no'
    */
   causesReplacement?: 'yes' | 'no' | 'maybe';
+
+  enum?: string[];
 }
 
 export class RichTypedField {

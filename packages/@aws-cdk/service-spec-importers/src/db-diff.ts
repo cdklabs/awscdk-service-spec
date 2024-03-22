@@ -110,6 +110,7 @@ export class DbDiff {
       previousTypes: collapseEmptyDiff(diffList(a.previousTypes ?? [], b.previousTypes ?? [], eqType)),
       type: diffField(a, b, 'type', eqType),
       causesReplacement: diffScalar(a, b, 'causesReplacement'),
+      enum: diffScalar(a, b, 'enum'),
     } satisfies DontCareAboutTypes<AllFieldsGiven<Property>>);
 
     if (anyDiffs) {

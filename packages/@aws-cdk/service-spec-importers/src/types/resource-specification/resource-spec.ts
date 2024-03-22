@@ -45,6 +45,7 @@ export namespace resourcespec {
   export interface PropertyType extends CfnTypeDefinition {
     readonly Documentation?: string;
     readonly Properties?: Record<string, Property>;
+    readonly Enum?: string[];
   }
 
   /**
@@ -58,6 +59,7 @@ export namespace resourcespec {
     readonly Documentation?: string;
     readonly Required?: boolean;
     readonly UpdateType: 'Mutable' | 'Immutable' | 'Conditional';
+    readonly Enum?: string[];
   }
 
   export interface Attribute extends CfnTypeDefinition {

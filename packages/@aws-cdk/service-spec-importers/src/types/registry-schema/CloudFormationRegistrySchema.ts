@@ -168,6 +168,8 @@ export interface ResourceTagging {
    * @default '/properties/Tags'
    */
   readonly tagProperty?: string;
+
+  readonly enum?: string[];
 }
 
 export interface ResourceLink {

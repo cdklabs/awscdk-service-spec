@@ -65,9 +65,14 @@ export interface PropertySpec {
    */
   initializer?: Expression;
   /**
+   * The initial assignment of the property.
+   */
+  enum?: string[];
+  /**
    * Body of the getter implementation
    */
   getterBody?: Block;
+
   /**
    * Signature and body of the setter implementation
    */
@@ -83,6 +88,7 @@ export interface IProperty extends Documented {
   readonly initializer?: Expression;
   readonly visibility: MemberVisibility;
   readonly static: boolean;
+  readonly enum?: string[];
 }
 
 export class Property extends TypeMember implements IProperty {
@@ -121,11 +127,17 @@ export class Property extends TypeMember implements IProperty {
    */
   public readonly type: Type;
 
+  public enum: string[] | undefined;
+
   public constructor(public readonly scope: MemberType, public readonly spec: PropertySpec) {
     super(scope, {
       ...spec,
     });
+    if (spec.name === 'packageType') {
+      console.log(spec);
+    }
     this.type = spec.type;
+    this.enum = spec.enum;
   }
 
   /**
