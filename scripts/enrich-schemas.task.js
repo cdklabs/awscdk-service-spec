@@ -74,10 +74,50 @@ function addPropertyEnums(sourceProperties, destProperties) {
         const sourceProperty = sourceProperties[propertyName];
         const destProperty = destProperties[propertyName];
 
-        if (destProperty && sourceProperty.enum && !destProperty.enum) {
-            destProperty.enum = sourceProperty.enum;
-        }
+        let paths = findPropertyEnumPaths(sourceProperty, "enum");
+        console.log(paths);
+
+        paths.forEach((path) => {
+            var sourceEnumValue = path.reduce((prop, n) => prop[n], sourceProperty);
+            var destEnumValue = path.reduce((prop, n) => {
+                if (prop && prop.hasOwnProperty(n)) {
+                    return prop[n];
+                } else {
+                    return undefined;
+                }
+            }, destProperty);
+
+            if (destProperty && sourceEnumValue && !destEnumValue) {
+                const lastKey = path.pop();
+                const propertyPath = path.reduce((value, key) => value[key], destProperty);
+                propertyPath["enum"] = sourceEnumValue;
+            }
+        })
+
+        // if (destProperty && sourceProperty.enum && !destProperty.enum) {
+        //     destProperty.enum = sourceProperty.enum;
+        // }
     });
+
+
+}
+
+function findPropertyEnumPaths(obj, key, path = []) {
+    let paths = [];
+
+    if (typeof obj !== 'object' || obj === null) {
+        return paths;
+    }
+
+    if (obj.hasOwnProperty(key)) {
+        paths.push([...path, key]);
+    }
+
+    Object.keys(obj).forEach(k => {
+        paths = paths.concat(findPropertyEnumPaths(obj[k], key, [...path, k]));
+    });
+
+    return paths;
 }
 
 async function fetchCfnLintSchema(tmpDir, tmpDest, tmpExtract) {
