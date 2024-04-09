@@ -112,7 +112,14 @@ export class TypeScriptRenderer extends Renderer {
       }
       this.emitList(props, '\n\n', (p) => this.renderProperty(p, 'interface', resourceName));
     });
-    if (structType.properties && resourceName.endsWith('Property')) {
+    let constructNamespace = false;
+    for (const prop of structType.properties) {
+      if (prop.enum) {
+        constructNamespace = true;
+        break;
+      }
+    }
+    if (constructNamespace && resourceName.endsWith('Property')) {
       this.emit(`\n${structType.exported ? 'export ' : ''}namespace ${resourceName}`);
       this.emitBlock(' ', () => {
         this.emitList(structType.properties, '', (t) => {
@@ -144,8 +151,8 @@ export class TypeScriptRenderer extends Renderer {
       this.emitBlock(' ', () => {
         this.emit('this.name = name;');
       });
-      this.emitList(enumList, '', (t) => {
-        this.emit('\npublic static readonly ' + t + ' = new ');
+      this.emitList(enumList, '', (t: string) => {
+        this.emit('\npublic static readonly ' + t.replace('.', '_').replace('-', '_') + ' = new ');
         this.emit(name.charAt(0).toUpperCase() + name.slice(1));
         this.emit('("' + t + '");');
       });
