@@ -87,7 +87,7 @@
       "name": "gather-versions",
       "steps": [
         {
-          "exec": "ts-node ../../../projenrc/gather-versions.exec.ts @cdklabs/typewriter MAJOR --deps ",
+          "exec": "node -e \"require(path.join(path.dirname(require.resolve('cdklabs-projen-project-types')), 'yarn', 'gather-versions.exec.js'))\" @cdklabs/typewriter MAJOR --deps ",
           "receiveArgs": true
         }
       ]

@@ -41,8 +41,8 @@ junit.xml
 /lib
 /dist/
 !/.eslintrc.json
-!/.eslintrc.js
 /dist/changelog.md
 /dist/version.txt
+!/.eslintrc.js
 db.json
 build-report

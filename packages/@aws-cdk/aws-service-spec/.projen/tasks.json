@@ -98,7 +98,7 @@
       "name": "gather-versions",
       "steps": [
         {
-          "exec": "ts-node ../../../projenrc/gather-versions.exec.ts @aws-cdk/aws-service-spec MAJOR --deps @cdklabs/tskb @aws-cdk/service-spec-types @aws-cdk/service-spec-importers",
+          "exec": "node -e \"require(path.join(path.dirname(require.resolve('cdklabs-projen-project-types')), 'yarn', 'gather-versions.exec.js'))\" @aws-cdk/aws-service-spec MAJOR --deps @cdklabs/tskb @aws-cdk/service-spec-types @aws-cdk/service-spec-importers",
           "receiveArgs": true
         }
       ]
