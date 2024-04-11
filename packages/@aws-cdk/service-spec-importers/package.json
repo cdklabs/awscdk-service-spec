@@ -23,7 +23,6 @@
     "eslint": "npx projen eslint",
     "gather-versions": "npx projen gather-versions",
     "gen-schemas": "npx projen gen-schemas",
-    "nx": "npx projen nx",
     "package": "npx projen package",
     "post-compile": "npx projen post-compile",
     "pre-compile": "npx projen pre-compile",

@@ -27,7 +27,6 @@
     ".vscode/settings.json",
     "awscdk-service-spec.code-workspace",
     "LICENSE",
-    "nx.json",
     "tsconfig.dev.json",
     "tsconfig.json"
   ],

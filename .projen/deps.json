@@ -46,10 +46,6 @@
       "type": "build"
     },
     {
-      "name": "nx",
-      "type": "build"
-    },
-    {
       "name": "prettier",
       "type": "build"
     },

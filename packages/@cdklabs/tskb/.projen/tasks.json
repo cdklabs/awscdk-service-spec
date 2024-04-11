@@ -87,7 +87,7 @@
       "name": "gather-versions",
       "steps": [
         {
-          "exec": "ts-node ../../../projenrc/gather-versions.exec.ts @cdklabs/tskb MAJOR --deps ",
+          "exec": "node -e \"require(path.join(path.dirname(require.resolve('cdklabs-projen-project-types')), 'yarn', 'gather-versions.exec.js'))\" @cdklabs/tskb MAJOR --deps ",
           "receiveArgs": true
         }
       ]
@@ -107,15 +107,6 @@
       "steps": [
         {
           "exec": "yarn install --check-files --frozen-lockfile"
-        }
-      ]
-    },
-    "nx": {
-      "name": "nx",
-      "steps": [
-        {
-          "exec": "nx run",
-          "receiveArgs": true
         }
       ]
     },
