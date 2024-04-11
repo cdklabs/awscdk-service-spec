@@ -17,8 +17,6 @@ export class YarnMonorepo extends yarn.CdkLabsMonorepo {
   public constructor(options: YarnMonoRepoOptions) {
     super(options);
 
-    this.addGitIgnore('/.nx');
-
     // Hide generated config files in VSCode
     this.vscode?.settings.addSettings({
       'files.exclude': {
