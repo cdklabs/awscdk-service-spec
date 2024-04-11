@@ -22,6 +22,7 @@ const repo = new YarnMonorepo({
     'eslint-plugin-import',
   ],
   vscodeWorkspace: true,
+  nx: true,
 
   prettier: true,
   prettierOptions: {
