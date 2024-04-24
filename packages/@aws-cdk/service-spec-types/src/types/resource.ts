@@ -400,6 +400,11 @@ export enum ResourceScrutinyType {
    * A set of egress rules
    */
   EgressRuleResource = 'EgressRuleResource',
+
+  /**
+   * SsoResource
+   */
+  SsoResource = 'SsoResource',
 }
 
 /**

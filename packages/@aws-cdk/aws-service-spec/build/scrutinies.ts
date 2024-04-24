@@ -93,6 +93,11 @@ export class Scrutinies {
     this.setResourceScrutiny('AWS::EC2::SecurityGroupEgress', ResourceScrutinyType.EgressRuleResource);
     this.setPropertyScrutiny('AWS::EC2::SecurityGroup', 'SecurityGroupIngress', PropertyScrutinyType.IngressRules);
     this.setPropertyScrutiny('AWS::EC2::SecurityGroup', 'SecurityGroupEgress', PropertyScrutinyType.EgressRules);
+
+    // AWS IAM Identity Center (formerly AWS SSO)
+    this.setResourceScrutiny('AWS::SSO::Assignment', ResourceScrutinyType.SsoResource);
+    this.setResourceScrutiny('AWS::SSO::PermissionSet', ResourceScrutinyType.SsoResource);
+    this.setResourceScrutiny('AWS::SSO::InstanceAccessControlAttributeConfiguration', ResourceScrutinyType.SsoResource);
   }
 
   private setResourceScrutiny(cfnType: string, scrutiny: ResourceScrutinyType) {
