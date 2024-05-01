@@ -19,3 +19,4 @@ tsconfig.tsbuildinfo
 /.nx
 /.gitattributes
 /.projenrc.ts
+/projenrc
