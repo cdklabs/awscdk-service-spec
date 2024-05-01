@@ -4,7 +4,7 @@ import { patching } from '@aws-cdk/service-spec-importers';
 registerServicePatches(
   forResource('AWS::Bedrock::KnowledgeBase', (lens) => {
     const reason = patching.Reason.sourceIssue(
-      'Schema for StorageConfiguration on AWS::Bedrock::KnowledgeBase resource is not parsed correctly by import-cloudformation-registry code',
+      'StorageConfiguration on AWS::Bedrock::KnowledgeBase resource is being dropped while building source model db due to error while importing "oneOf" union type',
     );
     replaceDefinition(
       'StorageConfiguration',
