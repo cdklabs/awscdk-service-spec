@@ -400,6 +400,27 @@ export enum ResourceScrutinyType {
    * A set of egress rules
    */
   EgressRuleResource = 'EgressRuleResource',
+
+  /**
+   * AWS::SSO::Assignment
+   *
+   * IAM Identity Center (formerly known as SSO)
+   */
+  SsoAssignmentResource = 'SsoAssignmentResource',
+
+  /**
+   * AWS::SSO::InstanceAccessControlAttributeConfiguration
+   *
+   * IAM Identity Center (formerly known as SSO)
+   */
+  SsoInstanceACAConfigResource = 'SsoInstanceACAConfigResource',
+
+  /**
+   * AWS::SSO::PermissionSet
+   *
+   * IAM Identity Center (formerly known as SSO)
+   */
+  SsoPermissionSet = 'SsoPermissionSet',
 }
 
 /**
