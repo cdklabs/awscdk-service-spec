@@ -85,15 +85,30 @@ export namespace jsonschema {
   /**
    * Determines whether or not the provided schema represents an `anyOf` constraint.
    *
-   * Example of a schema that would represent an `anyOf` constraint:
+   * Examples:
    *
-   * {
+   * const schema = {
    *   "anyOf": [
    *     { schema 1 },
    *     { schema 2 },
    *     { schema 3 }
    *   ]
    * }
+   * jsonschema.isAnyOf(schema) -> true
+   *
+   * const schema = {
+   *   "type": "object",
+   *   "properties": {
+   *     "property1": "value1",
+   *     "property2": "value2"
+   *   },
+   *   "anyOf": [
+   *     { schema 1 },
+   *     { schema 2 }
+   *   ]
+   * }
+   * jsonschema.isAnyOf(schema) -> false
+   *
    *
    * @returns true if the schema represents an `anyOf` constraint. Otherwise, false.
    */
@@ -118,15 +133,29 @@ export namespace jsonschema {
   /**
    * Determines whether or not the provided schema represents a `oneOf` constraint.
    *
-   * Example of a schema that would represent a `oneOf` constraint:
+   * Examples:
    *
-   * {
+   * const schema = {
    *   "oneOf": [
    *     { schema 1 },
    *     { schema 2 },
    *     { schema 3 }
    *   ]
    * }
+   * jsonschema.isOneOf(schema) -> true
+   *
+   * const schema = {
+   *   "type": "object",
+   *   "properties": {
+   *     "property1": "value1",
+   *     "property2": "value2"
+   *   },
+   *   "oneOf": [
+   *     { schema 1 },
+   *     { schema 2 }
+   *   ]
+   * }
+   * jsonschema.isOneOf(schema) -> false
    *
    * @returns true if the schema represents a `oneOf` constraint. Otherwise, false.
    */
@@ -141,15 +170,30 @@ export namespace jsonschema {
   /**
    * Determines whether or not the provided schema represents an `allOf` constraint.
    *
-   * Example of a schema that would represent an `allOf` constraint:
+   * Examples:
    *
-   * {
+   * const schema = {
    *   "allOf": [
    *     { schema 1 },
    *     { schema 2 },
    *     { schema 3 }
    *   ]
    * }
+   * jsonschema.isOneOf(schema) -> true
+   *
+   * const schema = {
+   *   "type": "object",
+   *   "properties": {
+   *     "property1": "value1",
+   *     "property2": "value2"
+   *   },
+   *   "allOf": [
+   *     { schema 1 },
+   *     { schema 2 }
+   *   ]
+   * }
+   * jsonschema.isOneOf(schema) -> false
+   *
    *
    * @returns true if the schema represents an `allOf` constraint. Otherwise, false.
    */
