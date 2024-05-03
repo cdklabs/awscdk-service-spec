@@ -23,6 +23,10 @@ export namespace jsonschema {
     return x && typeof x === 'object' && !Array.isArray(x) && Object.keys(x).length === 0;
   }
 
+  function isTypeDefined(x: any) {
+    return 'type' in x;
+  }
+
   export interface Annotatable {
     readonly $comment?: string;
     readonly description?: string;
@@ -79,7 +83,7 @@ export namespace jsonschema {
   }
 
   export function isAnyOf(x: Schema): x is AnyOf<any> {
-    return !isAnyType(x) && 'anyOf' in x && !('type' in x);
+    return !isAnyType(x) && !isTypeDefined(x) && 'anyOf' in x;
   }
 
   export interface OneOf<S> extends Annotatable {
@@ -97,7 +101,7 @@ export namespace jsonschema {
   }
 
   export function isOneOf(x: Schema): x is OneOf<any> {
-    return !isAnyType(x) && 'oneOf' in x && !('type' in x);
+    return !isAnyType(x) && !isTypeDefined(x) && 'oneOf' in x;
   }
 
   export interface AllOf<S> extends Annotatable {
@@ -105,7 +109,7 @@ export namespace jsonschema {
   }
 
   export function isAllOf(x: Schema): x is AllOf<any> {
-    return !isAnyType(x) && 'allOf' in x && !('type' in x);
+    return !isAnyType(x) && !isTypeDefined(x) && 'allOf' in x;
   }
 
   export interface MapLikeObject extends Annotatable {
