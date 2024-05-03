@@ -79,7 +79,7 @@ export namespace jsonschema {
   }
 
   export function isAnyOf(x: Schema): x is AnyOf<any> {
-    return !((x as any).type === 'object') && !isAnyType(x) && 'anyOf' in x;
+    return !isAnyType(x) && 'anyOf' in x && !('type' in x);
   }
 
   export interface OneOf<S> extends Annotatable {
@@ -97,7 +97,7 @@ export namespace jsonschema {
   }
 
   export function isOneOf(x: Schema): x is OneOf<any> {
-    return !((x as any).type === 'object') && !isAnyType(x) && 'oneOf' in x;
+    return !isAnyType(x) && 'oneOf' in x && !('type' in x);
   }
 
   export interface AllOf<S> extends Annotatable {
@@ -105,7 +105,7 @@ export namespace jsonschema {
   }
 
   export function isAllOf(x: Schema): x is AllOf<any> {
-    return !((x as any).type === 'object') && !isAnyType(x) && 'allOf' in x;
+    return !isAnyType(x) && 'allOf' in x && !('type' in x);
   }
 
   export interface MapLikeObject extends Annotatable {
