@@ -82,6 +82,21 @@ export namespace jsonschema {
     readonly anyOf: Array<S>;
   }
 
+  /**
+   * Determines whether or not the provided schema represents an `anyOf` constraint.
+   *
+   * Example of a schema that would represent an `anyOf` constraint:
+   *
+   * {
+   *   "anyOf": [
+   *     { schema 1 },
+   *     { schema 2 },
+   *     { schema 3 }
+   *   ]
+   * }
+   *
+   * @returns true if the schema represents an `anyOf` constraint. Otherwise, false.
+   */
   export function isAnyOf(x: Schema): x is AnyOf<any> {
     return !isAnyType(x) && !isTypeDefined(x) && 'anyOf' in x;
   }
@@ -100,6 +115,21 @@ export namespace jsonschema {
     }
   }
 
+  /**
+   * Determines whether or not the provided schema represents a `oneOf` constraint.
+   *
+   * Example of a schema that would represent a `oneOf` constraint:
+   *
+   * {
+   *   "oneOf": [
+   *     { schema 1 },
+   *     { schema 2 },
+   *     { schema 3 }
+   *   ]
+   * }
+   *
+   * @returns true if the schema represents a `oneOf` constraint. Otherwise, false.
+   */
   export function isOneOf(x: Schema): x is OneOf<any> {
     return !isAnyType(x) && !isTypeDefined(x) && 'oneOf' in x;
   }
@@ -108,6 +138,21 @@ export namespace jsonschema {
     readonly allOf: Array<S>;
   }
 
+  /**
+   * Determines whether or not the provided schema represents an `allOf` constraint.
+   *
+   * Example of a schema that would represent an `allOf` constraint:
+   *
+   * {
+   *   "allOf": [
+   *     { schema 1 },
+   *     { schema 2 },
+   *     { schema 3 }
+   *   ]
+   * }
+   *
+   * @returns true if the schema represents an `allOf` constraint. Otherwise, false.
+   */
   export function isAllOf(x: Schema): x is AllOf<any> {
     return !isAnyType(x) && !isTypeDefined(x) && 'allOf' in x;
   }
