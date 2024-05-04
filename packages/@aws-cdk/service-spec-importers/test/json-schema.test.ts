@@ -70,7 +70,6 @@ test('isAllOf is false for schema containing allOf constraint and a defined type
         type: 'string',
       },
     },
-    required: ['id'],
     allOf: [{ required: ['property1'] }, { required: ['property2'] }],
     additionalProperties: false,
   } as jsonschema.Schema;

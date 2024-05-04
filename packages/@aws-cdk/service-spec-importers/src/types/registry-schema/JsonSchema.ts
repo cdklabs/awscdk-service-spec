@@ -179,11 +179,7 @@ export namespace jsonschema {
    * jsonschema.isAllOf(schema) -> true
    *
    * const schema = {
-   *   "type": "object",
-   *   "properties": {
-   *     "property1": "value1",
-   *     "property2": "value2"
-   *   },
+   *   "type": "string",
    *   "allOf": [
    *     { schema 1 },
    *     { schema 2 }
