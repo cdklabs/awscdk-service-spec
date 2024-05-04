@@ -83,7 +83,7 @@ export namespace jsonschema {
   }
 
   /**
-   * Determines whether or not the provided schema represents an `anyOf` constraint.
+   * Determines whether or not the provided schema represents an `anyOf` type operator.
    *
    * Examples:
    *
@@ -107,7 +107,7 @@ export namespace jsonschema {
    * jsonschema.isAnyOf(schema) -> false
    *
    *
-   * @returns true if the schema represents an `anyOf` constraint. Otherwise, false.
+   * @returns true if the schema represents an `anyOf` type operator. Otherwise, false.
    */
   export function isAnyOf(x: Schema): x is AnyOf<any> {
     return !isAnyType(x) && !isTypeDefined(x) && 'anyOf' in x;
@@ -128,7 +128,7 @@ export namespace jsonschema {
   }
 
   /**
-   * Determines whether or not the provided schema represents a `oneOf` constraint.
+   * Determines whether or not the provided schema represents a `oneOf` type operator.
    *
    * Examples:
    *
@@ -154,7 +154,7 @@ export namespace jsonschema {
    * };
    * jsonschema.isOneOf(schema) -> false
    *
-   * @returns true if the schema represents a `oneOf` constraint. Otherwise, false.
+   * @returns true if the schema represents a `oneOf` type operator. Otherwise, false.
    */
   export function isOneOf(x: Schema): x is OneOf<any> {
     return !isAnyType(x) && !isTypeDefined(x) && 'oneOf' in x;
@@ -165,7 +165,7 @@ export namespace jsonschema {
   }
 
   /**
-   * Determines whether or not the provided schema represents an `allOf` constraint.
+   * Determines whether or not the provided schema represents an `allOf` type operator.
    *
    * Examples:
    *
@@ -188,7 +188,7 @@ export namespace jsonschema {
    * jsonschema.isAllOf(schema) -> false
    *
    *
-   * @returns true if the schema represents an `allOf` constraint. Otherwise, false.
+   * @returns true if the schema represents an `allOf` type operator. Otherwise, false.
    */
   export function isAllOf(x: Schema): x is AllOf<any> {
     return !isAnyType(x) && !isTypeDefined(x) && 'allOf' in x;
