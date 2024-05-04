@@ -93,20 +93,17 @@ export namespace jsonschema {
    *     { schema 2 },
    *     { schema 3 }
    *   ]
-   * }
+   * };
    * jsonschema.isAnyOf(schema) -> true
    *
    * const schema = {
-   *   "type": "object",
-   *   "properties": {
-   *     "property1": "value1",
-   *     "property2": "value2"
-   *   },
+   *   "type": "string",
    *   "anyOf": [
    *     { schema 1 },
-   *     { schema 2 }
+   *     { schema 2 },
+   *     { schema 3 }
    *   ]
-   * }
+   * };
    * jsonschema.isAnyOf(schema) -> false
    *
    *
@@ -141,7 +138,7 @@ export namespace jsonschema {
    *     { schema 2 },
    *     { schema 3 }
    *   ]
-   * }
+   * };
    * jsonschema.isOneOf(schema) -> true
    *
    * const schema = {
@@ -154,7 +151,7 @@ export namespace jsonschema {
    *     { schema 1 },
    *     { schema 2 }
    *   ]
-   * }
+   * };
    * jsonschema.isOneOf(schema) -> false
    *
    * @returns true if the schema represents a `oneOf` constraint. Otherwise, false.
@@ -178,8 +175,8 @@ export namespace jsonschema {
    *     { schema 2 },
    *     { schema 3 }
    *   ]
-   * }
-   * jsonschema.isOneOf(schema) -> true
+   * };
+   * jsonschema.isAllOf(schema) -> true
    *
    * const schema = {
    *   "type": "object",
@@ -191,8 +188,8 @@ export namespace jsonschema {
    *     { schema 1 },
    *     { schema 2 }
    *   ]
-   * }
-   * jsonschema.isOneOf(schema) -> false
+   * };
+   * jsonschema.isAllOf(schema) -> false
    *
    *
    * @returns true if the schema represents an `allOf` constraint. Otherwise, false.
