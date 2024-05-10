@@ -1,5 +1,5 @@
 import { Renderer } from './base';
-import { CallableDeclaration, isCallableDeclaration } from '../callable';
+import { FreeFunction, isCallableDeclaration } from '../callable';
 import { ClassType } from '../class';
 import { Documented } from '../documented';
 import {
@@ -411,11 +411,11 @@ export class TypeScriptRenderer extends Renderer {
     throw new Error(`Symbol ${sym} (in ${sym.scope}) not visible from ${this.scopes[0]} (missing import?)`);
   }
 
-  protected renderFunction(func: CallableDeclaration) {
+  protected renderFunction(func: FreeFunction) {
     this.renderDocs(func);
     this.emit(`// @ts-ignore TS6133\n`);
 
-    this.emit(`function ${func.name}`);
+    this.emit(`${func.exported ? 'export ' : ''}function ${func.name}`);
     this.renderParameters(func.parameters);
     if (func.returnType) {
       this.emit(': ');
