@@ -10,7 +10,7 @@ beforeEach(() => {
 describe('free functions', () => {
   test('can export a free function', () => {
     const fn = new FreeFunction(scope, {
-      name: 'freefunction',
+      name: 'freeFunction',
       export: true,
     });
 
@@ -19,7 +19,7 @@ describe('free functions', () => {
     expect(renderer.render(scope)).toMatchInlineSnapshot(`
       "/* eslint-disable prettier/prettier,max-len */
       // @ts-ignore TS6133
-      export function freefunction(): void {
+      export function freeFunction(): void {
         // test comment
       }"
     `);
