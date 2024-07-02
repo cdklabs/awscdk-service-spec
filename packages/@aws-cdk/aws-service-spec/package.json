@@ -43,7 +43,7 @@
     "projen": "^0.82.8",
     "source-map-support": "^0.5.21",
     "ts-jest": "^29.1.5",
-    "typescript": "^5.5.2"
+    "typescript": "^5.5.3"
   },
   "dependencies": {
     "@aws-cdk/service-spec-types": "^0.0.0",
