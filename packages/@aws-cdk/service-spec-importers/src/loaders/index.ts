@@ -6,3 +6,4 @@ export * from './load-stateful-resources';
 export * from './load-sam-schema';
 export * from './load-sam-spec';
 export * from './load-cloudwatch-console-service-directory';
+export * from './load-getatt-allowlist';
