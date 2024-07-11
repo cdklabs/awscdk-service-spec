@@ -22,6 +22,9 @@ new DatabaseBuilder(db, options)
   // Import (legacy) SAM Resource Specification from a directory structure containing a patch set: *.json
   .importSamResourceSpec('data/SAMResourceSpecification/')
 
+  // Import GetAtt'able attributes with the same name as properties
+  .importGetAttAllowList('data/GetAttAllowlist/GetAttAllowlist.json')
+
   // Import various model enhancements
   .importCloudFormationDocs('data/CloudFormationDocumentation.json')
   .importStatefulResources('data/StatefulResources/StatefulResources.json')
