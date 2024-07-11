@@ -20,7 +20,7 @@ export class FullDatabase extends DatabaseBuilder {
       .importSamJsonSchema(path.join(SOURCES, 'SAMSpec/sam.schema.json'), patchSamTemplateSpec)
       .importCloudFormationDocs(path.join(SOURCES, 'CloudFormationDocumentation/CloudFormationDocumentation.json'))
       .importStatefulResources(path.join(SOURCES, 'StatefulResources/StatefulResources.json'))
-      .importGetAttAllowList(path.join(SOURCES, 'GetAttAllowlist/GetAttAllowlist.json'))
+      .importGetAttAllowList(path.join(SOURCES, 'CloudFormationGetAttAllowList/gettatt-allowlist.json'))
       .importCannedMetrics(
         path.join(SOURCES, 'CloudWatchConsoleServiceDirectory/CloudWatchConsoleServiceDirectory.json'),
       )

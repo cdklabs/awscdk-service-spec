@@ -145,6 +145,9 @@
         },
         {
           "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudWatchConsoleServiceDirectory --out schemas/CloudWatchConsoleServiceDirectory.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type GetAttAllowList --out schemas/GetAttAllowList.schema.json"
         }
       ]
     },

@@ -123,6 +123,7 @@ const serviceSpecSchemaTask = serviceSpecImporters.addTask('gen-schemas', {
     'StatefulResources',
     'SamTemplateSchema',
     'CloudWatchConsoleServiceDirectory',
+    'GetAttAllowList',
   ].map((typeName: string) => ({
     exec: [
       'ts-json-schema-generator',
