@@ -4,7 +4,7 @@ import { forResource, registerServicePatches, replaceDefinition } from './core';
 registerServicePatches(
   forResource('AWS::SecurityLake::Subscriber', (lens) => {
     const reason = patching.Reason.sourceIssue(
-      'Sources array on AWS::SecruityLake::Subscriber is being dropped from final service spec db',
+      'Sources array on AWS::SecruityLake::Subscriber is being dropped from final service spec db due to error producing Source type',
     );
     replaceDefinition(
       'Source',
