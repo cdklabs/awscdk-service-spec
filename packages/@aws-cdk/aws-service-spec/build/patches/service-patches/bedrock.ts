@@ -31,4 +31,39 @@ registerServicePatches(
       reason,
     )(lens);
   }),
+  forResource('AWS::Bedrock::DataSource', (lens) => {
+    const reason = patching.Reason.sourceIssue(
+      'DataSourceConfiguration on AWS::Bedrock::DataSource resource is being dropped for unknown reason but suppoted by CloudForamtion',
+    );
+    replaceDefinition(
+      "DataSourceConfiguration",
+      {
+        type: 'object',
+        description: 'Specifies a raw data source location to ingest.',
+        properties: {
+          Type : {
+            "$ref" : "#/definitions/DataSourceType"
+          },
+          S3Configuration: {
+            "$ref" : "#/definitions/S3DataSourceConfiguration"
+          },
+          ConfluenceConfiguration: {
+            "$ref" : "#/definitions/ConfluenceDataSourceConfiguration"
+          },
+          SalesforceConfiguration: {
+            "$ref" : "#/definitions/SalesforceDataSourceConfiguration"
+          },
+          SharePointConfiguration: {
+            "$ref" : "#/definitions/SharePointDataSourceConfiguration"
+          },
+          WebConfiguration: {
+            "$ref" : "#/definitions/WebDataSourceConfiguration"
+          }
+        },
+        required: ['Type'],
+        additionalProperties: false,
+      },
+      reason,
+    )(lens);
+  }),
 );
