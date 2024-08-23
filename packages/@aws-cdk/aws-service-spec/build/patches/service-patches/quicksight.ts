@@ -4,7 +4,7 @@ import { forResource, registerServicePatches, replaceDefinition } from './core';
 registerServicePatches(
   forResource('AWS::QuickSight::DataSet', (lens) => {
     const reason = patching.Reason.sourceIssue(
-      'RefreshConfiguration property is marked as optional unintentionally.',
+      'RefreshConfiguration property is marked as optional unintentionally by service team. Set it back.',
     );
     replaceDefinition(
       'DataSetRefreshProperties',
