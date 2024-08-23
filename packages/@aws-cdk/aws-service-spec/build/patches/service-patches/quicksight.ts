@@ -9,15 +9,15 @@ registerServicePatches(
     replaceDefinition(
       'DataSetRefreshProperties',
       {
-        "type" : "object",
-        "description" : "<p>The refresh properties of a dataset.</p>",
-        "properties" : {
-          "RefreshConfiguration" : {
-            "$ref" : "#/definitions/RefreshConfiguration"
+        type: "object",
+        description: "<p>The refresh properties of a dataset.</p>",
+        properties: {
+          RefreshConfiguration: {
+            "$ref": "#/definitions/RefreshConfiguration"
           }
         },
-        "required" : [ "RefreshConfiguration" ],
-        "additionalProperties" : false
+        required: [ "RefreshConfiguration" ],
+        additionalProperties: false
       },
       reason,
     )(lens);
