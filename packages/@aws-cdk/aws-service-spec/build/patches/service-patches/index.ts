@@ -23,6 +23,7 @@ import './dms';
 import './elasticsearch';
 import './iot1click';
 import './opensearch';
+import './quicksight';
 import './rds';
 import './resiliencehub';
 import './s3';
