@@ -23,6 +23,10 @@ export namespace jsonschema {
     return x && typeof x === 'object' && !Array.isArray(x) && Object.keys(x).length === 0;
   }
 
+  function isTypeDefined(x: any) {
+    return 'type' in x;
+  }
+
   export interface Annotatable {
     readonly $comment?: string;
     readonly description?: string;
@@ -78,8 +82,35 @@ export namespace jsonschema {
     readonly anyOf: Array<S>;
   }
 
+  /**
+  * Determines whether or not the provided schema represents an `anyOf` type operator.
+  *
+  * Examples:
+  *
+  * const schema = {
+  *   "anyOf": [
+  *     { schema 1 },
+  *     { schema 2 },
+  *     { schema 3 }
+  *   ]
+  * };
+  * jsonschema.isAnyOf(schema) -> true
+  *
+  * const schema = {
+  *   "type": "string",
+  *   "anyOf": [
+  *     { schema 1 },
+  *     { schema 2 },
+  *     { schema 3 }
+  *   ]
+  * };
+  * jsonschema.isAnyOf(schema) -> false
+  *
+  *
+  * @returns true if the schema represents an `anyOf` type operator. Otherwise, false.
+  */
   export function isAnyOf(x: Schema): x is AnyOf<any> {
-    return !isAnyType(x) && 'anyOf' in x;
+    return !isAnyType(x) && !isTypeDefined(x) && 'anyOf' in x;
   }
 
   export interface OneOf<S> extends Annotatable {
@@ -96,16 +127,71 @@ export namespace jsonschema {
     }
   }
 
+  /**
+   * Determines whether or not the provided schema represents a `oneOf` type operator.
+   *
+   * Examples:
+   *
+   * const schema = {
+   *   "oneOf": [
+   *     { schema 1 },
+   *     { schema 2 },
+   *     { schema 3 }
+   *   ]
+   * };
+   * jsonschema.isOneOf(schema) -> true
+   *
+   * const schema = {
+   *   "type": "object",
+   *   "properties": {
+   *     "property1": "value1",
+   *     "property2": "value2"
+   *   },
+   *   "oneOf": [
+   *     { schema 1 },
+   *     { schema 2 }
+   *   ]
+   * };
+   * jsonschema.isOneOf(schema) -> false
+   *
+   * @returns true if the schema represents a `oneOf` type operator. Otherwise, false.
+   */
   export function isOneOf(x: Schema): x is OneOf<any> {
-    return !isAnyType(x) && 'oneOf' in x;
+    return !isAnyType(x) && !isTypeDefined(x) && 'oneOf' in x;
   }
 
   export interface AllOf<S> extends Annotatable {
     readonly allOf: Array<S>;
   }
 
+  /**
+   * Determines whether or not the provided schema represents an `allOf` type operator.
+   *
+   * Examples:
+   *
+   * const schema = {
+   *   "allOf": [
+   *     { schema 1 },
+   *     { schema 2 },
+   *     { schema 3 }
+   *   ]
+   * };
+   * jsonschema.isAllOf(schema) -> true
+   *
+   * const schema = {
+   *   "type": "string",
+   *   "allOf": [
+   *     { schema 1 },
+   *     { schema 2 }
+   *   ]
+   * };
+   * jsonschema.isAllOf(schema) -> false
+   *
+   *
+   * @returns true if the schema represents an `allOf` type operator. Otherwise, false.
+   */
   export function isAllOf(x: Schema): x is AllOf<any> {
-    return !isAnyType(x) && 'allOf' in x;
+    return !isAnyType(x) && !isTypeDefined(x) && 'allOf' in x;
   }
 
   export interface MapLikeObject extends Annotatable {
