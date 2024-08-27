@@ -121,7 +121,20 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         report.reportFailure('interpreting', ...convertedTypes.filter(isFailure));
 
         const types = convertedTypes.filter(isSuccess);
-        removeUnionDuplicates(types);
+        try {
+          removeUnionDuplicates(types);
+        } catch (e) {
+          throw new Error(
+            `removeUnionDuplicates threw.\njsonschema.isOneOf() returned ${jsonschema.isOneOf(
+              resolvedSchema,
+            )}, type in is ${'type' in resolvedSchema}. JsonSchema is ${JSON.stringify(resolvedSchema, undefined, 2)}\n
+            length of the schema is: ${Object.keys(resolvedSchema).length},\n
+            inner is: ${JSON.stringify(inner, undefined, 2)}\n
+            convertedTypes is: ${JSON.stringify(convertedTypes, undefined, 2)}\n
+            types is: ${JSON.stringify(types, undefined, 2)}\n
+            `,
+          );
+        }
 
         return { type: 'union', types };
       } else if (jsonschema.isAllOf(resolvedSchema)) {
