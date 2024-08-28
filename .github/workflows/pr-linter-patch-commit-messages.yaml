@@ -1,0 +1,37 @@
+name: PR Linters to verify patches commit message
+
+on:
+  pull_request:
+    paths:
+      - 'packages/@aws-cdk/aws-service-spec/build/patches/service-patches/**'
+
+jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Validate patches commit messages
+        run: |
+          # Initialize a flag to track if a valid commit message is found
+          VALID_COMMIT_FOUND=false
+
+          # Loop through each commit in the PR
+          for COMMIT in $(git rev-list --no-merges origin/main..HEAD); do
+            MESSAGE=$(git log -1 --pretty=%B $COMMIT)
+
+            # Check if the commit message starts with 'feat' or 'fix'
+            if [[ $MESSAGE =~ ^(feat|fix) ]]; then
+              VALID_COMMIT_FOUND=true
+              break
+            fi
+          done
+
+          # Fail the workflow if no valid commit message is found
+          if [ "$VALID_COMMIT_FOUND" = false ]; then
+            echo "Schema patches should include either 'feat' or 'fix' in the commit messages."
+            exit 1
+          fi
