@@ -159,7 +159,7 @@ export namespace jsonschema {
   export function isOneOf(x: Schema): x is OneOf<any> {
     if ('oneOf' in (x as any) && !isAnyType(x)) {
       for (const elem of (x as any).oneOf) {
-        if (!isAnyType(elem) && isTypeDefined(elem)) {
+        if (!isAnyType(elem) && (isTypeDefined(elem) || isReference(elem))) {
           return true;
         }
       }
