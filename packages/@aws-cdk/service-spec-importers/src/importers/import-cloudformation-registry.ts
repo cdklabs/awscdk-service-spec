@@ -1,3 +1,4 @@
+//import { appendFileSync } from 'fs';
 import { PropertyType, RichPropertyType, SpecDatabase, TagVariant } from '@aws-cdk/service-spec-types';
 import { locateFailure, Fail, failure, isFailure, Result, tryCatch, using, ref, isSuccess } from '@cdklabs/tskb';
 import { ProblemReport, ReportAudience } from '../report';
@@ -69,7 +70,8 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     }
 
     const required = calculateDefinitelyRequired(source);
-
+    //appendFileSync('foo2', 'required.has("AuthParameters") ' + required.has('AuthParameters') + '\n');
+    //appendFileSync('foo2', 'required.has("DataSourceConfiguration") ' + required.has('DataSourceConfiguration') + '\n');
     for (const [name, property] of Object.entries(source.properties)) {
       let resolvedSchema = resolve(property);
 
@@ -80,6 +82,33 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
           required: required.has(name),
           defaultValue: describeDefault(resolvedSchema),
         });
+
+        /////////////////
+        //appendFileSync('foo', 'title ' + source.title + '\n');
+        //appendFileSync('foo', 'name ' + name + '\n');
+        //appendFileSync('foo', 'required.has(name) ' + required.has(name) + '\n');
+        /*
+        if ('AuthParameters' in source.properties) {
+          throw new Error(
+            `AuthParameters in properties! AuthParameters in required == ${required.has('AuthParameters')}`,
+          );
+        }
+        if (name === 'AuthParameters') {
+          throw new Error(
+            `setting set property to: ${JSON.stringify(
+              {
+                type,
+                documentation: descriptionOf(resolvedSchema),
+                required: required.has(name),
+                defaultValue: describeDefault(resolvedSchema),
+              },
+              undefined,
+              2,
+            )}`,
+          );
+        }
+          */
+        /////////////////
       });
     }
   }
@@ -96,6 +125,44 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       const reference = jsonschema.resolvedReference(resolvedSchema);
       const referenceName = jsonschema.resolvedReferenceName(resolvedSchema);
       const nameHint = referenceName ? lastWord(referenceName) : lastWord(propertyName);
+
+      ///////////////////
+      /*
+      if (
+        nameHint.includes('MultiplexVideoSettings') ||
+        nameHint.includes('MultiplexStatmuxVideoSettings') ||
+        nameHint.includes('NetworkInterfaces')
+      ) {
+        report.reportFailure(
+          'interpreting',
+          fail(
+            nameHint +
+              ' top-level ' +
+              JSON.stringify(resolvedSchema) +
+              '\n' +
+              'oneOf: ' +
+              jsonschema.isOneOf(resolvedSchema),
+          ),
+        );
+        */
+      /*
+        throw new Error(
+          `multiplexvideosettings found, schema is: ${JSON.stringify(resolvedSchema, undefined, 2)}
+          \n jsonschema.isOneOf returned ${jsonschema.isOneOf(resolvedSchema)}\n
+          keys: ${Object.keys(resolvedSchema)}
+          type in: ${'type' in (resolvedSchema as any)}
+
+
+          `,
+        );
+      }
+          */
+
+      if ('oneOf' in (resolvedSchema as any)) {
+        report.reportFailure('interpreting', fail(nameHint + ' top-level'));
+        //console.log(`oneOf spotted in ${nameHint}, schema is: ${JSON.stringify(resolvedSchema, undefined, 2)}`);
+      }
+      ///////////////////
 
       if (jsonschema.isAnyType(resolvedSchema)) {
         return { type: 'json' };
@@ -121,6 +188,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         report.reportFailure('interpreting', ...convertedTypes.filter(isFailure));
 
         const types = convertedTypes.filter(isSuccess);
+        ///////////////////////////////////////
         try {
           removeUnionDuplicates(types);
         } catch (e) {
@@ -135,6 +203,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
             `,
           );
         }
+        ///////////////////////////////////////
 
         return { type: 'union', types };
       } else if (jsonschema.isAllOf(resolvedSchema)) {
@@ -142,6 +211,15 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         const firstResolved = resolvedSchema.allOf[0];
         return schemaTypeToModelType(nameHint, resolve(firstResolved), fail);
       } else {
+        ///////////////////
+        if (
+          nameHint.includes('MultiplexVideoSettings') ||
+          nameHint.includes('MultiplexStatmuxVideoSettings') ||
+          nameHint.includes('NetworkInterfaces')
+        ) {
+          report.reportFailure('interpreting', fail(nameHint + ' 4 ' + JSON.stringify(resolvedSchema, undefined, 2)));
+        }
+        ///////////////////
         switch (resolvedSchema.type) {
           case 'string':
             if (resolvedSchema.format === 'timestamp') {
@@ -150,6 +228,18 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
             return { type: 'string' };
 
           case 'array':
+            ///////////////////
+            if (
+              nameHint.includes('MultiplexVideoSettings') ||
+              nameHint.includes('MultiplexStatmuxVideoSettings') ||
+              nameHint.includes('NetworkInterfaces')
+            ) {
+              report.reportFailure(
+                'interpreting',
+                fail(nameHint + ' 20 ' + JSON.stringify(resolvedSchema, undefined, 2)),
+              );
+            }
+            ///////////////////
             // FIXME: insertionOrder, uniqueItems
             return using(
               schemaTypeToModelType(collectionNameHint(nameHint), resolve(resolvedSchema.items ?? true), fail),
@@ -163,6 +253,15 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
             return { type: 'boolean' };
 
           case 'object':
+            ///////////////////
+            if (
+              nameHint.includes('MultiplexVideoSettings') ||
+              nameHint.includes('MultiplexStatmuxVideoSettings') ||
+              nameHint.includes('NetworkInterfaces')
+            ) {
+              report.reportFailure('interpreting', fail(nameHint + ' 8'));
+            }
+            ///////////////////
             return schemaObjectToModelType(nameHint, resolvedSchema, fail);
 
           case 'number':
@@ -182,6 +281,15 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
   function schemaObjectToModelType(nameHint: string, schema: jsonschema.Object, fail: Fail): Result<PropertyType> {
     if (jsonschema.isMapLikeObject(schema)) {
+      ///////////////////
+      if (
+        nameHint.includes('MultiplexVideoSettings') ||
+        nameHint.includes('MultiplexStatmuxVideoSettings') ||
+        nameHint.includes('NetworkInterfaces')
+      ) {
+        report.reportFailure('interpreting', fail(nameHint + ' 13'));
+      }
+      ///////////////////
       return mapLikeSchemaToModelType(nameHint, schema, fail);
     } else {
       return objectLikeSchemaToModelType(nameHint, schema, fail);
@@ -228,6 +336,16 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         element,
       }));
     }
+
+    ///////////////////
+    if (
+      nameHint.includes('MultiplexVideoSettings') ||
+      nameHint.includes('MultiplexStatmuxVideoSettings') ||
+      nameHint.includes('NetworkInterfaces')
+    ) {
+      report.reportFailure('interpreting', fail(nameHint + ' 17'));
+    }
+    ///////////////////
 
     // Fully untyped map that's not a type
     // @todo types should probably also just be json since they are useless otherwise. Fix after this package is in use.
@@ -333,9 +451,11 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
   function calculateDefinitelyRequired(source: RequiredContainer): Set<string> {
     const ret = new Set([...(source.required ?? [])]);
 
+    /*
     if (source.oneOf) {
       setExtend(ret, setIntersect(...source.oneOf.map(calculateDefinitelyRequired)));
     }
+      */
     if (source.anyOf) {
       setExtend(ret, setIntersect(...source.anyOf.map(calculateDefinitelyRequired)));
     }
