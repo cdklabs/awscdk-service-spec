@@ -110,7 +110,7 @@ export namespace jsonschema {
    * @returns true if the schema represents an `anyOf` type operator. Otherwise, false.
    */
   export function isAnyOf(x: Schema): x is AnyOf<any> {
-    return !isAnyType(x) && !isTypeDefined(x) && 'anyOf' in x;
+    return !isAnyType(x) && 'anyOf' in x;
   }
 
   export interface OneOf<S> extends Annotatable {
@@ -198,7 +198,7 @@ export namespace jsonschema {
    * @returns true if the schema represents an `allOf` type operator. Otherwise, false.
    */
   export function isAllOf(x: Schema): x is AllOf<any> {
-    return !isAnyType(x) && !isTypeDefined(x) && 'allOf' in x;
+    return !isAnyType(x) && 'allOf' in x;
   }
 
   export interface MapLikeObject extends Annotatable {
