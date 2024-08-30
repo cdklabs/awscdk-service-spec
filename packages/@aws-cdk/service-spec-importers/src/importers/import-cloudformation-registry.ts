@@ -451,11 +451,9 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
   function calculateDefinitelyRequired(source: RequiredContainer): Set<string> {
     const ret = new Set([...(source.required ?? [])]);
 
-    /*
     if (source.oneOf) {
       setExtend(ret, setIntersect(...source.oneOf.map(calculateDefinitelyRequired)));
     }
-      */
     if (source.anyOf) {
       setExtend(ret, setIntersect(...source.anyOf.map(calculateDefinitelyRequired)));
     }
