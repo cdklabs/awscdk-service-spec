@@ -165,8 +165,6 @@ export namespace jsonschema {
       }
     }
     return false;
-    //return !isAnyType(x) && !isTypeDefined(x) && 'oneOf' in x;
-    //return !isAnyType(x) && 'oneOf' in x;
   }
 
   export interface AllOf<S> extends Annotatable {
