@@ -202,7 +202,6 @@ test('reference types are correctly named', () => {
 });
 
 test('read required properties from allOf/anyOf', () => {
-  /*
   importCloudFormationRegistryResource({
     db,
     report,
@@ -231,7 +230,158 @@ test('read required properties from allOf/anyOf', () => {
     .filter(([_, value]) => value.required)
     .map(([name, _]) => name);
   expect(requiredProps).toContain('InBoth');
-  */
+});
+
+test('oneOf containing a list of "required" properties and a required property', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::OneOf::Required',
+      description: 'Resource Type Description',
+      definitions: {
+        OneConfiguration: {
+          type: 'object',
+          properties: {
+            Foo: { type: 'string' },
+          },
+        },
+        AnotherConfiguration: {
+          type: 'object',
+          properties: {
+            Bar: { type: 'string' },
+          },
+        },
+        SomeConfigurationProp: {
+          type: 'object',
+          description: 'does something useful',
+          properties: {
+            Type: {
+              $ref: '#/definitions/SomeType',
+            },
+            OneConfiguration: {
+              $ref: '#/definitions/OneConfiguration',
+            },
+            AnotherConfiguration: {
+              $ref: '#/definitions/AnotherConfiguration',
+            },
+          },
+          required: ['Type'],
+          oneOf: [{ required: ['OneConfiguration'] }, { required: ['AnotherConfiguration'] }],
+          additionalProperties: false,
+        },
+        SomeType: {
+          type: 'string',
+          description: 'which config to use',
+          enum: ['ONE', 'ANOTHERONE'],
+        },
+      },
+      properties: {
+        DataSourceConfiguration: {
+          $ref: '#/definitions/SomeConfigurationProp',
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::OneOf::Required').only();
+  const requiredProps = Object.entries(resource.properties)
+    .filter(([_, value]) => value.required)
+    .map(([name, _]) => name);
+  expect(requiredProps.length).toBe(0);
+  expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+});
+
+test('oneOf containing a list of entire resource definitions', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::Complex::OneOf',
+      description: 'Resource Type Description',
+      definitions: {
+        MultiplexVideoSettings: {
+          description: 'The video configuration for each program in a multiplex.',
+          type: 'object',
+          oneOf: [
+            {
+              type: 'object',
+              properties: {
+                SomethingRequired: {
+                  type: 'integer',
+                  description: 'something',
+                  minimum: 100000,
+                  maximum: 100000000,
+                },
+              },
+              required: ['SomethingRequired'],
+              additionalProperties: false,
+            },
+            {
+              type: 'object',
+              properties: {
+                StatmuxSettings: {
+                  description: 'foobar',
+                  $ref: '#/definitions/MultiplexStatmuxVideoSettings',
+                },
+              },
+              required: ['StatmuxSettings'],
+              additionalProperties: false,
+            },
+          ],
+        },
+        MultiplexProgramSettings: {
+          description: 'some helpful documentation',
+          type: 'object',
+          properties: {
+            FooProp: {
+              type: 'string',
+              description: 'something useful',
+            },
+            VideoSettings: {
+              $ref: '#/definitions/MultiplexVideoSettings',
+              description: 'Program video settings configuration.',
+            },
+          },
+          required: ['FooProp'],
+          additionalProperties: false,
+        },
+        MultiplexStatmuxVideoSettings: {
+          description: 'Statmux rate control settings',
+          type: 'object',
+          properties: {
+            Foo: {
+              type: 'integer',
+              description: 'anything',
+              minimum: 0,
+              maximum: 2,
+            },
+          },
+          additionalProperties: false,
+        },
+      },
+      properties: {
+        MultiplexProgramSettings: {
+          description: 'The settings for this multiplex program.',
+          $ref: '#/definitions/MultiplexProgramSettings',
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Complex::OneOf').only();
+  const requiredProps = Object.entries(resource.properties)
+    .filter(([_, value]) => value.required)
+    .map(([name, _]) => name);
+  expect(requiredProps.length).toBe(0);
+});
+
+test('a type definition using oneOf to define required properties', () => {
+  // multiplex
+});
+
+test('a type definition using oneOf to define required properties', () => {
+  // events
 });
 
 test('only object types get type definitions', () => {
