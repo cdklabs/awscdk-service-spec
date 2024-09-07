@@ -30,3 +30,4 @@ import './s3';
 import './sagemaker';
 import './wafv2';
 import './securitylake';
+import './iotfleetwise';
