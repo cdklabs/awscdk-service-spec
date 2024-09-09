@@ -338,7 +338,7 @@ test('oneOf with only a reference', () => {
   const requiredProps = Object.entries(resource.properties)
     .filter(([_, value]) => value.required)
     .map(([name, _]) => name);
-  //expect(Object.keys(resource.properties)).toContain('OneOfRef');
+  expect(Object.keys(resource.properties)).toContain('OneOfRef');
   expect(requiredProps.length).toBe(0);
 });
 
@@ -392,7 +392,6 @@ test('oneOf with only a type definition', () => {
   const requiredProps = Object.entries(resource.properties)
     .filter(([_, value]) => value.required)
     .map(([name, _]) => name);
-  //report.write('foobar');
   expect(Object.keys(resource.properties)).toContain('FooOrBar');
   expect(requiredProps.length).toBe(0);
 });

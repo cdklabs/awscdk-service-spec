@@ -86,30 +86,6 @@ export namespace jsonschema {
 
   /**
    * Determines whether or not the provided schema represents an `anyOf` type operator.
-   *
-   * Examples:
-   *
-   * const schema = {
-   *   "anyOf": [
-   *     { schema 1 },
-   *     { schema 2 },
-   *     { schema 3 }
-   *   ]
-   * };
-   * jsonschema.isAnyOf(schema) -> true
-   *
-   * const schema = {
-   *   "type": "string",
-   *   "anyOf": [
-   *     { schema 1 },
-   *     { schema 2 },
-   *     { schema 3 }
-   *   ]
-   * };
-   * jsonschema.isAnyOf(schema) -> false
-   *
-   *
-   * @returns true if the schema represents an `anyOf` type operator. Otherwise, false.
    */
   export function isAnyOf(x: Schema): x is AnyOf<any> {
     return !isAnyType(x) && 'anyOf' in x;
