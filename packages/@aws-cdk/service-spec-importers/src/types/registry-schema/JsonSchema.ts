@@ -131,32 +131,6 @@ export namespace jsonschema {
 
   /**
    * Determines whether or not the provided schema represents a `oneOf` type operator.
-   *
-   * Examples:
-   *
-   * const schema = {
-   *   "oneOf": [
-   *     { schema 1 },
-   *     { schema 2 },
-   *     { schema 3 }
-   *   ]
-   * };
-   * jsonschema.isOneOf(schema) -> true
-   *
-   * const schema = {
-   *   "type": "object",
-   *   "properties": {
-   *     "property1": "value1",
-   *     "property2": "value2"
-   *   },
-   *   "oneOf": [
-   *     { schema 1 },
-   *     { schema 2 }
-   *   ]
-   * };
-   * jsonschema.isOneOf(schema) -> false
-   *
-   * @returns true if the schema represents a `oneOf` type operator. Otherwise, false.
    */
   export function isOneOf(x: Schema): x is OneOf<any> {
     if ('oneOf' in (x as any) && !isAnyType(x)) {
@@ -175,29 +149,6 @@ export namespace jsonschema {
 
   /**
    * Determines whether or not the provided schema represents an `allOf` type operator.
-   *
-   * Examples:
-   *
-   * const schema = {
-   *   "allOf": [
-   *     { schema 1 },
-   *     { schema 2 },
-   *     { schema 3 }
-   *   ]
-   * };
-   * jsonschema.isAllOf(schema) -> true
-   *
-   * const schema = {
-   *   "type": "string",
-   *   "allOf": [
-   *     { schema 1 },
-   *     { schema 2 }
-   *   ]
-   * };
-   * jsonschema.isAllOf(schema) -> false
-   *
-   *
-   * @returns true if the schema represents an `allOf` type operator. Otherwise, false.
    */
   export function isAllOf(x: Schema): x is AllOf<any> {
     return !isAnyType(x) && 'allOf' in x;
