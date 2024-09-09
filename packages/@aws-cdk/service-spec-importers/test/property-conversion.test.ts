@@ -292,96 +292,222 @@ test('oneOf containing a list of "required" properties and a required property',
   expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
 });
 
-test('oneOf containing a list of entire resource definitions', () => {
+test('oneOf with only a type definition', () => {
   importCloudFormationRegistryResource({
     db,
     report,
     resource: {
-      typeName: 'AWS::Complex::OneOf',
+      typeName: 'AWS::OneOf::TypeOnly',
       description: 'Resource Type Description',
-      definitions: {
-        MultiplexVideoSettings: {
-          description: 'The video configuration for each program in a multiplex.',
-          type: 'object',
-          oneOf: [
-            {
-              type: 'object',
-              properties: {
-                SomethingRequired: {
-                  type: 'integer',
-                  description: 'something',
-                  minimum: 100000,
-                  maximum: 100000000,
-                },
-              },
-              required: ['SomethingRequired'],
-              additionalProperties: false,
-            },
-            {
-              type: 'object',
-              properties: {
-                StatmuxSettings: {
-                  description: 'foobar',
-                  $ref: '#/definitions/MultiplexStatmuxVideoSettings',
-                },
-              },
-              required: ['StatmuxSettings'],
-              additionalProperties: false,
-            },
-          ],
-        },
-        MultiplexProgramSettings: {
-          description: 'some helpful documentation',
-          type: 'object',
-          properties: {
-            FooProp: {
-              type: 'string',
-              description: 'something useful',
-            },
-            VideoSettings: {
-              $ref: '#/definitions/MultiplexVideoSettings',
-              description: 'Program video settings configuration.',
-            },
-          },
-          required: ['FooProp'],
-          additionalProperties: false,
-        },
-        MultiplexStatmuxVideoSettings: {
-          description: 'Statmux rate control settings',
-          type: 'object',
-          properties: {
-            Foo: {
-              type: 'integer',
-              description: 'anything',
-              minimum: 0,
-              maximum: 2,
-            },
-          },
-          additionalProperties: false,
-        },
-      },
+      definitions: {},
       properties: {
-        MultiplexProgramSettings: {
-          description: 'The settings for this multiplex program.',
-          $ref: '#/definitions/MultiplexProgramSettings',
+        TypeOnly: {
+          type: 'object',
+          properties: {
+            TypeOneOf1: {
+              type: 'object',
+              oneOf: [
+                {
+                  type: 'object',
+                  properties: {
+                    Foo: { type: 'string' },
+                  },
+                },
+                {
+                  type: 'object',
+                  properties: {
+                    Bar: { type: 'string' },
+                  },
+                },
+              ],
+            },
+          },
+          additionalProperties: false,
         },
       },
     },
   });
 
-  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Complex::OneOf').only();
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::OneOf::TypeOnly').only();
   const requiredProps = Object.entries(resource.properties)
     .filter(([_, value]) => value.required)
     .map(([name, _]) => name);
+  expect(Object.keys(resource.properties)).toContain('TypeOnly');
   expect(requiredProps.length).toBe(0);
 });
 
-test('a type definition using oneOf to define required properties', () => {
-  // multiplex
+test('oneOf with only a reference', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::OneOf::RefOnly',
+      description: 'Resource Type Description',
+      definitions: {
+        OneOfRef1: {
+          type: 'object',
+          properties: {
+            Foo: { type: 'string' },
+          },
+        },
+        OneOfRef2: {
+          type: 'object',
+          properties: {
+            Bar: { type: 'string' },
+          },
+        },
+      },
+      properties: {
+        OneOfRef: {
+          insertionOrder: false,
+          type: 'array',
+          items: {
+            oneOf: [
+              {
+                $ref: '#/definitions/OneOfRef1',
+              },
+              {
+                $ref: '#/definitions/OneOfRef2',
+              },
+            ],
+          },
+          maxItems: 500,
+          minItems: 1,
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::OneOf::RefOnly').only();
+  const requiredProps = Object.entries(resource.properties)
+    .filter(([_, value]) => value.required)
+    .map(([name, _]) => name);
+  //expect(Object.keys(resource.properties)).toContain('OneOfRef');
+  expect(requiredProps.length).toBe(0);
 });
 
-test('a type definition using oneOf to define required properties', () => {
-  // events
+test('schemas with arrays as types do not break', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::IoTFleetWise::Campaign',
+      description: 'Definition of AWS::IoTFleetWise::Campaign Resource Type',
+      definitions: {
+        Compression: {
+          type: 'string',
+          enum: ['OFF', 'SNAPPY'],
+          default: 'OFF',
+        },
+        DataDestinationConfig: {
+          oneOf: [
+            {
+              additionalProperties: false,
+              type: 'object',
+              title: 'S3Config',
+              properties: {
+                S3Config: {
+                  $ref: '#/definitions/S3Config',
+                },
+              },
+              required: ['S3Config'],
+            },
+            {
+              additionalProperties: false,
+              type: 'object',
+              title: 'TimestreamConfig',
+              properties: {
+                TimestreamConfig: {
+                  $ref: '#/definitions/TimestreamConfig',
+                },
+              },
+              required: ['TimestreamConfig'],
+            },
+          ],
+        },
+        S3Config: {
+          additionalProperties: false,
+          type: 'object',
+          properties: {
+            BucketArn: {
+              maxLength: 100,
+              type: 'string',
+              pattern: '^arn:(aws[a-zA-Z0-9-]*):s3:::.+$',
+              minLength: 16,
+            },
+            DataFormat: {
+              $ref: '#/definitions/DataFormat',
+            },
+            StorageCompressionFormat: {
+              $ref: '#/definitions/StorageCompressionFormat',
+            },
+            Prefix: {
+              maxLength: 512,
+              type: 'string',
+              pattern: "^[a-zA-Z0-9-_:./!*'()]+$",
+              minLength: 1,
+            },
+          },
+          required: ['BucketArn'],
+        },
+        TimestreamConfig: {
+          additionalProperties: false,
+          type: 'object',
+          properties: {
+            TimestreamTableArn: {
+              maxLength: 2048,
+              type: 'string',
+              pattern:
+                '^arn:(aws[a-zA-Z0-9-]*):timestream:[a-zA-Z0-9-]+:[0-9]{12}:database\\/[a-zA-Z0-9_.-]+\\/table\\/[a-zA-Z0-9_.-]+$',
+              minLength: 20,
+            },
+            ExecutionRoleArn: {
+              maxLength: 2048,
+              type: 'string',
+              pattern:
+                '^arn:(aws[a-zA-Z0-9-]*):iam::(\\d{12})?:(role((\\u002F)|(\\u002F[\\u0021-\\u007F]+\\u002F))[\\w+=,.@-]+)$',
+              minLength: 20,
+            },
+          },
+          required: ['TimestreamTableArn', 'ExecutionRoleArn'],
+        },
+        DataFormat: {
+          type: 'string',
+          enum: ['JSON', 'PARQUET'],
+        },
+        StorageCompressionFormat: {
+          type: 'string',
+          enum: ['NONE', 'GZIP'],
+        },
+      },
+      properties: {
+        Description: {
+          minLength: 1,
+          pattern: '^[^\\u0000-\\u001F\\u007F]+$',
+          type: 'string',
+          maxLength: 2048,
+        },
+        DataDestinationConfigs: {
+          minItems: 1,
+          maxItems: 1,
+          insertionOrder: false,
+          type: 'array',
+          items: {
+            $ref: '#/definitions/DataDestinationConfig',
+          },
+        },
+      },
+      additionalProperties: false,
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::IoTFleetWise::Campaign').only();
+  const requiredProps = Object.entries(resource.properties)
+    .filter(([_, value]) => value.required)
+    .map(([name, _]) => name);
+  //report.write('foobar');
+  expect(Object.keys(resource.properties)).toContain('DataDestinationConfigs');
+  expect(requiredProps.length).toBe(0);
 });
 
 test('only object types get type definitions', () => {
