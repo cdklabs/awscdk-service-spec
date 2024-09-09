@@ -1,3 +1,5 @@
+import { CommonTypeCombinatorFields } from './CloudFormationRegistrySchema';
+
 export namespace jsonschema {
   export type Schema = SingletonSchema | OneOf<Schema> | AnyOf<Schema> | AllOf<Schema>;
 
@@ -15,7 +17,7 @@ export namespace jsonschema {
 
   export type EmptyObject = Record<string, never>;
 
-  export function isAnyType(x: Schema): x is AnyType {
+  export function isAnyType(x: Schema | CommonTypeCombinatorFields): x is AnyType {
     return x === true || isEmptyObject(x);
   }
 
@@ -158,7 +160,7 @@ export namespace jsonschema {
    */
   export function isOneOf(x: Schema): x is OneOf<any> {
     if ('oneOf' in (x as any) && !isAnyType(x)) {
-      for (const elem of (x as any).oneOf) {
+      for (const elem of (x as RecordLikeObject).oneOf!) {
         if (!isAnyType(elem) && (isTypeDefined(elem) || isReference(elem))) {
           return true;
         }
@@ -231,6 +233,7 @@ export namespace jsonschema {
     readonly type: 'object';
     readonly properties: ObjectProperties;
     readonly required?: string[];
+    readonly oneOf?: (CommonTypeCombinatorFields | RecordLikeObject)[];
     /**
      * FIXME: should be required but some service teams have omitted it.
      */
@@ -442,7 +445,7 @@ export namespace jsonschema {
    */
   export type Resolver = ReturnType<typeof makeResolver>;
 
-  export function isReference(x: Schema): x is Reference {
+  export function isReference(x: Schema | CommonTypeCombinatorFields): x is Reference {
     if (x === undefined) {
       debugger;
     }
