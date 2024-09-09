@@ -49,6 +49,7 @@
         "RELEASETAG": "dist/releasetag.txt",
         "RELEASE_TAG_PREFIX": "@aws-cdk/service-spec-importers@",
         "VERSIONRCOPTIONS": "{\"path\":\".\"}",
+        "BUMP_PACKAGE": "commit-and-tag-version@^12",
         "RELEASABLE_COMMITS": "git log --oneline $LATEST_TAG..HEAD -- ."
       },
       "steps": [
@@ -230,6 +231,7 @@
         "RELEASETAG": "dist/releasetag.txt",
         "RELEASE_TAG_PREFIX": "@aws-cdk/service-spec-importers@",
         "VERSIONRCOPTIONS": "{\"path\":\".\"}",
+        "BUMP_PACKAGE": "commit-and-tag-version@^12",
         "RELEASABLE_COMMITS": "git log --oneline $LATEST_TAG..HEAD -- ."
       },
       "steps": [
