@@ -109,7 +109,7 @@ export interface CloudFormationRegistryResource extends ImplicitJsonSchemaRecord
  *
  * (They can be nested)
  */
-interface CommonTypeCombinatorFields {
+export interface CommonTypeCombinatorFields {
   readonly required?: string[];
   readonly type?: string;
   readonly oneOf?: CommonTypeCombinatorFields[];

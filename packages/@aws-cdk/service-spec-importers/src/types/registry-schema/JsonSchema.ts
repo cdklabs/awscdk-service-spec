@@ -1,3 +1,5 @@
+import { CommonTypeCombinatorFields } from './CloudFormationRegistrySchema';
+
 export namespace jsonschema {
   export type Schema = SingletonSchema | OneOf<Schema> | AnyOf<Schema> | AllOf<Schema>;
 
@@ -15,12 +17,16 @@ export namespace jsonschema {
 
   export type EmptyObject = Record<string, never>;
 
-  export function isAnyType(x: Schema): x is AnyType {
+  export function isAnyType(x: Schema | CommonTypeCombinatorFields): x is AnyType {
     return x === true || isEmptyObject(x);
   }
 
   function isEmptyObject(x: any) {
     return x && typeof x === 'object' && !Array.isArray(x) && Object.keys(x).length === 0;
+  }
+
+  function isTypeDefined(x: any) {
+    return 'type' in x;
   }
 
   export interface Annotatable {
@@ -78,6 +84,9 @@ export namespace jsonschema {
     readonly anyOf: Array<S>;
   }
 
+  /**
+   * Determines whether or not the provided schema represents an `anyOf` type operator.
+   */
   export function isAnyOf(x: Schema): x is AnyOf<any> {
     return !isAnyType(x) && 'anyOf' in x;
   }
@@ -96,14 +105,27 @@ export namespace jsonschema {
     }
   }
 
+  /**
+   * Determines whether or not the provided schema represents a `oneOf` type operator.
+   */
   export function isOneOf(x: Schema): x is OneOf<any> {
-    return !isAnyType(x) && 'oneOf' in x;
+    if ('oneOf' in (x as any) && !isAnyType(x)) {
+      for (const elem of (x as RecordLikeObject).oneOf!) {
+        if (!isAnyType(elem) && (isTypeDefined(elem) || isReference(elem))) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   export interface AllOf<S> extends Annotatable {
     readonly allOf: Array<S>;
   }
 
+  /**
+   * Determines whether or not the provided schema represents an `allOf` type operator.
+   */
   export function isAllOf(x: Schema): x is AllOf<any> {
     return !isAnyType(x) && 'allOf' in x;
   }
@@ -138,6 +160,7 @@ export namespace jsonschema {
     readonly type: 'object';
     readonly properties: ObjectProperties;
     readonly required?: string[];
+    readonly oneOf?: (CommonTypeCombinatorFields | RecordLikeObject)[];
     /**
      * FIXME: should be required but some service teams have omitted it.
      */
@@ -349,7 +372,7 @@ export namespace jsonschema {
    */
   export type Resolver = ReturnType<typeof makeResolver>;
 
-  export function isReference(x: Schema): x is Reference {
+  export function isReference(x: Schema | CommonTypeCombinatorFields): x is Reference {
     if (x === undefined) {
       debugger;
     }

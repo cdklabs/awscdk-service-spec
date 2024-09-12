@@ -232,6 +232,170 @@ test('read required properties from allOf/anyOf', () => {
   expect(requiredProps).toContain('InBoth');
 });
 
+test('oneOf containing a list of "required" properties and a required property', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::OneOf::Required',
+      description: 'Resource Type Description',
+      definitions: {
+        OneConfiguration: {
+          type: 'object',
+          properties: {
+            Foo: { type: 'string' },
+          },
+        },
+        AnotherConfiguration: {
+          type: 'object',
+          properties: {
+            Bar: { type: 'string' },
+          },
+        },
+        SomeConfigurationProp: {
+          type: 'object',
+          description: 'does something useful',
+          properties: {
+            Type: {
+              $ref: '#/definitions/SomeType',
+            },
+            OneConfiguration: {
+              $ref: '#/definitions/OneConfiguration',
+            },
+            AnotherConfiguration: {
+              $ref: '#/definitions/AnotherConfiguration',
+            },
+          },
+          required: ['Type'],
+          oneOf: [{ required: ['OneConfiguration'] }, { required: ['AnotherConfiguration'] }],
+          additionalProperties: false,
+        },
+        SomeType: {
+          type: 'string',
+          description: 'which config to use',
+          enum: ['ONE', 'ANOTHERONE'],
+        },
+      },
+      properties: {
+        DataSourceConfiguration: {
+          $ref: '#/definitions/SomeConfigurationProp',
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::OneOf::Required').only();
+  const requiredProps = Object.entries(resource.properties)
+    .filter(([_, value]) => value.required)
+    .map(([name, _]) => name);
+  expect(requiredProps.length).toBe(0);
+  expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+});
+
+test('oneOf with only a reference', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::OneOf::RefOnly',
+      description: 'Resource Type Description',
+      definitions: {
+        OneOfRef1: {
+          type: 'object',
+          properties: {
+            Foo: { type: 'string' },
+          },
+        },
+        OneOfRef2: {
+          type: 'object',
+          properties: {
+            Bar: { type: 'string' },
+          },
+        },
+      },
+      properties: {
+        OneOfRef: {
+          insertionOrder: false,
+          type: 'array',
+          items: {
+            oneOf: [
+              {
+                $ref: '#/definitions/OneOfRef1',
+              },
+              {
+                $ref: '#/definitions/OneOfRef2',
+              },
+            ],
+          },
+          maxItems: 500,
+          minItems: 1,
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::OneOf::RefOnly').only();
+  const requiredProps = Object.entries(resource.properties)
+    .filter(([_, value]) => value.required)
+    .map(([name, _]) => name);
+  expect(Object.keys(resource.properties)).toContain('OneOfRef');
+  expect(requiredProps.length).toBe(0);
+});
+
+test('oneOf with only a type definition', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::Foo::Bar',
+      description: 'Definition of AWS::Foo::Bar Resource Type',
+      definitions: {
+        FooOrBar: {
+          oneOf: [
+            {
+              additionalProperties: false,
+              type: 'object',
+              properties: {
+                Foo: {
+                  type: 'boolean',
+                },
+              },
+            },
+            {
+              additionalProperties: false,
+              type: 'object',
+              properties: {
+                Bar: {
+                  type: 'boolean',
+                },
+              },
+            },
+          ],
+        },
+      },
+      properties: {
+        FooOrBar: {
+          minItems: 1,
+          maxItems: 1,
+          insertionOrder: false,
+          type: 'array',
+          items: {
+            $ref: '#/definitions/FooOrBar',
+          },
+        },
+      },
+      additionalProperties: false,
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Foo::Bar').only();
+  const requiredProps = Object.entries(resource.properties)
+    .filter(([_, value]) => value.required)
+    .map(([name, _]) => name);
+  expect(Object.keys(resource.properties)).toContain('FooOrBar');
+  expect(requiredProps.length).toBe(0);
+});
+
 test('only object types get type definitions', () => {
   importCloudFormationRegistryResource({
     db,
