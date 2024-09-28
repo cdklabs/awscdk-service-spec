@@ -227,6 +227,8 @@ new SingleSource(repo, {
   dir: 'sources/SAMSpec',
   source: 'https://raw.githubusercontent.com/awslabs/goformation/master/schema/sam.schema.json',
 });
+
+// https://github.com/aws-cloudformation/cfn-lint/pull/3257
 new SingleSource(repo, {
   name: 'stateful-resources',
   dir: 'sources/StatefulResources',
