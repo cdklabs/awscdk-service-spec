@@ -292,6 +292,67 @@ test('oneOf containing a list of "required" properties and a required property',
   expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
 });
 
+test('anyOf containing a list of subproperties', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName : "AWS::DMS::DataProvider",
+      description : "Resource schema for AWS::DMS::DataProvider",
+      properties : {
+        Settings : {
+          description : "The property identifies the exact type of settings for the data provider.",
+          type : "object",
+          properties : {
+            PostgreSqlSettings : {
+              description : "PostgreSqlSettings property identifier.",
+              type : "object",
+              properties : {
+                ServerName : {
+                  type : "string"
+                },
+              },
+            },
+            MySqlSettings : {
+              description : "MySqlSettings property identifier.",
+              type : "object",
+              properties : {
+                ServerName : {
+                  "type" : "string"
+                },
+              },
+            },
+            OracleSettings : {
+              description : "OracleSettings property identifier.",
+              type : "object",
+              properties : {
+                ServerName : {
+                  type : "string"
+                },
+              },
+            },
+          },
+          anyOf : [ {
+            required : [ "PostgreSqlSettings" ]
+          }, {
+            required : [ "MySqlSettings" ]
+          }, {
+            required : [ "OracleSettings" ]
+          }, ],
+          additionalProperties : false
+        },
+      }
+    }
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::DMS::DataProvider').only();
+  const requiredProps = Object.entries(resource.properties)
+    .filter(([_, value]) => value.required)
+    .map(([name, _]) => name);
+  expect(requiredProps.length).toBe(0);
+  expect(Object.keys(resource.properties)).toContain('Settings');
+});
+
 test('oneOf with only a reference', () => {
   importCloudFormationRegistryResource({
     db,
