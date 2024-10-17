@@ -20,8 +20,8 @@ registerServicePatches(
     replaceResourceProperty(
       'Settings',
       {
-        description: 'The property identifies the exact type of settings for the data provider.',
         type: 'object',
+        description: 'The property identifies the exact type of settings for the data provider.',
         properties: {
           PostgreSqlSettings: {
             description: 'PostgreSqlSettings property identifier.',
@@ -135,7 +135,7 @@ registerServicePatches(
         additionalProperties: false,
       },
       patching.Reason.other(
-        'Temporary fix to fix the issue of missing the Settings property till we fix the anyOff issue'
+        'Temporary fix to fix the issue of missing the Settings property till we fix the anyOff issue',
       ),
     )(lens);
   }),

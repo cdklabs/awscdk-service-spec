@@ -36,6 +36,7 @@ export namespace jsonschema {
   }
 
   export interface Reference extends Annotatable {
+    readonly type?: 'object';
     readonly $ref: string;
 
     /**
