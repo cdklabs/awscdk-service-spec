@@ -132,6 +132,20 @@ registerServicePatches(
             additionalProperties: false,
           },
         },
+        anyOf: [
+          {
+            required: ['PostgreSqlSettings'],
+          },
+          {
+            required: ['MySqlSettings'],
+          },
+          {
+            required: ['OracleSettings'],
+          },
+          {
+            required: ['MicrosoftSqlServerSettings'],
+          },
+        ],
         additionalProperties: false,
       },
       patching.Reason.other(
