@@ -634,6 +634,10 @@
         },
         "title": {
           "type": "string"
+        },
+        "type": {
+          "const": "object",
+          "type": "string"
         }
       },
       "required": [
