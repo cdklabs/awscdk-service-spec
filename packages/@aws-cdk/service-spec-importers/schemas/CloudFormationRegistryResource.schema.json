@@ -574,6 +574,19 @@
           "description": "FIXME: should be required but some service teams have omitted it.",
           "type": "boolean"
         },
+        "anyOf": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/CommonTypeCombinatorFields"
+              },
+              {
+                "$ref": "#/definitions/jsonschema.RecordLikeObject"
+              }
+            ]
+          },
+          "type": "array"
+        },
         "description": {
           "type": "string"
         },
