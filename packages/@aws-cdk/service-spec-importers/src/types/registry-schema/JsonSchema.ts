@@ -36,6 +36,7 @@ export namespace jsonschema {
   }
 
   export interface Reference extends Annotatable {
+    readonly type?: 'object';
     readonly $ref: string;
 
     /**
@@ -161,6 +162,7 @@ export namespace jsonschema {
     readonly properties: ObjectProperties;
     readonly required?: string[];
     readonly oneOf?: (CommonTypeCombinatorFields | RecordLikeObject)[];
+    readonly anyOf?: (CommonTypeCombinatorFields | RecordLikeObject)[];
     /**
      * FIXME: should be required but some service teams have omitted it.
      */
