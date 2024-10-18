@@ -117,9 +117,9 @@ export namespace jsonschema {
    * Determines whether or not the provided schema represents a `oneOf` type operator.
    */
   export function isOneOf(x: Schema | CommonTypeCombinatorFields): x is OneOf<any> {
-    if ('oneOf' in (x as any) && !isAnyType(x)) {
-      for (const elem of (x as RecordLikeObject).oneOf!) {
-        if (!isAnyType(elem) && (isTypeDefined(elem) || isReference(elem))) {
+    if (x && !isAnyType(x) && 'oneOf' in x) {
+      for (const elem of x.oneOf!) {
+        if (!isAnyType(elem) && (isTypeDefined(elem) || isReference(elem) || isAnyOf(elem) || isOneOf(elem))) {
           return true;
         }
       }

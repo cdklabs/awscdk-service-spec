@@ -565,6 +565,67 @@ test('oneOf containing a list of "required" properties and a required property',
   expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
 });
 
+test('mix of oneOf and anyOf in one property', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::OneOf::Required',
+      description: 'Resource Type Description',
+      properties: {
+        DataSourceConfiguration: {
+          type: 'object',
+          properties: {
+            prop1: {
+              type: 'string',
+            },
+            prop2: {
+              type: 'object',
+              properties: {
+                prop2prop1: {
+                  type: 'string',
+                },
+                prop2prop2: {
+                  type: 'string',
+                },
+                prop2prop3: {
+                  type: 'string',
+                },
+              },
+              oneOf: [
+                {
+                  required: ['prop2prop1'],
+                },
+                {
+                  required: ['prop2prop2'],
+                },
+                {
+                  required: ['prop2prop3'],
+                },
+              ],
+            },
+            prop3: {
+              type: 'number',
+            },
+          },
+          anyOf: [
+            {
+              required: ['prop1', 'prop2'],
+            },
+            {
+              required: ['prop1', 'prop3'],
+            },
+          ],
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::OneOf::Required').only();
+  expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+  expect(db.all('typeDefinition').length).toBe(2);
+});
+
 test('oneOf with only a reference', () => {
   importCloudFormationRegistryResource({
     db,
