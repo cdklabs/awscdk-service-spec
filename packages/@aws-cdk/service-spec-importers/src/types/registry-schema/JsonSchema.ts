@@ -90,11 +90,8 @@ export namespace jsonschema {
    */
   export function isAnyOf(x: Schema): x is AnyOf<any> {
     if (x && !isAnyType(x) && 'anyOf' in x) {
-      for (const elem of (x as RecordLikeObject).anyOf!) {
-        if (elem && !isAnyType(elem) && (isTypeDefined(elem) || isReference(elem))) {
-          return true;
-        }
-      }
+      // differentiate between AnyOf type, and RecordLikeObject type.
+      return !('type' in x && x.type === 'object');
     }
     return false;
   }
