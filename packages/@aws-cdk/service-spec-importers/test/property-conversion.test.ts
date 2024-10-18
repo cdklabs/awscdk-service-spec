@@ -232,6 +232,49 @@ test('read required properties from allOf/anyOf', () => {
   expect(requiredProps).toContain('InBoth');
 });
 
+test('anyOf different types that exist in property with object type', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::anyOf::Required',
+      description: 'Resource Type Description',
+      properties: {
+        DataSourceConfiguration: {
+          description: 'description',
+          type: 'object',
+          anyOf: [
+            {
+              description: 'Empty Error object.',
+              type: 'object',
+              additionalProperties: false,
+            },
+            {
+              description: 'Key Value',
+              type: 'object',
+              additionalProperties: false,
+              properties: {
+                Key: {
+                  type: 'string',
+                },
+                Value: {
+                  type: 'string',
+                  enum: ['v1', 'v2'],
+                },
+              },
+              required: ['Key', 'Value'],
+            },
+          ],
+          additionalProperties: false,
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::anyOf::Required').only();
+  expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+});
+
 test('anyOf different types that exist in patternProperties', async () => {
   importCloudFormationRegistryResource({
     db,

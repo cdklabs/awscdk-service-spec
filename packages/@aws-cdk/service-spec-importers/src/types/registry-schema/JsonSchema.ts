@@ -88,10 +88,13 @@ export namespace jsonschema {
   /**
    * Determines whether or not the provided schema represents an `anyOf` type operator.
    */
-  export function isAnyOf(x: Schema): x is AnyOf<any> {
+  export function isAnyOf(x: Schema | CommonTypeCombinatorFields): x is AnyOf<any> {
     if (x && !isAnyType(x) && 'anyOf' in x) {
-      // differentiate between AnyOf type, and RecordLikeObject type.
-      return !('type' in x && x.type === 'object');
+      for (const elem of x.anyOf!) {
+        if (elem && !isAnyType(elem) && (isTypeDefined(elem) || isReference(elem) || isAnyOf(elem) || isOneOf(elem))) {
+          return true;
+        }
+      }
     }
     return false;
   }
@@ -113,7 +116,7 @@ export namespace jsonschema {
   /**
    * Determines whether or not the provided schema represents a `oneOf` type operator.
    */
-  export function isOneOf(x: Schema): x is OneOf<any> {
+  export function isOneOf(x: Schema | CommonTypeCombinatorFields): x is OneOf<any> {
     if ('oneOf' in (x as any) && !isAnyType(x)) {
       for (const elem of (x as RecordLikeObject).oneOf!) {
         if (!isAnyType(elem) && (isTypeDefined(elem) || isReference(elem))) {
