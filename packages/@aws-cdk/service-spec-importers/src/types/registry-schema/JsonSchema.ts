@@ -89,9 +89,9 @@ export namespace jsonschema {
    * Determines whether or not the provided schema represents an `anyOf` type operator.
    */
   export function isAnyOf(x: Schema): x is AnyOf<any> {
-    if ('anyOf' in (x as any) && !isAnyType(x)) {
+    if (x && !isAnyType(x) && 'anyOf' in x) {
       for (const elem of (x as RecordLikeObject).anyOf!) {
-        if (!isAnyType(elem) && (isTypeDefined(elem) || isReference(elem))) {
+        if (elem && !isAnyType(elem) && (isTypeDefined(elem) || isReference(elem))) {
           return true;
         }
       }

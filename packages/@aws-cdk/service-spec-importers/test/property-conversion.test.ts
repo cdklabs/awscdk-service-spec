@@ -232,6 +232,203 @@ test('read required properties from allOf/anyOf', () => {
   expect(requiredProps).toContain('InBoth');
 });
 
+test('anyOf containing a list of "required" properties and a required property', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::anyOf::Required',
+      description: 'Resource Type Description',
+      properties: {
+        DataSourceConfiguration: {
+          description: 'description',
+          type: 'object',
+          properties: {
+            prop1: {
+              description: 'prop1.',
+              type: 'object',
+              properties: {
+                subprop1: {
+                  type: 'string',
+                },
+                subprop2: {
+                  type: 'integer',
+                },
+              },
+              required: ['subprop1', 'subprop2'],
+              additionalProperties: false,
+            },
+            prop2: {
+              description: 'prop2 doc',
+              type: 'object',
+              properties: {
+                subprop1: {
+                  type: 'string',
+                },
+                subprop2: {
+                  type: 'integer',
+                },
+              },
+              required: ['subprop1', 'subprop2'],
+              additionalProperties: false,
+            },
+          },
+          anyOf: [
+            {
+              required: ['prop1'],
+            },
+            {
+              required: ['prop2'],
+            },
+          ],
+          additionalProperties: false,
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::anyOf::Required').only();
+  const requiredProps = Object.entries(resource.properties)
+    .filter(([_, value]) => value.required)
+    .map(([name, _]) => name);
+  expect(requiredProps.length).toBe(0);
+  expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+});
+
+test('properties are referring to some Enum type', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::anyOf::Required',
+      description: 'Resource Type Description',
+      definitions: {
+        ref1Type: {
+          type: 'string',
+          enum: ['v1', 'v2'],
+        },
+      },
+      properties: {
+        DataSourceConfiguration: {
+          description: 'description',
+          type: 'object',
+          properties: {
+            prop1: {
+              description: 'prop1.',
+              type: 'object',
+              properties: {
+                subprop1: {
+                  type: 'object',
+                  $ref: '#/definitions/ref1Type',
+                },
+                subprop2: {
+                  type: 'integer',
+                },
+              },
+              required: ['subprop1', 'subprop2'],
+              additionalProperties: false,
+            },
+            prop2: {
+              description: 'prop2 doc',
+              type: 'object',
+              properties: {
+                subprop1: {
+                  type: 'object',
+                  $ref: '#/definitions/ref1Type',
+                },
+                subprop2: {
+                  type: 'integer',
+                },
+              },
+              required: ['subprop1', 'subprop2'],
+              additionalProperties: false,
+            },
+          },
+          additionalProperties: false,
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::anyOf::Required').only();
+  const requiredProps = Object.entries(resource.properties)
+    .filter(([_, value]) => value.required)
+    .map(([name, _]) => name);
+  expect(requiredProps.length).toBe(0);
+  expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+});
+
+test('properties are referring to some Enum type and anyOf', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::anyOf::Required',
+      description: 'Resource Type Description',
+      definitions: {
+        ref1Type: {
+          type: 'string',
+          enum: ['v1', 'v2'],
+        },
+      },
+      properties: {
+        DataSourceConfiguration: {
+          description: 'description',
+          type: 'object',
+          properties: {
+            prop1: {
+              description: 'prop1.',
+              type: 'object',
+              properties: {
+                subprop1: {
+                  type: 'object',
+                  $ref: '#/definitions/ref1Type',
+                },
+                subprop2: {
+                  type: 'integer',
+                },
+              },
+              required: ['subprop1', 'subprop2'],
+              additionalProperties: false,
+            },
+            prop2: {
+              description: 'prop2 doc',
+              type: 'object',
+              properties: {
+                subprop1: {
+                  type: 'object',
+                  $ref: '#/definitions/ref1Type',
+                },
+                subprop2: {
+                  type: 'integer',
+                },
+              },
+              required: ['subprop1', 'subprop2'],
+              additionalProperties: false,
+            },
+          },
+          anyOf: [
+            {
+              required: ['prop1'],
+            },
+            {
+              required: ['prop2'],
+            },
+          ],
+          additionalProperties: false,
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::anyOf::Required').only();
+  const requiredProps = Object.entries(resource.properties)
+    .filter(([_, value]) => value.required)
+    .map(([name, _]) => name);
+  expect(requiredProps.length).toBe(0);
+  expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+});
+
 test('oneOf containing a list of "required" properties and a required property', async () => {
   importCloudFormationRegistryResource({
     db,
