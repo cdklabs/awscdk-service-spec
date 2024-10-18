@@ -26,7 +26,7 @@ export namespace jsonschema {
   }
 
   function isTypeDefined(x: any) {
-    return 'type' in x;
+    return 'type' in x && !('$ref' in x);
   }
 
   export interface Annotatable {
@@ -88,8 +88,15 @@ export namespace jsonschema {
   /**
    * Determines whether or not the provided schema represents an `anyOf` type operator.
    */
-  export function isAnyOf(x: Schema): x is AnyOf<any> {
-    return !isAnyType(x) && 'anyOf' in x;
+  export function isAnyOf(x: Schema | CommonTypeCombinatorFields): x is AnyOf<any> {
+    if (x && !isAnyType(x) && 'anyOf' in x) {
+      for (const elem of x.anyOf!) {
+        if (elem && !isAnyType(elem) && (isTypeDefined(elem) || isReference(elem) || isAnyOf(elem) || isOneOf(elem))) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   export interface OneOf<S> extends Annotatable {
@@ -109,10 +116,10 @@ export namespace jsonschema {
   /**
    * Determines whether or not the provided schema represents a `oneOf` type operator.
    */
-  export function isOneOf(x: Schema): x is OneOf<any> {
-    if ('oneOf' in (x as any) && !isAnyType(x)) {
-      for (const elem of (x as RecordLikeObject).oneOf!) {
-        if (!isAnyType(elem) && (isTypeDefined(elem) || isReference(elem))) {
+  export function isOneOf(x: Schema | CommonTypeCombinatorFields): x is OneOf<any> {
+    if (x && !isAnyType(x) && 'oneOf' in x) {
+      for (const elem of x.oneOf!) {
+        if (!isAnyType(elem) && (isTypeDefined(elem) || isReference(elem) || isAnyOf(elem) || isOneOf(elem))) {
           return true;
         }
       }

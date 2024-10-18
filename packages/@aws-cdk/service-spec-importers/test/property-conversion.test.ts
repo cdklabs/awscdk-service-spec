@@ -232,6 +232,279 @@ test('read required properties from allOf/anyOf', () => {
   expect(requiredProps).toContain('InBoth');
 });
 
+test('anyOf different types that exist in property with object type', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::anyOf::Required',
+      description: 'Resource Type Description',
+      properties: {
+        DataSourceConfiguration: {
+          description: 'description',
+          type: 'object',
+          anyOf: [
+            {
+              description: 'Empty Error object.',
+              type: 'object',
+              additionalProperties: false,
+            },
+            {
+              description: 'Key Value',
+              type: 'object',
+              additionalProperties: false,
+              properties: {
+                Key: {
+                  type: 'string',
+                },
+                Value: {
+                  type: 'string',
+                  enum: ['v1', 'v2'],
+                },
+              },
+              required: ['Key', 'Value'],
+            },
+          ],
+          additionalProperties: false,
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::anyOf::Required').only();
+  expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+});
+
+test('anyOf different types that exist in patternProperties', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::anyOf::Required',
+      description: 'Resource Type Description',
+      properties: {
+        DataSourceConfiguration: {
+          description: 'description',
+          type: 'object',
+          patternProperties: {
+            '^[a-zA-Z0-9]+$': {
+              anyOf: [
+                {
+                  type: 'string',
+                },
+                {
+                  type: 'integer',
+                },
+              ],
+            },
+          },
+          additionalProperties: false,
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::anyOf::Required').only();
+  expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+});
+
+test('anyOf containing a list of "required" properties and a required property', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::anyOf::Required',
+      description: 'Resource Type Description',
+      properties: {
+        DataSourceConfiguration: {
+          description: 'description',
+          type: 'object',
+          properties: {
+            prop1: {
+              description: 'prop1.',
+              type: 'object',
+              properties: {
+                subprop1: {
+                  type: 'string',
+                },
+                subprop2: {
+                  type: 'integer',
+                },
+              },
+              required: ['subprop1', 'subprop2'],
+              additionalProperties: false,
+            },
+            prop2: {
+              description: 'prop2 doc',
+              type: 'object',
+              properties: {
+                subprop1: {
+                  type: 'string',
+                },
+                subprop2: {
+                  type: 'integer',
+                },
+              },
+              required: ['subprop1', 'subprop2'],
+              additionalProperties: false,
+            },
+          },
+          anyOf: [
+            {
+              required: ['prop1'],
+            },
+            {
+              required: ['prop2'],
+            },
+          ],
+          additionalProperties: false,
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::anyOf::Required').only();
+  const requiredProps = Object.entries(resource.properties)
+    .filter(([_, value]) => value.required)
+    .map(([name, _]) => name);
+  expect(requiredProps.length).toBe(0);
+  expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+});
+
+test('properties are referring to some Enum type', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::anyOf::Required',
+      description: 'Resource Type Description',
+      definitions: {
+        ref1Type: {
+          type: 'string',
+          enum: ['v1', 'v2'],
+        },
+      },
+      properties: {
+        DataSourceConfiguration: {
+          description: 'description',
+          type: 'object',
+          properties: {
+            prop1: {
+              description: 'prop1.',
+              type: 'object',
+              properties: {
+                subprop1: {
+                  type: 'object',
+                  $ref: '#/definitions/ref1Type',
+                },
+                subprop2: {
+                  type: 'integer',
+                },
+              },
+              required: ['subprop1', 'subprop2'],
+              additionalProperties: false,
+            },
+            prop2: {
+              description: 'prop2 doc',
+              type: 'object',
+              properties: {
+                subprop1: {
+                  type: 'object',
+                  $ref: '#/definitions/ref1Type',
+                },
+                subprop2: {
+                  type: 'integer',
+                },
+              },
+              required: ['subprop1', 'subprop2'],
+              additionalProperties: false,
+            },
+          },
+          additionalProperties: false,
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::anyOf::Required').only();
+  const requiredProps = Object.entries(resource.properties)
+    .filter(([_, value]) => value.required)
+    .map(([name, _]) => name);
+  expect(requiredProps.length).toBe(0);
+  expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+});
+
+test('properties are referring to some Enum type and anyOf', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::anyOf::Required',
+      description: 'Resource Type Description',
+      definitions: {
+        ref1Type: {
+          type: 'string',
+          enum: ['v1', 'v2'],
+        },
+      },
+      properties: {
+        DataSourceConfiguration: {
+          description: 'description',
+          type: 'object',
+          properties: {
+            prop1: {
+              description: 'prop1.',
+              type: 'object',
+              properties: {
+                subprop1: {
+                  type: 'object',
+                  $ref: '#/definitions/ref1Type',
+                },
+                subprop2: {
+                  type: 'integer',
+                },
+              },
+              required: ['subprop1', 'subprop2'],
+              additionalProperties: false,
+            },
+            prop2: {
+              description: 'prop2 doc',
+              type: 'object',
+              properties: {
+                subprop1: {
+                  type: 'object',
+                  $ref: '#/definitions/ref1Type',
+                },
+                subprop2: {
+                  type: 'integer',
+                },
+              },
+              required: ['subprop1', 'subprop2'],
+              additionalProperties: false,
+            },
+          },
+          anyOf: [
+            {
+              required: ['prop1'],
+            },
+            {
+              required: ['prop2'],
+            },
+          ],
+          additionalProperties: false,
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::anyOf::Required').only();
+  const requiredProps = Object.entries(resource.properties)
+    .filter(([_, value]) => value.required)
+    .map(([name, _]) => name);
+  expect(requiredProps.length).toBe(0);
+  expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+});
+
 test('oneOf containing a list of "required" properties and a required property', async () => {
   importCloudFormationRegistryResource({
     db,
@@ -290,6 +563,67 @@ test('oneOf containing a list of "required" properties and a required property',
     .map(([name, _]) => name);
   expect(requiredProps.length).toBe(0);
   expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+});
+
+test('mix of oneOf and anyOf in one property', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::OneOf::Required',
+      description: 'Resource Type Description',
+      properties: {
+        DataSourceConfiguration: {
+          type: 'object',
+          properties: {
+            prop1: {
+              type: 'string',
+            },
+            prop2: {
+              type: 'object',
+              properties: {
+                prop2prop1: {
+                  type: 'string',
+                },
+                prop2prop2: {
+                  type: 'string',
+                },
+                prop2prop3: {
+                  type: 'string',
+                },
+              },
+              oneOf: [
+                {
+                  required: ['prop2prop1'],
+                },
+                {
+                  required: ['prop2prop2'],
+                },
+                {
+                  required: ['prop2prop3'],
+                },
+              ],
+            },
+            prop3: {
+              type: 'number',
+            },
+          },
+          anyOf: [
+            {
+              required: ['prop1', 'prop2'],
+            },
+            {
+              required: ['prop1', 'prop3'],
+            },
+          ],
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::OneOf::Required').only();
+  expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+  expect(db.all('typeDefinition').length).toBe(2);
 });
 
 test('oneOf with only a reference', () => {
