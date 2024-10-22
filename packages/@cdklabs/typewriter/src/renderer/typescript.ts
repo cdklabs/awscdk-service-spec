@@ -63,7 +63,9 @@ export class TypeScriptRenderer extends Renderer {
       for (const doc of mod.documentation) {
         this.emit(`// ${doc}\n`);
       }
-      this.emit('/* eslint-disable prettier/prettier,max-len */\n');
+      this.emit(
+        '/* eslint-disable prettier/prettier, max-len, quote-props, quotes, comma-spacing, @typescript-eslint/comma-dangle */\n',
+      );
       this.renderImports(mod);
       this.renderModuleTypes(mod);
 
