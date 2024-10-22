@@ -68,8 +68,8 @@ export class TypeScriptRenderer extends Renderer {
   public constructor(options: TypeScriptRenderOptions = {}) {
     super(options);
 
-    this.eslintPrettier = options.eslintPrettier ?? true;
-    this.eslintCommaDangle = options.eslintCommaDangle ?? false;
+    this.eslintPrettier = options.eslintPrettier ?? false;
+    this.eslintCommaDangle = options.eslintCommaDangle ?? true;
   }
 
   protected renderModule(mod: Module) {
@@ -77,7 +77,9 @@ export class TypeScriptRenderer extends Renderer {
       for (const doc of mod.documentation) {
         this.emit(`// ${doc}\n`);
       }
-      this.emit(`/* eslint-disable ${this.eslintPrettier ? 'prettier/prettier, ' : ''}${this.eslintCommaDangle ? '@typescript-eslint/comma-dangle, ' : ''}quote-props, quotes, comma-spacing, max-len */\n`);
+      this.emit(`/* eslint-disable ${!this.eslintPrettier ? 'prettier/prettier, ' : ''}`);
+      this.emit(`${!this.eslintCommaDangle ? '@typescript-eslint/comma-dangle, ' : ''}`);
+      this.emit('quote-props, quotes, comma-spacing, max-len */\n');
       this.renderImports(mod);
       this.renderModuleTypes(mod);
 
