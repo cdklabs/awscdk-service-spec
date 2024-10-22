@@ -8,7 +8,7 @@ beforeEach(() => {
 });
 
 describe('functions', () => {
-  test('functions can be implicitly not exported', () => {
+  test('functions are implicitly not exported', () => {
     new FreeFunction(scope, {
       name: 'freeFunction',
     });
