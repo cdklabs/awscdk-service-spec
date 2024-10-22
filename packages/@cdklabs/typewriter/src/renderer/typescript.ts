@@ -1,4 +1,4 @@
-import { Renderer } from './base';
+import { Renderer, RenderOptions } from './base';
 import { CallableDeclaration, isCallableDeclaration } from '../callable';
 import { ClassType } from '../class';
 import { Documented } from '../documented';
@@ -57,15 +57,27 @@ import { PrimitiveType, Type } from '../type';
 import { TypeParameterSpec } from '../type-declaration';
 import { Initializer, MemberVisibility, Method } from '../type-member';
 
+export interface TypeScriptRenderOptions extends RenderOptions {
+  eslintPrettier?: boolean;
+  eslintCommaDangle?: boolean;
+}
+
 export class TypeScriptRenderer extends Renderer {
+  private eslintPrettier: boolean;
+  private eslintCommaDangle: boolean;
+  public constructor(options: TypeScriptRenderOptions = {}) {
+    super(options);
+
+    this.eslintPrettier = options.eslintPrettier ?? true;
+    this.eslintCommaDangle = options.eslintCommaDangle ?? false;
+  }
+
   protected renderModule(mod: Module) {
     this.withScope(mod, () => {
       for (const doc of mod.documentation) {
         this.emit(`// ${doc}\n`);
       }
-      this.emit(
-        '/* eslint-disable prettier/prettier, max-len, quote-props, quotes, comma-spacing, @typescript-eslint/comma-dangle */\n',
-      );
+      this.emit(`/* eslint-disable ${this.eslintPrettier ? 'prettier/prettier, ' : ''}${this.eslintCommaDangle ? '@typescript-eslint/comma-dangle, ' : ''}quote-props, quotes, comma-spacing, max-len */\n`);
       this.renderImports(mod);
       this.renderModuleTypes(mod);
 
