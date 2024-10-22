@@ -81,6 +81,7 @@ export class TypeScriptRenderer extends Renderer {
     }
 
     if (mod.imports.length > 0) {
+
       this.emit('\n');
     }
   }
