@@ -83,8 +83,8 @@ export class TypeScriptRenderer extends Renderer {
       for (const doc of mod.documentation) {
         this.emit(`// ${doc}\n`);
       }
-      this.renderImports(mod);
       this.renderEslint();
+      this.renderImports(mod);
       this.renderModuleTypes(mod);
 
       this.emitList(mod.initialization, '\n', (s) => this.renderStatement(s));
