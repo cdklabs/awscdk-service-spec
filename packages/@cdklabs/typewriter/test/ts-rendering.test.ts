@@ -10,7 +10,7 @@ beforeEach(() => {
 describe('eslint rules', () => {
   test('prettier/prettier and max-len are disabled by default', () => {
     const renderer = new TypeScriptRenderer();
-    expect(renderer.render(scope)).toMatchInlineSnapshot(`"/* eslint-disable max-len, prettier/prettier*/"`);
+    expect(renderer.render(scope)).toMatchInlineSnapshot(`"/* eslint-disable prettier/prettier, max-len*/"`);
   });
 
   test('max-len can be explicitly disabled without disabling prettier/prettier', () => {

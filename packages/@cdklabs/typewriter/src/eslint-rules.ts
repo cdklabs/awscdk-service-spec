@@ -1,3 +1,6 @@
+/**
+ * All Eslint rules that typewriter can disable.
+ */
 export enum EsLintRules {
   COMMA_DANGLE = '@typescript-eslint/comma-dangle',
   COMMA_SPACING = 'comma-spacing',

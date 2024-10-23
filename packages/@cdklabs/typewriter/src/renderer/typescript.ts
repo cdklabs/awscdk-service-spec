@@ -75,7 +75,7 @@ export class TypeScriptRenderer extends Renderer {
   public constructor(options: TypeScriptRenderOptions = {}) {
     super(options);
 
-    this.disabledEsLintRules = options.disabledEsLintRules ?? [EsLintRules.MAX_LEN, EsLintRules.PRETTIER_PRETTIER];
+    this.disabledEsLintRules = options.disabledEsLintRules ?? [EsLintRules.PRETTIER_PRETTIER, EsLintRules.MAX_LEN];
   }
 
   protected renderModule(mod: Module) {
