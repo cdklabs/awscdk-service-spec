@@ -789,7 +789,7 @@ export class TypeScriptRenderer extends Renderer {
   private renderEslint() {
     this.emit(this.disabledEsLintRules.length > 0 ? '/* eslint-disable ' : '');
     this.emitList(this.disabledEsLintRules, ', ', (rule) => this.emit(rule));
-    this.emit(this.disabledEsLintRules.length > 0 ? '*/\n' : '');
+    this.emit(this.disabledEsLintRules.length > 0 ? ' */\n' : '');
   }
 
   private parenthesized(block: () => void) {
