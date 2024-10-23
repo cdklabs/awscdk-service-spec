@@ -83,10 +83,8 @@ export class TypeScriptRenderer extends Renderer {
       for (const doc of mod.documentation) {
         this.emit(`// ${doc}\n`);
       }
-      this.emit(this.disabledEsLintRules.length > 0 ? '/* eslint-disable ' : '');
-      this.emitList(this.disabledEsLintRules, ', ', (rule) => this.emit(rule));
-      this.emit(this.disabledEsLintRules.length > 0 ? '*/\n' : '');
       this.renderImports(mod);
+      this.renderEslint();
       this.renderModuleTypes(mod);
 
       this.emitList(mod.initialization, '\n', (s) => this.renderStatement(s));
@@ -786,6 +784,12 @@ export class TypeScriptRenderer extends Renderer {
         ret.push('');
       }
     }
+  }
+
+  private renderEslint() {
+    this.emit(this.disabledEsLintRules.length > 0 ? '/* eslint-disable ' : '');
+    this.emitList(this.disabledEsLintRules, ', ', (rule) => this.emit(rule));
+    this.emit(this.disabledEsLintRules.length > 0 ? '*/\n' : '');
   }
 
   private parenthesized(block: () => void) {
