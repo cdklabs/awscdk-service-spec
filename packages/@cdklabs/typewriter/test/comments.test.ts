@@ -16,7 +16,7 @@ describe('statements', () => {
     fn.addBody(code.comment('test comment'));
 
     expect(renderer.render(scope)).toMatchInlineSnapshot(`
-      "/* eslint-disable prettier/prettier, quote-props, quotes, comma-spacing, max-len */
+      "/* eslint-disable max-len, prettier/prettier*/
       // @ts-ignore TS6133
       function freeFunction(): void {
         // test comment
@@ -32,7 +32,7 @@ describe('statements', () => {
     fn.addBody(code.commentOn(code.stmt.ret(code.expr.lit(1)), 'test comment'));
 
     expect(renderer.render(scope)).toMatchInlineSnapshot(`
-      "/* eslint-disable prettier/prettier, quote-props, quotes, comma-spacing, max-len */
+      "/* eslint-disable max-len, prettier/prettier*/
       // @ts-ignore TS6133
       function freeFunction(): void {
         // test comment
@@ -51,7 +51,7 @@ describe('expressions', () => {
     fn.addBody(code.stmt.ret(code.commentOn(code.expr.lit(1), 'test comment')));
 
     expect(renderer.render(scope)).toMatchInlineSnapshot(`
-      "/* eslint-disable prettier/prettier, quote-props, quotes, comma-spacing, max-len */
+      "/* eslint-disable max-len, prettier/prettier*/
       // @ts-ignore TS6133
       function freeFunction(): void {
         return /* test comment */ 1;
@@ -75,7 +75,7 @@ describe('expressions', () => {
     );
 
     expect(renderer.render(scope)).toMatchInlineSnapshot(`
-      "/* eslint-disable prettier/prettier, quote-props, quotes, comma-spacing, max-len */
+      "/* eslint-disable max-len, prettier/prettier*/
       // @ts-ignore TS6133
       function freeFunction(): void {
         return ["foo", /* test comment */ "bar", "baz"];
@@ -91,7 +91,7 @@ describe('expressions', () => {
     fn.addBody(code.stmt.ret(code.commentOn($E(code.expr.lit(1)).convertToString(), 'test comment')));
 
     expect(renderer.render(scope)).toMatchInlineSnapshot(`
-      "/* eslint-disable prettier/prettier, quote-props, quotes, comma-spacing, max-len */
+      "/* eslint-disable max-len, prettier/prettier*/
       // @ts-ignore TS6133
       function freeFunction(): void {
         return /* test comment */ 1.convertToString();

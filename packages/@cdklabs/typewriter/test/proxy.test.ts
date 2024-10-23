@@ -17,7 +17,7 @@ describe('expression proxy', () => {
     fn.addBody(code.stmt.ret($E(code.expr.lit(1)).convertToString()));
 
     expect(renderer.render(scope)).toMatchInlineSnapshot(`
-      "/* eslint-disable prettier/prettier, quote-props, quotes, comma-spacing, max-len */
+      "/* eslint-disable max-len, prettier/prettier*/
       // @ts-ignore TS6133
       function freeFunction(): string {
         return 1.convertToString();

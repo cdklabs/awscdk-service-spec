@@ -1,4 +1,5 @@
 import { Module, TypeScriptRenderer } from '../src';
+import { EsLintRules } from '../src/eslint-rules';
 
 let scope: Module;
 
@@ -7,45 +8,41 @@ beforeEach(() => {
 });
 
 describe('eslint rules', () => {
-  test('prettier/prettier is disabled by default', () => {
+  test('prettier/prettier and max-len are disabled by default', () => {
     const renderer = new TypeScriptRenderer();
+    expect(renderer.render(scope)).toMatchInlineSnapshot(`"/* eslint-disable max-len, prettier/prettier*/"`);
+  });
+
+  test('max-len can be explicitly disabled without disabling prettier/prettier', () => {
+    const renderer = new TypeScriptRenderer({ disabledEsLintRules: [EsLintRules.MAX_LEN] });
+    expect(renderer.render(scope)).toMatchInlineSnapshot(`"/* eslint-disable max-len*/"`);
+  });
+
+  test('A single eslint rule can be disabled', () => {
+    const renderer = new TypeScriptRenderer({ disabledEsLintRules: [EsLintRules.COMMA_DANGLE] });
+    expect(renderer.render(scope)).toMatchInlineSnapshot(`"/* eslint-disable @typescript-eslint/comma-dangle*/"`);
+  });
+
+  test('many eslint rules can be disabled', () => {
+    const renderer = new TypeScriptRenderer({
+      disabledEsLintRules: [
+        EsLintRules.COMMA_DANGLE,
+        EsLintRules.COMMA_SPACING,
+        EsLintRules.MAX_LEN,
+        EsLintRules.PRETTIER_PRETTIER,
+        EsLintRules.QUOTES,
+        EsLintRules.QUOTE_PROPS,
+      ],
+    });
     expect(renderer.render(scope)).toMatchInlineSnapshot(
-      `"/* eslint-disable prettier/prettier, quote-props, quotes, comma-spacing, max-len */"`,
+      `"/* eslint-disable @typescript-eslint/comma-dangle, comma-spacing, max-len, prettier/prettier, quotes, quote-props*/"`,
     );
   });
 
-  test('prettier/prettier can be explicitly enabled', () => {
-    const renderer = new TypeScriptRenderer({ eslintPrettier: true });
-    expect(renderer.render(scope)).toMatchInlineSnapshot(
-      `"/* eslint-disable quote-props, quotes, comma-spacing, max-len */"`,
-    );
-  });
-
-  test('prettier/prettier can be explicitly disabled', () => {
-    const renderer = new TypeScriptRenderer({ eslintPrettier: false });
-    expect(renderer.render(scope)).toMatchInlineSnapshot(
-      `"/* eslint-disable prettier/prettier, quote-props, quotes, comma-spacing, max-len */"`,
-    );
-  });
-
-  test('@typescript-eslint/comma-dangle is enabled by default', () => {
-    const renderer = new TypeScriptRenderer();
-    expect(renderer.render(scope)).toMatchInlineSnapshot(
-      `"/* eslint-disable prettier/prettier, quote-props, quotes, comma-spacing, max-len */"`,
-    );
-  });
-
-  test('@typescript-eslint/comma-dangle can be explicitly disabled', () => {
-    const renderer = new TypeScriptRenderer({ eslintCommaDangle: false });
-    expect(renderer.render(scope)).toMatchInlineSnapshot(
-      `"/* eslint-disable prettier/prettier, @typescript-eslint/comma-dangle, quote-props, quotes, comma-spacing, max-len */"`,
-    );
-  });
-
-  test('@typescript-eslint/comma-dangle can be explicitly enabled', () => {
-    const renderer = new TypeScriptRenderer({ eslintCommaDangle: true });
-    expect(renderer.render(scope)).toMatchInlineSnapshot(
-      `"/* eslint-disable prettier/prettier, quote-props, quotes, comma-spacing, max-len */"`,
-    );
+  test('all eslint rules can be enabled', () => {
+    const renderer = new TypeScriptRenderer({
+      disabledEsLintRules: [],
+    });
+    expect(renderer.render(scope)).toMatchInlineSnapshot(`""`);
   });
 });

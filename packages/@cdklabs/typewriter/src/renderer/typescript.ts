@@ -2,6 +2,7 @@ import { Renderer, RenderOptions } from './base';
 import { CallableDeclaration, isCallableDeclaration } from '../callable';
 import { ClassType } from '../class';
 import { Documented } from '../documented';
+import { EsLintRules } from '../eslint-rules';
 import {
   AnonymousInterfaceImplementation,
   Expression,
@@ -57,19 +58,24 @@ import { PrimitiveType, Type } from '../type';
 import { TypeParameterSpec } from '../type-declaration';
 import { Initializer, MemberVisibility, Method } from '../type-member';
 
+/**
+ * Options to render TypeScript
+ */
 export interface TypeScriptRenderOptions extends RenderOptions {
-  eslintPrettier?: boolean;
-  eslintCommaDangle?: boolean;
+  /**
+   * Eslint rules to disable. These are disabled in the entire generated module.
+   *
+   * @default: max-len, prettier/prettier
+   */
+  disabledEsLintRules?: EsLintRules[];
 }
 
 export class TypeScriptRenderer extends Renderer {
-  private eslintPrettier: boolean;
-  private eslintCommaDangle: boolean;
+  private disabledEsLintRules: EsLintRules[];
   public constructor(options: TypeScriptRenderOptions = {}) {
     super(options);
 
-    this.eslintPrettier = options.eslintPrettier ?? false;
-    this.eslintCommaDangle = options.eslintCommaDangle ?? true;
+    this.disabledEsLintRules = options.disabledEsLintRules ?? [EsLintRules.MAX_LEN, EsLintRules.PRETTIER_PRETTIER];
   }
 
   protected renderModule(mod: Module) {
@@ -77,9 +83,9 @@ export class TypeScriptRenderer extends Renderer {
       for (const doc of mod.documentation) {
         this.emit(`// ${doc}\n`);
       }
-      this.emit(`/* eslint-disable ${!this.eslintPrettier ? 'prettier/prettier, ' : ''}`);
-      this.emit(`${!this.eslintCommaDangle ? '@typescript-eslint/comma-dangle, ' : ''}`);
-      this.emit('quote-props, quotes, comma-spacing, max-len */\n');
+      this.emit(this.disabledEsLintRules.length > 0 ? '/* eslint-disable ' : '');
+      this.emitList(this.disabledEsLintRules, ', ', (rule) => this.emit(rule));
+      this.emit(this.disabledEsLintRules.length > 0 ? '*/\n' : '');
       this.renderImports(mod);
       this.renderModuleTypes(mod);
 
