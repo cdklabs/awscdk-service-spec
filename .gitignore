@@ -49,7 +49,7 @@ jspm_packages/
 !/awscdk-service-spec.code-workspace
 /.nx
 !/nx.json
-!/.github/workflows/auto-queue.yml
+!/.github/workflows/auto-merge.yml
 !/.vscode/launch.json
 !/.github/workflows/test-aws-cdk-integration.yml
 !/.github/workflows/update-source-documentation.yml
