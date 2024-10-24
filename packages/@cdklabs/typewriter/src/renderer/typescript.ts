@@ -54,7 +54,7 @@ import {
 import { StructType } from '../struct';
 import { ThingSymbol } from '../symbol';
 import { PrimitiveType, Type } from '../type';
-import { TypeParameterSpec } from '../type-declaration';
+import { TypeDeclaration, TypeParameterSpec } from '../type-declaration';
 import { Initializer, MemberVisibility, Method } from '../type-member';
 
 export class TypeScriptRenderer extends Renderer {
@@ -411,11 +411,10 @@ export class TypeScriptRenderer extends Renderer {
     throw new Error(`Symbol ${sym} (in ${sym.scope}) not visible from ${this.scopes[0]} (missing import?)`);
   }
 
-  protected renderFunction(func: CallableDeclaration) {
+  protected renderFunction(func: CallableDeclaration & TypeDeclaration) {
     this.renderDocs(func);
     this.emit(`// @ts-ignore TS6133\n`);
-
-    this.emit(`function ${func.name}`);
+    this.emit(`${func.exported ? 'export ' : ''}function ${func.name}`);
     this.renderParameters(func.parameters);
     if (func.returnType) {
       this.emit(': ');
