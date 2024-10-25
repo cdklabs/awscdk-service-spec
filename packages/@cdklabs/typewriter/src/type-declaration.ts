@@ -88,13 +88,6 @@ export abstract class TypeDeclaration implements Documented, Exported {
   }
 
   /**
-   * Whether this type is being exported from its scope
-   */
-  public get export() {
-    return !!this.spec.export;
-  }
-
-  /**
    * The generic type parameters of the type
    */
   public get typeParameters(): ReadonlyArray<TypeParameter> | undefined {
