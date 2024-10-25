@@ -6,7 +6,7 @@ import { Statement } from './statements';
 import { Block } from './statements/block';
 import { asStmt } from './statements/private';
 import { Type } from './type';
-import { DeclarationKind, TypeDeclaration, TypeSpec } from './type-declaration';
+import { DeclarationKind, Exportable, TypeDeclaration, TypeSpec } from './type-declaration';
 
 export interface CallableSpec extends TypeSpec {
   name: string;
@@ -29,10 +29,11 @@ export interface CallableExpr {
 /**
  * Can't be called "Function"
  */
-export class FreeFunction extends TypeDeclaration implements CallableDeclaration {
+export class FreeFunction extends TypeDeclaration implements CallableDeclaration, Exportable {
   public readonly returnType: Type;
   public readonly kind = DeclarationKind.Function;
   public readonly parameters = new Array<Parameter>();
+  public readonly export?: boolean | undefined;
 
   private _body?: Block;
 
@@ -43,6 +44,7 @@ export class FreeFunction extends TypeDeclaration implements CallableDeclaration
     for (const p of this.spec.parameters ?? []) {
       this.addParameter(p);
     }
+    this.export = this.exported;
   }
 
   public get name(): string {
