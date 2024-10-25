@@ -2,6 +2,7 @@ import { Renderer, RenderOptions } from './base';
 import { CallableDeclaration, isCallableDeclaration } from '../callable';
 import { ClassType } from '../class';
 import { Documented } from '../documented';
+import { EsLintRules } from '../eslint-rules';
 import {
   AnonymousInterfaceImplementation,
   Expression,
@@ -56,7 +57,6 @@ import { ThingSymbol } from '../symbol';
 import { PrimitiveType, Type } from '../type';
 import { Exported, TypeParameterSpec } from '../type-declaration';
 import { Initializer, MemberVisibility, Method } from '../type-member';
-import { EsLintRules } from '../eslint-rules';
 
 /**
  * Options to render TypeScript
