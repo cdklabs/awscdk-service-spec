@@ -52,7 +52,7 @@ export interface TypeSpec extends Documented, Exportable {
 /**
  * An abstract jsii type
  */
-export abstract class TypeDeclaration implements Documented {
+export abstract class TypeDeclaration implements Documented, Exportable {
   /**
    * The simple name of the type (MyClass).
    */
@@ -80,6 +80,13 @@ export abstract class TypeDeclaration implements Documented {
    * Whether this type is being exported from its scope
    */
   public get exported() {
+    return !!this.spec.export;
+  }
+
+  /**
+   * Whether this type is being exported from its scope
+   */
+  public get export() {
     return !!this.spec.export;
   }
 

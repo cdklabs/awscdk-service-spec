@@ -14,7 +14,7 @@ describe('functions', () => {
     });
 
     expect(renderer.render(scope)).toMatchInlineSnapshot(`
-      "/* eslint-disable prettier/prettier,max-len */
+      "/* eslint-disable prettier/prettier, max-len */
       // @ts-ignore TS6133
       function freeFunction(): void;"
     `);
@@ -27,7 +27,7 @@ describe('functions', () => {
     });
 
     expect(renderer.render(scope)).toMatchInlineSnapshot(`
-      "/* eslint-disable prettier/prettier,max-len */
+      "/* eslint-disable prettier/prettier, max-len */
       // @ts-ignore TS6133
       export function freeFunction(): void;"
     `);
@@ -40,7 +40,7 @@ describe('functions', () => {
     });
 
     expect(renderer.render(scope)).toMatchInlineSnapshot(`
-      "/* eslint-disable prettier/prettier,max-len */
+      "/* eslint-disable prettier/prettier, max-len */
       // @ts-ignore TS6133
       function freeFunction(): void;"
     `);

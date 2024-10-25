@@ -33,7 +33,6 @@ export class FreeFunction extends TypeDeclaration implements CallableDeclaration
   public readonly returnType: Type;
   public readonly kind = DeclarationKind.Function;
   public readonly parameters = new Array<Parameter>();
-  public readonly export?: boolean | undefined;
 
   private _body?: Block;
 
@@ -44,7 +43,6 @@ export class FreeFunction extends TypeDeclaration implements CallableDeclaration
     for (const p of this.spec.parameters ?? []) {
       this.addParameter(p);
     }
-    this.export = this.exported;
   }
 
   public get name(): string {
