@@ -19,6 +19,10 @@ export interface Exportable {
   export?: boolean;
 }
 
+export interface Exported {
+  exported?: boolean;
+}
+
 export interface TypeParameterSpec {
   readonly name: string;
   readonly extendsType?: Type;
@@ -52,7 +56,7 @@ export interface TypeSpec extends Documented, Exportable {
 /**
  * An abstract jsii type
  */
-export abstract class TypeDeclaration implements Documented, Exportable {
+export abstract class TypeDeclaration implements Documented, Exported {
   /**
    * The simple name of the type (MyClass).
    */
