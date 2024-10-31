@@ -6,17 +6,21 @@
     },
     {
       "name": "@types/node",
-      "version": "^18",
       "type": "build"
     },
     {
       "name": "@typescript-eslint/eslint-plugin",
-      "version": "^6",
+      "version": "^7",
       "type": "build"
     },
     {
       "name": "@typescript-eslint/parser",
-      "version": "^6",
+      "version": "^7",
+      "type": "build"
+    },
+    {
+      "name": "commit-and-tag-version",
+      "version": "^12",
       "type": "build"
     },
     {

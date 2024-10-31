@@ -22,6 +22,7 @@ const repo = new YarnMonorepo({
     'eslint-plugin-import',
   ],
   vscodeWorkspace: true,
+  nx: true,
 
   prettier: true,
   prettierOptions: {
@@ -122,6 +123,7 @@ const serviceSpecSchemaTask = serviceSpecImporters.addTask('gen-schemas', {
     'StatefulResources',
     'SamTemplateSchema',
     'CloudWatchConsoleServiceDirectory',
+    'GetAttAllowList',
   ].map((typeName: string) => ({
     exec: [
       'ts-json-schema-generator',
@@ -225,6 +227,8 @@ new SingleSource(repo, {
   dir: 'sources/SAMSpec',
   source: 'https://raw.githubusercontent.com/aws/serverless-application-model/develop/schema_source/sam.schema.json',
 });
+
+// https://github.com/aws-cloudformation/cfn-lint/pull/3257
 new SingleSource(repo, {
   name: 'stateful-resources',
   dir: 'sources/StatefulResources',

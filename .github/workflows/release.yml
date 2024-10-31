@@ -30,9 +30,9 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 16.14.0
+          node-version: lts/*
       - name: Install dependencies
         run: yarn install --check-files --frozen-lockfile
       - name: release
@@ -62,7 +62,7 @@ jobs:
         working-directory: packages/@cdklabs/tskb
       - name: "@cdklabs/tskb: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.0
         with:
           name: cdklabs-tskb_build-artifact
           path: packages/@cdklabs/tskb/dist
@@ -74,7 +74,7 @@ jobs:
         working-directory: packages/@cdklabs/typewriter
       - name: "@cdklabs/typewriter: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.0
         with:
           name: cdklabs-typewriter_build-artifact
           path: packages/@cdklabs/typewriter/dist
@@ -86,7 +86,7 @@ jobs:
         working-directory: packages/@aws-cdk/service-spec-types
       - name: "@aws-cdk/service-spec-types: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.0
         with:
           name: aws-cdk-service-spec-types_build-artifact
           path: packages/@aws-cdk/service-spec-types/dist
@@ -98,7 +98,7 @@ jobs:
         working-directory: packages/@aws-cdk/service-spec-importers
       - name: "@aws-cdk/service-spec-importers: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.0
         with:
           name: aws-cdk-service-spec-importers_build-artifact
           path: packages/@aws-cdk/service-spec-importers/dist
@@ -110,14 +110,16 @@ jobs:
         working-directory: packages/@aws-cdk/aws-service-spec
       - name: "@aws-cdk/aws-service-spec: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.0
         with:
           name: aws-cdk-aws-service-spec_build-artifact
           path: packages/@aws-cdk/aws-service-spec/dist
           overwrite: true
   cdklabs-tskb_release_github:
     name: "@cdklabs/tskb: Publish to GitHub Releases"
-    needs: release
+    needs:
+      - release
+      - cdklabs-tskb_release_npm
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -125,7 +127,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: lts/*
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -138,7 +140,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_REF: ${{ github.ref }}
+          GITHUB_REF: ${{ github.sha }}
         run: errout=$(mktemp); gh release create $(cat dist/releasetag.txt) -R $GITHUB_REPOSITORY -F dist/changelog.md -t $(cat dist/releasetag.txt) --target $GITHUB_REF 2> $errout && true; exitcode=$?; if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" $errout; then cat $errout; exit $exitcode; fi
   cdklabs-tskb_release_npm:
     name: "@cdklabs/tskb: Publish to npm"
@@ -150,7 +152,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: lts/*
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -167,7 +169,9 @@ jobs:
         run: npx -p publib@latest publib-npm
   cdklabs-typewriter_release_github:
     name: "@cdklabs/typewriter: Publish to GitHub Releases"
-    needs: release
+    needs:
+      - release
+      - cdklabs-typewriter_release_npm
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -175,7 +179,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: lts/*
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -188,7 +192,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_REF: ${{ github.ref }}
+          GITHUB_REF: ${{ github.sha }}
         run: errout=$(mktemp); gh release create $(cat dist/releasetag.txt) -R $GITHUB_REPOSITORY -F dist/changelog.md -t $(cat dist/releasetag.txt) --target $GITHUB_REF 2> $errout && true; exitcode=$?; if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" $errout; then cat $errout; exit $exitcode; fi
   cdklabs-typewriter_release_npm:
     name: "@cdklabs/typewriter: Publish to npm"
@@ -200,7 +204,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: lts/*
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -217,7 +221,9 @@ jobs:
         run: npx -p publib@latest publib-npm
   aws-cdk-service-spec-types_release_github:
     name: "@aws-cdk/service-spec-types: Publish to GitHub Releases"
-    needs: release
+    needs:
+      - release
+      - aws-cdk-service-spec-types_release_npm
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -225,7 +231,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: lts/*
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -238,7 +244,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_REF: ${{ github.ref }}
+          GITHUB_REF: ${{ github.sha }}
         run: errout=$(mktemp); gh release create $(cat dist/releasetag.txt) -R $GITHUB_REPOSITORY -F dist/changelog.md -t $(cat dist/releasetag.txt) --target $GITHUB_REF 2> $errout && true; exitcode=$?; if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" $errout; then cat $errout; exit $exitcode; fi
   aws-cdk-service-spec-types_release_npm:
     name: "@aws-cdk/service-spec-types: Publish to npm"
@@ -250,7 +256,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: lts/*
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -267,7 +273,9 @@ jobs:
         run: npx -p publib@latest publib-npm
   aws-cdk-service-spec-importers_release_github:
     name: "@aws-cdk/service-spec-importers: Publish to GitHub Releases"
-    needs: release
+    needs:
+      - release
+      - aws-cdk-service-spec-importers_release_npm
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -275,7 +283,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: lts/*
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -288,7 +296,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_REF: ${{ github.ref }}
+          GITHUB_REF: ${{ github.sha }}
         run: errout=$(mktemp); gh release create $(cat dist/releasetag.txt) -R $GITHUB_REPOSITORY -F dist/changelog.md -t $(cat dist/releasetag.txt) --target $GITHUB_REF 2> $errout && true; exitcode=$?; if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" $errout; then cat $errout; exit $exitcode; fi
   aws-cdk-service-spec-importers_release_npm:
     name: "@aws-cdk/service-spec-importers: Publish to npm"
@@ -300,7 +308,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: lts/*
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -317,7 +325,9 @@ jobs:
         run: npx -p publib@latest publib-npm
   aws-cdk-aws-service-spec_release_github:
     name: "@aws-cdk/aws-service-spec: Publish to GitHub Releases"
-    needs: release
+    needs:
+      - release
+      - aws-cdk-aws-service-spec_release_npm
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -325,7 +335,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: lts/*
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -338,7 +348,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_REF: ${{ github.ref }}
+          GITHUB_REF: ${{ github.sha }}
         run: errout=$(mktemp); gh release create $(cat dist/releasetag.txt) -R $GITHUB_REPOSITORY -F dist/changelog.md -t $(cat dist/releasetag.txt) --target $GITHUB_REF 2> $errout && true; exitcode=$?; if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" $errout; then cat $errout; exit $exitcode; fi
   aws-cdk-aws-service-spec_release_npm:
     name: "@aws-cdk/aws-service-spec: Publish to npm"
@@ -350,7 +360,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: lts/*
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:

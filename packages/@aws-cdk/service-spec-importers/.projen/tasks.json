@@ -49,6 +49,7 @@
         "RELEASETAG": "dist/releasetag.txt",
         "RELEASE_TAG_PREFIX": "@aws-cdk/service-spec-importers@",
         "VERSIONRCOPTIONS": "{\"path\":\".\"}",
+        "BUMP_PACKAGE": "commit-and-tag-version@^12",
         "RELEASABLE_COMMITS": "git log --oneline $LATEST_TAG..HEAD -- ."
       },
       "steps": [
@@ -59,7 +60,7 @@
           "builtin": "release/bump-version"
         }
       ],
-      "condition": "! git log --oneline -1 | grep -q \"chore(release):\""
+      "condition": "git log --oneline -1 | grep -qv \"chore(release):\""
     },
     "check-for-updates": {
       "name": "check-for-updates",
@@ -68,7 +69,7 @@
       },
       "steps": [
         {
-          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/fs-extra,@types/jest,eslint-config-prettier,eslint-import-resolver-typescript,eslint-plugin-import,eslint-plugin-prettier,jest,prettier,projen,source-map-support,ts-jest,ts-json-schema-generator,typescript,canonicalize,commander,fast-json-patch,fs-extra,sort-json"
+          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/fs-extra,@types/jest,@types/node,eslint-config-prettier,eslint-import-resolver-typescript,eslint-plugin-import,eslint-plugin-prettier,jest,prettier,projen,source-map-support,ts-jest,ts-json-schema-generator,typescript,canonicalize,commander,fast-json-patch,fs-extra,sort-json"
         }
       ]
     },
@@ -117,7 +118,7 @@
       "name": "gather-versions",
       "steps": [
         {
-          "exec": "ts-node ../../../projenrc/gather-versions.exec.ts @aws-cdk/service-spec-importers MAJOR --deps @cdklabs/tskb @aws-cdk/service-spec-types",
+          "exec": "node -e \"require(path.join(path.dirname(require.resolve('cdklabs-projen-project-types')), 'yarn', 'gather-versions.exec.js'))\" @aws-cdk/service-spec-importers MAJOR --deps @cdklabs/tskb @aws-cdk/service-spec-types",
           "receiveArgs": true
         }
       ]
@@ -145,6 +146,9 @@
         },
         {
           "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CloudWatchConsoleServiceDirectory --out schemas/CloudWatchConsoleServiceDirectory.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type GetAttAllowList --out schemas/GetAttAllowList.schema.json"
         }
       ]
     },
@@ -183,7 +187,7 @@
           "exec": "mkdir -p dist/js"
         },
         {
-          "exec": "mv $(npm pack) dist/js/"
+          "exec": "npm pack --pack-destination dist/js"
         }
       ]
     },
@@ -227,6 +231,7 @@
         "RELEASETAG": "dist/releasetag.txt",
         "RELEASE_TAG_PREFIX": "@aws-cdk/service-spec-importers@",
         "VERSIONRCOPTIONS": "{\"path\":\".\"}",
+        "BUMP_PACKAGE": "commit-and-tag-version@^12",
         "RELEASABLE_COMMITS": "git log --oneline $LATEST_TAG..HEAD -- ."
       },
       "steps": [

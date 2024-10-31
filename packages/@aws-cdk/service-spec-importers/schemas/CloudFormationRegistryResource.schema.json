@@ -29,38 +29,7 @@
         },
         "anyOf": {
           "items": {
-            "additionalProperties": false,
-            "description": "Type combinator fields we commonly see at the resource level\n\n(They can be nested)",
-            "properties": {
-              "allOf": {
-                "items": {
-                  "$ref": "#/definitions/interface-403906428-3451-3797-403906428-0-57631380716174"
-                },
-                "type": "array"
-              },
-              "anyOf": {
-                "items": {
-                  "$ref": "#/definitions/interface-403906428-3451-3797-403906428-0-57631380716174"
-                },
-                "type": "array"
-              },
-              "oneOf": {
-                "items": {
-                  "$ref": "#/definitions/interface-403906428-3451-3797-403906428-0-57631380716174"
-                },
-                "type": "array"
-              },
-              "required": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "type": {
-                "type": "string"
-              }
-            },
-            "type": "object"
+            "$ref": "#/definitions/CommonTypeCombinatorFields"
           },
           "type": "array"
         },
@@ -110,38 +79,7 @@
         "oneOf": {
           "description": "Technically this should have been canonicalized out, but that will complicate a lot of the rest of the code.\n\nSo we allow embedded oneOfs/anyOfs, only at the top level.",
           "items": {
-            "additionalProperties": false,
-            "description": "Type combinator fields we commonly see at the resource level\n\n(They can be nested)",
-            "properties": {
-              "allOf": {
-                "items": {
-                  "$ref": "#/definitions/interface-403906428-3451-3797-403906428-0-57631380716174"
-                },
-                "type": "array"
-              },
-              "anyOf": {
-                "items": {
-                  "$ref": "#/definitions/interface-403906428-3451-3797-403906428-0-57631380716174"
-                },
-                "type": "array"
-              },
-              "oneOf": {
-                "items": {
-                  "$ref": "#/definitions/interface-403906428-3451-3797-403906428-0-57631380716174"
-                },
-                "type": "array"
-              },
-              "required": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "type": {
-                "type": "string"
-              }
-            },
-            "type": "object"
+            "$ref": "#/definitions/CommonTypeCombinatorFields"
           },
           "type": "array"
         },
@@ -214,6 +152,40 @@
         "properties",
         "typeName"
       ],
+      "type": "object"
+    },
+    "CommonTypeCombinatorFields": {
+      "additionalProperties": false,
+      "description": "Type combinator fields we commonly see at the resource level\n\n(They can be nested)",
+      "properties": {
+        "allOf": {
+          "items": {
+            "$ref": "#/definitions/CommonTypeCombinatorFields"
+          },
+          "type": "array"
+        },
+        "anyOf": {
+          "items": {
+            "$ref": "#/definitions/CommonTypeCombinatorFields"
+          },
+          "type": "array"
+        },
+        "oneOf": {
+          "items": {
+            "$ref": "#/definitions/CommonTypeCombinatorFields"
+          },
+          "type": "array"
+        },
+        "required": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
       "type": "object"
     },
     "Handler": {
@@ -306,40 +278,6 @@
           "default": true,
           "description": "Whether the resource is taggable",
           "type": "boolean"
-        }
-      },
-      "type": "object"
-    },
-    "interface-403906428-3451-3797-403906428-0-57631380716174": {
-      "additionalProperties": false,
-      "description": "Type combinator fields we commonly see at the resource level\n\n(They can be nested)",
-      "properties": {
-        "allOf": {
-          "items": {
-            "$ref": "#/definitions/interface-403906428-3451-3797-403906428-0-57631380716174"
-          },
-          "type": "array"
-        },
-        "anyOf": {
-          "items": {
-            "$ref": "#/definitions/interface-403906428-3451-3797-403906428-0-57631380716174"
-          },
-          "type": "array"
-        },
-        "oneOf": {
-          "items": {
-            "$ref": "#/definitions/interface-403906428-3451-3797-403906428-0-57631380716174"
-          },
-          "type": "array"
-        },
-        "required": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "type": {
-          "type": "string"
         }
       },
       "type": "object"
@@ -636,6 +574,19 @@
           "description": "FIXME: should be required but some service teams have omitted it.",
           "type": "boolean"
         },
+        "anyOf": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/CommonTypeCombinatorFields"
+              },
+              {
+                "$ref": "#/definitions/jsonschema.RecordLikeObject"
+              }
+            ]
+          },
+          "type": "array"
+        },
         "description": {
           "type": "string"
         },
@@ -645,6 +596,19 @@
         "minProperties": {
           "description": "FIXME: these are weird but oh hey?",
           "type": "number"
+        },
+        "oneOf": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/CommonTypeCombinatorFields"
+              },
+              {
+                "$ref": "#/definitions/jsonschema.RecordLikeObject"
+              }
+            ]
+          },
+          "type": "array"
         },
         "properties": {
           "$ref": "#/definitions/jsonschema.ObjectProperties"
@@ -682,6 +646,10 @@
           "type": "string"
         },
         "title": {
+          "type": "string"
+        },
+        "type": {
+          "const": "object",
           "type": "string"
         }
       },

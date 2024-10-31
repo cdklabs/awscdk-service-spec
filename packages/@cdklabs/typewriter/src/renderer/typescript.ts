@@ -1,7 +1,8 @@
-import { Renderer } from './base';
+import { Renderer, RenderOptions } from './base';
 import { CallableDeclaration, isCallableDeclaration } from '../callable';
 import { ClassType } from '../class';
 import { Documented } from '../documented';
+import { EsLintRules } from '../eslint-rules';
 import {
   AnonymousInterfaceImplementation,
   Expression,
@@ -54,16 +55,35 @@ import {
 import { StructType } from '../struct';
 import { ThingSymbol } from '../symbol';
 import { PrimitiveType, Type } from '../type';
-import { TypeParameterSpec } from '../type-declaration';
+import { Exported, TypeParameterSpec } from '../type-declaration';
 import { Initializer, MemberVisibility, Method } from '../type-member';
 
+/**
+ * Options to render TypeScript
+ */
+export interface TypeScriptRenderOptions extends RenderOptions {
+  /**
+   * Eslint rules to disable. These are disabled in the entire generated module.
+   *
+   * @default: max-len, prettier/prettier
+   */
+  disabledEsLintRules?: EsLintRules[];
+}
+
 export class TypeScriptRenderer extends Renderer {
+  private disabledEsLintRules: EsLintRules[];
+  public constructor(options: TypeScriptRenderOptions = {}) {
+    super(options);
+
+    this.disabledEsLintRules = options.disabledEsLintRules ?? [EsLintRules.PRETTIER_PRETTIER, EsLintRules.MAX_LEN];
+  }
+
   protected renderModule(mod: Module) {
     this.withScope(mod, () => {
       for (const doc of mod.documentation) {
         this.emit(`// ${doc}\n`);
       }
-      this.emit('/* eslint-disable prettier/prettier,max-len */\n');
+      this.renderEslint();
       this.renderImports(mod);
       this.renderModuleTypes(mod);
 
@@ -411,11 +431,10 @@ export class TypeScriptRenderer extends Renderer {
     throw new Error(`Symbol ${sym} (in ${sym.scope}) not visible from ${this.scopes[0]} (missing import?)`);
   }
 
-  protected renderFunction(func: CallableDeclaration) {
+  protected renderFunction(func: CallableDeclaration & Exported) {
     this.renderDocs(func);
     this.emit(`// @ts-ignore TS6133\n`);
-
-    this.emit(`function ${func.name}`);
+    this.emit(`${func.exported ? 'export ' : ''}function ${func.name}`);
     this.renderParameters(func.parameters);
     if (func.returnType) {
       this.emit(': ');
@@ -764,6 +783,12 @@ export class TypeScriptRenderer extends Renderer {
         ret.push('');
       }
     }
+  }
+
+  private renderEslint() {
+    this.emit(this.disabledEsLintRules.length > 0 ? '/* eslint-disable ' : '');
+    this.emitList(this.disabledEsLintRules, ', ', (rule) => this.emit(rule));
+    this.emit(this.disabledEsLintRules.length > 0 ? ' */\n' : '');
   }
 
   private parenthesized(block: () => void) {

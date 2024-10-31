@@ -39,7 +39,8 @@
         "RELEASETAG": "dist/releasetag.txt",
         "RELEASE_TAG_PREFIX": "@aws-cdk/aws-service-spec@",
         "VERSIONRCOPTIONS": "{\"path\":\".\"}",
-        "RELEASABLE_COMMITS": "git log --no-merges --oneline $LATEST_TAG..HEAD -E --grep '^(feat|fix){1}(\\([^()[:space:]]+\\))?(!)?:[[:blank:]]+.+' -- . ../service-spec-types ../../../sources"
+        "BUMP_PACKAGE": "commit-and-tag-version@^12",
+        "RELEASABLE_COMMITS": "git log --no-merges --oneline $LATEST_TAG..HEAD -E --grep \"^(feat|fix){1}(\\([^()[:space:]]+\\))?(!)?:[[:blank:]]+.+\" -- . ../service-spec-types ../../../sources"
       },
       "steps": [
         {
@@ -49,7 +50,7 @@
           "builtin": "release/bump-version"
         }
       ],
-      "condition": "! git log --oneline -1 | grep -q \"chore(release):\""
+      "condition": "git log --oneline -1 | grep -qv \"chore(release):\""
     },
     "check-for-updates": {
       "name": "check-for-updates",
@@ -58,7 +59,7 @@
       },
       "steps": [
         {
-          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/jest,eslint-config-prettier,eslint-import-resolver-typescript,eslint-plugin-import,eslint-plugin-prettier,jest,prettier,projen,source-map-support,ts-jest,typescript"
+          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/jest,@types/node,eslint-config-prettier,eslint-import-resolver-typescript,eslint-plugin-import,eslint-plugin-prettier,jest,prettier,projen,source-map-support,ts-jest,typescript"
         }
       ]
     },
@@ -98,7 +99,7 @@
       "name": "gather-versions",
       "steps": [
         {
-          "exec": "ts-node ../../../projenrc/gather-versions.exec.ts @aws-cdk/aws-service-spec MAJOR --deps @cdklabs/tskb @aws-cdk/service-spec-types @aws-cdk/service-spec-importers",
+          "exec": "node -e \"require(path.join(path.dirname(require.resolve('cdklabs-projen-project-types')), 'yarn', 'gather-versions.exec.js'))\" @aws-cdk/aws-service-spec MAJOR --deps @cdklabs/tskb @aws-cdk/service-spec-types @aws-cdk/service-spec-importers",
           "receiveArgs": true
         }
       ]
@@ -138,7 +139,7 @@
           "exec": "mkdir -p dist/js"
         },
         {
-          "exec": "mv $(npm pack) dist/js/"
+          "exec": "npm pack --pack-destination dist/js"
         }
       ]
     },
@@ -182,7 +183,8 @@
         "RELEASETAG": "dist/releasetag.txt",
         "RELEASE_TAG_PREFIX": "@aws-cdk/aws-service-spec@",
         "VERSIONRCOPTIONS": "{\"path\":\".\"}",
-        "RELEASABLE_COMMITS": "git log --no-merges --oneline $LATEST_TAG..HEAD -E --grep '^(feat|fix){1}(\\([^()[:space:]]+\\))?(!)?:[[:blank:]]+.+' -- . ../service-spec-types ../../../sources"
+        "BUMP_PACKAGE": "commit-and-tag-version@^12",
+        "RELEASABLE_COMMITS": "git log --no-merges --oneline $LATEST_TAG..HEAD -E --grep \"^(feat|fix){1}(\\([^()[:space:]]+\\))?(!)?:[[:blank:]]+.+\" -- . ../service-spec-types ../../../sources"
       },
       "steps": [
         {

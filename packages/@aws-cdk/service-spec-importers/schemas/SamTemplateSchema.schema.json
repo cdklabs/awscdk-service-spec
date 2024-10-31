@@ -2,6 +2,40 @@
   "$ref": "#/definitions/SamTemplateSchema",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
+    "CommonTypeCombinatorFields": {
+      "additionalProperties": false,
+      "description": "Type combinator fields we commonly see at the resource level\n\n(They can be nested)",
+      "properties": {
+        "allOf": {
+          "items": {
+            "$ref": "#/definitions/CommonTypeCombinatorFields"
+          },
+          "type": "array"
+        },
+        "anyOf": {
+          "items": {
+            "$ref": "#/definitions/CommonTypeCombinatorFields"
+          },
+          "type": "array"
+        },
+        "oneOf": {
+          "items": {
+            "$ref": "#/definitions/CommonTypeCombinatorFields"
+          },
+          "type": "array"
+        },
+        "required": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "SamTemplateSchema": {
       "$ref": "#/definitions/jsonschema.SchemaFile",
       "description": "The SAM schema is just JSON schema with no frills"
@@ -298,6 +332,19 @@
           "description": "FIXME: should be required but some service teams have omitted it.",
           "type": "boolean"
         },
+        "anyOf": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/CommonTypeCombinatorFields"
+              },
+              {
+                "$ref": "#/definitions/jsonschema.RecordLikeObject"
+              }
+            ]
+          },
+          "type": "array"
+        },
         "description": {
           "type": "string"
         },
@@ -307,6 +354,19 @@
         "minProperties": {
           "description": "FIXME: these are weird but oh hey?",
           "type": "number"
+        },
+        "oneOf": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/CommonTypeCombinatorFields"
+              },
+              {
+                "$ref": "#/definitions/jsonschema.RecordLikeObject"
+              }
+            ]
+          },
+          "type": "array"
         },
         "properties": {
           "$ref": "#/definitions/jsonschema.ObjectProperties"
@@ -344,6 +404,10 @@
           "type": "string"
         },
         "title": {
+          "type": "string"
+        },
+        "type": {
+          "const": "object",
           "type": "string"
         }
       },
@@ -436,6 +500,19 @@
           "description": "FIXME: should be required but some service teams have omitted it.",
           "type": "boolean"
         },
+        "anyOf": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/CommonTypeCombinatorFields"
+              },
+              {
+                "$ref": "#/definitions/jsonschema.RecordLikeObject"
+              }
+            ]
+          },
+          "type": "array"
+        },
         "definitions": {
           "additionalProperties": {
             "$ref": "#/definitions/jsonschema.Schema"
@@ -452,6 +529,19 @@
         "minProperties": {
           "description": "FIXME: these are weird but oh hey?",
           "type": "number"
+        },
+        "oneOf": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/CommonTypeCombinatorFields"
+              },
+              {
+                "$ref": "#/definitions/jsonschema.RecordLikeObject"
+              }
+            ]
+          },
+          "type": "array"
         },
         "properties": {
           "$ref": "#/definitions/jsonschema.ObjectProperties"

@@ -3,6 +3,7 @@ import { assertSuccess, Result } from '@cdklabs/tskb';
 import { importCannedMetrics } from './importers/import-canned-metrics';
 import { importCloudFormationDocumentation } from './importers/import-cloudformation-docs';
 import { importCloudFormationRegistryResource } from './importers/import-cloudformation-registry';
+import { importGetAttAllowList } from './importers/import-getatt-allowlist';
 import { ResourceSpecImporter, SAMSpecImporter } from './importers/import-resource-spec';
 import { SamResources } from './importers/import-sam';
 import { importStatefulResources } from './importers/import-stateful-resources';
@@ -12,6 +13,7 @@ import {
   loadDefaultCloudWatchConsoleServiceDirectory,
   loadDefaultResourceSpecification,
   loadDefaultStatefulResources,
+  loadGetAttAllowList,
   LoadResult,
   loadSamSchema,
   loadSamSpec,
@@ -175,6 +177,17 @@ export class DatabaseBuilder {
         report,
       );
       importCannedMetrics(db, cloudWatchServiceDirectory, report);
+    });
+  }
+
+  /**
+   * Import the GetAtt allowlist
+   */
+  public importGetAttAllowList(specFilePath: string) {
+    return this.addSourceImporter(async (db, report) => {
+      const allowListSpec = this.loadResult(await loadGetAttAllowList(specFilePath, this.options), report);
+
+      importGetAttAllowList(db, allowListSpec);
     });
   }
 

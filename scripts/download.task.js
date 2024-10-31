@@ -23,10 +23,15 @@ var reqOptions = {
 
 const file = fs.createWriteStream(tmpDest);
 fetch(url, reqOptions).then((res) => {
+
+  if (res.status !== 200) {
+    throw new Error(`Http Status ${res.status}`);
+  }
+
   res.body.pipe(file);
   file
     .on('finish', () => {
-      file.close();
+      file.close();  
       console.log('Download completed');
       
       // Print a hash of the downloaded file that can be used for inspection
@@ -60,6 +65,9 @@ fetch(url, reqOptions).then((res) => {
     })
     .on('error', function (error) {
       fs.rmSync(tmpDir, { recursive: true, force: true });
-      console.error(`Download failed: ${error.message}`);
-    });
+      throw error;
+    });  
+}).catch(e => {
+  console.error(`Download failed: ${e.message}`);
+  process.exit(1);
 });

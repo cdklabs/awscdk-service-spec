@@ -57,8 +57,8 @@ export class Scrutinies {
   private autoPropertyScrutiny(propertyName: string, property: Property): PropertyScrutinyType | undefined {
     const richDb = new RichSpecDatabase(this.db);
 
-    // Detect fields named like ManagedPolicyArns
-    if (propertyName === 'ManagedPolicyArns') {
+    // Detect fields named like ManagedPolicyArns or ManagedPolicies (AWS::SSO::PermissionSet, for example)
+    if (propertyName === 'ManagedPolicyArns' || propertyName === 'ManagedPolicies') {
       return PropertyScrutinyType.ManagedPolicies;
     }
 
@@ -93,6 +93,12 @@ export class Scrutinies {
     this.setResourceScrutiny('AWS::EC2::SecurityGroupEgress', ResourceScrutinyType.EgressRuleResource);
     this.setPropertyScrutiny('AWS::EC2::SecurityGroup', 'SecurityGroupIngress', PropertyScrutinyType.IngressRules);
     this.setPropertyScrutiny('AWS::EC2::SecurityGroup', 'SecurityGroupEgress', PropertyScrutinyType.EgressRules);
+
+    // AWS IAM Identity Center (formerly AWS SSO)
+    // eslint-disable-next-line prettier/prettier
+    this.setResourceScrutiny('AWS::SSO::InstanceAccessControlAttributeConfiguration', ResourceScrutinyType.SsoInstanceACAConfigResource);
+    this.setResourceScrutiny('AWS::SSO::Assignment', ResourceScrutinyType.SsoAssignmentResource);
+    this.setResourceScrutiny('AWS::SSO::PermissionSet', ResourceScrutinyType.SsoPermissionSet);
   }
 
   private setResourceScrutiny(cfnType: string, scrutiny: ResourceScrutinyType) {

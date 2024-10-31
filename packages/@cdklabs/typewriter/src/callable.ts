@@ -6,7 +6,7 @@ import { Statement } from './statements';
 import { Block } from './statements/block';
 import { asStmt } from './statements/private';
 import { Type } from './type';
-import { DeclarationKind, TypeDeclaration, TypeSpec } from './type-declaration';
+import { DeclarationKind, Exported, TypeDeclaration, TypeSpec } from './type-declaration';
 
 export interface CallableSpec extends TypeSpec {
   name: string;
@@ -29,7 +29,7 @@ export interface CallableExpr {
 /**
  * Can't be called "Function"
  */
-export class FreeFunction extends TypeDeclaration implements CallableDeclaration {
+export class FreeFunction extends TypeDeclaration implements CallableDeclaration, Exported {
   public readonly returnType: Type;
   public readonly kind = DeclarationKind.Function;
   public readonly parameters = new Array<Parameter>();
