@@ -4,7 +4,7 @@ This directory contains an entire JSON schema for a CloudFormation template, inc
 
 ## Source
 
-<https://raw.githubusercontent.com/awslabs/goformation/master/schema/sam.schema.json>
+<https://raw.githubusercontent.com/aws/serverless-application-model/develop/schema_source/sam.schema.json>
 
 ## Instructions
 
