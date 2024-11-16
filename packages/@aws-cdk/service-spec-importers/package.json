@@ -51,7 +51,7 @@
     "jest": "^29.7.0",
     "jest-junit": "^15",
     "prettier": "^2.8.8",
-    "projen": "^0.90.2",
+    "projen": "^0.90.3",
     "source-map-support": "^0.5.21",
     "ts-jest": "^29.2.5",
     "ts-json-schema-generator": "^1.5.1",
