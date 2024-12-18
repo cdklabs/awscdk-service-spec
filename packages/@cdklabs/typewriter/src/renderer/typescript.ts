@@ -67,11 +67,11 @@ export interface TypeScriptRenderOptions extends RenderOptions {
    *
    * @default: max-len, prettier/prettier
    */
-  disabledEsLintRules?: EsLintRules[];
+  disabledEsLintRules?: string[];
 }
 
 export class TypeScriptRenderer extends Renderer {
-  private disabledEsLintRules: EsLintRules[];
+  private disabledEsLintRules: string[];
   public constructor(options: TypeScriptRenderOptions = {}) {
     super(options);
 

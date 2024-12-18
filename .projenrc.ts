@@ -19,6 +19,7 @@ const repo = new YarnMonorepo({
     'eslint',
     '@typescript-eslint/parser@^6',
     '@typescript-eslint/eslint-plugin@^6',
+    '@stylistic/eslint-plugin@^2',
     'eslint-plugin-import',
   ],
   vscodeWorkspace: true,

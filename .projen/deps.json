@@ -1,6 +1,11 @@
 {
   "dependencies": [
     {
+      "name": "@stylistic/eslint-plugin",
+      "version": "^2",
+      "type": "build"
+    },
+    {
       "name": "@types/node",
       "type": "build"
     },
