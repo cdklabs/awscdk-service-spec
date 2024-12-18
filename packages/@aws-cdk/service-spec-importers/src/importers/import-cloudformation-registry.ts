@@ -71,16 +71,22 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     const required = calculateDefinitelyRequired(source);
 
     for (const [name, property] of Object.entries(source.properties)) {
-      let resolvedSchema = resolve(property);
-
-      withResult(schemaTypeToModelType(name, resolvedSchema, fail.in(`property ${name}`)), (type) => {
-        target.setProperty(name, {
-          type,
-          documentation: descriptionOf(resolvedSchema),
-          required: required.has(name),
-          defaultValue: describeDefault(resolvedSchema),
+      try {
+        let resolvedSchema = resolve(property);
+        withResult(schemaTypeToModelType(name, resolvedSchema, fail.in(`property ${name}`)), (type) => {
+          target.setProperty(name, {
+            type,
+            documentation: descriptionOf(resolvedSchema),
+            required: required.has(name),
+            defaultValue: describeDefault(resolvedSchema),
+          });
         });
-      });
+      } catch (e) {
+        report.reportFailure(
+          'interpreting',
+          fail(`Skip generating property ${name} for resource ${resource.typeName} because of ${e}`),
+        );
+      }
     }
   }
 

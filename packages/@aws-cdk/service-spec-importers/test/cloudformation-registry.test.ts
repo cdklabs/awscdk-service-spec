@@ -84,6 +84,38 @@ test('type definitions in deprecated properties do not fail', () => {
   // THEN: no failure
 });
 
+test('referring to non-exist type do not fail', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::Some::Type',
+      description: 'resource with property has type non exist',
+      properties: {
+        id: { $ref: '#/definitions/Type' },
+        prop: { $ref: '#/definitions/NotExistType' },
+        prop2: { $ref: '#/definitions/Type' },
+      },
+      definitions: {
+        Type: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+            },
+          },
+        },
+      },
+    },
+  });
+
+  // THEN:
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type').only();
+  expect(Object.keys(resource.properties)).toContain('id');
+  expect(Object.keys(resource.properties)).toContain('prop2');
+  expect(Object.keys(resource.properties)).not.toContain('prop');
+});
+
 test('empty objects are treated as "any"', () => {
   importCloudFormationRegistryResource({
     db,
