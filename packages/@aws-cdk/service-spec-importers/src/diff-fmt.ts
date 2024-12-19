@@ -53,8 +53,8 @@ export class DiffFormatter {
       listWithCaption(
         'resources',
         [...this.dbs[db].follow('hasResource', s)]
-        .sort(sortByKey(e => e.entity.name))
-        .map((e) => this.renderResource(e.entity, db).prefix([' '])),
+          .sort(sortByKey((e) => e.entity.name))
+          .map((e) => this.renderResource(e.entity, db).prefix([' '])),
       ),
     ]);
   }
