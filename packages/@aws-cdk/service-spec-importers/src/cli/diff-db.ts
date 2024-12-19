@@ -1,4 +1,4 @@
-import { loadDatabase } from '@aws-cdk/service-spec-types';
+import { emptyDatabase, loadDatabase } from '@aws-cdk/service-spec-types';
 import { Command } from 'commander';
 import { handleFailure } from './util';
 import { DbDiff } from '../db-diff';
@@ -11,14 +11,26 @@ async function main() {
     .name('diff-db')
     .description('Calculate differences between two databases')
     .argument('<db1>', 'First database file')
-    .argument('<db2>', 'Second database file')
+    .argument('[db2]', 'Second database file')
     .option('-j, --json', 'Output json', false)
     .parse();
   const options = program.opts();
   const args = program.args;
 
-  const db1 = await loadDatabase(args[0]);
-  const db2 = await loadDatabase(args[1]);
+  let db1;
+  let db2;
+  let realDiff;
+  if (args[1]) {
+    // Compare 2 actual database
+    db1 = await loadDatabase(args[0]);
+    db2 = await loadDatabase(args[1]);
+    realDiff = true;
+  } else {
+    // Compare 1 database to an empty one (count everything as added)
+    db1 = emptyDatabase();
+    db2 = await loadDatabase(args[0]);
+    realDiff = false;
+  }
 
   const result = new DbDiff(db1, db2).diff();
 
@@ -34,7 +46,7 @@ async function main() {
     console.log(new DiffFormatter(db1, db2).format(result));
   }
 
-  process.exitCode = hasChanges ? 1 : 0;
+  process.exitCode = hasChanges && realDiff ? 1 : 0;
 }
 
 main().catch(handleFailure);

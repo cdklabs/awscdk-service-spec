@@ -78,6 +78,14 @@ export class PrintableTree {
     return this;
   }
 
+  /**
+   * Prefix all lines of the tree with the given list of cells.
+   *
+   * The first line will be prefixed with `first`.
+   *
+   * The other lines will be prefixed with `rest` if given, or the length of
+   * `first` in spaces if rest is not given.
+   */
   public prefix(first: string[], rest?: string[]) {
     rest = rest ?? first.map((x) => ' '.repeat(x.length));
 
