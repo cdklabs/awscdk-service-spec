@@ -52,7 +52,9 @@ export class DiffFormatter {
       ),
       listWithCaption(
         'resources',
-        this.dbs[db].follow('hasResource', s).map((e) => this.renderResource(e.entity, db).prefix([' '])),
+        [...this.dbs[db].follow('hasResource', s)]
+        .sort(sortByKey(e => e.entity.name))
+        .map((e) => this.renderResource(e.entity, db).prefix([' '])),
       ),
     ]);
   }
@@ -95,7 +97,9 @@ export class DiffFormatter {
       listWithCaption('attributes', this.renderProperties(r.attributes, db)),
       listWithCaption(
         'types',
-        this.dbs[db].follow('usesType', r).map((e) => this.renderTypeDefinition(e.entity, db).prefix([' '])),
+        [...this.dbs[db].follow('usesType', r)]
+          .sort(sortByKey((e) => e.entity.name))
+          .map((e) => this.renderTypeDefinition(e.entity, db).prefix([' '])),
       ),
     ]);
   }
@@ -290,4 +294,8 @@ function listWithCaption(caption: string, trees: PrintableTree[]) {
   const ret = new PrintableTree(`${caption}`);
   ret.addBullets(trees);
   return ret.prefix([' '], ['  ']);
+}
+
+function sortByKey<T>(keyFn: (x: T) => string): (a: T, b: T) => number {
+  return (a, b) => keyFn(a).localeCompare(keyFn(b));
 }
