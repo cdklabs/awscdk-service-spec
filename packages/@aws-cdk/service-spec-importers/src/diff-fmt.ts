@@ -20,7 +20,7 @@ import { PrintableTree } from './printable-tree';
 const ADDITION = '[+]';
 const UPDATE = '[~]';
 const REMOVAL = '[-]';
-const META_INDENT = 2;
+const META_INDENT = 6;
 
 const [OLD_DB, NEW_DB] = [0, 1];
 
@@ -52,7 +52,7 @@ export class DiffFormatter {
       ),
       listWithCaption(
         'resources',
-        this.dbs[db].follow('hasResource', s).map((e) => this.renderResource(e.entity, db)),
+        this.dbs[db].follow('hasResource', s).map((e) => this.renderResource(e.entity, db).prefix([' '])),
       ),
     ]);
   }
@@ -66,8 +66,8 @@ export class DiffFormatter {
         'resources',
         this.renderMapDiff(
           s.resourceDiff,
-          (r, db) => this.renderResource(r, db),
-          (k, u) => this.renderUpdatedResource(k, u),
+          (r, db) => this.renderResource(r, db).prefix([' ']),
+          (k, u) => this.renderUpdatedResource(k, u).prefix([' ']),
         ),
       ),
     ];
@@ -95,7 +95,7 @@ export class DiffFormatter {
       listWithCaption('attributes', this.renderProperties(r.attributes, db)),
       listWithCaption(
         'types',
-        this.dbs[db].follow('usesType', r).map((e) => this.renderTypeDefinition(e.entity, db)),
+        this.dbs[db].follow('usesType', r).map((e) => this.renderTypeDefinition(e.entity, db).prefix([' '])),
       ),
     ]);
   }
@@ -121,7 +121,7 @@ export class DiffFormatter {
         'types',
         this.renderMapDiff(
           r.typeDefinitionDiff,
-          (t, db) => this.renderTypeDefinition(t, db),
+          (t, db) => this.renderTypeDefinition(t, db).prefix([' ']),
           (k, u) => this.renderUpdatedTypeDefinition(k, u),
         ),
       ),
@@ -177,7 +177,7 @@ export class DiffFormatter {
   }
 
   private renderProperties(ps: Record<string, Property>, db: number): PrintableTree[] {
-    return Object.entries(ps).map(([name, p]) => this.renderProperty(p, db).prefix([`${name}: `]));
+    return Object.entries(ps).map(([name, p]) => this.renderProperty(p, db).prefix([' ', `${name}: `]));
   }
 
   private renderMapDiff<E, U>(
