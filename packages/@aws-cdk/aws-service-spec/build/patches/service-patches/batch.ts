@@ -10,5 +10,7 @@ registerServicePatches(
     renameDefinition('EksContainerResourceRequirements', 'Resources', reason)(lens);
     renameDefinition('EksContainerSecurityContext', 'SecurityContext', reason)(lens);
     renameDefinition('EksPodProperties', 'PodProperties', reason)(lens);
+    renameDefinition('Volume', 'Volumes', reason)(lens);
+    renameDefinition('EFSVolumeConfiguration', 'EfsVolumeConfiguration', reason)(lens);
   }),
 );
