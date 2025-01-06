@@ -103,21 +103,21 @@ export function renameDefinition(
 }
 
 /**
- * Drop the old definition, and rename the new definition to have the same old name to keep backward compatability
+ * Drop the existing definition, and rename the new definition to have the same old name to keep backward compatability
  *
  * NOTE: returns a new patcher. Still needs to be applied to a lens.
  */
 export function replaceExitingDefinitionWithNewOne(
-  oldDefinitionName: string,
+  existingDefinitionName: string,
   newDefinitionName: string,
   reason: patching.Reason,
 ): patching.JsonObjectPatcher {
   return (lens) => {
     if (lens.jsonPointer === `/definitions`) {
       // remove the old definition
-      lens.removeProperty(reason.reason, oldDefinitionName);
+      lens.removeProperty(reason.reason, existingDefinitionName);
       // rename the new definition to be named as the old one
-      lens.renameProperty(reason.reason, newDefinitionName, oldDefinitionName);
+      lens.renameProperty(reason.reason, newDefinitionName, existingDefinitionName);
     }
     if (lens.value.$ref === `#/definitions/${newDefinitionName}`) {
       lens.recordPatch(reason.reason, {
@@ -125,7 +125,7 @@ export function replaceExitingDefinitionWithNewOne(
         path: lens.jsonPointer,
         value: {
           ...lens.value,
-          $ref: `#/definitions/${oldDefinitionName}`,
+          $ref: `#/definitions/${existingDefinitionName}`,
         },
       });
     }

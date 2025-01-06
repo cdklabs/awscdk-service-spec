@@ -9,9 +9,9 @@ registerServicePatches(
     renameDefinition('EksHostPath', 'HostPath', reason)(lens);
     renameDefinition('EksContainerResourceRequirements', 'Resources', reason)(lens);
     renameDefinition('EksContainerSecurityContext', 'SecurityContext', reason)(lens);
-    replaceExitingDefinitionWithNewOne('EksPodProperties', 'PodProperties', reason)(lens);
-    replaceExitingDefinitionWithNewOne('Volume', 'Volumes', reason)(lens);
-    replaceExitingDefinitionWithNewOne('EFSVolumeConfiguration', 'EfsVolumeConfiguration', reason)(lens);
+    replaceExitingDefinitionWithNewOne('PodProperties', 'EksPodProperties', reason)(lens);
+    replaceExitingDefinitionWithNewOne('Volumes', 'Volume', reason)(lens);
+    replaceExitingDefinitionWithNewOne('EfsVolumeConfiguration', 'EFSVolumeConfiguration', reason)(lens);
 
   }),
 );
