@@ -1,4 +1,4 @@
-import { forResource, registerServicePatches, renameDefinition, replaceExitingDefinitionWithNewOne } from './core';
+import { forResource, registerServicePatches, renameDefinition } from './core';
 import { patching } from '@aws-cdk/service-spec-importers';
 
 registerServicePatches(
@@ -9,9 +9,8 @@ registerServicePatches(
     renameDefinition('EksHostPath', 'HostPath', reason)(lens);
     renameDefinition('EksContainerResourceRequirements', 'Resources', reason)(lens);
     renameDefinition('EksContainerSecurityContext', 'SecurityContext', reason)(lens);
-    replaceExitingDefinitionWithNewOne('PodProperties', 'EksPodProperties', reason)(lens);
-    replaceExitingDefinitionWithNewOne('Volumes', 'Volume', reason)(lens);
-    replaceExitingDefinitionWithNewOne('EfsVolumeConfiguration', 'EFSVolumeConfiguration', reason)(lens);
-
+    renameDefinition('EksPodProperties', 'PodProperties', reason)(lens);
+    renameDefinition('Volume', 'Volumes', reason)(lens);
+    renameDefinition('EFSVolumeConfiguration', 'EfsVolumeConfiguration', reason)(lens);
   }),
 );

@@ -103,36 +103,6 @@ export function renameDefinition(
 }
 
 /**
- * Drop the existing definition, and rename the new definition to have the same old name to keep backward compatability
- *
- * NOTE: returns a new patcher. Still needs to be applied to a lens.
- */
-export function replaceExitingDefinitionWithNewOne(
-  existingDefinitionName: string,
-  newDefinitionName: string,
-  reason: patching.Reason,
-): patching.JsonObjectPatcher {
-  return (lens) => {
-    if (lens.jsonPointer === `/definitions`) {
-      // remove the old definition
-      lens.removeProperty(reason.reason, existingDefinitionName);
-      // rename the new definition to be named as the old one
-      lens.renameProperty(reason.reason, newDefinitionName, existingDefinitionName);
-    }
-    if (lens.value.$ref === `#/definitions/${newDefinitionName}`) {
-      lens.recordPatch(reason.reason, {
-        op: 'replace',
-        path: lens.jsonPointer,
-        value: {
-          ...lens.value,
-          $ref: `#/definitions/${existingDefinitionName}`,
-        },
-      });
-    }
-  };
-}
-
-/**
  * Replace the a type definition, only if the definition actually exists.
  *
  * NOTE: returns a new patcher. Still needs to be applied to a lens.
