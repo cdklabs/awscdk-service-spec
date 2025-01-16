@@ -1,4 +1,4 @@
-import { PropertyType, emptyDatabase } from '@aws-cdk/service-spec-types';
+import { PropertyType, emptyDatabase, DefinitionReference } from '@aws-cdk/service-spec-types';
 import { importCloudFormationRegistryResource } from '../src/importers/import-cloudformation-registry';
 import { ProblemReport } from '../src/report';
 
@@ -264,6 +264,22 @@ test('anyOf different types that exist in property with object type', async () =
               },
               required: ['Key', 'Value'],
             },
+            {
+              description: 'Key Value 2',
+              type: 'object',
+              additionalProperties: false,
+              title: 'KV2',
+              properties: {
+                Key2: {
+                  type: 'string',
+                },
+                Value2: {
+                  type: 'string',
+                  enum: ['v1', 'v2'],
+                },
+              },
+              required: ['Key2', 'Value2'],
+            },
           ],
           additionalProperties: false,
         },
@@ -273,6 +289,13 @@ test('anyOf different types that exist in property with object type', async () =
 
   const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::anyOf::Required').only();
   expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+
+  const prop = resource.properties?.DataSourceConfiguration;
+  expect(prop.type.type).toBe('union');
+
+  expect((prop.type as { types: DefinitionReference[] }).types[0].type).toBe('json');
+  const type = db.get('typeDefinition', (prop.type as { types: DefinitionReference[] }).types[1].reference.$ref);
+  expect(Object.keys(type.properties).length).toBe(4);
 });
 
 test('anyOf different types that exist in patternProperties', async () => {
@@ -394,6 +417,11 @@ test('anyOf typed objects', async () => {
 
   const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::anyOf::Required').only();
   expect(Object.keys(resource.properties)).toContain('ResourceConfigurationDefinition');
+  const prop = resource.properties?.ResourceConfigurationDefinition;
+  expect(prop.type.type).toBe('union');
+
+  const type = db.get('typeDefinition', (prop.type as { types: DefinitionReference[] }).types[0].reference.$ref);
+  expect(Object.keys(type.properties).length).toBe(3);
 });
 
 test('anyOf containing a list of "required" properties and a required property', async () => {
