@@ -237,7 +237,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       return { type: 'tag' };
     }
 
-    const { typeDefinitionBuilder, freshInSession } = resourceBuilder.typeDefinitionBuilder(nameHint);
+    const { typeDefinitionBuilder, freshInSession } = resourceBuilder.typeDefinitionBuilder(nameHint, { schema });
 
     // If the type has no props, it's not a RecordLikeObject and we don't need to recurse
     // @todo The type should probably also just be json since they are useless otherwise. Fix after this package is in use.

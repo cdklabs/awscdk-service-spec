@@ -308,6 +308,94 @@ test('anyOf different types that exist in patternProperties', async () => {
   expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
 });
 
+test('anyOf typed objects', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::anyOf::Required',
+      description: 'Resource Type Description',
+      definitions: {
+        IpResource: {
+          minLength: 4,
+          type: 'string',
+          maxLength: 39,
+        },
+        PortRange: {
+          minLength: 1,
+          pattern: '^((\\d{1,5}\\-\\d{1,5})|(\\d+))$',
+          type: 'string',
+          maxLength: 11,
+        },
+        DnsResource: {
+          additionalProperties: false,
+          type: 'object',
+          properties: {
+            IpAddressType: {
+              type: 'string',
+              enum: ['IPV4', 'IPV6', 'DUALSTACK'],
+            },
+            DomainName: {
+              minLength: 3,
+              type: 'string',
+              maxLength: 255,
+            },
+          },
+          required: ['DomainName', 'IpAddressType'],
+        },
+        ArnResource: {
+          pattern: '^arn:[a-z0-9][-.a-z0-9]{0,62}:vpc-lattice:([a-z0-9][-.a-z0-9]{0,62})?:\\d{12}?:[^/].{0,1023}$',
+          type: 'string',
+          maxLength: 1224,
+        },
+      },
+      properties: {
+        ResourceConfigurationDefinition: {
+          oneOf: [
+            {
+              additionalProperties: false,
+              type: 'object',
+              title: 'IpResource',
+              properties: {
+                IpResource: {
+                  $ref: '#/definitions/IpResource',
+                },
+              },
+              required: ['IpResource'],
+            },
+            {
+              additionalProperties: false,
+              type: 'object',
+              title: 'ArnResource',
+              properties: {
+                ArnResource: {
+                  $ref: '#/definitions/ArnResource',
+                },
+              },
+              required: ['ArnResource'],
+            },
+            {
+              additionalProperties: false,
+              type: 'object',
+              title: 'DnsResource',
+              properties: {
+                DnsResource: {
+                  $ref: '#/definitions/DnsResource',
+                },
+              },
+              required: ['DnsResource'],
+            },
+          ],
+          type: 'object',
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::anyOf::Required').only();
+  expect(Object.keys(resource.properties)).toContain('ResourceConfigurationDefinition');
+});
+
 test('anyOf containing a list of "required" properties and a required property', async () => {
   importCloudFormationRegistryResource({
     db,
