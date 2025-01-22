@@ -230,7 +230,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
   function objectLikeSchemaToModelType(
     nameHint: string,
-    schema: jsonschema.MapLikeObject,
+    schema: jsonschema.RecordLikeObject,
     fail: Fail,
   ): Result<PropertyType> {
     if (looksLikeBuiltinTagType(schema)) {

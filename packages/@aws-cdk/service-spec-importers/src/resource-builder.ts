@@ -346,7 +346,7 @@ export class ResourceBuilder extends PropertyBagBuilder {
 
   public typeDefinitionBuilder(
     typeName: string,
-    options?: { description?: string; schema?: jsonschema.MapLikeObject },
+    options?: { description?: string; schema?: jsonschema.RecordLikeObject },
   ) {
     const existing = this.typeDefinitions.get(typeName);
     const description = options?.description;
@@ -360,8 +360,14 @@ export class ResourceBuilder extends PropertyBagBuilder {
       // If db already contains typeName's type definition, we want to additionally
       // check if the schema matches the type definition. If the schema includes new
       // properties, we want to add them to the type definition.
-      const schemaTitle = options?.schema?.title;
-      if (schemaTitle && !Object.keys(existing.properties).includes(schemaTitle)) {
+
+      // Note that CloudFormation documentation has a limitation where it only shows
+      // the first property defined in `oneOf` schema. https://t.corp.amazon.com/P190050655/overview
+      // However, it is deployable using other properties in the `oneOf` although it's not
+      // shown in CloudFormation documentation. The following CDK code will make sure the
+      // generated L1 Constructs include all properties in `oneOf` schema.
+      const properties = options?.schema?.properties ?? {};
+      if (!Object.keys(properties).every((element) => Object.keys(existing.properties).includes(element))) {
         return {
           typeDefinitionBuilder: new TypeDefinitionBuilder(this.db, existing),
           freshInDb: true,
