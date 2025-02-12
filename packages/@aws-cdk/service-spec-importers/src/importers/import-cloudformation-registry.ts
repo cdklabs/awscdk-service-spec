@@ -134,7 +134,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         const convertedTypes = inner.map((t) => {
           const innerSchema = resolve(t);
           // Check if the inner schema is an Record-like object with 'properties'
-          if (jsonschema.isObject(innerSchema) && jsonschema.isRecordLikeObject(innerSchema)) {
+          if (jsonschema.isObject(innerSchema) && !jsonschema.isMapLikeObject(innerSchema)) {
             // If the schema has a title, use it to differentiate different types in 'oneOf' or
             // 'anyOf' items
             if (innerSchema.title) {
