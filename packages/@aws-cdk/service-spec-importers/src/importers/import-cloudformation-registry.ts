@@ -123,7 +123,39 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
           return schemaTypeToModelType(nameHint, jsonschema.setResolvedReference(combinedType, reference), fail);
         }
 
-        const convertedTypes = inner.map((t) => schemaTypeToModelType(nameHint, resolve(t), fail));
+        // There are two ways `oneOf` or `anyOf` can be used:
+        // 1. (Problematic Case) The property item itself is one of multiple object types,
+        //    where each type references a definition
+        // 2. (Not Problematic) The property item is a single type that references a definition,
+        //    and that definition itself is one of multiple types of definitions.
+
+        // The error occurs in the first case, where CDK treats only the first type in `oneOf` or `anyOf` as valid.
+        // To fix the first case, we need to make sure we generate unique name hint for each referenced definition.
+        const convertedTypes = inner.map((t) => {
+          const innerSchema = resolve(t);
+          // Check if the inner schema is an Record-like object with 'properties'
+          if (jsonschema.isObject(innerSchema) && jsonschema.isRecordLikeObject(innerSchema)) {
+            // If the schema has a title, use it to differentiate different types in 'oneOf' or
+            // 'anyOf' items
+            if (innerSchema.title) {
+              const name = nameHint + innerSchema.title;
+              return schemaTypeToModelType(name, innerSchema, fail);
+            }
+
+            // If there is no title, check if the schema contains exactly one definition.
+            // Resolve the definition to obtain the definition name to differentiate different
+            // types in 'oneOf' or 'anyOf' items.
+            const properties = innerSchema.properties;
+            if (Object.keys(properties).length === 1) {
+              const property = properties[Object.keys(properties)[0]];
+              const resolvedProperty = resolve(property);
+              const resolvedName = jsonschema.resolvedReferenceName(resolvedProperty);
+              const name = resolvedName ? nameHint + resolvedName : nameHint;
+              return schemaTypeToModelType(name, innerSchema, fail);
+            }
+          }
+          return schemaTypeToModelType(nameHint, innerSchema, fail);
+        });
         report.reportFailure('interpreting', ...convertedTypes.filter(isFailure));
 
         const types = convertedTypes.filter(isSuccess);
