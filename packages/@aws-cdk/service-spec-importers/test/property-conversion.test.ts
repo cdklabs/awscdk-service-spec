@@ -292,12 +292,10 @@ test('anyOf different types that exist in property with object type', async () =
 
   const prop = resource.properties?.DataSourceConfiguration;
   expect(prop.type.type).toBe('union');
-
   expect((prop.type as { types: DefinitionReference[] }).types[0].type).toBe('json');
-  const type2 = db.get('typeDefinition', (prop.type as { types: DefinitionReference[] }).types[1].reference.$ref);
-  expect(Object.keys(type2.properties).length).toBe(2);
-  const type3 = db.get('typeDefinition', (prop.type as { types: DefinitionReference[] }).types[2].reference.$ref);
-  expect(Object.keys(type3.properties).length).toBe(2);
+
+  const type = db.get('typeDefinition', (prop.type as { types: DefinitionReference[] }).types[1].reference.$ref);
+  expect(Object.keys(type.properties).length).toBe(4);
 });
 
 test('anyOf different types that exist in patternProperties', async () => {
@@ -333,7 +331,7 @@ test('anyOf different types that exist in patternProperties', async () => {
   expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
 });
 
-test('anyOf typed objects', async () => {
+test('oneOf typed objects and should generate union type properties', async () => {
   importCloudFormationRegistryResource({
     db,
     report,
@@ -418,15 +416,106 @@ test('anyOf typed objects', async () => {
 
   const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::anyOf::Required').only();
   expect(Object.keys(resource.properties)).toContain('ResourceConfigurationDefinition');
+
+  const prop = resource.properties?.ResourceConfigurationDefinition;
+  expect(prop.type.type).toBe('union');
+  expect(Object.keys((prop.type as { types: DefinitionReference[] }).types).length).toBe(3);
+
+  const type = db.get('typeDefinition', (prop.type as { types: DefinitionReference[] }).types[0].reference.$ref);
+  expect(Object.keys(type.properties).length).toBe(1);
+});
+
+test('anyOf typed objects and should generate object type property', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::anyOf::Required',
+      description: 'Resource Type Description',
+      definitions: {
+        IpResource: {
+          minLength: 4,
+          type: 'string',
+          maxLength: 39,
+        },
+        PortRange: {
+          minLength: 1,
+          pattern: '^((\\d{1,5}\\-\\d{1,5})|(\\d+))$',
+          type: 'string',
+          maxLength: 11,
+        },
+        DnsResource: {
+          additionalProperties: false,
+          type: 'object',
+          properties: {
+            IpAddressType: {
+              type: 'string',
+              enum: ['IPV4', 'IPV6', 'DUALSTACK'],
+            },
+            DomainName: {
+              minLength: 3,
+              type: 'string',
+              maxLength: 255,
+            },
+          },
+          required: ['DomainName', 'IpAddressType'],
+        },
+        ArnResource: {
+          pattern: '^arn:[a-z0-9][-.a-z0-9]{0,62}:vpc-lattice:([a-z0-9][-.a-z0-9]{0,62})?:\\d{12}?:[^/].{0,1023}$',
+          type: 'string',
+          maxLength: 1224,
+        },
+      },
+      properties: {
+        ResourceConfigurationDefinition: {
+          anyOf: [
+            {
+              additionalProperties: false,
+              type: 'object',
+              properties: {
+                IpResource: {
+                  $ref: '#/definitions/IpResource',
+                },
+              },
+              required: ['IpResource'],
+            },
+            {
+              additionalProperties: false,
+              type: 'object',
+              title: 'ArnResource',
+              properties: {
+                ArnResource: {
+                  $ref: '#/definitions/ArnResource',
+                },
+              },
+              required: ['ArnResource'],
+            },
+            {
+              additionalProperties: false,
+              type: 'object',
+              title: 'DnsResource',
+              properties: {
+                DnsResource: {
+                  $ref: '#/definitions/DnsResource',
+                },
+              },
+              required: ['DnsResource'],
+            },
+          ],
+          type: 'object',
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::anyOf::Required').only();
+  expect(Object.keys(resource.properties)).toContain('ResourceConfigurationDefinition');
+
   const prop = resource.properties?.ResourceConfigurationDefinition;
   expect(prop.type.type).toBe('union');
 
   const type = db.get('typeDefinition', (prop.type as { types: DefinitionReference[] }).types[0].reference.$ref);
-  expect(Object.keys(type.properties).length).toBe(1);
-  const type2 = db.get('typeDefinition', (prop.type as { types: DefinitionReference[] }).types[1].reference.$ref);
-  expect(Object.keys(type2.properties).length).toBe(1);
-  const type3 = db.get('typeDefinition', (prop.type as { types: DefinitionReference[] }).types[2].reference.$ref);
-  expect(Object.keys(type3.properties).length).toBe(1);
+  expect(Object.keys(type.properties).length).toBe(3);
 });
 
 test('anyOf containing a list of "required" properties and a required property', async () => {
