@@ -105,7 +105,11 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
       if (jsonschema.isAnyType(resolvedSchema)) {
         return { type: 'json' };
-      } else if (jsonschema.isOneOf(resolvedSchema) || jsonschema.isAnyOf(resolvedSchema) || jsonschema.isAllOf(resolvedSchema)) {
+      } else if (
+        jsonschema.isOneOf(resolvedSchema) ||
+        jsonschema.isAnyOf(resolvedSchema) ||
+        jsonschema.isAllOf(resolvedSchema)
+      ) {
         const inner = jsonschema.innerSchemas(resolvedSchema);
         // The union type is a type definition
         // This is something we don't support at the moment as it's effectively a XOR for the property type
