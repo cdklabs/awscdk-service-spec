@@ -99,7 +99,6 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     fail: Fail,
   ): Result<PropertyType> {
     return tryCatch(fail, (): Result<PropertyType> => {
-      const reference = jsonschema.resolvedReference(resolvedSchema);
       const referenceName = jsonschema.resolvedReferenceName(resolvedSchema);
       const nameHint = referenceName ? lastWord(referenceName) : lastWord(propertyName);
 
@@ -111,21 +110,6 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         jsonschema.isAllOf(resolvedSchema)
       ) {
         const inner = jsonschema.innerSchemas(resolvedSchema);
-        // The union type is a type definition
-        // This is something we don't support at the moment as it's effectively a XOR for the property type
-        // In future we should create an enum like class for this, but we cannot at the moment to maintain backwards compatibility
-        // For now we assume the union is merged into a single object
-        if (reference && inner.every((s) => jsonschema.isObject(s))) {
-          report.reportFailure(
-            'interpreting',
-            fail(`Ref ${referenceName} is a union of objects. Merging into a single type.`),
-          );
-          const combinedType = unionSchemas(...inner) as jsonschema.ConcreteSchema;
-          if (isFailure(combinedType)) {
-            return combinedType;
-          }
-          return schemaTypeToModelType(nameHint, jsonschema.setResolvedReference(combinedType, reference), fail);
-        }
 
         let convertedTypes;
         if (jsonschema.isOneOf(resolvedSchema)) {
