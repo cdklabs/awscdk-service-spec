@@ -105,7 +105,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
       if (jsonschema.isAnyType(resolvedSchema)) {
         return { type: 'json' };
-      } else if (jsonschema.isOneOf(resolvedSchema) || jsonschema.isAnyOf(resolvedSchema)) {
+      } else if (jsonschema.isOneOf(resolvedSchema) || jsonschema.isAnyOf(resolvedSchema) || jsonschema.isAllOf(resolvedSchema)) {
         const inner = jsonschema.innerSchemas(resolvedSchema);
         // The union type is a type definition
         // This is something we don't support at the moment as it's effectively a XOR for the property type
@@ -140,8 +140,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
               // If the schema has a title, use it to differentiate different types in 'oneOf' or
               // 'anyOf' items
               if (innerSchema.title) {
-                const name = nameHint + innerSchema.title;
-                return schemaTypeToModelType(name, innerSchema, fail);
+                return schemaTypeToModelType(innerSchema.title, innerSchema, fail);
               }
 
               // If there is no title, check if the schema contains exactly one definition.
@@ -149,8 +148,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
               // types in 'oneOf' or 'anyOf' items.
               const properties = Object.keys(innerSchema.properties);
               if (properties.length === 1) {
-                const name = nameHint + properties[0];
-                return schemaTypeToModelType(name, innerSchema, fail);
+                return schemaTypeToModelType(properties[0], innerSchema, fail);
               }
             }
             return schemaTypeToModelType(nameHint, innerSchema, fail);
@@ -164,10 +162,6 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         removeUnionDuplicates(types);
 
         return { type: 'union', types };
-      } else if (jsonschema.isAllOf(resolvedSchema)) {
-        // FIXME: Do a proper thing here
-        const firstResolved = resolvedSchema.allOf[0];
-        return schemaTypeToModelType(nameHint, resolve(firstResolved), fail);
       } else {
         switch (resolvedSchema.type) {
           case 'string':
