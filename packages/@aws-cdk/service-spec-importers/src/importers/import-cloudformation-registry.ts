@@ -99,41 +99,57 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     fail: Fail,
   ): Result<PropertyType> {
     return tryCatch(fail, (): Result<PropertyType> => {
-      const reference = jsonschema.resolvedReference(resolvedSchema);
       const referenceName = jsonschema.resolvedReferenceName(resolvedSchema);
       const nameHint = referenceName ? lastWord(referenceName) : lastWord(propertyName);
 
       if (jsonschema.isAnyType(resolvedSchema)) {
         return { type: 'json' };
-      } else if (jsonschema.isOneOf(resolvedSchema) || jsonschema.isAnyOf(resolvedSchema)) {
+      } else if (
+        jsonschema.isOneOf(resolvedSchema) ||
+        jsonschema.isAnyOf(resolvedSchema) ||
+        jsonschema.isAllOf(resolvedSchema)
+      ) {
         const inner = jsonschema.innerSchemas(resolvedSchema);
-        // The union type is a type definition
-        // This is something we don't support at the moment as it's effectively a XOR for the property type
-        // In future we should create an enum like class for this, but we cannot at the moment to maintain backwards compatibility
-        // For now we assume the union is merged into a single object
-        if (reference && inner.every((s) => jsonschema.isObject(s))) {
-          report.reportFailure(
-            'interpreting',
-            fail(`Ref ${referenceName} is a union of objects. Merging into a single type.`),
-          );
-          const combinedType = unionSchemas(...inner) as jsonschema.ConcreteSchema;
-          if (isFailure(combinedType)) {
-            return combinedType;
-          }
-          return schemaTypeToModelType(nameHint, jsonschema.setResolvedReference(combinedType, reference), fail);
-        }
 
-        const convertedTypes = inner.map((t) => schemaTypeToModelType(nameHint, resolve(t), fail));
+        let convertedTypes;
+        if (jsonschema.isOneOf(resolvedSchema)) {
+          // There are two ways `oneOf` can be used:
+          // 1. (Problematic Case) The property item itself is one of multiple object types,
+          //    where each type references a definition
+          // 2. (Not Problematic) The property item is a single type that references a definition,
+          //    and that definition itself is one of multiple types of definitions.
+
+          // The error occurs in the first case, where CDK treats only the first type in `oneOf` or `anyOf` as valid.
+          // To fix the first case, we need to make sure we generate unique name hint for each referenced definition.
+          convertedTypes = inner.map((t) => {
+            const innerSchema = resolve(t);
+            // Check if the inner schema contains '.properties'
+            if (jsonschema.isObject(innerSchema) && !jsonschema.isMapLikeObject(innerSchema)) {
+              // If the schema has a title, use it to differentiate different types in 'oneOf' or
+              // 'anyOf' items
+              if (innerSchema.title) {
+                return schemaTypeToModelType(innerSchema.title, innerSchema, fail);
+              }
+
+              // If there is no title, check if the schema contains exactly one definition.
+              // Resolve the definition to obtain the definition name to differentiate different
+              // types in 'oneOf' or 'anyOf' items.
+              const properties = Object.keys(innerSchema.properties);
+              if (properties.length === 1) {
+                return schemaTypeToModelType(properties[0], innerSchema, fail);
+              }
+            }
+            return schemaTypeToModelType(nameHint, innerSchema, fail);
+          });
+        } else {
+          convertedTypes = inner.map((t) => schemaTypeToModelType(nameHint, resolve(t), fail));
+        }
         report.reportFailure('interpreting', ...convertedTypes.filter(isFailure));
 
         const types = convertedTypes.filter(isSuccess);
         removeUnionDuplicates(types);
 
         return { type: 'union', types };
-      } else if (jsonschema.isAllOf(resolvedSchema)) {
-        // FIXME: Do a proper thing here
-        const firstResolved = resolvedSchema.allOf[0];
-        return schemaTypeToModelType(nameHint, resolve(firstResolved), fail);
       } else {
         switch (resolvedSchema.type) {
           case 'string':
@@ -230,14 +246,14 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
   function objectLikeSchemaToModelType(
     nameHint: string,
-    schema: jsonschema.MapLikeObject,
+    schema: jsonschema.RecordLikeObject,
     fail: Fail,
   ): Result<PropertyType> {
     if (looksLikeBuiltinTagType(schema)) {
       return { type: 'tag' };
     }
 
-    const { typeDefinitionBuilder, freshInSession } = resourceBuilder.typeDefinitionBuilder(nameHint);
+    const { typeDefinitionBuilder, freshInSession } = resourceBuilder.typeDefinitionBuilder(nameHint, { schema });
 
     // If the type has no props, it's not a RecordLikeObject and we don't need to recurse
     // @todo The type should probably also just be json since they are useless otherwise. Fix after this package is in use.
