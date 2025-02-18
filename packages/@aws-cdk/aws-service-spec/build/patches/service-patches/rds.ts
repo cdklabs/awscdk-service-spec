@@ -7,4 +7,9 @@ registerServicePatches(
     ['ReadEndpoint'],
     patching.Reason.sourceIssue('ReadEndpoint should be listed in readOnlyProperties.'),
   ),
+  fp.removeFromReadOnlyProperties(
+    'AWS::RDS::GlobalCluster',
+    ['GlobalEndppoint'],
+    patching.Reason.sourceIssue('GlobalEndpoint should not be listed in readOnlyProperties.'),
+  )
 );
