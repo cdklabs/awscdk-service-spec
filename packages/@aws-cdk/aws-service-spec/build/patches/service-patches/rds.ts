@@ -9,7 +9,7 @@ registerServicePatches(
   ),
   fp.removeFromReadOnlyProperties(
     'AWS::RDS::GlobalCluster',
-    ['GlobalEndppoint'],
+    ['GlobalEndpoint'],
     patching.Reason.sourceIssue('GlobalEndpoint should not be listed in readOnlyProperties.'),
-  )
+  ),
 );
