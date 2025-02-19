@@ -52,9 +52,9 @@ jobs:
       - id: check-publish-aws-cdk-aws-service-spec
         run: (git ls-remote -q --exit-code --tags origin $(cat dist/releasetag.txt) && (echo "publish=false" >> $GITHUB_OUTPUT)) || echo "publish=true" >> $GITHUB_OUTPUT
         working-directory: packages/@aws-cdk/aws-service-spec
-      - name: Check for new commits
+      - name: Output the sha value that downstream checks expect
         id: git_remote
-        run: echo "latest_commit=$(git ls-remote origin -h ${{ github.ref }} | cut -f1)" >> $GITHUB_OUTPUT
+        run: echo "latest_commit=${{ github.sha }}" >> $GITHUB_OUTPUT
       - name: "@cdklabs/tskb: Backup artifact permissions"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
         run: cd dist && getfacl -R . > permissions-backup.acl
