@@ -1667,10 +1667,10 @@ case@^1.6.3:
   resolved "https://registry.yarnpkg.com/case/-/case-1.6.3.tgz#0a4386e3e9825351ca2e6216c60467ff5f1ea1c9"
   integrity sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==
 
-cdklabs-projen-project-types@^0.1.231:
-  version "0.1.231"
-  resolved "https://registry.yarnpkg.com/cdklabs-projen-project-types/-/cdklabs-projen-project-types-0.1.231.tgz#43565c2c7946e942bf38dc7624848e2b3d8c9efa"
-  integrity sha512-eO7ZfxIXeqjoPG0yNE19JqiPet5/pOQXFny8PeA0gH3SXKzvu6f6lDFtuxsOdovPEkn3zjSdz6+fkCVHQGipeg==
+cdklabs-projen-project-types@^0.1.233:
+  version "0.1.233"
+  resolved "https://registry.yarnpkg.com/cdklabs-projen-project-types/-/cdklabs-projen-project-types-0.1.233.tgz#d26fa6eb3358710694d07a1495247eeba79153eb"
+  integrity sha512-+zqhe9BIponbSHU1mh6weRgm9O6xIsOSpv0cPdoi9RO1RGQ3SAsHzumRojrVlwaZ1V/7wMP8eEsSXQ0o2Y5LGg==
   dependencies:
     yaml "^2.7.0"
 
@@ -2449,10 +2449,10 @@ eslint-import-resolver-node@^0.3.9:
     is-core-module "^2.13.0"
     resolve "^1.22.4"
 
-eslint-import-resolver-typescript@^3.8.2:
-  version "3.8.2"
-  resolved "https://registry.yarnpkg.com/eslint-import-resolver-typescript/-/eslint-import-resolver-typescript-3.8.2.tgz#e5223f19f1cb11f68cad7dd5403cfe48d9b9b67a"
-  integrity sha512-o0nvXxsatYCDTzI1K5b3aYGQ6PjpDGJEVN86zqJw5SEewhmmggfRTotd2dqWr2t2zbeYpIEWGTCkgtUpIEIcaQ==
+eslint-import-resolver-typescript@^3.8.3:
+  version "3.8.3"
+  resolved "https://registry.yarnpkg.com/eslint-import-resolver-typescript/-/eslint-import-resolver-typescript-3.8.3.tgz#1721a1e4417e57a8fe6bf9463d0db8e220285eef"
+  integrity sha512-A0bu4Ks2QqDWNpeEgTQMPTngaMhuDu4yv6xpftBMAf+1ziXnpx+eSR1WRfoPTe2BAiAjHFZ7kSNx1fvr5g5pmQ==
   dependencies:
     "@nolyfill/is-core-module" "1.0.39"
     debug "^4.3.7"
@@ -2460,7 +2460,7 @@ eslint-import-resolver-typescript@^3.8.2:
     get-tsconfig "^4.10.0"
     is-bun-module "^1.0.2"
     stable-hash "^0.0.4"
-    tinyglobby "^0.2.11"
+    tinyglobby "^0.2.12"
 
 eslint-module-utils@^2.12.0:
   version "2.12.0"
@@ -4831,10 +4831,10 @@ process-nextick-args@~2.0.0:
   resolved "https://registry.yarnpkg.com/process-nextick-args/-/process-nextick-args-2.0.1.tgz#7820d9b16120cc55ca9ae7792680ae7dba6d7fe2"
   integrity sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==
 
-projen@^0.91.12:
-  version "0.91.12"
-  resolved "https://registry.yarnpkg.com/projen/-/projen-0.91.12.tgz#519ccb73926b40edb86cd5a7f41b2638fe75d503"
-  integrity sha512-Fu4GQsGMtYkI/vao/j5U+2DJcDoUR7Oc1gPGfEN1cTZFA3Swnxe51Wau96gcVb1KWnxAkR6He8fcLnvQaso+Ew==
+projen@^0.91.13:
+  version "0.91.13"
+  resolved "https://registry.yarnpkg.com/projen/-/projen-0.91.13.tgz#f8f2051aa8920a3e7d169b147c51117bf7f080a5"
+  integrity sha512-qs06tT0JtE0170QlfsSWgQ2syo5IbKlrCNQwvSezbjPrB2eDUXa+f/bnY70/4To+VcVkHuatgEPBusQLfa71+Q==
   dependencies:
     "@iarna/toml" "^2.2.5"
     case "^1.6.3"
@@ -5533,25 +5533,25 @@ through@2, "through@>=2.2.7 <3", through@^2.3.4:
   resolved "https://registry.yarnpkg.com/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
   integrity sha512-w89qg7PI8wAdvX60bMDP+bFoD5Dvhm9oLheFp5O4a2QF0cSBGsBX4qZmadPMvVqlLJBBci+WqGGOAPvcDeNSVg==
 
-tinyglobby@^0.2.11:
-  version "0.2.11"
-  resolved "https://registry.yarnpkg.com/tinyglobby/-/tinyglobby-0.2.11.tgz#9182cff655a0e272aad850d1a84c5e8e0f700426"
-  integrity sha512-32TmKeeKUahv0Go8WmQgiEp9Y21NuxjwjqiRC1nrUB51YacfSwuB44xgXD+HdIppmMRgjQNPdrHyA6vIybYZ+g==
+tinyglobby@^0.2.12:
+  version "0.2.12"
+  resolved "https://registry.yarnpkg.com/tinyglobby/-/tinyglobby-0.2.12.tgz#ac941a42e0c5773bd0b5d08f32de82e74a1a61b5"
+  integrity sha512-qkf4trmKSIiMTs/E63cxH+ojC2unam7rJ0WrauAzpT3ECNTxGRMlaXxVbfxMUC/w0LaYk6jQ4y/nGR9uBO3tww==
   dependencies:
     fdir "^6.4.3"
     picomatch "^4.0.2"
 
-tldts-core@^6.1.77:
-  version "6.1.77"
-  resolved "https://registry.yarnpkg.com/tldts-core/-/tldts-core-6.1.77.tgz#0fa4563163a7a61d72c4b05650fb66fc7e815500"
-  integrity sha512-bCaqm24FPk8OgBkM0u/SrEWJgHnhBWYqeBo6yUmcZJDCHt/IfyWBb+14CXdGi4RInMv4v7eUAin15W0DoA+Ytg==
+tldts-core@^6.1.78:
+  version "6.1.78"
+  resolved "https://registry.yarnpkg.com/tldts-core/-/tldts-core-6.1.78.tgz#47b477d9742870daa01dbd5ff9a598a48379728c"
+  integrity sha512-jS0svNsB99jR6AJBmfmEWuKIgz91Haya91Z43PATaeHJ24BkMoNRb/jlaD37VYjb0mYf6gRL/HOnvS1zEnYBiw==
 
 tldts@^6.1.32:
-  version "6.1.77"
-  resolved "https://registry.yarnpkg.com/tldts/-/tldts-6.1.77.tgz#714e3d1989e562886f2ed97b65e95a8e9f9e92d9"
-  integrity sha512-lBpoWgy+kYmuXWQ83+R7LlJCnsd9YW8DGpZSHhrMl4b8Ly/1vzOie3OdtmUJDkKxcgRGOehDu5btKkty+JEe+g==
+  version "6.1.78"
+  resolved "https://registry.yarnpkg.com/tldts/-/tldts-6.1.78.tgz#ee94576653a60d421ff94162c4e9060f2e62467b"
+  integrity sha512-fSgYrW0ITH0SR/CqKMXIruYIPpNu5aDgUp22UhYoSrnUQwc7SBqifEBFNce7AAcygUPBo6a/gbtcguWdmko4RQ==
   dependencies:
-    tldts-core "^6.1.77"
+    tldts-core "^6.1.78"
 
 tmp@~0.2.1:
   version "0.2.3"
