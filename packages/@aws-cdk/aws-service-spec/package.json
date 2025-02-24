@@ -43,7 +43,7 @@
     "prettier": "^2.8.8",
     "projen": "^0.91.13",
     "source-map-support": "^0.5.21",
-    "ts-jest": "^29.2.5",
+    "ts-jest": "^29.2.6",
     "typescript": "^5.7.3"
   },
   "dependencies": {
