@@ -125,6 +125,10 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
         const convertedTypes = inner.map((t) => {
           if (jsonschema.isObject(t) && jsonschema.isRecordLikeObject(t)) {
+            // The item in union type is an object
+            // We need to remove 'required' constraint from the object schema definition as we're dealing
+            // with oneOf/anyOf. Note that we should ONLY remove 'required' when the 'required' constraint
+            // refers to the object itself not the inner properties
             const refName = jsonschema.resolvedReferenceName(t);
             if ((t.title && t.required?.includes(t.title)) || (refName && t.required?.includes(refName))) {
               return schemaTypeToModelType(nameHint, resolve({ ...t, required: undefined }), fail);
