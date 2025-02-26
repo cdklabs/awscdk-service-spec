@@ -1,4 +1,4 @@
-import { PropertyType, emptyDatabase, DefinitionReference, ArrayType } from '@aws-cdk/service-spec-types';
+import { PropertyType, emptyDatabase, DefinitionReference, ArrayType, TypeUnion } from '@aws-cdk/service-spec-types';
 import { importCloudFormationRegistryResource } from '../src/importers/import-cloudformation-registry';
 import { ProblemReport } from '../src/report';
 
@@ -329,6 +329,90 @@ test('anyOf different types that exist in patternProperties', async () => {
 
   const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::anyOf::Required').only();
   expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+});
+
+test('same property but different one of types', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::oneOf::Required',
+      description: 'Resource Type Description',
+      properties: {
+        DataSourceConfiguration: {
+          description: 'description',
+          type: 'object',
+          properties: {
+            foo: {
+              oneOf: [
+                {
+                  type: 'string',
+                },
+                {
+                  type: 'array',
+                },
+              ],
+            },
+          },
+          additionalProperties: false,
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::oneOf::Required').only();
+  expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+  const prop = resource.properties?.DataSourceConfiguration;
+
+  const type = db.get('typeDefinition', (prop.type as DefinitionReference).reference.$ref);
+  expect(type.name).toEqual('DataSourceConfiguration');
+  expect(type.properties.foo.type.type).toBe('union');
+  expect((type.properties.foo.type as TypeUnion<any>).types.length).toBe(2);
+});
+
+test('same property name but different types', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::oneOf::Required',
+      description: 'Resource Type Description',
+      properties: {
+        DataSourceConfiguration: {
+          oneOf: [
+            {
+              description: 'description',
+              type: 'object',
+              properties: {
+                foo: {
+                  type: 'array',
+                },
+              },
+              additionalProperties: false,
+            },
+            {
+              description: 'description',
+              type: 'object',
+              properties: {
+                foo: {
+                  type: 'string',
+                },
+              },
+              additionalProperties: false,
+            },
+          ],
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::oneOf::Required').only();
+  expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+  const prop = resource.properties?.DataSourceConfiguration;
+
+  const type = db.get('typeDefinition', (prop.type as { types: DefinitionReference[] }).types[0].reference.$ref);
+  expect(type.name).toEqual('DataSourceConfiguration');
+  expect(type.properties.foo.type.type).toBe('array');
 });
 
 test('oneOf typed objects with property ref a definition', async () => {

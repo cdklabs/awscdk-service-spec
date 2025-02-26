@@ -139,7 +139,9 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
             if ((t.title && t.required?.includes(t.title)) || (refName && t.required?.includes(refName))) {
               report.reportFailure(
                 'interpreting',
-                fail(`${propertyName} is a union of objects. Merging into a single type and removing required fields.`),
+                fail(
+                  `${propertyName} is a union of objects. Merging into a single type and removing required fields for oneOf and anyOf.`,
+                ),
               );
               return schemaTypeToModelType(nameHint, resolve({ ...t, required: undefined }), fail);
             }
@@ -211,7 +213,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
             if (elementName && nextName && elementName === nextName && element.type !== next.type) {
               report.reportFailure(
                 'interpreting',
-                fail(`Invalid schema with property name ${element.title} but types ${element.type} and ${next.type}`),
+                fail(`Invalid schema with property name ${elementName} but types ${element.type} and ${next.type}`),
               );
             }
           }
