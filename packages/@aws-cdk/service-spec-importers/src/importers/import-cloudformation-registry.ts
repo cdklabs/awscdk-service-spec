@@ -127,7 +127,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         // that has the same property name but different types. For simplicity, we do not validate if the types
         // are overlapping. We will add this case to the problem report. An sample schema would be i.e. 
         // foo: { oneOf: [ { properties: { type: ObjectA } }, { properties: { type: ObjectB } }]}
-        validateCombiningSchemaType(inner);
+        validateCombiningSchemaType(inner, fail);
 
         const convertedTypes = inner.map((t) => {
           if (jsonschema.isObject(t) && jsonschema.isRecordLikeObject(t)) {
@@ -195,7 +195,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     });
   }
 
-  function validateCombiningSchemaType(schema: jsonschema.ConcreteSchema[]) {
+  function validateCombiningSchemaType(schema: jsonschema.ConcreteSchema[], fail: Fail) {
     schema.forEach((element, index) => {
       if (!jsonschema.isAnyType(element) && !jsonschema.isCombining(element)) {
         schema.slice(index + 1).forEach((next) => {
