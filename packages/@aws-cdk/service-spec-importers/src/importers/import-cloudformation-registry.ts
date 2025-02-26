@@ -125,7 +125,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
         // Validate oneOf and anyOf types schema by validating whether there are two definitions in oneOf/anyOf
         // that has the same property name but different types. For simplicity, we do not validate if the types
-        // are overlapping. We will add this case to the problem report. An sample schema would be i.e. 
+        // are overlapping. We will add this case to the problem report. An sample schema would be i.e.
         // foo: { oneOf: [ { properties: { type: ObjectA } }, { properties: { type: ObjectB } }]}
         validateCombiningSchemaType(inner, fail);
 
@@ -215,10 +215,9 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
               );
             }
           }
-        })
+        });
       }
     });
-
   }
 
   function schemaObjectToModelType(nameHint: string, schema: jsonschema.Object, fail: Fail): Result<PropertyType> {
