@@ -123,7 +123,12 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
           return schemaTypeToModelType(nameHint, jsonschema.setResolvedReference(combinedType, reference), fail);
         }
 
-        const convertedTypes = inner.map((t) => schemaTypeToModelType(nameHint, resolve(t), fail));
+        const convertedTypes = inner.map((t) => {          
+          if (jsonschema.isObject(t)) {
+            return schemaTypeToModelType(nameHint, resolve({ ...t, required: undefined }), fail);
+          }
+          return schemaTypeToModelType(nameHint, resolve(t), fail);
+        });
         report.reportFailure('interpreting', ...convertedTypes.filter(isFailure));
 
         const types = convertedTypes.filter(isSuccess);
@@ -230,14 +235,14 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
   function objectLikeSchemaToModelType(
     nameHint: string,
-    schema: jsonschema.MapLikeObject,
+    schema: jsonschema.RecordLikeObject,
     fail: Fail,
   ): Result<PropertyType> {
     if (looksLikeBuiltinTagType(schema)) {
       return { type: 'tag' };
     }
 
-    const { typeDefinitionBuilder, freshInSession } = resourceBuilder.typeDefinitionBuilder(nameHint);
+    const { typeDefinitionBuilder, freshInSession } = resourceBuilder.typeDefinitionBuilder(nameHint, { schema });
 
     // If the type has no props, it's not a RecordLikeObject and we don't need to recurse
     // @todo The type should probably also just be json since they are useless otherwise. Fix after this package is in use.

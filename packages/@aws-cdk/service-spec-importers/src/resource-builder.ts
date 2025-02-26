@@ -11,6 +11,7 @@ import {
   TypeDefinition,
 } from '@aws-cdk/service-spec-types';
 import { AllFieldsGiven } from './diff-helpers';
+import { jsonschema } from './types';
 
 /**
  * Options for the resourceBuilder API
@@ -343,14 +344,29 @@ export class ResourceBuilder extends PropertyBagBuilder {
     return currentBag[fieldPath[fieldPath.length - 1]];
   }
 
-  public typeDefinitionBuilder(typeName: string, description?: string) {
+  public typeDefinitionBuilder(
+    typeName: string,
+    options?: { description?: string; schema?: jsonschema.RecordLikeObject },
+  ) {
     const existing = this.typeDefinitions.get(typeName);
+    const description = options?.description;
     const freshInSession = !this.typesCreatedHere.has(typeName);
     this.typesCreatedHere.add(typeName);
 
     if (existing) {
       if (!existing.documentation && description) {
         existing.documentation = description;
+      }
+      const properties = options?.schema?.properties ?? {};
+      // If db already contains typeName's type definition, we want to additionally
+      // check if the schema matches the type definition. If the schema includes new
+      // properties, we want to add them to the type definition.
+      if (!Object.keys(properties).every((element) => Object.keys(existing.properties).includes(element))) {
+        return {
+          typeDefinitionBuilder: new TypeDefinitionBuilder(this.db, existing),
+          freshInDb: true,
+          freshInSession: true,
+        };
       }
       return {
         typeDefinitionBuilder: new TypeDefinitionBuilder(this.db, existing),
