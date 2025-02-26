@@ -123,9 +123,12 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
           return schemaTypeToModelType(nameHint, jsonschema.setResolvedReference(combinedType, reference), fail);
         }
 
-        const convertedTypes = inner.map((t) => {          
-          if (jsonschema.isObject(t)) {
-            return schemaTypeToModelType(nameHint, resolve({ ...t, required: undefined }), fail);
+        const convertedTypes = inner.map((t) => {
+          if (jsonschema.isObject(t) && jsonschema.isRecordLikeObject(t)) {
+            const refName = jsonschema.resolvedReferenceName(t);
+            if (!refName || (refName && t.required?.includes(refName))) {
+              return schemaTypeToModelType(nameHint, resolve({ ...t, required: undefined }), fail);
+            }
           }
           return schemaTypeToModelType(nameHint, resolve(t), fail);
         });

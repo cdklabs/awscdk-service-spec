@@ -1,4 +1,4 @@
-import { PropertyType, emptyDatabase, DefinitionReference } from '@aws-cdk/service-spec-types';
+import { PropertyType, emptyDatabase, DefinitionReference, ArrayType } from '@aws-cdk/service-spec-types';
 import { importCloudFormationRegistryResource } from '../src/importers/import-cloudformation-registry';
 import { ProblemReport } from '../src/report';
 
@@ -331,7 +331,7 @@ test('anyOf different types that exist in patternProperties', async () => {
   expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
 });
 
-test('oneOf typed objects', async () => {
+test('oneOf typed objects with property ref a definition', async () => {
   importCloudFormationRegistryResource({
     db,
     report,
@@ -429,7 +429,7 @@ test('oneOf typed objects', async () => {
   expect(type.properties.IpResource.required).toBe(undefined);
 });
 
-test('oneOf typed objects', async () => {
+test('oneOf typed objects with one of in properties', async () => {
   importCloudFormationRegistryResource({
     db,
     report,
@@ -522,6 +522,144 @@ test('oneOf typed objects', async () => {
   expect(type.name).toBe('ResourceConfigurationDefinition');
   expect(Object.keys(type.properties).length).toBe(3);
   expect(type.properties.IpResource.required).toBe(undefined);
+});
+
+test('oneOf typed objects with oneof in definition', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::OneOf::Test',
+      description: 'desc',
+      definitions: {
+        CanInterface: {
+          type: 'object',
+          properties: {
+            Name: {
+              type: 'string',
+              maxLength: 100,
+              minLength: 1,
+            },
+            ProtocolName: {
+              type: 'string',
+              maxLength: 50,
+              minLength: 1,
+            },
+            ProtocolVersion: {
+              type: 'string',
+              maxLength: 50,
+              minLength: 1,
+            },
+          },
+          required: ['Name'],
+          additionalProperties: false,
+        },
+        CanNetworkInterface: {
+          type: 'object',
+          properties: {
+            InterfaceId: {
+              type: 'string',
+              maxLength: 50,
+              minLength: 1,
+            },
+            Type: {
+              type: 'string',
+              enum: ['CAN_INTERFACE'],
+            },
+            CanInterface: {
+              $ref: '#/definitions/CanInterface',
+            },
+          },
+          required: ['InterfaceId', 'Type', 'CanInterface'],
+          additionalProperties: false,
+        },
+        ObdNetworkInterface: {
+          type: 'object',
+          properties: {
+            InterfaceId: {
+              type: 'string',
+              maxLength: 50,
+              minLength: 1,
+            },
+            Type: {
+              type: 'string',
+              enum: ['OBD_INTERFACE'],
+            },
+            ObdInterface: {
+              $ref: '#/definitions/ObdInterface',
+            },
+          },
+          required: ['InterfaceId', 'Type', 'ObdInterface'],
+          additionalProperties: false,
+        },
+        ObdInterface: {
+          type: 'object',
+          properties: {
+            Name: {
+              type: 'string',
+              maxLength: 100,
+              minLength: 1,
+            },
+          },
+          required: ['Name'],
+          additionalProperties: false,
+        },
+        CustomDecodingNetworkInterface: {
+          type: 'object',
+          properties: {
+            InterfaceId: {
+              type: 'string',
+              maxLength: 50,
+              minLength: 1,
+            },
+            Type: {
+              type: 'string',
+              enum: ['CUSTOM_DECODING_INTERFACE'],
+            },
+            CustomDecodingInterface: {
+              $ref: '#/definitions/CustomDecodingInterface',
+            },
+          },
+          required: ['InterfaceId', 'Type', 'CustomDecodingInterface'],
+          additionalProperties: false,
+        },
+      },
+      properties: {
+        NetworkInterfaces: {
+          insertionOrder: false,
+          type: 'array',
+          items: {
+            oneOf: [
+              {
+                $ref: '#/definitions/CanNetworkInterface',
+              },
+              {
+                $ref: '#/definitions/ObdNetworkInterface',
+              },
+              {
+                $ref: '#/definitions/CustomDecodingNetworkInterface',
+              },
+            ],
+          },
+          maxItems: 5000,
+          minItems: 1,
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::OneOf::Test').only();
+  expect(Object.keys(resource.properties)).toContain('NetworkInterfaces');
+  const prop = resource.properties?.NetworkInterfaces;
+  expect(prop.type.type).toBe('array');
+
+  const type = db.get(
+    'typeDefinition',
+    ((prop.type as ArrayType<any>).element as { types: DefinitionReference[] }).types[0].reference.$ref,
+  );
+  expect(type.name).toBe('CanNetworkInterface');
+  expect(Object.keys(type.properties).length).toBe(3);
+  expect(type.properties.InterfaceId.required).toBe(true);
 });
 
 test('anyOf containing a list of "required" properties and a required property', async () => {
