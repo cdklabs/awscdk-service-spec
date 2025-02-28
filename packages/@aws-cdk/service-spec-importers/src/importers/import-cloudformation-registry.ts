@@ -123,7 +123,31 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
           return schemaTypeToModelType(nameHint, jsonschema.setResolvedReference(combinedType, reference), fail);
         }
 
-        const convertedTypes = inner.map((t) => schemaTypeToModelType(nameHint, resolve(t), fail));
+        // Validate oneOf and anyOf types schema by validating whether there are two definitions in oneOf/anyOf
+        // that has the same property name but different types. For simplicity, we do not validate if the types
+        // are overlapping. We will add this case to the problem report. An sample schema would be i.e.
+        // foo: { oneOf: [ { properties: { type: ObjectA } }, { properties: { type: ObjectB } }]}
+        validateCombiningSchemaType(inner, fail);
+
+        const convertedTypes = inner.map((t) => {
+          if (jsonschema.isObject(t) && jsonschema.isRecordLikeObject(t)) {
+            // The item in union type is an object with properties
+            // We need to remove 'required' constraint from the object schema definition as we're dealing
+            // with oneOf/anyOf. Note that we should ONLY remove 'required' when the 'required' constraint
+            // refers to the object itself not the inner properties
+            const refName = jsonschema.resolvedReferenceName(t);
+            if ((t.title && t.required?.includes(t.title)) || (refName && t.required?.includes(refName))) {
+              report.reportFailure(
+                'interpreting',
+                fail(
+                  `${propertyName} is a union of objects. Merging into a single type and removing required fields for oneOf and anyOf.`,
+                ),
+              );
+              return schemaTypeToModelType(nameHint, resolve({ ...t, required: undefined }), fail);
+            }
+          }
+          return schemaTypeToModelType(nameHint, resolve(t), fail);
+        });
         report.reportFailure('interpreting', ...convertedTypes.filter(isFailure));
 
         const types = convertedTypes.filter(isSuccess);
@@ -170,6 +194,31 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       }
 
       throw new Error('Unable to produce type');
+    });
+  }
+
+  function validateCombiningSchemaType(schema: jsonschema.ConcreteSchema[], fail: Fail) {
+    schema.forEach((element, index) => {
+      if (!jsonschema.isAnyType(element) && !jsonschema.isCombining(element)) {
+        schema.slice(index + 1).forEach((next) => {
+          if (!jsonschema.isAnyType(next) && !jsonschema.isCombining(next)) {
+            if (element.title === next.title && element.type !== next.type) {
+              report.reportFailure(
+                'interpreting',
+                fail(`Invalid schema with property name ${element.title} but types ${element.type} and ${next.type}`),
+              );
+            }
+            const elementName = jsonschema.resolvedReferenceName(element);
+            const nextName = jsonschema.resolvedReferenceName(next);
+            if (elementName && nextName && elementName === nextName && element.type !== next.type) {
+              report.reportFailure(
+                'interpreting',
+                fail(`Invalid schema with property name ${elementName} but types ${element.type} and ${next.type}`),
+              );
+            }
+          }
+        });
+      }
     });
   }
 
@@ -230,14 +279,14 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
   function objectLikeSchemaToModelType(
     nameHint: string,
-    schema: jsonschema.MapLikeObject,
+    schema: jsonschema.RecordLikeObject,
     fail: Fail,
   ): Result<PropertyType> {
     if (looksLikeBuiltinTagType(schema)) {
       return { type: 'tag' };
     }
 
-    const { typeDefinitionBuilder, freshInSession } = resourceBuilder.typeDefinitionBuilder(nameHint);
+    const { typeDefinitionBuilder, freshInSession } = resourceBuilder.typeDefinitionBuilder(nameHint, { schema });
 
     // If the type has no props, it's not a RecordLikeObject and we don't need to recurse
     // @todo The type should probably also just be json since they are useless otherwise. Fix after this package is in use.

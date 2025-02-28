@@ -1,4 +1,4 @@
-import { PropertyType, emptyDatabase } from '@aws-cdk/service-spec-types';
+import { PropertyType, emptyDatabase, DefinitionReference, ArrayType, TypeUnion } from '@aws-cdk/service-spec-types';
 import { importCloudFormationRegistryResource } from '../src/importers/import-cloudformation-registry';
 import { ProblemReport } from '../src/report';
 
@@ -264,6 +264,22 @@ test('anyOf different types that exist in property with object type', async () =
               },
               required: ['Key', 'Value'],
             },
+            {
+              description: 'Key Value 2',
+              type: 'object',
+              additionalProperties: false,
+              title: 'KV2',
+              properties: {
+                Key2: {
+                  type: 'string',
+                },
+                Value2: {
+                  type: 'string',
+                  enum: ['v1', 'v2'],
+                },
+              },
+              required: ['Key2', 'Value2'],
+            },
           ],
           additionalProperties: false,
         },
@@ -273,6 +289,13 @@ test('anyOf different types that exist in property with object type', async () =
 
   const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::anyOf::Required').only();
   expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+
+  const prop = resource.properties?.DataSourceConfiguration;
+  expect(prop.type.type).toBe('union');
+
+  expect((prop.type as { types: DefinitionReference[] }).types[0].type).toBe('json');
+  const type = db.get('typeDefinition', (prop.type as { types: DefinitionReference[] }).types[1].reference.$ref);
+  expect(Object.keys(type.properties).length).toBe(4);
 });
 
 test('anyOf different types that exist in patternProperties', async () => {
@@ -306,6 +329,421 @@ test('anyOf different types that exist in patternProperties', async () => {
 
   const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::anyOf::Required').only();
   expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+});
+
+test('same property but different one of types', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::oneOf::Required',
+      description: 'Resource Type Description',
+      properties: {
+        DataSourceConfiguration: {
+          description: 'description',
+          type: 'object',
+          properties: {
+            foo: {
+              oneOf: [
+                {
+                  type: 'string',
+                },
+                {
+                  type: 'array',
+                },
+              ],
+            },
+          },
+          additionalProperties: false,
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::oneOf::Required').only();
+  expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+  const prop = resource.properties?.DataSourceConfiguration;
+
+  const type = db.get('typeDefinition', (prop.type as DefinitionReference).reference.$ref);
+  expect(type.name).toEqual('DataSourceConfiguration');
+  expect(type.properties.foo.type.type).toBe('union');
+  expect((type.properties.foo.type as TypeUnion<any>).types.length).toBe(2);
+});
+
+test('same property name but different types', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::oneOf::Required',
+      description: 'Resource Type Description',
+      properties: {
+        DataSourceConfiguration: {
+          oneOf: [
+            {
+              description: 'description',
+              type: 'object',
+              properties: {
+                foo: {
+                  type: 'array',
+                },
+              },
+              additionalProperties: false,
+            },
+            {
+              description: 'description',
+              type: 'object',
+              properties: {
+                foo: {
+                  type: 'string',
+                },
+              },
+              additionalProperties: false,
+            },
+          ],
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::oneOf::Required').only();
+  expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
+  const prop = resource.properties?.DataSourceConfiguration;
+
+  const type = db.get('typeDefinition', (prop.type as { types: DefinitionReference[] }).types[0].reference.$ref);
+  expect(type.name).toEqual('DataSourceConfiguration');
+  expect(type.properties.foo.type.type).toBe('array');
+});
+
+test('oneOf typed objects with property ref a definition', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::oneOf::Required',
+      description: 'Resource Type Description',
+      definitions: {
+        ResourceConfigurationDefinition: {
+          oneOf: [
+            {
+              additionalProperties: false,
+              type: 'object',
+              title: 'IpResource',
+              properties: {
+                IpResource: {
+                  $ref: '#/definitions/IpResource',
+                },
+              },
+              required: ['IpResource'],
+            },
+            {
+              additionalProperties: false,
+              type: 'object',
+              title: 'ArnResource',
+              properties: {
+                ArnResource: {
+                  $ref: '#/definitions/ArnResource',
+                },
+              },
+              required: ['ArnResource'],
+            },
+            {
+              additionalProperties: false,
+              type: 'object',
+              title: 'DnsResource',
+              properties: {
+                DnsResource: {
+                  $ref: '#/definitions/DnsResource',
+                },
+              },
+              required: ['DnsResource'],
+            },
+          ],
+          type: 'object',
+        },
+        IpResource: {
+          minLength: 4,
+          type: 'string',
+          maxLength: 39,
+        },
+        PortRange: {
+          minLength: 1,
+          pattern: '^((\\d{1,5}\\-\\d{1,5})|(\\d+))$',
+          type: 'string',
+          maxLength: 11,
+        },
+        DnsResource: {
+          additionalProperties: false,
+          type: 'object',
+          properties: {
+            IpAddressType: {
+              type: 'string',
+              enum: ['IPV4', 'IPV6', 'DUALSTACK'],
+            },
+            DomainName: {
+              minLength: 3,
+              type: 'string',
+              maxLength: 255,
+            },
+          },
+          required: ['DomainName', 'IpAddressType'],
+        },
+        ArnResource: {
+          pattern: '^arn:[a-z0-9][-.a-z0-9]{0,62}:vpc-lattice:([a-z0-9][-.a-z0-9]{0,62})?:\\d{12}?:[^/].{0,1023}$',
+          type: 'string',
+          maxLength: 1224,
+        },
+      },
+      properties: {
+        ResourceConfigurationDefinition: {
+          $ref: '#/definitions/ResourceConfigurationDefinition',
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::oneOf::Required').only();
+  expect(Object.keys(resource.properties)).toContain('ResourceConfigurationDefinition');
+  const prop = resource.properties?.ResourceConfigurationDefinition;
+  expect(prop.type.type).toBe('ref');
+
+  const type = db.get('typeDefinition', (prop.type as DefinitionReference).reference.$ref);
+  expect(type.name).toBe('ResourceConfigurationDefinition');
+  expect(Object.keys(type.properties).length).toBe(3);
+  expect(type.properties.IpResource.required).toBe(undefined);
+});
+
+test('oneOf typed objects with one of in properties', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::oneOf::Required',
+      description: 'Resource Type Description',
+      definitions: {
+        IpResource: {
+          minLength: 4,
+          type: 'string',
+          maxLength: 39,
+        },
+        PortRange: {
+          minLength: 1,
+          pattern: '^((\\d{1,5}\\-\\d{1,5})|(\\d+))$',
+          type: 'string',
+          maxLength: 11,
+        },
+        DnsResource: {
+          additionalProperties: false,
+          type: 'object',
+          properties: {
+            IpAddressType: {
+              type: 'string',
+              enum: ['IPV4', 'IPV6', 'DUALSTACK'],
+            },
+            DomainName: {
+              minLength: 3,
+              type: 'string',
+              maxLength: 255,
+            },
+          },
+          required: ['DomainName', 'IpAddressType'],
+        },
+        ArnResource: {
+          pattern: '^arn:[a-z0-9][-.a-z0-9]{0,62}:vpc-lattice:([a-z0-9][-.a-z0-9]{0,62})?:\\d{12}?:[^/].{0,1023}$',
+          type: 'string',
+          maxLength: 1224,
+        },
+      },
+      properties: {
+        ResourceConfigurationDefinition: {
+          oneOf: [
+            {
+              additionalProperties: false,
+              type: 'object',
+              title: 'IpResource',
+              properties: {
+                IpResource: {
+                  $ref: '#/definitions/IpResource',
+                },
+              },
+              required: ['IpResource'],
+            },
+            {
+              additionalProperties: false,
+              type: 'object',
+              title: 'ArnResource',
+              properties: {
+                ArnResource: {
+                  $ref: '#/definitions/ArnResource',
+                },
+              },
+              required: ['ArnResource'],
+            },
+            {
+              additionalProperties: false,
+              type: 'object',
+              title: 'DnsResource',
+              properties: {
+                DnsResource: {
+                  $ref: '#/definitions/DnsResource',
+                },
+              },
+              required: ['DnsResource'],
+            },
+          ],
+          type: 'object',
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::oneOf::Required').only();
+  expect(Object.keys(resource.properties)).toContain('ResourceConfigurationDefinition');
+  const prop = resource.properties?.ResourceConfigurationDefinition;
+  expect(prop.type.type).toBe('union');
+
+  const type = db.get('typeDefinition', (prop.type as { types: DefinitionReference[] }).types[0].reference.$ref);
+  expect(type.name).toBe('ResourceConfigurationDefinition');
+  expect(Object.keys(type.properties).length).toBe(3);
+  expect(type.properties.IpResource.required).toBe(undefined);
+});
+
+test('oneOf typed objects with oneof in definition', async () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::OneOf::Test',
+      description: 'desc',
+      definitions: {
+        CanInterface: {
+          type: 'object',
+          properties: {
+            Name: {
+              type: 'string',
+              maxLength: 100,
+              minLength: 1,
+            },
+            ProtocolName: {
+              type: 'string',
+              maxLength: 50,
+              minLength: 1,
+            },
+            ProtocolVersion: {
+              type: 'string',
+              maxLength: 50,
+              minLength: 1,
+            },
+          },
+          required: ['Name'],
+          additionalProperties: false,
+        },
+        CanNetworkInterface: {
+          type: 'object',
+          properties: {
+            InterfaceId: {
+              type: 'string',
+              maxLength: 50,
+              minLength: 1,
+            },
+            Type: {
+              type: 'string',
+              enum: ['CAN_INTERFACE'],
+            },
+            CanInterface: {
+              $ref: '#/definitions/CanInterface',
+            },
+          },
+          required: ['InterfaceId', 'Type', 'CanInterface'],
+          additionalProperties: false,
+        },
+        ObdNetworkInterface: {
+          type: 'object',
+          properties: {
+            InterfaceId: {
+              type: 'string',
+              maxLength: 50,
+              minLength: 1,
+            },
+            Type: {
+              type: 'string',
+              enum: ['OBD_INTERFACE'],
+            },
+            ObdInterface: {
+              $ref: '#/definitions/ObdInterface',
+            },
+          },
+          required: ['InterfaceId', 'Type', 'ObdInterface'],
+          additionalProperties: false,
+        },
+        ObdInterface: {
+          type: 'object',
+          properties: {
+            Name: {
+              type: 'string',
+              maxLength: 100,
+              minLength: 1,
+            },
+          },
+          required: ['Name'],
+          additionalProperties: false,
+        },
+        CustomDecodingNetworkInterface: {
+          type: 'object',
+          properties: {
+            InterfaceId: {
+              type: 'string',
+              maxLength: 50,
+              minLength: 1,
+            },
+            Type: {
+              type: 'string',
+              enum: ['CUSTOM_DECODING_INTERFACE'],
+            },
+            CustomDecodingInterface: {
+              $ref: '#/definitions/CustomDecodingInterface',
+            },
+          },
+          required: ['InterfaceId', 'Type', 'CustomDecodingInterface'],
+          additionalProperties: false,
+        },
+      },
+      properties: {
+        NetworkInterfaces: {
+          insertionOrder: false,
+          type: 'array',
+          items: {
+            oneOf: [
+              {
+                $ref: '#/definitions/CanNetworkInterface',
+              },
+              {
+                $ref: '#/definitions/ObdNetworkInterface',
+              },
+              {
+                $ref: '#/definitions/CustomDecodingNetworkInterface',
+              },
+            ],
+          },
+          maxItems: 5000,
+          minItems: 1,
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::OneOf::Test').only();
+  expect(Object.keys(resource.properties)).toContain('NetworkInterfaces');
+  const prop = resource.properties?.NetworkInterfaces;
+  expect(prop.type.type).toBe('array');
+
+  const type = db.get(
+    'typeDefinition',
+    ((prop.type as ArrayType<any>).element as { types: DefinitionReference[] }).types[0].reference.$ref,
+  );
+  expect(type.name).toBe('CanNetworkInterface');
+  expect(Object.keys(type.properties).length).toBe(3);
+  expect(type.properties.InterfaceId.required).toBe(true);
 });
 
 test('anyOf containing a list of "required" properties and a required property', async () => {
