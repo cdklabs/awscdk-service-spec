@@ -61,7 +61,7 @@
     "@aws-cdk/service-spec-types": "^0.0.0",
     "@cdklabs/tskb": "^0.0.0",
     "ajv": "^6",
-    "canonicalize": "^2.0.0",
+    "canonicalize": "^2.1.0",
     "chalk": "^4",
     "commander": "^11.1.0",
     "fast-json-patch": "^3.1.1",
