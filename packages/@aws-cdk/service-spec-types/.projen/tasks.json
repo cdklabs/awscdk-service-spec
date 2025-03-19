@@ -91,7 +91,7 @@
       "name": "gather-versions",
       "steps": [
         {
-          "exec": "node -e \"require(path.join(path.dirname(require.resolve('cdklabs-projen-project-types')), 'yarn', 'gather-versions.exec.js'))\" @aws-cdk/service-spec-types MAJOR --deps @cdklabs/tskb",
+          "exec": "node -e \"require(path.join(path.dirname(require.resolve('cdklabs-projen-project-types')), 'yarn', 'gather-versions.exec.js')).cliMain()\" @cdklabs/tskb=major",
           "receiveArgs": true
         }
       ]
