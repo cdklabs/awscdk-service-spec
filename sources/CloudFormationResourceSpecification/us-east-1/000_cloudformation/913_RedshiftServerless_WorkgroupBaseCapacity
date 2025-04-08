@@ -1,15 +1,11 @@
 {
-  "ResourceTypes": {
-    "AWS::RedshiftServerless::Workgroup": {
-      "patch": {
-        "description": "BaseCapacity attribute is duplicated in Workgroup",
-        "operations": [
-          {
-            "op": "remove",
-            "path": "/Attributes/Workgroup"
-          }
-        ]
+  "patch": {
+    "description": "BaseCapacity attribute is duplicated in Workgroup",
+    "operations": [
+      {
+        "op": "remove",
+        "path": "/ResourceTypes/AWS::RedshiftServerless::Workgroup"
       }
-    }
+    ]
   }
 }
