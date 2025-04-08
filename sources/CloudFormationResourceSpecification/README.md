@@ -16,3 +16,47 @@ The AWS CloudFormation resource specification is a JSON-formatted text file that
 
 This is the legacy format to describe CloudFormation resources.
 We use this data source to supplement information not yet available in the [CloudFormation Schema](../CloudFormationSchema)
+
+# Patching
+
+Sometimes it is necessary to patch in certain things directly into this source as opposed to others.
+In these cases, the following steps should be taken:
+1. Create a new patch file in `us-east-1/000_cloudformation`. Make sure the file is titled with some number (the order it will be processed)
+followed by a brief description, and suffixed with `_patch.json`.
+2. Following the format of existing patches, format the JSON to point to the resource you would like to alter, followed by "patch".
+Provide a "description" of what the patch is for, and "operations" that you wish to perform. See below for an example:
+```json
+{
+    "PropertyTypes": {
+        "AWS::Service::Resource": {
+            "patch": {
+                "description": "This is a resource patch",
+                "operations": [
+                    {
+                        "op": "add",
+                        "path": "/Path/To/NewThing",
+                        "value": {
+                            "Documentation": "...",
+                            "Properties": {
+                                "X": "...",
+                                "Y": "...",
+                                "Z": "..."
+                            }
+                        }
+                    },
+                    {
+                        "op": "remove",
+                        "path": "Path/To/Another.Attribute"
+                    },
+                    {
+                        "op": "replace",
+                        "path": "Path/To/Yet.Another",
+                        "value": "List"
+                    }
+                ]
+            }
+        }
+    }
+}
+```
+
