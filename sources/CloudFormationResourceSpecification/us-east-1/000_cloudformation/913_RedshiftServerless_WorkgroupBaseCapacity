@@ -5,7 +5,7 @@
       "operations": [
         {
           "op": "remove",
-          "path": "/AWS::RedshiftServerless::Workgroup/Attributes/Workgroup"
+          "path": "/AWS::RedshiftServerless::Workgroup"
         }
       ]
     }
