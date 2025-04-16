@@ -8,7 +8,7 @@ registerServicePatches(
     patching.Reason.sourceIssue('ReadEndpoint should be listed in readOnlyProperties.'),
   ),
   fp.patchResourceAt<types.CloudFormationRegistryResource['readOnlyProperties']>(
-    'AWS::DMS::ReplicationConfig',
+    'AWS::RDS::DBInstance',
     '/properties/CertificateDetails',
     patching.Reason.sourceIssue('Missing description caused property to be removed in L1 update.'),
     (descriptionAndType = []) => {
