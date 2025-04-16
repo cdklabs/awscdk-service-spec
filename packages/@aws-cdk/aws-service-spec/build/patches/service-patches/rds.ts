@@ -7,4 +7,9 @@ registerServicePatches(
     ['ReadEndpoint'],
     patching.Reason.sourceIssue('ReadEndpoint should be listed in readOnlyProperties.'),
   ),
+  fp.addReadOnlyProperties(
+    'AWS::RDS::DBInstance',
+    ['CertificateDetails', 'Endpoint'],
+    patching.Reason.sourceIssue('CertificateDetails and Endpoint should be listed in readOnlyProperties. Pending service team confirmation that the removal of these properties is intentional.'),
+  ),
 );
