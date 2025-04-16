@@ -1,4 +1,4 @@
-import { addDefinitions, forResource, fp, registerServicePatches, replaceDefinition, replaceDefinitionProperty } from './core';
+import { fp, registerServicePatches } from './core';
 import { patching } from '@aws-cdk/service-spec-importers';
 
 registerServicePatches(
