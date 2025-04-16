@@ -11,10 +11,11 @@ registerServicePatches(
     'AWS::DMS::ReplicationConfig',
     '/properties/CertificateDetails',
     patching.Reason.sourceIssue('Missing description caused property to be removed in L1 update.'),
-    (descriptionAndType = {}) => {
-      descriptionAndType = {
-        "$ref" : "#/definitions/CertificateDetails",
-        "description" : "The details of the DB instance’s server certificate."
+    (descriptionAndType = []) => {
+      for (const [idx, prop] of descriptionAndType.entries()) {
+        if (prop.startsWith('/description')) {
+          descriptionAndType[idx] = 'The details of the DB instance’s server certificate.';
+        }
       }
       return descriptionAndType;
     },
