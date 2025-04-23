@@ -2,6 +2,16 @@ import { patching, types } from '@aws-cdk/service-spec-importers';
 
 export const SERVICE_PATCHERS: Array<patching.JsonLensPatcher> = [];
 
+export enum PROPERTY_TYPES {
+  STRING = 'string',
+  NUMBER = "number",
+  BOOLEAN = "boolean",
+  OBJECT = "object",
+  ARRAY = "array",
+  INTEGER = "integer",
+  NULL = "null",
+}
+
 /**
  * Register an unnamed exception patcher
  */
@@ -197,6 +207,33 @@ export namespace fp {
           }
         }
         return readOnlyProperties;
+      },
+    );
+  }
+
+  type SchemaType = "string" | "number" | "boolean" | "object" | "array" | "integer" | "null";
+
+
+  /**
+   * Add properties to `properties`
+   */
+  export function addPropertys<TypeName extends string = string>(
+    resource: TypeName,
+    propertyName: string,
+    propertyType: SchemaType,
+    reason: patching.Reason,
+  ): patching.Patcher<patching.JsonLens> {
+    return patchResourceAt<types.CloudFormationRegistryResource['properties']>(
+      resource,
+      '/properties',
+      reason,
+      (dbInstanceProperties) => {
+        if(!(propertyName in dbInstanceProperties)) {
+          dbInstanceProperties[propertyName] = {
+            type: propertyType
+          } as types.jsonschema.Schema;
+        }
+        return dbInstanceProperties;
       },
     );
   }
