@@ -2,16 +2,6 @@ import { patching, types } from '@aws-cdk/service-spec-importers';
 
 export const SERVICE_PATCHERS: Array<patching.JsonLensPatcher> = [];
 
-export enum PROPERTY_TYPES {
-  STRING = 'string',
-  NUMBER = "number",
-  BOOLEAN = "boolean",
-  OBJECT = "object",
-  ARRAY = "array",
-  INTEGER = "integer",
-  NULL = "null",
-}
-
 /**
  * Register an unnamed exception patcher
  */
