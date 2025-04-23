@@ -203,7 +203,6 @@ export namespace fp {
 
   type SchemaType = "string" | "number" | "boolean" | "object" | "array" | "integer" | "null";
 
-
   /**
    * Add properties to `properties`
    */
