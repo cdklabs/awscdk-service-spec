@@ -201,28 +201,45 @@ export namespace fp {
     );
   }
 
-  type SchemaType = "string" | "number" | "boolean" | "object" | "array" | "integer" | "null";
-
   /**
-   * Add properties to `properties`
+   * Add a property to `properties`
    */
-  export function addPropertys<TypeName extends string = string>(
+  export function addProperty<TypeName extends string = string>(
     resource: TypeName,
     propertyName: string,
-    propertyType: SchemaType,
+    propertyType: string,
     reason: patching.Reason,
   ): patching.Patcher<patching.JsonLens> {
     return patchResourceAt<types.CloudFormationRegistryResource['properties']>(
       resource,
       '/properties',
       reason,
-      (dbInstanceProperties) => {
-        if(!(propertyName in dbInstanceProperties)) {
-          dbInstanceProperties[propertyName] = {
-            type: propertyType
+      (properties) => {
+        if(!(propertyName in properties)) {
+          properties[propertyName] = {
+            type: propertyType 
+            /**
+             * Currently this only works for the basic case. 
+             * 
+             * TODO: need to support the case where it uses $ref to reference an existing type in "definitions" 
+             * e.g.
+             * "MasterUserSecret" : {
+                "$ref" : "#/definitions/MasterUserSecret",
+                "description" : "The secret managed by RDS in AWS Secrets Manager for the master user password.\n For more information, see [Password management with Secrets Manager](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-secrets-manager.html) in the *Amazon RDS User Guide.*"
+              },
+             * and also the case where `type: "array"`, in which case we have to add an `items` property as well. 
+             * e.g.
+             * "ProcessorFeatures" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/definitions/ProcessorFeature"
+                },
+                "description" : "The number of CPU cores and the number of threads per core for the DB instance class of the DB instance.\n This setting doesn't apply to Amazon Aurora or RDS Custom DB instances."
+              },
+             */
           } as types.jsonschema.Schema;
         }
-        return dbInstanceProperties;
+        return properties;
       },
     );
   }
