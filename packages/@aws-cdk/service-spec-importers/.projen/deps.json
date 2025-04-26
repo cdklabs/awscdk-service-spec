@@ -77,10 +77,6 @@
       "type": "build"
     },
     {
-      "name": "projen",
-      "type": "build"
-    },
-    {
       "name": "source-map-support",
       "type": "build"
     },
