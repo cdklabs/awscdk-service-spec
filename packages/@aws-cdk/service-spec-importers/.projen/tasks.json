@@ -121,7 +121,7 @@
       "name": "gather-versions",
       "steps": [
         {
-          "exec": "node -e \"require(require.resolve('cdklabs-projen-project-types/lib/yarn/gather-versions.exec.js')).cliMain()\" @aws-cdk/service-spec-types=major @cdklabs/tskb=major",
+          "exec": "node -e \"require(require.resolve('cdklabs-projen-project-types/lib/yarn/gather-versions.exec.js')).cliMain()\" @aws-cdk/service-spec-types=future-minor @cdklabs/tskb=future-minor",
           "receiveArgs": true
         }
       ]
