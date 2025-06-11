@@ -90,6 +90,34 @@ test('importing properties of incompatible types leads to previousTypes', () => 
   );
 });
 
+test('typing first as Json and then String leaves just String and nothing else', () => {
+  // This behavior is an attempt to automatically discriminate between legitimate type evolution
+  // and schema bugfixes (only for very specific cases).
+  const resource = importBoth({
+    spec: {
+      Properties: {
+        Prop1: { PrimitiveType: 'Json', UpdateType: 'Mutable' },
+      },
+    },
+    registry: {
+      properties: {
+        Prop1: { type: 'string' },
+      },
+    },
+  });
+
+  expect(resource.properties.Prop1).toEqual(
+    expect.objectContaining({
+      type: { type: 'string' },
+    } satisfies Partial<Property>),
+  );
+  expect(resource.properties.Prop1).not.toEqual(
+    expect.objectContaining({
+      previousTypes: expect.anything(),
+    } satisfies Partial<Property>),
+  );
+});
+
 test('importing string on top of date-time does nothing', () => {
   const resource = importBoth({
     spec: {

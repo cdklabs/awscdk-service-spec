@@ -410,7 +410,7 @@ test('same property name but different types', async () => {
   expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
   const prop = resource.properties?.DataSourceConfiguration;
 
-  const type = db.get('typeDefinition', (prop.type as { types: DefinitionReference[] }).types[0].reference.$ref);
+  const type = db.get('typeDefinition', (prop.type as DefinitionReference).reference.$ref);
   expect(type.name).toEqual('DataSourceConfiguration');
   expect(type.properties.foo.type.type).toBe('array');
 });
@@ -600,9 +600,9 @@ test('oneOf typed objects with one of in properties', async () => {
   const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::oneOf::Required').only();
   expect(Object.keys(resource.properties)).toContain('ResourceConfigurationDefinition');
   const prop = resource.properties?.ResourceConfigurationDefinition;
-  expect(prop.type.type).toBe('union');
+  expect(prop.type.type).toBe('ref');
 
-  const type = db.get('typeDefinition', (prop.type as { types: DefinitionReference[] }).types[0].reference.$ref);
+  const type = db.get('typeDefinition', (prop.type as DefinitionReference).reference.$ref);
   expect(type.name).toBe('ResourceConfigurationDefinition');
   expect(Object.keys(type.properties).length).toBe(3);
   expect(type.properties.IpResource.required).toBe(undefined);

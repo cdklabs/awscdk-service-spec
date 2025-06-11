@@ -1,6 +1,7 @@
 import { PropertyType, SpecDatabase, TypeDefinition } from '@aws-cdk/service-spec-types';
 import { ref } from '@cdklabs/tskb';
 import { PropertyBagBuilder, ResourceBuilder, SpecBuilder } from '../resource-builder';
+import { maybeUnion } from '../type-manipulation';
 import { CloudFormationResourceSpecification, SAMResourceSpecification, resourcespec } from '../types';
 
 //////////////////////////////////////////////////////////////////////
@@ -288,16 +289,5 @@ export class SAMSpecImporter extends ResourceSpecImporterBase<SAMResourceSpecifi
       }
       throw new Error(`Unknown primitive type: ${prim} in resource ${self.resourceName}`);
     }
-  }
-}
-
-function maybeUnion(types: PropertyType[]): PropertyType {
-  switch (types.length) {
-    case 0:
-      throw new Error('Oops, no types');
-    case 1:
-      return types[0];
-    default:
-      return { type: 'union', types };
   }
 }
