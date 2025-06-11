@@ -211,11 +211,7 @@ export class RichTypedField {
     // `json` -> `named type`, or `named type` -> `named type`.  For now I'm
     // wary of destroying too much information; we'll just do the fix specifically
     // for `json` -> `string`.
-    if (
-      type.type === 'string' &&
-      this.field.previousTypes?.length === 1 &&
-      this.field.previousTypes[0].type === 'json'
-    ) {
+    if (type.type === 'string' && this.field.type.type === 'json') {
       this.field.type = type;
       return true;
     }
