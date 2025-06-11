@@ -182,6 +182,8 @@ export class RichTypedField {
    * Update the type of this property with a new type
    *
    * Only if it's not in the set of types already.
+   *
+   * Returns true if the type was updated.
    */
   public updateType(type: PropertyType): boolean {
     const richType = new RichPropertyType(type);
@@ -199,6 +201,23 @@ export class RichTypedField {
     // the same type but we dropped some formatting information. No need to make this a separate type.
     if (type.type === 'string' && this.types().some((t) => t.type === 'date-time')) {
       return false;
+    }
+
+    // Special case: if the new type is `string` and the old type is `json`, we assume this is a correction
+    // of a bug; the old type was incorrectly typed as Json, and we're now correcting this. Since this was a
+    // bug, we don't need to keep the old type: it was never accurate.
+    //
+    // We could be more broad, and only maintain type history if we go from
+    // `json` -> `named type`, or `named type` -> `named type`.  For now I'm
+    // wary of destroying too much information; we'll just do the fix specifically
+    // for `json` -> `string`.
+    if (
+      type.type === 'string' &&
+      this.field.previousTypes?.length === 1 &&
+      this.field.previousTypes[0].type === 'json'
+    ) {
+      this.field.type = type;
+      return true;
     }
 
     if (!this.field.previousTypes) {

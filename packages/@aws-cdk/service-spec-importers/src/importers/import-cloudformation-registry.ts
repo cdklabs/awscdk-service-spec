@@ -3,6 +3,7 @@ import { locateFailure, Fail, failure, isFailure, Result, tryCatch, using, ref, 
 import { ProblemReport, ReportAudience } from '../report';
 import { PropertyBagBuilder, SpecBuilder } from '../resource-builder';
 import { unionSchemas } from '../schema-manipulation/unify-schemas';
+import { maybeUnion } from '../type-manipulation';
 import {
   CloudFormationRegistryResource,
   ImplicitJsonSchemaRecord,
@@ -153,7 +154,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         const types = convertedTypes.filter(isSuccess);
         removeUnionDuplicates(types);
 
-        return { type: 'union', types };
+        return maybeUnion(types);
       } else if (jsonschema.isAllOf(resolvedSchema)) {
         // FIXME: Do a proper thing here
         const firstResolved = resolvedSchema.allOf[0];
