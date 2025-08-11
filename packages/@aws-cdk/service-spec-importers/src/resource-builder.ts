@@ -195,6 +195,12 @@ export class ResourceBuilder extends PropertyBagBuilder {
     this.simplifyProperty(this.resource.attributes[name]);
   }
 
+  public deleteProperties(...names: string[]) {
+    for (const name of names) {
+      delete this.resource.properties[name];
+    }
+  }
+
   /**
    * Mark the given properties as attributes instead
    *
