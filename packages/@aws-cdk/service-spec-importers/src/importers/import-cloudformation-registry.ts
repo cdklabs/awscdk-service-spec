@@ -418,8 +418,16 @@ function lastWord(x: string): string {
 function findAttributes(resource: CloudFormationRegistryResource): string[] {
   const candidates = new Set(resource.readOnlyProperties ?? []);
 
-  // FIXME: I think this might be incorrect
+  // I *think* this is guarding against services marking a property as BOTH
+  // `createOnly` and `readOnly`: perhaps because from their PoV it's immutable.
+  // That doesn't make it an attribute, though.
   const exclusions = resource.createOnlyProperties ?? [];
+
+  // (Only if the primary identifier is a single property and not a compund property)
+  // The primary identifier's property is not considered an attribute.
+  if (resource.primaryIdentifier?.length === 1) {
+    exclusions.push(resource.primaryIdentifier[0]);
+  }
 
   return Array.from(new Set([...candidates].filter((a) => !exclusions.includes(a))));
 }
