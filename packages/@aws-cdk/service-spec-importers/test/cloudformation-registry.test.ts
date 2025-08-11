@@ -134,3 +134,25 @@ test('empty objects are treated as "any"', () => {
   const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type').only();
   expect(resource.properties.data.type).toEqual({ type: 'json' });
 });
+
+test('exclude primary identifier from set of attributes', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::Some::Type',
+      description: 'resource with PrimaryIdentifier',
+      properties: {
+        id: { type: 'string' },
+        input: { type: 'string' },
+        data: { type: 'string' },
+      },
+      readOnlyProperties: ['/properties/data'],
+      primaryIdentifier: ['/properties/id'],
+    },
+  });
+
+  // THEN:
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type').only();
+  expect(Object.keys(resource.attributes)).toEqual(['data']);
+});
