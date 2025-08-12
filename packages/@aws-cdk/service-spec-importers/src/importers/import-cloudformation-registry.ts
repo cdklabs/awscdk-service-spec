@@ -427,12 +427,6 @@ function findAttributes(resource: CloudFormationRegistryResource): string[] {
   // That doesn't make it an attribute, though.
   const exclusions = resource.createOnlyProperties ?? [];
 
-  // (Only if the primary identifier is a single property and not a compund property)
-  // The primary identifier's property is not considered an attribute.
-  if (resource.primaryIdentifier?.length === 1) {
-    exclusions.push(resource.primaryIdentifier[0]);
-  }
-
   return Array.from(new Set([...candidates].filter((a) => !exclusions.includes(a))));
 }
 
