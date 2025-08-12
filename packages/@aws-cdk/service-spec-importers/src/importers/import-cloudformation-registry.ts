@@ -27,7 +27,8 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
   const specBuilder = new SpecBuilder(db);
   const resourceBuilder = specBuilder.resourceBuilder(resource.typeName, {
     description: resource.description,
-    primaryIdentifier: resource.primaryIdentifier?.map((id) => id.slice(12)), // remove "/properties/" that reliably is included in each identifier
+    primaryIdentifier: resource.primaryIdentifier?.map(simplePropNameFromJsonPtr),
+    readOnlyProperties: resource.readOnlyProperties?.map(simplePropNameFromJsonPtr),
     region: options.region,
   });
   const resourceFailure = failure.in(resource.typeName);
@@ -59,7 +60,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
   // Take all attribute names and mark them as not being able to be properties
   resourceBuilder.markAsAttributes(safeAttributeNames);
-  resourceBuilder.deleteProperties(...(resource.readOnlyProperties?.map(simplePropNameFromJsonPtr) ?? []));
+  resourceBuilder.maybeRemovePrimaryIdentifier();
 
   // Mark all 'createOnlyProperties' as immutable.
   resourceBuilder.markAsImmutable((resource.createOnlyProperties ?? []).map(simplePropNameFromJsonPtr));

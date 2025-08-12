@@ -20,6 +20,7 @@ export interface ResourceBuilderOptions {
   description?: string;
   region?: string;
   primaryIdentifier?: string[];
+  readOnlyProperties?: string[];
 }
 
 /**
@@ -40,7 +41,7 @@ export class SpecBuilder {
         resource.primaryIdentifier = options.primaryIdentifier;
       }
 
-      return new ResourceBuilder(this.db, resource);
+      return new ResourceBuilder(this.db, resource, options);
     }
 
     const resource = this.db.allocate('resource', {
@@ -61,7 +62,7 @@ export class SpecBuilder {
       this.db.link('regionHasService', region, service);
     }
 
-    return new ResourceBuilder(this.db, resource);
+    return new ResourceBuilder(this.db, resource, options);
   }
 
   private allocateService(resourceTypeName: string, resourceTypeNameSeparator = '::') {
@@ -173,10 +174,17 @@ export class ResourceBuilder extends PropertyBagBuilder {
    */
   private originalProperties: ResourceProperties = {};
 
-  constructor(public readonly db: SpecDatabase, public readonly resource: Resource) {
+  private readOnlyProperties: string[];
+
+  constructor(
+    public readonly db: SpecDatabase,
+    public readonly resource: Resource,
+    options: ResourceBuilderOptions = {},
+  ) {
     super(resource);
     this.indexExistingTypeDefinitions();
     Object.assign(this.originalProperties, resource.properties);
+    this.readOnlyProperties = options.readOnlyProperties ?? [];
   }
 
   public setProperty(name: string, prop: Property) {
@@ -195,10 +203,20 @@ export class ResourceBuilder extends PropertyBagBuilder {
     this.simplifyProperty(this.resource.attributes[name]);
   }
 
-  public deleteProperties(...names: string[]) {
-    for (const name of names) {
-      delete this.resource.properties[name];
+  /**
+   * If the primary identifier is a single property and it is also ReadOnly, it's neither a property nor an attribute.
+   */
+  public maybeRemovePrimaryIdentifier() {
+    if (this.resource.primaryIdentifier?.length !== 1) {
+      return;
     }
+    const primaryIdentifier = this.resource.primaryIdentifier[0];
+    if (!this.readOnlyProperties?.includes(this.resource.primaryIdentifier[0])) {
+      return;
+    }
+
+    delete this.resource.properties[primaryIdentifier];
+    delete this.resource.attributes[primaryIdentifier];
   }
 
   /**
