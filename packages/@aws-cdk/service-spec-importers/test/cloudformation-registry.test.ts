@@ -135,7 +135,7 @@ test('empty objects are treated as "any"', () => {
   expect(resource.properties.data.type).toEqual({ type: 'json' });
 });
 
-test('exclude primary identifier from set of attributes', () => {
+test('primary, readonly identifier is neither attribute nor property', () => {
   importCloudFormationRegistryResource({
     db,
     report,
@@ -147,7 +147,7 @@ test('exclude primary identifier from set of attributes', () => {
         input: { type: 'string' },
         data: { type: 'string' },
       },
-      readOnlyProperties: ['/properties/data'],
+      readOnlyProperties: ['/properties/data', '/properties/id'],
       primaryIdentifier: ['/properties/id'],
     },
   });
@@ -155,4 +155,5 @@ test('exclude primary identifier from set of attributes', () => {
   // THEN:
   const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type').only();
   expect(Object.keys(resource.attributes)).toEqual(['data']);
+  expect(Object.keys(resource.properties)).toEqual(['input']);
 });
