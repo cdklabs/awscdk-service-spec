@@ -18,6 +18,13 @@ export interface LoadCloudFormationRegistryResourceOptions {
   readonly region?: string;
 }
 
+/**
+ * Import a CloudFormation Registry resource specification into an existing resource
+ *
+ * The resource object has already been filled with properties and attributes from previous
+ * revisions of the spec (perhaps the legacy CloudFormation spec, or the SAM spec, or
+ * specs from different regions).
+ */
 export function importCloudFormationRegistryResource(options: LoadCloudFormationRegistryResourceOptions) {
   const { db, resource } = options;
   const report = options.report.forAudience(ReportAudience.fromCloudFormationResource(resource.typeName));
