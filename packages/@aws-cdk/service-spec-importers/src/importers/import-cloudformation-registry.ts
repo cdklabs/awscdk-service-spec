@@ -34,7 +34,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
   const specBuilder = new SpecBuilder(db);
   const resourceBuilder = specBuilder.resourceBuilder(resource.typeName, {
     description: resource.description,
-    primaryIdentifier: resource.primaryIdentifier?.map((id) => id.slice(12)), // remove "/properties/" that reliably is included in each identifier
+    primaryIdentifier: resource.primaryIdentifier?.map(simplePropNameFromJsonPtr),
     region: options.region,
   });
   const resourceFailure = failure.in(resource.typeName);
@@ -53,6 +53,9 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
   // in the CloudFormation registry spec, fields cannot be attributes and properties at the same time.
   const attributeNames = findAttributes(resource).map(simplePropNameFromJsonPtr);
   resourceBuilder.markAsAttributes(attributeNames);
+
+  // If the primary identifier is a single property and it is also ReadOnly, it's neither a property nor an attribute.
+  resourceBuilder.maybeRemovePrimaryIdentifier(resource.readOnlyProperties?.map(simplePropNameFromJsonPtr));
 
   // Mark all 'createOnlyProperties' as immutable.
   resourceBuilder.markAsImmutable((resource.createOnlyProperties ?? []).map(simplePropNameFromJsonPtr));
