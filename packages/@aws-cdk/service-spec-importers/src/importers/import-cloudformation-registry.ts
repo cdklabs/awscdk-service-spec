@@ -40,14 +40,6 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
   });
   const resourceFailure = failure.in(resource.typeName);
 
-  // Before we start adding properties, collect the set of property names that
-  // are also attribute names.
-  const conflictingAttributesAndPropNames = new Set(
-    Object.keys(resourceBuilder.resource.properties).filter(
-      (p) => resourceBuilder.resource.attributes[p] !== undefined,
-    ),
-  );
-
   recurseProperties(resource, resourceBuilder, resourceFailure);
 
   // AWS::CloudFront::ContinuousDeploymentPolicy recently introduced a change where they're marking deprecatedProperties
@@ -58,22 +50,19 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     .map(simplePropNameFromJsonPtr);
   resourceBuilder.markDeprecatedProperties(...deprecatedProperties);
 
-  // Mark everything 'readOnlyProperties` as attributes. However, in the old spec it is possible
-  // that properties and attributes have the same names, with different types. If that happens (by
-  // virtue of the property and attribute both existing), we need to retain
-  // both, so don't move the property to attributes.
+  // Mark everything 'readOnlyProperties` as attributes. This removes them from 'properties', as
+  // in the CloudFormation registry spec, fields cannot be attributes and properties at the same time.
   const attributeNames = findAttributes(resource).map(simplePropNameFromJsonPtr);
-  const safeAttributeNames = attributeNames.filter((a) => !conflictingAttributesAndPropNames.has(a));
+  resourceBuilder.markAsAttributes(attributeNames);
 
-  // Take all attribute names and mark them as not being able to be properties
-  resourceBuilder.markAsAttributes(safeAttributeNames);
+  // If the primary identifier is a single property and it is also ReadOnly, it's neither a property nor an attribute.
   resourceBuilder.maybeRemovePrimaryIdentifier();
 
   // Mark all 'createOnlyProperties' as immutable.
   resourceBuilder.markAsImmutable((resource.createOnlyProperties ?? []).map(simplePropNameFromJsonPtr));
 
   handleFailure(handleTags(resourceFailure));
-  return resourceBuilder.resource;
+  return resourceBuilder.commit();
 
   function recurseProperties(source: ImplicitJsonSchemaRecord, target: PropertyBagBuilder, fail: Fail) {
     if (!source.properties) {
@@ -304,14 +293,14 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     // @todo The type should probably also just be json since they are useless otherwise. Fix after this package is in use.
     if (freshInSession) {
       if (schema.description) {
-        typeDefinitionBuilder.typeDef.documentation = schema.description;
+        typeDefinitionBuilder.setFields({ documentation: schema.description });
       }
       if (jsonschema.isRecordLikeObject(schema)) {
         recurseProperties(schema, typeDefinitionBuilder, fail.in(`typedef ${nameHint}`));
       }
     }
 
-    return { type: 'ref', reference: ref(typeDefinitionBuilder.typeDef) };
+    return { type: 'ref', reference: ref(typeDefinitionBuilder.commit()) };
   }
 
   function looksLikeBuiltinTagType(schema: jsonschema.Object): boolean {
@@ -366,7 +355,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
           const resolvedType = resolve(tagType);
 
           let variant: TagVariant = 'standard';
-          if (resourceBuilder.resource.cloudFormationType === 'AWS::AutoScaling::AutoScalingGroup') {
+          if (resourceBuilder.cloudFormationType === 'AWS::AutoScaling::AutoScalingGroup') {
             variant = 'asg';
           } else if (jsonschema.isObject(resolvedType) && jsonschema.isMapLikeObject(resolvedType)) {
             variant = 'map';

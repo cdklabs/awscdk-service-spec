@@ -106,10 +106,41 @@ export class SpecBuilder {
   }
 }
 
+interface ObjectWithProperties {
+  properties: ResourceProperties;
+}
+
 export class PropertyBagBuilder {
-  constructor(private readonly _propertyBag: { properties: ResourceProperties }) {}
+  protected candidateProperties: ResourceProperties = {};
+
+  constructor(private readonly _propertyBag: ObjectWithProperties) {}
 
   public setProperty(name: string, prop: Property) {
+    this.candidateProperties[name] = prop;
+  }
+
+  /**
+   * Delete a property from the builder
+   *
+   * This avoids committing it to the underlying property bag -- if the underlying
+   * bag already has the property, it will not be removed.
+   */
+  public unsetProperty(name: string) {
+    delete this.candidateProperties[name];
+  }
+
+  /**
+   * Commit the property and attribute changes to the underlying property bag.
+   */
+  public commit(): ObjectWithProperties {
+    for (const [name, prop] of Object.entries(this.candidateProperties)) {
+      this.commitProperty(name, prop);
+    }
+
+    return this._propertyBag;
+  }
+
+  private commitProperty(name: string, prop: Property) {
     if (this._propertyBag.properties[name]) {
       this.mergeProperty(this._propertyBag.properties[name], prop);
     } else {
@@ -168,39 +199,41 @@ export class ResourceBuilder extends PropertyBagBuilder {
   private typesCreatedHere = new Set<string>();
 
   /**
-   * We maintain this for markAsAttributes: so we can look up property
-   * definitions for properties that may have been removed from
-   * `this.resource.properties` already.
+   * Keep a copy of all properties configured here
+   *
+   * We'll need some of them later to turn them into attributes.
    */
-  private originalProperties: ResourceProperties = {};
+  private allProperties: ResourceProperties = {};
+
+  private candidateAttributes: ResourceProperties = {};
 
   private readOnlyProperties: string[];
 
   constructor(
-    public readonly db: SpecDatabase,
-    public readonly resource: Resource,
+    private readonly db: SpecDatabase,
+    private readonly resource: Resource,
     options: ResourceBuilderOptions = {},
   ) {
     super(resource);
     this.indexExistingTypeDefinitions();
-    Object.assign(this.originalProperties, resource.properties);
     this.readOnlyProperties = options.readOnlyProperties ?? [];
+  }
+
+  public get cloudFormationType(): string {
+    return this.resource.cloudFormationType;
   }
 
   public setProperty(name: string, prop: Property) {
     super.setProperty(name, prop);
-
-    // Keep a copy in 'originalProperties' as well.
-    this.originalProperties[name] = this.resource.properties[name];
+    this.allProperties[name] = prop;
   }
 
   public setAttribute(name: string, attr: Attribute) {
-    if (this.resource.attributes[name]) {
-      this.mergeProperty(this.resource.attributes[name], attr);
-    } else {
-      this.resource.attributes[name] = attr;
-    }
-    this.simplifyProperty(this.resource.attributes[name]);
+    this.candidateAttributes[name] = attr;
+  }
+
+  public unsetAttribute(name: string) {
+    delete this.candidateAttributes[name];
   }
 
   /**
@@ -215,8 +248,8 @@ export class ResourceBuilder extends PropertyBagBuilder {
       return;
     }
 
-    delete this.resource.properties[primaryIdentifier];
-    delete this.resource.attributes[primaryIdentifier];
+    this.unsetProperty(primaryIdentifier);
+    this.unsetAttribute(primaryIdentifier);
   }
 
   /**
@@ -238,20 +271,20 @@ export class ResourceBuilder extends PropertyBagBuilder {
    */
   public markAsAttributes(props: string[]) {
     for (const propName of props) {
-      if (this.originalProperties[propName]) {
-        this.setAttribute(propName, this.originalProperties[propName]);
-        delete this.resource.properties[propName];
+      if (this.candidateProperties[propName]) {
+        this.setAttribute(propName, this.candidateProperties[propName]);
+        this.unsetProperty(propName);
         continue;
       }
 
       // In case of a half-upconverted legacy spec, the property might also
       // exist with a name that has any `.` stripped.
       const strippedName = stripPeriods(propName);
-      if (this.originalProperties[strippedName]) {
+      if (this.candidateProperties[strippedName]) {
         // The ACTUAL name is still the name with '.' in it, but we copy the type
         // from the stripped name.
-        this.setAttribute(propName, this.originalProperties[strippedName]);
-        delete this.resource.properties[strippedName];
+        this.setAttribute(propName, this.candidateProperties[strippedName]);
+        this.unsetProperty(strippedName);
         continue;
       }
 
@@ -316,7 +349,7 @@ export class ResourceBuilder extends PropertyBagBuilder {
 
   public markDeprecatedProperties(...props: string[]) {
     for (const propName of props) {
-      (this.resource.properties[propName] ?? {}).deprecated = Deprecation.WARN;
+      (this.candidateProperties[propName] ?? {}).deprecated = Deprecation.WARN;
     }
   }
 
@@ -325,9 +358,9 @@ export class ResourceBuilder extends PropertyBagBuilder {
   }
 
   public propertyDeep(...fieldPath: string[]): Property | undefined {
-    // The property bag we're searching in. Start by searching 'originalProperties', not
-    // the final set of resource props (as markAsAttributes may have deleted some of them)
-    let currentBag: ResourceProperties = this.originalProperties;
+    // The property bag we're searching in. Start by searching 'allProperties', not
+    // the current set of resource props (as markAsAttributes may have deleted some of them)
+    let currentBag: ResourceProperties = this.allProperties;
 
     for (let i = 0; i < fieldPath.length - 1; i++) {
       const prop = currentBag[fieldPath[i]];
@@ -412,6 +445,29 @@ export class ResourceBuilder extends PropertyBagBuilder {
   }
 
   /**
+   * Commit the property and attribute changes to the resource.
+   */
+  public commit(): Resource {
+    // Commit properties
+    super.commit();
+
+    for (const [name, attr] of Object.entries(this.candidateAttributes)) {
+      this.commitAttribute(name, attr);
+    }
+
+    return this.resource;
+  }
+
+  private commitAttribute(name: string, attr: Attribute) {
+    if (this.resource.attributes[name]) {
+      this.mergeProperty(this.resource.attributes[name], attr);
+    } else {
+      this.resource.attributes[name] = attr;
+    }
+    this.simplifyProperty(this.resource.attributes[name]);
+  }
+
+  /**
    * Index the existing type definitions currently in the DB
    */
   private indexExistingTypeDefinitions() {
@@ -421,9 +477,23 @@ export class ResourceBuilder extends PropertyBagBuilder {
   }
 }
 
+export type TypeDefinitionFields = Pick<TypeDefinition, 'documentation' | 'mustRenderForBwCompat'>;
+
 export class TypeDefinitionBuilder extends PropertyBagBuilder {
-  constructor(public readonly db: SpecDatabase, public readonly typeDef: TypeDefinition) {
+  private readonly fields: TypeDefinitionFields = {};
+
+  constructor(public readonly db: SpecDatabase, private readonly typeDef: TypeDefinition) {
     super(typeDef);
+  }
+
+  public setFields(fields: TypeDefinitionFields) {
+    Object.assign(this.fields, fields);
+  }
+
+  public commit(): TypeDefinition {
+    super.commit();
+    Object.assign(this.typeDef, this.fields);
+    return this.typeDef;
   }
 }
 
