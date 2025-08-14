@@ -55,7 +55,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
   resourceBuilder.markAsAttributes(attributeNames);
 
   // If the primary identifier is a single property and it is also ReadOnly, it's neither a property nor an attribute.
-  resourceBuilder.maybeRemovePrimaryIdentifier(resource.readOnlyProperties?.map(simplePropNameFromJsonPtr));
+  resourceBuilder.unattributePrimaryIdentifier(resource.readOnlyProperties?.map(simplePropNameFromJsonPtr));
 
   // Mark all 'createOnlyProperties' as immutable.
   resourceBuilder.markAsImmutable((resource.createOnlyProperties ?? []).map(simplePropNameFromJsonPtr));

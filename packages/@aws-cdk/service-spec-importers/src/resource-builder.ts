@@ -229,9 +229,9 @@ export class ResourceBuilder extends PropertyBagBuilder {
   }
 
   /**
-   * If the primary identifier is a single property and it is also ReadOnly, it's neither a property nor an attribute.
+   * If the primary identifier is a single property and it is also ReadOnly, it's not an attribute
    */
-  public maybeRemovePrimaryIdentifier(readOnlyProperties?: string[]) {
+  public unattributePrimaryIdentifier(readOnlyProperties?: string[]) {
     if (this.resource.primaryIdentifier?.length !== 1) {
       return;
     }
@@ -240,7 +240,6 @@ export class ResourceBuilder extends PropertyBagBuilder {
       return;
     }
 
-    this.unsetProperty(primaryIdentifier);
     this.unsetAttribute(primaryIdentifier);
   }
 
