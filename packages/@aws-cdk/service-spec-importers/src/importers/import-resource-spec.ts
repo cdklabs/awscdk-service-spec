@@ -53,6 +53,8 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
     this.handleAttributes(resourceSpec.Attributes ?? {});
 
     this.handleUnusedTypes();
+
+    this.resourceBuilder.commit();
   }
 
   /**
@@ -81,7 +83,7 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
     const { typeDefinitionBuilder, freshInDb, freshInSession } = this.resourceBuilder.typeDefinitionBuilder(typeName);
 
     if (freshInDb && this.renderingUnusedTypes) {
-      typeDefinitionBuilder.typeDef.mustRenderForBwCompat = true;
+      typeDefinitionBuilder.setFields({ mustRenderForBwCompat: true });
     }
 
     if (freshInSession) {
@@ -89,7 +91,7 @@ abstract class ResourceSpecImporterBase<Spec extends CloudFormationResourceSpeci
       this.recurseProperties(spec.Properties ?? {}, typeDefinitionBuilder);
     }
 
-    return { type: 'ref', reference: ref(typeDefinitionBuilder.typeDef) };
+    return { type: 'ref', reference: ref(typeDefinitionBuilder.commit()) };
   }
 
   protected recurseProperties(
