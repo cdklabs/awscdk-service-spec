@@ -229,6 +229,21 @@ export class ResourceBuilder extends PropertyBagBuilder {
   }
 
   /**
+   * If the primary identifier is a single property and it is also ReadOnly, it's not an attribute
+   */
+  public unattributePrimaryIdentifier(readOnlyProperties?: string[]) {
+    if (this.resource.primaryIdentifier?.length !== 1) {
+      return;
+    }
+    const primaryIdentifier = this.resource.primaryIdentifier[0];
+    if (!readOnlyProperties?.includes(primaryIdentifier)) {
+      return;
+    }
+
+    this.unsetAttribute(primaryIdentifier);
+  }
+
+  /**
    * Mark the given properties as attributes instead
    *
    * These can be simple property names (`Foo`, `Bar`), but they can also be
