@@ -197,17 +197,18 @@ test('a prop+attr of the same name will not be overwritten', () => {
     },
   });
 
-  expect(resource.attributes.Something).toEqual(
-    expect.objectContaining({
-      type: { type: 'integer' },
-    }),
-  );
-  expect(resource.properties.Something).toEqual(
-    expect.objectContaining({
+  expect({ attribute: resource.attributes.Something }).toEqual({
+    attribute: expect.objectContaining({
       type: { type: 'json' },
-      previousTypes: [{ type: 'string' }],
+      previousTypes: [{ type: 'integer' }],
     }),
-  );
+  });
+
+  expect({ property: resource.properties.Something }).toEqual({
+    property: expect.objectContaining({
+      type: { type: 'string' },
+    }),
+  });
 });
 
 function importBoth(options: {
