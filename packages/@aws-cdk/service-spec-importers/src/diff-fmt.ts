@@ -156,7 +156,7 @@ export class DiffFormatter {
         this.renderMapDiff(
           r.metrics,
           (m) => this.renderMetric(m).prefix([' ']),
-          (k, u) => this.renderUpdatedMetric(k, u),
+          (k, u) => this.renderUpdatedMetric(k, u).prefix([' ']),
         ),
       ),
     ]);
