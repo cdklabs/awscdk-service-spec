@@ -1,3 +1,4 @@
+import { Metric } from './metrics';
 import { Attribute, Property, Resource, Service, TypeDefinition } from './resource';
 
 export interface SpecDatabaseDiff {
@@ -22,6 +23,11 @@ export interface UpdatedService {
   readonly capitalized?: ScalarDiff<Service['capitalized']>;
   readonly cloudFormationNamespace?: ScalarDiff<Service['cloudFormationNamespace']>;
   readonly resourceDiff?: MapDiff<Resource, UpdatedResource>;
+  readonly metrics?: MapDiff<Metric, ChangedMetric>;
+}
+
+export interface ChangedMetric {
+  readonly statistic?: ScalarDiff<string>;
 }
 
 export interface UpdatedResource {
@@ -37,6 +43,7 @@ export interface UpdatedResource {
   readonly scrutinizable?: ScalarDiff<Resource['scrutinizable']>;
   readonly typeDefinitionDiff?: MapDiff<TypeDefinition, UpdatedTypeDefinition>;
   readonly primaryIdentifier?: ListDiff<string, void>;
+  readonly metrics?: MapDiff<Metric, ChangedMetric>;
 }
 
 export interface UpdatedProperty {

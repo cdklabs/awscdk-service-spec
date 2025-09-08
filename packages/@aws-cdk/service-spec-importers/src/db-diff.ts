@@ -1,5 +1,7 @@
 import {
   Attribute,
+  ChangedMetric,
+  Metric,
   Property,
   PropertyType,
   Resource,
@@ -13,6 +15,7 @@ import {
   UpdatedResource,
   UpdatedService,
   UpdatedTypeDefinition,
+  MapDiff,
 } from '@aws-cdk/service-spec-types';
 import {
   diffByKey,
@@ -46,8 +49,38 @@ export class DbDiff {
       cloudFormationNamespace: diffScalar(a, b, 'cloudFormationNamespace'),
       name: diffScalar(a, b, 'name'),
       shortName: diffScalar(a, b, 'shortName'),
+      metrics: this.diffServiceMetrics(a, b),
       resourceDiff: this.diffServiceResources(a, b),
     } satisfies AllFieldsGiven<UpdatedService>);
+  }
+
+  public diffServiceMetrics(a: Service, b: Service): UpdatedService['metrics'] {
+    const aMetrics = this.db1.follow('serviceHasMetric', a).map((r) => r.entity);
+    const bMetrics = this.db2.follow('serviceHasMetric', b).map((r) => r.entity);
+    return this.diffMetrics(aMetrics, bMetrics);
+  }
+
+  public diffResourceMetrics(a: Resource, b: Resource): UpdatedResource['metrics'] {
+    const aMetrics = this.db1.follow('resourceHasMetric', a).map((r) => r.entity);
+    const bMetrics = this.db2.follow('resourceHasMetric', b).map((r) => r.entity);
+    return this.diffMetrics(aMetrics, bMetrics);
+  }
+
+  public diffMetrics(a: Metric[], b: Metric[]): MapDiff<Metric, ChangedMetric> | undefined {
+    return collapseEmptyDiff(
+      diffByKey(
+        a,
+        b,
+        (metric) => `${metric.namespace} • ${metric.name}`,
+        (x, y) => this.diffMetric(x, y),
+      ),
+    );
+  }
+
+  private diffMetric(a: Metric, b: Metric): ChangedMetric | undefined {
+    return collapseUndefined({
+      statistic: diffScalar(a, b, 'statistic'),
+    } satisfies AllFieldsGiven<ChangedMetric>);
   }
 
   public diffServiceResources(a: Service, b: Service): UpdatedService['resourceDiff'] {
@@ -80,6 +113,7 @@ export class DbDiff {
       attributes: collapseEmptyDiff(diffMap(a.attributes, b.attributes, (x, y) => this.diffAttribute(x, y))),
       properties: collapseEmptyDiff(diffMap(a.properties, b.properties, (x, y) => this.diffProperty(x, y))),
       typeDefinitionDiff: this.diffResourceTypeDefinitions(a, b),
+      metrics: this.diffResourceMetrics(a, b),
     } satisfies AllFieldsGiven<UpdatedResource>);
   }
 

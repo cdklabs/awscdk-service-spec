@@ -1,6 +1,8 @@
 import {
+  ChangedMetric,
   Deprecation,
   MapDiff,
+  Metric,
   Property,
   Resource,
   RichPropertyType,
@@ -56,6 +58,12 @@ export class DiffFormatter {
           .sort(sortByKey((e) => e.entity.name))
           .map((e) => this.renderResource(e.entity, db).prefix([' '])),
       ),
+      listWithCaption(
+        'metrics',
+        [...this.dbs[db].follow('serviceHasMetric', s)]
+          .sort(sortByKey((e) => e.entity.name))
+          .map((e) => this.renderMetric(e.entity).prefix([' '])),
+      ),
     ]);
   }
 
@@ -70,6 +78,14 @@ export class DiffFormatter {
           s.resourceDiff,
           (r, db) => this.renderResource(r, db).prefix([' ']),
           (k, u) => this.renderUpdatedResource(k, u).prefix([' ']),
+        ),
+      ),
+      listWithCaption(
+        'metrics',
+        this.renderMapDiff(
+          s.metrics,
+          (m) => this.renderMetric(m).prefix([' ']),
+          (k, u) => this.renderUpdatedMetric(k, u).prefix([' ']),
         ),
       ),
     ];
@@ -101,6 +117,12 @@ export class DiffFormatter {
           .sort(sortByKey((e) => e.entity.name))
           .map((e) => this.renderTypeDefinition(e.entity, db).prefix([' '])),
       ),
+      listWithCaption(
+        'metrics',
+        [...this.dbs[db].follow('resourceHasMetric', r)]
+          .sort(sortByKey((e) => e.entity.name))
+          .map((e) => this.renderMetric(e.entity).prefix([' '])),
+      ),
     ]);
   }
 
@@ -129,6 +151,14 @@ export class DiffFormatter {
           (k, u) => this.renderUpdatedTypeDefinition(k, u),
         ),
       ),
+      listWithCaption(
+        'metrics',
+        this.renderMapDiff(
+          r.metrics,
+          (m) => this.renderMetric(m).prefix([' ']),
+          (k, u) => this.renderUpdatedMetric(k, u),
+        ),
+      ),
     ]);
   }
 
@@ -144,6 +174,16 @@ export class DiffFormatter {
     return new PrintableTree(`type ${key}`).addBullets([
       new PrintableTree(...listFromDiffs(d)).indent(META_INDENT),
       listWithCaption('properties', this.renderPropertyDiff(t.properties)),
+    ]);
+  }
+
+  private renderMetric(m: Metric): PrintableTree {
+    return new PrintableTree(`${m.namespace} • ${m.name} • ${m.statistic}`);
+  }
+
+  private renderUpdatedMetric(k: string, u: ChangedMetric): PrintableTree {
+    return new PrintableTree(k).addBullets([
+      new PrintableTree(...listFromDiffs(pick(u, ['statistic']))).indent(META_INDENT),
     ]);
   }
 
