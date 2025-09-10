@@ -228,6 +228,18 @@ new SingleSource(repo, {
   dir: 'sources/SAMSpec',
   source: 'https://raw.githubusercontent.com/awslabs/goformation/master/schema/sam.schema.json',
 });
+new SingleSource(repo, {
+  name: 'arn-templates',
+  dir: 'sources/ArnTemplates',
+  fileName: 'arn-templates.json',
+  source: 's3://230541556993-cfn-docs/arn-templates.json',
+  awsAuth: {
+    region: 'us-east-1',
+    roleToAssume: Role.fromGitHubSecret('AWS_ROLE_TO_ASSUME'),
+    roleSessionName: 'awscdk-service-spec',
+    roleDurationSeconds: 900,
+  },
+});
 
 // https://github.com/aws-cloudformation/cfn-lint/pull/3257
 new SingleSource(repo, {

@@ -21,6 +21,7 @@ export class FullDatabase extends DatabaseBuilder {
       .importCloudFormationDocs(path.join(SOURCES, 'CloudFormationDocumentation/CloudFormationDocumentation.json'))
       .importStatefulResources(path.join(SOURCES, 'StatefulResources/StatefulResources.json'))
       .importGetAttAllowList(path.join(SOURCES, 'CloudFormationGetAttAllowList/gettatt-allowlist.json'))
+      .importArnTemplates(path.join(SOURCES, 'ArnTemplates/arn-templates.json'))
       .importCannedMetrics(
         path.join(SOURCES, 'CloudWatchConsoleServiceDirectory/CloudWatchConsoleServiceDirectory.json'),
       )
