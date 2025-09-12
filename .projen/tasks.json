@@ -145,6 +145,14 @@
         }
       ]
     },
+    "update-source:arn-templates": {
+      "name": "update-source:arn-templates",
+      "steps": [
+        {
+          "exec": "aws s3 cp s3://230541556993-cfn-docs/arn-templates.json sources/ArnTemplates/arn-templates.json"
+        }
+      ]
+    },
     "update-source:cfn-schema": {
       "name": "update-source:cfn-schema",
       "steps": [
@@ -205,6 +213,9 @@
         },
         {
           "spawn": "update-source:sam"
+        },
+        {
+          "spawn": "update-source:arn-templates"
         },
         {
           "spawn": "update-source:stateful-resources"

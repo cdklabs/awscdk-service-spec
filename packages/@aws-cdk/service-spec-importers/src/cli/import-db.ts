@@ -14,6 +14,7 @@ const AVAILABLE_SOURCES: Record<string, keyof DatabaseBuilder> = {
   cfnDocs: 'importCloudFormationDocs',
   statefulResources: 'importStatefulResources',
   cannedMetrics: 'importCannedMetrics',
+  arnTemplates: 'importArnTemplates',
 };
 
 async function main() {

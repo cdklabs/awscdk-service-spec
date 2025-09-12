@@ -56,6 +56,7 @@ jspm_packages/
 !/.github/workflows/update-source-sam-spec.yml
 !/.github/workflows/update-source-cfn-schema.yml
 !/.github/workflows/update-source-sam.yml
+!/.github/workflows/update-source-arn-templates.yml
 !/.github/workflows/update-source-stateful-resources.yml
 !/.projenrc.ts
 !/.github/workflows/release.yml
