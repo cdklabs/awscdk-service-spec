@@ -1,6 +1,7 @@
 import {
   Attribute,
   ChangedMetric,
+  MapDiff,
   Metric,
   Property,
   PropertyType,
@@ -15,18 +16,17 @@ import {
   UpdatedResource,
   UpdatedService,
   UpdatedTypeDefinition,
-  MapDiff,
 } from '@aws-cdk/service-spec-types';
 import {
-  diffByKey,
-  collapseUndefined,
-  diffScalar,
-  collapseEmptyDiff,
-  jsonEq,
-  diffMap,
-  diffList,
-  diffField,
   AllFieldsGiven,
+  collapseEmptyDiff,
+  collapseUndefined,
+  diffByKey,
+  diffField,
+  diffList,
+  diffMap,
+  diffScalar,
+  jsonEqModuloId,
 } from './diff-helpers';
 
 export class DbDiff {
@@ -103,10 +103,10 @@ export class DbDiff {
       documentation: diffScalar(a, b, 'documentation'),
       cloudFormationType: diffScalar(a, b, 'cloudFormationType'),
       isStateful: diffScalar(a, b, 'isStateful'),
-      identifier: diffField(a, b, 'identifier', jsonEq),
+      identifier: diffField(a, b, 'identifier', jsonEqModuloId),
       name: diffScalar(a, b, 'name'),
       scrutinizable: diffScalar(a, b, 'scrutinizable'),
-      tagInformation: diffField(a, b, 'tagInformation', jsonEq),
+      tagInformation: diffField(a, b, 'tagInformation', jsonEqModuloId),
       primaryIdentifier: collapseEmptyDiff(
         diffList(a.primaryIdentifier ?? [], b.primaryIdentifier ?? [], (x, y) => x === y),
       ),

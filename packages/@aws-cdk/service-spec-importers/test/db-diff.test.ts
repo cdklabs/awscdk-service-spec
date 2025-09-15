@@ -19,6 +19,27 @@ test('property diff ignores union order', () => {
   expect(pd).toBeUndefined();
 });
 
+test('resource diff ignores the $id field', () => {
+  const r1 = db1.allocate('resource', {
+    cloudFormationType: 'AWS::My::Resource',
+    identifier: { $id: '1', arnTemplate: 'foo' },
+    name: 'MyResource',
+    attributes: {},
+    properties: {},
+  });
+  const r2 = db1.allocate('resource', {
+    cloudFormationType: 'AWS::My::Resource',
+    identifier: { $id: '2', arnTemplate: 'foo' },
+    name: 'MyResource',
+    attributes: {},
+    properties: {},
+  });
+
+  const rd = diff.diffResource(r1, r2);
+
+  expect(rd).toBeUndefined();
+});
+
 test('property diff ignores union order, even when using type references', () => {
   const t1 = db1.allocate('typeDefinition', { name: 'MyType', properties: {} });
   const t2 = db2.allocate('typeDefinition', { name: 'MyType', properties: {} });
