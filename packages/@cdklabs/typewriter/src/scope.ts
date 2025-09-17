@@ -170,3 +170,18 @@ export class RichScope {
     return this.scope.tryFindType(this.scope.qualifyName(name));
   }
 }
+
+/**
+ * A scope that is never meant to be added to the syntax tree. Useful for
+ * when you have to add something to a scope, but don't want it to be
+ * rendered automatically by the renderer when traversing the tree.
+ *
+ * Example: if you want to render an inner class, inside a method, wrap
+ * the class in a TypeDeclarationStatement. If you add the class to the
+ * dummy scope, it will only be rendered as part of the statement.
+ */
+export class DummyScope extends ScopeImpl {
+  constructor() {
+    super('<dummy scope>');
+  }
+}

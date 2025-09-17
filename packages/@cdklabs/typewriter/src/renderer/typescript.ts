@@ -51,6 +51,7 @@ import {
   ThrowStatement,
   MonkeyPatchMethod,
   EmptyStatement,
+  TypeDeclarationStatement,
 } from '../statements';
 import { StructType } from '../struct';
 import { ThingSymbol } from '../symbol';
@@ -529,6 +530,9 @@ export class TypeScriptRenderer extends Renderer {
         this.emit(' ');
         this.renderBlock(x.body);
         this.emit(';');
+      }),
+      typeCase(TypeDeclarationStatement, (x) => {
+        this.renderDeclaration(x.decl);
       }),
     ]);
 
