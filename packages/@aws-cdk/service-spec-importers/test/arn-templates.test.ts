@@ -41,10 +41,7 @@ test('assigns arnTemplate when found', () => {
       $id: '0',
       attributes: {},
       cloudFormationType: 'AWS::S3::Bucket',
-      identifier: {
-        $id: '2',
-        arnTemplate: 'arn:${Partition}:s3:::${BucketName}',
-      },
+      arnTemplate: 'arn:${Partition}:s3:::${BucketName}',
       primaryIdentifier: ['BucketName'],
       name: 'Type',
       properties: {
