@@ -108,10 +108,6 @@ export function jsonEq<A>(a: A, b: A): boolean {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
-export function jsonEqModuloId<A>(a: A, b: A): boolean {
-  return JSON.stringify(removeId(a)) === JSON.stringify(removeId(b));
-}
-
 export function diffScalar<A extends object, K extends keyof A>(
   a: A,
   b: A,
@@ -134,8 +130,8 @@ export function diffField<A extends object, K extends keyof A>(
     return undefined;
   }
   return {
-    old: removeId(a[k]!),
-    new: removeId(b[k]!),
+    old: a[k]!,
+    new: b[k]!,
   };
 }
 
@@ -160,12 +156,3 @@ export function collapseEmptyDiff<A extends ListDiff<any, any> | MapDiff<any, an
 
 export type Eq<A> = (x: A, y: A) => boolean;
 export type AllFieldsGiven<A extends object> = { [k in keyof Required<A>]: A[k] };
-
-function removeId(x: any): any {
-  if (x && typeof x === 'object') {
-    const copy = { ...x };
-    delete copy.$id;
-    return copy;
-  }
-  return x;
-}

@@ -6,13 +6,12 @@ export function importArnTemplates(arnIndex: Record<string, string>, db: SpecDat
   for (let resource of db.all('resource')) {
     const arnTemplate = arnIndex[resource.cloudFormationType];
     if (arnTemplate != null) {
-      resource.identifier =
-        resource.identifier != null ? { ...resource.identifier, arnTemplate } : { $id: db.id(), arnTemplate };
+      resource.arnTemplate = arnTemplate;
     }
   }
 
   for (let resource of db.all('resource')) {
-    if (resource.identifier == null) {
+    if (resource.arnTemplate == null) {
       report.reportFailure(
         new ReportAudience('ARN Template Import'),
         `interpreting`,

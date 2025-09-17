@@ -37,7 +37,7 @@ export interface UpdatedResource {
   readonly documentation?: ScalarDiff<string>;
   readonly properties?: MapDiff<Property, UpdatedProperty>;
   readonly attributes?: MapDiff<Attribute, UpdatedAttribute>;
-  readonly identifier?: ScalarDiff<Resource['identifier']>;
+  readonly arnTemplate?: ScalarDiff<string>;
   readonly isStateful?: ScalarDiff<boolean>;
   readonly tagInformation?: ScalarDiff<Resource['tagInformation']>;
   readonly scrutinizable?: ScalarDiff<Resource['scrutinizable']>;
