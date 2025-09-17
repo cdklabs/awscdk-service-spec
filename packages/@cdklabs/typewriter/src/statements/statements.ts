@@ -3,6 +3,7 @@ import { asStmt } from './private';
 import { CommentableImpl, ICommentable } from '../code-fragments';
 import { Expression } from '../expressions';
 import { Parameter } from '../parameter';
+import { TypeDeclaration } from '../type-declaration';
 
 export class Statement extends CommentableImpl implements ICommentable {}
 
@@ -105,6 +106,12 @@ export class MonkeyPatchMethod extends Statement {
     public readonly parameters: Parameter[],
     public readonly body: Block,
   ) {
+    super();
+  }
+}
+
+export class TypeDeclarationStatement extends Statement {
+  constructor(public readonly decl: TypeDeclaration) {
     super();
   }
 }
