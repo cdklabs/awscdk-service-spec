@@ -64,7 +64,7 @@ export interface Resource extends Entity {
   readonly properties: ResourceProperties;
   readonly attributes: Record<string, Attribute>;
   readonly validations?: unknown;
-  identifier?: ResourceIdentifier;
+  arnTemplate?: string;
   isStateful?: boolean;
 
   /**

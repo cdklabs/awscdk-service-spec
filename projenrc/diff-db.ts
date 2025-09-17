@@ -134,30 +134,51 @@ export class DiffDb extends pj.Component {
             this.importers.outdir + '/bin/diff-db',
           )} base/db.json.gz head/db.json.gz > DIFF || echo "diff-result=true" >> $GITHUB_OUTPUT`,
         },
+        pj.github.WorkflowSteps.uploadArtifact({
+          name: 'Upload diff',
+          if: 'steps.diff-db.outputs.diff-result',
+          with: {
+            name: 'db-diff-${{ github.event.pull_request.head.sha }}',
+            path: 'DIFF',
+          },
+        }),
         {
           name: 'Create PR.md',
           if: 'steps.diff-db.outputs.diff-result',
+          env: {
+            DIFF_LIMIT: String(200_000), // @see https://github.com/dead-claudia/github-limits?tab=readme-ov-file#pr-body
+          },
           run: [
+            'if [ $(wc -c < DIFF) -gt $DIFF_LIMIT ]; then',
+            '  echo "> [!WARNING]" >> PR.md',
+            '  echo "> Diff too large for inline display. Download the full diff using the link below." >> PR.md',
+            '  echo "" >> PR.md',
+            'fi',
             `echo '**${this.serviceSpec.name}**: Model database diff detected' >> PR.md`,
+            'echo "[📁 Download full diff](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> PR.md',
             "echo '```' >> PR.md",
-            'cat DIFF >> PR.md',
+            'head -c $DIFF_LIMIT DIFF >> PR.md',
+            'if [ $(wc -c < DIFF) -gt $DIFF_LIMIT ]; then',
+            '  echo "" >> PR.md',
+            '  echo "... (truncated)" >> PR.md',
+            'fi',
             "echo '```' >> PR.md",
           ].join('\n'),
         },
         {
           name: 'Comment diff',
           if: 'steps.diff-db.outputs.diff-result',
-          uses: 'thollander/actions-comment-pull-request@v2',
+          uses: 'thollander/actions-comment-pull-request@v3',
           with: {
             comment_tag: 'diff-db',
             mode: 'recreate',
-            filePath: 'PR.md',
+            'file-path': 'PR.md',
           },
         },
         {
           name: 'Delete outdated diff',
           if: '!(steps.diff-db.outputs.diff-result)',
-          uses: 'thollander/actions-comment-pull-request@v2',
+          uses: 'thollander/actions-comment-pull-request@v3',
           with: {
             comment_tag: 'diff-db',
             message: `**${this.serviceSpec.name}**: No model change detected`,

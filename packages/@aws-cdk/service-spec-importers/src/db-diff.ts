@@ -103,7 +103,7 @@ export class DbDiff {
       documentation: diffScalar(a, b, 'documentation'),
       cloudFormationType: diffScalar(a, b, 'cloudFormationType'),
       isStateful: diffScalar(a, b, 'isStateful'),
-      identifier: diffField(a, b, 'identifier', jsonEq),
+      arnTemplate: diffScalar(a, b, 'arnTemplate'),
       name: diffScalar(a, b, 'name'),
       scrutinizable: diffScalar(a, b, 'scrutinizable'),
       tagInformation: diffField(a, b, 'tagInformation', jsonEq),

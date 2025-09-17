@@ -99,14 +99,13 @@ export class DiffFormatter {
       new PrintableTree(
         ...listFromProps(r, [
           'name',
-          'identifier',
           'cloudFormationType',
           'cloudFormationTransform',
           'documentation',
-          'identifier',
           'isStateful',
           'scrutinizable',
           'tagInformation',
+          'arnTemplate',
         ]),
       ).indent(META_INDENT),
       listWithCaption('properties', this.renderProperties(r.properties, db)),
@@ -129,14 +128,13 @@ export class DiffFormatter {
   private renderUpdatedResource(key: string, r: UpdatedResource): PrintableTree {
     const d = pick(r, [
       'name',
-      'identifier',
       'cloudFormationType',
       'cloudFormationTransform',
       'documentation',
-      'identifier',
       'isStateful',
       'scrutinizable',
       'tagInformation',
+      'arnTemplate',
     ]);
 
     return new PrintableTree(`resource ${key}`).addBullets([
