@@ -1,6 +1,8 @@
 import {
+  ChangedMetric,
   Deprecation,
   MapDiff,
+  Metric,
   Property,
   Resource,
   RichPropertyType,
@@ -56,6 +58,12 @@ export class DiffFormatter {
           .sort(sortByKey((e) => e.entity.name))
           .map((e) => this.renderResource(e.entity, db).prefix([' '])),
       ),
+      listWithCaption(
+        'metrics',
+        [...this.dbs[db].follow('serviceHasMetric', s)]
+          .sort(sortByKey((e) => e.entity.name))
+          .map((e) => this.renderMetric(e.entity).prefix([' '])),
+      ),
     ]);
   }
 
@@ -72,6 +80,14 @@ export class DiffFormatter {
           (k, u) => this.renderUpdatedResource(k, u).prefix([' ']),
         ),
       ),
+      listWithCaption(
+        'metrics',
+        this.renderMapDiff(
+          s.metrics,
+          (m) => this.renderMetric(m).prefix([' ']),
+          (k, u) => this.renderUpdatedMetric(k, u).prefix([' ']),
+        ),
+      ),
     ];
 
     const ret = new PrintableTree(`service ${key}`).addBullets(bullets);
@@ -83,14 +99,13 @@ export class DiffFormatter {
       new PrintableTree(
         ...listFromProps(r, [
           'name',
-          'identifier',
           'cloudFormationType',
           'cloudFormationTransform',
           'documentation',
-          'identifier',
           'isStateful',
           'scrutinizable',
           'tagInformation',
+          'arnTemplate',
         ]),
       ).indent(META_INDENT),
       listWithCaption('properties', this.renderProperties(r.properties, db)),
@@ -101,20 +116,25 @@ export class DiffFormatter {
           .sort(sortByKey((e) => e.entity.name))
           .map((e) => this.renderTypeDefinition(e.entity, db).prefix([' '])),
       ),
+      listWithCaption(
+        'metrics',
+        [...this.dbs[db].follow('resourceHasMetric', r)]
+          .sort(sortByKey((e) => e.entity.name))
+          .map((e) => this.renderMetric(e.entity).prefix([' '])),
+      ),
     ]);
   }
 
   private renderUpdatedResource(key: string, r: UpdatedResource): PrintableTree {
     const d = pick(r, [
       'name',
-      'identifier',
       'cloudFormationType',
       'cloudFormationTransform',
       'documentation',
-      'identifier',
       'isStateful',
       'scrutinizable',
       'tagInformation',
+      'arnTemplate',
     ]);
 
     return new PrintableTree(`resource ${key}`).addBullets([
@@ -127,6 +147,14 @@ export class DiffFormatter {
           r.typeDefinitionDiff,
           (t, db) => this.renderTypeDefinition(t, db).prefix([' ']),
           (k, u) => this.renderUpdatedTypeDefinition(k, u),
+        ),
+      ),
+      listWithCaption(
+        'metrics',
+        this.renderMapDiff(
+          r.metrics,
+          (m) => this.renderMetric(m).prefix([' ']),
+          (k, u) => this.renderUpdatedMetric(k, u).prefix([' ']),
         ),
       ),
     ]);
@@ -144,6 +172,16 @@ export class DiffFormatter {
     return new PrintableTree(`type ${key}`).addBullets([
       new PrintableTree(...listFromDiffs(d)).indent(META_INDENT),
       listWithCaption('properties', this.renderPropertyDiff(t.properties)),
+    ]);
+  }
+
+  private renderMetric(m: Metric): PrintableTree {
+    return new PrintableTree(`${m.namespace} • ${m.name} • ${m.statistic}`);
+  }
+
+  private renderUpdatedMetric(k: string, u: ChangedMetric): PrintableTree {
+    return new PrintableTree(k).addBullets([
+      new PrintableTree(...listFromDiffs(pick(u, ['statistic']))).indent(META_INDENT),
     ]);
   }
 

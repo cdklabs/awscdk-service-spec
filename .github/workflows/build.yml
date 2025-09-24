@@ -148,23 +148,42 @@ jobs:
         id: diff-db
         run: packages/@aws-cdk/service-spec-importers/bin/diff-db base/db.json.gz head/db.json.gz > DIFF || echo "diff-result=true" >> $GITHUB_OUTPUT
         continue-on-error: true
+      - name: Upload diff
+        if: steps.diff-db.outputs.diff-result
+        uses: actions/upload-artifact@v4.4.0
+        with:
+          name: db-diff-${{ github.event.pull_request.head.sha }}
+          path: DIFF
+          overwrite: true
       - name: Create PR.md
         if: steps.diff-db.outputs.diff-result
+        env:
+          DIFF_LIMIT: "200000"
         run: |-
+          if [ $(wc -c < DIFF) -gt $DIFF_LIMIT ]; then
+            echo "> [!WARNING]" >> PR.md
+            echo "> Diff too large for inline display. Download the full diff using the link below." >> PR.md
+            echo "" >> PR.md
+          fi
           echo '**@aws-cdk/aws-service-spec**: Model database diff detected' >> PR.md
+          echo "[📁 Download full diff](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> PR.md
           echo '```' >> PR.md
-          cat DIFF >> PR.md
+          head -c $DIFF_LIMIT DIFF >> PR.md
+          if [ $(wc -c < DIFF) -gt $DIFF_LIMIT ]; then
+            echo "" >> PR.md
+            echo "... (truncated)" >> PR.md
+          fi
           echo '```' >> PR.md
       - name: Comment diff
         if: steps.diff-db.outputs.diff-result
-        uses: thollander/actions-comment-pull-request@v2
+        uses: thollander/actions-comment-pull-request@v3
         with:
           comment_tag: diff-db
           mode: recreate
-          filePath: PR.md
+          file-path: PR.md
       - name: Delete outdated diff
         if: "!(steps.diff-db.outputs.diff-result)"
-        uses: thollander/actions-comment-pull-request@v2
+        uses: thollander/actions-comment-pull-request@v3
         with:
           comment_tag: diff-db
           message: "**@aws-cdk/aws-service-spec**: No model change detected"

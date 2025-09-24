@@ -3,6 +3,7 @@ import {
   explodeTypeArray,
   missingTypeObject,
   removeEmptyRequiredArray,
+  sanitizePrimaryIdentifier,
 } from '../../src/patches/json-schema-patches';
 import { patchObject } from '../utils';
 
@@ -228,5 +229,41 @@ describe(missingTypeObject, () => {
         },
       },
     });
+  });
+});
+
+describe(sanitizePrimaryIdentifier, () => {
+  test('does not modify valid primaryIdentifier', () => {
+    const obj = {
+      typeName: 'AWS::Service::Resource',
+      type: 'object',
+      primaryIdentifier: ['/properties/RestApiId', '/properties/SomethingElse'],
+      properties: {
+        valid: {
+          type: 'string',
+        },
+      },
+    };
+
+    const patchedObj = patchObject(obj, sanitizePrimaryIdentifier);
+
+    expect(patchedObj).toEqual(obj);
+  });
+
+  test('does modify affected primaryIdentifier', () => {
+    const obj = {
+      typeName: 'AWS::ApiGateway::RequestValidator',
+      type: 'object',
+      primaryIdentifier: ['/properties/RestApiId', '/properties/ValidatorId'],
+      properties: {
+        valid: {
+          type: 'string',
+        },
+      },
+    };
+
+    const patchedObj = patchObject(obj, sanitizePrimaryIdentifier);
+
+    expect(patchedObj.primaryIdentifier).toEqual(['/properties/ValidatorId']);
   });
 });

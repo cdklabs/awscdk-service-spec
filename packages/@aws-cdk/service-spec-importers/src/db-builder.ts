@@ -1,5 +1,7 @@
+import { promises as fs } from 'fs';
 import { emptyDatabase, SpecDatabase } from '@aws-cdk/service-spec-types';
 import { assertSuccess, Result } from '@cdklabs/tskb';
+import { importArnTemplates } from './importers/import-arn-templates';
 import { importCannedMetrics } from './importers/import-canned-metrics';
 import { importCloudFormationDocumentation } from './importers/import-cloudformation-docs';
 import { importCloudFormationRegistryResource } from './importers/import-cloudformation-registry';
@@ -188,6 +190,13 @@ export class DatabaseBuilder {
       const allowListSpec = this.loadResult(await loadGetAttAllowList(specFilePath, this.options), report);
 
       importGetAttAllowList(db, allowListSpec);
+    });
+  }
+
+  public importArnTemplates(filePath: string) {
+    return this.addSourceImporter(async (db, report) => {
+      const arnFormatIndex = JSON.parse(await fs.readFile(filePath, { encoding: 'utf-8' }));
+      importArnTemplates(arnFormatIndex, db, report);
     });
   }
 

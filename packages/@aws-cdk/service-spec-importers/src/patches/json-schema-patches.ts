@@ -27,6 +27,7 @@ export const normalizeJsonSchema = onlyObjects(
     canonicalizeTypeOperators('anyOf'),
     canonicalizeTypeOperators('allOf'),
     removeEmptyRequiredArray,
+    sanitizePrimaryIdentifier,
   ),
 );
 
@@ -151,6 +152,24 @@ export function missingTypeObject(lens: JsonObjectLens) {
 export function removeEmptyRequiredArray(lens: JsonObjectLens) {
   if (lens.value.type === 'object' && Array.isArray(lens.value.required) && lens.value.required.length === 0) {
     lens.removeProperty(NO_MISTAKE, 'required');
+  }
+}
+
+/**
+ * Some resource types have an incorrect primaryIdentifier, that includes attributes that cannot be read,
+ * that is, the CloudFormation intrinsic Ref function does not return them, and it's not possible to Fn::GetAtt them
+ * either.
+ *
+ * This patch sanitizes the primaryIdentifier by removing the problematic attributes from the affected types.
+ */
+export function sanitizePrimaryIdentifier(lens: JsonObjectLens) {
+  const affectedTypes = ['AWS::ApiGateway::RequestValidator', 'AWS::ApiGateway::Model'];
+
+  if (isRoot(lens) && affectedTypes.includes(lens.value.typeName as string)) {
+    if (Array.isArray(lens.value.primaryIdentifier)) {
+      const sanitized = lens.value.primaryIdentifier.filter((x: string) => x !== '/properties/RestApiId');
+      lens.replaceProperty(NO_MISTAKE, 'primaryIdentifier', sanitized);
+    }
   }
 }
 
