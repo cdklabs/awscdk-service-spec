@@ -232,7 +232,7 @@ new SingleSource(repo, {
   name: 'arn-templates',
   dir: 'sources/ArnTemplates',
   fileName: 'arn-templates.json',
-  source: 's3://230541556993-cfn-docs/arn-templates.json',
+  source: 's3://962595532322-arn-templates/arn-templates.json',
   awsAuth: {
     region: 'us-east-1',
     roleToAssume: Role.fromGitHubSecret('AWS_ROLE_TO_ASSUME'),
