@@ -149,7 +149,7 @@
       "name": "update-source:arn-templates",
       "steps": [
         {
-          "exec": "aws s3 cp s3://230541556993-cfn-docs/arn-templates.json sources/ArnTemplates/arn-templates.json"
+          "exec": "aws s3 cp s3://962595532322-arn-templates/arn-templates.json sources/ArnTemplates/arn-templates.json"
         }
       ]
     },
