@@ -21,7 +21,7 @@ jobs:
       CI: "true"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           lfs: true
@@ -62,7 +62,7 @@ jobs:
         working-directory: packages/@cdklabs/tskb
       - name: "@cdklabs/tskb: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v4.4.0
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: cdklabs-tskb_build-artifact
           path: packages/@cdklabs/tskb/dist
@@ -74,7 +74,7 @@ jobs:
         working-directory: packages/@cdklabs/typewriter
       - name: "@cdklabs/typewriter: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v4.4.0
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: cdklabs-typewriter_build-artifact
           path: packages/@cdklabs/typewriter/dist
@@ -86,7 +86,7 @@ jobs:
         working-directory: packages/@aws-cdk/service-spec-types
       - name: "@aws-cdk/service-spec-types: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v4.4.0
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: aws-cdk-service-spec-types_build-artifact
           path: packages/@aws-cdk/service-spec-types/dist
@@ -98,7 +98,7 @@ jobs:
         working-directory: packages/@aws-cdk/service-spec-importers
       - name: "@aws-cdk/service-spec-importers: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v4.4.0
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: aws-cdk-service-spec-importers_build-artifact
           path: packages/@aws-cdk/service-spec-importers/dist
@@ -110,7 +110,7 @@ jobs:
         working-directory: packages/@aws-cdk/aws-service-spec
       - name: "@aws-cdk/aws-service-spec: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v4.4.0
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: aws-cdk-aws-service-spec_build-artifact
           path: packages/@aws-cdk/aws-service-spec/dist
@@ -125,11 +125,11 @@ jobs:
       contents: write
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-cdklabs-tskb == 'true' }}
     steps:
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: cdklabs-tskb_build-artifact
           path: dist
@@ -149,11 +149,11 @@ jobs:
       contents: read
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-cdklabs-tskb == 'true' }}
     steps:
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: cdklabs-tskb_build-artifact
           path: dist
@@ -177,11 +177,11 @@ jobs:
       contents: write
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-cdklabs-typewriter == 'true' }}
     steps:
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: cdklabs-typewriter_build-artifact
           path: dist
@@ -201,11 +201,11 @@ jobs:
       contents: read
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-cdklabs-typewriter == 'true' }}
     steps:
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: cdklabs-typewriter_build-artifact
           path: dist
@@ -229,11 +229,11 @@ jobs:
       contents: write
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-service-spec-types == 'true' }}
     steps:
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: aws-cdk-service-spec-types_build-artifact
           path: dist
@@ -253,11 +253,11 @@ jobs:
       contents: read
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-service-spec-types == 'true' }}
     steps:
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: aws-cdk-service-spec-types_build-artifact
           path: dist
@@ -281,11 +281,11 @@ jobs:
       contents: write
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-service-spec-importers == 'true' }}
     steps:
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: aws-cdk-service-spec-importers_build-artifact
           path: dist
@@ -305,11 +305,11 @@ jobs:
       contents: read
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-service-spec-importers == 'true' }}
     steps:
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: aws-cdk-service-spec-importers_build-artifact
           path: dist
@@ -333,11 +333,11 @@ jobs:
       contents: write
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-aws-service-spec == 'true' }}
     steps:
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: aws-cdk-aws-service-spec_build-artifact
           path: dist
@@ -357,11 +357,11 @@ jobs:
       contents: read
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-aws-service-spec == 'true' }}
     steps:
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: aws-cdk-aws-service-spec_build-artifact
           path: dist
