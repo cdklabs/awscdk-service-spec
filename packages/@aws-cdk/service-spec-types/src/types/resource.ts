@@ -165,6 +165,11 @@ export interface Property {
    * @default 'no'
    */
   causesReplacement?: 'yes' | 'no' | 'maybe';
+
+  /**
+   * Relationship references to other CloudFormation resources
+   */
+  relationshipRefs?: RelationshipRef[];
 }
 
 export class RichTypedField {
@@ -473,6 +478,21 @@ export enum PropertyScrutinyType {
    * A set of egress rules (on a security group)
    */
   EgressRules = 'EgressRules',
+}
+
+/**
+ * Represents a relationship reference to another CloudFormation resource
+ */
+export interface RelationshipRef {
+  /**
+   * The CloudFormation resource type this property references
+   */
+  readonly typeName: string;
+
+  /**
+   * The property path within the referenced resource (e.g., "/Id")
+   */
+  readonly propertyPath: string;
 }
 
 export class RichPropertyType {
