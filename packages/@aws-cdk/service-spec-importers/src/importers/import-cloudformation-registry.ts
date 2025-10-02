@@ -1,4 +1,4 @@
-import { PropertyType, RichPropertyType, SpecDatabase, TagVariant } from '@aws-cdk/service-spec-types';
+import { PropertyType, RelationshipRef, RichPropertyType, SpecDatabase, TagVariant } from '@aws-cdk/service-spec-types';
 import { locateFailure, Fail, failure, isFailure, Result, tryCatch, using, ref, isSuccess } from '@cdklabs/tskb';
 import { ProblemReport, ReportAudience } from '../report';
 import { PropertyBagBuilder, SpecBuilder } from '../resource-builder';
@@ -76,6 +76,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
             documentation: descriptionOf(resolvedSchema),
             required: required.has(name),
             defaultValue: describeDefault(resolvedSchema),
+            relationshipRefs: extractRelationshipRefs(resolvedSchema),
           });
         });
       } catch (e) {
@@ -85,6 +86,39 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         );
       }
     }
+  }
+
+  /**
+   * Recursively extracts relationshipRef metadata from JSON schemas
+   *
+   * Finds relationshipRef objects that indicate this property references
+   * another CloudFormation resource, and converts property paths to name.
+   */
+  function extractRelationshipRefs(schema: jsonschema.ResolvedSchema): RelationshipRef[] {
+    const refs: RelationshipRef[] = [];
+
+    function collectRefs(s: jsonschema.ConcreteSchema) {
+      if (jsonschema.isAnyType(s)) return;
+
+      if ('relationshipRef' in s && s.relationshipRef) {
+        refs.push({
+          typeName: s.relationshipRef.typeName,
+          propertyName: s.relationshipRef.propertyPath.startsWith('/properties/')
+            ? s.relationshipRef.propertyPath.slice(12)
+            : s.relationshipRef.propertyPath,
+        });
+      }
+
+      // We cannot use jsonschema.anyOf / oneOf because a relationshipRef has not type in the schema
+      if (jsonschema.isAnyOf(s) || jsonschema.isOneOf(s)) {
+        jsonschema.innerSchemas(s).forEach(collectRefs);
+      } else if (jsonschema.isArray(s) && s.items) {
+        collectRefs(resolve(s.items));
+      }
+    }
+
+    collectRefs(schema);
+    return refs;
   }
 
   /**
@@ -155,6 +189,9 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         // FIXME: Do a proper thing here
         const firstResolved = resolvedSchema.allOf[0];
         return schemaTypeToModelType(nameHint, resolve(firstResolved), fail);
+      } else if (jsonschema.isRelationshipRef(resolvedSchema)) {
+        // relationshipRef schema - treat as string
+        return { type: 'string' };
       } else {
         switch (resolvedSchema.type) {
           case 'string':
@@ -196,9 +233,13 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
   function validateCombiningSchemaType(schema: jsonschema.ConcreteSchema[], fail: Fail) {
     schema.forEach((element, index) => {
-      if (!jsonschema.isAnyType(element) && !jsonschema.isCombining(element)) {
+      if (
+        !jsonschema.isAnyType(element) &&
+        !jsonschema.isCombining(element) &&
+        !jsonschema.isRelationshipRef(element)
+      ) {
         schema.slice(index + 1).forEach((next) => {
-          if (!jsonschema.isAnyType(next) && !jsonschema.isCombining(next)) {
+          if (!jsonschema.isAnyType(next) && !jsonschema.isCombining(next) && !jsonschema.isRelationshipRef(next)) {
             if (element.title === next.title && element.type !== next.type) {
               report.reportFailure(
                 'interpreting',
@@ -323,7 +364,8 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
       jsonschema.isAnyType(schema) ||
       jsonschema.isAllOf(schema) ||
       jsonschema.isAnyOf(schema) ||
-      jsonschema.isOneOf(schema)
+      jsonschema.isOneOf(schema) ||
+      jsonschema.isRelationshipRef(schema)
     ) {
       return undefined;
     }
@@ -401,7 +443,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 }
 
 function descriptionOf(x: jsonschema.ConcreteSchema) {
-  return jsonschema.isAnyType(x) ? undefined : x.description;
+  return jsonschema.isAnyType(x) || jsonschema.isRelationshipRef(x) ? undefined : x.description;
 }
 
 function lastWord(x: string): string {
