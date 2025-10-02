@@ -490,9 +490,9 @@ export interface RelationshipRef {
   readonly typeName: string;
 
   /**
-   * The property path within the referenced resource (e.g., "/Id")
+   * The property name within the referenced resource (e.g., "Id")
    */
-  readonly propertyPath: string;
+  readonly propertyName: string;
 }
 
 export class RichPropertyType {
