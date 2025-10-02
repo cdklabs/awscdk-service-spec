@@ -94,7 +94,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
    * Finds relationshipRef objects that indicate this property references
    * another CloudFormation resource, and converts property paths to name.
    */
-  function extractRelationshipRefs(schema: jsonschema.ResolvedSchema): RelationshipRef[] {
+  function extractRelationshipRefs(schema: jsonschema.ResolvedSchema) {
     const refs: RelationshipRef[] = [];
 
     function collectRefs(s: jsonschema.ConcreteSchema) {
@@ -118,7 +118,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     }
 
     collectRefs(schema);
-    return refs;
+    return refs.length > 0 ? refs : undefined;
   }
 
   /**
