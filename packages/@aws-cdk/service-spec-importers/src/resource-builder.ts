@@ -159,6 +159,7 @@ export class PropertyBagBuilder {
       documentation: updates.documentation,
       required: updates.required,
       scrutinizable: updates.scrutinizable,
+      relationshipRefs: updates.relationshipRefs,
 
       // These will be handled specially below
       previousTypes: undefined,
