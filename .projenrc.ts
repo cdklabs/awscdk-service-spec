@@ -39,6 +39,13 @@ const repo = new YarnMonorepo({
     lfsPatterns: ['sources/**/*.json'],
   },
 
+  tsconfig: {
+    compilerOptions: {
+      target: 'ES2022',
+      lib: ['es2022'],
+    },
+  },
+
   autoApproveOptions: {
     allowedUsernames: ['aws-cdk-automation', 'dependabot[bot]'],
   },
@@ -107,6 +114,8 @@ const serviceSpecImporters = new TypeScriptWorkspace({
   tsconfig: {
     compilerOptions: {
       skipLibCheck: true,
+      target: 'ES2022',
+      lib: ['es2022'],
     },
   },
 });
