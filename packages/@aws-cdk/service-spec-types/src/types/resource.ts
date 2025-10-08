@@ -487,7 +487,7 @@ export interface RelationshipRef {
   /**
    * The CloudFormation resource type this property references
    */
-  readonly typeName: string;
+  readonly cloudFormationType: string;
 
   /**
    * The property name within the referenced resource (e.g., "Id")
