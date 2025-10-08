@@ -416,22 +416,6 @@
       ],
       "type": "object"
     },
-    "jsonschema.RelationshipRefSchema": {
-      "additionalProperties": false,
-      "properties": {
-        "propertyPath": {
-          "type": "string"
-        },
-        "typeName": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "typeName",
-        "propertyPath"
-      ],
-      "type": "object"
-    },
     "jsonschema.Schema": {
       "anyOf": [
         {
@@ -445,9 +429,6 @@
         },
         {
           "$ref": "#/definitions/jsonschema.AllOf%3CSchema%3E"
-        },
-        {
-          "$ref": "#/definitions/jsonschema.RelationshipRefSchema"
         }
       ]
     },
@@ -638,9 +619,6 @@
         },
         "pattern": {
           "type": "string"
-        },
-        "relationshipRef": {
-          "$ref": "#/definitions/jsonschema.RelationshipRefSchema"
         },
         "title": {
           "type": "string"
