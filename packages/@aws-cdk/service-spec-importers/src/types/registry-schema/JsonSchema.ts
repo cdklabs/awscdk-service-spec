@@ -1,7 +1,7 @@
 import { CommonTypeCombinatorFields } from './CloudFormationRegistrySchema';
 
 export namespace jsonschema {
-  export type Schema = SingletonSchema | OneOf<Schema> | AnyOf<Schema> | AllOf<Schema>;
+  export type Schema = SingletonSchema | OneOf<Schema> | AnyOf<Schema> | AllOf<Schema> | RelationshipRefSchema;
 
   export type SingletonSchema = Reference | ConcreteSingletonSchema;
 
@@ -9,7 +9,8 @@ export namespace jsonschema {
     | ConcreteSingletonSchema
     | OneOf<ConcreteSchema>
     | AnyOf<ConcreteSchema>
-    | AllOf<ConcreteSchema>;
+    | AllOf<ConcreteSchema>
+    | RelationshipRefSchema;
 
   export type ConcreteSingletonSchema = Object | String | SchemaArray | Boolean | Number | Null | AnyType;
 
@@ -91,7 +92,11 @@ export namespace jsonschema {
   export function isAnyOf(x: Schema | CommonTypeCombinatorFields): x is AnyOf<any> {
     if (x && !isAnyType(x) && 'anyOf' in x) {
       for (const elem of x.anyOf!) {
-        if (elem && !isAnyType(elem) && (isTypeDefined(elem) || isReference(elem) || isAnyOf(elem) || isOneOf(elem))) {
+        if (
+          elem &&
+          !isAnyType(elem) &&
+          (isTypeDefined(elem) || isReference(elem) || isAnyOf(elem) || isOneOf(elem) || isRelationshipRef(elem))
+        ) {
           return true;
         }
       }
@@ -119,7 +124,10 @@ export namespace jsonschema {
   export function isOneOf(x: Schema | CommonTypeCombinatorFields): x is OneOf<any> {
     if (x && !isAnyType(x) && 'oneOf' in x) {
       for (const elem of x.oneOf!) {
-        if (!isAnyType(elem) && (isTypeDefined(elem) || isReference(elem) || isAnyOf(elem) || isOneOf(elem))) {
+        if (
+          !isAnyType(elem) &&
+          (isTypeDefined(elem) || isReference(elem) || isAnyOf(elem) || isOneOf(elem) || isRelationshipRef(elem))
+        ) {
           return true;
         }
       }
@@ -199,6 +207,18 @@ export namespace jsonschema {
     return !(x as RecordLikeObject).properties;
   }
 
+  export interface RelationshipRefSchema {
+    readonly typeName: string;
+    readonly propertyPath: string;
+  }
+
+  /**
+   * Determines if a schema is a relationshipRef (only has relationshipRef, no type)
+   */
+  export function isRelationshipRef(x: any): x is RelationshipRefSchema {
+    return x && typeof x === 'object' && 'relationshipRef' in x && !('type' in x);
+  }
+
   export interface String extends Annotatable {
     readonly type: 'string';
     readonly default?: string;
@@ -209,6 +229,7 @@ export namespace jsonschema {
     readonly enum?: string[];
     readonly format?: 'date-time' | 'uri' | 'timestamp';
     readonly examples?: string[];
+    readonly relationshipRef?: RelationshipRefSchema;
   }
 
   export function isString(x: ConcreteSchema): x is String {
