@@ -15,6 +15,7 @@ const AVAILABLE_SOURCES: Record<string, keyof DatabaseBuilder> = {
   statefulResources: 'importStatefulResources',
   cannedMetrics: 'importCannedMetrics',
   arnTemplates: 'importArnTemplates',
+  oobRelationships: 'importOobRelationships',
 };
 
 async function main() {

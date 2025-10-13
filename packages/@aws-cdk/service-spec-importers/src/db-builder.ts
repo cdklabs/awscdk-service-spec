@@ -6,6 +6,7 @@ import { importCannedMetrics } from './importers/import-canned-metrics';
 import { importCloudFormationDocumentation } from './importers/import-cloudformation-docs';
 import { importCloudFormationRegistryResource } from './importers/import-cloudformation-registry';
 import { importGetAttAllowList } from './importers/import-getatt-allowlist';
+import { importOobRelationships } from './importers/import-oob-relationships';
 import { ResourceSpecImporter, SAMSpecImporter } from './importers/import-resource-spec';
 import { SamResources } from './importers/import-sam';
 import { importStatefulResources } from './importers/import-stateful-resources';
@@ -19,6 +20,7 @@ import {
   LoadResult,
   loadSamSchema,
   loadSamSpec,
+  loadOobRelationships,
 } from './loaders';
 import { JsonLensPatcher } from './patching';
 import { ProblemReport, ReportAudience } from './report';
@@ -197,6 +199,13 @@ export class DatabaseBuilder {
     return this.addSourceImporter(async (db, report) => {
       const arnFormatIndex = JSON.parse(await fs.readFile(filePath, { encoding: 'utf-8' }));
       importArnTemplates(arnFormatIndex, db, report);
+    });
+  }
+
+  public importOobRelationships(filePath: string) {
+    return this.addSourceImporter(async (db, report) => {
+      const data = this.loadResult(await loadOobRelationships(filePath, this.options), report);
+      importOobRelationships(db, data, report);
     });
   }
 

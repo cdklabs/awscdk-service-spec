@@ -1,0 +1,37 @@
+{
+  "$ref": "#/definitions/OobRelationshipData",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "OobRelationshipData": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "relationships": {
+            "additionalProperties": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "cloudformationType": {
+                    "type": "string"
+                  },
+                  "propertyPath": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "cloudformationType",
+                  "propertyPath"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "type": "object"
+    }
+  }
+}
