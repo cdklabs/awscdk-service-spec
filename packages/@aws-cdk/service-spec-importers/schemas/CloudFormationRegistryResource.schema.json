@@ -658,6 +658,25 @@
       ],
       "type": "object"
     },
+    "jsonschema.RelationshipRefSchema": {
+      "additionalProperties": false,
+      "description": "Relationship as defined in the CloudFormation Registry Schema. Represents how resource property relationships are specified in the source schema files.",
+      "properties": {
+        "propertyPath": {
+          "description": "The property path (e.g. '/properties/BucketName')",
+          "type": "string"
+        },
+        "typeName": {
+          "description": "The cloudFormationType (e.g. 'AWS::S3::Bucket')",
+          "type": "string"
+        }
+      },
+      "required": [
+        "typeName",
+        "propertyPath"
+      ],
+      "type": "object"
+    },
     "jsonschema.Schema": {
       "anyOf": [
         {
@@ -781,6 +800,9 @@
         },
         "pattern": {
           "type": "string"
+        },
+        "relationshipRef": {
+          "$ref": "#/definitions/jsonschema.RelationshipRefSchema"
         },
         "title": {
           "type": "string"

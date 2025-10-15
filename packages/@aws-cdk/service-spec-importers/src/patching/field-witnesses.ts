@@ -21,6 +21,7 @@ export const STRING_KEY_WITNESS: TypeKeyWitness<jsonschema.String> = {
   pattern: true,
   title: true,
   const: true,
+  relationshipRef: true,
 };
 
 export const NUMBER_KEY_WITNESS: TypeKeyWitness<jsonschema.Number> = {

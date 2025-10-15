@@ -91,7 +91,11 @@ export namespace jsonschema {
   export function isAnyOf(x: Schema | CommonTypeCombinatorFields): x is AnyOf<any> {
     if (x && !isAnyType(x) && 'anyOf' in x) {
       for (const elem of x.anyOf!) {
-        if (elem && !isAnyType(elem) && (isTypeDefined(elem) || isReference(elem) || isAnyOf(elem) || isOneOf(elem))) {
+        if (
+          elem &&
+          !isAnyType(elem) &&
+          (isTypeDefined(elem) || isReference(elem) || isAnyOf(elem) || isOneOf(elem) || containsRelationship(elem))
+        ) {
           return true;
         }
       }
@@ -119,7 +123,10 @@ export namespace jsonschema {
   export function isOneOf(x: Schema | CommonTypeCombinatorFields): x is OneOf<any> {
     if (x && !isAnyType(x) && 'oneOf' in x) {
       for (const elem of x.oneOf!) {
-        if (!isAnyType(elem) && (isTypeDefined(elem) || isReference(elem) || isAnyOf(elem) || isOneOf(elem))) {
+        if (
+          !isAnyType(elem) &&
+          (isTypeDefined(elem) || isReference(elem) || isAnyOf(elem) || isOneOf(elem) || containsRelationship(elem))
+        ) {
           return true;
         }
       }
@@ -199,6 +206,47 @@ export namespace jsonschema {
     return !(x as RecordLikeObject).properties;
   }
 
+  /**
+   * Relationship as defined in the CloudFormation Registry Schema.
+   * Represents how resource property relationships are specified in the source schema files.
+   */
+  export interface RelationshipRefSchema {
+    /** The cloudFormationType (e.g. 'AWS::S3::Bucket') */
+    readonly typeName: string;
+    /** The property path (e.g. '/properties/BucketName') */
+    readonly propertyPath: string;
+  }
+
+  /**
+   * Determines if a schema is a relationshipRef
+   */
+  function isRelationshipRef(x: any): x is RelationshipRefSchema {
+    return (
+      x &&
+      'typeName' in x &&
+      typeof x.typeName === 'string' &&
+      'propertyPath' in x &&
+      typeof x.propertyPath === 'string'
+    );
+  }
+
+  /**
+   * Determines if a schema contains a relationshipRef
+   * This function handles the two following cases:
+   * { type: 'string', relationshipRef: {...} } -> occurs when there a single relationship for a property
+   * { relationshipRef: {...} } -> occurs when there are multiple relationships as the source data looks like this:
+   * { type: 'string', anyOf: [ { relationshipRef: {...} }, ...]} (the type is not present along relationshipRef)
+   */
+  export function containsRelationship(x: any): x is { relationshipRef: RelationshipRefSchema } {
+    return (
+      x &&
+      typeof x === 'object' &&
+      (!('type' in x) || x.type === 'string') &&
+      'relationshipRef' in x &&
+      isRelationshipRef(x.relationshipRef)
+    );
+  }
+
   export interface String extends Annotatable {
     readonly type: 'string';
     readonly default?: string;
@@ -209,6 +257,7 @@ export namespace jsonschema {
     readonly enum?: string[];
     readonly format?: 'date-time' | 'uri' | 'timestamp';
     readonly examples?: string[];
+    readonly relationshipRef?: RelationshipRefSchema;
   }
 
   export function isString(x: ConcreteSchema): x is String {
