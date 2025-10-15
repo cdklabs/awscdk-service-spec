@@ -1,4 +1,4 @@
-import { PropertyType, RichPropertyType, SpecDatabase, TagVariant } from '@aws-cdk/service-spec-types';
+import { PropertyType, RelationshipRef, RichPropertyType, SpecDatabase, TagVariant } from '@aws-cdk/service-spec-types';
 import { locateFailure, Fail, failure, isFailure, Result, tryCatch, using, ref, isSuccess } from '@cdklabs/tskb';
 import { ProblemReport, ReportAudience } from '../report';
 import { PropertyBagBuilder, SpecBuilder } from '../resource-builder';
@@ -76,6 +76,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
             documentation: descriptionOf(resolvedSchema),
             required: required.has(name),
             defaultValue: describeDefault(resolvedSchema),
+            relationshipRefs: extractRelationshipRefs(resolvedSchema),
           });
         });
       } catch (e) {
@@ -85,6 +86,43 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         );
       }
     }
+  }
+
+  /**
+   * Extracts relationshipRef metadata from JSON schemas
+   *
+   * Finds relationshipRef objects that indicate this property references
+   * another CloudFormation resource, and converts property paths to name.
+   */
+  function extractRelationshipRefs(schema: jsonschema.ResolvedSchema) {
+    const relationships: RelationshipRef[] = [];
+
+    if (jsonschema.isAnyType(schema)) return;
+
+    // Collect possible relationships in anyOf/oneOf or arrays
+    const toInspect = [];
+    if (jsonschema.isUnionSchema(schema)) {
+      toInspect.push(...jsonschema.innerSchemas(schema));
+    } else if (jsonschema.isArray(schema) && schema.items) {
+      if (jsonschema.isUnionSchema(schema.items)) {
+        toInspect.push(...jsonschema.innerSchemas(schema.items));
+      } else {
+        toInspect.push(schema.items);
+      }
+    } else {
+      toInspect.push(schema);
+    }
+
+    for (const rel of toInspect) {
+      if (jsonschema.containsRelationship(rel)) {
+        relationships.push({
+          cloudFormationType: rel.relationshipRef.typeName,
+          propertyName: simplePropNameFromJsonPtr(rel.relationshipRef.propertyPath),
+        });
+      }
+    }
+
+    return relationships.length > 0 ? relationships : undefined;
   }
 
   /**
@@ -155,6 +193,9 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         // FIXME: Do a proper thing here
         const firstResolved = resolvedSchema.allOf[0];
         return schemaTypeToModelType(nameHint, resolve(firstResolved), fail);
+      } else if (jsonschema.containsRelationship(resolvedSchema)) {
+        // relationshipRef schema - treat as string as the type property is not present when they appear inside anyOf/oneOf
+        return { type: 'string' };
       } else {
         switch (resolvedSchema.type) {
           case 'string':
