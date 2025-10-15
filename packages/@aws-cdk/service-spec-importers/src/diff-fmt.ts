@@ -4,6 +4,7 @@ import {
   MapDiff,
   Metric,
   Property,
+  RelationshipRef,
   Resource,
   RichPropertyType,
   ScalarDiff,
@@ -184,6 +185,10 @@ export class DiffFormatter {
       new PrintableTree(...listFromDiffs(pick(u, ['statistic']))).indent(META_INDENT),
     ]);
   }
+  private formatRelRefs(refs?: RelationshipRef[]): string {
+    if (!refs?.length) return 'undefined';
+    return `[${refs.map((r) => `${r.cloudFormationType}.${r.propertyName}`).join(', ')}]`;
+  }
 
   private renderProperty(p: Property, db: number): PrintableTree {
     const ret = new PrintableTree();
@@ -209,7 +214,7 @@ export class DiffFormatter {
       attributes.push('immutable?');
     }
 
-    // Documentation changes are rendered outside, they'll be too large
+    // Documentation and relationship changes are rendered outside, they'll be too large
 
     if (attributes.length) {
       ret.emit(` (${attributes.join(', ')})`);
@@ -292,6 +297,13 @@ export class DiffFormatter {
         }
         if (pu.old.documentation !== pu.new.documentation) {
           ret.addTree(new PrintableTree('(documentation changed)'));
+        }
+
+        const oldRefs = this.formatRelRefs(pu.old.relationshipRefs);
+        const newRefs = this.formatRelRefs(pu.new.relationshipRefs);
+        if (oldRefs !== newRefs) {
+          ret.addTree(new PrintableTree(`- relationshipRefs: ${oldRefs}`).colorize(chalk.red));
+          ret.addTree(new PrintableTree(`+ relationshipRefs: ${newRefs}`).colorize(chalk.green));
         }
         return ret.prefix([` ${key}: `]);
       }
