@@ -37,41 +37,98 @@ test('include primaryIdentifier in database', () => {
   expect(primaryIdentifier).toEqual(['id', 'secondId']);
 });
 
-test('relationshipRef extraction', () => {
+test('anyOf with string type next to relationshipRef extraction', () => {
   importCloudFormationRegistryResource({
     db,
     report,
     resource: {
       typeName: 'AWS::EC2::VPCEndpoint',
-      description:
-        'Specifies a VPC endpoint. A VPC endpoint provides a private connection between your VPC and an endpoint service.',
+      description: 'AWS::EC2::VPCEndpoint Description',
       properties: {
         SecurityGroupIds: {
           uniqueItems: true,
-          description:
-            'The IDs of the security groups to associate with the endpoint network interfaces. If this parameter is not specified, we use the default security group for the VPC. Security groups are supported only for interface endpoints.',
+          description: 'SecurityGroupIds Description',
           insertionOrder: false,
           type: 'array',
           items: {
             anyOf: [
               {
-                relationshipRef: {
-                  typeName: 'AWS::EC2::SecurityGroup',
-                  propertyPath: '/properties/GroupId',
-                },
+                type: 'string',
+                relationshipRef: { typeName: 'AWS::Some::Service', propertyPath: '/properties/prop1' },
               },
               {
-                relationshipRef: {
-                  typeName: 'AWS::EC2::SecurityGroup',
-                  propertyPath: '/properties/Id',
-                },
+                type: 'string',
+                relationshipRef: { typeName: 'AWS::Some::Service', propertyPath: '/properties/prop2' },
               },
+            ],
+          },
+        },
+      },
+    } as CloudFormationRegistryResource,
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::EC2::VPCEndpoint').only();
+
+  // Check array with anyOf with string type relationships
+  expect(resource.properties.SecurityGroupIds.relationshipRefs).toEqual([
+    { cloudFormationType: 'AWS::Some::Service', propertyName: 'prop1' },
+    { cloudFormationType: 'AWS::Some::Service', propertyName: 'prop2' },
+  ]);
+});
+
+test('anyOf inside anyOf relationshipRef extraction', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::EC2::VPCEndpoint',
+      description: 'AWS::EC2::VPCEndpoint Description',
+      properties: {
+        SecurityGroupIds: {
+          uniqueItems: true,
+          description: 'SecurityGroupIds Description',
+          insertionOrder: false,
+          type: 'array',
+          items: {
+            anyOf: [
               {
-                relationshipRef: {
-                  typeName: 'AWS::EC2::VPC',
-                  propertyPath: '/properties/DefaultSecurityGroup',
-                },
+                anyOf: [
+                  { relationshipRef: { typeName: 'AWS::Some::Service', propertyPath: '/properties/prop1' } },
+                  { relationshipRef: { typeName: 'AWS::Some::Service', propertyPath: '/properties/prop2' } },
+                ],
               },
+            ],
+            type: 'string',
+          },
+        },
+      },
+    } as CloudFormationRegistryResource,
+  });
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::EC2::VPCEndpoint').only();
+  expect(resource.properties.SecurityGroupIds.relationshipRefs).toEqual([
+    { cloudFormationType: 'AWS::Some::Service', propertyName: 'prop1' },
+    { cloudFormationType: 'AWS::Some::Service', propertyName: 'prop2' },
+  ]);
+});
+
+test('single and anyOf relationshipRef extraction', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::EC2::VPCEndpoint',
+      description: 'AWS::EC2::VPCEndpoint Description',
+      properties: {
+        SecurityGroupIds: {
+          uniqueItems: true,
+          description: 'SecurityGroupIds Description',
+          insertionOrder: false,
+          type: 'array',
+          items: {
+            anyOf: [
+              { relationshipRef: { typeName: 'AWS::Some::Service1', propertyPath: '/properties/prop1' } },
+              { relationshipRef: { typeName: 'AWS::Some::Service1', propertyPath: '/properties/prop2' } },
+              { relationshipRef: { typeName: 'AWS::Some::Service2', propertyPath: '/properties/prop1' } },
             ],
             type: 'string',
           },
@@ -79,10 +136,7 @@ test('relationshipRef extraction', () => {
         SubnetIds: {
           type: 'array',
           items: {
-            relationshipRef: {
-              typeName: 'AWS::EC2::Subnet',
-              propertyPath: '/properties/SubnetId',
-            },
+            relationshipRef: { typeName: 'AWS::Some::Service3', propertyPath: '/properties/prop1' },
             type: 'string',
           },
         },
@@ -94,14 +148,14 @@ test('relationshipRef extraction', () => {
 
   // // Check array with anyOf relationships
   expect(resource.properties.SecurityGroupIds.relationshipRefs).toEqual([
-    { cloudFormationType: 'AWS::EC2::SecurityGroup', propertyName: 'GroupId' },
-    { cloudFormationType: 'AWS::EC2::SecurityGroup', propertyName: 'Id' },
-    { cloudFormationType: 'AWS::EC2::VPC', propertyName: 'DefaultSecurityGroup' },
+    { cloudFormationType: 'AWS::Some::Service1', propertyName: 'prop1' },
+    { cloudFormationType: 'AWS::Some::Service1', propertyName: 'prop2' },
+    { cloudFormationType: 'AWS::Some::Service2', propertyName: 'prop1' },
   ]);
 
   // Check simple array relationship
   expect(resource.properties.SubnetIds.relationshipRefs).toEqual([
-    { cloudFormationType: 'AWS::EC2::Subnet', propertyName: 'SubnetId' },
+    { cloudFormationType: 'AWS::Some::Service3', propertyName: 'prop1' },
   ]);
 });
 

@@ -220,7 +220,7 @@ export namespace jsonschema {
   /**
    * Determines if a schema is a relationshipRef
    */
-  function isRelationshipRef(x: any): x is RelationshipRefSchema {
+  export function isRelationshipRef(x: any): x is RelationshipRefSchema {
     return (
       x &&
       'typeName' in x &&
@@ -237,14 +237,8 @@ export namespace jsonschema {
    * { relationshipRef: {...} } -> occurs when there are multiple relationships as the source data looks like this:
    * { type: 'string', anyOf: [ { relationshipRef: {...} }, ...]} (the type is not present along relationshipRef)
    */
-  export function containsRelationship(x: any): x is { relationshipRef: RelationshipRefSchema } {
-    return (
-      x &&
-      typeof x === 'object' &&
-      (!('type' in x) || x.type === 'string') &&
-      'relationshipRef' in x &&
-      isRelationshipRef(x.relationshipRef)
-    );
+  export function containsRelationship(x: any): boolean {
+    return x && typeof x === 'object' && 'relationshipRef' in x && isRelationshipRef(x.relationshipRef);
   }
 
   export interface String extends Annotatable {

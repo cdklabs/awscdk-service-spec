@@ -70,13 +70,14 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     for (const [name, property] of Object.entries(source.properties)) {
       try {
         let resolvedSchema = resolve(property);
+        const relationships = collectPossibleRelationships(resolvedSchema);
         withResult(schemaTypeToModelType(name, resolvedSchema, fail.in(`property ${name}`)), (type) => {
           target.setProperty(name, {
             type,
             documentation: descriptionOf(resolvedSchema),
             required: required.has(name),
             defaultValue: describeDefault(resolvedSchema),
-            relationshipRefs: extractRelationshipRefs(resolvedSchema),
+            relationshipRefs: relationships.length > 0 ? relationships : undefined,
           });
         });
       } catch (e) {
@@ -89,40 +90,34 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
   }
 
   /**
-   * Extracts relationshipRef metadata from JSON schemas
+   * Recursively extracts relationshipRef metadata from JSON schemas
    *
    * Finds relationshipRef objects that indicate this property references
    * another CloudFormation resource, and converts property paths to name.
+   * This function handles the following cases:
+   * Single relationship for property -> { type: 'string', relationshipRef: {...} }
+   * When there are multiple relationships or the relationships are nested behind
+   * layers of oneOf/anyOf/allOf the data looks like
+   * { type: 'string', anyOf: [ { relationshipRef: {...} }, ...]}
    */
-  function extractRelationshipRefs(schema: jsonschema.ResolvedSchema) {
-    const relationships: RelationshipRef[] = [];
+  function collectPossibleRelationships(schema: jsonschema.ConcreteSchema): RelationshipRef[] {
+    if (jsonschema.isAnyType(schema)) {
+      return [];
+    }
 
-    if (jsonschema.isAnyType(schema)) return;
-
-    // Collect possible relationships in anyOf/oneOf or arrays
-    const toInspect = [];
-    if (jsonschema.isUnionSchema(schema)) {
-      toInspect.push(...jsonschema.innerSchemas(schema));
+    if (jsonschema.isCombining(schema)) {
+      return jsonschema.innerSchemas(schema).flatMap((s) => collectPossibleRelationships(s));
     } else if (jsonschema.isArray(schema) && schema.items) {
-      if (jsonschema.isUnionSchema(schema.items)) {
-        toInspect.push(...jsonschema.innerSchemas(schema.items));
-      } else {
-        toInspect.push(schema.items);
-      }
-    } else {
-      toInspect.push(schema);
+      return collectPossibleRelationships(resolve(schema.items));
+    } else if ('relationshipRef' in schema && jsonschema.isRelationshipRef(schema.relationshipRef)) {
+      return [
+        {
+          cloudFormationType: schema.relationshipRef.typeName,
+          propertyName: simplePropNameFromJsonPtr(schema.relationshipRef.propertyPath),
+        },
+      ];
     }
-
-    for (const rel of toInspect) {
-      if (jsonschema.containsRelationship(rel)) {
-        relationships.push({
-          cloudFormationType: rel.relationshipRef.typeName,
-          propertyName: simplePropNameFromJsonPtr(rel.relationshipRef.propertyPath),
-        });
-      }
-    }
-
-    return relationships.length > 0 ? relationships : undefined;
+    return [];
   }
 
   /**
