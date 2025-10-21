@@ -1,4 +1,4 @@
-import { PropertyType, RichPropertyType, SpecDatabase, TagVariant } from '@aws-cdk/service-spec-types';
+import { PropertyType, RelationshipRef, RichPropertyType, SpecDatabase, TagVariant } from '@aws-cdk/service-spec-types';
 import { locateFailure, Fail, failure, isFailure, Result, tryCatch, using, ref, isSuccess } from '@cdklabs/tskb';
 import { ProblemReport, ReportAudience } from '../report';
 import { PropertyBagBuilder, SpecBuilder } from '../resource-builder';
@@ -70,12 +70,14 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
     for (const [name, property] of Object.entries(source.properties)) {
       try {
         let resolvedSchema = resolve(property);
+        const relationships = collectPossibleRelationships(resolvedSchema);
         withResult(schemaTypeToModelType(name, resolvedSchema, fail.in(`property ${name}`)), (type) => {
           target.setProperty(name, {
             type,
             documentation: descriptionOf(resolvedSchema),
             required: required.has(name),
             defaultValue: describeDefault(resolvedSchema),
+            relationshipRefs: relationships.length > 0 ? relationships : undefined,
           });
         });
       } catch (e) {
@@ -85,6 +87,37 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         );
       }
     }
+  }
+
+  /**
+   * Recursively extracts relationshipRef metadata from JSON schemas
+   *
+   * Finds relationshipRef objects that indicate this property references
+   * another CloudFormation resource, and converts property paths to name.
+   * This function handles the following cases:
+   * Single relationship for property -> { type: 'string', relationshipRef: {...} }
+   * When there are multiple relationships or the relationships are nested behind
+   * layers of oneOf/anyOf/allOf the data looks like
+   * { type: 'string', anyOf: [ { relationshipRef: {...} }, ...]}
+   */
+  function collectPossibleRelationships(schema: jsonschema.ConcreteSchema): RelationshipRef[] {
+    if (jsonschema.isAnyType(schema)) {
+      return [];
+    }
+
+    if (jsonschema.isCombining(schema)) {
+      return jsonschema.innerSchemas(schema).flatMap((s) => collectPossibleRelationships(s));
+    } else if (jsonschema.isArray(schema) && schema.items) {
+      return collectPossibleRelationships(resolve(schema.items));
+    } else if ('relationshipRef' in schema && jsonschema.isRelationshipRef(schema.relationshipRef)) {
+      return [
+        {
+          cloudFormationType: schema.relationshipRef.typeName,
+          propertyName: simplePropNameFromJsonPtr(schema.relationshipRef.propertyPath),
+        },
+      ];
+    }
+    return [];
   }
 
   /**
@@ -155,6 +188,9 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
         // FIXME: Do a proper thing here
         const firstResolved = resolvedSchema.allOf[0];
         return schemaTypeToModelType(nameHint, resolve(firstResolved), fail);
+      } else if (jsonschema.containsRelationship(resolvedSchema)) {
+        // relationshipRef schema - treat as string as the type property is not present when they appear inside anyOf/oneOf
+        return { type: 'string' };
       } else {
         switch (resolvedSchema.type) {
           case 'string':

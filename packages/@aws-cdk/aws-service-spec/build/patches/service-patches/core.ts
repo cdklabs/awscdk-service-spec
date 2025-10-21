@@ -1,4 +1,5 @@
 import { patching, types } from '@aws-cdk/service-spec-importers';
+import { jsonschema } from '@aws-cdk/service-spec-importers/lib/types';
 
 export const SERVICE_PATCHERS: Array<patching.JsonLensPatcher> = [];
 
@@ -319,5 +320,111 @@ export namespace fp {
         }
       }
     };
+  }
+
+  /**
+   * Remove a relationship from a schema section (`properties` or `definitions`).
+   * The path must include `/properties` or `/definitions`.
+   *
+   * NOTE: returns a new patcher. Still needs to be applied to a lens.
+   */
+  function removeRelationshipFromSchemaSection<TypeName extends string = string>({
+    section,
+    resource,
+    propertyPath,
+    targetResource,
+    targetProperty,
+    reason,
+  }: {
+    section: 'properties' | 'definitions';
+    resource: TypeName;
+    propertyPath: string;
+    targetResource: TypeName;
+    targetProperty: string;
+    reason: patching.Reason;
+  }): patching.Patcher<patching.JsonLens> {
+    return patchResourceAt<types.CloudFormationRegistryResource[typeof section]>(
+      resource,
+      propertyPath,
+      reason,
+      (property) => {
+        if (!property) {
+          return property;
+        }
+
+        const isTargetRelationship = (rel: any) =>
+          'relationshipRef' in rel &&
+          jsonschema.isRelationshipRef(rel.relationshipRef) &&
+          rel.relationshipRef.typeName === targetResource &&
+          rel.relationshipRef.propertyPath === targetProperty;
+
+        if ('items' in property && isTargetRelationship(property.items)) {
+          if (typeof property.items === 'object' && 'relationshipRef' in property.items) {
+            delete (property.items as any).relationshipRef;
+          }
+        } else if ('anyOf' in property && Array.isArray(property.anyOf)) {
+          const idx = property.anyOf.findIndex(isTargetRelationship);
+          if (idx >= 0) {
+            delete property.anyOf[idx];
+          }
+        }
+        return property;
+      },
+    );
+  }
+
+  /**
+   * Remove a relationship from a property that may have multiple relationshipRefs.
+   * The `propertyPath` must include `/properties`.
+   */
+  export function removeRelationshipfromProperty<TypeName extends string = string>({
+    resource,
+    propertyPath,
+    targetResource,
+    targetProperty,
+    reason,
+  }: {
+    resource: TypeName;
+    propertyPath: string;
+    targetResource: TypeName;
+    targetProperty: string;
+    reason: patching.Reason;
+  }): patching.Patcher<patching.JsonLens> {
+    return removeRelationshipFromSchemaSection({
+      section: 'properties',
+      resource,
+      propertyPath,
+      targetResource,
+      targetProperty,
+      reason,
+    });
+  }
+
+  /**
+   * Remove a relationship from a definition that may have multiple relationshipRefs.
+   * The `propertyPath` must include `/definitions`.
+   * Note, you might need to remove the relationship from the property as well
+   */
+  export function removeRelationshipfromDefinition<TypeName extends string = string>({
+    resource,
+    propertyPath,
+    targetResource,
+    targetProperty,
+    reason,
+  }: {
+    resource: TypeName;
+    propertyPath: string;
+    targetResource: TypeName;
+    targetProperty: string;
+    reason: patching.Reason;
+  }): patching.Patcher<patching.JsonLens> {
+    return removeRelationshipFromSchemaSection({
+      section: 'definitions',
+      resource,
+      propertyPath,
+      targetResource,
+      targetProperty,
+      reason,
+    });
   }
 }

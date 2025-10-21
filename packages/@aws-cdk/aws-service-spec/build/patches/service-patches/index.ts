@@ -20,6 +20,7 @@ import './cognito';
 import './config';
 import './dms';
 import './elasticsearch';
+import './ec2';
 import './iot1click';
 import './opensearch';
 import './rds';
