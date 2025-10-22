@@ -6,10 +6,7 @@ import { OobRelationshipData } from '../types';
 const PROPERTIES_PREFIX = '/properties/';
 
 // Relationships containing these suffixes in their property path will be ignored
-const IGNORED_PATH_SUFFIXES = [
-  'Tags/Value',
-  'Description',
-];
+const IGNORED_PATH_SUFFIXES = ['Tags/Value', 'Description'];
 
 /**
  * Context passed between functions when processing relationships
