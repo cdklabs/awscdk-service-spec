@@ -5,6 +5,12 @@ import { OobRelationshipData } from '../types';
 
 const PROPERTIES_PREFIX = '/properties/';
 
+// Relationships containing these suffixes in their property path will be ignored
+const IGNORED_PATH_SUFFIXES = [
+  'Tags/Value',
+  'Description',
+];
+
 /**
  * Context passed between functions when processing relationships
  */
@@ -32,7 +38,7 @@ export function importOobRelationships(db: SpecDatabase, relationshipData: OobRe
 
       for (const [propertyPath, relationships] of Object.entries(resourceData.relationships)) {
         for (const rel of relationships) {
-          if (propertyPath.endsWith('Tags/Value')) continue;
+          if (IGNORED_PATH_SUFFIXES.some((s) => propertyPath.endsWith(s))) continue;
 
           const ctx: RelationshipContext = {
             cloudformationType,

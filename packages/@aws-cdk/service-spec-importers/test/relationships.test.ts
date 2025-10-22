@@ -186,30 +186,6 @@ test('deduplicates relationships', () => {
   ]);
 });
 
-test('skips Tags/Value relationships', () => {
-  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Test::Resource').only();
-  resource.properties.Tags = {
-    type: { type: 'array', element: { type: 'string' } },
-  };
-
-  const relationshipData: OobRelationshipData = {
-    'AWS::Test::Resource': {
-      relationships: {
-        'Tags/Value': [
-          {
-            cloudformationType: 'AWS::SomeService::Resource',
-            propertyPath: 'Arn',
-          },
-        ],
-      },
-    },
-  };
-
-  importOobRelationships(db, relationshipData, report);
-
-  expect(resource.properties.Tags.relationshipRefs).toBeUndefined();
-});
-
 test('handles multiple relationships', () => {
   const relationshipData: OobRelationshipData = {
     'AWS::Test::Resource': {
@@ -269,4 +245,24 @@ test('applies relationship to previousTypes', () => {
       propertyName: 'Arn',
     },
   ]);
+});
+
+test.each(['Tags/Value', 'Description', 'Something/Description'])('ignores relationship with %s suffix', (suffix) => {
+  const relationshipData: OobRelationshipData = {
+    'AWS::Test::Resource': {
+      relationships: {
+        [suffix]: [
+          {
+            cloudformationType: 'AWS::IAM::Role',
+            propertyPath: '/properties/Arn',
+          },
+        ],
+      },
+    },
+  };
+
+  importOobRelationships(db, relationshipData, report);
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Test::Resource').only();
+  expect(resource.properties.RoleArn.relationshipRefs).toBeUndefined();
 });
