@@ -5,6 +5,10 @@ import { Block, ExpressionStatement, Statement } from '../statements';
 import { ThingSymbol } from '../symbol';
 
 export class Expression extends CommentableImpl implements ICommentable {
+  // Class member so that other types don't become implicitly assignable to Expressions
+  // (protected instead of private to make sure TS doesn't complain about unused var)
+  protected readonly _isExpression = true;
+
   public prop(property: string): ObjectPropertyAccess {
     return new ObjectPropertyAccess(this, property);
   }

@@ -26,7 +26,7 @@ export abstract class Renderer {
   }
 
   /**
-   * Render a renderable to a string.
+   * Render a module to a string.
    */
   public render(scope: Module): string {
     this.emitter = new IndentedStringBuilder();
