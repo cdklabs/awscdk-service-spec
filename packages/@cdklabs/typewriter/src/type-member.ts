@@ -137,6 +137,7 @@ export interface InitializerSpec extends Omit<MethodSpec, 'name' | 'returnType'>
 export class Initializer extends Method implements CallableDeclaration {
   constructor(public readonly type: MemberType, public readonly initializerSpec: InitializerSpec) {
     super(type, {
+      ...initializerSpec,
       name: 'constructor',
       returnType: type.type,
     });
