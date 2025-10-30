@@ -30,7 +30,6 @@ test('anonymous interface implementation', () => {
   ].join('\n'));
 });
 
-
 test('splat', () => {
   const ex = expr.splat(expr.ident('input'));
 
