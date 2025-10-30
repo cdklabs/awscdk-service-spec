@@ -5,7 +5,11 @@ import { Expression } from '../expressions';
 import { Parameter } from '../parameter';
 import { TypeDeclaration } from '../type-declaration';
 
-export class Statement extends CommentableImpl implements ICommentable {}
+export class Statement extends CommentableImpl implements ICommentable {
+  // Class member so that Expressions don't become implicitly assignable to Statements
+  // (protected instead of private to make sure TS doesn't complain about unused var)
+  protected readonly _isStatement = true;
+}
 
 export class ReturnStatement extends Statement {
   public constructor(public readonly expression?: Expression) {
