@@ -622,7 +622,8 @@ export class TypeScriptRenderer extends Renderer {
       typeCase(AnonymousInterfaceImplementation, (x) =>
         this.emitBlock('', () =>
           this.emitList(Object.entries(x.members), ',\n', ([key, val]) => {
-            this.emit(`${JSON.stringify(key)}: `);
+            this.renderPropertyName(key);
+            this.emit(': ');
             this.renderExpression(val);
           }),
         ),
@@ -687,7 +688,8 @@ export class TypeScriptRenderer extends Renderer {
           this.renderExpression(what);
         } else {
           const [key, val] = what;
-          this.emit(`${JSON.stringify(key)}: `);
+          this.renderPropertyName(key);
+          this.emit(': ');
           this.renderExpression(val);
         }
       });
