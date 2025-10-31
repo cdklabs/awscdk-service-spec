@@ -7,7 +7,10 @@ export interface TypeScriptWorkspaceOptions extends yarn.TypeScriptWorkspaceOpti
 
 export class TypeScriptWorkspace extends yarn.TypeScriptWorkspace {
   public constructor(options: TypeScriptWorkspaceOptions) {
-    super(options);
+    super({
+      npmTrustedPublishing: true,
+      ...options,
+    });
 
     // Allow a force compile, this is required because we use composite projects
     this.tasks.tryFind('compile')?.reset('tsc --build', {
