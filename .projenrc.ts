@@ -58,6 +58,7 @@ const repo = new YarnMonorepo({
     }),
   },
   npmTrustedPublishing: true,
+  releaseEnvironment: 'release',
 
   githubOptions: {
     pullRequestLintOptions: {
