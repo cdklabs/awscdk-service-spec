@@ -57,6 +57,7 @@ const repo = new YarnMonorepo({
       schedule: '11 2 * * 3,6',
     }),
   },
+  npmTrustedPublishing: true,
 
   githubOptions: {
     pullRequestLintOptions: {

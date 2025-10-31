@@ -151,7 +151,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v5
         with:
-          node-version: lts/*
+          node-version: 24.x
       - name: Download build artifacts
         uses: actions/download-artifact@v5
         with:
@@ -165,7 +165,7 @@ jobs:
           NPM_DIST_TAG: latest
           NPM_REGISTRY: registry.npmjs.org
           NPM_CONFIG_PROVENANCE: "true"
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TRUSTED_PUBLISHER: "true"
         run: npx -p publib@latest publib-npm
   cdklabs-typewriter_release_github:
     name: "@cdklabs/typewriter: Publish to GitHub Releases"
@@ -203,7 +203,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v5
         with:
-          node-version: lts/*
+          node-version: 24.x
       - name: Download build artifacts
         uses: actions/download-artifact@v5
         with:
@@ -217,7 +217,7 @@ jobs:
           NPM_DIST_TAG: latest
           NPM_REGISTRY: registry.npmjs.org
           NPM_CONFIG_PROVENANCE: "true"
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TRUSTED_PUBLISHER: "true"
         run: npx -p publib@latest publib-npm
   aws-cdk-service-spec-types_release_github:
     name: "@aws-cdk/service-spec-types: Publish to GitHub Releases"
@@ -255,7 +255,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v5
         with:
-          node-version: lts/*
+          node-version: 24.x
       - name: Download build artifacts
         uses: actions/download-artifact@v5
         with:
@@ -269,7 +269,7 @@ jobs:
           NPM_DIST_TAG: latest
           NPM_REGISTRY: registry.npmjs.org
           NPM_CONFIG_PROVENANCE: "true"
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TRUSTED_PUBLISHER: "true"
         run: npx -p publib@latest publib-npm
   aws-cdk-service-spec-importers_release_github:
     name: "@aws-cdk/service-spec-importers: Publish to GitHub Releases"
@@ -307,7 +307,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v5
         with:
-          node-version: lts/*
+          node-version: 24.x
       - name: Download build artifacts
         uses: actions/download-artifact@v5
         with:
@@ -321,7 +321,7 @@ jobs:
           NPM_DIST_TAG: latest
           NPM_REGISTRY: registry.npmjs.org
           NPM_CONFIG_PROVENANCE: "true"
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TRUSTED_PUBLISHER: "true"
         run: npx -p publib@latest publib-npm
   aws-cdk-aws-service-spec_release_github:
     name: "@aws-cdk/aws-service-spec: Publish to GitHub Releases"
@@ -359,7 +359,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v5
         with:
-          node-version: lts/*
+          node-version: 24.x
       - name: Download build artifacts
         uses: actions/download-artifact@v5
         with:
@@ -373,5 +373,5 @@ jobs:
           NPM_DIST_TAG: latest
           NPM_REGISTRY: registry.npmjs.org
           NPM_CONFIG_PROVENANCE: "true"
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TRUSTED_PUBLISHER: "true"
         run: npx -p publib@latest publib-npm
