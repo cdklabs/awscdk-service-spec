@@ -1,7 +1,12 @@
-import * as expr from './builder';
 import { Expression } from './expressions';
-import { NewExpression } from './objects';
+import { NewExpression, ThisInstance } from './objects';
+import { CallableExpr } from '../callable';
+import { IScope } from '../scope';
+import { ThingSymbol } from '../symbol';
 import { Type } from '../type';
+import * as expr from './builder';
+import { sym } from './builder';
+import { Method } from '../type-member';
 
 const isProxy = Symbol();
 
@@ -58,6 +63,11 @@ const EXPRESSION_HANDLERS: ProxyHandler<Expression> = {
   has: () => true,
 };
 
+/**
+ * Provides access to the local `this` as an expression proxy.
+ */
+export const $this: ExpressionProxy<ThisInstance> = $E(expr.this_());
+
 export type ExpressionProxy<E> = E & {
   (...args: Expression[]): ExpressionProxy<Expression>;
   [key: string]: ExpressionProxy<Expression>;
@@ -102,3 +112,45 @@ const TYPE_HANDLERS: ProxyHandler<Type> = {
   set: () => false,
   has: () => true,
 };
+
+/**
+ * A class representing an expression proxy which builds a JavaScript object that
+ * will mirror the JavaScript operations done to it in an expression tree.
+ */
+export class CallableProxy implements CallableExpr {
+  /**
+   * Creates a new CallableProxy that can be called with the specified name.
+   */
+  public static fromName(scope: IScope, name: string) {
+    return new CallableProxy($E(sym(new ThingSymbol(name, scope))), name);
+  }
+
+  public static fromMethod(method: Method) {
+    if (method.static) {
+      return new CallableProxy($E(sym(method.type.symbol).prop(method.name)), method.name);
+    }
+    return new CallableProxy($this[method.name], method.name);
+  }
+
+  private readonly expr: Expression;
+  private readonly name: string;
+
+  private constructor(expression: Expression, name: string) {
+    this.expr = expression;
+    this.name = name;
+  }
+
+  /**
+   * Invokes the callable expression with the provided arguments.
+   */
+  public invoke(...args: Expression[]) {
+    return this.expr.call(...args);
+  }
+
+  /**
+   * The name of the expression proxy.
+   */
+  public toString() {
+    return this.name;
+  }
+}

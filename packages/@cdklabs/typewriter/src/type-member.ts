@@ -1,6 +1,6 @@
-import { CallableDeclaration, CallableSpec } from './callable';
+import { CallableDeclaration, CallableExpr, CallableSpec } from './callable';
 import { DocsSpec, Documented } from './documented';
-import { Expression, ObjectPropertyAccess } from './expressions';
+import { CallableProxy, Expression, ObjectPropertyAccess } from './expressions';
 import { MemberType } from './member-type';
 import { Parameter, ParameterSpec } from './parameter';
 import { Property as PropertyType } from './property';
@@ -86,7 +86,7 @@ export interface MethodSpec extends CallableSpec {
   static?: boolean;
 }
 
-export class Method extends TypeMember implements CallableDeclaration {
+export class Method extends TypeMember implements CallableDeclaration, CallableExpr {
   public readonly returnType: Type;
   public readonly visibility: MemberVisibility;
   public readonly parameters = new Array<Parameter>();
@@ -114,7 +114,11 @@ export class Method extends TypeMember implements CallableDeclaration {
     return this.spec.name;
   }
 
-  public bind(receiver: Expression) {
+  public invoke(...args: Expression[]): Expression {
+    return CallableProxy.fromMethod(this).invoke(...args);
+  }
+
+  public bind(receiver: Expression): ObjectPropertyAccess {
     return new ObjectPropertyAccess(receiver, this.name);
   }
 

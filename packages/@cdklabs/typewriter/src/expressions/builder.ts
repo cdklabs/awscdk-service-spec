@@ -99,6 +99,20 @@ export function lit(value: any): Expression {
 }
 
 /**
+ * Render a JavaScript value as a string
+ */
+export function str(value: any): Expression {
+  return lit(String(value));
+}
+
+/**
+ * Render a JavaScript value as a number
+ */
+export function num(value: number): Expression {
+  return lit(value);
+}
+
+/**
  * An array for use in a destructuring assignment: `[<name>, ...]`
  */
 export function destructuringArray(...names: Expression[]) {
