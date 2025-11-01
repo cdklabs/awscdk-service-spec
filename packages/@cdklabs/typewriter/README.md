@@ -5,18 +5,18 @@ Write code with an AST builder instead of string concatenation.
 ## Self-contained example
 
 ```ts
-import { expr, stmt, FreeFunction, Module, TypeScriptRenderer } from '@cdklabs/typewriter';
+import { code, FreeFunction, Module, TypeScriptRenderer } from '@cdklabs/typewriter';
 
 // Create a new module
 const scope = new Module('my-package');
 
 // Add a function to the module ...
 const fn = new FreeFunction(scope, {
-    name: 'myFunction',
+  name: 'myFunction',
 });
 
 // ... add statements to the function body
-fn.addBody(stmt.ret(expr.lit(1)));
+fn.addBody(code.stmt.ret(code.expr.lit(1)));
 
 // Emit the code
 const renderer = new TypeScriptRenderer();
@@ -38,25 +38,26 @@ These builders help you construct complex code structures with ease.
 ### Using the `expr` builder
 
 The `expr` module contains functions for creating various types of expressions.
-sHere are some examples:
+Here are some examples:
 
 ```ts
-import { expr } from '@cdklabs/typewriter';
+import { code } from '@cdklabs/typewriter';
+// or: import { expr } from '@cdklabs/typewriter';
 
 // Create a literal expression
-const literalExpr = expr.lit(42);
+const literalExpr = code.expr.lit(42);
 
 // Create an identifier
-const identExpr = expr.ident('myVariable');
+const identExpr = code.expr.ident('myVariable');
 
 // Create an object literal
-const objectExpr = expr.object({ key1: expr.lit('value1'), key2: expr.lit(2) });
+const objectExpr = code.expr.object({ key1: code.expr.lit('value1'), key2: code.expr.lit(2) });
 
 // Create a function call
-const callExpr = expr.builtInFn('console.log', expr.lit('Hello, world!'));
+const callExpr = code.expr.builtInFn('console.log', code.expr.lit('Hello, world!'));
 
 // Create a binary operation
-const binOpExpr = expr.binOp(expr.lit(5), '+', expr.lit(3));
+const binOpExpr = code.expr.binOp(code.expr.lit(5), '+', code.expr.lit(3));
 ```
 
 ### Using `stmt` builder
@@ -65,24 +66,25 @@ The `stmt` module provides functions for creating various types of statements.
 Here are some examples:
 
 ```ts
-import { stmt } from '@cdklabs/typewriter';
+import { code } from '@cdklabs/typewriter';
+// or: import { stmt, expr } from '@cdklabs/typewriter';
 
 // Create a return statement
-const returnStmt = stmt.ret(expr.lit(42));
+const returnStmt = code.stmt.ret(code.expr.lit(42));
 
 // Create an if statement
-const ifStmt = stmt.if_(expr.binOp(expr.ident('x'), '>', expr.lit(0)))
-  .then(stmt.expr(expr.builtInFn('console.log', expr.lit('Positive'))))
-  .else(stmt.expr(expr.builtInFn('console.log', expr.lit('Non-positive'))));
+const ifStmt = code.stmt.if_(code.expr.binOp(code.expr.ident('x'), '>', code.expr.lit(0)))
+  .then(code.stmt.expr(code.expr.builtInFn('console.log', code.expr.lit('Positive'))))
+  .else(code.stmt.expr(code.expr.builtInFn('console.log', code.expr.lit('Non-positive'))));
 
 // Create a variable declaration
-const varDeclStmt = stmt.constVar(expr.ident('myVar'), expr.lit('Hello'));
+const varDeclStmt = code.stmt.constVar(code.expr.ident('myVar'), code.expr.lit('Hello'));
 
 // Create a for loop
-const forLoopStmt = stmt.forConst(
-  expr.ident('i'),
-  expr.builtInFn('Array', expr.lit(5)),
-  stmt.expr(expr.builtInFn('console.log', expr.ident('i')))
+const forLoopStmt = code.stmt.forConst(
+  code.expr.ident('i'),
+  code.expr.builtInFn('Array', code.expr.lit(5)),
+  code.stmt.expr(code.expr.builtInFn('console.log', code.expr.ident('i')))
 );
 
 // Create a block of statements
@@ -266,16 +268,23 @@ console.log(generatedCode);
 
 ### ESLint Rule Management
 
-The `TypeScriptRenderer` also provides functionality for managing ESLint rules in the generated code. This is particularly useful when you need to disable certain linting rules for generated code. By default, the `prettier/prettier` and `max-len` ESLint rules are disabled.
+The `TypeScriptRenderer` also provides functionality for managing ESLint rules in the generated code. This is particularly useful when you need to disable certain linting rules for generated code. By default, the `prettier/prettier` and `@stylistic/max-len` ESLint rules are disabled.
 
-You can customize the ESLint rule management using the `eslintRules` option when creating a `TypeScriptRenderer` instance:
+You can customize the ESLint rule management using the `disabledEsLintRules` option when creating a `TypeScriptRenderer` instance:
 
 ```ts
+import { TypeScriptRenderer, EsLintRules } from '@cdklabs/typewriter';
+
 const renderer = new TypeScriptRenderer({
-  eslintRules: {
-    '@typescript-eslint/comma-dangle': 'off',
-    'max-len': 'off',
-  },
+  disabledEsLintRules: [
+    EsLintRules.COMMA_DANGLE,
+    EsLintRules.MAX_LEN,
+  ],
+});
+
+// Or disable all rules by passing an empty array
+const noRulesRenderer = new TypeScriptRenderer({
+  disabledEsLintRules: [],
 });
 ```
 
@@ -291,10 +300,129 @@ This feature allows you to fine-tune the linting behavior for your generated cod
 
 4. Structure your code hierarchically: Use classes like `Class`, `Interface`, and `Struct` to create complex type structures that mirror the desired output.
 
-5. Render at the end: Build your entire code structure before rendering. Use the `TypeScriptRenderer` to generate the final TypeScript code only when your structure is complete.
+5. Render at the end: Build your entire code structure before rendering. Use the `TypeScriptRenderer` to generate the final TypeScript code.
 
-6. Utilize documentation features: Add documentation to your generated code using the `docs` property available on many classes. This helps in generating well-documented TypeScript code.
+6. Utilize documentation features: Add documentation to your generated code using the `withComments` method available on many classes. This helps in generating well-documented TypeScript code.
 
 7. Modularize your code generation: For large projects, consider splitting your code generation logic into multiple functions or classes, each responsible for generating a specific part of your TypeScript code.
 
 8. Test your generated code: After generating the TypeScript code, it's a good practice to compile and test it to ensure it behaves as expected.
+
+## Working with Classes and Interfaces
+
+The library provides robust support for creating classes and interfaces:
+
+```ts
+import { Module, ClassType, InterfaceType, Type, MemberVisibility, TypeScriptRenderer, code } from '@cdklabs/typewriter';
+
+const scope = new Module('my-module');
+
+// Create an interface
+const myInterface = new InterfaceType(scope, {
+  name: 'MyInterface',
+  export: true,
+});
+
+myInterface.addProperty({
+  name: 'name',
+  type: Type.STRING,
+});
+
+myInterface.addProperty({
+  name: 'age',
+  type: Type.NUMBER,
+  optional: true,
+});
+
+// Create a class that implements the interface
+const myClass = new ClassType(scope, {
+  name: 'MyClass',
+  export: true,
+  implements: [myInterface.type],
+});
+
+// Add properties
+myClass.addProperty({
+  name: 'name',
+  type: Type.STRING,
+  visibility: MemberVisibility.Public,
+});
+
+myClass.addProperty({
+  name: 'age',
+  type: Type.NUMBER,
+  visibility: MemberVisibility.Private,
+  optional: true,
+});
+
+// Add a constructor
+myClass.addInitializer({
+  parameters: [
+    { name: 'name', type: Type.STRING },
+    { name: 'age', type: Type.NUMBER, optional: true },
+  ],
+  body: code.stmt.block(
+    code.stmt.assign(code.expr.get(code.expr.this_(), 'name'), code.expr.ident('name')),
+    code.stmt.assign(code.expr.get(code.expr.this_(), 'age'), code.expr.ident('age')),
+  ),
+});
+
+// Add a method
+myClass.addMethod({
+  name: 'greet',
+  returnType: Type.STRING,
+  body: code.stmt.block(
+    code.stmt.ret(
+      code.expr.strConcat(
+        code.expr.lit('Hello, my name is '),
+        code.expr.get(code.expr.this_(), 'name'),
+      ),
+    ),
+  ),
+});
+
+const renderer = new TypeScriptRenderer();
+console.log(renderer.render(scope));
+```
+
+## Comments and Documentation
+
+You can add comments to various code elements:
+
+```ts
+import { Module, FreeFunction, Type, code, TypeScriptRenderer } from '@cdklabs/typewriter';
+
+const scope = new Module('my-module');
+
+const fn = new FreeFunction(scope, {
+  name: 'calculate',
+  returnType: Type.NUMBER,
+});
+
+// Add JSDoc comments
+fn.withComments(
+  'Calculate a complex value',
+  '',
+  '@returns The calculated result',
+);
+
+fn.addBody(
+  code.commentOn(
+    code.stmt.ret(code.expr.lit(42)),
+    'Return the answer to everything',
+  ),
+);
+
+const renderer = new TypeScriptRenderer();
+console.log(renderer.render(scope));
+// Output:
+// /**
+//  * Calculate a complex value
+//  *
+//  * @returns The calculated result
+//  */
+// function calculate(): number {
+//   // Return the answer to everything
+//   return 42;
+// }
+```
