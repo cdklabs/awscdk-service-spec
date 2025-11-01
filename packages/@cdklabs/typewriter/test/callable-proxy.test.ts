@@ -13,7 +13,7 @@ describe('CallableProxy', () => {
 
   describe('fromName', () => {
     test('creates callable from name', () => {
-      const callable = CallableProxy.fromName(scope, 'testFunction');
+      const callable = CallableProxy.fromName('testFunction', scope);
       const result = callable.invoke();
       classType.addInitializer({
         body: stmt.block(result.asStmt()),
@@ -29,7 +29,7 @@ describe('CallableProxy', () => {
     });
 
     test('can call with arguments', () => {
-      const callable = CallableProxy.fromName(scope, 'testFunction');
+      const callable = CallableProxy.fromName('testFunction', scope);
       const result = callable.invoke(expr.str('arg1'), expr.num(42));
       classType.addInitializer({
         body: stmt.block(result.asStmt()),

@@ -121,7 +121,7 @@ export class CallableProxy implements CallableExpr {
   /**
    * Creates a new CallableProxy that can be called with the specified name.
    */
-  public static fromName(scope: IScope, name: string) {
+  public static fromName(name: string, scope: IScope) {
     return new CallableProxy($E(sym(new ThingSymbol(name, scope))), name);
   }
 
