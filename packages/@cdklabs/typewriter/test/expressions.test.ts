@@ -36,6 +36,18 @@ test('splat', () => {
   expect(renderExpr(ex)).toMatch('...input');
 });
 
+test('ternary if-then-else', () => {
+  const ex = expr.cond(expr.binOp(expr.ident('x'), '>', expr.lit(0)), expr.lit('positive'), expr.lit('non-positive'));
+
+  expect(renderExpr(ex)).toMatch('((x > 0) ? "positive" : "non-positive")');
+});
+
+test('ternary with fluent then/else', () => {
+  const ex = expr.cond(expr.ident('condition')).then(expr.lit('yes')).else(expr.lit('no'));
+
+  expect(renderExpr(ex)).toMatch('condition ? "yes" : "no"');
+});
+
 function renderExpr(ex: Expression) {
   const scope = new Module('typewriter.test');
   scope.addInitialization(stmt.expr(ex));

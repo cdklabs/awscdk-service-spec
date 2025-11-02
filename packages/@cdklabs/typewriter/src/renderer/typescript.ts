@@ -725,7 +725,7 @@ export class TypeScriptRenderer extends Renderer {
 
     this.renderStatement(ifThen.thenStatement ?? new Block());
     if (ifThen.elseStatement) {
-      this.emit(' else');
+      this.emit(' else ');
       this.renderStatement(ifThen.elseStatement);
     }
   }
