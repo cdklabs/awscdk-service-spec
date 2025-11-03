@@ -125,26 +125,6 @@ export class EncryptionAtRestAspect implements IAspect {
       return;
     }
 
-    if (pattern === 'type-based-selection') {
-      const configProp = properties.find((p: any) => p.purpose === 'configuration');
-      const typeProp = properties.find((p: any) => p.purpose === 'encryption-type');
-      const kmsProp = properties.find((p: any) => p.purpose === 'kms-key-id');
-
-      if (configProp && typeProp?.path) {
-        const obj: any = {};
-        const typeKey = typeProp.path.split('.')[1];
-        obj[typeKey] = kmsKey ? typeProp.acceptedValues?.[1] || 'KMS' : typeProp.acceptedValues?.[0] || 'AES256';
-        
-        if (kmsProp?.path && kmsKey) {
-          const kmsKeyName = kmsProp.path.split('.')[1];
-          obj[kmsKeyName] = kmsKey;
-        }
-        
-        resource.addPropertyOverride(configProp.name, obj);
-      }
-      return;
-    }
-
     // Fallback: apply first KMS property found
     const kmsProp = properties.find((p: any) => p.purpose === 'kms-key-id');
     if (kmsProp && kmsKey) {

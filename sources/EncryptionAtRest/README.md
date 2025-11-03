@@ -9,7 +9,7 @@ This directory contains structured data about encryption at rest configuration f
 
 ## Patterns
 
-The data categorizes resources into 6 encryption configuration patterns:
+The data categorizes resources into 5 encryption configuration patterns:
 
 ### 1. key-only
 Only accepts a KMS key ID property, no enable flag required.
@@ -24,16 +24,12 @@ Complex nested configuration structure with multiple encryption options.
 - Example: AWS::S3::Bucket, AWS::Bedrock::DataSource
 
 ### 4. specification-object
-Wrapper object containing enable flag and encryption options.
-- Example: AWS::DynamoDB::Table, AWS::OpenSearchService::Domain
+Wrapper object containing enable flag and encryption options with documented nested structure.
+- Example: AWS::DynamoDB::Table, AWS::OpenSearchService::Domain, AWS::ECR::Repository
 
 ### 5. multiple-contexts
 Different encryption settings for different data contexts (storage, backups, etc.).
 - Example: AWS::RDS::DBInstance, AWS::WorkSpaces::Workspace
-
-### 6. type-based-selection
-Encryption type selection determines which additional properties are required.
-- Example: AWS::ECR::Repository, AWS::Glue::DataCatalogEncryptionSettings
 
 ## Property Purposes
 
