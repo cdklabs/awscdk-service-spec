@@ -82,7 +82,7 @@ export class EncryptionAtRestAspect implements IAspect {
     const { pattern, properties } = config;
     const kmsKey = this.props.kmsKey;
 
-    if (pattern === 'kms-only') {
+    if (pattern === 'key-only') {
       const kmsProp = properties.find((p: any) => p.purpose === 'kms-key-id');
       if (kmsProp && kmsKey) {
         resource.addPropertyOverride(kmsProp.name, kmsKey);
@@ -90,7 +90,7 @@ export class EncryptionAtRestAspect implements IAspect {
       return;
     }
 
-    if (pattern === 'boolean-and-key') {
+    if (pattern === 'enable-and-key') {
       const enableProp = properties.find((p: any) => p.purpose === 'enable-flag');
       const kmsProp = properties.find((p: any) => p.purpose === 'kms-key-id');
       
