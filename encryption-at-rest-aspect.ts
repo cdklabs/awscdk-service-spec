@@ -79,58 +79,67 @@ export class EncryptionAtRestAspect implements IAspect {
   }
 
   private applyEncryption(resource: CfnResource, config: any): void {
-    const { pattern, properties } = config;
+    const { properties } = config;
     const kmsKey = this.props.kmsKey;
 
-    if (pattern === 'key-only') {
-      const kmsProp = properties.find((p: any) => p.purpose === 'kms-key-id');
-      if (kmsProp && kmsKey) {
-        resource.addPropertyOverride(kmsProp.name, kmsKey);
+    // Group properties by context
+    const contexts = new Map<string, any[]>();
+    for (const prop of properties) {
+      const ctx = prop.context || 'default';
+      if (!contexts.has(ctx)) {
+        contexts.set(ctx, []);
       }
-      return;
+      contexts.get(ctx)!.push(prop);
     }
 
-    if (pattern === 'enable-and-key') {
-      const enableProp = properties.find((p: any) => p.purpose === 'enable-flag');
-      const kmsProp = properties.find((p: any) => p.purpose === 'kms-key-id');
-      
-      if (enableProp) {
-        resource.addPropertyOverride(enableProp.name, true);
-      }
-      if (kmsProp && kmsKey) {
-        resource.addPropertyOverride(kmsProp.name, kmsKey);
-      }
-      return;
+    // Apply encryption for each context
+    for (const [context, props] of contexts) {
+      this.applyEncryptionForContext(resource, props, kmsKey);
     }
+  }
 
-    if (pattern === 'configuration-object') {
-      const configProp = properties.find((p: any) => p.purpose === 'configuration');
-      if (!configProp) return;
+  private applyEncryptionForContext(resource: CfnResource, properties: any[], kmsKey?: string): void {
+    const configProp = properties.find(p => p.purpose === 'configuration');
+    const topLevelProps = properties.filter(p => !p.path);
+    const nestedProps = properties.filter(p => p.path);
 
-      const nestedProps = properties.filter((p: any) => p.path);
-      if (nestedProps.length > 0) {
-        const obj: any = {};
-        for (const prop of nestedProps) {
-          const key = prop.path.split('.').pop()?.replace('[]', '');
-          if (!key) continue;
-          
-          if (prop.purpose === 'enable-flag') {
-            obj[key] = true;
-          } else if (prop.purpose === 'kms-key-id' && kmsKey) {
-            obj[key] = kmsKey;
-          } else if (prop.purpose === 'encryption-type' && prop.acceptedValues) {
-            obj[key] = kmsKey ? (prop.acceptedValues.find(v => v.includes('KMS')) || prop.acceptedValues[0]) : prop.acceptedValues[0];
+    // If there's a configuration object with nested properties
+    if (configProp && nestedProps.length > 0) {
+      const obj: any = {};
+      for (const prop of nestedProps) {
+        const key = prop.path.split('.').pop()?.replace('[]', '');
+        if (!key) continue;
+        
+        if (prop.purpose === 'enable-flag') {
+          obj[key] = true;
+        } else if (prop.purpose === 'kms-key-id' && kmsKey) {
+          obj[key] = kmsKey;
+        } else if (prop.purpose === 'encryption-type') {
+          if (prop.acceptedValues) {
+            obj[key] = kmsKey ? (prop.acceptedValues.find((v: string) => v.includes('KMS')) || prop.acceptedValues[0]) : prop.acceptedValues[0];
+          } else {
+            obj[key] = kmsKey ? 'KMS' : 'AES256';
           }
         }
-        resource.addPropertyOverride(configProp.name, obj);
       }
+      resource.addPropertyOverride(configProp.name, obj);
       return;
     }
 
-    // Fallback: apply first KMS property found
-    const kmsProp = properties.find((p: any) => p.purpose === 'kms-key-id');
-    if (kmsProp && kmsKey) {
-      resource.addPropertyOverride(kmsProp.name, kmsKey);
+    // Apply top-level properties
+    for (const prop of topLevelProps) {
+      if (prop.purpose === 'enable-flag') {
+        resource.addPropertyOverride(prop.name, true);
+      } else if (prop.purpose === 'kms-key-id' && kmsKey) {
+        resource.addPropertyOverride(prop.name, kmsKey);
+      } else if (prop.purpose === 'encryption-type' && kmsKey) {
+        if (prop.acceptedValues) {
+          const kmsValue = prop.acceptedValues.find((v: string) => v.includes('KMS'));
+          if (kmsValue) {
+            resource.addPropertyOverride(prop.name, kmsValue);
+          }
+        }
+      }
     }
   }
 }
