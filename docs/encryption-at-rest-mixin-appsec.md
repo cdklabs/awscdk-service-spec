@@ -50,7 +50,7 @@
 **Code Generation Approach:**
 
 - **Build-time generation:** Mixin code is generated from data.json during package build
-- **No runtime loading:** data.json is not included in the published package
+- **Not shipped:** data.json is not included in the published package
 - **Type-safe output:** Generated code has explicit type checks for each resource
 - **Optimized performance:** No JSON parsing or dynamic lookups at runtime
 - **Security benefit:** Eliminates runtime data injection attacks
@@ -128,8 +128,8 @@ AWS::RDS::DBInstance:
 ### 5.2 Trust Boundaries
 
 1. **User → Mixin:** User applies mixin to constructs
-2. **Mixin → data.json:** Mixin reads purpose-driven specification
-3. **Mixin → CloudFormation:** Mixin modifies resource properties by purpose
+2. **Build → data.json:** Code generator reads data.json at build time
+3. **Mixin → CloudFormation:** Generated mixin modifies resource properties by purpose
 
 ### 5.3 Threats & Mitigations
 
@@ -232,9 +232,11 @@ AWS::RDS::DBInstance:
 
 - ✅ **Package signing:** npm package signatures
 - ✅ **Dependency pinning:** Lock files for reproducible builds
-- ✅ **Schema validation:** data.json validated against schema
+- ✅ **Schema validation:** data.json validated against schema during build
 - ✅ **Human review:** All changes to data.json security-reviewed
 - ✅ **Minimal dependencies:** Mixin has no external dependencies beyond aws-cdk-lib
+- ✅ **Build-time generation:** data.json not shipped, eliminating runtime data injection
+- ✅ **Reproducible builds:** Generated code can be audited in source control
 
 **Residual Risk:** LOW (standard npm security practices)
 
@@ -264,29 +266,34 @@ AWS::RDS::DBInstance:
 ## 7. Implementation Safeguards
 
 ```typescript
+// Generated code structure (example for AWS::S3::Bucket)
 export class EncryptionAtRest {
   constructor(private readonly props: EncryptionAtRestProps = {}) {}
 
-  // SAFEGUARD 1: Type-safe construct checking
+  // SAFEGUARD 1: Type-safe construct checking (generated per resource)
   supports(construct: IConstruct): boolean {
     if (!(construct instanceof CfnResource)) {
       return false;
     }
-    return construct.cfnResourceType in encryptionData;
+    // Generated switch statement for all 150 resources
+    switch (construct.cfnResourceType) {
+      case 'AWS::S3::Bucket':
+      case 'AWS::DynamoDB::Table':
+      // ... 148 more cases
+        return true;
+      default:
+        return false;
+    }
   }
 
   // SAFEGUARD 2: Fail-safe application
   applyTo(construct: IConstruct): IConstruct {
-    if (!(construct instanceof CfnResource)) {
-      return construct; // Skip non-CFN resources
+    if (!this.supports(construct)) {
+      return construct; // Skip unsupported resources
     }
 
-    const config = encryptionData[construct.cfnResourceType];
-    if (!config) {
-      return construct; // Skip unknown resources
-    }
-
-    this.applyEncryption(construct, config);
+    // Generated resource-specific logic
+    this.applyEncryption(construct);
     return construct;
   }
 
@@ -294,37 +301,57 @@ export class EncryptionAtRest {
   validate(construct: IConstruct): string[] {
     const errors: string[] = [];
     
-    // Check for existing encryption configuration
-    const hasExistingEncryption = config.properties.some((prop: any) => {
-      if (prop.purpose === 'enable-flag' || 
-          prop.purpose === 'kms-key-id' || 
-          prop.purpose === 'configuration') {
-        const value = (construct as any)[prop.name];
-        return value !== undefined && value !== null;
-      }
-      return false;
-    });
-
-    if (hasExistingEncryption) {
-      errors.push(`${construct.cfnResourceType} already has encryption configured`);
+    if (!this.supports(construct)) {
+      return errors;
     }
+    
+    // Generated validation logic per resource type
+    if (construct.cfnResourceType === 'AWS::S3::Bucket') {
+      if ((construct as any).bucketEncryption !== undefined) {
+        errors.push('AWS::S3::Bucket already has encryption configured');
+      }
+    }
+    // ... more resource-specific checks
 
     return errors;
   }
 
-  // SAFEGUARD 4: Purpose-driven application with context grouping
-  private applyEncryption(resource: CfnResource, config: any): void {
-    // Group properties by context for atomic application
-    const contexts = new Map<string, any[]>();
-    for (const prop of config.properties) {
-      const ctx = prop.context || 'default';
-      if (!contexts.has(ctx)) contexts.set(ctx, []);
-      contexts.get(ctx)!.push(prop);
-    }
+  // SAFEGUARD 4: Purpose-driven application (generated per resource)
+  private applyEncryption(resource: CfnResource): void {
+    const resourceType = resource.cfnResourceType;
     
-    // Apply encryption for each context independently
-    for (const [, props] of contexts) {
-      this.applyEncryptionForContext(resource, props, this.props.kmsKey);
+    // Generated switch with purpose-driven logic
+    switch (resourceType) {
+      case 'AWS::S3::Bucket':
+        this.applyS3BucketEncryption(resource);
+        break;
+      case 'AWS::DynamoDB::Table':
+        this.applyDynamoDBTableEncryption(resource);
+        break;
+      // ... 148 more cases
+    }
+  }
+
+  // Generated resource-specific methods
+  private applyS3BucketEncryption(resource: CfnResource): void {
+    // Purpose: configuration (nested object)
+    resource.addPropertyOverride('BucketEncryption.ServerSideEncryptionConfiguration.0.ServerSideEncryptionByDefault.SSEAlgorithm', 
+      this.props.kmsKey ? 'aws:kms' : 'AES256');
+    if (this.props.kmsKey) {
+      // Purpose: kms-key-id
+      resource.addPropertyOverride('BucketEncryption.ServerSideEncryptionConfiguration.0.ServerSideEncryptionByDefault.KMSMasterKeyID', 
+        this.props.kmsKey);
+    }
+  }
+
+  private applyDynamoDBTableEncryption(resource: CfnResource): void {
+    // Purpose: configuration (nested object)
+    resource.addPropertyOverride('SSESpecification.SSEEnabled', true);
+    if (this.props.kmsKey) {
+      // Purpose: encryption-type
+      resource.addPropertyOverride('SSESpecification.SSEType', 'KMS');
+      // Purpose: kms-key-id
+      resource.addPropertyOverride('SSESpecification.KMSMasterKeyId', this.props.kmsKey);
     }
   }
 }
@@ -528,13 +555,15 @@ test('mustApply() succeeds when all resources supported', () => {
 - Defense-in-depth validation (schema + CDK + CloudFormation + IAM)
 - Fail-safe defaults with explicit application model
 - Input validation via `validate()` method
+- Code generation eliminates runtime data injection attacks
 
-**Mixin-Specific Advantages:**
+**Code Generation Advantages:**
 
-- Explicit application reduces accidental misconfiguration
-- Composable with other mixins for layered security
-- Works with L1, L2, and custom constructs
-- Type-safe integration with CDK
+- **No runtime data:** data.json not shipped, reducing attack surface
+- **Type safety:** Generated code is fully type-checked
+- **Performance:** No JSON parsing or dynamic lookups at runtime
+- **Auditability:** Generated code can be reviewed in source control
+- **Immutability:** Encryption logic fixed at build time
 
 ## 11. Operational Security
 
