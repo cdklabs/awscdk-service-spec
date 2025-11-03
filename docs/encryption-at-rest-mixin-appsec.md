@@ -20,22 +20,22 @@
          │
          ▼
 ┌──────────────────────────────────────┐
-│  EncryptionAtRest Mixin              │
+│  EncryptionAtRest Mixin (Generated)  │
 │  ┌────────────────────────────────┐  │
 │  │ supports(construct)            │  │
-│  │  → Check if CfnResource        │  │
-│  │  → Lookup in data.json         │  │
+│  │  → Type-safe resource checks   │  │
 │  │                                │  │
 │  │ applyTo(construct)             │  │
-│  │  → Group props by context      │  │
-│  │  → Apply by purpose            │  │
+│  │  → Resource-specific logic     │  │
+│  │  → Purpose-driven application  │  │
 │  │                                │  │
 │  │ validate(construct)            │  │
-│  │  → Verify encryption applied   │  │
+│  │  → Pre-application checks      │  │
 │  └────────────────────────────────┘  │
-└────────┬─────────────────────────────┘
+└──────────────────────────────────────┘
+         ▲
+         │ Code Generation (Build Time)
          │
-         ▼
 ┌──────────────────────────────────────┐
 │  data.json (Security-Reviewed)       │
 │  ┌────────────────────────────────┐  │
@@ -46,6 +46,14 @@
 │  └────────────────────────────────┘  │
 └──────────────────────────────────────┘
 ```
+
+**Code Generation Approach:**
+
+- **Build-time generation:** Mixin code is generated from data.json during package build
+- **No runtime loading:** data.json is not included in the published package
+- **Type-safe output:** Generated code has explicit type checks for each resource
+- **Optimized performance:** No JSON parsing or dynamic lookups at runtime
+- **Security benefit:** Eliminates runtime data injection attacks
 
 ## 3. User Interface
 
@@ -75,7 +83,7 @@ Mixins.of(scope, ConstructSelector.resourcesOfType('AWS::S3::Bucket'))
 
 - **Explicit application:** Mixin must be explicitly applied via `.with()` or `Mixins.of()`
 - **Flexible key management:** Supports AWS-managed and customer-managed keys
-- **Validation built-in:** `validate()` method ensures encryption was properly applied
+- **Input validation:** `validate()` method checks for existing encryption before application
 - **Type-safe:** TypeScript ensures correct usage patterns
 - **Framework-level enforcement:** `mustApply()` provides strict mode at framework level
 
@@ -138,7 +146,7 @@ AWS::RDS::DBInstance:
 - ✅ **CDK validation:** Property names validated at synth time
 - ✅ **Human security review:** All 150 resources manually verified
 - ✅ **Schema validation:** JSON Schema enforces structure
-- ✅ **Mixin validation:** `validate()` method checks encryption was applied
+- ✅ **Mixin validation:** `validate()` method checks for existing encryption
 
 **Residual Risk:** LOW
 
@@ -170,7 +178,7 @@ AWS::RDS::DBInstance:
 **Mitigations:**
 
 - ✅ **Explicit application:** Mixin only applies when explicitly called via `.with()`
-- ✅ **Validation method:** `validate()` can detect existing encryption
+- ✅ **Validation method:** `validate()` detects existing encryption before application
 - ✅ **Immutable by default:** CloudFormation prevents modification of encryption settings for many resources
 - ✅ **User responsibility:** Developers explicitly choose to apply mixin
 
@@ -244,7 +252,7 @@ AWS::RDS::DBInstance:
 ### 6.2 Auditability
 
 - **REQ-5:** Mixin application MUST be visible in synthesized CloudFormation
-- **REQ-6:** `validate()` method MUST report encryption status
+- **REQ-6:** `validate()` method MUST detect existing encryption configuration
 - **REQ-7:** Mixin MUST be traceable in CDK construct tree
 
 ### 6.3 Least Privilege
@@ -282,12 +290,12 @@ export class EncryptionAtRest {
     return construct;
   }
 
-  // SAFEGUARD 3: Post-application validation
+  // SAFEGUARD 3: Pre-application validation
   validate(construct: IConstruct): string[] {
     const errors: string[] = [];
     
-    // Check if encryption was properly applied
-    const hasEncryption = config.properties.some((prop: any) => {
+    // Check for existing encryption configuration
+    const hasExistingEncryption = config.properties.some((prop: any) => {
       if (prop.purpose === 'enable-flag' || 
           prop.purpose === 'kms-key-id' || 
           prop.purpose === 'configuration') {
@@ -297,8 +305,8 @@ export class EncryptionAtRest {
       return false;
     });
 
-    if (!hasEncryption) {
-      errors.push(`Encryption not configured for ${construct.cfnResourceType}`);
+    if (hasExistingEncryption) {
+      errors.push(`${construct.cfnResourceType} already has encryption configured`);
     }
 
     return errors;
@@ -426,21 +434,29 @@ test('context grouping', () => {
 ### 9.3 Validation Tests
 
 ```typescript
-test('validate() returns errors for unencrypted resources', () => {
-  const bucket = new CfnBucket(stack, 'Bucket', {});
+test('validate() returns errors for already encrypted resources', () => {
+  const bucket = new CfnBucket(stack, 'Bucket', {
+    bucketEncryption: { /* already configured */ }
+  });
   const mixin = new EncryptionAtRest();
   
   const errors = mixin.validate(bucket);
-  expect(errors).toContain('Encryption not configured for AWS::S3::Bucket');
+  expect(errors).toContain(expect.stringContaining('already has encryption configured'));
 });
 
-test('validate() returns no errors after successful application', () => {
+test('validate() returns no errors for unencrypted resources', () => {
   const bucket = new CfnBucket(stack, 'Bucket', {});
   const mixin = new EncryptionAtRest();
   
-  mixin.applyTo(bucket);
   const errors = mixin.validate(bucket);
+  expect(errors).toHaveLength(0);
+});
+
+test('validate() returns empty for unsupported constructs', () => {
+  const construct = new Construct(stack, 'Unknown');
+  const mixin = new EncryptionAtRest();
   
+  const errors = mixin.validate(construct);
   expect(errors).toHaveLength(0);
 });
 ```
@@ -511,7 +527,7 @@ test('mustApply() succeeds when all resources supported', () => {
 - Comprehensive coverage (150 resources, 269 properties)
 - Defense-in-depth validation (schema + CDK + CloudFormation + IAM)
 - Fail-safe defaults with explicit application model
-- Built-in validation via `validate()` method
+- Input validation via `validate()` method
 
 **Mixin-Specific Advantages:**
 
@@ -525,7 +541,7 @@ test('mustApply() succeeds when all resources supported', () => {
 ### 11.1 Monitoring & Alerting
 
 - Mixin application visible in CloudFormation templates
-- `validate()` method provides programmatic verification
+- `validate()` method provides pre-application safety checks
 - CDK synthesis logs show mixin application
 - CloudFormation deployment logs show encryption configuration
 
@@ -555,7 +571,7 @@ test('mustApply() succeeds when all resources supported', () => {
 **Governance Features:**
 
 - Explicit mixin application for audit trail
-- `validate()` method for compliance verification
+- `validate()` method for pre-application checks
 - Centralized encryption key management
 - Consistent encryption across 150+ resource types
 - Composable with other security mixins

@@ -32,7 +32,7 @@ export class EncryptionAtRest {
    * Check if this mixin can be applied to the given construct.
    */
   supports(construct: IConstruct): boolean {
-    if (!(construct instanceof CfnResource)) {
+    if (!CfnResource.isCfnResource(construct)) {
       return false;
     }
     return construct.cfnResourceType in encryptionData;
@@ -42,7 +42,7 @@ export class EncryptionAtRest {
    * Apply encryption at rest to the construct.
    */
   applyTo(construct: IConstruct): IConstruct {
-    if (!(construct instanceof CfnResource)) {
+    if (!this.supports(construct)) {
       return construct;
     }
 
@@ -56,10 +56,11 @@ export class EncryptionAtRest {
   }
 
   /**
-   * Validate that encryption was properly applied.
+   * Validate the construct before applying the mixin.
+   * Returns validation errors if the construct cannot be safely encrypted.
    */
   validate(construct: IConstruct): string[] {
-    if (!(construct instanceof CfnResource)) {
+    if (!this.supports(construct)) {
       return [];
     }
 
@@ -70,8 +71,8 @@ export class EncryptionAtRest {
 
     const errors: string[] = [];
     
-    // Check if any encryption property was set
-    const hasEncryption = config.properties.some((prop: any) => {
+    // Check if encryption is already configured
+    const hasExistingEncryption = config.properties.some((prop: any) => {
       if (prop.purpose === 'enable-flag' || prop.purpose === 'kms-key-id' || prop.purpose === 'configuration') {
         const value = (construct as any)[prop.name];
         return value !== undefined && value !== null;
@@ -79,8 +80,8 @@ export class EncryptionAtRest {
       return false;
     });
 
-    if (!hasEncryption) {
-      errors.push(`Encryption not configured for ${construct.cfnResourceType}`);
+    if (hasExistingEncryption) {
+      errors.push(`${construct.cfnResourceType} already has encryption configured - applying mixin may overwrite existing settings`);
     }
 
     return errors;
