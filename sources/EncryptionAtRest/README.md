@@ -31,8 +31,6 @@ Complex object containing multiple encryption settings.
 - Example: `EncryptionConfiguration`, `SSESpecification`, `EncryptionOptions`
 - Acts as a container for nested encryption properties
 
-## Configuration Approaches
-
 ### Top-Level Properties
 Simple resources with encryption properties directly on the resource.
 ```yaml
