@@ -103,7 +103,7 @@ export class EncryptionAtRestAspect implements IAspect {
       return;
     }
 
-    if (pattern === 'specification-object' || pattern === 'configuration-object') {
+    if (pattern === 'configuration-object') {
       const configProp = properties.find((p: any) => p.purpose === 'configuration');
       if (!configProp) return;
 
@@ -111,13 +111,15 @@ export class EncryptionAtRestAspect implements IAspect {
       if (nestedProps.length > 0) {
         const obj: any = {};
         for (const prop of nestedProps) {
-          const key = prop.path.split('.')[1];
+          const key = prop.path.split('.').pop()?.replace('[]', '');
+          if (!key) continue;
+          
           if (prop.purpose === 'enable-flag') {
             obj[key] = true;
           } else if (prop.purpose === 'kms-key-id' && kmsKey) {
             obj[key] = kmsKey;
           } else if (prop.purpose === 'encryption-type' && prop.acceptedValues) {
-            obj[key] = prop.acceptedValues[0];
+            obj[key] = kmsKey ? (prop.acceptedValues.find(v => v.includes('KMS')) || prop.acceptedValues[0]) : prop.acceptedValues[0];
           }
         }
         resource.addPropertyOverride(configProp.name, obj);
