@@ -1,8 +1,571 @@
-# AppSec Design Document: CDK Encryption-at-Rest Aspect
+# AppSec Design Document: CDK Encryption-at-Rest Mixin
 
 ## 1. Overview
 
-**Purpose:** Provide a CDK Aspect that automatically applies encryption-at-rest configuration to AWS resources based on a curated, purpose-driven specification.
+**Purpose:** Provide a CDK Mixin that applies encryption-at-rest configuration to AWS resources based on a curated, purpose-driven specification.
+
+**Scope:** 150 AWS CloudFormation resource types with verified encryption-at-rest support.
+
+**Security Posture:** Defense-in-depth approach with fail-safe defaults, validation at multiple layers, and comprehensive coverage of AWS encryption patterns.
+
+## 2. Architecture
+
+```
+┌─────────────────────────────────┐
+│  User CDK App                   │
+│                                 │
+│  new CfnBucket(...)             │
+│    .with(new EncryptionAtRest())│
+└────────┬────────────────────────┘
+         │
+         ▼
+┌──────────────────────────────────────┐
+│  EncryptionAtRest Mixin              │
+│  ┌────────────────────────────────┐  │
+│  │ supports(construct)            │  │
+│  │  → Check if CfnResource        │  │
+│  │  → Lookup in data.json         │  │
+│  │                                │  │
+│  │ applyTo(construct)             │  │
+│  │  → Group props by context      │  │
+│  │  → Apply by purpose            │  │
+│  │                                │  │
+│  │ validate(construct)            │  │
+│  │  → Verify encryption applied   │  │
+│  └────────────────────────────────┘  │
+└────────┬─────────────────────────────┘
+         │
+         ▼
+┌──────────────────────────────────────┐
+│  data.json (Security-Reviewed)       │
+│  ┌────────────────────────────────┐  │
+│  │ 150 resources                  │  │
+│  │ 4 property purposes            │  │
+│  │ Context-aware grouping         │  │
+│  │ Nested property paths          │  │
+│  └────────────────────────────────┘  │
+└──────────────────────────────────────┘
+```
+
+## 3. User Interface
+
+```typescript
+interface EncryptionAtRestProps {
+  readonly kmsKey?: string;      // KMS key identifier (ARN, ID, or alias)
+}
+
+// Usage with L1 constructs
+const bucket = new s3.CfnBucket(scope, 'Bucket')
+  .with(new EncryptionAtRest({ kmsKey: 'arn:aws:kms:...' }));
+
+// Usage with L2 constructs
+const table = new dynamodb.Table(scope, 'Table', { ... })
+  .with(new EncryptionAtRest());
+
+// Apply to multiple resources (fail-safe: skips unsupported)
+Mixins.of(scope, ConstructSelector.resourcesOfType('AWS::S3::Bucket'))
+  .apply(new EncryptionAtRest({ kmsKey: 'key-123' }));
+
+// Enforce application (fails if any resource unsupported)
+Mixins.of(scope, ConstructSelector.resourcesOfType('AWS::S3::Bucket'))
+  .mustApply(new EncryptionAtRest({ kmsKey: 'key-123' }));
+```
+
+**Security Design Decisions:**
+
+- **Explicit application:** Mixin must be explicitly applied via `.with()` or `Mixins.of()`
+- **Flexible key management:** Supports AWS-managed and customer-managed keys
+- **Validation built-in:** `validate()` method ensures encryption was properly applied
+- **Type-safe:** TypeScript ensures correct usage patterns
+- **Framework-level enforcement:** `mustApply()` provides strict mode at framework level
+
+## 4. Purpose-Driven Security Model
+
+### 4.1 Property Classification
+
+All encryption properties are classified by **purpose**, enabling consistent security controls:
+
+| Purpose           | Count | Security Role       | Validation                  |
+| ----------------- | ----- | ------------------- | --------------------------- |
+| `kms-key-id`      | 154   | Key specification   | ARN format, IAM permissions |
+| `configuration`   | 52    | Container object    | Nested structure validation |
+| `encryption-type` | 42    | Algorithm selection | Allowed values enforcement  |
+| `enable-flag`     | 21    | Explicit enablement | Boolean type safety         |
+
+**Security Benefit:** Purpose-based logic eliminates pattern-specific vulnerabilities and ensures consistent security controls across all resource types.
+
+### 4.2 Context-Aware Encryption
+
+Resources with multiple encryption contexts (e.g., RDS storage + performance insights) are handled atomically:
+
+```typescript
+// Properties with same context are grouped and applied together
+AWS::RDS::DBInstance:
+  - StorageEncrypted (context: storage)
+  - KmsKeyId (context: storage)
+  - PerformanceInsightsKMSKeyId (context: performance-insights)
+```
+
+**Security Benefit:** Prevents partial encryption where some data contexts remain unencrypted.
+
+## 5. Threat Model
+
+### 5.1 Assets
+
+- **Customer data at rest** in 150+ AWS resource types
+- **KMS keys** (AWS-managed and customer-managed)
+- **data.json specification** (150 resources, 269 properties)
+- **CDK application code** using the mixin
+
+### 5.2 Trust Boundaries
+
+1. **User → Mixin:** User applies mixin to constructs
+2. **Mixin → data.json:** Mixin reads purpose-driven specification
+3. **Mixin → CloudFormation:** Mixin modifies resource properties by purpose
+
+### 5.3 Threats & Mitigations
+
+#### **T1: Property Mapping Errors**
+
+**Threat:** Incorrect purpose classification applies encryption to wrong property.
+
+**Impact:** MEDIUM - Resources remain unencrypted or misconfigured.
+
+**Mitigations:**
+
+- ✅ **Purpose-driven logic:** Eliminates pattern-specific mapping errors
+- ✅ **Nested path validation:** Full property paths documented (45 resources)
+- ✅ **CDK validation:** Property names validated at synth time
+- ✅ **Human security review:** All 150 resources manually verified
+- ✅ **Schema validation:** JSON Schema enforces structure
+- ✅ **Mixin validation:** `validate()` method checks encryption was applied
+
+**Residual Risk:** LOW
+
+---
+
+#### **T2: KMS Key Misuse**
+
+**Threat:** User provides invalid/unauthorized KMS key ARN.
+
+**Impact:** MEDIUM - Deployment fails or uses unintended key.
+
+**Mitigations:**
+
+- ✅ **CloudFormation validation:** KMS key validated at deploy time
+- ✅ **IAM enforcement:** KMS key access controlled via IAM policies
+- ✅ **Purpose classification:** All 154 kms-key-id properties consistently handled
+- ✅ **Type safety:** TypeScript ensures string type for key properties
+
+**Residual Risk:** LOW (CloudFormation + IAM provide defense-in-depth)
+
+---
+
+#### **T3: Encryption Downgrade**
+
+**Threat:** Mixin overwrites stronger encryption with weaker settings.
+
+**Impact:** HIGH - Security regression.
+
+**Mitigations:**
+
+- ✅ **Explicit application:** Mixin only applies when explicitly called via `.with()`
+- ✅ **Validation method:** `validate()` can detect existing encryption
+- ✅ **Immutable by default:** CloudFormation prevents modification of encryption settings for many resources
+- ✅ **User responsibility:** Developers explicitly choose to apply mixin
+
+**Residual Risk:** LOW-MEDIUM (user must exercise care when applying to existing resources)
+
+---
+
+#### **T4: Incomplete Context Coverage**
+
+**Threat:** Multi-context resources only partially encrypted (e.g., RDS storage encrypted but performance insights unencrypted).
+
+**Impact:** HIGH - Data leakage through unencrypted context.
+
+**Mitigations:**
+
+- ✅ **Context grouping:** Properties with same context applied atomically
+- ✅ **3 multi-context resources identified:** RDS::DBInstance, RDS::DBCluster, WorkSpaces::Workspace
+- ✅ **All contexts documented:** Each context explicitly specified in data.json
+- ✅ **Single mixin application:** One `.with()` call applies all contexts
+
+**Residual Risk:** LOW
+
+---
+
+#### **T5: Incomplete Resource Coverage**
+
+**Threat:** New AWS resources not in data.json remain unencrypted.
+
+**Impact:** MEDIUM - Partial encryption coverage.
+
+**Mitigations:**
+
+- ✅ **150 resources covered:** Comprehensive coverage of encryption-capable resources
+- ✅ **33 resources removed:** Non-encryption resources eliminated during review
+- ✅ **`supports()` method:** Returns false for unknown resources
+- ✅ **Fail-safe behavior:** `apply()` skips unknown resources without error
+- ✅ **Strict enforcement available:** `mustApply()` fails if unknown resources encountered
+- ✅ **Framework-level control:** Organizations can enforce complete coverage via `mustApply()`
+
+**Residual Risk:** MEDIUM (ongoing maintenance required as AWS releases new services)
+
+---
+
+#### **T6: Supply Chain Attack**
+
+**Threat:** Compromised npm package delivers malicious mixin code.
+
+**Impact:** CRITICAL - Arbitrary code execution in CDK apps.
+
+**Mitigations:**
+
+- ✅ **Package signing:** npm package signatures
+- ✅ **Dependency pinning:** Lock files for reproducible builds
+- ✅ **Schema validation:** data.json validated against schema
+- ✅ **Human review:** All changes to data.json security-reviewed
+- ✅ **Minimal dependencies:** Mixin has no external dependencies beyond aws-cdk-lib
+
+**Residual Risk:** LOW (standard npm security practices)
+
+---
+
+## 6. Security Requirements
+
+### 6.1 Fail-Safe Defaults
+
+- **REQ-1:** Unknown resources MUST return false from `supports()`
+- **REQ-2:** `apply()` MUST skip unsupported constructs without error
+- **REQ-3:** `mustApply()` MUST fail if any selected construct is unsupported
+- **REQ-4:** Mixin MUST NOT modify non-encryption properties
+
+### 6.2 Auditability
+
+- **REQ-5:** Mixin application MUST be visible in synthesized CloudFormation
+- **REQ-6:** `validate()` method MUST report encryption status
+- **REQ-7:** Mixin MUST be traceable in CDK construct tree
+
+### 6.3 Least Privilege
+
+- **REQ-8:** Mixin MUST only modify encryption-related properties (validated by purpose)
+- **REQ-9:** KMS key access controlled via IAM (not mixin responsibility)
+- **REQ-10:** Context isolation: Multi-context resources handled independently
+
+## 7. Implementation Safeguards
+
+```typescript
+export class EncryptionAtRest {
+  constructor(private readonly props: EncryptionAtRestProps = {}) {}
+
+  // SAFEGUARD 1: Type-safe construct checking
+  supports(construct: IConstruct): boolean {
+    if (!(construct instanceof CfnResource)) {
+      return false;
+    }
+    return construct.cfnResourceType in encryptionData;
+  }
+
+  // SAFEGUARD 2: Fail-safe application
+  applyTo(construct: IConstruct): IConstruct {
+    if (!(construct instanceof CfnResource)) {
+      return construct; // Skip non-CFN resources
+    }
+
+    const config = encryptionData[construct.cfnResourceType];
+    if (!config) {
+      return construct; // Skip unknown resources
+    }
+
+    this.applyEncryption(construct, config);
+    return construct;
+  }
+
+  // SAFEGUARD 3: Post-application validation
+  validate(construct: IConstruct): string[] {
+    const errors: string[] = [];
+    
+    // Check if encryption was properly applied
+    const hasEncryption = config.properties.some((prop: any) => {
+      if (prop.purpose === 'enable-flag' || 
+          prop.purpose === 'kms-key-id' || 
+          prop.purpose === 'configuration') {
+        const value = (construct as any)[prop.name];
+        return value !== undefined && value !== null;
+      }
+      return false;
+    });
+
+    if (!hasEncryption) {
+      errors.push(`Encryption not configured for ${construct.cfnResourceType}`);
+    }
+
+    return errors;
+  }
+
+  // SAFEGUARD 4: Purpose-driven application with context grouping
+  private applyEncryption(resource: CfnResource, config: any): void {
+    // Group properties by context for atomic application
+    const contexts = new Map<string, any[]>();
+    for (const prop of config.properties) {
+      const ctx = prop.context || 'default';
+      if (!contexts.has(ctx)) contexts.set(ctx, []);
+      contexts.get(ctx)!.push(prop);
+    }
+    
+    // Apply encryption for each context independently
+    for (const [, props] of contexts) {
+      this.applyEncryptionForContext(resource, props, this.props.kmsKey);
+    }
+  }
+}
+```
+
+## 8. Data Integrity & Validation
+
+### 8.1 Schema Enforcement
+
+```json
+{
+  "properties": {
+    "purpose": {
+      "enum": ["enable-flag", "kms-key-id", "encryption-type", "configuration"]
+    },
+    "path": {
+      "description": "Full property path for nested properties"
+    },
+    "context": {
+      "description": "Encryption context for multi-context resources"
+    }
+  }
+}
+```
+
+**Security Benefit:** Schema validation prevents malformed data from reaching production.
+
+### 8.2 Human Review Process
+
+- ✅ **150 resources manually verified** against AWS documentation
+- ✅ **33 non-encryption resources removed** during security review
+- ✅ **All nested properties documented** (45 resources with 100+ nested paths)
+- ✅ **Purpose classification validated** for all 269 properties
+
+## 9. Testing Strategy
+
+### 9.1 Mixin Interface Tests
+
+```typescript
+test('supports() returns true for known resources', () => {
+  const bucket = new CfnBucket(stack, 'Bucket');
+  const mixin = new EncryptionAtRest();
+  
+  expect(mixin.supports(bucket)).toBe(true);
+});
+
+test('supports() returns false for unknown resources', () => {
+  const construct = new Construct(stack, 'Unknown');
+  const mixin = new EncryptionAtRest();
+  
+  expect(mixin.supports(construct)).toBe(false);
+});
+
+test('applyTo() returns construct unchanged for unsupported types', () => {
+  const construct = new Construct(stack, 'Unknown');
+  const mixin = new EncryptionAtRest();
+  
+  const result = mixin.applyTo(construct);
+  expect(result).toBe(construct);
+});
+```
+
+### 9.2 Purpose-Specific Tests
+
+```typescript
+test('enable-flag purpose', () => {
+  const volume = new CfnVolume(stack, 'Vol', {});
+  const mixin = new EncryptionAtRest();
+  
+  mixin.applyTo(volume);
+  
+  const template = Template.fromStack(stack);
+  template.hasResourceProperties('AWS::EC2::Volume', {
+    Encrypted: true
+  });
+});
+
+test('kms-key-id purpose', () => {
+  const secret = new CfnSecret(stack, 'Secret', {});
+  const mixin = new EncryptionAtRest({ 
+    kmsKey: 'arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012' 
+  });
+  
+  mixin.applyTo(secret);
+  
+  const template = Template.fromStack(stack);
+  template.hasResourceProperties('AWS::SecretsManager::Secret', {
+    KmsKeyId: Match.stringLikeRegexp('arn:aws:kms:.*')
+  });
+});
+
+test('context grouping', () => {
+  const instance = new CfnDBInstance(stack, 'DB', {});
+  const mixin = new EncryptionAtRest({ kmsKey: 'key-123' });
+  
+  mixin.applyTo(instance);
+  
+  const template = Template.fromStack(stack);
+  template.hasResourceProperties('AWS::RDS::DBInstance', {
+    StorageEncrypted: true,
+    KmsKeyId: 'key-123',
+    PerformanceInsightsKMSKeyId: 'key-123'
+  });
+});
+```
+
+### 9.3 Validation Tests
+
+```typescript
+test('validate() returns errors for unencrypted resources', () => {
+  const bucket = new CfnBucket(stack, 'Bucket', {});
+  const mixin = new EncryptionAtRest();
+  
+  const errors = mixin.validate(bucket);
+  expect(errors).toContain('Encryption not configured for AWS::S3::Bucket');
+});
+
+test('validate() returns no errors after successful application', () => {
+  const bucket = new CfnBucket(stack, 'Bucket', {});
+  const mixin = new EncryptionAtRest();
+  
+  mixin.applyTo(bucket);
+  const errors = mixin.validate(bucket);
+  
+  expect(errors).toHaveLength(0);
+});
+```
+
+### 9.4 Integration with Mixins Framework
+
+```typescript
+test('works with .with() syntax', () => {
+  const bucket = new CfnBucket(stack, 'Bucket')
+    .with(new EncryptionAtRest({ kmsKey: 'key-123' }));
+  
+  const template = Template.fromStack(stack);
+  template.hasResourceProperties('AWS::S3::Bucket', {
+    BucketEncryption: Match.objectLike({})
+  });
+});
+
+test('works with Mixins.of().apply() for bulk application', () => {
+  new CfnBucket(stack, 'Bucket1');
+  new CfnBucket(stack, 'Bucket2');
+  
+  Mixins.of(stack, ConstructSelector.resourcesOfType('AWS::S3::Bucket'))
+    .apply(new EncryptionAtRest({ kmsKey: 'key-123' }));
+  
+  const template = Template.fromStack(stack);
+  expect(template.findResources('AWS::S3::Bucket')).toHaveLength(2);
+  // Both buckets should have encryption
+});
+
+test('mustApply() fails on unsupported resources', () => {
+  new CfnBucket(stack, 'Bucket');
+  new Construct(stack, 'Unknown'); // Not a CfnResource
+  
+  expect(() => {
+    Mixins.of(stack, ConstructSelector.all())
+      .mustApply(new EncryptionAtRest({ kmsKey: 'key-123' }));
+  }).toThrow(/does not support/);
+});
+
+test('mustApply() succeeds when all resources supported', () => {
+  new CfnBucket(stack, 'Bucket1');
+  new CfnBucket(stack, 'Bucket2');
+  
+  expect(() => {
+    Mixins.of(stack, ConstructSelector.resourcesOfType('AWS::S3::Bucket'))
+      .mustApply(new EncryptionAtRest({ kmsKey: 'key-123' }));
+  }).not.toThrow();
+});
+```
+
+## 10. Risk Summary
+
+| Threat                   | Likelihood | Impact   | Residual Risk  |
+| ------------------------ | ---------- | -------- | -------------- |
+| T1: Mapping errors       | LOW        | MEDIUM   | **LOW**        |
+| T2: KMS key misuse       | MEDIUM     | MEDIUM   | **LOW**        |
+| T3: Encryption downgrade | LOW        | HIGH     | **LOW-MEDIUM** |
+| T4: Incomplete context   | LOW        | HIGH     | **LOW**        |
+| T5: Incomplete coverage  | HIGH       | MEDIUM   | **MEDIUM**     |
+| T6: Supply chain         | LOW        | CRITICAL | **LOW**        |
+
+**Overall Risk Rating:** **LOW** (acceptable for production use)
+
+**Key Security Strengths:**
+
+- Purpose-driven architecture eliminates pattern-specific vulnerabilities
+- Context-aware grouping prevents partial encryption
+- Comprehensive coverage (150 resources, 269 properties)
+- Defense-in-depth validation (schema + CDK + CloudFormation + IAM)
+- Fail-safe defaults with explicit application model
+- Built-in validation via `validate()` method
+
+**Mixin-Specific Advantages:**
+
+- Explicit application reduces accidental misconfiguration
+- Composable with other mixins for layered security
+- Works with L1, L2, and custom constructs
+- Type-safe integration with CDK
+
+## 11. Operational Security
+
+### 11.1 Monitoring & Alerting
+
+- Mixin application visible in CloudFormation templates
+- `validate()` method provides programmatic verification
+- CDK synthesis logs show mixin application
+- CloudFormation deployment logs show encryption configuration
+
+### 11.2 Maintenance & Updates
+
+- Quarterly security review of data.json against AWS documentation
+- Automated schema validation in CI/CD
+- Version data.json with semantic versioning
+- Security changelog for all data.json updates
+
+### 11.3 Incident Response
+
+- **Unknown resource:** `supports()` returns false, mixin skips
+- **Encryption downgrade:** User responsibility to check existing config
+- **Invalid KMS key:** CloudFormation deployment fails with clear error
+- **Supply chain compromise:** npm audit + package signature verification
+
+## 12. Compliance & Governance
+
+**Supported Compliance Frameworks:**
+
+- **HIPAA:** Encryption at rest for PHI
+- **PCI DSS:** Requirement 3.4 (encryption of cardholder data)
+- **GDPR:** Article 32 (security of processing)
+- **SOC 2:** CC6.7 (encryption of data at rest)
+
+**Governance Features:**
+
+- Explicit mixin application for audit trail
+- `validate()` method for compliance verification
+- Centralized encryption key management
+- Consistent encryption across 150+ resource types
+- Composable with other security mixins
+
+---
+
+**Document Version:** 3.0  
+**Last Updated:** 2025-11-03  
+**Security Review Status:** ✅ Approved  
+**Next Review:** 2026-02-03
 
 **Scope:** 150 AWS CloudFormation resource types with verified encryption-at-rest support.
 
@@ -14,12 +577,12 @@
 ┌─────────────────┐
 │  User CDK App   │
 │                 │
-│  aspect.apply() │
+│  mixin.with() │
 └────────┬────────┘
          │
          ▼
 ┌──────────────────────────────────────┐
-│  EncryptionAtRestAspect              │
+│  EncryptionAtRest              │
 │  ┌────────────────────────────────┐  │
 │  │ visit(node: IConstruct)        │  │
 │  │  1. Get CFN resource type      │  │
@@ -44,7 +607,7 @@
 ## 3. User Interface
 
 ```typescript
-interface EncryptionAtRestAspectProps {
+interface EncryptionAtRestProps {
   readonly kmsKey?: string;      // KMS key identifier (ARN, ID, or alias)
   readonly enabled?: boolean;     // Enable/disable toggle (default: true)
   readonly strict?: boolean;      // Fail on unknown resources (default: false)
@@ -52,6 +615,7 @@ interface EncryptionAtRestAspectProps {
 ```
 
 **Security Design Decisions:**
+
 - **Opt-out by default:** Encryption enabled unless explicitly disabled
 - **Strict mode available:** Organizations can enforce encryption coverage
 - **Flexible key management:** Supports AWS-managed and customer-managed keys
@@ -88,24 +652,28 @@ AWS::RDS::DBInstance:
 ## 5. Threat Model
 
 ### 5.1 Assets
+
 - **Customer data at rest** in 150+ AWS resource types
 - **KMS keys** (AWS-managed and customer-managed)
 - **data.json specification** (150 resources, 269 properties)
-- **CDK application code** using the aspect
+- **CDK application code** using the mixin
 
 ### 5.2 Trust Boundaries
-1. **User → Aspect:** User provides encryption configuration
-2. **Aspect → data.json:** Aspect reads purpose-driven specification
-3. **Aspect → CloudFormation:** Aspect modifies resource properties by purpose
+
+1. **User → Mixin:** User provides encryption configuration
+2. **Mixin → data.json:** Mixin reads purpose-driven specification
+3. **Mixin → CloudFormation:** Mixin modifies resource properties by purpose
 
 ### 5.3 Threats & Mitigations
 
 #### **T1: Property Mapping Errors**
+
 **Threat:** Incorrect purpose classification applies encryption to wrong property.
 
 **Impact:** MEDIUM - Resources remain unencrypted or misconfigured.
 
 **Mitigations:**
+
 - ✅ **Purpose-driven logic:** Eliminates pattern-specific mapping errors
 - ✅ **Nested path validation:** Full property paths documented (45 resources)
 - ✅ **CDK validation:** Property names validated at synth time
@@ -118,11 +686,13 @@ AWS::RDS::DBInstance:
 ---
 
 #### **T2: KMS Key Misuse**
+
 **Threat:** User provides invalid/unauthorized KMS key ARN.
 
 **Impact:** MEDIUM - Deployment fails or uses unintended key.
 
 **Mitigations:**
+
 - ✅ **CloudFormation validation:** KMS key validated at deploy time
 - ✅ **IAM enforcement:** KMS key access controlled via IAM policies
 - ✅ **Purpose classification:** All 154 kms-key-id properties consistently handled
@@ -133,11 +703,13 @@ AWS::RDS::DBInstance:
 ---
 
 #### **T3: Encryption Downgrade**
-**Threat:** Aspect overwrites stronger encryption with weaker settings.
+
+**Threat:** Mixin overwrites stronger encryption with weaker settings.
 
 **Impact:** HIGH - Security regression.
 
 **Mitigations:**
+
 - ✅ **Pre-flight check:** `hasEncryption()` detects existing configuration
 - ✅ **Strict mode:** Fails if encryption already configured
 - ✅ **Non-strict mode:** Logs warning and skips resource
@@ -148,11 +720,13 @@ AWS::RDS::DBInstance:
 ---
 
 #### **T4: Incomplete Context Coverage**
+
 **Threat:** Multi-context resources only partially encrypted (e.g., RDS storage encrypted but performance insights unencrypted).
 
 **Impact:** HIGH - Data leakage through unencrypted context.
 
 **Mitigations:**
+
 - ✅ **Context grouping:** Properties with same context applied atomically
 - ✅ **3 multi-context resources identified:** RDS::DBInstance, RDS::DBCluster, WorkSpaces::Workspace
 - ✅ **All contexts documented:** Each context explicitly specified in data.json
@@ -162,11 +736,13 @@ AWS::RDS::DBInstance:
 ---
 
 #### **T5: Incomplete Resource Coverage**
+
 **Threat:** New AWS resources not in data.json remain unencrypted.
 
 **Impact:** MEDIUM - Partial encryption coverage.
 
 **Mitigations:**
+
 - ✅ **150 resources covered:** Comprehensive coverage of encryption-capable resources
 - ✅ **33 resources removed:** Non-encryption resources eliminated during review
 - ✅ **Fail-safe logging:** Unknown resources logged with warning
@@ -177,11 +753,13 @@ AWS::RDS::DBInstance:
 ---
 
 #### **T6: Supply Chain Attack**
-**Threat:** Compromised npm package delivers malicious aspect code.
+
+**Threat:** Compromised npm package delivers malicious mixin code.
 
 **Impact:** CRITICAL - Arbitrary code execution in CDK apps.
 
 **Mitigations:**
+
 - ✅ **Package signing:** npm package signatures
 - ✅ **Dependency pinning:** Lock files for reproducible builds
 - ✅ **Schema validation:** data.json validated against schema
@@ -194,25 +772,28 @@ AWS::RDS::DBInstance:
 ## 6. Security Requirements
 
 ### 6.1 Fail-Safe Defaults
+
 - **REQ-1:** Unknown resources MUST log warning and skip (not fail) in non-strict mode
 - **REQ-2:** Strict mode MUST fail on unknown resources
-- **REQ-3:** Aspect MUST NOT overwrite existing encryption without explicit opt-in
+- **REQ-3:** Mixin MUST NOT overwrite existing encryption without explicit opt-in
 - **REQ-4:** Encryption MUST be enabled by default (`enabled: true`)
 
 ### 6.2 Auditability
+
 - **REQ-5:** All encryption decisions MUST be logged via CDK Annotations
-- **REQ-6:** Aspect MUST report which resources were modified
+- **REQ-6:** Mixin MUST report which resources were modified
 - **REQ-7:** Warnings MUST be emitted for skipped resources
 
 ### 6.3 Least Privilege
-- **REQ-8:** Aspect MUST only modify encryption-related properties (validated by purpose)
-- **REQ-9:** KMS key access controlled via IAM (not aspect responsibility)
+
+- **REQ-8:** Mixin MUST only modify encryption-related properties (validated by purpose)
+- **REQ-9:** KMS key access controlled via IAM (not mixin responsibility)
 - **REQ-10:** Context isolation: Multi-context resources handled independently
 
 ## 7. Implementation Safeguards
 
 ```typescript
-class EncryptionAtRestAspect implements IAspect {
+class EncryptionAtRest implements IMixin {
   visit(node: IConstruct): void {
     // SAFEGUARD 1: Only process CFN resources
     if (!(node instanceof CfnResource)) return;
@@ -288,6 +869,7 @@ class EncryptionAtRestAspect implements IAspect {
 ## 8. Data Integrity & Validation
 
 ### 8.1 Schema Enforcement
+
 ```json
 {
   "properties": {
@@ -307,6 +889,7 @@ class EncryptionAtRestAspect implements IAspect {
 **Security Benefit:** Schema validation prevents malformed data from reaching production.
 
 ### 8.2 Human Review Process
+
 - ✅ **150 resources manually verified** against AWS documentation
 - ✅ **33 non-encryption resources removed** during security review
 - ✅ **All nested properties documented** (45 resources with 100+ nested paths)
@@ -315,12 +898,13 @@ class EncryptionAtRestAspect implements IAspect {
 ## 9. Testing Strategy
 
 ### 9.1 Purpose-Specific Unit Tests
+
 ```typescript
 test('enable-flag purpose', () => {
   const stack = new Stack();
   const volume = new CfnVolume(stack, 'Vol', {...});
   
-  Aspects.of(stack).add(new EncryptionAtRestAspect());
+  Mixins.of(stack).add(new EncryptionAtRest());
   
   const template = Template.fromStack(stack);
   template.hasResourceProperties('AWS::EC2::Volume', {
@@ -332,7 +916,7 @@ test('kms-key-id purpose', () => {
   const stack = new Stack();
   const secret = new CfnSecret(stack, 'Secret', {...});
   
-  Aspects.of(stack).add(new EncryptionAtRestAspect({ 
+  Mixins.of(stack).add(new EncryptionAtRest({ 
     kmsKey: 'arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012' 
   }));
   
@@ -346,7 +930,7 @@ test('context grouping', () => {
   const stack = new Stack();
   const instance = new CfnDBInstance(stack, 'DB', {...});
   
-  Aspects.of(stack).add(new EncryptionAtRestAspect({ 
+  Mixins.of(stack).add(new EncryptionAtRest({ 
     kmsKey: 'key-123' 
   }));
   
@@ -360,6 +944,7 @@ test('context grouping', () => {
 ```
 
 ### 9.2 Security Tests
+
 ```typescript
 test('prevents encryption downgrade', () => {
   const stack = new Stack();
@@ -367,7 +952,7 @@ test('prevents encryption downgrade', () => {
     bucketEncryption: { /* already configured */ }
   });
   
-  Aspects.of(stack).add(new EncryptionAtRestAspect({ strict: true }));
+  Mixins.of(stack).add(new EncryptionAtRest({ strict: true }));
   
   expect(() => Template.fromStack(stack)).toThrow(/already has encryption/);
 });
@@ -379,7 +964,7 @@ test('strict mode fails on unknown resource', () => {
     type: 'AWS::FutureService::Resource'
   });
   
-  Aspects.of(stack).add(new EncryptionAtRestAspect({ strict: true }));
+  Mixins.of(stack).add(new EncryptionAtRest({ strict: true }));
   
   expect(() => Template.fromStack(stack)).toThrow(/No encryption configuration/);
 });
@@ -399,6 +984,7 @@ test('strict mode fails on unknown resource', () => {
 **Overall Risk Rating:** **LOW** (acceptable for production use)
 
 **Key Security Strengths:**
+
 - Purpose-driven architecture eliminates pattern-specific vulnerabilities
 - Context-aware grouping prevents partial encryption
 - Comprehensive coverage (150 resources, 269 properties)
@@ -408,18 +994,21 @@ test('strict mode fails on unknown resource', () => {
 ## 11. Operational Security
 
 ### 11.1 Monitoring & Alerting
+
 - Log all encryption applications via CDK Annotations
 - Track coverage metrics (% resources encrypted per stack)
 - Alert on unknown resource types in strict mode
 - Monitor for encryption downgrade attempts
 
 ### 11.2 Maintenance & Updates
+
 - Quarterly security review of data.json against AWS documentation
 - Automated schema validation in CI/CD
 - Version data.json with semantic versioning
 - Security changelog for all data.json updates
 
 ### 11.3 Incident Response
+
 - **Unknown resource detected:** Log warning, continue (non-strict) or fail (strict)
 - **Encryption downgrade attempted:** Log warning, skip resource (non-strict) or fail (strict)
 - **Invalid KMS key:** CloudFormation deployment fails with clear error
@@ -428,12 +1017,14 @@ test('strict mode fails on unknown resource', () => {
 ## 12. Compliance & Governance
 
 **Supported Compliance Frameworks:**
+
 - **HIPAA:** Encryption at rest for PHI
 - **PCI DSS:** Requirement 3.4 (encryption of cardholder data)
 - **GDPR:** Article 32 (security of processing)
 - **SOC 2:** CC6.7 (encryption of data at rest)
 
 **Governance Features:**
+
 - Strict mode for mandatory encryption policies
 - Audit trail via CDK Annotations
 - Centralized encryption key management
@@ -450,12 +1041,12 @@ test('strict mode fails on unknown resource', () => {
 ┌─────────────────┐
 │  User CDK App   │
 │                 │
-│  aspect.apply() │
+│  mixin.with() │
 └────────┬────────┘
          │
          ▼
 ┌─────────────────────────────────┐
-│  EncryptionAtRestAspect         │
+│  EncryptionAtRest         │
 │  ┌───────────────────────────┐  │
 │  │ visit(node: IConstruct)   │  │
 │  │  1. Get CFN resource type │  │
@@ -489,24 +1080,28 @@ interface EncryptionAtRestProps {
 ## 4. Threat Model
 
 ### 4.1 Assets
+
 - **Customer data at rest** in AWS resources
 - **KMS keys** used for encryption
 - **data.json specification** file
-- **CDK application code** using the aspect
+- **CDK application code** using the mixin
 
 ### 4.2 Trust Boundaries
-1. **User → Aspect:** User provides encryption configuration
-2. **Aspect → data.json:** Aspect reads specification
-3. **Aspect → CloudFormation:** Aspect modifies resource properties
+
+1. **User → Mixin:** User provides encryption configuration
+2. **Mixin → data.json:** Mixin reads specification
+3. **Mixin → CloudFormation:** Mixin modifies resource properties
 
 ### 4.3 Threats & Mitigations
 
 #### **T1: Property Mapping Errors**
+
 **Threat:** Incorrect mapping applies encryption to wrong property or skips encryption.
 
 **Impact:** MEDIUM - Resources remain unencrypted or misconfigured.
 
 **Mitigations:**
+
 - ✅ CDK validates property names and types at synth time (catches invalid properties immediately)
 - ✅ Code generation from data.json ensures type safety
 - ✅ Comprehensive test suite:
@@ -519,6 +1114,7 @@ interface EncryptionAtRestProps {
 **Residual Risk:** LOW
 
 **Why CDK validation is sufficient:**
+
 - CDK's `addPropertyOverride()` validates against CloudFormation spec at synth time
 - Invalid property names → synth fails with clear error
 - Wrong property types → TypeScript compilation fails
@@ -527,14 +1123,16 @@ interface EncryptionAtRestProps {
 ---
 
 #### **T2: KMS Key Misuse**
+
 **Threat:** User provides invalid/unauthorized KMS key ARN.
 
 **Impact:** MEDIUM - Deployment fails or uses unintended key.
 
 **Mitigations:**
+
 - ✅ CloudFormation validates KMS key at deploy time
 - ✅ IAM policies control KMS key access
-- ⚠️ **RECOMMENDED:** Aspect validates KMS ARN format before applying
+- ⚠️ **RECOMMENDED:** Mixin validates KMS ARN format before applying
 - ⚠️ **RECOMMENDED:** Optional allowlist of permitted KMS keys
 
 **Residual Risk:** LOW (CloudFormation catches most issues)
@@ -542,12 +1140,14 @@ interface EncryptionAtRestProps {
 ---
 
 #### **T3: Encryption Downgrade**
-**Threat:** Aspect overwrites stronger encryption with weaker settings.
+
+**Threat:** Mixin overwrites stronger encryption with weaker settings.
 
 **Impact:** HIGH - Security regression.
 
 **Mitigations:**
-- ✅ Aspect only applies if property is undefined/null
+
+- ✅ Mixin only applies if property is undefined/null
 - ✅ Explicit opt-in via `enabled: false` required to disable
 - ⚠️ **RECOMMENDED:** Audit mode that reports existing encryption settings
 - ⚠️ **RECOMMENDED:** Fail-closed: Error if attempting to weaken encryption
@@ -557,11 +1157,13 @@ interface EncryptionAtRestProps {
 ---
 
 #### **T4: Pattern Classification Errors**
+
 **Threat:** Resource classified with wrong pattern, leading to incorrect property structure.
 
 **Impact:** MEDIUM - Deployment fails or encryption not applied.
 
 **Mitigations:**
+
 - ✅ Code generation from data.json patterns ensures consistent implementation
 - ✅ Pattern-specific test suites:
   - `boolean-and-key`: Test that both Encrypted=true and KmsKeyId are set
@@ -576,12 +1178,14 @@ interface EncryptionAtRestProps {
 ---
 
 #### **T5: Incomplete Coverage**
+
 **Threat:** New AWS resources not in data.json remain unencrypted.
 
 **Impact:** MEDIUM - Partial encryption coverage.
 
 **Mitigations:**
-- ✅ Aspect logs warning for unknown resource types
+
+- ✅ Mixin logs warning for unknown resource types
 - ✅ Regular updates to data.json as AWS releases new services
 - ⚠️ **RECOMMENDED:** CI/CD check that fails if unknown resources detected
 - ⚠️ **RECOMMENDED:** Telemetry to track coverage gaps
@@ -591,11 +1195,13 @@ interface EncryptionAtRestProps {
 ---
 
 #### **T6: Supply Chain Attack**
-**Threat:** Compromised npm package delivers malicious aspect code.
+
+**Threat:** Compromised npm package delivers malicious mixin code.
 
 **Impact:** CRITICAL - Arbitrary code execution in CDK apps.
 
 **Mitigations:**
+
 - ✅ Package signing and verification
 - ✅ Dependency pinning with lock files
 - ✅ Regular security audits
@@ -609,23 +1215,26 @@ interface EncryptionAtRestProps {
 ## 5. Security Requirements
 
 ### 5.1 Fail-Safe Defaults
+
 - **REQ-1:** Unknown resources MUST log warning and skip (not fail)
 - **REQ-2:** Invalid KMS ARN format MUST be rejected
-- **REQ-3:** Aspect MUST NOT overwrite existing encryption settings without explicit opt-in
+- **REQ-3:** Mixin MUST NOT overwrite existing encryption settings without explicit opt-in
 
 ### 5.2 Auditability
+
 - **REQ-4:** All encryption decisions MUST be logged
-- **REQ-5:** Aspect MUST report which resources were modified
+- **REQ-5:** Mixin MUST report which resources were modified
 - **REQ-6:** Dry-run mode MUST be available for validation
 
 ### 5.3 Least Privilege
-- **REQ-7:** Aspect MUST only modify encryption-related properties
-- **REQ-8:** KMS key access controlled via IAM (not aspect responsibility)
+
+- **REQ-7:** Mixin MUST only modify encryption-related properties
+- **REQ-8:** KMS key access controlled via IAM (not mixin responsibility)
 
 ## 6. Implementation Safeguards
 
 ```typescript
-class EncryptionAtRestAspect implements IAspect {
+class EncryptionAtRest implements IMixin {
   visit(node: IConstruct): void {
     // SAFEGUARD 1: Only process CFN resources
     if (!CfnResource.isCfnResource(node)) return;
@@ -657,18 +1266,20 @@ class EncryptionAtRestAspect implements IAspect {
 ## 7. Testing Strategy
 
 ### 7.1 Code Generation Tests
-- ✅ Generate aspect code from data.json
+
+- ✅ Generate mixin code from data.json
 - ✅ Verify generated code compiles without errors
 - ✅ Type safety: Ensure all property references are type-safe
 
 ### 7.2 Pattern-Specific Unit Tests
+
 ```typescript
 // Example: boolean-and-key pattern
 test('RDS DBInstance encryption', () => {
   const stack = new Stack();
   const instance = new CfnDBInstance(stack, 'DB', {...});
   
-  Aspects.of(stack).add(new EncryptionAtRestAspect({ kmsKey: 'key-123' }));
+  Mixins.of(stack).add(new EncryptionAtRest({ kmsKey: 'key-123' }));
   
   const template = Template.fromStack(stack);
   template.hasResourceProperties('AWS::RDS::DBInstance', {
@@ -679,16 +1290,19 @@ test('RDS DBInstance encryption', () => {
 ```
 
 ### 7.3 Snapshot Tests
+
 - ✅ Golden templates for each resource type
 - ✅ Detect unintended changes to generated CloudFormation
 - ✅ Version control for encryption configurations
 
 ### 7.4 Integration Tests
+
 - ✅ CDK synth validates all properties (catches invalid names/types)
 - ✅ Deploy to test account and verify encryption via AWS APIs
 - ✅ Test with real KMS keys and IAM permissions
 
 ### 7.5 Security Tests
+
 - ✅ Attempt to overwrite existing encryption (should skip)
 - ✅ Provide invalid KMS ARNs (CDK/CloudFormation catches)
 - ✅ Test strict mode behavior
@@ -696,11 +1310,13 @@ test('RDS DBInstance encryption', () => {
 ## 8. Operational Considerations
 
 ### 8.1 Monitoring
+
 - Log all encryption applications
 - Track coverage metrics (% resources encrypted)
 - Alert on unknown resource types
 
 ### 8.2 Maintenance
+
 - Quarterly review of data.json against AWS documentation
 - Automated checks for new AWS resource types
 - Version data.json with semantic versioning
@@ -721,6 +1337,7 @@ test('RDS DBInstance encryption', () => {
 ## 10. Recommendations
 
 **MUST IMPLEMENT:**
+
 1. Code generation from data.json (ensures type safety and consistency)
 2. Comprehensive test suite (unit + integration + snapshot tests)
 3. Fail-safe defaults (skip unknown resources)
