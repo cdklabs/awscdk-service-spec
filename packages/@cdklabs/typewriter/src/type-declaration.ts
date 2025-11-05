@@ -65,7 +65,7 @@ export abstract class TypeDeclaration implements Documented, Exported {
   }
 
   /**
-   * The fully qualified name of the type (``<assembly>.<namespace>.<name>``)
+   * The fully qualified name of the type (``<parentScopeFqn>.<name>``)
    */
   public get fqn(): string {
     return this.scope.qualifyName(this.name);
