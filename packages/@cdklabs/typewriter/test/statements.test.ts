@@ -31,6 +31,12 @@ test('if-else with block statements', () => {
   `);
 });
 
+test('directCode statement builder', () => {
+  const s = stmt.directCode('console.log("hello")');
+
+  expect(renderStmt(s)).toMatchInlineSnapshot(`"console.log("hello");"`);
+});
+
 function renderStmt(s: Statement) {
   const scope = new Module('typewriter.test');
   scope.addInitialization(s);
