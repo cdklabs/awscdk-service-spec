@@ -56,6 +56,11 @@ export class ScopeImpl implements IScope {
   private readonly symbolMap = new Map<string, Map<string, Expression>>();
   public readonly typeMap: ReadonlyMap<string, TypeDeclaration> = this._typeMap;
 
+  /**
+   * Create a Scope with a given FQN
+   *
+   * All elements added to this scope will have this FQN as a prefix of their own FQN.
+   */
   constructor(public readonly fqn: string) {}
 
   public qualifyName(name: string): string {

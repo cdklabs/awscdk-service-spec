@@ -38,12 +38,28 @@ export class Module extends ScopeImpl {
   public readonly documentation = new Array<string>();
   public readonly initialization: ReadonlyArray<Statement> = this._initialization;
 
-  public get name(): string {
-    return this.fqn;
-  }
-
+  /**
+   * Create a module with a given FQN
+   *
+   * The FQN should just be unique, it does not need to correspond to a file
+   * name (it helps for you own bookkeeping if it is useful though).
+   *
+   * All types defined in this module will have this FQN as a prefix of their
+   * own FQN.
+   */
   public constructor(fqn: string) {
     super(fqn);
+  }
+
+  /**
+   * Whether this module has no types and no statements
+   */
+  public isEmpty(): boolean {
+    return this.types.length === 0 && this.initialization.length === 0;
+  }
+
+  public get name(): string {
+    return this.fqn;
   }
 
   public get importName() {
