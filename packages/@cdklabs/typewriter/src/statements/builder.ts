@@ -11,7 +11,7 @@ import {
   VariableDeclaration,
   ThrowStatement,
 } from './statements';
-import { Expression } from '../expressions';
+import { DirectCode, Expression } from '../expressions';
 
 export function ret(e?: Expression): Statement {
   return new ReturnStatement(e);
@@ -51,4 +51,14 @@ export function block(...stmts: Array<Statement | Expression>) {
 
 export function throw_(error: Expression) {
   return new ThrowStatement(error);
+}
+
+/**
+ * Insert a literal statement in the target code language
+ *
+ * (Internally uses an expression statement and the `directCode`
+ * expression).
+ */
+export function directCode(code: string): Statement {
+  return expr(new DirectCode(code));
 }
