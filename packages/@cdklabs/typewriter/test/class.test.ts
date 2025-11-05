@@ -25,3 +25,23 @@ test('class with a private constructor', () => {
     }"
   `);
 });
+
+test('can update some class spec fields after initial creation', () => {
+  const c = new ClassType(scope, {
+    name: 'MyClass',
+  });
+
+  c.update({
+    abstract: true,
+    extends: scope.type('SomeBase'),
+    implements: [scope.type('Interface1'), scope.type('Interface2')],
+    export: true,
+  });
+
+  expect(renderer.render(scope)).toMatchInlineSnapshot(`
+    "/* eslint-disable prettier/prettier, @stylistic/max-len */
+    export abstract class MyClass extends SomeBase implements Interface1, Interface2 {
+
+    }"
+  `);
+});
