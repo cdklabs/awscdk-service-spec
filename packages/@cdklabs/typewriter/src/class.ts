@@ -73,6 +73,15 @@ export class ClassType extends MemberType implements IScope {
     return new NewExpression(this.type, ...args);
   }
 
+  /**
+   * Update some of the fields of the class spec, except fields that are immutable or managed elsewhere.
+   *
+   * Members are managed via specific method calls.
+   */
+  public update<A extends Omit<Partial<ClassSpec>, 'properties' | 'methods' | 'name'>>(updates: A) {
+    Object.assign(this.spec, updates);
+  }
+
   //////////////////////////////////////////////////////////////////////
   // IScope
 
