@@ -75,6 +75,10 @@ export class Module extends ScopeImpl {
 
   /**
    * Add an import of another module into the current module
+   *
+   * `ModuleImport` should be either a `SelectiveModuleImport` or an
+   * `AliasedModuleImport`; symbols from the linked Module will automatically
+   * become availabe in the current module.
    */
   public addImport(imp: ModuleImport) {
     this._imports.push(imp);
