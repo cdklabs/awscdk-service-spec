@@ -30,16 +30,43 @@ export interface IScope {
 
   /**
    * Register a visible other scope into this scope
+   *
+   * Associate a resolver with all symbols from `scope`. When a symbol from
+   * the given scope is referenced, the `resolver` will be called to come up
+   * with the expression that should be used to do so.
+   *
+   * This affects the result of `symbolToExpression`.
+   *
+   * If the scopes in question are `Module`s, you should call something like:
+   *
+   * ```ts
+   * module1.addImport(new AliasedModuleImport(module2, pathToModule, 'xyz'));
+   * ```
+   *
+   * This will make all symbols from `module2` available in `module1.
    */
-  linkScope(scope: IScope, theImport: IScopeLink): void;
+  linkScope(scope: IScope, resolver: ISymbolResolver): void;
 
   /**
    * Register a visible symbol in this scope
+   *
+   * Associate a specific symbol with a given expression by which it can be
+   * referenced in the current scope.
+   *
+   * This affects the result of `symbolToExpression`.
+   *
+   * If the scopes in question are `Module`s, you should call something like:
+   *
+   * ```ts
+   * module1.addImport(new AliasedModuleImport(module2, pathToModule, 'xyz'));
+   * ```
+   *
+   * This will make all symbols from `module2` available in `module1.
    */
   linkSymbol(sym: ThingSymbol, alias: Expression): void;
 
   /**
-   * Turn a symbol into an expression that can be used to reference the symbol in this scope
+   * Turn a symbol into an expression that can be used to reference the symbol in this scope.
    */
   symbolToExpression(symbol: ThingSymbol): Expression | undefined;
 }
@@ -132,12 +159,17 @@ export const AMBIENT_SCOPE = new ScopeImpl('<<ambient>>');
 /**
  * Link one scope to another (make symbols from the linked scope visible in the current one)
  */
-export interface IScopeLink {
+export interface ISymbolResolver {
   /**
    * Return an expression that will reference the given symbol
    */
   referenceSymbol(sym: ThingSymbol): Expression;
 }
+
+/**
+ * Deprecated alias of ISymbolResolver
+ */
+export type IScopeLink = ISymbolResolver;
 
 /**
  * All things that have a scope
