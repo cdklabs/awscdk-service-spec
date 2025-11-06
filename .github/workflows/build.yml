@@ -186,6 +186,6 @@ jobs:
         if: "!(steps.diff-db.outputs.diff-result)"
         uses: thollander/actions-comment-pull-request@v3
         with:
-          comment_tag: diff-db
+          comment-tag: diff-db
           message: "**@aws-cdk/aws-service-spec**: No model change detected"
           mode: upsert
