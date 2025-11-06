@@ -88,6 +88,9 @@ export class TypeScriptRenderer extends Renderer {
       this.renderImports(mod);
       this.renderModuleTypes(mod);
 
+      if (mod.initialization.length > 0) {
+        this.emit('\n');
+      }
       this.emitList(mod.initialization, '\n', (s) => this.renderStatement(s));
     });
   }
