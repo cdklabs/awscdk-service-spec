@@ -202,9 +202,9 @@ export class DatabaseBuilder {
     });
   }
 
-  public importOobRelationships(filePath: string) {
+  public importOobRelationships(filePath: string, patcher?: JsonLensPatcher) {
     return this.addSourceImporter(async (db, report) => {
-      const data = this.loadResult(await loadOobRelationships(filePath, this.options), report);
+      const data = this.loadResult(await loadOobRelationships(filePath, { ...this.options, patcher }), report);
       importOobRelationships(db, data, report);
     });
   }

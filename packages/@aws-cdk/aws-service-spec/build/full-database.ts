@@ -5,6 +5,7 @@ import { Augmentations } from './augmentations';
 import { Scrutinies } from './scrutinies';
 import { patchSamTemplateSpec } from './patches/sam-patches';
 import { patchCloudFormationRegistry } from './patches/registry-patches';
+import { patchOobRelationships } from '@aws-cdk/service-spec-importers/src/patches/oob-relationship-patches';
 
 const SOURCES = path.join(__dirname, '../../../../sources');
 
@@ -22,7 +23,7 @@ export class FullDatabase extends DatabaseBuilder {
       .importStatefulResources(path.join(SOURCES, 'StatefulResources/StatefulResources.json'))
       .importGetAttAllowList(path.join(SOURCES, 'CloudFormationGetAttAllowList/gettatt-allowlist.json'))
       .importArnTemplates(path.join(SOURCES, 'ArnTemplates/arn-templates.json'))
-      .importOobRelationships(path.join(SOURCES, 'OobRelationships/relationships.json'))
+      .importOobRelationships(path.join(SOURCES, 'OobRelationships/relationships.json'), patchOobRelationships)
       .importCannedMetrics(
         path.join(SOURCES, 'CloudWatchConsoleServiceDirectory/CloudWatchConsoleServiceDirectory.json'),
       )
