@@ -180,7 +180,7 @@ export class DiffDb extends pj.Component {
           if: '!(steps.diff-db.outputs.diff-result)',
           uses: 'thollander/actions-comment-pull-request@v3',
           with: {
-            comment_tag: 'diff-db',
+            'comment-tag': 'diff-db',
             message: `**${this.serviceSpec.name}**: No model change detected`,
             mode: 'upsert',
           },
