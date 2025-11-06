@@ -22,3 +22,4 @@ export * from './code-fragments';
 export * from './expressions';
 export * from './statements';
 export * from './monkey-patched-type';
+export * from './eslint-rules';
