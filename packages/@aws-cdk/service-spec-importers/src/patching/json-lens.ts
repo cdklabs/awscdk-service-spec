@@ -47,6 +47,9 @@ export interface JsonLens {
 
   /** Record a raw patch operation. */
   recordPatch(reason: string, patch: PatchOperation): void;
+
+  /** Escape a segment of a key for JSON Pointer. */
+  escapeKey(key: string): string;
 }
 
 export interface JsonObjectLens extends JsonLens {

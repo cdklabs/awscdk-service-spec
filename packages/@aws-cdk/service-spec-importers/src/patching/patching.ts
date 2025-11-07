@@ -114,7 +114,7 @@ export class SchemaLens implements JsonLens, JsonObjectLens, JsonArrayLens {
   descendObjectField(key: string): SchemaLens {
     return new SchemaLens(this.value[key], {
       fileName: this.fileName,
-      jsonPointer: `${this.jsonPointer}/${key}`,
+      jsonPointer: `${this.jsonPointer}/${this.escapeKey(key)}`,
       rootPath: this.rootPath,
       reportInto: this.reports,
       patchInto: this.patches,
@@ -141,6 +141,17 @@ export class SchemaLens implements JsonLens, JsonObjectLens, JsonArrayLens {
       reason,
       subject: this.rootPath[0].value,
     });
+  }
+
+  /**
+   * Escapes a segment of a key for JSON Pointer (RFC 6901).
+   *
+   * Rules:
+   *   ~  → ~0
+   *   /  → ~1
+   */
+  escapeKey(key: string) {
+    return key.replace(/~/g, '~0').replace(/\//g, '~1');
   }
 }
 
