@@ -16,6 +16,7 @@ const AVAILABLE_SOURCES: Record<string, keyof DatabaseBuilder> = {
   cannedMetrics: 'importCannedMetrics',
   arnTemplates: 'importArnTemplates',
   oobRelationships: 'importOobRelationships',
+  eventbridgeschema: 'importEventBridgeSchema',
 };
 
 async function main() {

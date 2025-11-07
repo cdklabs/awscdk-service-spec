@@ -1,10 +1,10 @@
 import * as path from 'node:path';
-import { SpecDatabase } from '@aws-cdk/service-spec-types';
 import { DatabaseBuilder, DatabaseBuilderOptions, ReportAudience } from '@aws-cdk/service-spec-importers';
+import { SpecDatabase } from '@aws-cdk/service-spec-types';
 import { Augmentations } from './augmentations';
-import { Scrutinies } from './scrutinies';
-import { patchSamTemplateSpec } from './patches/sam-patches';
 import { patchCloudFormationRegistry } from './patches/registry-patches';
+import { patchSamTemplateSpec } from './patches/sam-patches';
+import { Scrutinies } from './scrutinies';
 
 const SOURCES = path.join(__dirname, '../../../../sources');
 
@@ -27,7 +27,9 @@ export class FullDatabase extends DatabaseBuilder {
         path.join(SOURCES, 'CloudWatchConsoleServiceDirectory/CloudWatchConsoleServiceDirectory.json'),
       )
       .importScrutinies()
-      .importAugmentations();
+      .importAugmentations()
+      .importEventBridgeSchema(path.join(SOURCES, 'EventBridgeSchema'));
+    // TODO: Add patch options for the resources decider
   }
 
   /**
