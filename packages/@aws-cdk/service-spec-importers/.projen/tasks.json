@@ -69,7 +69,7 @@
       },
       "steps": [
         {
-          "exec": "npx npm-check-updates@16 --upgrade --target=minor --peer --no-deprecated --dep=dev,peer,prod,optional --filter=@types/fs-extra,@types/jest,@types/node,eslint-config-prettier,eslint-import-resolver-typescript,eslint-plugin-import,eslint-plugin-prettier,jest,prettier,source-map-support,ts-jest,ts-json-schema-generator,typescript,canonicalize,commander,fast-json-patch,fs-extra,sort-json"
+          "exec": "npx npm-check-updates@18 --upgrade --target=minor --peer --no-deprecated --dep=dev,peer,prod,optional --filter=@types/fs-extra,@types/jest,@types/node,eslint-config-prettier,eslint-import-resolver-typescript,eslint-plugin-import,eslint-plugin-prettier,jest,prettier,source-map-support,ts-jest,ts-json-schema-generator,typescript,canonicalize,commander,fast-json-patch,fs-extra,sort-json"
         }
       ]
     },
