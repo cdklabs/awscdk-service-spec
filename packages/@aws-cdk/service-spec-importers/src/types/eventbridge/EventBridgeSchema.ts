@@ -1,4 +1,6 @@
-export interface EventBridgeSchema {
+import { ImplicitJsonSchemaRecord } from '../registry-schema/CloudFormationRegistrySchema';
+
+export interface EventBridgeSchema extends ImplicitJsonSchemaRecord {
   readonly SchemaName: string;
   readonly Content: {
     components: {

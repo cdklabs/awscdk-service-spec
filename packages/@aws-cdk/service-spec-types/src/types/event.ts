@@ -16,6 +16,8 @@ export type HasEvent = Relationship<Resource, Event>;
 export type EventProperties = Record<string, EventProperty>;
 export interface EventProperty {
   type: PropertyType;
+  //FIX: 99% this need to be deleted
+  required?: boolean;
 }
 
 export type EventUsesType = Relationship<Event, TypeDefinition>;

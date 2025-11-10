@@ -37,6 +37,7 @@ export function emptyDatabase() {
         name: fieldIndex('name', stringCmp),
         cloudFormationNamespace: fieldIndex('cloudFormationNamespace', stringCmp),
       }),
+      // FIX: Do i really want to reuse this? I feel no
       typeDefinition: entityCollection<TypeDefinition>(),
       augmentations: entityCollection<ResourceAugmentation>(),
       metric: entityCollection<Metric>().index({

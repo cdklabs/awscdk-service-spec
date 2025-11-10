@@ -33,6 +33,7 @@ export class DiffFormatter {
   constructor(db1: SpecDatabase, db2: SpecDatabase) {
     this.dbs = [db1, db2];
   }
+  // TODO: I'm pretty sure i need to add something here to make my changes to show in the diff thingy
 
   public format(diff: SpecDatabaseDiff): string {
     const tree = new PrintableTree();

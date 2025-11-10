@@ -359,7 +359,8 @@ export namespace jsonschema {
    * Make a resolver function that will resolve `$ref` entries with respect to the given document root.
    */
   export function makeResolver(root: any) {
-    const resolve = (ref: Schema): ResolvedSchema => {
+    const resolve = (ref: Schema, weird?: boolean): ResolvedSchema => {
+      console.log(`weird: ${weird}`);
       // Don't resolve again if schema is already resolved
       if (isResolvedSchema(ref)) {
         return ref;
@@ -395,7 +396,12 @@ export namespace jsonschema {
       }
 
       const parts = path.substring(2).split('/');
-      let current = root;
+      let current;
+      if (weird == true) {
+        current = root.Content;
+        console.log('WEIRD');
+      }
+      current = root;
       let lastKey: string | undefined;
       while (true) {
         if (parts.length === 0) {
