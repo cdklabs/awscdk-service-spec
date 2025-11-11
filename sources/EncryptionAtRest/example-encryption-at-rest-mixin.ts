@@ -1,7 +1,7 @@
 import { IConstruct } from 'constructs';
 import { CfnResource } from 'aws-cdk-lib';
 // this is a temporary hack. we will not load this file at runtime, but use it at build time to generate the mixin
-import * as encryptionData from './sources/EncryptionAtRest/data.json';
+import * as encryptionData from './data.json';
 
 export interface EncryptionAtRestProps {
   /**
