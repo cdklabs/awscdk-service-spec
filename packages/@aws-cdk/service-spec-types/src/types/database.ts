@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import { gunzipSync } from 'zlib';
 import { Database, entityCollection, fieldIndex, stringCmp } from '@cdklabs/tskb';
 import { IsAugmentedResource, ResourceAugmentation } from './augmentations';
-import { HasEvent, Event, EventUsesType } from './event';
+import { HasEvent, Event, EventUsesType, EventTypeDefinition } from './event';
 import {
   DimensionSet,
   Metric,
@@ -37,7 +37,7 @@ export function emptyDatabase() {
         name: fieldIndex('name', stringCmp),
         cloudFormationNamespace: fieldIndex('cloudFormationNamespace', stringCmp),
       }),
-      // FIX: Do i really want to reuse this? I feel no
+      eventTypeDefinition: entityCollection<EventTypeDefinition>(),
       typeDefinition: entityCollection<TypeDefinition>(),
       augmentations: entityCollection<ResourceAugmentation>(),
       metric: entityCollection<Metric>().index({
@@ -64,7 +64,7 @@ export function emptyDatabase() {
       resourceHasDimensionSet: r.relationship<ResourceHasDimensionSet>('resource', 'dimensionSet'),
       serviceHasDimensionSet: r.relationship<ServiceHasDimensionSet>('service', 'dimensionSet'),
       hasEvent: r.relationship<HasEvent>('resource', 'event'),
-      eventUsesType: r.relationship<EventUsesType>('event', 'typeDefinition'),
+      eventUsesType: r.relationship<EventUsesType>('event', 'eventTypeDefinition'),
     }),
   );
 }

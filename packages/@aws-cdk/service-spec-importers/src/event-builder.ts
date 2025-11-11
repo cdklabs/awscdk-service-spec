@@ -5,8 +5,8 @@ import {
   RichProperty,
   Service,
   SpecDatabase,
-  TypeDefinition,
   Event,
+  EventTypeDefinition,
 } from '@aws-cdk/service-spec-types';
 import { Entity, Reference } from '@cdklabs/tskb';
 import { AllFieldsGiven } from './diff-helpers';
@@ -20,7 +20,7 @@ export interface EventBuilderOptions {
 }
 
 export class SpecBuilder {
-  constructor(public readonly db: SpecDatabase) { }
+  constructor(public readonly db: SpecDatabase) {}
 
   public eventBuilder(schemaName: string, options: EventBuilderOptions) {
     const existing = this.db.lookup('event', 'name', 'equals', schemaName);
@@ -41,7 +41,7 @@ export class SpecBuilder {
 
     // FIX: mocking a type just for not blocking the code generation, need to be removed
 
-    const typeDef = this.db.allocate('typeDefinition', {
+    const typeDef = this.db.allocate('eventTypeDefinition', {
       name: 'mockTypeName',
       properties: {
         mockFieldName: {
@@ -56,7 +56,7 @@ export class SpecBuilder {
       return typeof x === 'string' ? { $ref: x } : { $ref: x.$id };
     }
 
-    const typeDef2 = this.db.allocate('typeDefinition', {
+    const typeDef2 = this.db.allocate('eventTypeDefinition', {
       name: 'mockTypeName2',
       properties: {
         mockFieldName: {
@@ -168,7 +168,7 @@ export class PropertyBagBuilder {
   protected candidateProperties: EventProperties = {};
 
   // @ts-ignore
-  constructor(private readonly _propertyBag: ObjectWithProperties) { }
+  constructor(private readonly _propertyBag: ObjectWithProperties) {}
 
   public setProperty(name: string, prop: EventProperty) {
     console.log('Setting property', { prop, name });
@@ -245,14 +245,14 @@ export class PropertyBagBuilder {
     if (!prop.required) {
       delete prop.required;
     }
-    if (prop.causesReplacement === 'no') {
-      delete prop.causesReplacement;
-    }
+    // if (prop.causesReplacement === 'no') {
+    //   delete prop.causesReplacement;
+    // }
   }
 }
 
 export class EventBuilder extends PropertyBagBuilder {
-  private typeDefinitions = new Map<string, TypeDefinition>();
+  private eventTypeDefinitions = new Map<string, EventTypeDefinition>();
   private typesCreatedHere = new Set<string>();
   //
   // /**
@@ -437,47 +437,46 @@ export class EventBuilder extends PropertyBagBuilder {
   //   return currentBag[fieldPath[fieldPath.length - 1]];
   // }
   //
-  public typeDefinitionBuilder(
+  public eventTypeDefinitionBuilder(
     typeName: string,
     options?: { description?: string; schema?: jsonschema.RecordLikeObject },
   ) {
-    const existing = this.typeDefinitions.get(typeName);
-    const description = options?.description;
+    const existing = this.eventTypeDefinitions.get(typeName);
+    // const description = options?.description;
     const freshInSession = !this.typesCreatedHere.has(typeName);
     this.typesCreatedHere.add(typeName);
 
     if (existing) {
-      if (!existing.documentation && description) {
-        existing.documentation = description;
-      }
+      // if (!existing.documentation && description) {
+      //   existing.documentation = description;
+      // }
       const properties = options?.schema?.properties ?? {};
       // If db already contains typeName's type definition, we want to additionally
       // check if the schema matches the type definition. If the schema includes new
       // properties, we want to add them to the type definition.
       if (!Object.keys(properties).every((element) => Object.keys(existing.properties).includes(element))) {
         return {
-          typeDefinitionBuilder: new TypeDefinitionBuilder(this.db, existing),
+          eventTypeDefinitionBuilder: new EventTypeDefinitionBuilder(this.db, existing),
           freshInDb: true,
           freshInSession: true,
         };
       }
       return {
-        typeDefinitionBuilder: new TypeDefinitionBuilder(this.db, existing),
+        eventTypeDefinitionBuilder: new EventTypeDefinitionBuilder(this.db, existing),
         freshInDb: false,
         freshInSession,
       };
     }
 
-    const typeDef = this.db.allocate('typeDefinition', {
+    const typeDef = this.db.allocate('eventTypeDefinition', {
       name: typeName,
-      documentation: description,
       properties: {},
     });
     this.db.link('eventUsesType', this.event, typeDef);
-    this.typeDefinitions.set(typeName, typeDef);
+    this.eventTypeDefinitions.set(typeName, typeDef);
 
-    const builder = new TypeDefinitionBuilder(this.db, typeDef);
-    return { typeDefinitionBuilder: builder, freshInDb: true, freshInSession };
+    const builder = new EventTypeDefinitionBuilder(this.db, typeDef);
+    return { eventTypeDefinitionBuilder: builder, freshInDb: true, freshInSession };
   }
 
   /**
@@ -513,22 +512,23 @@ export class EventBuilder extends PropertyBagBuilder {
   // }
 }
 
-export type TypeDefinitionFields = Pick<TypeDefinition, 'documentation' | 'mustRenderForBwCompat'>;
+// export type EventTypeDefinitionFields = Pick<EventTypeDefinition, 'documentation' | 'mustRenderForBwCompat'>;
 
-export class TypeDefinitionBuilder extends PropertyBagBuilder {
-  private readonly fields: TypeDefinitionFields = {};
+export class EventTypeDefinitionBuilder extends PropertyBagBuilder {
+  // private readonly fields: EventTypeDefinitionFields = {};
 
-  constructor(public readonly db: SpecDatabase, private readonly typeDef: TypeDefinition) {
+  // @ts-ignore
+  constructor(public readonly db: SpecDatabase, private readonly typeDef: EventTypeDefinition) {
     super(typeDef);
   }
 
-  public setFields(fields: TypeDefinitionFields) {
-    Object.assign(this.fields, fields);
-  }
+  // public setFields(fields: EventTypeDefinitionFields) {
+  //   Object.assign(this.fields, fields);
+  // }
 
-  public commit(): TypeDefinition {
+  public commit(): EventTypeDefinition {
     super.commit();
-    Object.assign(this.typeDef, this.fields);
+    // Object.assign(this.typeDef, this.fields);
     return this.typeDef;
   }
 }

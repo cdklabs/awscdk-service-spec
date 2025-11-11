@@ -1,5 +1,5 @@
 import { Entity, Relationship } from '@cdklabs/tskb';
-import { PropertyType, Resource, TypeDefinition } from './resource';
+import { PropertyType, Resource } from './resource';
 
 export interface Event extends Entity {
   readonly name: string;
@@ -21,4 +21,14 @@ export interface EventProperty {
   required?: boolean;
 }
 
-export type EventUsesType = Relationship<Event, TypeDefinition>;
+export interface EventTypeDefinition extends Entity {
+  readonly name: string;
+  readonly properties: EventProperties;
+}
+
+// export interface EventDefinitionReference {
+//   readonly type: 'ref';
+//   readonly reference: Reference<EventTypeDefinition>;
+// }
+
+export type EventUsesType = Relationship<Event, EventTypeDefinition>;

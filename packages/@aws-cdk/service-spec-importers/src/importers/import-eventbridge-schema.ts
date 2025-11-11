@@ -289,20 +289,22 @@ export function importEventBridgeSchema(options: LoadEventBridgeSchmemaOptions) 
     //   return;
     // }
     // FIX: fix this bang later
-    const { typeDefinitionBuilder, freshInSession } = eventBuilder!.typeDefinitionBuilder(nameHint, { schema });
+    const { eventTypeDefinitionBuilder, freshInSession } = eventBuilder!.eventTypeDefinitionBuilder(nameHint, {
+      schema,
+    });
 
     // If the type has no props, it's not a RecordLikeObject and we don't need to recurse
     // @todo The type should probably also just be json since they are useless otherwise. Fix after this package is in use.
     if (freshInSession) {
-      if (schema.description) {
-        typeDefinitionBuilder.setFields({ documentation: schema.description });
-      }
+      // if (schema.description) {
+      //   eventTypeDefinitionBuilder.setFields({ documentation: schema.description });
+      // }
       if (jsonschema.isRecordLikeObject(schema)) {
-        recurseProperties(schema, typeDefinitionBuilder, fail.in(`typedef ${nameHint}`));
+        recurseProperties(schema, eventTypeDefinitionBuilder, fail.in(`typedef ${nameHint}`));
       }
     }
 
-    return { type: 'ref', reference: ref(typeDefinitionBuilder.commit()) };
+    return { type: 'ref', reference: ref(eventTypeDefinitionBuilder.commit()) };
   }
 
   function looksLikeBuiltinTagType(schema: jsonschema.Object): boolean {
@@ -430,7 +432,7 @@ function removeUnionDuplicates(types: PropertyType[]) {
     throw new Error('Union cannot be empty');
   }
 
-  for (let i = 0; i < types.length;) {
+  for (let i = 0; i < types.length; ) {
     const type = new RichPropertyType(types[i]);
 
     let dupe = false;
