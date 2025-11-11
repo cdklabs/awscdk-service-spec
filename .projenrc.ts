@@ -238,7 +238,7 @@ new RegionalSource(repo, {
 new SingleSource(repo, {
   name: 'sam',
   dir: 'sources/SAMSpec',
-  source: 'https://raw.githubusercontent.com/awslabs/goformation/master/schema/sam.schema.json',
+  source: 'https://raw.githubusercontent.com/aws/serverless-application-model/develop/schema_source/sam.schema.json',
 });
 new SingleSource(repo, {
   name: 'arn-templates',
