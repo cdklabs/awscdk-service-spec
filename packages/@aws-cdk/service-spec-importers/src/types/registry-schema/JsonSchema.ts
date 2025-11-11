@@ -360,7 +360,6 @@ export namespace jsonschema {
    */
   export function makeResolver(root: any) {
     const resolve = (ref: Schema, weird?: boolean): ResolvedSchema => {
-      console.log(`weird: ${weird}`);
       // Don't resolve again if schema is already resolved
       if (isResolvedSchema(ref)) {
         return ref;
@@ -400,8 +399,12 @@ export namespace jsonschema {
       if (weird == true) {
         current = root.Content;
         console.log('WEIRD');
+        console.log({ path, typeof: typeof root, root: JSON.stringify(root), current: JSON.stringify(current) });
+      } else {
+        current = root;
+        // console.log('NOTWIERD');
+        // console.log({ typeof: typeof root, root: JSON.stringify(root), current: JSON.stringify(root) });
       }
-      current = root;
       let lastKey: string | undefined;
       while (true) {
         if (parts.length === 0) {
@@ -410,6 +413,12 @@ export namespace jsonschema {
         lastKey = parts.shift()!;
         current = current[lastKey];
       }
+
+      if (weird == true) {
+        console.log('WEIRD IN another place');
+        console.log({ current: JSON.stringify(current) });
+      }
+
       if (current === undefined) {
         throw new Error(`Invalid $ref: ${path}`);
       }

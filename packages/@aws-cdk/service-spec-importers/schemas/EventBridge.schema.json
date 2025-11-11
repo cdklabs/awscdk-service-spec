@@ -14,14 +14,12 @@
         },
         "Description": {
           "type": "string"
-        },
-        "Type": {
-          "type": "string"
         }
       },
       "required": [
         "SchemaName",
-        "Content"
+        "Content",
+        "Description"
       ],
       "type": "object"
     },

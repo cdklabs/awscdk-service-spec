@@ -17,6 +17,7 @@ export function importEventBridgeSchema(options: LoadEventBridgeSchmemaOptions) 
   const eventBuilder = specBuilder.eventBuilder(event.SchemaName, {
     source: event.Content.components.schemas.AWSEvent['x-amazon-events-source'],
     detailType: event.Content.components.schemas.AWSEvent['x-amazon-events-detail-type'],
+    description: event.Description,
   });
 
   if (eventBuilder == undefined) {
@@ -47,28 +48,8 @@ export function importEventBridgeSchema(options: LoadEventBridgeSchmemaOptions) 
   // FIX: there's some problem here event.properties exist for some reason
   // @ts-ignore
   recurseProperties(event.Content.components.schemas.AWSEvent, eventBuilder, eventFailure);
-  //
-  // // AWS::CloudFront::ContinuousDeploymentPolicy recently introduced a change where they're marking deprecatedProperties
-  // // as `/definitions/<Type>/properties/<Prop>` instead of `/properties/<Prop1>/<Prop2>/<Prop3>`. Ignore those, as it's
-  // // out-of-spec
-  // const deprecatedProperties = (event.deprecatedProperties ?? [])
-  //   .filter((p) => p.startsWith('/properties/'))
-  //   .map(simplePropNameFromJsonPtr);
-  // eventBuilder.markDeprecatedProperties(...deprecatedProperties);
-  //
-  // // Mark everything 'readOnlyProperties` as attributes. This removes them from 'properties', as
-  // // in the CloudFormation registry spec, fields cannot be attributes and properties at the same time.
-  // const attributeNames = findAttributes(event).map(simplePropNameFromJsonPtr);
-  // eventBuilder.markAsAttributes(attributeNames);
-  //
-  // // Mark all 'createOnlyProperties' as immutable.
-  // eventBuilder.markAsImmutable((event.createOnlyProperties ?? []).map(simplePropNameFromJsonPtr));
-  //
   // handleFailure(handleTags(eventFailure));
 
-  // if (event.SchemaName == 'aws.a4b@RoomStateChange') {
-  //   console.log({});
-  // }
   return eventBuilder.commit();
 
   // FIX: i need to pass the specific detail object not like CF schema
@@ -104,37 +85,6 @@ export function importEventBridgeSchema(options: LoadEventBridgeSchmemaOptions) 
       }
     }
   }
-
-  /**
-   * Recursively extracts relationshipRef metadata from JSON schemas
-   *
-   * Finds relationshipRef objects that indicate this property references
-   * another CloudFormation resource, and converts property paths to name.
-   * This function handles the following cases:
-   * Single relationship for property -> { type: 'string', relationshipRef: {...} }
-   * When there are multiple relationships or the relationships are nested behind
-   * layers of oneOf/anyOf/allOf the data looks like
-   * { type: 'string', anyOf: [ { relationshipRef: {...} }, ...]}
-   */
-  // function collectPossibleRelationships(schema: jsonschema.ConcreteSchema): RelationshipRef[] {
-  //   if (jsonschema.isAnyType(schema)) {
-  //     return [];
-  //   }
-  //
-  //   if (jsonschema.isCombining(schema)) {
-  //     return jsonschema.innerSchemas(schema).flatMap((s) => collectPossibleRelationships(s));
-  //   } else if (jsonschema.isArray(schema) && schema.items) {
-  //     return collectPossibleRelationships(resolve(schema.items));
-  //   } else if ('relationshipRef' in schema && jsonschema.isRelationshipRef(schema.relationshipRef)) {
-  //     return [
-  //       {
-  //         cloudFormationType: schema.relationshipRef.typeName,
-  //         propertyName: simplePropNameFromJsonPtr(schema.relationshipRef.propertyPath),
-  //       },
-  //     ];
-  //   }
-  //   return [];
-  // }
 
   /**
    * Convert a JSON schema type to a type in the database model
@@ -374,26 +324,6 @@ export function importEventBridgeSchema(options: LoadEventBridgeSchmemaOptions) 
     );
   }
 
-  // function describeDefault(schema: jsonschema.ConcreteSchema): string | undefined {
-  //   if (
-  //     jsonschema.isAnyType(schema) ||
-  //     jsonschema.isAllOf(schema) ||
-  //     jsonschema.isAnyOf(schema) ||
-  //     jsonschema.isOneOf(schema)
-  //   ) {
-  //     return undefined;
-  //   }
-  //
-  //   switch (schema.type) {
-  //     case 'string':
-  //     case 'number':
-  //     case 'integer':
-  //     case 'boolean':
-  //       return schema.default !== undefined ? JSON.stringify(schema.default) : undefined;
-  //   }
-  //
-  //   return undefined;
-  // }
   //
   // function handleTags(fail: Fail) {
   //   return tryCatch(fail, () => {
@@ -500,7 +430,7 @@ function removeUnionDuplicates(types: PropertyType[]) {
     throw new Error('Union cannot be empty');
   }
 
-  for (let i = 0; i < types.length; ) {
+  for (let i = 0; i < types.length;) {
     const type = new RichPropertyType(types[i]);
 
     let dupe = false;

@@ -2,6 +2,7 @@ import { ImplicitJsonSchemaRecord } from '../registry-schema/CloudFormationRegis
 
 export interface EventBridgeSchema extends ImplicitJsonSchemaRecord {
   readonly SchemaName: string;
+  readonly Description: string;
   readonly Content: {
     components: {
       schemas: {

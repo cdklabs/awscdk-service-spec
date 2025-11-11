@@ -16,10 +16,11 @@ import { jsonschema } from './types';
 export interface EventBuilderOptions {
   readonly source: string;
   readonly detailType: string;
+  readonly description: string;
 }
 
 export class SpecBuilder {
-  constructor(public readonly db: SpecDatabase) {}
+  constructor(public readonly db: SpecDatabase) { }
 
   public eventBuilder(schemaName: string, options: EventBuilderOptions) {
     const existing = this.db.lookup('event', 'name', 'equals', schemaName);
@@ -72,6 +73,7 @@ export class SpecBuilder {
       name: schemaName.split('@').pop()!,
       source: options.source,
       detailType: options.detailType,
+      description: options.description,
       properties: {
         mockTypeName2: {
           type: {
@@ -96,8 +98,8 @@ export class SpecBuilder {
       return new EventBuilder(this.db, event);
     }
     const resource = this.allocateResource(service);
-    console.log('hasEvent link is creating...');
-    console.log({ resource: JSON.stringify(resource), event: JSON.stringify(event) });
+    // console.log('hasEvent link is creating...');
+    // console.log({ resource: JSON.stringify(resource), event: JSON.stringify(event) });
     // TODO: should i return the entity only
     this.db.link('hasEvent', resource.entity, event);
     // TODO: Do i need to do this??
@@ -166,7 +168,7 @@ export class PropertyBagBuilder {
   protected candidateProperties: EventProperties = {};
 
   // @ts-ignore
-  constructor(private readonly _propertyBag: ObjectWithProperties) {}
+  constructor(private readonly _propertyBag: ObjectWithProperties) { }
 
   public setProperty(name: string, prop: EventProperty) {
     console.log('Setting property', { prop, name });

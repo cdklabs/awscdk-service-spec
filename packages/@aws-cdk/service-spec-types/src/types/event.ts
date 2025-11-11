@@ -3,6 +3,7 @@ import { PropertyType, Resource, TypeDefinition } from './resource';
 
 export interface Event extends Entity {
   readonly name: string;
+  readonly description: string;
   readonly source: string;
   readonly detailType: string;
   readonly identifiersPath: Array<string>;
