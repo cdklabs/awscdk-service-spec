@@ -179,7 +179,7 @@
       "name": "update-source:sam",
       "steps": [
         {
-          "exec": "node ./scripts/download.task.js https://raw.githubusercontent.com/awslabs/goformation/master/schema/sam.schema.json sources/SAMSpec/sam.schema.json"
+          "exec": "node ./scripts/download.task.js https://raw.githubusercontent.com/aws/serverless-application-model/develop/schema_source/sam.schema.json sources/SAMSpec/sam.schema.json"
         }
       ]
     },
