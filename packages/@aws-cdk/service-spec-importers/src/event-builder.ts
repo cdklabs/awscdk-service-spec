@@ -19,7 +19,7 @@ export interface EventBuilderOptions {
 }
 
 export class SpecBuilder {
-  constructor(public readonly db: SpecDatabase) { }
+  constructor(public readonly db: SpecDatabase) {}
 
   public eventBuilder(schemaName: string, options: EventBuilderOptions) {
     const existing = this.db.lookup('event', 'name', 'equals', schemaName);
@@ -160,7 +160,7 @@ export class PropertyBagBuilder {
   protected candidateProperties: EventProperties = {};
 
   // @ts-ignore
-  constructor(private readonly _propertyBag: ObjectWithProperties) { }
+  constructor(private readonly _propertyBag: ObjectWithProperties) {}
 
   public setProperty(name: string, prop: EventProperty) {
     console.log('Setting property', { prop, name });

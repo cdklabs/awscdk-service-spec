@@ -231,6 +231,8 @@ export class DatabaseBuilder {
             report,
             region: region.regionName,
           });
+          const existing = db.lookup('event', 'name', 'equals', event.SchemaName.split('@')[1]);
+          console.log('db-builder', { existing });
         }
       }
     });

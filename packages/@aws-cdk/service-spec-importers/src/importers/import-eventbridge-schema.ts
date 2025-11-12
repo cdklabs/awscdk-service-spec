@@ -98,7 +98,11 @@ export function importEventBridgeSchema(options: LoadEventBridgeSchmemaOptions) 
   // recurseProperties(event.Content.components.schemas.AWSEvent, eventBuilder, eventFailure);
   // handleFailure(handleTags(eventFailure));
 
-  return eventBuilder.commit();
+  const existing = db.lookup('event', 'name', 'equals', event.SchemaName.split('@')[1]);
+  console.log('in import', { existing });
+  const eventRet = eventBuilder.commit();
+
+  return eventRet;
 
   // FIX: i need to pass the specific detail object not like CF schema
   function recurseProperties(source: ImplicitJsonSchemaRecord, target: PropertyBagBuilder, fail: Fail) {
@@ -480,7 +484,7 @@ function removeUnionDuplicates(types: PropertyType[]) {
     throw new Error('Union cannot be empty');
   }
 
-  for (let i = 0; i < types.length; ) {
+  for (let i = 0; i < types.length;) {
     const type = new RichPropertyType(types[i]);
 
     let dupe = false;
