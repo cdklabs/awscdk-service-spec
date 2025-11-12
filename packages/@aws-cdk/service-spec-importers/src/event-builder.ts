@@ -1,7 +1,7 @@
 import {
   EventProperties,
   EventProperty,
-  Property,
+  // Property,
   RichProperty,
   Service,
   SpecDatabase,
@@ -188,7 +188,7 @@ export class PropertyBagBuilder {
     return this._propertyBag;
   }
 
-  private commitProperty(name: string, prop: Property) {
+  private commitProperty(name: string, prop: EventProperty) {
     if (this._propertyBag.properties[name]) {
       this.mergeProperty(this._propertyBag.properties[name], prop);
     } else {
@@ -197,31 +197,31 @@ export class PropertyBagBuilder {
     this.simplifyProperty(this._propertyBag.properties[name]);
   }
 
-  protected mergeProperty(prop: Property, updates: Property) {
+  protected mergeProperty(prop: EventProperty, updates: EventProperty) {
     // This handles merges that are trivial scalar overwrites. All
     // fields must be represented, if you have special code to handle
     // a field, put it in here as 'undefined' and add code to handle it below.
     copyDefined({
-      causesReplacement: updates.causesReplacement,
-      defaultValue: updates.defaultValue,
-      deprecated: updates.deprecated,
-      documentation: updates.documentation,
+      // causesReplacement: updates.causesReplacement,
+      // defaultValue: updates.defaultValue,
+      // deprecated: updates.deprecated,
+      // documentation: updates.documentation,
       required: updates.required,
-      scrutinizable: updates.scrutinizable,
-      relationshipRefs: updates.relationshipRefs,
+      // scrutinizable: updates.scrutinizable,
+      // relationshipRefs: updates.relationshipRefs,
 
       // These will be handled specially below
-      previousTypes: undefined,
+      // previousTypes: undefined,
       type: undefined,
     });
 
     // Special field handling
-    for (const type of updates.previousTypes ?? []) {
-      new RichProperty(prop).updateType(type);
-    }
+    // for (const type of updates.previousTypes ?? []) {
+    //   new RichProperty(prop).updateType(type);
+    // }
     new RichProperty(prop).updateType(updates.type);
 
-    function copyDefined(upds: AllFieldsGiven<Partial<Property>>) {
+    function copyDefined(upds: AllFieldsGiven<Partial<EventProperty>>) {
       for (const [key, value] of Object.entries(upds)) {
         if (value !== undefined) {
           (prop as any)[key] = value;
@@ -233,7 +233,7 @@ export class PropertyBagBuilder {
   /**
    * Remove settings that are equal to their defaults
    */
-  protected simplifyProperty(prop: Property) {
+  protected simplifyProperty(prop: EventProperty) {
     if (!prop.required) {
       delete prop.required;
     }
