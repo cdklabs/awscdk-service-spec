@@ -1,4 +1,4 @@
-import { PropertyType, RichPropertyType, SpecDatabase } from '@aws-cdk/service-spec-types';
+import { PropertyType, RichPropertyType, Service, SpecDatabase } from '@aws-cdk/service-spec-types';
 import { locateFailure, Fail, failure, isFailure, Result, tryCatch, using, ref, isSuccess } from '@cdklabs/tskb';
 import { SpecBuilder, PropertyBagBuilder } from '../event-builder';
 import { ProblemReport, ReportAudience } from '../report';
@@ -12,6 +12,62 @@ import { EventBridgeSchema, ImplicitJsonSchemaRecord, jsonschema } from '../type
  */
 function isEmptyObjectType(schema: any): boolean {
   return schema.type === 'object' && !schema.properties;
+}
+
+// TODO: change name to get?
+function allocateService({
+  eventSchemaName,
+  eventTypeNameSeparator = '@',
+  db,
+}: {
+  eventSchemaName: string;
+  eventTypeNameSeparator?: string;
+  db: SpecDatabase;
+}): Service | undefined {
+  const schemaNameParts = eventSchemaName.split(eventTypeNameSeparator);
+  // parts e.g. ["aws.s3", "ObjectCreated"]
+  const serviceName = schemaNameParts[0].replace('.', '-').toLowerCase();
+
+  const services = db.lookup('service', 'name', 'equals', serviceName);
+
+  if (services.length == 0) {
+    return;
+  }
+
+  // TODO: i think only will do that for me
+  // if (true) {
+  //   throw Error(`This service doesn't existing in cloudformation ${serviceName}`);
+  // }
+  return services.only();
+}
+
+// TODO: change name to get?
+function allocateResource({ db, service }: { db: SpecDatabase; service: Service }) {
+  const resource = eventDecider({ service, db });
+
+  return resource;
+  // TODO: I have no idea what i'm doing now :D, how the resource will not be in the DB?
+  // const resource = this.db.allocate('service', {
+  //   name,
+  //   shortName,
+  //   capitalized,
+  //   cloudFormationNamespace,
+  // });
+
+  // return resource;
+}
+
+// TODO: change name to resource decider?
+// function eventDecider(service: Service) {
+function eventDecider({ db, service }: { db: SpecDatabase; service: Service }) {
+  // TODO: need to get all the requred property field names here
+  const resources = db.follow('hasResource', service);
+  if (service.name == 'aws-lambda') {
+    console.log({ resources: JSON.stringify(resources, null, 2) });
+  }
+
+  // TODO: Change this to proper resource
+  return resources[0];
 }
 
 export function importEventBridgeSchema(options: LoadEventBridgeSchmemaOptions) {
@@ -98,10 +154,20 @@ export function importEventBridgeSchema(options: LoadEventBridgeSchmemaOptions) 
   // recurseProperties(event.Content.components.schemas.AWSEvent, eventBuilder, eventFailure);
   // handleFailure(handleTags(eventFailure));
 
-  const existing = db.lookup('event', 'name', 'equals', event.SchemaName.split('@')[1]);
-  console.log('in import', { existing });
   const eventRet = eventBuilder.commit();
 
+  const service = allocateService({ eventSchemaName: event.SchemaName, db });
+  if (service == undefined) {
+    // TODO: Maybe i need to return undefined
+    return eventRet;
+  }
+  const resource = allocateResource({ service, db });
+  // console.log('hasEvent link is creating...');
+  // console.log({ resource: JSON.stringify(resource), event: JSON.stringify(event) });
+
+  const eventDB = db.lookup('event', 'name', 'equals', event.SchemaName).only();
+  // TODO: should i return the entity only
+  db.link('hasEvent', resource.entity, eventDB);
   return eventRet;
 
   // FIX: i need to pass the specific detail object not like CF schema

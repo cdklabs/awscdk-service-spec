@@ -1,9 +1,7 @@
 import {
   EventProperties,
   EventProperty,
-  // Property,
   RichProperty,
-  Service,
   SpecDatabase,
   Event,
   EventTypeDefinition,
@@ -69,7 +67,7 @@ export class SpecBuilder {
     // typeDef.name;
     const event = this.db.allocate('event', {
       // FIX: need to fix the bang?
-      name: schemaName.split('@').pop()!,
+      name: schemaName,
       source: options.source,
       detailType: options.detailType,
       description: options.description,
@@ -84,16 +82,6 @@ export class SpecBuilder {
     //
     // TODO: add more information for the event
 
-    const service = this.allocateService(schemaName);
-    if (service == undefined) {
-      // TODO: Maybe i need to return undefined
-      return new EventBuilder(this.db, event);
-    }
-    const resource = this.allocateResource(service);
-    // console.log('hasEvent link is creating...');
-    // console.log({ resource: JSON.stringify(resource), event: JSON.stringify(event) });
-    // TODO: should i return the entity only
-    this.db.link('hasEvent', resource.entity, event);
     // TODO: Do i need to do this??
     // if (options.region) {
     //   const region = this.allocateRegion(options.region);
@@ -102,53 +90,6 @@ export class SpecBuilder {
     // }
 
     return new EventBuilder(this.db, event);
-  }
-
-  // TODO: change name to get?
-  private allocateService(eventSchemaName: string, eventTypeNameSeparator = '@') {
-    const parts = eventSchemaName.split(eventTypeNameSeparator);
-    // parts e.g. ["aws.s3", "ObjectCreated"]
-    const serviceName = parts[0].replace('.', '-').toLowerCase();
-
-    const services = this.db.lookup('service', 'name', 'equals', serviceName);
-
-    if (services.length == 0) {
-      return;
-    }
-
-    // TODO: i think only will do that for me
-    // if (true) {
-    //   throw Error(`This service doesn't existing in cloudformation ${serviceName}`);
-    // }
-    return services.only();
-  }
-
-  // TODO: change name to get?
-  private allocateResource(service: Service) {
-    const resource = this.eventDecider(service);
-
-    return resource;
-    // TODO: I have no idea what i'm doing now :D, how the resource will not be in the DB?
-    // const resource = this.db.allocate('service', {
-    //   name,
-    //   shortName,
-    //   capitalized,
-    //   cloudFormationNamespace,
-    // });
-
-    // return resource;
-  }
-
-  // TODO: change name to resource decider?
-  private eventDecider(service: Service) {
-    // TODO: need to get all the requred property field names here
-    const resources = this.db.follow('hasResource', service);
-    if (service.name == 'aws-lambda') {
-      console.log({ resources: JSON.stringify(resources, null, 2) });
-    }
-
-    // TODO: Change this to proper resource
-    return resources[0];
   }
 }
 //
