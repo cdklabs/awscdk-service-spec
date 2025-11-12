@@ -6,6 +6,14 @@ import { unionSchemas } from '../schema-manipulation/unify-schemas';
 import { maybeUnion } from '../type-manipulation';
 import { EventBridgeSchema, ImplicitJsonSchemaRecord, jsonschema } from '../types';
 
+/**
+ * Check if a schema represents an empty object type
+ * An empty object type has type: "object" but no properties field
+ */
+function isEmptyObjectType(schema: any): boolean {
+  return schema.type === 'object' && !schema.properties;
+}
+
 export function importEventBridgeSchema(options: LoadEventBridgeSchmemaOptions) {
   const { db, event } = options;
   // FIX: this pointing toward CF resource
@@ -33,21 +41,61 @@ export function importEventBridgeSchema(options: LoadEventBridgeSchmemaOptions) 
   // FIX: jsonschema pointing toward cloudformation thing
   const resolve = jsonschema.makeResolver(event);
 
-  // const parts = event.Content.components.schemas.AWSEvent.properties.detail.$ref.substring(2).split('/');
-  // let current = event.Content;
-  // let lastKey: string | undefined;
-  // while (true) {
-  //   if (parts.length === 0) {
-  //     break;
-  //   }
-  //   lastKey = parts.shift()!;
-  //   // @ts-ignore
-  //   current = current[lastKey];
-  // }
+  const parts = event.Content.components.schemas.AWSEvent.properties.detail.$ref.substring(2).split('/');
+  let current = event.Content;
+  let lastKey: string | undefined;
+  while (true) {
+    if (parts.length === 0) {
+      break;
+    }
+    lastKey = parts.shift()!;
+    // @ts-ignore
+    current = current[lastKey];
+  }
 
-  // FIX: there's some problem here event.properties exist for some reason
+  // Get the type name from the reference (e.g., "ScheduledEvent")
+  const detailTypeName = lastKey;
+
+  // Determine if detail is required
   // @ts-ignore
-  recurseProperties(event.Content.components.schemas.AWSEvent, eventBuilder, eventFailure);
+  const required2 = event.Content.components.schemas.AWSEvent.required?.includes('detail') ?? false;
+
+  // Check if the resolved detail type is an empty object
+  // @ts-ignore - current is dynamically resolved from the schema
+  if (isEmptyObjectType(current)) {
+    // Treat as JSON type - add a property with the detail type name
+    eventBuilder.setProperty(detailTypeName!, {
+      type: { type: 'json' },
+      required: required2,
+    });
+    // @ts-ignore - current is dynamically resolved from the schema
+  } else if (current.properties) {
+    // Create a type definition for the detail type
+    const { eventTypeDefinitionBuilder } = eventBuilder.eventTypeDefinitionBuilder(detailTypeName!, {
+      // @ts-ignore - current is dynamically resolved from the schema
+      schema: current,
+    });
+
+    // Recurse into the detail type's properties to build the type definition
+    // @ts-ignore - current is dynamically resolved from the schema
+    recurseProperties(current, eventTypeDefinitionBuilder, eventFailure);
+
+    // Commit the type definition to get a reference
+    const typeDef = eventTypeDefinitionBuilder.commit();
+
+    // Add a property to the event that references the type definition
+    eventBuilder.setProperty(detailTypeName!, {
+      type: { type: 'ref', reference: ref(typeDef) },
+      required: required2,
+    });
+  } else {
+    // Unexpected case: not an object with properties and not an empty object
+    report.reportFailure(
+      'interpreting',
+      eventFailure(`Detail type has unexpected structure: ${JSON.stringify(current)}`),
+    );
+  }
+  // recurseProperties(event.Content.components.schemas.AWSEvent, eventBuilder, eventFailure);
   // handleFailure(handleTags(eventFailure));
 
   return eventBuilder.commit();
