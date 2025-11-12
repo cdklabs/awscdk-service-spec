@@ -8,7 +8,6 @@ import {
   Event,
   EventTypeDefinition,
 } from '@aws-cdk/service-spec-types';
-import { Entity, Reference } from '@cdklabs/tskb';
 import { AllFieldsGiven } from './diff-helpers';
 import { jsonschema } from './types';
 
@@ -20,7 +19,7 @@ export interface EventBuilderOptions {
 }
 
 export class SpecBuilder {
-  constructor(public readonly db: SpecDatabase) {}
+  constructor(public readonly db: SpecDatabase) { }
 
   public eventBuilder(schemaName: string, options: EventBuilderOptions) {
     const existing = this.db.lookup('event', 'name', 'equals', schemaName);
@@ -41,53 +40,46 @@ export class SpecBuilder {
 
     // FIX: mocking a type just for not blocking the code generation, need to be removed
 
-    const typeDef = this.db.allocate('eventTypeDefinition', {
-      name: 'mockTypeName',
-      properties: {
-        mockFieldName: {
-          type: {
-            type: 'string',
-          },
-        },
-      },
-    });
+    // const typeDef = this.db.allocate('eventTypeDefinition', {
+    //   name: 'mockTypeName',
+    //   properties: {
+    //     mockFieldName: {
+    //       type: {
+    //         type: 'string',
+    //       },
+    //     },
+    //   },
+    // });
 
-    function ref<E extends Entity>(x: E | string): Reference<E> {
-      return typeof x === 'string' ? { $ref: x } : { $ref: x.$id };
-    }
+    // function ref<E extends Entity>(x: E | string): Reference<E> {
+    //   return typeof x === 'string' ? { $ref: x } : { $ref: x.$id };
+    // }
 
-    const typeDef2 = this.db.allocate('eventTypeDefinition', {
-      name: 'mockTypeName2',
-      properties: {
-        mockFieldName: {
-          type: {
-            type: 'ref',
-            reference: ref(typeDef),
-          },
-        },
-      },
-    });
-    typeDef.name;
+    // const typeDef2 = this.db.allocate('eventTypeDefinition', {
+    //   name: 'mockTypeName2',
+    //   properties: {
+    //     mockFieldName: {
+    //       type: {
+    //         type: 'ref',
+    //         reference: ref(typeDef),
+    //       },
+    //     },
+    //   },
+    // });
+    // typeDef.name;
     const event = this.db.allocate('event', {
       // FIX: need to fix the bang?
       name: schemaName.split('@').pop()!,
       source: options.source,
       detailType: options.detailType,
       description: options.description,
-      properties: {
-        mockTypeName2: {
-          type: {
-            type: 'ref',
-            reference: ref(typeDef2),
-          },
-        },
-      },
+      properties: {},
       identifiersPath: ['mockTypeName2.mockTypeName'],
       // attributes: {},
     });
 
-    this.db.link('eventUsesType', event, typeDef);
-    this.db.link('eventUsesType', event, typeDef2);
+    // this.db.link('eventUsesType', event, typeDef);
+    // this.db.link('eventUsesType', event, typeDef2);
     // mocking type ends
     //
     // TODO: add more information for the event
@@ -168,7 +160,7 @@ export class PropertyBagBuilder {
   protected candidateProperties: EventProperties = {};
 
   // @ts-ignore
-  constructor(private readonly _propertyBag: ObjectWithProperties) {}
+  constructor(private readonly _propertyBag: ObjectWithProperties) { }
 
   public setProperty(name: string, prop: EventProperty) {
     console.log('Setting property', { prop, name });
