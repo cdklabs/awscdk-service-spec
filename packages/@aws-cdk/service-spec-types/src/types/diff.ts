@@ -43,6 +43,7 @@ export interface UpdatedResource {
   readonly scrutinizable?: ScalarDiff<Resource['scrutinizable']>;
   readonly typeDefinitionDiff?: MapDiff<TypeDefinition, UpdatedTypeDefinition>;
   readonly primaryIdentifier?: ListDiff<string, void>;
+  readonly logTypes?: ListDiff<string, void>;
   readonly metrics?: MapDiff<Metric, ChangedMetric>;
 }
 

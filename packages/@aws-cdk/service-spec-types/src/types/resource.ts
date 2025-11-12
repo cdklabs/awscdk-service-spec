@@ -66,6 +66,7 @@ export interface Resource extends Entity {
   readonly validations?: unknown;
   arnTemplate?: string;
   isStateful?: boolean;
+  logTypes?: string[];
 
   /**
    * Information about the taggability of this resource

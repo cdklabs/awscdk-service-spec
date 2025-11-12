@@ -110,6 +110,7 @@ export class DbDiff {
       primaryIdentifier: collapseEmptyDiff(
         diffList(a.primaryIdentifier ?? [], b.primaryIdentifier ?? [], (x, y) => x === y),
       ),
+      logTypes: collapseEmptyDiff(diffList(a.logTypes ?? [], b.logTypes ?? [], (x, y) => x === y)),
       attributes: collapseEmptyDiff(diffMap(a.attributes, b.attributes, (x, y) => this.diffAttribute(x, y))),
       properties: collapseEmptyDiff(diffMap(a.properties, b.properties, (x, y) => this.diffProperty(x, y))),
       typeDefinitionDiff: this.diffResourceTypeDefinitions(a, b),

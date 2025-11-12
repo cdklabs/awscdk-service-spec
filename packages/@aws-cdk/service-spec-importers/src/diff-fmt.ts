@@ -107,6 +107,7 @@ export class DiffFormatter {
           'scrutinizable',
           'tagInformation',
           'arnTemplate',
+          'logTypes',
         ]),
       ).indent(META_INDENT),
       listWithCaption('properties', this.renderProperties(r.properties, db)),
