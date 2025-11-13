@@ -1,5 +1,26 @@
-import { PropertyType, RichPropertyType, Service, SpecDatabase, Event, Resource } from '@aws-cdk/service-spec-types';
-import { locateFailure, Fail, failure, isFailure, Result, tryCatch, using, ref, isSuccess, Link } from '@cdklabs/tskb';
+import {
+  PropertyType,
+  RichPropertyType,
+  Service,
+  SpecDatabase,
+  Event,
+  Resource,
+  EventTypeDefinition,
+  IdentifierPath,
+} from '@aws-cdk/service-spec-types';
+import {
+  locateFailure,
+  Fail,
+  failure,
+  isFailure,
+  Result,
+  tryCatch,
+  using,
+  ref,
+  isSuccess,
+  Link,
+  Reference,
+} from '@cdklabs/tskb';
 import { SpecBuilder, PropertyBagBuilder } from '../event-builder';
 import { ProblemReport, ReportAudience } from '../report';
 import { unionSchemas } from '../schema-manipulation/unify-schemas';
@@ -50,7 +71,7 @@ function allocateResource({
   db: SpecDatabase;
   service: Service;
   event: Event;
-}): Link<Resource, {}> | undefined {
+}): Resource | undefined {
   const resource = eventDecider({ service, db, event });
 
   return resource;
@@ -77,17 +98,14 @@ interface TypeInfo {
 /**
  * MatchDetail interface for tracking what matched
  */
-interface MatchDetail {
-  typeId: string;
-  fieldName?: string;
-}
 
 /**
  * ResourceMatch interface for resources with matches
  */
 interface ResourceMatch {
+  // TODO: remove Link type
   resource: Link<Resource, {}>;
-  matches: MatchDetail[];
+  matches: IdentifierPath[];
 }
 
 /**
@@ -112,7 +130,7 @@ function normalizeNameToSegments(name: string): string[] {
  * Queries db.follow('eventUsesType', event) to get all type definitions
  * Returns array of TypeInfo objects with typeId, typeName, and fields
  */
-function extractEventTypeInfo(db: SpecDatabase, event: Event): TypeInfo[] {
+function extractEventTypeInfo(db: SpecDatabase, event: Event): EventTypeDefinition[] {
   // Query for type definitions linked to the event
   const typeDefinitions = db.follow('eventUsesType', event);
 
@@ -121,22 +139,24 @@ function extractEventTypeInfo(db: SpecDatabase, event: Event): TypeInfo[] {
     return [];
   }
 
+  return typeDefinitions.map((x) => x.entity);
+
   // Extract type information from each type definition
-  const typeInfos: TypeInfo[] = [];
-  for (const typeDefWrapper of typeDefinitions) {
-    const typeDef = typeDefWrapper.entity;
-    const typeId = typeDef.$id;
-    const typeName = typeDef.name || '';
-    const fields = typeDef.properties ? Object.keys(typeDef.properties) : [];
-
-    typeInfos.push({
-      typeId,
-      typeName,
-      fields,
-    });
-  }
-
-  return typeInfos;
+  // const typeInfos: TypeInfo[] = [];
+  // for (const typeDefWrapper of typeDefinitions) {
+  //   const typeDef = typeDefWrapper.entity;
+  //   const typeId = typeDef.$id;
+  //   const typeName = typeDef.name || '';
+  //   const fields = typeDef.properties ? Object.keys(typeDef.properties) : [];
+  //
+  //   typeInfos.push({
+  //     typeId,
+  //     typeName,
+  //     fields,
+  //   });
+  // }
+  //
+  // return typeInfos;
 }
 
 /**
@@ -144,13 +164,16 @@ function extractEventTypeInfo(db: SpecDatabase, event: Event): TypeInfo[] {
  * Compares normalized type names and field names against resource type names
  * Returns array of ResourceMatch objects for resources with at least one match
  */
-function matchTypesAndFieldsToResources(resources: Link<Resource, {}>[], typeInfos: TypeInfo[]): ResourceMatch[] {
+function matchTypesAndFieldsToResources(
+  resources: Link<Resource, {}>[],
+  typeInfos: EventTypeDefinition[],
+): ResourceMatch[] {
   const resourceMatches: ResourceMatch[] = [];
 
   // Iterate through all resources from service
   for (const resourceWrapper of resources) {
     const resource = resourceWrapper.entity;
-    const matches: MatchDetail[] = [];
+    const matches: IdentifierPath[] = [];
 
     // Extract resource type name from CloudFormation type
     // e.g., "Bucket" from "AWS::S3::Bucket"
@@ -172,7 +195,7 @@ function matchTypesAndFieldsToResources(resources: Link<Resource, {}>[], typeInf
     // For each type info, compare against resource
     for (const typeInfo of typeInfos) {
       // Normalize type name and compare segments against resource segments
-      const typeSegments = normalizeNameToSegments(typeInfo.typeName);
+      const typeSegments = normalizeNameToSegments(typeInfo.name);
 
       // Check if any type name segment matches any resource segment
       const typeNameMatches = typeSegments.some((typeSeg) => resourceSegments.toLowerCase() == typeSeg);
@@ -180,23 +203,23 @@ function matchTypesAndFieldsToResources(resources: Link<Resource, {}>[], typeInf
       // If type name segments match, create MatchDetail with typeId only
       if (typeNameMatches) {
         matches.push({
-          typeId: typeInfo.typeId,
+          type: ref(typeInfo),
         });
       }
 
       // For each field in type, check for matches
-      for (const field of typeInfo.fields) {
+      for (const field of Object.keys(typeInfo.properties)) {
         // Normalize field name and compare segments against resource segments
         const fieldSegments = normalizeNameToSegments(field);
 
         // Check if any field segment matches any resource segment
         const fieldMatches = fieldSegments.some((fieldSeg) => resourceSegments.toLowerCase() == fieldSeg);
-        console.log({ typeName: typeInfo.typeName, fieldSegments, fieldMatches, resourceSegments });
+        console.log({ typeName: typeInfo.name, fieldSegments, fieldMatches, resourceSegments });
 
         // If field segments match, create MatchDetail with typeId and fieldName
         if (fieldMatches) {
           matches.push({
-            typeId: typeInfo.typeId,
+            type: ref(typeInfo),
             fieldName: field,
           });
         }
@@ -226,7 +249,7 @@ function eventDecider({
   db: SpecDatabase;
   service: Service;
   event: Event;
-}): Link<Resource, {}> | undefined {
+}): Resource | undefined {
   // Call extractEventTypeInfo to get type information
   const typeInfos = extractEventTypeInfo(db, event);
 
@@ -253,9 +276,9 @@ function eventDecider({
         console.log('    Matches:');
         match.matches.forEach((detail) => {
           if (detail.fieldName) {
-            console.log(`      - Type ID: ${detail.typeId}, Field: ${detail.fieldName}`);
+            console.log(`      - Type ID: ${detail.type}, Field: ${detail.fieldName}`);
           } else {
-            console.log(`      - Type ID: ${detail.typeId}`);
+            console.log(`      - Type ID: ${detail.type}`);
           }
         });
       });
@@ -275,7 +298,7 @@ function eventDecider({
     console.log(
       `Event schema name: ${event.name}, matching resource name: ${resourceMatches[0].resource.entity.name} with cloudformation type: ${resourceMatches[0].resource.entity.cloudFormationType}`,
     );
-    return resourceMatches[0].resource;
+    return resourceMatches[0].resource.entity;
   } else if (resourceMatches.length == 0) {
     console.log(`Event schema name: ${event.name}, doesn't match any resource in cloudformation`);
   }
@@ -389,11 +412,14 @@ export function importEventBridgeSchema(options: LoadEventBridgeSchmemaOptions) 
   // Check if resource is defined before calling db.link
   // Only create hasEvent link when resource exists
   if (resource) {
-    db.link('hasEvent', resource.entity, eventDB);
+    // eventBuilder.addIdentifierPath()
+    db.link('hasEvent', resource, eventDB);
     // TODO: add the identifier path
   }
+  // FIX: I believe i need this line
+  return eventBuilder.commit();
 
-  return eventRet;
+  // return eventRet;
 
   // FIX: i need to pass the specific detail object not like CF schema
   function recurseProperties(source: ImplicitJsonSchemaRecord, target: PropertyBagBuilder, fail: Fail) {
@@ -647,7 +673,7 @@ export function importEventBridgeSchema(options: LoadEventBridgeSchmemaOptions) 
       }
     }
 
-    return { type: 'ref', reference: ref(eventTypeDefinitionBuilder.commit()) };
+    return { type: 'ref', reference: ref({ propertis: eventTypeDefinitionBuilder.commit().properties }) };
   }
 
   function looksLikeBuiltinTagType(schema: jsonschema.Object): boolean {
@@ -775,7 +801,7 @@ function removeUnionDuplicates(types: PropertyType[]) {
     throw new Error('Union cannot be empty');
   }
 
-  for (let i = 0; i < types.length; ) {
+  for (let i = 0; i < types.length;) {
     const type = new RichPropertyType(types[i]);
 
     let dupe = false;

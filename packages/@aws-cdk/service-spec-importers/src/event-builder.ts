@@ -5,6 +5,7 @@ import {
   SpecDatabase,
   Event,
   EventTypeDefinition,
+  IdentifierPath,
 } from '@aws-cdk/service-spec-types';
 import { AllFieldsGiven } from './diff-helpers';
 import { jsonschema } from './types';
@@ -17,7 +18,7 @@ export interface EventBuilderOptions {
 }
 
 export class SpecBuilder {
-  constructor(public readonly db: SpecDatabase) {}
+  constructor(public readonly db: SpecDatabase) { }
 
   public eventBuilder(schemaName: string, options: EventBuilderOptions) {
     const existing = this.db.lookup('event', 'name', 'equals', schemaName);
@@ -72,7 +73,7 @@ export class SpecBuilder {
       detailType: options.detailType,
       description: options.description,
       properties: {},
-      identifiersPath: ['mockTypeName2.mockTypeName'],
+      identifiersPath: [],
       // attributes: {},
     });
 
@@ -95,17 +96,23 @@ export class SpecBuilder {
 //
 interface ObjectWithProperties {
   properties: EventProperties;
+  identifiersPath: Array<IdentifierPath>;
 }
 
 export class PropertyBagBuilder {
   protected candidateProperties: EventProperties = {};
+  protected identifiersPath: Array<IdentifierPath> = [];
 
   // @ts-ignore
-  constructor(private readonly _propertyBag: ObjectWithProperties) {}
+  constructor(private readonly _propertyBag: ObjectWithProperties) { }
 
   public setProperty(name: string, prop: EventProperty) {
     // console.log('Setting property', { prop, name });
     this.candidateProperties[name] = prop;
+  }
+
+  public addIdentifierPath(identifierPath: IdentifierPath) {
+    this.identifiersPath.push(identifierPath);
   }
   //
   //   /**
@@ -451,7 +458,7 @@ export class EventTypeDefinitionBuilder extends PropertyBagBuilder {
   // private readonly fields: EventTypeDefinitionFields = {};
 
   // @ts-ignore
-  constructor(public readonly db: SpecDatabase, private readonly typeDef: EventTypeDefinition) {
+  constructor(public readonly db: SpecDatabase, private readonly typeDef: ObjectWithProperties) {
     super(typeDef);
   }
 
@@ -459,7 +466,7 @@ export class EventTypeDefinitionBuilder extends PropertyBagBuilder {
   //   Object.assign(this.fields, fields);
   // }
 
-  public commit(): EventTypeDefinition {
+  public commit(): ObjectWithProperties {
     super.commit();
     // Object.assign(this.typeDef, this.fields);
     return this.typeDef;

@@ -1,4 +1,4 @@
-import { Entity, Relationship } from '@cdklabs/tskb';
+import { Entity, Reference, Relationship } from '@cdklabs/tskb';
 import { PropertyType, Resource } from './resource';
 
 export interface Event extends Entity {
@@ -6,10 +6,12 @@ export interface Event extends Entity {
   readonly description: string;
   readonly source: string;
   readonly detailType: string;
-  readonly identifiersPath: Array<string>;
+  readonly identifiersPath: Array<IdentifierPath>;
   // TODO: i think i need some type related to typeDefinition
   readonly properties: EventProperties;
 }
+
+export type IdentifierPath = { type: Reference<EventTypeDefinition>; fieldName?: string };
 
 export type HasEvent = Relationship<Resource, Event>;
 
