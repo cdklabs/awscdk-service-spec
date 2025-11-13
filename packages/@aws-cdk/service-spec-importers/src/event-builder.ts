@@ -18,7 +18,7 @@ export interface EventBuilderOptions {
 }
 
 export class SpecBuilder {
-  constructor(public readonly db: SpecDatabase) { }
+  constructor(public readonly db: SpecDatabase) {}
 
   public eventBuilder(schemaName: string, options: EventBuilderOptions) {
     const existing = this.db.lookup('event', 'name', 'equals', schemaName);
@@ -96,7 +96,7 @@ export class SpecBuilder {
 //
 interface ObjectWithProperties {
   properties: EventProperties;
-  identifiersPath: Array<IdentifierPath>;
+  // identifiersPath: Array<IdentifierPath>;
 }
 
 export class PropertyBagBuilder {
@@ -104,7 +104,7 @@ export class PropertyBagBuilder {
   protected identifiersPath: Array<IdentifierPath> = [];
 
   // @ts-ignore
-  constructor(private readonly _propertyBag: ObjectWithProperties) { }
+  constructor(private readonly _propertyBag: ObjectWithProperties) {}
 
   public setProperty(name: string, prop: EventProperty) {
     // console.log('Setting property', { prop, name });
@@ -131,6 +131,11 @@ export class PropertyBagBuilder {
   public commit(): ObjectWithProperties {
     for (const [name, prop] of Object.entries(this.candidateProperties)) {
       this.commitProperty(name, prop);
+    }
+
+    // Commit identifier paths if the property bag is an Event
+    if ('identifiersPath' in this._propertyBag && this.identifiersPath.length > 0) {
+      (this._propertyBag as any).identifiersPath = this.identifiersPath;
     }
 
     return this._propertyBag;
@@ -458,7 +463,7 @@ export class EventTypeDefinitionBuilder extends PropertyBagBuilder {
   // private readonly fields: EventTypeDefinitionFields = {};
 
   // @ts-ignore
-  constructor(public readonly db: SpecDatabase, private readonly typeDef: ObjectWithProperties) {
+  constructor(public readonly db: SpecDatabase, private readonly typeDef: EventTypeDefinition) {
     super(typeDef);
   }
 
@@ -466,7 +471,7 @@ export class EventTypeDefinitionBuilder extends PropertyBagBuilder {
   //   Object.assign(this.fields, fields);
   // }
 
-  public commit(): ObjectWithProperties {
+  public commit() {
     super.commit();
     // Object.assign(this.typeDef, this.fields);
     return this.typeDef;

@@ -8,19 +8,7 @@ import {
   EventTypeDefinition,
   IdentifierPath,
 } from '@aws-cdk/service-spec-types';
-import {
-  locateFailure,
-  Fail,
-  failure,
-  isFailure,
-  Result,
-  tryCatch,
-  using,
-  ref,
-  isSuccess,
-  Link,
-  Reference,
-} from '@cdklabs/tskb';
+import { locateFailure, Fail, failure, isFailure, Result, tryCatch, using, ref, isSuccess, Link } from '@cdklabs/tskb';
 import { SpecBuilder, PropertyBagBuilder } from '../event-builder';
 import { ProblemReport, ReportAudience } from '../report';
 import { unionSchemas } from '../schema-manipulation/unify-schemas';
@@ -71,7 +59,7 @@ function allocateResource({
   db: SpecDatabase;
   service: Service;
   event: Event;
-}): Resource | undefined {
+}): { resource: Resource; matchDetail: IdentifierPath[] } | undefined {
   const resource = eventDecider({ service, db, event });
 
   return resource;
@@ -89,11 +77,11 @@ function allocateResource({
 /**
  * TypeInfo interface for event type definitions
  */
-interface TypeInfo {
-  typeId: string;
-  typeName: string;
-  fields: string[];
-}
+// interface TypeInfo {
+//   typeId: string;
+//   typeName: string;
+//   fields: string[];
+// }
 
 /**
  * MatchDetail interface for tracking what matched
@@ -249,7 +237,7 @@ function eventDecider({
   db: SpecDatabase;
   service: Service;
   event: Event;
-}): Resource | undefined {
+}): { resource: Resource; matchDetail: IdentifierPath[] } | undefined {
   // Call extractEventTypeInfo to get type information
   const typeInfos = extractEventTypeInfo(db, event);
 
@@ -298,7 +286,7 @@ function eventDecider({
     console.log(
       `Event schema name: ${event.name}, matching resource name: ${resourceMatches[0].resource.entity.name} with cloudformation type: ${resourceMatches[0].resource.entity.cloudFormationType}`,
     );
-    return resourceMatches[0].resource.entity;
+    return { resource: resourceMatches[0].resource.entity, matchDetail: resourceMatches[0].matches };
   } else if (resourceMatches.length == 0) {
     console.log(`Event schema name: ${event.name}, doesn't match any resource in cloudformation`);
   }
@@ -412,8 +400,9 @@ export function importEventBridgeSchema(options: LoadEventBridgeSchmemaOptions) 
   // Check if resource is defined before calling db.link
   // Only create hasEvent link when resource exists
   if (resource) {
-    // eventBuilder.addIdentifierPath()
-    db.link('hasEvent', resource, eventDB);
+    console.log({ event: event.SchemaName, matches: resource.matchDetail[0] });
+    eventBuilder.addIdentifierPath(resource.matchDetail[0]);
+    db.link('hasEvent', resource.resource, eventDB);
     // TODO: add the identifier path
   }
   // FIX: I believe i need this line
@@ -673,7 +662,7 @@ export function importEventBridgeSchema(options: LoadEventBridgeSchmemaOptions) 
       }
     }
 
-    return { type: 'ref', reference: ref({ propertis: eventTypeDefinitionBuilder.commit().properties }) };
+    return { type: 'ref', reference: ref(eventTypeDefinitionBuilder.commit()) };
   }
 
   function looksLikeBuiltinTagType(schema: jsonschema.Object): boolean {
@@ -801,7 +790,7 @@ function removeUnionDuplicates(types: PropertyType[]) {
     throw new Error('Union cannot be empty');
   }
 
-  for (let i = 0; i < types.length;) {
+  for (let i = 0; i < types.length; ) {
     const type = new RichPropertyType(types[i]);
 
     let dupe = false;
