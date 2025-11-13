@@ -211,9 +211,9 @@ export class DatabaseBuilder {
   }
 
   public importLogSources(filepath: string) {
-    return this.addSourceImporter(async (db) => {
+    return this.addSourceImporter(async (db, report) => {
       const logSourceData = JSON.parse(await fs.readFile(filepath, { encoding: 'utf-8' }));
-      importLogSources(db, logSourceData);
+      importLogSources(db, logSourceData, report);
     });
   }
 
