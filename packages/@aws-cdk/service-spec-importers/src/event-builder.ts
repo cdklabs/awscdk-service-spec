@@ -104,7 +104,7 @@ export class PropertyBagBuilder {
   constructor(private readonly _propertyBag: ObjectWithProperties) {}
 
   public setProperty(name: string, prop: EventProperty) {
-    console.log('Setting property', { prop, name });
+    // console.log('Setting property', { prop, name });
     this.candidateProperties[name] = prop;
   }
   //

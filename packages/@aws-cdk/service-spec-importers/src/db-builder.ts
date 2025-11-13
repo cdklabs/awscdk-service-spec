@@ -224,15 +224,15 @@ export class DatabaseBuilder {
       });
       for (const region of regions) {
         for (const event of region.events) {
-          console.log({ region, resource: JSON.stringify(event, null, 2), name: event.SchemaName });
+          // console.log({ region, resource: JSON.stringify(event, null, 2), name: event.SchemaName });
           importEventBridgeSchema({
             db,
             event,
             report,
             region: region.regionName,
           });
-          const existing = db.lookup('event', 'name', 'equals', event.SchemaName.split('@')[1]);
-          console.log('db-builder', { existing });
+          // const existing = db.lookup('event', 'name', 'equals', event.SchemaName.split('@')[1]);
+          // console.log('db-builder', { existing });
         }
       }
     });

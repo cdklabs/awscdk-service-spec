@@ -398,8 +398,8 @@ export namespace jsonschema {
       let current;
       if (weird == true) {
         current = root.Content;
-        console.log('WEIRD');
-        console.log({ path, typeof: typeof root, root: JSON.stringify(root), current: JSON.stringify(current) });
+        // console.log('WEIRD');
+        // console.log({ path, typeof: typeof root, root: JSON.stringify(root), current: JSON.stringify(current) });
       } else {
         current = root;
         // console.log('NOTWIERD');
@@ -415,8 +415,8 @@ export namespace jsonschema {
       }
 
       if (weird == true) {
-        console.log('WEIRD IN another place');
-        console.log({ current: JSON.stringify(current) });
+        // console.log('WEIRD IN another place');
+        // console.log({ current: JSON.stringify(current) });
       }
 
       if (current === undefined) {

@@ -1,5 +1,5 @@
-import { PropertyType, RichPropertyType, Service, SpecDatabase } from '@aws-cdk/service-spec-types';
-import { locateFailure, Fail, failure, isFailure, Result, tryCatch, using, ref, isSuccess } from '@cdklabs/tskb';
+import { PropertyType, RichPropertyType, Service, SpecDatabase, Event, Resource } from '@aws-cdk/service-spec-types';
+import { locateFailure, Fail, failure, isFailure, Result, tryCatch, using, ref, isSuccess, Link } from '@cdklabs/tskb';
 import { SpecBuilder, PropertyBagBuilder } from '../event-builder';
 import { ProblemReport, ReportAudience } from '../report';
 import { unionSchemas } from '../schema-manipulation/unify-schemas';
@@ -42,8 +42,16 @@ function allocateService({
 }
 
 // TODO: change name to get?
-function allocateResource({ db, service }: { db: SpecDatabase; service: Service }) {
-  const resource = eventDecider({ service, db });
+function allocateResource({
+  db,
+  service,
+  event,
+}: {
+  db: SpecDatabase;
+  service: Service;
+  event: Event;
+}): Link<Resource, {}> | undefined {
+  const resource = eventDecider({ service, db, event });
 
   return resource;
   // TODO: I have no idea what i'm doing now :D, how the resource will not be in the DB?
@@ -57,17 +65,223 @@ function allocateResource({ db, service }: { db: SpecDatabase; service: Service 
   // return resource;
 }
 
-// TODO: change name to resource decider?
-// function eventDecider(service: Service) {
-function eventDecider({ db, service }: { db: SpecDatabase; service: Service }) {
-  // TODO: need to get all the requred property field names here
-  const resources = db.follow('hasResource', service);
-  if (service.name == 'aws-lambda') {
-    console.log({ resources: JSON.stringify(resources, null, 2) });
+/**
+ * TypeInfo interface for event type definitions
+ */
+interface TypeInfo {
+  typeId: string;
+  typeName: string;
+  fields: string[];
+}
+
+/**
+ * MatchDetail interface for tracking what matched
+ */
+interface MatchDetail {
+  typeId: string;
+  fieldName?: string;
+}
+
+/**
+ * ResourceMatch interface for resources with matches
+ */
+interface ResourceMatch {
+  resource: Link<Resource, {}>;
+  matches: MatchDetail[];
+}
+
+/**
+ * Normalize a name into lowercase segments for comparison
+ * Splits by hyphens, underscores, and camelCase
+ * Filters out generic identifiers (name, id, arn)
+ */
+function normalizeNameToSegments(name: string): string[] {
+  // Split camelCase: insert hyphen before capitals
+  const withHyphens = name.replace(/([A-Z])/g, '-$1');
+
+  // Split by hyphens and underscores
+  const segments = withHyphens.toLowerCase().split(/[-_]/);
+
+  // Filter out empty strings and generic identifiers
+  const genericIds = new Set(['name', 'id', 'arn']);
+  return segments.filter((s) => s.length > 0 && !genericIds.has(s));
+}
+
+/**
+ * Extract type information from an event
+ * Queries db.follow('eventUsesType', event) to get all type definitions
+ * Returns array of TypeInfo objects with typeId, typeName, and fields
+ */
+function extractEventTypeInfo(db: SpecDatabase, event: Event): TypeInfo[] {
+  // Query for type definitions linked to the event
+  const typeDefinitions = db.follow('eventUsesType', event);
+
+  // If no type definitions found, return empty array
+  if (!typeDefinitions || typeDefinitions.length === 0) {
+    return [];
   }
 
-  // TODO: Change this to proper resource
-  return resources[0];
+  // Extract type information from each type definition
+  const typeInfos: TypeInfo[] = [];
+  for (const typeDefWrapper of typeDefinitions) {
+    const typeDef = typeDefWrapper.entity;
+    const typeId = typeDef.$id;
+    const typeName = typeDef.name || '';
+    const fields = typeDef.properties ? Object.keys(typeDef.properties) : [];
+
+    typeInfos.push({
+      typeId,
+      typeName,
+      fields,
+    });
+  }
+
+  return typeInfos;
+}
+
+/**
+ * Match event types and fields to CloudFormation resources
+ * Compares normalized type names and field names against resource type names
+ * Returns array of ResourceMatch objects for resources with at least one match
+ */
+function matchTypesAndFieldsToResources(resources: Link<Resource, {}>[], typeInfos: TypeInfo[]): ResourceMatch[] {
+  const resourceMatches: ResourceMatch[] = [];
+
+  // Iterate through all resources from service
+  for (const resourceWrapper of resources) {
+    const resource = resourceWrapper.entity;
+    const matches: MatchDetail[] = [];
+
+    // Extract resource type name from CloudFormation type
+    // e.g., "Bucket" from "AWS::S3::Bucket"
+    const cfType = resource.cloudFormationType || '';
+    const parts = cfType.split('::');
+    const resourceTypeName = parts.length >= 3 ? parts[2] : cfType;
+
+    // Normalize resource type name using normalizeNameToSegments
+    // TODO: i don't think this is needed
+    // const resourceSegments = normalizeNameToSegments(resourceTypeName);
+    // FIX: return the below
+    const resourceSegments = resourceTypeName;
+    console.log('Match Types & Fields To Resources', {
+      cfType,
+      resourceTypeName,
+      resourceSegments: JSON.stringify(resourceSegments, null, 2),
+    });
+
+    // For each type info, compare against resource
+    for (const typeInfo of typeInfos) {
+      // Normalize type name and compare segments against resource segments
+      const typeSegments = normalizeNameToSegments(typeInfo.typeName);
+
+      // Check if any type name segment matches any resource segment
+      const typeNameMatches = typeSegments.some((typeSeg) => resourceSegments.toLowerCase() == typeSeg);
+
+      // If type name segments match, create MatchDetail with typeId only
+      if (typeNameMatches) {
+        matches.push({
+          typeId: typeInfo.typeId,
+        });
+      }
+
+      // For each field in type, check for matches
+      for (const field of typeInfo.fields) {
+        // Normalize field name and compare segments against resource segments
+        const fieldSegments = normalizeNameToSegments(field);
+
+        // Check if any field segment matches any resource segment
+        const fieldMatches = fieldSegments.some((fieldSeg) => resourceSegments.toLowerCase() == fieldSeg);
+        console.log({ typeName: typeInfo.typeName, fieldSegments, fieldMatches, resourceSegments });
+
+        // If field segments match, create MatchDetail with typeId and fieldName
+        if (fieldMatches) {
+          matches.push({
+            typeId: typeInfo.typeId,
+            fieldName: field,
+          });
+        }
+      }
+    }
+
+    // Collect ResourceMatch objects for resources with at least one match
+    if (matches.length > 0) {
+      resourceMatches.push({
+        resource: resourceWrapper,
+        matches,
+      });
+    }
+  }
+
+  // Return array of ResourceMatch objects
+  return resourceMatches;
+}
+
+// TODO: change name to resource decider?
+// function eventDecider(service: Service) {
+function eventDecider({
+  db,
+  service,
+  event,
+}: {
+  db: SpecDatabase;
+  service: Service;
+  event: Event;
+}): Link<Resource, {}> | undefined {
+  // Call extractEventTypeInfo to get type information
+  const typeInfos = extractEventTypeInfo(db, event);
+
+  // Get resources using db.follow('hasResource', service)
+  const resources = db.follow('hasResource', service);
+  console.log('Event Decider', { resources: JSON.stringify(resources, null, 2), eventName: event.name });
+
+  // Call matchTypesAndFieldsToResources to find matches
+  const resourceMatches = matchTypesAndFieldsToResources(Array.from(resources), typeInfos);
+
+  // console.log('Event Decider', { serviceName: service.name });
+  // Debug logging for aws-lambda service
+  if (service.name === 'aws-s3') {
+    console.log('=== AWS S3 Resource Matching Debug ===');
+    console.log('Type Infos:', JSON.stringify(typeInfos, null, 2));
+    console.log('Total Resources:', resources.length);
+    console.log('Matching Resources:', resourceMatches.length);
+
+    // Log match details including type IDs and field names
+    if (resourceMatches.length > 0) {
+      console.log('Match Details:');
+      resourceMatches.forEach((match, index) => {
+        console.log(`  Resource ${index + 1}:`, match.resource.entity.cloudFormationType);
+        console.log('    Matches:');
+        match.matches.forEach((detail) => {
+          if (detail.fieldName) {
+            console.log(`      - Type ID: ${detail.typeId}, Field: ${detail.fieldName}`);
+          } else {
+            console.log(`      - Type ID: ${detail.typeId}`);
+          }
+        });
+      });
+    }
+
+    console.log('==========================================');
+  }
+
+  if (resourceMatches.length > 1) {
+    console.log('A single event matching multiple resources', {
+      resourceMatches: JSON.stringify(resourceMatches, null, 2),
+    });
+  }
+
+  // If matches found, return first matching resource
+  if (resourceMatches.length > 0) {
+    console.log(
+      `Event schema name: ${event.name}, matching resource name: ${resourceMatches[0].resource.entity.name} with cloudformation type: ${resourceMatches[0].resource.entity.cloudFormationType}`,
+    );
+    return resourceMatches[0].resource;
+  } else if (resourceMatches.length == 0) {
+    console.log(`Event schema name: ${event.name}, doesn't match any resource in cloudformation`);
+  }
+
+  // If no matches found, return undefined
+  return undefined;
 }
 
 export function importEventBridgeSchema(options: LoadEventBridgeSchmemaOptions) {
@@ -158,16 +372,27 @@ export function importEventBridgeSchema(options: LoadEventBridgeSchmemaOptions) 
 
   const service = allocateService({ eventSchemaName: event.SchemaName, db });
   if (service == undefined) {
+    console.log(`The service related to this event schema name ${event.SchemaName} doesn't exist in CF`);
     // TODO: Maybe i need to return undefined
     return eventRet;
   }
-  const resource = allocateResource({ service, db });
+
+  // Move eventDB lookup before allocateResource call
+  const eventDB = db.lookup('event', 'name', 'equals', event.SchemaName).only();
+
+  // Pass eventDB as event parameter to allocateResource
+  const resource = allocateResource({ service, db, event: eventDB });
+
   // console.log('hasEvent link is creating...');
   // console.log({ resource: JSON.stringify(resource), event: JSON.stringify(event) });
 
-  const eventDB = db.lookup('event', 'name', 'equals', event.SchemaName).only();
-  // TODO: should i return the entity only
-  db.link('hasEvent', resource.entity, eventDB);
+  // Check if resource is defined before calling db.link
+  // Only create hasEvent link when resource exists
+  if (resource) {
+    db.link('hasEvent', resource.entity, eventDB);
+    // TODO: add the identifier path
+  }
+
   return eventRet;
 
   // FIX: i need to pass the specific detail object not like CF schema
@@ -181,10 +406,10 @@ export function importEventBridgeSchema(options: LoadEventBridgeSchmemaOptions) 
 
     for (const [name, property] of Object.entries(source.properties)) {
       try {
-        console.log('looping over the properties', { name, property });
+        // console.log('looping over the properties', { name, property });
         // FIX: this boolean should be something else
         let resolvedSchema = resolve(property, true);
-        console.log({ resolvedSchema });
+        // console.log({ resolvedSchema });
         // const relationships = collectPossibleRelationships(resolvedSchema);
         withResult(schemaTypeToModelType(name, resolvedSchema, fail.in(`property ${name}`)), (type) => {
           target.setProperty(name, {
@@ -550,7 +775,7 @@ function removeUnionDuplicates(types: PropertyType[]) {
     throw new Error('Union cannot be empty');
   }
 
-  for (let i = 0; i < types.length;) {
+  for (let i = 0; i < types.length; ) {
     const type = new RichPropertyType(types[i]);
 
     let dupe = false;
