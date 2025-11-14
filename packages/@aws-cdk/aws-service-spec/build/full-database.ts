@@ -27,7 +27,7 @@ export class FullDatabase extends DatabaseBuilder {
       .importCannedMetrics(
         path.join(SOURCES, 'CloudWatchConsoleServiceDirectory/CloudWatchConsoleServiceDirectory.json'),
       )
-      .importLogSources(path.join(SOURCES, 'LogSources/log-source-resouce.json'))
+      .importLogSources(path.join(SOURCES, 'LogSources/log-source-resource.json'))
       .importScrutinies()
       .importAugmentations();
   }

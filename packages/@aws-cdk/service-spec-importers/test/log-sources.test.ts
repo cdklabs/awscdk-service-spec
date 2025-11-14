@@ -31,36 +31,69 @@ test('adds log type to resource', () => {
   importLogSources(
     db,
     {
-      SomeTypeLogs: {
+      SomeTypeS3Logs: {
         LogType: 'SOME_LOGS',
         ResourceTypes: ['AWS::Some::Type'],
+        Destinations: [
+          {
+            DestinationType: 'S3',
+            PermissionsVersion: 'V2',
+          },
+        ],
+      },
+      SomeTypeTracesLogs: {
+        LogType: 'TRACES',
+        ResourceTypes: ['AWS::Some::Type'],
+        Destinations: [
+          {
+            DestinationType: 'XRAY',
+            PermissionsVersion: 'V2',
+          },
+        ],
       },
     },
     report,
   );
 
   const res = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0];
-  expect(res.logTypes).toEqual(['SOME_LOGS']);
+  expect(res.vendedLogs?.logType).toEqual(['SOME_LOGS', 'TRACES']);
+  expect(res.vendedLogs?.logDestinations).toEqual([
+    { destinationType: 'S3', permissionVersion: 'V2' },
+    { destinationType: 'XRAY', permissionVersion: 'V2' },
+  ]);
 });
 
-test('adds multiple log types to resource', () => {
+test('adds multiple log types to resource and does not add duplicate destinations', () => {
   importLogSources(
     db,
     {
       SomeTypeApplicationLogs: {
         LogType: 'APPLICATION_LOGS',
         ResourceTypes: ['AWS::Some::Type'],
+        Destinations: [
+          {
+            DestinationType: 'S3',
+            PermissionsVersion: 'V2',
+          },
+        ],
       },
       SomeTypeEventLogs: {
         LogType: 'EVENT_LOGS',
         ResourceTypes: ['AWS::Some::Type'],
+        Destinations: [
+          {
+            DestinationType: 'S3',
+            PermissionsVersion: 'V2',
+          },
+        ],
       },
     },
     report,
   );
 
   const res = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0];
-  expect(res.logTypes).toEqual(['APPLICATION_LOGS', 'EVENT_LOGS']);
+  expect(res.vendedLogs?.logType).toEqual(['APPLICATION_LOGS', 'EVENT_LOGS']);
+  expect(res.vendedLogs?.logDestinations).toEqual([{ destinationType: 'S3', permissionVersion: 'V2' }]);
 });
 
 test('adds log types to multiple resources', () => {
@@ -69,17 +102,25 @@ test('adds log types to multiple resources', () => {
     {
       MultiTypeApplicationLogs: {
         LogType: 'APPLICATION_LOGS',
-        ResourceTypes: ['AWS::Other::Type', 'AWS::Some::Type'],
+        ResourceTypes: ['AWS::Some::Type', 'AWS::Other::Type'],
+        Destinations: [
+          {
+            DestinationType: 'S3',
+            PermissionsVersion: 'V2',
+          },
+        ],
       },
     },
     report,
   );
 
   const someRes = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0];
-  expect(someRes.logTypes).toEqual(['APPLICATION_LOGS']);
+  expect(someRes.vendedLogs?.logType).toEqual(['APPLICATION_LOGS']);
+  expect(someRes.vendedLogs?.logDestinations).toEqual([{ destinationType: 'S3', permissionVersion: 'V2' }]);
 
   const otherRes = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Other::Type')[0];
-  expect(otherRes.logTypes).toEqual(['APPLICATION_LOGS']);
+  expect(otherRes.vendedLogs?.logType).toEqual(['APPLICATION_LOGS']);
+  expect(otherRes.vendedLogs?.logDestinations).toEqual([{ destinationType: 'S3', permissionVersion: 'V2' }]);
 });
 
 test('does not assign logTypes if resource does not exist in Cloudformation', () => {
@@ -88,7 +129,13 @@ test('does not assign logTypes if resource does not exist in Cloudformation', ()
     {
       SomeTypeLogs: {
         LogType: 'SOME_LOGS',
-        ResourceTypes: ['AWS::Missing::Type'], // this type does not exist
+        ResourceTypes: ['AWS::Missing::Type'],
+        Destinations: [
+          {
+            DestinationType: 'S3',
+            PermissionsVersion: 'V2',
+          },
+        ],
       },
     },
     report,

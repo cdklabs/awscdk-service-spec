@@ -41,9 +41,9 @@ export interface UpdatedResource {
   readonly isStateful?: ScalarDiff<boolean>;
   readonly tagInformation?: ScalarDiff<Resource['tagInformation']>;
   readonly scrutinizable?: ScalarDiff<Resource['scrutinizable']>;
+  readonly vendedLogs?: ScalarDiff<Resource['vendedLogs']>;
   readonly typeDefinitionDiff?: MapDiff<TypeDefinition, UpdatedTypeDefinition>;
   readonly primaryIdentifier?: ListDiff<string, void>;
-  readonly logTypes?: ListDiff<string, void>;
   readonly metrics?: MapDiff<Metric, ChangedMetric>;
 }
 

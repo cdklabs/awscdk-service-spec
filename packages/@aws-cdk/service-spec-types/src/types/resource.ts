@@ -66,7 +66,7 @@ export interface Resource extends Entity {
   readonly validations?: unknown;
   arnTemplate?: string;
   isStateful?: boolean;
-  logTypes?: string[];
+  vendedLogs?: VendedLog;
 
   /**
    * Information about the taggability of this resource
@@ -494,6 +494,16 @@ export interface RelationshipRef {
    * The property name within the referenced resource (e.g., "Id")
    */
   readonly propertyName: string;
+}
+
+export interface VendedLog {
+  readonly logType: string[];
+  readonly logDestinations: LogDestination[];
+}
+
+export interface LogDestination {
+  destinationType: string;
+  permissionVersion: string;
 }
 
 export class RichPropertyType {
