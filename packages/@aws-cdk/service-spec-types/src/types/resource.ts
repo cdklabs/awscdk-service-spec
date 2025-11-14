@@ -498,7 +498,7 @@ export interface RelationshipRef {
 }
 
 /**
- * Represents the types of Logs a Cloudformation Resource can produce and what destinations can consume them
+ * Represents the types of logs a Cloudformation Resource can produce and what destinations can consume them
  */
 export interface VendedLog {
   /**
@@ -508,9 +508,9 @@ export interface VendedLog {
   /**
    * List of the types of logs a Cloudformation resource can produce
    */
-  readonly logType: string[];
+  readonly logTypes: string[];
   /**
-   * List of the destinations the can consume those logs and the permissions they require
+   * List of the destinations the can consume those logs
    */
   readonly logDestinations: LogDestination[];
 }
