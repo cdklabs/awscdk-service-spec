@@ -1,5 +1,6 @@
 import { Entity, Reference, Relationship } from '@cdklabs/tskb';
 import { SpecDatabase } from './database';
+import { EventTypeDefinition } from './event';
 import { sortKeyComparator } from '../util/sorting';
 
 export interface Partition extends Entity {
@@ -348,7 +349,7 @@ export interface BuiltinTagType {
 
 export interface DefinitionReference {
   readonly type: 'ref';
-  readonly reference: Reference<TypeDefinition>;
+  readonly reference: Reference<TypeDefinition | EventTypeDefinition>;
 }
 
 export interface ArrayType<E> {

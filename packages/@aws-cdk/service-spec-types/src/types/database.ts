@@ -2,6 +2,7 @@ import { promises as fs } from 'fs';
 import { gunzipSync } from 'zlib';
 import { Database, entityCollection, fieldIndex, stringCmp } from '@cdklabs/tskb';
 import { IsAugmentedResource, ResourceAugmentation } from './augmentations';
+import { HasEvent, Event, EventUsesType, EventTypeDefinition } from './event';
 import {
   DimensionSet,
   Metric,
@@ -36,6 +37,7 @@ export function emptyDatabase() {
         name: fieldIndex('name', stringCmp),
         cloudFormationNamespace: fieldIndex('cloudFormationNamespace', stringCmp),
       }),
+      eventTypeDefinition: entityCollection<EventTypeDefinition>(),
       typeDefinition: entityCollection<TypeDefinition>(),
       augmentations: entityCollection<ResourceAugmentation>(),
       metric: entityCollection<Metric>().index({
@@ -45,6 +47,9 @@ export function emptyDatabase() {
       }),
       dimensionSet: entityCollection<DimensionSet>().index({
         dedupKey: fieldIndex('dedupKey', stringCmp),
+      }),
+      event: entityCollection<Event>().index({
+        name: fieldIndex('name', stringCmp),
       }),
     },
     (r) => ({
@@ -58,6 +63,8 @@ export function emptyDatabase() {
       serviceHasMetric: r.relationship<ServiceHasMetric>('service', 'metric'),
       resourceHasDimensionSet: r.relationship<ResourceHasDimensionSet>('resource', 'dimensionSet'),
       serviceHasDimensionSet: r.relationship<ServiceHasDimensionSet>('service', 'dimensionSet'),
+      hasEvent: r.relationship<HasEvent>('resource', 'event'),
+      eventUsesType: r.relationship<EventUsesType>('event', 'eventTypeDefinition'),
     }),
   );
 }
