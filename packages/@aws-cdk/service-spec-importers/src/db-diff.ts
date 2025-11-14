@@ -106,7 +106,6 @@ export class DbDiff {
       arnTemplate: diffScalar(a, b, 'arnTemplate'),
       name: diffScalar(a, b, 'name'),
       scrutinizable: diffScalar(a, b, 'scrutinizable'),
-      // since VendedLogs is a pretty complex type, will probably have make a new eq function
       vendedLogs: diffField(a, b, 'vendedLogs', jsonEq),
       tagInformation: diffField(a, b, 'tagInformation', jsonEq),
       primaryIdentifier: collapseEmptyDiff(

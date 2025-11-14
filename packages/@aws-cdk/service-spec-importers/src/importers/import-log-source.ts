@@ -14,29 +14,53 @@ export function importLogSources(
   >,
   report: ProblemReport,
 ) {
+  // clears vendedLogs property from all resources before processing - goal: ensure that logTypes and destinations are up to date and cut down on complicated deduplication code
+  for (const resource of db.all('resource')) {
+    if (resource.vendedLogs) {
+      delete resource.vendedLogs;
+    }
+  }
+
   for (const value of Object.values(logSourceData)) {
     for (const resourceType of value.ResourceTypes) {
       try {
         const resource = db.lookup('resource', 'cloudFormationType', 'equals', resourceType).only();
+        let permissionValue = '';
+        for (const dest of value.Destinations) {
+          if (permissionValue === '') {
+            permissionValue = dest.PermissionsVersion;
+          } else {
+            if (permissionValue !== dest.PermissionsVersion) {
+              report.reportFailure(
+                new ReportAudience('Log Source Import'),
+                'interpreting',
+                failure.in(resourceType)(
+                  `Resouce of type ${resourceType} has inconsistent permissions version for log of type ${value.LogType}`,
+                ),
+              );
+            }
+          }
+        }
+
         const destinations = value.Destinations.map((dest) => ({
           destinationType: dest.DestinationType,
-          permissionVersion: dest.PermissionsVersion,
         }));
 
         if (resource.vendedLogs) {
+          // we take whatever the newest permissions value is and assume that all logs in a resource use the same permissions
+          resource.vendedLogs.permissionsVersion = permissionValue;
           resource.vendedLogs.logType.push(value.LogType);
           // dedupes incoming destinations
           const newDestinations = destinations.filter(
             (dest) =>
               !resource.vendedLogs!.logDestinations.some(
-                (existing) =>
-                  existing.destinationType === dest.destinationType &&
-                  existing.permissionVersion === dest.permissionVersion,
+                (existing) => existing.destinationType === dest.destinationType,
               ),
           );
           resource.vendedLogs.logDestinations.push(...newDestinations);
         } else {
           resource.vendedLogs = {
+            permissionsVersion: permissionValue,
             logType: [value.LogType],
             logDestinations: destinations,
           };

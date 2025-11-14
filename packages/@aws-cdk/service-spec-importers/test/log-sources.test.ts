@@ -56,11 +56,11 @@ test('adds log type to resource', () => {
   );
 
   const res = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0];
-  expect(res.vendedLogs?.logType).toEqual(['SOME_LOGS', 'TRACES']);
-  expect(res.vendedLogs?.logDestinations).toEqual([
-    { destinationType: 'S3', permissionVersion: 'V2' },
-    { destinationType: 'XRAY', permissionVersion: 'V2' },
-  ]);
+  expect(res.vendedLogs).toEqual({
+    permissionsVersion: 'V2',
+    logType: ['SOME_LOGS', 'TRACES'],
+    logDestinations: [{ destinationType: 'S3' }, { destinationType: 'XRAY' }],
+  });
 });
 
 test('adds multiple log types to resource and does not add duplicate destinations', () => {
@@ -92,8 +92,11 @@ test('adds multiple log types to resource and does not add duplicate destination
   );
 
   const res = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0];
-  expect(res.vendedLogs?.logType).toEqual(['APPLICATION_LOGS', 'EVENT_LOGS']);
-  expect(res.vendedLogs?.logDestinations).toEqual([{ destinationType: 'S3', permissionVersion: 'V2' }]);
+  expect(res.vendedLogs).toEqual({
+    permissionsVersion: 'V2',
+    logType: ['APPLICATION_LOGS', 'EVENT_LOGS'],
+    logDestinations: [{ destinationType: 'S3' }],
+  });
 });
 
 test('adds log types to multiple resources', () => {
@@ -115,12 +118,18 @@ test('adds log types to multiple resources', () => {
   );
 
   const someRes = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0];
-  expect(someRes.vendedLogs?.logType).toEqual(['APPLICATION_LOGS']);
-  expect(someRes.vendedLogs?.logDestinations).toEqual([{ destinationType: 'S3', permissionVersion: 'V2' }]);
+  expect(someRes.vendedLogs).toEqual({
+    permissionsVersion: 'V2',
+    logType: ['APPLICATION_LOGS'],
+    logDestinations: [{ destinationType: 'S3' }],
+  });
 
   const otherRes = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Other::Type')[0];
-  expect(otherRes.vendedLogs?.logType).toEqual(['APPLICATION_LOGS']);
-  expect(otherRes.vendedLogs?.logDestinations).toEqual([{ destinationType: 'S3', permissionVersion: 'V2' }]);
+  expect(otherRes.vendedLogs).toEqual({
+    permissionsVersion: 'V2',
+    logType: ['APPLICATION_LOGS'],
+    logDestinations: [{ destinationType: 'S3' }],
+  });
 });
 
 test('does not assign logTypes if resource does not exist in Cloudformation', () => {

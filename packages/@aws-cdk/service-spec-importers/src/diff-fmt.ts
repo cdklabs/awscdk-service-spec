@@ -137,6 +137,7 @@ export class DiffFormatter {
       'scrutinizable',
       'tagInformation',
       'arnTemplate',
+      'vendedLogs',
     ]);
 
     return new PrintableTree(`resource ${key}`).addBullets([
