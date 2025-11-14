@@ -49,7 +49,7 @@ export function importLogSources(
         if (resource.vendedLogs) {
           // we take whatever the newest permissions value is and assume that all logs in a resource use the same permissions
           resource.vendedLogs.permissionsVersion = permissionValue;
-          resource.vendedLogs.logType.push(value.LogType);
+          resource.vendedLogs.logTypes.push(value.LogType);
           // dedupes incoming destinations
           const newDestinations = destinations.filter(
             (dest) =>
@@ -61,7 +61,7 @@ export function importLogSources(
         } else {
           resource.vendedLogs = {
             permissionsVersion: permissionValue,
-            logType: [value.LogType],
+            logTypes: [value.LogType],
             logDestinations: destinations,
           };
         }
