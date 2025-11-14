@@ -348,10 +348,10 @@ export class DiffFormatter {
         tree.push(new PrintableTree(`logTypes:`).addBullets(logTypesBullets));
       }
 
-      const oldDests = diff.old.logDestinations.map((d) => d.destinationType);
-      const newDests = diff.new.logDestinations.map((d) => d.destinationType);
-      const oldDestSet = new Set(oldDests);
-      const newDestSet = new Set(newDests);
+      const oldDestStrs = diff.old.logDestinations.map((d) => JSON.stringify(d));
+      const newDestStrs = diff.new.logDestinations.map((d) => JSON.stringify(d));
+      const oldDestSet = new Set(oldDestStrs);
+      const newDestSet = new Set(newDestStrs);
       const addedDests = [...newDestSet].filter((d) => !oldDestSet.has(d));
       const removedDests = [...oldDestSet].filter((d) => !newDestSet.has(d));
       if (addedDests.length > 0 || removedDests.length > 0) {
@@ -368,7 +368,7 @@ export class DiffFormatter {
     return new PrintableTree(`vendedLogs`).addBullets([
       new PrintableTree(`permissionsVersion: ${vendedLogs.permissionsVersion}`),
       new PrintableTree(`logTypes: [${vendedLogs.logTypes.join(', ')}]`),
-      new PrintableTree(`logDestinations: [${vendedLogs.logDestinations.map((d) => d.destinationType).join(', ')}]`),
+      new PrintableTree(`logDestinations: [${vendedLogs.logDestinations.map((d) => JSON.stringify(d)).join(', ')}]`),
     ]);
   }
 }
