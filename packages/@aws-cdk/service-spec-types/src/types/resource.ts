@@ -497,6 +497,8 @@ export interface RelationshipRef {
   readonly propertyName: string;
 }
 
+export type DestinationService = 'S3' | 'CWL' | 'FH' | 'XRAY';
+
 /**
  * Represents the types of logs a Cloudformation Resource can produce and what destinations can consume them
  */
@@ -504,7 +506,7 @@ export interface VendedLog {
   /**
    * What version of permissions the destination supports V1 | V2
    */
-  permissionsVersion: string;
+  readonly permissionsVersion: string;
   /**
    * List of the types of logs a Cloudformation resource can produce
    */
@@ -512,17 +514,7 @@ export interface VendedLog {
   /**
    * List of the destinations the can consume those logs
    */
-  readonly logDestinations: LogDestination[];
-}
-
-/**
- * Represents a destination that logs from a Cloudformation resource can be sent to
- */
-export interface LogDestination {
-  /**
-   * Resource type of the destination S3 | CWL | FH | XRAY
-   */
-  readonly destinationType: string;
+  readonly destinations: DestinationService[];
 }
 
 export class RichPropertyType {

@@ -337,29 +337,8 @@ export class DiffFormatter {
         );
       }
 
-      const oldTypes = new Set(diff.old.logTypes);
-      const newTypes = new Set(diff.new.logTypes);
-      const addedTypes = [...newTypes].filter((t) => !oldTypes.has(t));
-      const removedTypes = [...oldTypes].filter((t) => !newTypes.has(t));
-      if (addedTypes.length > 0 || removedTypes.length > 0) {
-        const logTypesBullets: PrintableTree[] = [];
-        removedTypes.forEach((type) => logTypesBullets.push(new PrintableTree(`- ${type}`).colorize(chalk.red)));
-        addedTypes.forEach((type) => logTypesBullets.push(new PrintableTree(`+ ${type}`).colorize(chalk.green)));
-        tree.push(new PrintableTree(`logTypes:`).addBullets(logTypesBullets));
-      }
-
-      const oldDestStrs = diff.old.logDestinations.map((d) => JSON.stringify(d));
-      const newDestStrs = diff.new.logDestinations.map((d) => JSON.stringify(d));
-      const oldDestSet = new Set(oldDestStrs);
-      const newDestSet = new Set(newDestStrs);
-      const addedDests = [...newDestSet].filter((d) => !oldDestSet.has(d));
-      const removedDests = [...oldDestSet].filter((d) => !newDestSet.has(d));
-      if (addedDests.length > 0 || removedDests.length > 0) {
-        const destBullets: PrintableTree[] = [];
-        removedDests.forEach((dest) => destBullets.push(new PrintableTree(`- ${dest}`).colorize(chalk.red)));
-        addedDests.forEach((dest) => destBullets.push(new PrintableTree(`+ ${dest}`).colorize(chalk.green)));
-        tree.push(new PrintableTree(`logDestinations:`).addBullets(destBullets));
-      }
+      this.renderVendedLogListDiff(diff, tree, 'logTypes');
+      this.renderVendedLogListDiff(diff, tree, 'destinations');
     }
     return tree;
   }
@@ -368,8 +347,23 @@ export class DiffFormatter {
     return new PrintableTree(`vendedLogs`).addBullets([
       new PrintableTree(`permissionsVersion: ${vendedLogs.permissionsVersion}`),
       new PrintableTree(`logTypes: [${vendedLogs.logTypes.join(', ')}]`),
-      new PrintableTree(`logDestinations: [${vendedLogs.logDestinations.map((d) => JSON.stringify(d)).join(', ')}]`),
+      new PrintableTree(`logDestinations: [${vendedLogs.destinations.join(', ')}]`),
     ]);
+  }
+
+  private renderVendedLogListDiff(diff: ScalarDiff<VendedLog | undefined>, tree: PrintableTree[], diffShown: string) {
+    if (diff.old && diff.new) {
+      const oldList = new Set(diff.old.logTypes);
+      const newList = new Set(diff.new.logTypes);
+      const addedTypes = [...newList].filter((t) => !oldList.has(t));
+      const removedTypes = [...oldList].filter((t) => !newList.has(t));
+      if (addedTypes.length > 0 || removedTypes.length > 0) {
+        const bullets: PrintableTree[] = [];
+        removedTypes.forEach((type) => bullets.push(new PrintableTree(`- ${type}`).colorize(chalk.red)));
+        addedTypes.forEach((type) => bullets.push(new PrintableTree(`+ ${type}`).colorize(chalk.green)));
+        tree.push(new PrintableTree(`${diffShown}:`).addBullets(bullets));
+      }
+    }
   }
 }
 
