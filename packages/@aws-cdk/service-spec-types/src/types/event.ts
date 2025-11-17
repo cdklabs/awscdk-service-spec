@@ -1,5 +1,6 @@
 import { Entity, Reference, Relationship } from '@cdklabs/tskb';
-import { PropertyType, Resource } from './resource';
+import { GenericPropertyType } from './common';
+import { Resource } from './resource';
 
 export interface Event extends Entity {
   /**
@@ -32,7 +33,10 @@ export interface Event extends Entity {
    * @example Object Created
    */
   readonly resourcesField: Array<ResourceField>;
-  readonly properties: EventProperties;
+  /**
+   * rootProperty has the reference for the root proprety for this event
+   */
+  readonly rootProperty: Reference<EventTypeDefinition>;
 }
 
 export interface ResourceField {
@@ -47,7 +51,7 @@ export interface EventProperty {
   /**
    * The type of this property
    */
-  type: PropertyType;
+  type: GenericPropertyType<EventTypeDefinition>;
   /**
    * Is this property required
    *

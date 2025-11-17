@@ -1,6 +1,6 @@
-import { Entity, Reference, Relationship } from '@cdklabs/tskb';
+import { Entity, Relationship } from '@cdklabs/tskb';
+import { ArrayType, MapType, GenericPropertyType, GenericDefinitionReference } from './common';
 import { SpecDatabase } from './database';
-import { EventTypeDefinition } from './event';
 import { sortKeyComparator } from '../util/sorting';
 
 export interface Partition extends Entity {
@@ -273,24 +273,6 @@ export enum Deprecation {
   IGNORE = 'IGNORE',
 }
 
-export type PropertyType =
-  | PrimitiveType
-  | DefinitionReference
-  | BuiltinTagType
-  | ArrayType<PropertyType>
-  | MapType<PropertyType>
-  | TypeUnion<PropertyType>;
-
-export type PrimitiveType =
-  | StringType
-  | NumberType
-  | IntegerType
-  | BooleanType
-  | JsonType
-  | DateTimeType
-  | NullType
-  | BuiltinTagType;
-
 export function isCollectionType(x: PropertyType): x is ArrayType<any> | MapType<any> {
   return x.type === 'array' || x.type === 'map';
 }
@@ -308,64 +290,6 @@ export interface TagInformation {
 }
 
 export type TagVariant = 'standard' | 'asg' | 'map';
-
-export interface StringType {
-  readonly type: 'string';
-}
-export interface BuiltinTagType {
-  readonly type: 'tag';
-}
-
-export interface NumberType {
-  readonly type: 'number';
-}
-
-export interface IntegerType {
-  readonly type: 'integer';
-}
-
-export interface BooleanType {
-  readonly type: 'boolean';
-}
-
-export interface JsonType {
-  readonly type: 'json';
-}
-
-export interface NullType {
-  readonly type: 'null';
-}
-
-export interface DateTimeType {
-  readonly type: 'date-time';
-}
-
-/**
- * The "legacy" tag type (used in the old resource spec)
- */
-export interface BuiltinTagType {
-  readonly type: 'tag';
-}
-
-export interface DefinitionReference {
-  readonly type: 'ref';
-  readonly reference: Reference<TypeDefinition | EventTypeDefinition>;
-}
-
-export interface ArrayType<E> {
-  readonly type: 'array';
-  readonly element: E;
-}
-
-export interface MapType<E> {
-  readonly type: 'map';
-  readonly element: E;
-}
-
-export interface TypeUnion<E> {
-  readonly type: 'union';
-  readonly types: E[];
-}
 
 export type HasResource = Relationship<Service, Resource>;
 export type RegionHasResource = Relationship<Region, Resource>;
@@ -647,3 +571,6 @@ export class RichPropertyType {
     }
   }
 }
+
+export type PropertyType = GenericPropertyType<TypeDefinition>;
+export type DefinitionReference = GenericDefinitionReference<TypeDefinition>;
