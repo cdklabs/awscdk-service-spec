@@ -347,7 +347,7 @@ export class DiffFormatter {
     return new PrintableTree(`vendedLogs`).addBullets([
       new PrintableTree(`permissionsVersion: ${vendedLogs.permissionsVersion}`),
       new PrintableTree(`logTypes: [${vendedLogs.logTypes.join(', ')}]`),
-      new PrintableTree(`logDestinations: [${vendedLogs.destinations.join(', ')}]`),
+      new PrintableTree(`destinations: [${vendedLogs.destinations.join(', ')}]`),
     ]);
   }
 
