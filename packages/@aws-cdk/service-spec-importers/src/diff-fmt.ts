@@ -16,6 +16,7 @@ import {
   UpdatedResource,
   UpdatedService,
   UpdatedTypeDefinition,
+  VendedLog,
 } from '@aws-cdk/service-spec-types';
 import chalk from 'chalk';
 import { PrintableTree } from './printable-tree';
@@ -107,6 +108,7 @@ export class DiffFormatter {
           'scrutinizable',
           'tagInformation',
           'arnTemplate',
+          'vendedLogs',
         ]),
       ).indent(META_INDENT),
       listWithCaption('properties', this.renderProperties(r.properties, db)),
@@ -142,6 +144,7 @@ export class DiffFormatter {
       new PrintableTree(...listFromDiffs(d)).indent(META_INDENT),
       listWithCaption('properties', this.renderPropertyDiff(r.properties)),
       listWithCaption('attributes', this.renderPropertyDiff(r.attributes)),
+      listWithCaption('vendedLogs', this.renderVendedLogsDiff(r.vendedLogs)),
       listWithCaption(
         'types',
         this.renderMapDiff(
@@ -309,6 +312,58 @@ export class DiffFormatter {
       }
       return new PrintableTree();
     });
+  }
+
+  private renderVendedLogsDiff(diff: ScalarDiff<VendedLog | undefined> | undefined): PrintableTree[] {
+    if (!diff || (!diff.old && !diff.new)) {
+      return [];
+    }
+    const tree: PrintableTree[] = [];
+
+    if (!diff.old && diff.new) {
+      return [this.renderVendedLogsType(diff.new).prefix([chalk.green(ADDITION), ' '], [' '])];
+    }
+    if (diff.old && !diff.new) {
+      return [this.renderVendedLogsType(diff.old).prefix([chalk.red(REMOVAL), ' '], [' '])];
+    }
+
+    if (diff.old && diff.new) {
+      if (diff.old.permissionsVersion !== diff.new.permissionsVersion) {
+        tree.push(
+          new PrintableTree(`permissionsVersion:`).addBullets([
+            new PrintableTree(`- ${diff.old.permissionsVersion}`).colorize(chalk.red),
+            new PrintableTree(`+ ${diff.new.permissionsVersion}`).colorize(chalk.green),
+          ]),
+        );
+      }
+
+      this.renderVendedLogListDiff(diff, tree, 'logTypes');
+      this.renderVendedLogListDiff(diff, tree, 'destinations');
+    }
+    return tree;
+  }
+
+  private renderVendedLogsType(vendedLogs: VendedLog): PrintableTree {
+    return new PrintableTree(`vendedLogs`).addBullets([
+      new PrintableTree(`permissionsVersion: ${vendedLogs.permissionsVersion}`),
+      new PrintableTree(`logTypes: [${vendedLogs.logTypes.join(', ')}]`),
+      new PrintableTree(`destinations: [${vendedLogs.destinations.join(', ')}]`),
+    ]);
+  }
+
+  private renderVendedLogListDiff(diff: ScalarDiff<VendedLog | undefined>, tree: PrintableTree[], diffShown: string) {
+    if (diff.old && diff.new) {
+      const oldList = new Set(diff.old.logTypes);
+      const newList = new Set(diff.new.logTypes);
+      const addedTypes = [...newList].filter((t) => !oldList.has(t));
+      const removedTypes = [...oldList].filter((t) => !newList.has(t));
+      if (addedTypes.length > 0 || removedTypes.length > 0) {
+        const bullets: PrintableTree[] = [];
+        removedTypes.forEach((type) => bullets.push(new PrintableTree(`- ${type}`).colorize(chalk.red)));
+        addedTypes.forEach((type) => bullets.push(new PrintableTree(`+ ${type}`).colorize(chalk.green)));
+        tree.push(new PrintableTree(`${diffShown}:`).addBullets(bullets));
+      }
+    }
   }
 }
 
