@@ -34,7 +34,7 @@ export interface Event extends Entity {
    */
   readonly resourcesField: Array<ResourceField>;
   /**
-   * rootProperty has the reference for the root proprety for this event
+   * rootProperty has the reference for the root property for this event
    */
   readonly rootProperty: Reference<EventTypeDefinition>;
 }
@@ -44,7 +44,7 @@ export interface ResourceField {
   fieldName?: string;
 }
 
-export type HasEvent = Relationship<Resource, Event>;
+export type ResourceHasEvent = Relationship<Resource, Event>;
 
 export type EventProperties = Record<string, EventProperty>;
 export interface EventProperty {

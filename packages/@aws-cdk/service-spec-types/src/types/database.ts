@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import { gunzipSync } from 'zlib';
 import { Database, entityCollection, fieldIndex, stringCmp } from '@cdklabs/tskb';
 import { IsAugmentedResource, ResourceAugmentation } from './augmentations';
-import { HasEvent, Event, EventUsesType, EventTypeDefinition } from './event';
+import { ResourceHasEvent, Event, EventUsesType, EventTypeDefinition } from './event';
 import {
   DimensionSet,
   Metric,
@@ -63,7 +63,7 @@ export function emptyDatabase() {
       serviceHasMetric: r.relationship<ServiceHasMetric>('service', 'metric'),
       resourceHasDimensionSet: r.relationship<ResourceHasDimensionSet>('resource', 'dimensionSet'),
       serviceHasDimensionSet: r.relationship<ServiceHasDimensionSet>('service', 'dimensionSet'),
-      hasEvent: r.relationship<HasEvent>('resource', 'event'),
+      resourceHasEvent: r.relationship<ResourceHasEvent>('resource', 'event'),
       eventUsesType: r.relationship<EventUsesType>('event', 'eventTypeDefinition'),
     }),
   );
@@ -83,7 +83,7 @@ export type SpecDatabase = ReturnType<typeof emptyDatabase>;
  * Helpers for working with a SpecDatabase
  */
 export class RichSpecDatabase {
-  constructor(private readonly db: SpecDatabase) {}
+  constructor(private readonly db: SpecDatabase) { }
 
   /**
    * Find all resources of a given type
