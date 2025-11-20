@@ -15,7 +15,7 @@ export interface EventBuilderOptions {
 }
 
 export class SpecBuilder {
-  constructor(public readonly db: SpecDatabase) { }
+  constructor(public readonly db: SpecDatabase) {}
 
   public eventTypeDefinitionBuilder(
     typeName: string,
@@ -81,7 +81,7 @@ export class PropertyBagBuilder {
   protected candidateProperties: EventProperties = {};
   protected resourcesField: Array<ResourceField> = [];
 
-  constructor(private readonly _propertyBag: ObjectWithProperties) { }
+  constructor(private readonly _propertyBag: ObjectWithProperties) {}
 
   public setProperty(name: string, prop: EventProperty) {
     this.candidateProperties[name] = prop;
