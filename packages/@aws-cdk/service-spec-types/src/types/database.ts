@@ -83,7 +83,7 @@ export type SpecDatabase = ReturnType<typeof emptyDatabase>;
  * Helpers for working with a SpecDatabase
  */
 export class RichSpecDatabase {
-  constructor(private readonly db: SpecDatabase) { }
+  constructor(private readonly db: SpecDatabase) {}
 
   /**
    * Find all resources of a given type
