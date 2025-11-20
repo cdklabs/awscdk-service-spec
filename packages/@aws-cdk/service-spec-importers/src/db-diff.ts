@@ -16,6 +16,12 @@ import {
   UpdatedService,
   UpdatedTypeDefinition,
   MapDiff,
+  Event,
+  EventTypeDefinition,
+  EventProperty,
+  UpdatedEvent,
+  UpdatedEventTypeDefinition,
+  UpdatedEventProperty,
 } from '@aws-cdk/service-spec-types';
 import {
   diffByKey,
@@ -115,6 +121,7 @@ export class DbDiff {
       properties: collapseEmptyDiff(diffMap(a.properties, b.properties, (x, y) => this.diffProperty(x, y))),
       typeDefinitionDiff: this.diffResourceTypeDefinitions(a, b),
       metrics: this.diffResourceMetrics(a, b),
+      events: this.diffResourceEvents(a, b),
     } satisfies AllFieldsGiven<UpdatedResource>);
   }
 
@@ -175,6 +182,105 @@ export class DbDiff {
       mustRenderForBwCompat: diffScalar(a, b, 'mustRenderForBwCompat'),
       properties: collapseEmptyDiff(diffMap(a.properties, b.properties, (x, y) => this.diffProperty(x, y))),
     } satisfies AllFieldsGiven<UpdatedTypeDefinition>);
+  }
+
+  public diffResourceEvents(a: Resource, b: Resource): UpdatedResource['events'] {
+    const aEvents = this.db1.follow('resourceHasEvent', a).map((r) => r.entity);
+    const bEvents = this.db2.follow('resourceHasEvent', b).map((r) => r.entity);
+
+    return collapseEmptyDiff(
+      diffByKey(
+        aEvents,
+        bEvents,
+        (event) => event.name,
+        (x, y) => this.diffEvent(x, y),
+      ),
+    );
+  }
+
+  public diffEvent(a: Event, b: Event): UpdatedEvent | undefined {
+    return collapseUndefined({
+      name: diffScalar(a, b, 'name'),
+      description: diffScalar(a, b, 'description'),
+      source: diffScalar(a, b, 'source'),
+      detailType: diffScalar(a, b, 'detailType'),
+      resourcesField: diffField(a, b, 'resourcesField', jsonEq),
+      rootProperty: diffField(a, b, 'rootProperty', jsonEq),
+      typeDefinitionDiff: this.diffEventTypeDefinitions(a, b),
+    } satisfies AllFieldsGiven<UpdatedEvent>);
+  }
+
+  public diffEventTypeDefinitions(a: Event, b: Event): UpdatedEvent['typeDefinitionDiff'] {
+    const aTypes = this.db1.follow('eventUsesType', a).map((r) => r.entity);
+    const bTypes = this.db2.follow('eventUsesType', b).map((r) => r.entity);
+
+    return collapseEmptyDiff(
+      diffByKey(
+        aTypes,
+        bTypes,
+        (type) => type.name,
+        (x, y) => this.diffEventTypeDefinition(x, y),
+      ),
+    );
+  }
+
+  public diffEventTypeDefinition(
+    a: EventTypeDefinition,
+    b: EventTypeDefinition,
+  ): UpdatedEventTypeDefinition | undefined {
+    return collapseUndefined({
+      name: diffScalar(a, b, 'name'),
+      properties: collapseEmptyDiff(diffMap(a.properties, b.properties, (x, y) => this.diffEventProperty(x, y))),
+    } satisfies AllFieldsGiven<UpdatedEventTypeDefinition>);
+  }
+
+  public diffEventProperty(a: EventProperty, b: EventProperty): UpdatedEventProperty | undefined {
+    const anyDiffs = collapseUndefined({
+      required: diffScalar(a, b, 'required', false),
+      type: diffField(a, b, 'type', (x, y) => this.eqEventPropertyType(x, y)),
+    } satisfies DontCareAboutTypes<AllFieldsGiven<EventProperty>>);
+
+    if (anyDiffs) {
+      return { old: a, new: b };
+    }
+    return undefined;
+  }
+
+  /**
+   * Compare event property types by stringifying them.
+   * Event property types reference EventTypeDefinition, not TypeDefinition.
+   */
+  private eqEventPropertyType(a: EventProperty['type'], b: EventProperty['type']): boolean {
+    return this.stringifyGenericType(a, this.db1) === this.stringifyGenericType(b, this.db2);
+  }
+
+  /**
+   * Stringify a generic property type for comparison.
+   */
+  private stringifyGenericType(type: EventProperty['type'], db: SpecDatabase): string {
+    if (type.type === 'string') return 'string';
+    if (type.type === 'number') return 'number';
+    if (type.type === 'integer') return 'integer';
+    if (type.type === 'boolean') return 'boolean';
+    if (type.type === 'json') return 'json';
+    if (type.type === 'date-time') return 'date-time';
+    if (type.type === 'null') return 'null';
+    if (type.type === 'tag') return 'tag';
+    if (type.type === 'ref') {
+      const entity = db.get('eventTypeDefinition', type.reference.$ref);
+      return `ref:${entity.name}`;
+    }
+    if (type.type === 'array') {
+      return `array<${this.stringifyGenericType(type.element, db)}>`;
+    }
+    if (type.type === 'map') {
+      return `map<${this.stringifyGenericType(type.element, db)}>`;
+    }
+    if (type.type === 'union') {
+      const types = type.types.map((t) => this.stringifyGenericType(t, db)).sort();
+      return `union<${types.join('|')}>`;
+    }
+    return 'unknown';
   }
 
   /**

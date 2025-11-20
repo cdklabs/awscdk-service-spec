@@ -101,7 +101,7 @@ export class PrintableTree {
   }
 
   public newline() {
-    if (this.lines[this.lines.length - 1].length > 0) {
+    if (this.lines.length === 0 || this.lines[this.lines.length - 1].length > 0) {
       this.lines.push([]);
     }
     return this;

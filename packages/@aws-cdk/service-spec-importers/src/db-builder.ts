@@ -5,6 +5,7 @@ import { importArnTemplates } from './importers/import-arn-templates';
 import { importCannedMetrics } from './importers/import-canned-metrics';
 import { importCloudFormationDocumentation } from './importers/import-cloudformation-docs';
 import { importCloudFormationRegistryResource } from './importers/import-cloudformation-registry';
+import { importEventBridgeSchema } from './importers/import-eventbridge-schema';
 import { importGetAttAllowList } from './importers/import-getatt-allowlist';
 import { importLogSources } from './importers/import-log-source';
 import { importOobRelationships } from './importers/import-oob-relationships';
@@ -23,6 +24,7 @@ import {
   loadSamSpec,
   loadOobRelationships,
 } from './loaders';
+import { loadDefaultEventBridgeSchema } from './loaders/load-eventbridge-schema';
 import { JsonLensPatcher } from './patching';
 import { ProblemReport, ReportAudience } from './report';
 
@@ -214,6 +216,26 @@ export class DatabaseBuilder {
     return this.addSourceImporter(async (db, report) => {
       const logSourceData = JSON.parse(await fs.readFile(filepath, { encoding: 'utf-8' }));
       importLogSources(db, logSourceData, report);
+    });
+  }
+
+  public importEventBridgeSchema(schemaDirectory: string) {
+    return this.addSourceImporter(async (db, report) => {
+      const regions = await loadDefaultEventBridgeSchema(schemaDirectory, {
+        ...this.options,
+        report,
+        failureAudience: this.defaultProblemGrouping,
+      });
+      for (const region of regions) {
+        for (const event of region.events) {
+          importEventBridgeSchema({
+            db,
+            event,
+            report,
+            region: region.regionName,
+          });
+        }
+      }
     });
   }
 
