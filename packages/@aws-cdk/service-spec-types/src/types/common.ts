@@ -52,6 +52,12 @@ export interface NullType {
   readonly type: 'null';
 }
 
+/**
+ *
+ * T is the entity type for compound objects.
+ *
+ * For example: TypeDefinition, EventTypeDefinition.
+ */
 export interface GenericDefinitionReference<T extends Entity> {
   readonly type: 'ref';
   readonly reference: Reference<T>;
