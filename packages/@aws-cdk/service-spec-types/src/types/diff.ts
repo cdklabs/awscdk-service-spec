@@ -1,3 +1,4 @@
+import { Event, EventTypeDefinition, EventProperty } from './event';
 import { Metric } from './metrics';
 import { Attribute, Property, Resource, Service, TypeDefinition } from './resource';
 
@@ -45,6 +46,7 @@ export interface UpdatedResource {
   readonly typeDefinitionDiff?: MapDiff<TypeDefinition, UpdatedTypeDefinition>;
   readonly primaryIdentifier?: ListDiff<string, void>;
   readonly metrics?: MapDiff<Metric, ChangedMetric>;
+  readonly events?: MapDiff<Event, UpdatedEvent>;
 }
 
 export interface UpdatedProperty {
@@ -62,6 +64,26 @@ export interface UpdatedTypeDefinition {
   readonly documentation?: ScalarDiff<string>;
   readonly properties?: MapDiff<Property, UpdatedProperty>;
   readonly mustRenderForBwCompat?: ScalarDiff<boolean>;
+}
+
+export interface UpdatedEvent {
+  readonly name?: ScalarDiff<string>;
+  readonly description?: ScalarDiff<string>;
+  readonly source?: ScalarDiff<string>;
+  readonly detailType?: ScalarDiff<string>;
+  readonly resourcesField?: ScalarDiff<Event['resourcesField']>;
+  readonly rootProperty?: ScalarDiff<Event['rootProperty']>;
+  readonly typeDefinitionDiff?: MapDiff<EventTypeDefinition, UpdatedEventTypeDefinition>;
+}
+
+export interface UpdatedEventTypeDefinition {
+  readonly name?: ScalarDiff<string>;
+  readonly properties?: MapDiff<EventProperty, UpdatedEventProperty>;
+}
+
+export interface UpdatedEventProperty {
+  readonly old: EventProperty;
+  readonly new: EventProperty;
 }
 
 export interface ScalarDiff<A> {
