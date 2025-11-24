@@ -8,6 +8,7 @@ Sometimes it is necessary to patch in certain aspects of the CloudFormation sche
 properly configured for our use cases. As such, we'll need to create a patch.
 
 You can create a patch by following these steps:
+
 1. Create a new patch file under `build/patches/service-patches/my-module.ts` (or use one of the existing patch files if it is for
 the same module).
 2. If you created a new file, add it to `build/patches/service-patches/index.ts`.

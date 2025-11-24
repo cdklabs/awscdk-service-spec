@@ -1,6 +1,6 @@
 # @aws-cdk/service-spec-types
 
-Types and utils for CloudFormation Service Specifications
+Types and utils for CloudFormation Service Specifications.
 
 ```ts
 import { emptyDatabase, SpecDatabase } from '@aws-cdk/service-spec-types';
