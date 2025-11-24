@@ -69,6 +69,13 @@ describe.each([false, true])('database is filled with one item (saveAndLoad: %p)
   });
 });
 
+test('can dehydrate from a data where the collection is missing without crashing', () => {
+  db.load({
+    idCtr: 1,
+    schema: {},
+  });
+});
+
 describe.each([false, true])('database is filled with multiple items (saveAndLoad: %p)', (saveAndLoad) => {
   beforeEach(() => {
     db.allocate('thing', {

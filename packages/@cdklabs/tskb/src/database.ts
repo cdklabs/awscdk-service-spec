@@ -207,7 +207,11 @@ export class Database<ES extends object, RS extends object> {
       }
       if (!!proto && typeof proto === 'object' && !!x && typeof x === 'object') {
         for (const [k, v] of Object.entries(proto)) {
-          hydrate(v, (x as any)[k]);
+          const dehydratedData = (x as any)[k];
+          if (dehydratedData !== undefined) {
+            // May be missing if this is from a database created from an old version of the schema
+            hydrate(v, dehydratedData);
+          }
         }
       }
     }
