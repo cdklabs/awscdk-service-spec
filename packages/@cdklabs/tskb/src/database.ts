@@ -197,21 +197,21 @@ export class Database<ES extends object, RS extends object> {
 
     function hydrate(proto: unknown, x: unknown): void {
       if (isEntityCollection(proto)) {
-        if (x !== undefined) {
-          proto.hydrateFrom(x);
-        }
+        proto.hydrateFrom(x);
       }
       if (isRelationshipCollection(proto)) {
-        if (x !== undefined) {
-          proto.hydrateFrom(x);
-        }
+        proto.hydrateFrom(x);
       }
       if (Array.isArray(x)) {
         x.forEach(hydrate);
       }
       if (!!proto && typeof proto === 'object' && !!x && typeof x === 'object') {
         for (const [k, v] of Object.entries(proto)) {
-          hydrate(v, (x as any)[k]);
+          const dehydratedData = (x as any)[k];
+          if (dehydratedData !== undefined) {
+            // May be missing if this is from a database created from an old version of the schema
+            hydrate(v, dehydratedData);
+          }
         }
       }
     }

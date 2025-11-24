@@ -29,6 +29,13 @@ beforeEach(() => {
   db = emptyDatabase();
 });
 
+test('can dehydrate from a data where the collections are missing without crashing', () => {
+  db.load({
+    idCtr: 1,
+    schema: {},
+  });
+});
+
 describe.each([false, true])('database with some entities (saveAndLoad: %p)', (saveAndLoad) => {
   beforeEach(() => {
     const a = db.allocate('thing', {
