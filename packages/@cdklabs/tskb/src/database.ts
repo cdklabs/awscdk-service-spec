@@ -241,11 +241,11 @@ type IndexNamesOf<A> = A extends EntityCollection<any> ? KeysOfUnion<A['indexes'
 type IndexOf<EC, I extends IndexNamesOf<EC>> =
   EC extends EntityCollection<any>
   ? EC['indexes'][I] extends EntityIndex<any, infer IndexType>
-  ? {
-    valueType: IndexType;
-    lookups: keyof EC['indexes'][I]['lookups'];
-  }
-  : never
+    ? {
+        valueType: IndexType;
+        lookups: keyof EC['indexes'][I]['lookups'];
+      }
+    : never
   : never;
 
 type EntityType<A> = A extends EntityCollection<infer B> ? B : never;
