@@ -197,10 +197,14 @@ export class Database<ES extends object, RS extends object> {
 
     function hydrate(proto: unknown, x: unknown): void {
       if (isEntityCollection(proto)) {
-        proto.hydrateFrom(x);
+        if (x !== undefined) {
+          proto.hydrateFrom(x);
+        }
       }
       if (isRelationshipCollection(proto)) {
-        proto.hydrateFrom(x);
+        if (x !== undefined) {
+          proto.hydrateFrom(x);
+        }
       }
       if (Array.isArray(x)) {
         x.forEach(hydrate);
@@ -237,11 +241,11 @@ type IndexNamesOf<A> = A extends EntityCollection<any> ? KeysOfUnion<A['indexes'
 type IndexOf<EC, I extends IndexNamesOf<EC>> =
   EC extends EntityCollection<any>
   ? EC['indexes'][I] extends EntityIndex<any, infer IndexType>
-    ? {
-        valueType: IndexType;
-        lookups: keyof EC['indexes'][I]['lookups'];
-      }
-    : never
+  ? {
+    valueType: IndexType;
+    lookups: keyof EC['indexes'][I]['lookups'];
+  }
+  : never
   : never;
 
 type EntityType<A> = A extends EntityCollection<infer B> ? B : never;
