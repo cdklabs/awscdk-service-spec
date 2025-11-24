@@ -17,6 +17,7 @@ const AVAILABLE_SOURCES: Record<string, keyof DatabaseBuilder> = {
   arnTemplates: 'importArnTemplates',
   oobRelationships: 'importOobRelationships',
   logSources: 'importLogSources',
+  eventbridgeschema: 'importEventBridgeSchema',
 };
 
 async function main() {

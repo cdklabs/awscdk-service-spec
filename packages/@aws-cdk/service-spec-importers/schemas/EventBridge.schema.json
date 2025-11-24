@@ -1,0 +1,95 @@
+{
+  "$ref": "#/definitions/EventBridgeSchema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "EventBridgeSchema": {
+      "additionalProperties": false,
+      "description": "Root class of an EventBridge Schema",
+      "properties": {
+        "SchemaName": {
+          "type": "string"
+        },
+        "Content": {
+          "$ref": "#/definitions/EventBridgeContent"
+        },
+        "Description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "SchemaName",
+        "Content",
+        "Description"
+      ],
+      "type": "object"
+    },
+    "EventBridgeContent": {
+      "additionalProperties": false,
+      "properties": {
+        "components": {
+          "$ref": "#/definitions/EventBridgeComponents"
+        }
+      },
+      "required": [
+        "components"
+      ],
+      "type": "object"
+    },
+    "EventBridgeComponents": {
+      "additionalProperties": false,
+      "properties": {
+        "schemas": {
+          "$ref": "#/definitions/EventBridgeSchemas"
+        }
+      },
+      "required": [
+        "schemas"
+      ],
+      "type": "object"
+    },
+    "EventBridgeSchemas": {
+      "additionalProperties": false,
+      "properties": {
+        "AWSEvent": {
+          "$ref": "#/definitions/AWSEvent"
+        }
+      },
+      "required": [
+        "AWSEvent"
+      ],
+      "type": "object"
+    },
+    "AWSEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "x-amazon-events-detail-type": {
+          "type": "string"
+        },
+        "x-amazon-events-source": {
+          "type": "string"
+        },
+        "properties": {
+          "$ref": "#/definitions/AWSEventProperties"
+        }
+      },
+      "required": [
+        "x-amazon-events-detail-type",
+        "x-amazon-events-source",
+        "properties"
+      ],
+      "type": "object"
+    },
+    "AWSEventProperties": {
+      "additionalProperties": false,
+      "properties": {
+        "detail": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "detail"
+      ],
+      "type": "object"
+    }
+  }
+}

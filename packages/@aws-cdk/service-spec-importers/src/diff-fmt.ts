@@ -17,6 +17,12 @@ import {
   UpdatedService,
   UpdatedTypeDefinition,
   VendedLog,
+  Event,
+  EventTypeDefinition,
+  EventProperty,
+  UpdatedEvent,
+  UpdatedEventTypeDefinition,
+  UpdatedEventProperty,
 } from '@aws-cdk/service-spec-types';
 import chalk from 'chalk';
 import { PrintableTree } from './printable-tree';
@@ -125,6 +131,12 @@ export class DiffFormatter {
           .sort(sortByKey((e) => e.entity.name))
           .map((e) => this.renderMetric(e.entity).prefix([' '])),
       ),
+      listWithCaption(
+        'events',
+        [...this.dbs[db].follow('resourceHasEvent', r)]
+          .sort(sortByKey((e) => e.entity.name))
+          .map((e) => this.renderEvent(e.entity, db).prefix([' '])),
+      ),
     ]);
   }
 
@@ -159,6 +171,14 @@ export class DiffFormatter {
           r.metrics,
           (m) => this.renderMetric(m).prefix([' ']),
           (k, u) => this.renderUpdatedMetric(k, u).prefix([' ']),
+        ),
+      ),
+      listWithCaption(
+        'events',
+        this.renderMapDiff(
+          r.events,
+          (e, db) => this.renderEvent(e, db).prefix([' ']),
+          (k, u) => this.renderUpdatedEvent(k, u).prefix([' ']),
         ),
       ),
     ]);
@@ -364,6 +384,195 @@ export class DiffFormatter {
         tree.push(new PrintableTree(`${diffShown}:`).addBullets(bullets));
       }
     }
+  }
+
+  private renderEvent(e: Event, db: number): PrintableTree {
+    const propsTree = new PrintableTree(
+      `description: ${render(e.description)}`,
+      `source: ${render(e.source)}`,
+      `detailType: ${render(e.detailType)}`,
+    );
+
+    const rootTypeDef = this.dbs[db].get('eventTypeDefinition', e.rootProperty.$ref);
+    propsTree.emit(`\nrootProperty: ${rootTypeDef.name}`);
+
+    if (e.resourcesField && e.resourcesField.length > 0) {
+      const resourceFields = e.resourcesField
+        .map((rf) => {
+          const typeDef = this.dbs[db].get('eventTypeDefinition', rf.type.$ref);
+          return rf.fieldName ? `${typeDef.name}.${rf.fieldName}` : typeDef.name;
+        })
+        .join(', ');
+      propsTree.emit(`\nresourcesField: [${resourceFields}]`);
+    }
+
+    return new PrintableTree(`event ${e.name}`).addBullets([
+      propsTree.indent(META_INDENT),
+      listWithCaption(
+        'types',
+        [...this.dbs[db].follow('eventUsesType', e)]
+          .sort(sortByKey((t) => t.entity.name))
+          .map((t) => this.renderEventTypeDefinition(t.entity, db).prefix([' '])),
+      ),
+    ]);
+  }
+
+  private renderUpdatedEvent(key: string, e: UpdatedEvent): PrintableTree {
+    const bullets: PrintableTree[] = [];
+
+    const simpleDiffs = pick(e, ['name', 'description', 'source', 'detailType']);
+    const simpleTree = new PrintableTree(...listFromDiffs(simpleDiffs));
+
+    if (e.rootProperty && e.rootProperty.old && e.rootProperty.new) {
+      const oldTypeDef = this.dbs[OLD_DB].get('eventTypeDefinition', e.rootProperty.old.$ref);
+      const newTypeDef = this.dbs[NEW_DB].get('eventTypeDefinition', e.rootProperty.new.$ref);
+      simpleTree.emit(`\n${chalk.red(`- rootProperty: ${oldTypeDef.name}`)}`);
+      simpleTree.emit(`\n${chalk.green(`+ rootProperty: ${newTypeDef.name}`)}`);
+    }
+
+    if (e.resourcesField) {
+      if (e.resourcesField.old && e.resourcesField.old.length > 0) {
+        const oldFields = e.resourcesField.old
+          .map((rf) => {
+            const typeDef = this.dbs[OLD_DB].get('eventTypeDefinition', rf.type.$ref);
+            return rf.fieldName ? `${typeDef.name}.${rf.fieldName}` : typeDef.name;
+          })
+          .join(', ');
+        simpleTree.emit(`\n${chalk.red(`- resourcesField: [${oldFields}]`)}`);
+      }
+      if (e.resourcesField.new && e.resourcesField.new.length > 0) {
+        const newFields = e.resourcesField.new
+          .map((rf) => {
+            const typeDef = this.dbs[NEW_DB].get('eventTypeDefinition', rf.type.$ref);
+            return rf.fieldName ? `${typeDef.name}.${rf.fieldName}` : typeDef.name;
+          })
+          .join(', ');
+        simpleTree.emit(`\n${chalk.green(`+ resourcesField: [${newFields}]`)}`);
+      }
+    }
+
+    bullets.push(simpleTree.indent(META_INDENT));
+
+    bullets.push(
+      listWithCaption(
+        'types',
+        this.renderMapDiff(
+          e.typeDefinitionDiff,
+          (t, db) => this.renderEventTypeDefinition(t, db).prefix([' ']),
+          (k, u) => this.renderUpdatedEventTypeDefinition(k, u),
+        ),
+      ),
+    );
+
+    return new PrintableTree(`event ${key}`).addBullets(bullets);
+  }
+
+  private renderEventTypeDefinition(t: EventTypeDefinition, db: number): PrintableTree {
+    return new PrintableTree(`type ${t.name}`).addBullets([
+      listWithCaption('properties', this.renderEventProperties(t.properties, db)),
+    ]);
+  }
+
+  private renderUpdatedEventTypeDefinition(key: string, t: UpdatedEventTypeDefinition): PrintableTree {
+    const d = pick(t, ['name']);
+    return new PrintableTree(`type ${key}`).addBullets([
+      new PrintableTree(...listFromDiffs(d)).indent(META_INDENT),
+      listWithCaption('properties', this.renderEventPropertyDiff(t.properties)),
+    ]);
+  }
+
+  private renderEventProperty(p: EventProperty, db: number): PrintableTree {
+    const ret = new PrintableTree();
+    ret.emit(this.stringifyEventPropertyType(p.type, this.dbs[db]));
+
+    const attributes = [];
+    if (p.required) {
+      attributes.push('required');
+    }
+
+    if (attributes.length) {
+      ret.emit(` (${attributes.join(', ')})`);
+    }
+
+    return ret;
+  }
+
+  private stringifyEventPropertyType(type: EventProperty['type'], db: SpecDatabase): string {
+    if (type.type === 'string') return 'string';
+    if (type.type === 'number') return 'number';
+    if (type.type === 'integer') return 'integer';
+    if (type.type === 'boolean') return 'boolean';
+    if (type.type === 'json') return 'json';
+    if (type.type === 'date-time') return 'date-time';
+    if (type.type === 'null') return 'null';
+    if (type.type === 'tag') return 'tag';
+    if (type.type === 'ref') {
+      const entity = db.get('eventTypeDefinition', type.reference.$ref);
+      return entity.name;
+    }
+    if (type.type === 'array') {
+      return `${this.stringifyEventPropertyType(type.element, db)}[]`;
+    }
+    if (type.type === 'map') {
+      return `Map<${this.stringifyEventPropertyType(type.element, db)}>`;
+    }
+    if (type.type === 'union') {
+      const types = type.types.map((t) => this.stringifyEventPropertyType(t, db));
+      return types.join(' | ');
+    }
+    return 'unknown';
+  }
+
+  private renderEventProperties(ps: Record<string, EventProperty>, db: number): PrintableTree[] {
+    return Object.entries(ps).map(([name, p]) => this.renderEventProperty(p, db).prefix([' ', `${name}: `]));
+  }
+
+  private renderEventPropertyDiff(diff?: MapDiff<EventProperty, UpdatedEventProperty>): PrintableTree[] {
+    if (!diff) {
+      return [];
+    }
+
+    const keys = Array.from(
+      new Set([
+        ...Object.keys(diff.added ?? {}),
+        ...Object.keys(diff.removed ?? {}),
+        ...Object.keys(diff.updated ?? {}),
+      ]),
+    );
+    keys.sort((a, b) => a.localeCompare(b));
+
+    return keys.flatMap((key) => {
+      const header = [' ', key, ': '];
+      const rest = [' ', ' '.repeat(key.length), '  '];
+
+      if (diff.added?.[key]) {
+        return [
+          this.renderEventProperty(diff.added?.[key]!, NEW_DB).prefix(
+            [chalk.green(ADDITION), ...header],
+            [' ', ...rest],
+          ),
+        ];
+      } else if (diff.removed?.[key]) {
+        return [
+          this.renderEventProperty(diff.removed?.[key]!, OLD_DB).prefix(
+            [chalk.red(REMOVAL), ...header],
+            [' ', ...rest],
+          ),
+        ];
+      } else if (diff.updated?.[key]) {
+        const pu = diff.updated?.[key]!;
+        const old = this.renderEventProperty(pu.old, OLD_DB);
+        const noo = this.renderEventProperty(pu.new, NEW_DB);
+
+        const ret = new PrintableTree();
+        if (old.toString() !== noo.toString()) {
+          ret.addTree(old.prefix(['- ']).colorize(chalk.red));
+          ret.addTree(noo.prefix(['+ ']).colorize(chalk.green));
+        }
+        return ret.prefix([` ${key}: `]);
+      }
+      return new PrintableTree();
+    });
   }
 }
 
