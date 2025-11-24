@@ -53,7 +53,7 @@ Options:
   -r, --report <report-directory>  Create a detailed build report in the specified directory
   -v, --validate                   Validate imported sources and fail if any data is invalid (default: false)
   -h, --help                       display help for command
-````
+```
 
 ## Sources
 
@@ -88,5 +88,5 @@ CloudFormationSchema/
 CLI: `samSchema`\
 Code: `importSamJsonSchema(filePath: string)`
 
-Import the (modern) JSON schema spec from SAM.
+Import the (modern) JSON Schema Spec from SAM.
 Path to a single file containing a SAM Registry Schema.
