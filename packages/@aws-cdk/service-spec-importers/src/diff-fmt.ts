@@ -374,8 +374,8 @@ export class DiffFormatter {
   private renderVendedLogListDiff(diff: ScalarDiff<VendedLog | undefined>, tree: PrintableTree[], diffShown: string) {
     if (diff.old && diff.new) {
       // the array should correspond to the value of diffShown
-      const oldList = new Set(diffShown === 'logTypes' ? diff.new.logTypes: diff.new.destinations);
-      const newList = new Set(diffShown === 'logTypes' ? diff.new.logTypes: diff.new.destinations);
+      const oldList = new Set(diffShown === 'logTypes' ? diff.new.logTypes : diff.new.destinations);
+      const newList = new Set(diffShown === 'logTypes' ? diff.new.logTypes : diff.new.destinations);
       const added = [...newList].filter((t) => !oldList.has(t));
       const removed = [...oldList].filter((t) => !newList.has(t));
       if (added.length > 0 || removed.length > 0) {
