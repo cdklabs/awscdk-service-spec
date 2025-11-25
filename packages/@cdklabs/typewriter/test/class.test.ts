@@ -1,4 +1,4 @@
-import { Block, ClassType, MemberVisibility, Module, TypeScriptRenderer } from '../src';
+import { Block, ClassType, expr, MemberVisibility, Module, Type, TypeScriptRenderer } from '../src';
 
 const renderer = new TypeScriptRenderer();
 let scope: Module;
@@ -22,6 +22,25 @@ test('class with a private constructor', () => {
       private constructor() {
 
       }
+    }"
+  `);
+});
+
+test('class with a private property', () => {
+  const c = new ClassType(scope, {
+    name: 'MyClass',
+  });
+  c.addProperty({
+    name: 'myProperty',
+    type: Type.STRING,
+    visibility: MemberVisibility.Private,
+    initializer: expr.lit('Hello World'),
+  });
+
+  expect(renderer.render(scope)).toMatchInlineSnapshot(`
+    "/* eslint-disable prettier/prettier, @stylistic/max-len */
+    class MyClass {
+      private myProperty: string = "Hello World";
     }"
   `);
 });

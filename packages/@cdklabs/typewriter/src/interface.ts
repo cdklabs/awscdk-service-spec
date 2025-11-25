@@ -1,5 +1,5 @@
 import { MemberType } from './member-type';
-import { PropertySpec } from './property';
+import { Property, PropertySpec } from './property';
 import { IScope } from './scope';
 import { Type } from './type';
 import { DeclarationKind, TypeSpec } from './type-declaration';
@@ -43,5 +43,14 @@ export class InterfaceType extends MemberType {
    */
   public update<A extends Omit<Partial<InterfaceSpec>, 'properties' | 'methods' | 'name'>>(updates: A) {
     Object.assign(this.spec, updates);
+  }
+
+  /**
+   * Adds a property to the interface
+   *
+   * Interface properties must be public.
+   */
+  public addProperty(spec: Omit<PropertySpec, 'protected' | 'visibility'>): Property {
+    return super.addProperty(spec);
   }
 }

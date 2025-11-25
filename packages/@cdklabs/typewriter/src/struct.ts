@@ -38,8 +38,10 @@ export class StructType extends MemberType {
 
   /**
    * Adds a property to the interface
+   *
+   * Struct members are always public and immutable.
    */
-  public addProperty(spec: Omit<PropertySpec, 'immutable'>): Property {
+  public addProperty(spec: Omit<PropertySpec, 'immutable' | 'protected' | 'visibility'>): Property {
     return super.addProperty({
       ...spec,
       immutable: true,

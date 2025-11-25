@@ -21,9 +21,20 @@ export interface PropertySpec {
   /**
    * Indicates if this property is protected (otherwise it is public)
    *
+   * @deprecated Use visibility instead.
    * @default false
    */
   protected?: boolean;
+
+  /**
+   * Indicates the visibility of this property
+   *
+   * Cannot be used together with `protected`.
+   *
+   * @default false
+   */
+  visibility?: MemberVisibility;
+
   /**
    * Indicates if this property is abstract
    *
@@ -106,6 +117,9 @@ export class Property extends TypeMember implements IProperty {
    * The visibility of the member.
    */
   public get visibility(): MemberVisibility {
+    if (this.spec?.visibility !== undefined) {
+      return this.spec.visibility;
+    }
     if (this.spec?.protected) {
       return MemberVisibility.Protected;
     }

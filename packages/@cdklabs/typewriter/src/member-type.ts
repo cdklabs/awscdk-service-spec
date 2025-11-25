@@ -29,6 +29,10 @@ export abstract class MemberType extends TypeDeclaration {
    * Adds a property to the interface
    */
   public addProperty(spec: PropertySpec): Property {
+    if (spec.protected && spec.visibility) {
+      throw new Error('Cannot specify both "protected" and "visibility"');
+    }
+
     const prop = new Property(this, {
       ...spec,
     });
