@@ -380,8 +380,8 @@ export class DiffFormatter {
       const removed = [...oldList].filter((t) => !newList.has(t));
       if (added.length > 0 || removed.length > 0) {
         const bullets: PrintableTree[] = [];
-        removed.forEach((diff) => bullets.push(new PrintableTree(`- ${diff}`).colorize(chalk.red)));
-        added.forEach((diff) => bullets.push(new PrintableTree(`+ ${diff}`).colorize(chalk.green)));
+        removed.forEach((obj) => bullets.push(new PrintableTree(`- ${obj}`).colorize(chalk.red)));
+        added.forEach((obj) => bullets.push(new PrintableTree(`+ ${obj}`).colorize(chalk.green)));
         tree.push(new PrintableTree(`${diffShown}:`).addBullets(bullets));
       }
     }
