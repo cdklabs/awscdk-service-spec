@@ -373,14 +373,15 @@ export class DiffFormatter {
 
   private renderVendedLogListDiff(diff: ScalarDiff<VendedLog | undefined>, tree: PrintableTree[], diffShown: string) {
     if (diff.old && diff.new) {
-      const oldList = new Set(diff.old.logTypes);
-      const newList = new Set(diff.new.logTypes);
-      const addedTypes = [...newList].filter((t) => !oldList.has(t));
-      const removedTypes = [...oldList].filter((t) => !newList.has(t));
-      if (addedTypes.length > 0 || removedTypes.length > 0) {
+      // the array should correspond to the value of diffShown
+      const oldList = new Set(diffShown === 'logTypes' ? diff.new.logTypes: diff.new.destinations);
+      const newList = new Set(diffShown === 'logTypes' ? diff.new.logTypes: diff.new.destinations);
+      const added = [...newList].filter((t) => !oldList.has(t));
+      const removed = [...oldList].filter((t) => !newList.has(t));
+      if (added.length > 0 || removed.length > 0) {
         const bullets: PrintableTree[] = [];
-        removedTypes.forEach((type) => bullets.push(new PrintableTree(`- ${type}`).colorize(chalk.red)));
-        addedTypes.forEach((type) => bullets.push(new PrintableTree(`+ ${type}`).colorize(chalk.green)));
+        removed.forEach((diff) => bullets.push(new PrintableTree(`- ${diff}`).colorize(chalk.red)));
+        added.forEach((diff) => bullets.push(new PrintableTree(`+ ${diff}`).colorize(chalk.green)));
         tree.push(new PrintableTree(`${diffShown}:`).addBullets(bullets));
       }
     }
