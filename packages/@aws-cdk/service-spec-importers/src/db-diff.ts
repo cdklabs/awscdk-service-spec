@@ -22,7 +22,9 @@ import {
   UpdatedEvent,
   UpdatedEventTypeDefinition,
   UpdatedEventProperty,
+  ResourceField,
 } from '@aws-cdk/service-spec-types';
+import { Reference } from '@cdklabs/tskb';
 import {
   diffByKey,
   collapseUndefined,
@@ -204,8 +206,8 @@ export class DbDiff {
       description: diffScalar(a, b, 'description'),
       source: diffScalar(a, b, 'source'),
       detailType: diffScalar(a, b, 'detailType'),
-      resourcesField: diffField(a, b, 'resourcesField', jsonEq),
-      rootProperty: diffField(a, b, 'rootProperty', jsonEq),
+      resourcesField: diffField(a, b, 'resourcesField', this.eqEventResourcesField.bind(this)),
+      rootProperty: diffField(a, b, 'rootProperty', this.eqEventRootProperty.bind(this)),
       typeDefinitionDiff: this.diffEventTypeDefinitions(a, b),
     } satisfies AllFieldsGiven<UpdatedEvent>);
   }
@@ -252,6 +254,23 @@ export class DbDiff {
    */
   private eqEventPropertyType(a: EventProperty['type'], b: EventProperty['type']): boolean {
     return this.stringifyGenericType(a, this.db1) === this.stringifyGenericType(b, this.db2);
+  }
+
+  private eqEventRootProperty(a: Reference<EventTypeDefinition>, b: Reference<EventTypeDefinition>): boolean {
+    return this.eqEventPropertyType({ type: 'ref', reference: a }, { type: 'ref', reference: b });
+  }
+
+  private eqEventResourcesField(a: ResourceField[], b: ResourceField[]): boolean {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      if (
+        !this.eqEventPropertyType({ type: 'ref', reference: a[i].type }, { type: 'ref', reference: b[i].type }) ||
+        a[i].fieldName !== b[i].fieldName
+      ) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**

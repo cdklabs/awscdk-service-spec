@@ -41,3 +41,29 @@ test('metrics diff only on statistic and ignore dedup key for diff', () => {
     statistic: { new: 'Maximum', old: 'Average' },
   });
 });
+
+test('event diff ignores different $ref IDs when event type definitions have same name', () => {
+  const eventType1 = db1.allocate('eventTypeDefinition', { name: 'WorkSpacesAccess', properties: {} });
+  const eventType2 = db2.allocate('eventTypeDefinition', { name: 'WorkSpacesAccess', properties: {} });
+
+  const event1 = db1.allocate('event', {
+    name: 'aws.workspaces@WorkSpacesAccess',
+    description: 'Test event',
+    source: 'aws.workspaces',
+    detailType: 'WorkSpaces Access',
+    rootProperty: ref(eventType1),
+    resourcesField: [{ type: ref(eventType1), fieldName: 'workspaceId' }],
+  });
+
+  const event2 = db2.allocate('event', {
+    name: 'aws.workspaces@WorkSpacesAccess',
+    description: 'Test event',
+    source: 'aws.workspaces',
+    detailType: 'WorkSpaces Access',
+    rootProperty: ref(eventType2),
+    resourcesField: [{ type: ref(eventType2), fieldName: 'workspaceId' }],
+  });
+
+  const ed = diff.diffEvent(event1, event2);
+  expect(ed).toBeUndefined();
+});
