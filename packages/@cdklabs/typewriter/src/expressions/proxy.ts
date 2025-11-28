@@ -1,5 +1,5 @@
 import { Expression } from './expressions';
-import { NewExpression, ThisInstance } from './objects';
+import { NewExpression } from './objects';
 import { CallableExpr } from '../callable';
 import { IScope } from '../scope';
 import { ThingSymbol } from '../symbol';
@@ -66,7 +66,7 @@ const EXPRESSION_HANDLERS: ProxyHandler<Expression> = {
 /**
  * Provides access to the local `this` as an expression proxy.
  */
-export const $this: ExpressionProxy<ThisInstance> = $E(expr.this_());
+export const $this: ExpressionProxy<Expression> = $E(expr.this_());
 
 export type ExpressionProxy<E> = E & {
   (...args: Expression[]): ExpressionProxy<Expression>;
