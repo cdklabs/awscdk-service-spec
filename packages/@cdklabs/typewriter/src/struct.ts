@@ -36,6 +36,10 @@ export class StructType extends MemberType {
     spec.properties?.forEach((p) => this.addProperty(p));
   }
 
+  public get extends() {
+    return this.spec.extends ?? [];
+  }
+
   /**
    * Adds a property to the interface
    *
