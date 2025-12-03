@@ -1,4 +1,4 @@
-import { InterfaceType, Module, TypeScriptRenderer } from '../src';
+import { InterfaceType, Module, StructType, TypeScriptRenderer } from '../src';
 
 const renderer = new TypeScriptRenderer();
 let scope: Module;
@@ -20,6 +20,40 @@ test('can update some interface spec fields after initial creation', () => {
   expect(renderer.render(scope)).toMatchInlineSnapshot(`
     "/* eslint-disable prettier/prettier, @stylistic/max-len */
     export interface MyInterface extends Interface1, Interface2 {
+
+    }"
+  `);
+});
+
+test('struct can extend struct', () => {
+  new StructType(scope, {
+    name: 'MyStruct',
+    extends: [scope.type('AnotherStruct')],
+  });
+
+  expect(renderer.render(scope)).toMatchInlineSnapshot(`
+    "/* eslint-disable prettier/prettier, @stylistic/max-len */
+    /**
+     * @struct
+     */
+    interface MyStruct extends AnotherStruct {
+
+    }"
+  `);
+});
+
+test('struct can extend multiple structs', () => {
+  new StructType(scope, {
+    name: 'MyStruct',
+    extends: [scope.type('AnotherStruct'), scope.type('SecondStruct')],
+  });
+
+  expect(renderer.render(scope)).toMatchInlineSnapshot(`
+    "/* eslint-disable prettier/prettier, @stylistic/max-len */
+    /**
+     * @struct
+     */
+    interface MyStruct extends AnotherStruct, SecondStruct {
 
     }"
   `);

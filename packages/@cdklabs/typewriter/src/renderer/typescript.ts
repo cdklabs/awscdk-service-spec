@@ -128,6 +128,12 @@ export class TypeScriptRenderer extends Renderer {
     this.renderDocs(structType, { forceStruct: true });
     this.emit(`${modifiers}interface ${structType.name}`);
     this.renderTypeParameters(structType.typeParameters);
+
+    if (structType.extends.length > 0) {
+      this.emit(' extends ');
+      this.emitList(structType.extends, ', ', (t) => this.renderType(t));
+    }
+
     this.emitBlock(' ', () => {
       const props = Array.from(structType.properties.values()).filter((p) => p.visibility === MemberVisibility.Public);
 
