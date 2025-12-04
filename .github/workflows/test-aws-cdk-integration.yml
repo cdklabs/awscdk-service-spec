@@ -49,5 +49,5 @@ jobs:
         run: yarn install
         working-directory: aws-cdk
       - name: Build aws/aws-cdk
-        run: npx lerna run build --no-bail --scope aws-cdk-lib --include-dependencies
+        run: npx lerna run build --no-bail --scope aws-cdk-lib --scope @aws-cdk/mixins-preview --include-dependencies
         working-directory: aws-cdk

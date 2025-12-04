@@ -117,7 +117,7 @@ function buildAwsCdkLib(repository: string, path: string): pj.github.workflows.S
     {
       name: `Build ${repository}`,
       workingDirectory: path,
-      run: 'npx lerna run build --no-bail --scope aws-cdk-lib --include-dependencies',
+      run: 'npx lerna run build --no-bail --scope aws-cdk-lib --scope @aws-cdk/mixins-preview --include-dependencies',
     },
   ];
 }
