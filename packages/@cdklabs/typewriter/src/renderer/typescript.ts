@@ -100,7 +100,11 @@ export class TypeScriptRenderer extends Renderer {
       if (imp instanceof AliasedModuleImport) {
         this.emit(`import * as ${imp.importAlias} from "${imp.moduleSource}";\n`);
       } else if (imp instanceof SelectiveModuleImport) {
-        this.emit(`import { ${imp.importedNames.join(', ')} } from "${imp.moduleSource}";\n`);
+        const names = imp.importedNames.map((name) => {
+          const alias = imp.getAlias(name);
+          return alias ? `${name} as ${alias}` : name;
+        });
+        this.emit(`import { ${names.join(', ')} } from "${imp.moduleSource}";\n`);
       }
     }
 

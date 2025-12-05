@@ -93,9 +93,35 @@ export class Module extends ScopeImpl {
   }
 
   /**
-   * Import the current module into the target module
+   * Import the current module into the target module with selective imports
+   *
+   * @param intoModule - The module to import into
+   * @param names - Array of import names. Each element can be:
+   *   - A string for regular imports: `'foo'` → `import { foo } from '...'`
+   *   - A tuple for aliased imports: `['foo', 'bar']` → `import { foo as bar } from '...'`
+   * @param props - Additional import properties
+   * @returns The SelectiveModuleImport instance for further customization
+   *
+   * @example Regular and aliased imports
+   * ```ts
+   * source.importSelective(target, ['RegularImport', ['LongName', 'Short']]);
+   * // Generates: import { RegularImport, LongName as Short } from "source";
+   * ```
+   *
+   * @example Avoiding name conflicts
+   * ```ts
+   * reactModule.importSelective(myModule, [['Component', 'ReactComponent'], 'useState']);
+   * // Generates: import { Component as ReactComponent, useState } from "react";
+   * ```
+   *
+   * @example Dynamic imports using returned instance
+   * ```ts
+   * const imp = source.importSelective(target, ['existing']);
+   * imp.addAliasedImport('foo', 'bar');
+   * // Generates: import { existing, foo as bar } from "source";
+   * ```
    */
-  public importSelective(intoModule: Module, names: string[], props: ModuleImportProps = {}) {
+  public importSelective(intoModule: Module, names: Array<string | [string, string]>, props: ModuleImportProps = {}) {
     const imp = new SelectiveModuleImport(this, props.fromLocation ?? this.importName, names);
     intoModule.addImport(imp);
     return imp;
@@ -157,35 +183,94 @@ export class AliasedModuleImport extends ModuleImport {
  * A selective import statement
  *
  * Import statements get rendered into the source module, and also count as scope linkage.
+ * Supports both regular imports and aliased imports.
+ *
+ * @example Constructor with mixed imports
+ * ```ts
+ * new SelectiveModuleImport(module, 'source', ['foo', ['bar', 'baz']]);
+ * // Generates: import { foo, bar as baz } from "source";
+ * ```
+ *
+ * @example Adding imports dynamically
+ * ```ts
+ * const imp = new SelectiveModuleImport(module, 'source');
+ * imp.addImportedName('foo');
+ * imp.addAliasedImport('bar', 'baz');
+ * // Generates: import { foo, bar as baz } from "source";
+ * ```
  */
 export class SelectiveModuleImport extends ModuleImport {
   public readonly importedNames: string[] = [];
+  private readonly aliasMap = new Map<string, string>();
   private targetScope?: IScope;
 
-  constructor(module: Module, moduleSource: string, importedNames: string[] = []) {
+  constructor(module: Module, moduleSource: string, importedNames: Array<string | [string, string]> = []) {
     super(module, moduleSource);
 
     for (const name of importedNames) {
-      this.addImportedName(name);
+      if (Array.isArray(name)) {
+        this.addAliasedImport(name[0], name[1]);
+      } else {
+        this.addImportedName(name);
+      }
     }
   }
 
+  /**
+   * Add a regular import name
+   *
+   * @param name - The name to import
+   * @example
+   * ```ts
+   * imp.addImportedName('MyClass');
+   * // Adds to: import { MyClass } from "...";
+   * ```
+   */
   public addImportedName(name: string) {
     this.importedNames.push(name);
     if (this.targetScope) {
-      this.linkSymbol(name, this.module);
+      this.linkSymbol(name, name, this.targetScope);
     }
+  }
+
+  /**
+   * Add an aliased import
+   *
+   * @param name - The original name in the source module
+   * @param alias - The alias to use in the target module
+   * @example
+   * ```ts
+   * imp.addAliasedImport('VeryLongClassName', 'Short');
+   * // Adds to: import { VeryLongClassName as Short } from "...";
+   * ```
+   */
+  public addAliasedImport(name: string, alias: string) {
+    this.importedNames.push(name);
+    this.aliasMap.set(name, alias);
+    if (this.targetScope) {
+      this.linkSymbol(name, alias, this.targetScope);
+    }
+  }
+
+  /**
+   * Get the alias for an imported name, if any
+   * @param name - The original name
+   * @returns The alias, or undefined if no alias exists
+   */
+  public getAlias(name: string): string | undefined {
+    return this.aliasMap.get(name);
   }
 
   public linkInto(scope: IScope): void {
     for (const name of this.importedNames) {
-      this.linkSymbol(name, scope);
+      const alias = this.aliasMap.get(name) ?? name;
+      this.linkSymbol(name, alias, scope);
     }
     this.targetScope = scope;
   }
 
-  private linkSymbol(name: string, scope: IScope) {
-    scope.linkSymbol(new ThingSymbol(name, this.module), expr.ident(name));
+  private linkSymbol(name: string, alias: string, scope: IScope) {
+    scope.linkSymbol(new ThingSymbol(name, this.module), expr.ident(alias));
   }
 }
 
