@@ -96,16 +96,42 @@ export class TypeScriptRenderer extends Renderer {
   }
 
   protected renderImports(mod: Module) {
+    const selectiveBySource = new Map<string, SelectiveModuleImport[]>();
+    const aliased: AliasedModuleImport[] = [];
+
     for (const imp of mod.imports) {
       if (imp instanceof AliasedModuleImport) {
-        this.emit(`import * as ${imp.importAlias} from "${imp.moduleSource}";\n`);
+        aliased.push(imp);
       } else if (imp instanceof SelectiveModuleImport) {
-        const names = imp.importedNames.map((name) => {
-          const alias = imp.getAlias(name);
-          return alias ? `${name} as ${alias}` : name;
-        });
-        this.emit(`import { ${names.join(', ')} } from "${imp.moduleSource}";\n`);
+        const imports = selectiveBySource.get(imp.moduleSource) ?? [];
+        imports.push(imp);
+        selectiveBySource.set(imp.moduleSource, imports);
       }
+    }
+
+    for (const imp of aliased) {
+      this.emit(`import * as ${imp.importAlias} from "${imp.moduleSource}";\n`);
+    }
+
+    for (const [source, imports] of selectiveBySource) {
+      const allImports = new Map<string, string | undefined>();
+      for (const imp of imports) {
+        for (const name of imp.importedNames) {
+          const alias = imp.getAlias(name);
+          const key = alias ? `${name}:${alias}` : name;
+          allImports.set(key, alias);
+        }
+      }
+      const sorted = Array.from(allImports.entries()).sort((a, b) => {
+        const nameA = a[0].split(':')[0];
+        const nameB = b[0].split(':')[0];
+        return nameA.localeCompare(nameB);
+      });
+      const names = sorted.map(([key, alias]) => {
+        const name = key.split(':')[0];
+        return alias ? `${name} as ${alias}` : name;
+      });
+      this.emit(`import { ${names.join(', ')} } from "${source}";\n`);
     }
 
     if (mod.imports.length > 0) {

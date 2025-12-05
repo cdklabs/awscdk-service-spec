@@ -25,7 +25,7 @@ test('selective import with multiple aliases using tuples', () => {
   const ts = new TypeScriptRenderer();
   expect(ts.render(target)).toMatchInlineSnapshot(`
     "/* eslint-disable prettier/prettier, @stylistic/max-len */
-    import { foo as bar, baz as qux } from "source";"
+    import { baz as qux, foo as bar } from "source";"
   `);
 });
 
@@ -38,7 +38,7 @@ test('selective import with mixed regular and aliased', () => {
   const ts = new TypeScriptRenderer();
   expect(ts.render(target)).toMatchInlineSnapshot(`
     "/* eslint-disable prettier/prettier, @stylistic/max-len */
-    import { regular, foo as bar } from "source";"
+    import { foo as bar, regular } from "source";"
   `);
 });
 
