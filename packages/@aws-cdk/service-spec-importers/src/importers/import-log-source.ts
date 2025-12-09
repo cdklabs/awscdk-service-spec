@@ -9,7 +9,7 @@ export function importLogSources(
     {
       LogType: string;
       ResourceTypes: string[];
-      Destinations: Array<{ DestinationType: string; PermissionsVersion: string }>;
+      Destinations: Array<{ DestinationType: string; PermissionsVersion: string; OutputFormat: string | null }>;
     }
   >,
   report: ProblemReport,
@@ -29,20 +29,20 @@ export function importLogSources(
           );
         }
 
-        const destinations = value.Destinations.map((dest) => dest.DestinationType as DestinationService);
+        const destinations: DestinationService[] = value.Destinations.map((dest) => ({
+          destinationType: dest.DestinationType,
+          outputFormat: dest.OutputFormat ? dest.OutputFormat : undefined,
+        }));
 
-        resource.vendedLogs ??= {
-          // we take whatever the newest permissions value is and assume that all logs in a resource use the same permissions
+        const newLog = {
+          // we take whatever the newest permissions value is and assume that all destinations for a certain logType use the same permissions
           permissionsVersion: permissionValue,
-          logTypes: [],
-          destinations: [],
+          logType: value.LogType,
+          destinations: destinations,
         };
 
-        resource.vendedLogs.logTypes.push(value.LogType);
-        // dedupes incoming destinations
-        const newDestinations = destinations.filter((dest) => !resource.vendedLogs!.destinations.includes(dest));
-
-        resource.vendedLogs.destinations.push(...newDestinations);
+        resource.vendedLogs ??= [];
+        resource.vendedLogs.push(newLog);
       } catch (err) {
         // assumes the only error we are likely to see is something relating to resource type not existing in the CFN DB
         report.reportFailure(
