@@ -1,6 +1,6 @@
 import { Event, EventTypeDefinition, EventProperty } from './event';
 import { Metric } from './metrics';
-import { Attribute, Property, Resource, Service, TypeDefinition, VendedLogs } from './resource';
+import { Attribute, Property, Resource, Service, TypeDefinition } from './resource';
 
 export interface SpecDatabaseDiff {
   services: MapDiff<Service, UpdatedService>;
@@ -42,7 +42,7 @@ export interface UpdatedResource {
   readonly isStateful?: ScalarDiff<boolean>;
   readonly tagInformation?: ScalarDiff<Resource['tagInformation']>;
   readonly scrutinizable?: ScalarDiff<Resource['scrutinizable']>;
-  readonly vendedLogs?: ListDiff<VendedLogs, void>;
+  readonly vendedLogs?: ScalarDiff<Resource['vendedLogs']>;
   readonly typeDefinitionDiff?: MapDiff<TypeDefinition, UpdatedTypeDefinition>;
   readonly primaryIdentifier?: ListDiff<string, void>;
   readonly metrics?: MapDiff<Metric, ChangedMetric>;
