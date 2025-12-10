@@ -1,6 +1,7 @@
 import {
   ChangedMetric,
   Deprecation,
+  ListDiff,
   MapDiff,
   Metric,
   Property,
@@ -334,41 +335,21 @@ export class DiffFormatter {
     });
   }
 
-  private renderVendedLogsDiff(diff: ScalarDiff<VendedLogs[] | undefined> | undefined): PrintableTree[] {
-    if (!diff || (!diff.old && !diff.new)) {
+  private renderVendedLogsDiff(diff: ListDiff<VendedLogs, void> | undefined): PrintableTree[] {
+    if (!diff) {
       return [];
     }
 
-    if (!diff.old && diff.new) {
-      return diff.new.map((vl) => this.renderVendedLog(vl).prefix([chalk.green(ADDITION), ' '], [' ']));
-    }
-    if (diff.old && !diff.new) {
-      return diff.old.map((vl) => this.renderVendedLog(vl).prefix([chalk.red(REMOVAL), ' '], [' ']));
-    }
-
     const tree: PrintableTree[] = [];
-    const oldMap = new Map((diff.old ?? []).map((vl) => [vl.logType, vl]));
-    const newMap = new Map((diff.new ?? []).map((vl) => [vl.logType, vl]));
 
-    const allLogTypes = new Set([...oldMap.keys(), ...newMap.keys()]);
-
-    for (const logType of allLogTypes) {
-      const oldVl = oldMap.get(logType);
-      const newVl = newMap.get(logType);
-
-      if (!oldVl && newVl) {
-        tree.push(this.renderVendedLog(newVl).prefix([chalk.green(ADDITION), ' '], [' ']));
-      } else if (oldVl && !newVl) {
-        tree.push(this.renderVendedLog(oldVl).prefix([chalk.red(REMOVAL), ' '], [' ']));
-      } else if (oldVl && newVl) {
-        const changes = this.compareVendedLogs(oldVl, newVl);
-        if (changes.length > 0) {
-          tree.push(
-            new PrintableTree(`logType: ${logType}`).addBullets(changes).prefix([chalk.yellow(UPDATE), ' '], [' ']),
-          );
-        }
-      }
+    if (diff.added) {
+      tree.push(...diff.added.map((vl) => this.renderVendedLog(vl).prefix([chalk.green(ADDITION), ' '], [' '])));
     }
+
+    if (diff.removed) {
+      tree.push(...diff.removed.map((vl) => this.renderVendedLog(vl).prefix([chalk.red(REMOVAL), ' '], [' '])));
+    }
+
     return tree;
   }
 
@@ -382,41 +363,41 @@ export class DiffFormatter {
     ]);
   }
 
-  private compareVendedLogs(old: VendedLogs, updated: VendedLogs): PrintableTree[] {
-    const changes: PrintableTree[] = [];
+  // private compareVendedLogs(old: VendedLogs, updated: VendedLogs): PrintableTree[] {
+  //   const changes: PrintableTree[] = [];
 
-    if (old.permissionsVersion !== updated.permissionsVersion) {
-      changes.push(
-        new PrintableTree(`permissionsVersion:`).addBullets([
-          new PrintableTree(`- ${old.permissionsVersion}`).colorize(chalk.red),
-          new PrintableTree(`+ ${updated.permissionsVersion}`).colorize(chalk.green),
-        ]),
-      );
-    }
+  //   if (old.permissionsVersion !== updated.permissionsVersion) {
+  //     changes.push(
+  //       new PrintableTree(`permissionsVersion:`).addBullets([
+  //         new PrintableTree(`- ${old.permissionsVersion}`).colorize(chalk.red),
+  //         new PrintableTree(`+ ${updated.permissionsVersion}`).colorize(chalk.green),
+  //       ]),
+  //     );
+  //   }
 
-    const oldDests = new Map(old.destinations.map((d) => [`${d.destinationType}:${d.outputFormat ?? ''}`, d]));
-    const newDests = new Map(updated.destinations.map((d) => [`${d.destinationType}:${d.outputFormat ?? ''}`, d]));
+  //   const oldDests = new Map(old.destinations.map((d) => [`${d.destinationType}:${d.outputFormat ?? ''}`, d]));
+  //   const newDests = new Map(updated.destinations.map((d) => [`${d.destinationType}:${d.outputFormat ?? ''}`, d]));
 
-    const added = [...newDests.keys()].filter((k) => !oldDests.has(k));
-    const removed = [...oldDests.keys()].filter((k) => !newDests.has(k));
+  //   const added = [...newDests.keys()].filter((k) => !oldDests.has(k));
+  //   const removed = [...oldDests.keys()].filter((k) => !newDests.has(k));
 
-    if (added.length > 0 || removed.length > 0) {
-      const bullets: PrintableTree[] = [];
-      removed.forEach((k) => {
-        const d = oldDests.get(k)!;
-        const str = d.outputFormat ? `${d.destinationType}(${d.outputFormat})` : d.destinationType;
-        bullets.push(new PrintableTree(`- ${str}`).colorize(chalk.red));
-      });
-      added.forEach((k) => {
-        const d = newDests.get(k)!;
-        const str = d.outputFormat ? `${d.destinationType}(${d.outputFormat})` : d.destinationType;
-        bullets.push(new PrintableTree(`+ ${str}`).colorize(chalk.green));
-      });
-      changes.push(new PrintableTree(`destinations:`).addBullets(bullets));
-    }
+  //   if (added.length > 0 || removed.length > 0) {
+  //     const bullets: PrintableTree[] = [];
+  //     removed.forEach((k) => {
+  //       const d = oldDests.get(k)!;
+  //       const str = d.outputFormat ? `${d.destinationType}(${d.outputFormat})` : d.destinationType;
+  //       bullets.push(new PrintableTree(`- ${str}`).colorize(chalk.red));
+  //     });
+  //     added.forEach((k) => {
+  //       const d = newDests.get(k)!;
+  //       const str = d.outputFormat ? `${d.destinationType}(${d.outputFormat})` : d.destinationType;
+  //       bullets.push(new PrintableTree(`+ ${str}`).colorize(chalk.green));
+  //     });
+  //     changes.push(new PrintableTree(`destinations:`).addBullets(bullets));
+  //   }
 
-    return changes;
-  }
+  //   return changes;
+  // }
 
   private renderEvent(e: Event, db: number): PrintableTree {
     const propsTree = new PrintableTree(
