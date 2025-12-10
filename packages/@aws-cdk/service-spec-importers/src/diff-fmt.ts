@@ -23,6 +23,7 @@ import {
   UpdatedEvent,
   UpdatedEventTypeDefinition,
   UpdatedEventProperty,
+  VendedLogs,
 } from '@aws-cdk/service-spec-types';
 import chalk from 'chalk';
 import { PrintableTree } from './printable-tree';
@@ -157,6 +158,7 @@ export class DiffFormatter {
       listWithCaption('properties', this.renderPropertyDiff(r.properties)),
       listWithCaption('attributes', this.renderPropertyDiff(r.attributes)),
       listWithCaption('vendedLogs', this.renderVendedLogsDiff(r.vendedLogs)),
+      listWithCaption('vendedLogsConfig', this.renderVendedLogsArrayDiff(r.vendedLogsConfig)),
       listWithCaption(
         'types',
         this.renderMapDiff(
@@ -332,6 +334,95 @@ export class DiffFormatter {
       }
       return new PrintableTree();
     });
+  }
+
+  private renderVendedLogsArrayDiff(diff: ScalarDiff<VendedLogs[] | undefined> | undefined): PrintableTree[] {
+    if (!diff) {
+      return [];
+    }
+
+    if (!diff.old && diff.new && Array.isArray(diff.new)) {
+      return diff.new.map((vl) => this.renderVendedLog(vl).prefix([chalk.green(ADDITION), ' '], [' ']));
+    }
+
+    if (diff.old && Array.isArray(diff.old) && !diff.new) {
+      return diff.old.map((vl) => this.renderVendedLog(vl).prefix([chalk.red(REMOVAL), ' '], [' ']));
+    }
+
+    if (Array.isArray(diff.old) && Array.isArray(diff.new)) {
+      const tree: PrintableTree[] = [];
+      const oldMap = new Map(diff.old.map((vl) => [vl.logType, vl]));
+      const newMap = new Map(diff.new.map((vl) => [vl.logType, vl]));
+
+      const allLogTypes = new Set([...oldMap.keys(), ...newMap.keys()]);
+
+      for (const logType of allLogTypes) {
+        const oldVl = oldMap.get(logType);
+        const newVl = newMap.get(logType);
+
+        if (!oldVl && newVl) {
+          tree.push(this.renderVendedLog(newVl).prefix([chalk.green(ADDITION), ' '], [' ']));
+        } else if (oldVl && !newVl) {
+          tree.push(this.renderVendedLog(oldVl).prefix([chalk.red(REMOVAL), ' '], [' ']));
+        } else if (oldVl && newVl) {
+          const changes = this.compareVendedLogs(oldVl, newVl);
+          if (changes.length > 0) {
+            tree.push(
+              new PrintableTree(`logType: ${logType}`).addBullets(changes).prefix([chalk.yellow(UPDATE), ' '], [' ']),
+            );
+          }
+        }
+      }
+
+      return tree;
+    }
+    return [];
+  }
+
+  private renderVendedLog(vl: VendedLogs): PrintableTree {
+    const destinations = vl.destinations
+      .map((d) => (d.outputFormat ? `${d.destinationType}(${d.outputFormat})` : d.destinationType))
+      .join(', ');
+    return new PrintableTree(`logType: ${vl.logType}`).addBullets([
+      new PrintableTree(`permissionsVersion: ${vl.permissionsVersion}`),
+      new PrintableTree(`destinations: [${destinations}]`),
+    ]);
+  }
+
+  private compareVendedLogs(old: VendedLogs, updated: VendedLogs): PrintableTree[] {
+    const changes: PrintableTree[] = [];
+
+    if (old.permissionsVersion !== updated.permissionsVersion) {
+      changes.push(
+        new PrintableTree(`permissionsVersion:`).addBullets([
+          new PrintableTree(`- ${old.permissionsVersion}`).colorize(chalk.red),
+          new PrintableTree(`+ ${updated.permissionsVersion}`).colorize(chalk.green),
+        ]),
+      );
+    }
+
+    const oldDests = new Map(old.destinations.map((d) => [`${d.destinationType}:${d.outputFormat ?? ''}`, d]));
+    const newDests = new Map(updated.destinations.map((d) => [`${d.destinationType}:${d.outputFormat ?? ''}`, d]));
+
+    const added = [...newDests.keys()].filter((k) => !oldDests.has(k));
+    const removed = [...oldDests.keys()].filter((k) => !newDests.has(k));
+
+    if (added.length > 0 || removed.length > 0) {
+      const bullets: PrintableTree[] = [];
+      removed.forEach((k) => {
+        const d = oldDests.get(k)!;
+        const str = d.outputFormat ? `${d.destinationType}(${d.outputFormat})` : d.destinationType;
+        bullets.push(new PrintableTree(`- ${str}`).colorize(chalk.red));
+      });
+      added.forEach((k) => {
+        const d = newDests.get(k)!;
+        const str = d.outputFormat ? `${d.destinationType}(${d.outputFormat})` : d.destinationType;
+        bullets.push(new PrintableTree(`+ ${str}`).colorize(chalk.green));
+      });
+      changes.push(new PrintableTree(`destinations:`).addBullets(bullets));
+    }
+
+    return changes;
   }
 
   private renderVendedLogsDiff(diff: ScalarDiff<VendedLog | undefined> | undefined): PrintableTree[] {
