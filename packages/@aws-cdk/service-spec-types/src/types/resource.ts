@@ -442,18 +442,30 @@ export interface VendedLog {
   readonly destinations: DestinationService[];
 }
 
+/**
+ * Represents a delivery destination that a Cloudformation resource can send logs to
+ */
 export interface DeliveryDestination {
+  /**
+   * The type of service that is ingesting the logs, can be S3 | FH | CWL | XRAY
+   */
   readonly destinationType: string;
+  /**
+   * Format of the logs that are send to this destination, can be json | plain | w3c | raw | parquet
+   */
   readonly outputFormat?: string;
 }
 
+/**
+ * Represents a type of log that a Cloudformation Resource can produce and what destinations can consume them
+ */
 export interface VendedLogs {
   /**
    * What version of permissions the destination supports V1 | V2
    */
   readonly permissionsVersion: string;
   /**
-   * List of the types of logs a Cloudformation resource can produce
+   * Type of log a Cloudformation resource can produce
    */
   readonly logType: string;
   /**
