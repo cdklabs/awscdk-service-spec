@@ -114,7 +114,7 @@ export class DbDiff {
       arnTemplate: diffScalar(a, b, 'arnTemplate'),
       name: diffScalar(a, b, 'name'),
       scrutinizable: diffScalar(a, b, 'scrutinizable'),
-      vendedLogs: diffField(a, b, 'vendedLogs', jsonEq),
+      vendedLogs: diffList(a.vendedLogs ?? [], b.vendedLogs ?? [], (x, y) => x === y),
       tagInformation: diffField(a, b, 'tagInformation', jsonEq),
       primaryIdentifier: collapseEmptyDiff(
         diffList(a.primaryIdentifier ?? [], b.primaryIdentifier ?? [], (x, y) => x === y),
