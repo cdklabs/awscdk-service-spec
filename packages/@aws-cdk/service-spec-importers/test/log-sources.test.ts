@@ -38,7 +38,6 @@ test('adds log type to resource', () => {
           {
             DestinationType: 'S3',
             PermissionsVersion: 'V2',
-            OutputFormat: 'json',
           },
         ],
       },
@@ -49,7 +48,6 @@ test('adds log type to resource', () => {
           {
             DestinationType: 'XRAY',
             PermissionsVersion: 'V2',
-            OutputFormat: null,
           },
         ],
       },
@@ -65,7 +63,6 @@ test('adds log type to resource', () => {
       destinations: [
         {
           destinationType: 'S3',
-          outputFormat: 'json',
         },
       ],
     },
@@ -75,7 +72,6 @@ test('adds log type to resource', () => {
       destinations: [
         {
           destinationType: 'XRAY',
-          outputFormat: undefined,
         },
       ],
     },
@@ -93,7 +89,6 @@ test('adds multiple log types to resource and does not add duplicate destination
           {
             DestinationType: 'S3',
             PermissionsVersion: 'V2',
-            OutputFormat: 'json',
           },
         ],
       },
@@ -104,7 +99,6 @@ test('adds multiple log types to resource and does not add duplicate destination
           {
             DestinationType: 'S3',
             PermissionsVersion: 'V2',
-            OutputFormat: 'json',
           },
         ],
       },
@@ -120,7 +114,6 @@ test('adds multiple log types to resource and does not add duplicate destination
       destinations: [
         {
           destinationType: 'S3',
-          outputFormat: 'json',
         },
       ],
     },
@@ -130,7 +123,6 @@ test('adds multiple log types to resource and does not add duplicate destination
       destinations: [
         {
           destinationType: 'S3',
-          outputFormat: 'json',
         },
       ],
     },
@@ -148,7 +140,6 @@ test('adds log types to multiple resources', () => {
           {
             DestinationType: 'S3',
             PermissionsVersion: 'V2',
-            OutputFormat: 'json',
           },
         ],
       },
@@ -164,7 +155,6 @@ test('adds log types to multiple resources', () => {
       destinations: [
         {
           destinationType: 'S3',
-          outputFormat: 'json',
         },
       ],
     },
@@ -178,7 +168,6 @@ test('adds log types to multiple resources', () => {
       destinations: [
         {
           destinationType: 'S3',
-          outputFormat: 'json',
         },
       ],
     },
@@ -196,7 +185,6 @@ test('does not assign logTypes if resource does not exist in Cloudformation', ()
           {
             DestinationType: 'S3',
             PermissionsVersion: 'V2',
-            OutputFormat: 'json',
           },
         ],
       },

@@ -9,7 +9,7 @@ export function importLogSources(
     {
       LogType: string;
       ResourceTypes: string[];
-      Destinations: Array<{ DestinationType: string; PermissionsVersion: string; OutputFormat: string | null }>;
+      Destinations: Array<{ DestinationType: string; PermissionsVersion: string; }>;
     }
   >,
   report: ProblemReport,
@@ -46,7 +46,6 @@ export function importLogSources(
 
         const destinations: DeliveryDestination[] = value.Destinations.map((dest) => ({
           destinationType: dest.DestinationType,
-          outputFormat: dest.OutputFormat ? dest.OutputFormat : undefined,
         }));
 
         const newLog = {

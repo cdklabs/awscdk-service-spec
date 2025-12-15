@@ -381,7 +381,7 @@ export class DiffFormatter {
 
   private renderVendedLog(vl: VendedLogs): PrintableTree {
     const destinations = vl.destinations
-      .map((d) => (d.outputFormat ? `${d.destinationType}(${d.outputFormat})` : d.destinationType))
+      .map((d) => (d.destinationType))
       .join(', ');
     return new PrintableTree(`logType: ${vl.logType}`).addBullets([
       new PrintableTree(`permissionsVersion: ${vl.permissionsVersion}`),
@@ -401,8 +401,8 @@ export class DiffFormatter {
       );
     }
 
-    const oldDests = new Map(old.destinations.map((d) => [`${d.destinationType}:${d.outputFormat ?? ''}`, d]));
-    const newDests = new Map(updated.destinations.map((d) => [`${d.destinationType}:${d.outputFormat ?? ''}`, d]));
+    const oldDests = new Map(old.destinations.map((d) => [`${d.destinationType}`, d]));
+    const newDests = new Map(updated.destinations.map((d) => [`${d.destinationType}`, d]));
 
     const added = [...newDests.keys()].filter((k) => !oldDests.has(k));
     const removed = [...oldDests.keys()].filter((k) => !newDests.has(k));
@@ -411,12 +411,12 @@ export class DiffFormatter {
       const bullets: PrintableTree[] = [];
       removed.forEach((k) => {
         const d = oldDests.get(k)!;
-        const str = d.outputFormat ? `${d.destinationType}(${d.outputFormat})` : d.destinationType;
+        const str = d.destinationType;
         bullets.push(new PrintableTree(`- ${str}`).colorize(chalk.red));
       });
       added.forEach((k) => {
         const d = newDests.get(k)!;
-        const str = d.outputFormat ? `${d.destinationType}(${d.outputFormat})` : d.destinationType;
+        const str = d.destinationType;
         bullets.push(new PrintableTree(`+ ${str}`).colorize(chalk.green));
       });
       changes.push(new PrintableTree(`destinations:`).addBullets(bullets));

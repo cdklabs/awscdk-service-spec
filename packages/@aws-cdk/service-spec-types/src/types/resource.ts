@@ -450,10 +450,6 @@ export interface DeliveryDestination {
    * The type of service that is ingesting the logs, can be S3 | FH | CWL | XRAY
    */
   readonly destinationType: string;
-  /**
-   * Format of the logs that are send to this destination, can be json | plain | w3c | raw | parquet
-   */
-  readonly outputFormat?: string;
 }
 
 /**
