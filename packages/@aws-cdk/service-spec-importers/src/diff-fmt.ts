@@ -380,9 +380,7 @@ export class DiffFormatter {
   }
 
   private renderVendedLog(vl: VendedLogs): PrintableTree {
-    const destinations = vl.destinations
-      .map((d) => (d.destinationType))
-      .join(', ');
+    const destinations = vl.destinations.map((d) => d.destinationType).join(', ');
     return new PrintableTree(`logType: ${vl.logType}`).addBullets([
       new PrintableTree(`permissionsVersion: ${vl.permissionsVersion}`),
       new PrintableTree(`destinations: [${destinations}]`),

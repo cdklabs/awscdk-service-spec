@@ -9,7 +9,7 @@ export function importLogSources(
     {
       LogType: string;
       ResourceTypes: string[];
-      Destinations: Array<{ DestinationType: string; PermissionsVersion: string; }>;
+      Destinations: Array<{ DestinationType: string; PermissionsVersion: string }>;
     }
   >,
   report: ProblemReport,
