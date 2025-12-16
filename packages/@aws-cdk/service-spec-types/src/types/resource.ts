@@ -68,6 +68,7 @@ export interface Resource extends Entity {
   arnTemplate?: string;
   isStateful?: boolean;
   vendedLogs?: VendedLog;
+  vendedLogsConfig?: VendedLogs[];
 
   /**
    * Information about the taggability of this resource
@@ -439,6 +440,34 @@ export interface VendedLog {
    * List of the destinations the can consume those logs
    */
   readonly destinations: DestinationService[];
+}
+
+/**
+ * Represents a delivery destination that a Cloudformation resource can send logs to
+ */
+export interface DeliveryDestination {
+  /**
+   * The type of service that is ingesting the logs, can be S3 | FH | CWL | XRAY
+   */
+  readonly destinationType: string;
+}
+
+/**
+ * Represents a type of log that a Cloudformation Resource can produce and what destinations can consume them
+ */
+export interface VendedLogs {
+  /**
+   * What version of permissions the destination supports V1 | V2
+   */
+  readonly permissionsVersion: string;
+  /**
+   * Type of log a Cloudformation resource can produce
+   */
+  readonly logType: string;
+  /**
+   * List of the destinations the can consume those logs
+   */
+  readonly destinations: DeliveryDestination[];
 }
 
 export class RichPropertyType {

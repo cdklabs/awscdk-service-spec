@@ -1,4 +1,4 @@
-import { DestinationService, SpecDatabase } from '@aws-cdk/service-spec-types';
+import { DeliveryDestination, DestinationService, SpecDatabase } from '@aws-cdk/service-spec-types';
 import { failure } from '@cdklabs/tskb';
 import { ProblemReport, ReportAudience } from '../report';
 
@@ -29,7 +29,7 @@ export function importLogSources(
           );
         }
 
-        const destinations = value.Destinations.map((dest) => dest.DestinationType as DestinationService);
+        const oldDestinations = value.Destinations.map((dest) => dest.DestinationType as DestinationService);
 
         resource.vendedLogs ??= {
           // we take whatever the newest permissions value is and assume that all logs in a resource use the same permissions
@@ -40,9 +40,22 @@ export function importLogSources(
 
         resource.vendedLogs.logTypes.push(value.LogType);
         // dedupes incoming destinations
-        const newDestinations = destinations.filter((dest) => !resource.vendedLogs!.destinations.includes(dest));
+        const newDestinations = oldDestinations.filter((dest) => !resource.vendedLogs!.destinations.includes(dest));
 
         resource.vendedLogs.destinations.push(...newDestinations);
+
+        const destinations: DeliveryDestination[] = value.Destinations.map((dest) => ({
+          destinationType: dest.DestinationType,
+        }));
+
+        const newLog = {
+          permissionsVersion: permissionValue,
+          logType: value.LogType,
+          destinations: destinations,
+        };
+
+        resource.vendedLogsConfig ??= [];
+        resource.vendedLogsConfig.push(newLog);
       } catch (err) {
         // assumes the only error we are likely to see is something relating to resource type not existing in the CFN DB
         report.reportFailure(
