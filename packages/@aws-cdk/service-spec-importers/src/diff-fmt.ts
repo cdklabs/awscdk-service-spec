@@ -16,7 +16,6 @@ import {
   UpdatedResource,
   UpdatedService,
   UpdatedTypeDefinition,
-  VendedLog,
   Event,
   EventTypeDefinition,
   EventProperty,
@@ -157,7 +156,7 @@ export class DiffFormatter {
       new PrintableTree(...listFromDiffs(d)).indent(META_INDENT),
       listWithCaption('properties', this.renderPropertyDiff(r.properties)),
       listWithCaption('attributes', this.renderPropertyDiff(r.attributes)),
-      listWithCaption('vendedLogs', this.renderVendedLogsDiff(r.vendedLogs)),
+      listWithCaption('vendedLogs', this.renderVendedLogsArrayDiff(r.vendedLogs)),
       listWithCaption('vendedLogsConfig', this.renderVendedLogsArrayDiff(r.vendedLogsConfig)),
       listWithCaption(
         'types',
@@ -421,59 +420,6 @@ export class DiffFormatter {
     }
 
     return changes;
-  }
-
-  private renderVendedLogsDiff(diff: ScalarDiff<VendedLog | undefined> | undefined): PrintableTree[] {
-    if (!diff || (!diff.old && !diff.new)) {
-      return [];
-    }
-    const tree: PrintableTree[] = [];
-
-    if (!diff.old && diff.new) {
-      return [this.renderVendedLogsType(diff.new).prefix([chalk.green(ADDITION), ' '], [' '])];
-    }
-    if (diff.old && !diff.new) {
-      return [this.renderVendedLogsType(diff.old).prefix([chalk.red(REMOVAL), ' '], [' '])];
-    }
-
-    if (diff.old && diff.new) {
-      if (diff.old.permissionsVersion !== diff.new.permissionsVersion) {
-        tree.push(
-          new PrintableTree(`permissionsVersion:`).addBullets([
-            new PrintableTree(`- ${diff.old.permissionsVersion}`).colorize(chalk.red),
-            new PrintableTree(`+ ${diff.new.permissionsVersion}`).colorize(chalk.green),
-          ]),
-        );
-      }
-
-      this.renderVendedLogListDiff(diff, tree, 'logTypes');
-      this.renderVendedLogListDiff(diff, tree, 'destinations');
-    }
-    return tree;
-  }
-
-  private renderVendedLogsType(vendedLogs: VendedLog): PrintableTree {
-    return new PrintableTree(`vendedLogs`).addBullets([
-      new PrintableTree(`permissionsVersion: ${vendedLogs.permissionsVersion}`),
-      new PrintableTree(`logTypes: [${vendedLogs.logTypes.join(', ')}]`),
-      new PrintableTree(`destinations: [${vendedLogs.destinations.join(', ')}]`),
-    ]);
-  }
-
-  private renderVendedLogListDiff(diff: ScalarDiff<VendedLog | undefined>, tree: PrintableTree[], diffShown: string) {
-    if (diff.old && diff.new) {
-      // the array should correspond to the value of diffShown
-      const oldList = new Set(diffShown === 'logTypes' ? diff.new.logTypes : diff.new.destinations);
-      const newList = new Set(diffShown === 'logTypes' ? diff.new.logTypes : diff.new.destinations);
-      const added = [...newList].filter((t) => !oldList.has(t));
-      const removed = [...oldList].filter((t) => !newList.has(t));
-      if (added.length > 0 || removed.length > 0) {
-        const bullets: PrintableTree[] = [];
-        removed.forEach((obj) => bullets.push(new PrintableTree(`- ${obj}`).colorize(chalk.red)));
-        added.forEach((obj) => bullets.push(new PrintableTree(`+ ${obj}`).colorize(chalk.green)));
-        tree.push(new PrintableTree(`${diffShown}:`).addBullets(bullets));
-      }
-    }
   }
 
   private renderEvent(e: Event, db: number): PrintableTree {
