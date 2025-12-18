@@ -56,7 +56,7 @@ test('adds log type to resource', () => {
   );
 
   const res = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0];
-  expect(res.vendedLogsConfig).toEqual([
+  expect(res.vendedLogs).toEqual([
     {
       permissionsVersion: 'V2',
       logType: 'SOME_LOGS',
@@ -107,7 +107,7 @@ test('adds multiple log types to resource and does not add duplicate destination
   );
 
   const res = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0];
-  expect(res.vendedLogsConfig).toEqual([
+  expect(res.vendedLogs).toEqual([
     {
       permissionsVersion: 'V2',
       logType: 'APPLICATION_LOGS',
@@ -148,7 +148,7 @@ test('adds log types to multiple resources', () => {
   );
 
   const someRes = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0];
-  expect(someRes.vendedLogsConfig).toEqual([
+  expect(someRes.vendedLogs).toEqual([
     {
       permissionsVersion: 'V2',
       logType: 'APPLICATION_LOGS',
@@ -161,7 +161,7 @@ test('adds log types to multiple resources', () => {
   ]);
 
   const otherRes = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Other::Type')[0];
-  expect(otherRes.vendedLogsConfig).toEqual([
+  expect(otherRes.vendedLogs).toEqual([
     {
       permissionsVersion: 'V2',
       logType: 'APPLICATION_LOGS',

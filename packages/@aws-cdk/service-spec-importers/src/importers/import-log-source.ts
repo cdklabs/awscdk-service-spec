@@ -1,4 +1,4 @@
-import { DeliveryDestination, DestinationService, SpecDatabase } from '@aws-cdk/service-spec-types';
+import { DeliveryDestination, SpecDatabase } from '@aws-cdk/service-spec-types';
 import { failure } from '@cdklabs/tskb';
 import { ProblemReport, ReportAudience } from '../report';
 
@@ -29,21 +29,6 @@ export function importLogSources(
           );
         }
 
-        const oldDestinations = value.Destinations.map((dest) => dest.DestinationType as DestinationService);
-
-        resource.vendedLogs ??= {
-          // we take whatever the newest permissions value is and assume that all logs in a resource use the same permissions
-          permissionsVersion: permissionValue,
-          logTypes: [],
-          destinations: [],
-        };
-
-        resource.vendedLogs.logTypes.push(value.LogType);
-        // dedupes incoming destinations
-        const newDestinations = oldDestinations.filter((dest) => !resource.vendedLogs!.destinations.includes(dest));
-
-        resource.vendedLogs.destinations.push(...newDestinations);
-
         const destinations: DeliveryDestination[] = value.Destinations.map((dest) => ({
           destinationType: dest.DestinationType,
         }));
@@ -54,6 +39,8 @@ export function importLogSources(
           destinations: destinations,
         };
 
+        resource.vendedLogs ??= [];
+        resource.vendedLogs.push(newLog);
         resource.vendedLogsConfig ??= [];
         resource.vendedLogsConfig.push(newLog);
       } catch (err) {
