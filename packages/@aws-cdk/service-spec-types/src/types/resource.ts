@@ -63,6 +63,16 @@ export interface Resource extends Entity {
   documentation?: string;
 
   /**
+   * The primary identifier, or identifiers, in Cloud Control API
+   *
+   * Uniquely identifies a resource in an account.
+   *
+   * This is read from the schema, which always pertains to the CCAPI identifier.
+   * Typically the same as the CloudFormation identifier, but not necessarily.
+   */
+  primaryIdentifier?: string[];
+
+  /**
    * The primary identifier, or identifiers, in CloudFormation
    *
    * Whatever gets returned when you call `{ Ref }` a resource. Typically the
@@ -72,17 +82,7 @@ export interface Resource extends Entity {
    * Generally the same as the `ccApiPrimaryIdentifier`, but can be different
    * for certain resources.
    */
-  primaryIdentifier?: string[];
-
-  /**
-   * The primary identifier, or identifiers, in Cloud Control API
-   *
-   * Uniquely identifies a resource in an account.
-   *
-   * This is read from the schema, which always pertains to the CCAPI identifier.
-   * Typically the same as the CloudFormation identifier, but not necessarily.
-   */
-  ccApiPrimaryIdentifier?: string[];
+  cfnRefIdentifier?: string[];
 
   readonly properties: ResourceProperties;
   readonly attributes: Record<string, Attribute>;

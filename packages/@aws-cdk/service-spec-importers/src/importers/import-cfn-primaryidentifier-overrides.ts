@@ -16,7 +16,7 @@ export function importCfnPrimaryIdentifierOverrides(db: SpecDatabase, allowList:
           errors.push(`No such property in CFN Primary Identifiers Override file: ${resourceType}.${propName}`);
         }
 
-        resource.primaryIdentifier = propNames;
+        resource.cfnRefIdentifier = propNames;
       }
     } catch (e: any) {
       errors.push(e.message);
