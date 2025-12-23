@@ -29,4 +29,3 @@ test('exercise the CFN identifier import flow', () => {
     cfnRefIdentifier: ['MyProp'],
   } satisfies Partial<Resource>);
 });
-
