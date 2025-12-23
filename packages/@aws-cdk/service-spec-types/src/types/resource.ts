@@ -61,7 +61,28 @@ export interface Resource extends Entity {
    */
   cloudFormationTransform?: string;
   documentation?: string;
+
+  /**
+   * The primary identifier, or identifiers, in Cloud Control API
+   *
+   * Uniquely identifies a resource in an account.
+   *
+   * This is read from the schema, which always pertains to the CCAPI identifier.
+   * Typically the same as the CloudFormation identifier, but not necessarily.
+   */
   primaryIdentifier?: string[];
+
+  /**
+   * The primary identifier, or identifiers, in CloudFormation
+   *
+   * Whatever gets returned when you call `{ Ref }` a resource. Typically the
+   * value that other resources in the same service expect to see as the way to
+   * reference this resource (name or ARN or Id).
+   *
+   * If missing, the `cfnRefIdentifier` is the same as the (CC-API) `primaryIdentifier`.
+   */
+  cfnRefIdentifier?: string[];
+
   readonly properties: ResourceProperties;
   readonly attributes: Record<string, Attribute>;
   readonly validations?: unknown;
@@ -302,11 +323,6 @@ export type ServiceInRegion = Relationship<Region, Service>;
 export type ResourceInRegion = Relationship<Region, Resource>;
 
 export type UsesType = Relationship<Resource, TypeDefinition>;
-
-export interface ResourceIdentifier extends Entity {
-  readonly arnTemplate?: string;
-  readonly primaryIdentifier?: string[];
-}
 
 /**
  * Mark a resource as a resource that needs additional scrutiy when added, removed or changed

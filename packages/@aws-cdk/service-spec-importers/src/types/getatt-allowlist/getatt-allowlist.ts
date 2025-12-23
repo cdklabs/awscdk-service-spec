@@ -1,6 +1,6 @@
 /**
- * Maps a resource type to a list of properties that are also attributes
+ * Maps a resource type to a list of properties that are overrides of the CCAPI schema primary identifiers
  */
-export interface GetAttAllowList {
+export interface CfnPrimaryIdentifierOverrides {
   [resourceType: string]: string[];
 }

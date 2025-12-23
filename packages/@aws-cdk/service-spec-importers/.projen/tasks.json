@@ -155,6 +155,9 @@
           "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type GetAttAllowList --out schemas/GetAttAllowList.schema.json"
         },
         {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type CfnPrimaryIdentifierOverrides --out schemas/CfnPrimaryIdentifierOverrides.schema.json"
+        },
+        {
           "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type OobRelationshipData --out schemas/OobRelationshipData.schema.json"
         }
       ]

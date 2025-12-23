@@ -67,8 +67,6 @@ function eventDecider({
   const resourceMatches = matchTypeFieldsToResources(resources, typeInfos);
 
   if (resourceMatches.length > 0) {
-    // TODO: remove this
-    console.log(`Resources Matches = ${resourceMatches.length}`);
     return { resource: resourceMatches[0].resource, matches: resourceMatches[0].matches };
   } else if (resourceMatches.length == 0) {
     // TODO: change this to report
@@ -112,7 +110,7 @@ function matchTypeFieldsToResources(resources: Resource[], typeInfos: EventTypeD
     if (matches.length > 0) {
       if (matches.length > 1) {
         //TODO: 17 events affected by this, some of them has resourceId & resourceName, some has in multiple levels the resource
-        console.log('here we are', { resource, matches: JSON.stringify(matches, null, 2) });
+        // console.log('here we are', { resource, matches: JSON.stringify(matches, null, 2) });
       }
       resourceMatches.push({
         resource,

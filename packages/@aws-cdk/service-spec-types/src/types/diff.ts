@@ -45,7 +45,8 @@ export interface UpdatedResource {
   readonly vendedLogs?: ScalarDiff<Resource['vendedLogs']>;
   readonly vendedLogsConfig?: ScalarDiff<Resource['vendedLogsConfig']>;
   readonly typeDefinitionDiff?: MapDiff<TypeDefinition, UpdatedTypeDefinition>;
-  readonly primaryIdentifier?: ListDiff<string, void>;
+  readonly primaryIdentifier?: ScalarDiff<string[]>;
+  readonly cfnRefIdentifier?: ScalarDiff<string[]>;
   readonly metrics?: MapDiff<Metric, ChangedMetric>;
   readonly events?: MapDiff<Event, UpdatedEvent>;
 }
