@@ -79,8 +79,7 @@ export interface Resource extends Entity {
    * value that other resources in the same service expect to see as the way to
    * reference this resource (name or ARN or Id).
    *
-   * Generally the same as the `ccApiPrimaryIdentifier`, but can be different
-   * for certain resources.
+   * If missing, the `cfnRefIdentifier` is the same as the (CC-API) `primaryIdentifier`.
    */
   cfnRefIdentifier?: string[];
 
