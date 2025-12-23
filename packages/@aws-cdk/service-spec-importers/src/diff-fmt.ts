@@ -115,6 +115,8 @@ export class DiffFormatter {
           'tagInformation',
           'arnTemplate',
           'vendedLogs',
+          'primaryIdentifier',
+          'cfnRefIdentifier',
         ]),
       ).indent(META_INDENT),
       listWithCaption('properties', this.renderProperties(r.properties, db)),
@@ -150,6 +152,9 @@ export class DiffFormatter {
       'scrutinizable',
       'tagInformation',
       'arnTemplate',
+      'vendedLogs',
+      'primaryIdentifier',
+      'cfnRefIdentifier',
     ]);
 
     return new PrintableTree(`resource ${key}`).addBullets([
