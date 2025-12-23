@@ -30,7 +30,8 @@ export class FullDatabase extends DatabaseBuilder {
       .importLogSources(path.join(SOURCES, 'LogSources/log-source-resource.json'))
       .importScrutinies()
       .importAugmentations()
-      .importEventBridgeSchema(path.join(SOURCES, 'EventBridgeSchema'));
+      .importEventBridgeSchema(path.join(SOURCES, 'EventBridgeSchema'))
+      .importCfnPrimaryIdentifierOverrides(path.join(SOURCES, 'CloudFormationRefOverrides/ref-overrides.json'));
   }
 
   /**

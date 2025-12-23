@@ -1,0 +1,16 @@
+{
+  "$ref": "#/definitions/CfnPrimaryIdentifierOverrides",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "CfnPrimaryIdentifierOverrides": {
+      "additionalProperties": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "description": "Maps a resource type to a list of properties that are overrides of the CCAPI schema primary identifiers",
+      "type": "object"
+    }
+  }
+}

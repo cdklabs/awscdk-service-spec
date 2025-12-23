@@ -39,6 +39,9 @@ export class SpecBuilder {
       if (!resource.primaryIdentifier) {
         resource.primaryIdentifier = options.primaryIdentifier;
       }
+      if (!resource.ccApiPrimaryIdentifier) {
+        resource.ccApiPrimaryIdentifier = options.primaryIdentifier;
+      }
 
       return new ResourceBuilder(this.db, resource);
     }
@@ -48,6 +51,7 @@ export class SpecBuilder {
       documentation: options.description,
       name: last(typeName.split('::')),
       primaryIdentifier: options.primaryIdentifier,
+      ccApiPrimaryIdentifier: options.primaryIdentifier,
       attributes: {},
       properties: {},
     });
