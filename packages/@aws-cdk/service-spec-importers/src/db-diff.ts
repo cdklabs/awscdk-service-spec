@@ -115,7 +115,6 @@ export class DbDiff {
       name: diffScalar(a, b, 'name'),
       scrutinizable: diffScalar(a, b, 'scrutinizable'),
       vendedLogs: diffField(a, b, 'vendedLogs', jsonEq),
-      vendedLogsConfig: diffField(a, b, 'vendedLogsConfig', jsonEq),
       tagInformation: diffField(a, b, 'tagInformation', jsonEq),
       primaryIdentifier: diffField(a, b, 'primaryIdentifier', jsonEq),
       cfnRefIdentifier: diffField(a, b, 'cfnRefIdentifier', jsonEq),

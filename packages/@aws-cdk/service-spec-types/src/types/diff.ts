@@ -43,7 +43,6 @@ export interface UpdatedResource {
   readonly tagInformation?: ScalarDiff<Resource['tagInformation']>;
   readonly scrutinizable?: ScalarDiff<Resource['scrutinizable']>;
   readonly vendedLogs?: ScalarDiff<Resource['vendedLogs']>;
-  readonly vendedLogsConfig?: ScalarDiff<Resource['vendedLogsConfig']>;
   readonly typeDefinitionDiff?: MapDiff<TypeDefinition, UpdatedTypeDefinition>;
   readonly primaryIdentifier?: ScalarDiff<string[]>;
   readonly cfnRefIdentifier?: ScalarDiff<string[]>;

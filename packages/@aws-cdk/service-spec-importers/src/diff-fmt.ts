@@ -162,7 +162,6 @@ export class DiffFormatter {
       listWithCaption('properties', this.renderPropertyDiff(r.properties)),
       listWithCaption('attributes', this.renderPropertyDiff(r.attributes)),
       listWithCaption('vendedLogs', this.renderVendedLogsArrayDiff(r.vendedLogs)),
-      listWithCaption('vendedLogsConfig', this.renderVendedLogsArrayDiff(r.vendedLogsConfig)),
       listWithCaption(
         'types',
         this.renderMapDiff(
