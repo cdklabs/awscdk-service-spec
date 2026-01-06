@@ -253,7 +253,7 @@ new SingleSource(repo, {
     roleDurationSeconds: 900,
   },
 });
-new SingleSource(repo,{
+new SingleSource(repo, {
   name: 'log-source-resource',
   dir: 'sources/LogSources',
   source: 's3://508003923337-log-source-templates/logSourceOutput.json',
