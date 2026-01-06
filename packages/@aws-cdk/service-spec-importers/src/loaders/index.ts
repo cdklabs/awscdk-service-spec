@@ -8,3 +8,4 @@ export * from './load-sam-spec';
 export * from './load-cloudwatch-console-service-directory';
 export * from './load-getatt-allowlist';
 export * from './load-oob-relationships';
+export * from './load-cfn-primary-identifier-overrides';

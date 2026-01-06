@@ -44,7 +44,8 @@ export interface UpdatedResource {
   readonly scrutinizable?: ScalarDiff<Resource['scrutinizable']>;
   readonly vendedLogs?: ScalarDiff<Resource['vendedLogs']>;
   readonly typeDefinitionDiff?: MapDiff<TypeDefinition, UpdatedTypeDefinition>;
-  readonly primaryIdentifier?: ListDiff<string, void>;
+  readonly primaryIdentifier?: ScalarDiff<string[]>;
+  readonly cfnRefIdentifier?: ScalarDiff<string[]>;
   readonly metrics?: MapDiff<Metric, ChangedMetric>;
   readonly events?: MapDiff<Event, UpdatedEvent>;
 }

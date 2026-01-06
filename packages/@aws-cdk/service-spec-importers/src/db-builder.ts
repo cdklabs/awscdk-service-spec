@@ -3,6 +3,7 @@ import { emptyDatabase, SpecDatabase } from '@aws-cdk/service-spec-types';
 import { assertSuccess, Result } from '@cdklabs/tskb';
 import { importArnTemplates } from './importers/import-arn-templates';
 import { importCannedMetrics } from './importers/import-canned-metrics';
+import { importCfnPrimaryIdentifierOverrides } from './importers/import-cfn-primaryidentifier-overrides';
 import { importCloudFormationDocumentation } from './importers/import-cloudformation-docs';
 import { importCloudFormationRegistryResource } from './importers/import-cloudformation-registry';
 import { importEventBridgeSchema } from './importers/import-eventbridge-schema';
@@ -23,6 +24,7 @@ import {
   loadSamSchema,
   loadSamSpec,
   loadOobRelationships,
+  loadCfnPrimaryIdentifierOverrides,
 } from './loaders';
 import { loadDefaultEventBridgeSchema } from './loaders/load-eventbridge-schema';
 import { JsonLensPatcher } from './patching';
@@ -195,6 +197,20 @@ export class DatabaseBuilder {
       const allowListSpec = this.loadResult(await loadGetAttAllowList(specFilePath, this.options), report);
 
       importGetAttAllowList(db, allowListSpec);
+    });
+  }
+
+  /**
+   * Import patches to primary identifiers
+   */
+  public importCfnPrimaryIdentifierOverrides(specFilePath: string) {
+    return this.addSourceImporter(async (db, report) => {
+      const cfnIdentifiers = this.loadResult(
+        await loadCfnPrimaryIdentifierOverrides(specFilePath, this.options),
+        report,
+      );
+
+      importCfnPrimaryIdentifierOverrides(db, cfnIdentifiers);
     });
   }
 
