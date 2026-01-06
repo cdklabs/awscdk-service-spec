@@ -89,7 +89,6 @@ export interface Resource extends Entity {
   arnTemplate?: string;
   isStateful?: boolean;
   vendedLogs?: VendedLogs[];
-  vendedLogsConfig?: VendedLogs[];
 
   /**
    * Information about the taggability of this resource
