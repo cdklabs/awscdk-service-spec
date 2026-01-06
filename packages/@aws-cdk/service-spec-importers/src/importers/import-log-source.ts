@@ -41,8 +41,6 @@ export function importLogSources(
 
         resource.vendedLogs ??= [];
         resource.vendedLogs.push(newLog);
-        resource.vendedLogsConfig ??= [];
-        resource.vendedLogsConfig.push(newLog);
       } catch (err) {
         // assumes the only error we are likely to see is something relating to resource type not existing in the CFN DB
         report.reportFailure(
