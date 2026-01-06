@@ -19,6 +19,7 @@
     "update-source:arn-templates": "npx projen update-source:arn-templates",
     "update-source:cfn-schema": "npx projen update-source:cfn-schema",
     "update-source:documentation": "npx projen update-source:documentation",
+    "update-source:log-source-resource": "npx projen update-source:log-source-resource",
     "update-source:sam": "npx projen update-source:sam",
     "update-source:sam-spec": "npx projen update-source:sam-spec",
     "update-source:stateful-resources": "npx projen update-source:stateful-resources",
