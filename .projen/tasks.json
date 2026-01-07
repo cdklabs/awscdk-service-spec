@@ -179,7 +179,7 @@
       "name": "update-source:log-source-resource",
       "steps": [
         {
-          "exec": "aws s3 cp s3://508003923337-log-source-templates/logSourceOutput.json sources/LogSources/logSourceOutput.json"
+          "exec": "aws s3 cp s3://508003923337-log-source-templates/log-source-resource.json sources/LogSources/log-source-resource.json"
         }
       ]
     },
