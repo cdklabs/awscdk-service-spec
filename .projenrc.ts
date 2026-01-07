@@ -256,7 +256,7 @@ new SingleSource(repo, {
 new SingleSource(repo, {
   name: 'log-source-resource',
   dir: 'sources/LogSources',
-  source: 's3://508003923337-log-source-templates/logSourceOutput.json',
+  source: 's3://508003923337-log-source-templates/log-source-resource.json',
   awsAuth: {
     region: 'us-east-1',
     roleToAssume: Role.fromGitHubSecret('AWS_ROLE_TO_ASSUME'),
