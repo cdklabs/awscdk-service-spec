@@ -132,8 +132,8 @@ test('complex scenario with multiple sources and mixed imports', () => {
   const ts = new TypeScriptRenderer();
   expect(ts.render(target)).toMatchInlineSnapshot(`
     "/* eslint-disable prettier/prettier, @stylistic/max-len */
-    import * as S2 from "source2";
     import { a, b as B, d } from "source1";
+    import * as S2 from "source2";
     import { c } from "source2";"
   `);
 });
