@@ -92,17 +92,17 @@ abstract class SourceUpdate extends Component {
         ...project.renderWorkflowSetup(),
         ...(needsAwsAccess && options.awsAuth
           ? [
-            {
-              name: 'Federate into AWS',
-              uses: 'aws-actions/configure-aws-credentials@v2',
-              with: {
-                'aws-region': options.awsAuth.region,
-                'role-to-assume': options.awsAuth.roleToAssume,
-                'role-session-name': options.awsAuth.roleSessionName,
-                'role-duration-seconds': options.awsAuth.roleDurationSeconds,
+              {
+                name: 'Federate into AWS',
+                uses: 'aws-actions/configure-aws-credentials@v2',
+                with: {
+                  'aws-region': options.awsAuth.region,
+                  'role-to-assume': options.awsAuth.roleToAssume,
+                  'role-session-name': options.awsAuth.roleSessionName,
+                  'role-duration-seconds': options.awsAuth.roleDurationSeconds,
+                },
               },
-            },
-          ]
+            ]
           : []),
       ],
       postBuildSteps: [
