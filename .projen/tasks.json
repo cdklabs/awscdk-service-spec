@@ -175,6 +175,14 @@
         }
       ]
     },
+    "update-source:eventbridge-schema": {
+      "name": "update-source:eventbridge-schema",
+      "steps": [
+        {
+          "exec": "ts-node scripts/eventbridge-schema-download.ts sources/EventBridgeSchema"
+        }
+      ]
+    },
     "update-source:log-source-resource": {
       "name": "update-source:log-source-resource",
       "steps": [
@@ -230,6 +238,9 @@
         },
         {
           "spawn": "update-source:stateful-resources"
+        },
+        {
+          "spawn": "update-source:eventbridge-schema"
         }
       ]
     },
