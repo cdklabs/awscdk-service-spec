@@ -14,6 +14,7 @@
 /.github/workflows/update-source-arn-templates.yml linguist-generated
 /.github/workflows/update-source-cfn-schema.yml linguist-generated
 /.github/workflows/update-source-documentation.yml linguist-generated
+/.github/workflows/update-source-eventbridge-schema.yml linguist-generated
 /.github/workflows/update-source-log-source-resource.yml linguist-generated
 /.github/workflows/update-source-sam-spec.yml linguist-generated
 /.github/workflows/update-source-sam.yml linguist-generated
