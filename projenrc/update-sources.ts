@@ -48,9 +48,9 @@ abstract class SourceUpdate extends Component {
 
     const taskName = `update-source:${options.name}`;
     const workflowName = `update-source-${options.name}`;
-    const needsS3Access = options.sources.some((s) => s.url?.startsWith('s3://'));
+    const needsAwsAccess = options.sources.some((s) => s.url?.startsWith('s3://') || s.scriptPath != null);
 
-    if (needsS3Access && !options.awsAuth) {
+    if (needsAwsAccess && !options.awsAuth) {
       throw new Error('S3 source detected. Must provide `awsAuth` option.');
     }
 
@@ -84,13 +84,13 @@ abstract class SourceUpdate extends Component {
       name: workflowName,
       permissions: {
         contents: github.workflows.JobPermission.READ,
-        idToken: needsS3Access ? github.workflows.JobPermission.WRITE : github.workflows.JobPermission.NONE,
+        idToken: needsAwsAccess ? github.workflows.JobPermission.WRITE : github.workflows.JobPermission.NONE,
         pullRequests: github.workflows.JobPermission.WRITE,
       },
       task: this.task,
       preBuildSteps: [
         ...project.renderWorkflowSetup(),
-        ...(needsS3Access && options.awsAuth
+        ...(needsAwsAccess && options.awsAuth
           ? [
               {
                 name: 'Federate into AWS',

@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: none
+      id-token: write
       pull-requests: write
     steps:
       - name: Checkout
@@ -27,6 +27,13 @@ jobs:
           node-version: lts/*
       - name: Install dependencies
         run: yarn install --check-files --frozen-lockfile
+      - name: Federate into AWS
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: us-east-1
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: awscdk-eventbridge-schema
+          role-duration-seconds: 900
       - name: update-source:eventbridge-schema
         run: npx projen update-source:eventbridge-schema
       - name: Create Pull Request
