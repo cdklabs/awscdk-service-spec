@@ -214,10 +214,11 @@ export class DatabaseBuilder {
     });
   }
 
-  public importArnTemplates(filePath: string) {
+  public importArnTemplates(filePath: string, overridesFilePath: string) {
     return this.addSourceImporter(async (db, report) => {
       const arnFormatIndex = JSON.parse(await fs.readFile(filePath, { encoding: 'utf-8' }));
-      importArnTemplates(arnFormatIndex, db, report);
+      const overrides = JSON.parse(await fs.readFile(overridesFilePath, { encoding: 'utf-8' }));
+      importArnTemplates({ ...arnFormatIndex, ...overrides }, db, report);
     });
   }
 
