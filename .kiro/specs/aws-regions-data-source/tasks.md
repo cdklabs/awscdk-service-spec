@@ -50,31 +50,31 @@ This implementation plan breaks down the AWS Regions Data Source feature into di
   - Ensure no TypeScript errors
   - Ask the user if questions arise
 
-- [ ] 6. Implement loader in service-spec-importers
-  - [ ] 6.1 Create `packages/@aws-cdk/service-spec-importers/src/loaders/load-aws-partitions.ts`
+- [x] 6. Implement loader in service-spec-importers
+  - [x] 6.1 Create `packages/@aws-cdk/service-spec-importers/src/loaders/load-aws-partitions.ts`
     - Implement `loadAwsPartitions` function following the pattern of `load-stateful-resources.ts`
     - Use `Loader.fromSchemaFile` with the generated schema
     - _Requirements: 5.1, 5.2, 5.3_
-  - [ ] 6.2 Export loader from `packages/@aws-cdk/service-spec-importers/src/loaders/index.ts`
+  - [x] 6.2 Export loader from `packages/@aws-cdk/service-spec-importers/src/loaders/index.ts`
     - Add export for `loadAwsPartitions`
     - _Requirements: 5.5_
-  - [ ] 6.3 Write unit tests for loader
+  - [x] 6.3 Write unit tests for loader
     - Test loading valid partitions.json succeeds
     - Test loading invalid JSON fails appropriately
     - **Property 1: Schema Validation**
     - **Property 4: Loader Rejects Invalid Data**
     - **Validates: Requirements 3.3, 3.4, 5.2**
 
-- [ ] 7. Implement importer in service-spec-importers
-  - [ ] 7.1 Create `packages/@aws-cdk/service-spec-importers/src/importers/import-aws-partitions.ts`
+- [x] 7. Implement importer in service-spec-importers
+  - [x] 7.1 Create `packages/@aws-cdk/service-spec-importers/src/importers/import-aws-partitions.ts`
     - Implement `importAwsPartitions` function following the pattern of `import-stateful-resources.ts`
     - Create Partition entities with all metadata fields
     - Create/reuse Region entities and link to partitions
     - _Requirements: 6.1, 6.2, 6.3_
-  - [ ] 7.2 Add `importAwsPartitions` method to `packages/@aws-cdk/service-spec-importers/src/db-builder.ts`
+  - [x] 7.2 Add `importAwsPartitions` method to `packages/@aws-cdk/service-spec-importers/src/db-builder.ts`
     - Follow the pattern of `importStatefulResources`
     - _Requirements: 6.4_
-  - [ ] 7.3 Write unit tests for importer
+  - [x] 7.3 Write unit tests for importer
     - Test importing creates Partition entities
     - Test importing creates Region entities
     - Test importing creates hasRegion relationships
@@ -82,21 +82,21 @@ This implementation plan breaks down the AWS Regions Data Source feature into di
     - **Property 3: Import Round-Trip Consistency**
     - **Validates: Requirements 4.2, 6.2, 7.2**
 
-- [ ] 8. Checkpoint - Verify loader and importer work
+- [x] 8. Checkpoint - Verify loader and importer work
   - Run tests in service-spec-importers package
   - Ensure all tests pass
   - Ask the user if questions arise
 
-- [ ] 9. Integrate into aws-service-spec build
-  - [ ] 9.1 Update `packages/@aws-cdk/aws-service-spec/build/full-database.ts`
+- [x] 9. Integrate into aws-service-spec build
+  - [x] 9.1 Update `packages/@aws-cdk/aws-service-spec/build/full-database.ts`
     - Add `importAwsPartitions` call with path to partitions.json
     - _Requirements: 7.1_
-  - [ ] 9.2 Run full database build to verify integration
+  - [x] 9.2 Run full database build to verify integration
     - Execute `yarn build` in aws-service-spec package
     - Verify no build errors
     - _Requirements: 7.2_
 
-- [ ] 10. Final checkpoint - Verify complete integration
+- [x] 10. Final checkpoint - Verify complete integration
   - Ensure all tests pass across all packages
   - Verify the generated database includes partition data
   - Ask the user if questions arise

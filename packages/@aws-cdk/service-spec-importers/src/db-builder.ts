@@ -2,6 +2,7 @@ import { promises as fs } from 'fs';
 import { emptyDatabase, SpecDatabase } from '@aws-cdk/service-spec-types';
 import { assertSuccess, Result } from '@cdklabs/tskb';
 import { importArnTemplates } from './importers/import-arn-templates';
+import { importAwsPartitions } from './importers/import-aws-partitions';
 import { importCannedMetrics } from './importers/import-canned-metrics';
 import { importCfnPrimaryIdentifierOverrides } from './importers/import-cfn-primaryidentifier-overrides';
 import { importCloudFormationDocumentation } from './importers/import-cloudformation-docs';
@@ -14,6 +15,7 @@ import { ResourceSpecImporter, SAMSpecImporter } from './importers/import-resour
 import { SamResources } from './importers/import-sam';
 import { importStatefulResources } from './importers/import-stateful-resources';
 import {
+  loadAwsPartitions,
   loadDefaultCloudFormationDocs,
   loadDefaultCloudFormationRegistryResources,
   loadDefaultCloudWatchConsoleServiceDirectory,
@@ -173,6 +175,16 @@ export class DatabaseBuilder {
     return this.addSourceImporter(async (db, report) => {
       const stateful = this.loadResult(await loadDefaultStatefulResources(filePath, this.options), report);
       importStatefulResources(db, stateful);
+    });
+  }
+
+  /**
+   * Import AWS partitions and regions data
+   */
+  public importAwsPartitions(filePath: string) {
+    return this.addSourceImporter(async (db, report) => {
+      const partitions = this.loadResult(await loadAwsPartitions(filePath, this.options), report);
+      importAwsPartitions(db, partitions);
     });
   }
 
