@@ -53,6 +53,7 @@ test('event diff ignores different $ref IDs when event type definitions have sam
     detailType: 'WorkSpaces Access',
     rootProperty: ref(eventType1),
     resourcesField: [{ type: ref(eventType1), fieldName: 'workspaceId' }],
+    isLinkedToResource: false,
   });
 
   const event2 = db2.allocate('event', {
@@ -62,6 +63,7 @@ test('event diff ignores different $ref IDs when event type definitions have sam
     detailType: 'WorkSpaces Access',
     rootProperty: ref(eventType2),
     resourcesField: [{ type: ref(eventType2), fieldName: 'workspaceId' }],
+    isLinkedToResource: false,
   });
 
   const ed = diff.diffEvent(event1, event2);
