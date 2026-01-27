@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import { gunzipSync } from 'zlib';
 import { Database, entityCollection, fieldIndex, stringCmp } from '@cdklabs/tskb';
 import { IsAugmentedResource, ResourceAugmentation } from './augmentations';
-import { ResourceHasEvent, Event, EventUsesType, EventTypeDefinition } from './event';
+import { ResourceHasEvent, Event, EventUsesType, EventTypeDefinition, serviceHasEvent } from './event';
 import {
   DimensionSet,
   Metric,
@@ -64,6 +64,7 @@ export function emptyDatabase() {
       resourceHasDimensionSet: r.relationship<ResourceHasDimensionSet>('resource', 'dimensionSet'),
       serviceHasDimensionSet: r.relationship<ServiceHasDimensionSet>('service', 'dimensionSet'),
       resourceHasEvent: r.relationship<ResourceHasEvent>('resource', 'event'),
+      serviceHasEvent: r.relationship<serviceHasEvent>('service', 'event'),
       eventUsesType: r.relationship<EventUsesType>('event', 'eventTypeDefinition'),
     }),
   );

@@ -38,7 +38,7 @@ import {
 } from './diff-helpers';
 
 export class DbDiff {
-  constructor(private readonly db1: SpecDatabase, private readonly db2: SpecDatabase) {}
+  constructor(private readonly db1: SpecDatabase, private readonly db2: SpecDatabase) { }
 
   public diff(): SpecDatabaseDiff {
     return {
@@ -59,7 +59,21 @@ export class DbDiff {
       shortName: diffScalar(a, b, 'shortName'),
       metrics: this.diffServiceMetrics(a, b),
       resourceDiff: this.diffServiceResources(a, b),
+      eventDiff: this.diffServiceEvents(a, b),
     } satisfies AllFieldsGiven<UpdatedService>);
+  }
+
+  public diffServiceEvents(a: Service, b: Service): UpdatedService['eventDiff'] {
+    const aEvents = this.db1.follow('serviceHasEvent', a).map((r) => r.entity);
+    const bEvents = this.db2.follow('serviceHasEvent', b).map((r) => r.entity);
+    return collapseEmptyDiff(
+      diffByKey(
+        aEvents,
+        bEvents,
+        (event) => event.name,
+        (x, y) => this.diffEvent(x, y),
+      ),
+    );
   }
 
   public diffServiceMetrics(a: Service, b: Service): UpdatedService['metrics'] {
