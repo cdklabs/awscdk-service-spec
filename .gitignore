@@ -59,6 +59,7 @@ jspm_packages/
 !/.github/workflows/update-source-arn-templates.yml
 !/.github/workflows/update-source-log-source-resource.yml
 !/.github/workflows/update-source-stateful-resources.yml
+!/.github/workflows/update-source-aws-partitions.yml
 !/.github/workflows/update-source-eventbridge-schema.yml
 !/.projenrc.ts
 !/.github/workflows/release.yml

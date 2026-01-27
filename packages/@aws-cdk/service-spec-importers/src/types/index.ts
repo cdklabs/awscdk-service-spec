@@ -9,3 +9,4 @@ export * from './getatt-allowlist/getatt-allowlist';
 export * from './oob-relationships/OobRelationships';
 export * from './eventbridge/EventBridgeSchema';
 export * from './cfn-primaryidentifier-overrides/cfn-primaryidentifier-overrides';
+export * from './aws-partitions/AwsPartitionsSource';
