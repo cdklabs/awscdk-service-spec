@@ -460,7 +460,7 @@ export class DiffFormatter {
   private renderUpdatedEvent(key: string, e: UpdatedEvent): PrintableTree {
     const bullets: PrintableTree[] = [];
 
-    const simpleDiffs = pick(e, ['name', 'description', 'source', 'detailType']);
+    const simpleDiffs = pick(e, ['name', 'description', 'source', 'detailType', 'isLinkedToResource']);
     const simpleTree = new PrintableTree(...listFromDiffs(simpleDiffs));
 
     if (e.rootProperty && e.rootProperty.old && e.rootProperty.new) {

@@ -208,6 +208,7 @@ export class DbDiff {
       resourcesField: diffField(a, b, 'resourcesField', this.eqEventResourcesField.bind(this)),
       rootProperty: diffField(a, b, 'rootProperty', this.eqEventRootProperty.bind(this)),
       typeDefinitionDiff: this.diffEventTypeDefinitions(a, b),
+      isLinkedToResource: diffScalar(a, b, 'isLinkedToResource'),
     } satisfies AllFieldsGiven<UpdatedEvent>);
   }
 
