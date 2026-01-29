@@ -72,6 +72,12 @@ export class DiffFormatter {
           .sort(sortByKey((e) => e.entity.name))
           .map((e) => this.renderMetric(e.entity).prefix([' '])),
       ),
+      listWithCaption(
+        'metrics',
+        [...this.dbs[db].follow('serviceHasEvent', s)]
+          .sort(sortByKey((e) => e.entity.name))
+          .map((e) => this.renderEvent(e.entity, db).prefix([' '])),
+      ),
     ]);
   }
 
@@ -94,6 +100,14 @@ export class DiffFormatter {
           s.metrics,
           (m) => this.renderMetric(m).prefix([' ']),
           (k, u) => this.renderUpdatedMetric(k, u).prefix([' ']),
+        ),
+      ),
+      listWithCaption(
+        'events',
+        this.renderMapDiff(
+          s.eventDiff,
+          (e, db) => this.renderEvent(e, db).prefix([' ']),
+          (k, u) => this.renderUpdatedEvent(k, u).prefix([' ']),
         ),
       ),
     ];

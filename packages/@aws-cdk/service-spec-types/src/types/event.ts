@@ -1,6 +1,6 @@
 import { Entity, Reference, Relationship } from '@cdklabs/tskb';
 import { GenericPropertyType } from './common';
-import { Resource } from './resource';
+import { Resource, Service } from './resource';
 
 export interface Event extends Entity {
   /**
@@ -45,6 +45,8 @@ export interface ResourceField {
 }
 
 export type ResourceHasEvent = Relationship<Resource, Event>;
+
+export type serviceHasEvent = Relationship<Service, Event>;
 
 export type EventProperties = Record<string, EventProperty>;
 export interface EventProperty {

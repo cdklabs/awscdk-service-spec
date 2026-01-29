@@ -25,6 +25,7 @@ export interface UpdatedService {
   readonly cloudFormationNamespace?: ScalarDiff<Service['cloudFormationNamespace']>;
   readonly resourceDiff?: MapDiff<Resource, UpdatedResource>;
   readonly metrics?: MapDiff<Metric, ChangedMetric>;
+  readonly eventDiff?: MapDiff<Event, UpdatedEvent>;
 }
 
 export interface ChangedMetric {
