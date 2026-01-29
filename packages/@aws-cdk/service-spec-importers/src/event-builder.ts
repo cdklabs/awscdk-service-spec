@@ -6,6 +6,7 @@ import {
   EventTypeDefinition,
   ResourceField,
   Resource,
+  Service,
 } from '@aws-cdk/service-spec-types';
 import { jsonschema } from './types';
 
@@ -116,6 +117,7 @@ export class EventBuilder extends PropertyBagBuilder {
   private typesCreatedHere = new Set<string>();
   private typesToLink: EventTypeDefinition[] = [];
   private resourcesToLink: Array<Resource> = [];
+  private serviceToLink?: Service;
 
   private constructor(
     public readonly db: SpecDatabase,
@@ -151,6 +153,10 @@ export class EventBuilder extends PropertyBagBuilder {
   public linkResourceToEvent(resource: Resource, resourceField: ResourceField) {
     this.resourcesToLink.push(resource);
     this.addResourceField(resourceField);
+  }
+
+  public linkServiceToEvent(service: Service) {
+    this.serviceToLink = service;
   }
 
   public eventTypeDefinitionBuilder(
@@ -211,6 +217,10 @@ export class EventBuilder extends PropertyBagBuilder {
 
     for (const resource of this.resourcesToLink) {
       this.db.link('resourceHasEvent', resource, this.event);
+    }
+
+    if (this.serviceToLink != undefined) {
+      this.db.link('serviceHasEvent', this.serviceToLink, this.event);
     }
 
     return this.event;
