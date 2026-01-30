@@ -161,7 +161,7 @@
     "@smithy/types" "^4.12.0"
     tslib "^2.6.2"
 
-"@aws-sdk/credential-provider-http@^3.972.3":
+"@aws-sdk/credential-provider-http@^3.972.3", "@aws-sdk/credential-provider-http@^3.972.4":
   version "3.972.4"
   resolved "https://registry.yarnpkg.com/@aws-sdk/credential-provider-http/-/credential-provider-http-3.972.4.tgz#bab20c5fbbe19eed1445d3b76a0cd608d1937767"
   integrity sha512-OC7F3ipXV12QfDEWybQGHLzoeHBlAdx/nLzPfHP0Wsabu3JBffu5nlzSaJNf7to9HGtOW8Bpu8NX0ugmDrCbtw==
@@ -212,12 +212,12 @@
     tslib "^2.6.2"
 
 "@aws-sdk/credential-provider-node@^3.972.2":
-  version "3.972.2"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/credential-provider-node/-/credential-provider-node-3.972.2.tgz#7f308337fc0674c340878da6c7061caffe03501d"
-  integrity sha512-Lz1J5IZdTjLYTVIcDP5DVDgi1xlgsF3p1cnvmbfKbjCRhQpftN2e2J4NFfRRvPD54W9+bZ8l5VipPXtTYK7aEg==
+  version "3.972.3"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/credential-provider-node/-/credential-provider-node-3.972.3.tgz#15c05c9ea2d086bb2e965e21dc3d94cb71939ce2"
+  integrity sha512-iu+JwWHM7tHowKqE+8wNmI3sM6mPEiI9Egscz2BEV7adyKmV95oR9tBO4VIOl72FGDi7X9mXg19VtqIpSkEEsA==
   dependencies:
     "@aws-sdk/credential-provider-env" "^3.972.2"
-    "@aws-sdk/credential-provider-http" "^3.972.3"
+    "@aws-sdk/credential-provider-http" "^3.972.4"
     "@aws-sdk/credential-provider-ini" "^3.972.2"
     "@aws-sdk/credential-provider-process" "^3.972.2"
     "@aws-sdk/credential-provider-sso" "^3.972.2"
@@ -3223,9 +3223,9 @@ duplexer@^0.1.1:
   integrity sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==
 
 electron-to-chromium@^1.5.263:
-  version "1.5.279"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.279.tgz#67dfdeb22fd81412d0d18d1d9b2c749e9b8945cb"
-  integrity sha512-0bblUU5UNdOt5G7XqGiJtpZMONma6WAfq9vsFmtn9x1+joAObr6x1chfqyxFSDCAFwFhCQDrqeAr6MYdpwJ9Hg==
+  version "1.5.282"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.282.tgz#6695816e5b170210d6aa07561546ed7d97347630"
+  integrity sha512-FCPkJtpst28UmFzd903iU7PdeVTfY0KAeJy+Lk0GLZRwgwYHn/irRcaCbQQOmr5Vytc/7rcavsYLvTM8RiHYhQ==
 
 emittery@^0.13.1:
   version "0.13.1"
@@ -5790,10 +5790,10 @@ process-nextick-args@~2.0.0:
   resolved "https://registry.yarnpkg.com/process-nextick-args/-/process-nextick-args-2.0.1.tgz#7820d9b16120cc55ca9ae7792680ae7dba6d7fe2"
   integrity sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==
 
-projen@^0.99.8:
-  version "0.99.8"
-  resolved "https://registry.yarnpkg.com/projen/-/projen-0.99.8.tgz#aa9b004f254ba132fe2dcc90cff61e4d0bfb2ee5"
-  integrity sha512-1loAy1XQ5rZ0vobXOdt+ytHTz/6F77H4d4Rtn1Kz0TA/UzTxPgCgBmfOy6ZYAmsXE7Jq+ODGjYdZhaKSQDw10Q==
+projen@^0.99.9:
+  version "0.99.9"
+  resolved "https://registry.yarnpkg.com/projen/-/projen-0.99.9.tgz#62dcffdc615b19e203e7889204aadb33c4edf062"
+  integrity sha512-yg+0VCwfQyeqwclPuono0vNYKOAsPoO+CCh7xapI2dru8Xw5pEtNs+LEIfFd2pMwEUDTn7QyN/Jt4IfP9jLEzw==
   dependencies:
     "@iarna/toml" "^2.2.5"
     case "^1.6.3"
