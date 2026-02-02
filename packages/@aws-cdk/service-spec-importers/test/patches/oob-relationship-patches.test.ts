@@ -1,4 +1,4 @@
-import { removeRelationship } from '../../src/patches/oob-relationship-patches';
+import { removeRelationship, removeAllRelationships } from '../../src/patches/oob-relationship-patches';
 import { patchObject } from '../utils';
 
 describe('removeRelationshipsToService', () => {
@@ -114,5 +114,61 @@ describe('removeRelationshipsToService', () => {
         },
       },
     });
+  });
+});
+
+describe('removeAllRelationships', () => {
+  test('removes all relationships from a property', () => {
+    const obj = {
+      'AWS::CloudWatch::Alarm': {
+        relationships: {
+          'Dimensions/Value': [
+            { cloudformationType: 'AWS::Lambda::Function', propertyPath: '/properties/FunctionName' },
+            { cloudformationType: 'AWS::SQS::Queue', propertyPath: '/properties/QueueName' },
+            { cloudformationType: 'AWS::SNS::Topic', propertyPath: '/properties/TopicName' },
+          ],
+          OtherProperty: [{ cloudformationType: 'AWS::IAM::Role', propertyPath: '/properties/Arn' }],
+        },
+      },
+    };
+
+    const patchedObj = patchObject(
+      obj,
+      removeAllRelationships({
+        resource: 'AWS::CloudWatch::Alarm',
+        propertyPath: 'Dimensions/Value',
+        reason: 'Dimension Value is too generic',
+      }),
+    );
+
+    expect(patchedObj).toEqual({
+      'AWS::CloudWatch::Alarm': {
+        relationships: {
+          'Dimensions/Value': [],
+          OtherProperty: [{ cloudformationType: 'AWS::IAM::Role', propertyPath: '/properties/Arn' }],
+        },
+      },
+    });
+  });
+
+  test('does not affect other resources', () => {
+    const obj = {
+      'AWS::Other::Resource': {
+        relationships: {
+          'Dimensions/Value': [{ cloudformationType: 'AWS::Lambda::Function', propertyPath: '/properties/Arn' }],
+        },
+      },
+    };
+
+    const patchedObj = patchObject(
+      obj,
+      removeAllRelationships({
+        resource: 'AWS::CloudWatch::Alarm',
+        propertyPath: 'Dimensions/Value',
+        reason: 'test',
+      }),
+    );
+
+    expect(patchedObj).toEqual(obj);
   });
 });
