@@ -167,7 +167,7 @@ export class DbDiff {
       previousTypes: collapseEmptyDiff(diffList(a.previousTypes ?? [], b.previousTypes ?? [], eqType)),
       type: diffField(a, b, 'type', eqType),
       causesReplacement: diffScalar(a, b, 'causesReplacement'),
-      relationshipRefs: diffField(a, b, 'relationshipRefs', jsonEq),
+      relationshipRefs: collapseEmptyDiff(diffList(a.relationshipRefs ?? [], b.relationshipRefs ?? [], jsonEq)),
     } satisfies DontCareAboutTypes<AllFieldsGiven<Property>>);
 
     if (anyDiffs) {
