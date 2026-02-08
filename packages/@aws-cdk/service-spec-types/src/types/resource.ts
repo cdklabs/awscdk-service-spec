@@ -5,6 +5,26 @@ import { sortKeyComparator } from '../util/sorting';
 
 export interface Partition extends Entity {
   readonly partition: string;
+  /**
+   * The DNS suffix for this partition (e.g., "amazonaws.com")
+   */
+  readonly dnsSuffix?: string;
+  /**
+   * The dual-stack DNS suffix for this partition (e.g., "api.aws")
+   */
+  readonly dualStackDnsSuffix?: string;
+  /**
+   * A regex pattern that matches region names in this partition
+   */
+  readonly regionRegex?: string;
+  /**
+   * Whether this partition supports FIPS endpoints
+   */
+  readonly supportsFIPS?: boolean;
+  /**
+   * Whether this partition supports dual-stack endpoints
+   */
+  readonly supportsDualStack?: boolean;
 }
 
 export type HasRegion = Relationship<Partition, Region, { isPrimary?: boolean }>;
