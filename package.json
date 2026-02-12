@@ -17,6 +17,7 @@
     "run": "npx projen run",
     "test": "npx projen test",
     "update-source:arn-templates": "npx projen update-source:arn-templates",
+    "update-source:aws-partitions": "npx projen update-source:aws-partitions",
     "update-source:cfn-schema": "npx projen update-source:cfn-schema",
     "update-source:documentation": "npx projen update-source:documentation",
     "update-source:eventbridge-schema": "npx projen update-source:eventbridge-schema",
