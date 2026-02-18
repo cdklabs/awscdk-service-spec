@@ -14,7 +14,10 @@ export function importLogSources(
   >,
   report: ProblemReport,
 ) {
-  for (const value of Object.values(logSourceData)) {
+  for (const [name, value] of Object.entries(logSourceData)) {
+    if (name === 'BedrockAgentCorePaymentsApplicationLogs') {
+      continue;
+    }
     for (const resourceType of value.ResourceTypes) {
       try {
         const resource = db.lookup('resource', 'cloudFormationType', 'equals', resourceType).only();
