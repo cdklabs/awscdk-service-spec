@@ -432,17 +432,17 @@ export class DiffFormatter {
       const oldDest = oldDestMap.get(destType);
       const newDest = newDestMap.get(destType);
 
-      if (oldDest && !newDest) {
+      if (oldDest?.outputFormats && !newDest?.outputFormats) {
         const bullets = oldDest.outputFormats?.length
           ? [new PrintableTree(`outputFormats: [${oldDest.outputFormats.join(', ')}]`)]
           : [];
         destChanges.push(new PrintableTree(destType).addBullets(bullets));
-      } else if (!oldDest && newDest) {
+      } else if (!oldDest?.outputFormats && newDest?.outputFormats) {
         const bullets = newDest.outputFormats?.length
           ? [new PrintableTree(`outputFormats: [${newDest.outputFormats.join(', ')}]`)]
           : [];
         destChanges.push(new PrintableTree(destType).addBullets(bullets));
-      } else if (oldDest && newDest) {
+      } else if (oldDest?.outputFormats && newDest?.outputFormats) {
         const oldFormats = oldDest.outputFormats?.join(', ') ?? '';
         const newFormats = newDest.outputFormats?.join(', ') ?? '';
         if (oldFormats !== newFormats) {
