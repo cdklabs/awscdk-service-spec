@@ -462,7 +462,7 @@ export class DiffFormatter {
 
     const oldMandatory = old.mandatoryFields?.join(', ') ?? '';
     const newMandatory = updated.mandatoryFields?.join(', ') ?? '';
-    if(old.mandatoryFields && !updated.mandatoryFields) {
+    if (old.mandatoryFields && !updated.mandatoryFields) {
       changes.push(
         new PrintableTree(`mandatoryFields:`).addBullets([
           new PrintableTree(`- [${oldMandatory}]`).colorize(chalk.red),
@@ -487,11 +487,9 @@ export class DiffFormatter {
 
     const oldOptional = old.optionalFields?.join(', ') ?? '';
     const newOptional = updated.optionalFields?.join(', ') ?? '';
-    if(old.optionalFields && !updated.optionalFields) {
+    if (old.optionalFields && !updated.optionalFields) {
       changes.push(
-        new PrintableTree(`mandatoryFields:`).addBullets([
-          new PrintableTree(`- [${oldOptional}]`).colorize(chalk.red),
-        ]),
+        new PrintableTree(`mandatoryFields:`).addBullets([new PrintableTree(`- [${oldOptional}]`).colorize(chalk.red)]),
       );
     } else if (updated.optionalFields && !old.optionalFields) {
       changes.push(
@@ -509,7 +507,7 @@ export class DiffFormatter {
         );
       }
     }
-    
+
     return changes;
   }
 
