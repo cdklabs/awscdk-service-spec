@@ -398,10 +398,17 @@ export class DiffFormatter {
 
   private renderVendedLog(vl: VendedLogs): PrintableTree {
     const destinations = vl.destinations.map((d) => d.destinationType).join(', ');
-    return new PrintableTree(`logType: ${vl.logType}`).addBullets([
+    const bullets = [
       new PrintableTree(`permissionsVersion: ${vl.permissionsVersion}`),
       new PrintableTree(`destinations: [${destinations}]`),
-    ]);
+    ];
+    if (vl.mandatoryFields?.length) {
+      bullets.push(new PrintableTree(`mandatoryFields: [${vl.mandatoryFields.join(', ')}]`));
+    }
+    if (vl.optionalFields?.length) {
+      bullets.push(new PrintableTree(`optionalFields: [${vl.optionalFields.join(', ')}]`));
+    }
+    return new PrintableTree(`logType: ${vl.logType}`).addBullets(bullets);
   }
 
   private compareVendedLogs(old: VendedLogs, updated: VendedLogs): PrintableTree[] {
@@ -416,25 +423,63 @@ export class DiffFormatter {
       );
     }
 
-    const oldDests = new Map(old.destinations.map((d) => [`${d.destinationType}`, d]));
-    const newDests = new Map(updated.destinations.map((d) => [`${d.destinationType}`, d]));
+    const oldDestMap = new Map(old.destinations.map((d) => [d.destinationType, d]));
+    const newDestMap = new Map(updated.destinations.map((d) => [d.destinationType, d]));
+    const allDestTypes = new Set([...oldDestMap.keys(), ...newDestMap.keys()]);
 
-    const added = [...newDests.keys()].filter((k) => !oldDests.has(k));
-    const removed = [...oldDests.keys()].filter((k) => !newDests.has(k));
+    const destChanges: PrintableTree[] = [];
+    for (const destType of allDestTypes) {
+      const oldDest = oldDestMap.get(destType);
+      const newDest = newDestMap.get(destType);
 
-    if (added.length > 0 || removed.length > 0) {
-      const bullets: PrintableTree[] = [];
-      removed.forEach((k) => {
-        const d = oldDests.get(k)!;
-        const str = d.destinationType;
-        bullets.push(new PrintableTree(`- ${str}`).colorize(chalk.red));
-      });
-      added.forEach((k) => {
-        const d = newDests.get(k)!;
-        const str = d.destinationType;
-        bullets.push(new PrintableTree(`+ ${str}`).colorize(chalk.green));
-      });
-      changes.push(new PrintableTree(`destinations:`).addBullets(bullets));
+      if (oldDest && !newDest) {
+        const bullets = oldDest.outputFormats?.length
+          ? [new PrintableTree(`outputFormats: [${oldDest.outputFormats.join(', ')}]`)]
+          : [];
+        destChanges.push(new PrintableTree(destType).addBullets(bullets).prefix(['-'], [' ']).colorize(chalk.red));
+      } else if (!oldDest && newDest) {
+        const bullets = newDest.outputFormats?.length
+          ? [new PrintableTree(`outputFormats: [${newDest.outputFormats.join(', ')}]`)]
+          : [];
+        destChanges.push(new PrintableTree(destType).addBullets(bullets).prefix(['+'], [' ']).colorize(chalk.green));
+      } else if (oldDest && newDest) {
+        const oldFormats = oldDest.outputFormats?.join(', ') ?? '';
+        const newFormats = newDest.outputFormats?.join(', ') ?? '';
+        if (oldFormats !== newFormats) {
+          destChanges.push(
+            new PrintableTree(destType).addBullets([
+              new PrintableTree(`- outputFormats: [${oldFormats}]`).colorize(chalk.red),
+              new PrintableTree(`+ outputFormats: [${newFormats}]`).colorize(chalk.green),
+            ]),
+          );
+        }
+      }
+    }
+
+    if (destChanges.length > 0) {
+      changes.push(new PrintableTree('destinations:').addBullets(destChanges));
+    }
+
+    const oldMandatory = old.mandatoryFields?.join(', ') ?? '';
+    const newMandatory = updated.mandatoryFields?.join(', ') ?? '';
+    if (oldMandatory !== newMandatory) {
+      changes.push(
+        new PrintableTree(`mandatoryFields:`).addBullets([
+          new PrintableTree(`- [${oldMandatory}]`).colorize(chalk.red),
+          new PrintableTree(`+ [${newMandatory}]`).colorize(chalk.green),
+        ]),
+      );
+    }
+
+    const oldOptional = old.optionalFields?.join(', ') ?? '';
+    const newOptional = updated.optionalFields?.join(', ') ?? '';
+    if (oldOptional !== newOptional) {
+      changes.push(
+        new PrintableTree(`optionalFields:`).addBullets([
+          new PrintableTree(`- [${oldOptional}]`).colorize(chalk.red),
+          new PrintableTree(`+ [${newOptional}]`).colorize(chalk.green),
+        ]),
+      );
     }
 
     return changes;

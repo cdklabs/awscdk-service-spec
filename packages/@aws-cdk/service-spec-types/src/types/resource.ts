@@ -445,6 +445,15 @@ export interface DeliveryDestination {
    * The type of service that is ingesting the logs, can be S3 | FH | CWL | XRAY
    */
   readonly destinationType: string;
+  /**
+   * Options for format of logs sent to this delivery destination, can be json | parquet | w3c | plain | raw | undefined
+   * What formats are avalible vary based on destinationType
+   * S3 destination types can accept json, plain, w3c, or parquet
+   * Cloudwatch destination types can accept plain or json
+   * Firehose destination types can accept json, raw, or parquet
+   * XRay destination types do not use output formats
+   */
+  readonly outputFormats?: string[];
 }
 
 /**
@@ -463,6 +472,14 @@ export interface VendedLogs {
    * List of the destinations the can consume those logs
    */
   readonly destinations: DeliveryDestination[];
+  /**
+   * Record fields that are mandatory to be delivered
+   */
+  mandatoryFields?: string[];
+  /**
+   * Record fields that can be optionally delivered
+   */
+  optionalFields?: string[];
 }
 
 export class RichPropertyType {
