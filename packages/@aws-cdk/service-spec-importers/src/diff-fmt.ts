@@ -489,18 +489,18 @@ export class DiffFormatter {
     const newOptional = updated.optionalFields?.join(', ') ?? '';
     if (old.optionalFields && !updated.optionalFields) {
       changes.push(
-        new PrintableTree(`mandatoryFields:`).addBullets([new PrintableTree(`- [${oldOptional}]`).colorize(chalk.red)]),
+        new PrintableTree(`optionalFields:`).addBullets([new PrintableTree(`- [${oldOptional}]`).colorize(chalk.red)]),
       );
     } else if (updated.optionalFields && !old.optionalFields) {
       changes.push(
-        new PrintableTree(`mandatoryFields:`).addBullets([
+        new PrintableTree(`optionalFields:`).addBullets([
           new PrintableTree(`+ [${newOptional}]`).colorize(chalk.green),
         ]),
       );
     } else if (old.optionalFields && updated.optionalFields) {
       if (oldOptional !== newOptional) {
         changes.push(
-          new PrintableTree(`mandatoryFields:`).addBullets([
+          new PrintableTree(`optionalFields:`).addBullets([
             new PrintableTree(`- [${oldOptional}]`).colorize(chalk.red),
             new PrintableTree(`+ [${newOptional}]`).colorize(chalk.green),
           ]),
