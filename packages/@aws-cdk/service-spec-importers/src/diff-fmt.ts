@@ -436,12 +436,12 @@ export class DiffFormatter {
         const bullets = oldDest.outputFormats?.length
           ? [new PrintableTree(`outputFormats: [${oldDest.outputFormats.join(', ')}]`)]
           : [];
-        destChanges.push(new PrintableTree(destType).addBullets(bullets).prefix(['-'], [' ']).colorize(chalk.red));
+        destChanges.push(new PrintableTree(destType).addBullets(bullets));
       } else if (!oldDest && newDest) {
         const bullets = newDest.outputFormats?.length
           ? [new PrintableTree(`outputFormats: [${newDest.outputFormats.join(', ')}]`)]
           : [];
-        destChanges.push(new PrintableTree(destType).addBullets(bullets).prefix(['+'], [' ']).colorize(chalk.green));
+        destChanges.push(new PrintableTree(destType).addBullets(bullets));
       } else if (oldDest && newDest) {
         const oldFormats = oldDest.outputFormats?.join(', ') ?? '';
         const newFormats = newDest.outputFormats?.join(', ') ?? '';
@@ -462,26 +462,54 @@ export class DiffFormatter {
 
     const oldMandatory = old.mandatoryFields?.join(', ') ?? '';
     const newMandatory = updated.mandatoryFields?.join(', ') ?? '';
-    if (oldMandatory !== newMandatory) {
+    if(old.mandatoryFields && !updated.mandatoryFields) {
       changes.push(
         new PrintableTree(`mandatoryFields:`).addBullets([
           new PrintableTree(`- [${oldMandatory}]`).colorize(chalk.red),
+        ]),
+      );
+    } else if (updated.mandatoryFields && !old.mandatoryFields) {
+      changes.push(
+        new PrintableTree(`mandatoryFields:`).addBullets([
           new PrintableTree(`+ [${newMandatory}]`).colorize(chalk.green),
         ]),
       );
+    } else if (old.mandatoryFields && updated.mandatoryFields) {
+      if (oldMandatory !== newMandatory) {
+        changes.push(
+          new PrintableTree(`mandatoryFields:`).addBullets([
+            new PrintableTree(`- [${oldMandatory}]`).colorize(chalk.red),
+            new PrintableTree(`+ [${newMandatory}]`).colorize(chalk.green),
+          ]),
+        );
+      }
     }
 
     const oldOptional = old.optionalFields?.join(', ') ?? '';
     const newOptional = updated.optionalFields?.join(', ') ?? '';
-    if (oldOptional !== newOptional) {
+    if(old.optionalFields && !updated.optionalFields) {
       changes.push(
-        new PrintableTree(`optionalFields:`).addBullets([
+        new PrintableTree(`mandatoryFields:`).addBullets([
           new PrintableTree(`- [${oldOptional}]`).colorize(chalk.red),
+        ]),
+      );
+    } else if (updated.optionalFields && !old.optionalFields) {
+      changes.push(
+        new PrintableTree(`mandatoryFields:`).addBullets([
           new PrintableTree(`+ [${newOptional}]`).colorize(chalk.green),
         ]),
       );
+    } else if (old.optionalFields && updated.optionalFields) {
+      if (oldOptional !== newOptional) {
+        changes.push(
+          new PrintableTree(`mandatoryFields:`).addBullets([
+            new PrintableTree(`- [${oldOptional}]`).colorize(chalk.red),
+            new PrintableTree(`+ [${newOptional}]`).colorize(chalk.green),
+          ]),
+        );
+      }
     }
-
+    
     return changes;
   }
 
