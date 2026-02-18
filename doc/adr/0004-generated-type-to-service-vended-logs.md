@@ -26,13 +26,19 @@ export interface VendedLogs {
     readonly permissionsVersion: string;
     readonly logType: string;
     readonly destinations: DeliveryDestination[];
+    mandatoryFields?: string[];
+    optionalFields?: string[];
 }
 
 export DeliveryDestinations {
     readonly destinationType: string;
+    readonly outputFormats?: string[]
 }
 ```
-`vendedLogs` is effectively an array of log types for each resource. Each log type has their own set of destination resources they can deliver to and those destinations share the same version of permissions. Log types are arranged like this because not all of them within the same resource share the same destination resource, most notably, the log type `TRACES` can only deliver to `XRAY` resources and nothing else, while most other log types can delivery to anything but `XRAY`s. 
+`vendedLogs` is effectively an array of log types for each resource. The `VendedLogs` interface is arranged so that all of the properties directly related to delivery sources and the delivery are nested directly under `VendedLogs`, however anything related to the delivery destinations is nested under `DeliveryDestinations`. This follows the pattern of how vended logs is implemented more generally, where the delivery and the delivery source are closely related and the delivery destination is necessary to set up the delivery but otherwise is not as closely linked to the delivery as the source is. 
+The information that is necessary to setting up a delivery connection with vended logs is the log type and the destination type, permissions version is also important but only to S3 destinations. This is why properties related to those fields are the only ones that are mandatory for each resource that implements `vendedLogs` to have. 
+`OutputFormats` and `RecordFields` are not required to set up vendedLogs and not every destination or logSource has them. Supported `outputFormats` are different for each destination and certain logTypes exclude some `outputFormats` from certain destinations. `RecordFields` has been split into 2 different arrays to make implementation easier, the `mandatoryFields` and the `optionalFields`.
+`RecordFields` are either mandatory or not, we want to know which `RecordFields` are mandatory so we can send them straight to the `CfnDelivery` object that is created in the `VendedLogsMixin` and users don't have the opportunity to accidentally exclude a mandatory field. 
 
 ## Consequences
 
