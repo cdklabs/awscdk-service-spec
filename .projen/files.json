@@ -12,6 +12,8 @@
     ".github/workflows/update-source-arn-templates.yml",
     ".github/workflows/update-source-cfn-schema.yml",
     ".github/workflows/update-source-documentation.yml",
+    ".github/workflows/update-source-eventbridge-schema.yml",
+    ".github/workflows/update-source-log-source-resource.yml",
     ".github/workflows/update-source-sam-spec.yml",
     ".github/workflows/update-source-sam.yml",
     ".github/workflows/update-source-stateful-resources.yml",

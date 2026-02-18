@@ -1,6 +1,6 @@
 import * as pj from 'projen';
 import { AwsCdkIntegrationTest, DiffDb, TypeScriptWorkspace, YarnMonorepo } from './projenrc';
-import { RegionalSource, Role, SingleSource, SourceProcessing } from './projenrc/update-sources';
+import { RegionalSource, Role, ScriptSource, SingleSource, SourceProcessing } from './projenrc/update-sources';
 
 const workflowRunsOn = [
   // 'ubuntu-latest',
@@ -21,6 +21,7 @@ const repo = new YarnMonorepo({
     '@typescript-eslint/eslint-plugin@^6',
     '@stylistic/eslint-plugin@^2',
     'eslint-plugin-import',
+    '@aws-sdk/client-schemas',
   ],
   vscodeWorkspace: true,
   nx: true,
@@ -136,6 +137,7 @@ const serviceSpecSchemaTask = serviceSpecImporters.addTask('gen-schemas', {
     'SamTemplateSchema',
     'CloudWatchConsoleServiceDirectory',
     'GetAttAllowList',
+    'CfnPrimaryIdentifierOverrides',
     'OobRelationshipData',
   ].map((typeName: string) => ({
     exec: [
@@ -252,6 +254,17 @@ new SingleSource(repo, {
     roleDurationSeconds: 900,
   },
 });
+new SingleSource(repo, {
+  name: 'log-source-resource',
+  dir: 'sources/LogSources',
+  source: 's3://508003923337-log-source-templates/log-source-resource.json',
+  awsAuth: {
+    region: 'us-east-1',
+    roleToAssume: Role.fromGitHubSecret('AWS_ROLE_TO_ASSUME'),
+    roleSessionName: 'awscdk-service-spec',
+    roleDurationSeconds: 900,
+  },
+});
 
 // https://github.com/aws-cloudformation/cfn-lint/pull/3257
 new SingleSource(repo, {
@@ -259,6 +272,18 @@ new SingleSource(repo, {
   dir: 'sources/StatefulResources',
   source:
     'https://raw.githubusercontent.com/aws-cloudformation/cfn-lint/main/src/cfnlint/data/AdditionalSpecs/StatefulResources.json',
+});
+
+new ScriptSource(repo, {
+  name: 'eventbridge-schema',
+  dir: 'sources/EventBridgeSchema',
+  scriptPath: 'scripts/eventbridge-schema-download.ts',
+  awsAuth: {
+    region: 'us-east-1',
+    roleToAssume: Role.fromGitHubSecret('AWS_ROLE_TO_ASSUME'),
+    roleSessionName: 'awscdk-eventbridge-schema',
+    roleDurationSeconds: 900,
+  },
 });
 
 repo.synth();

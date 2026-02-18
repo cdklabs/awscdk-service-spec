@@ -1,6 +1,6 @@
 import { Entity, Reference, Relationship } from '@cdklabs/tskb';
 import { GenericPropertyType } from './common';
-import { Resource } from './resource';
+import { Resource, Service } from './resource';
 
 export interface Event extends Entity {
   /**
@@ -37,6 +37,10 @@ export interface Event extends Entity {
    * rootProperty has the reference for the root property for this event
    */
   readonly rootProperty: Reference<EventTypeDefinition>;
+  /**
+   * Indicates whether this event is linked to at least a single resource
+   */
+  isLinkedToResource: boolean;
 }
 
 export interface ResourceField {
@@ -45,6 +49,8 @@ export interface ResourceField {
 }
 
 export type ResourceHasEvent = Relationship<Resource, Event>;
+
+export type serviceHasEvent = Relationship<Service, Event>;
 
 export type EventProperties = Record<string, EventProperty>;
 export interface EventProperty {

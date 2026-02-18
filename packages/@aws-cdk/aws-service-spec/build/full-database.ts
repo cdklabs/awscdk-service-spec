@@ -22,7 +22,7 @@ export class FullDatabase extends DatabaseBuilder {
       .importCloudFormationDocs(path.join(SOURCES, 'CloudFormationDocumentation/CloudFormationDocumentation.json'))
       .importStatefulResources(path.join(SOURCES, 'StatefulResources/StatefulResources.json'))
       .importGetAttAllowList(path.join(SOURCES, 'CloudFormationGetAttAllowList/gettatt-allowlist.json'))
-      .importArnTemplates(path.join(SOURCES, 'ArnTemplates/arn-templates.json'))
+      .importArnTemplates(path.join(SOURCES, 'ArnTemplates/arn-templates.json'), path.join(SOURCES, 'ArnTemplates/arn-overrides.json'))
       .importOobRelationships(path.join(SOURCES, 'OobRelationships/relationships.json'), patchOobRelationships)
       .importCannedMetrics(
         path.join(SOURCES, 'CloudWatchConsoleServiceDirectory/CloudWatchConsoleServiceDirectory.json'),
@@ -30,7 +30,8 @@ export class FullDatabase extends DatabaseBuilder {
       .importLogSources(path.join(SOURCES, 'LogSources/log-source-resource.json'))
       .importScrutinies()
       .importAugmentations()
-      .importEventBridgeSchema(path.join(SOURCES, 'EventBridgeSchema'));
+      .importEventBridgeSchema(path.join(SOURCES, 'EventBridgeSchema'))
+      .importCfnPrimaryIdentifierOverrides(path.join(SOURCES, 'CloudFormationRefOverrides/ref-overrides.json'));
   }
 
   /**

@@ -175,6 +175,22 @@
         }
       ]
     },
+    "update-source:eventbridge-schema": {
+      "name": "update-source:eventbridge-schema",
+      "steps": [
+        {
+          "exec": "ts-node scripts/eventbridge-schema-download.ts sources/EventBridgeSchema"
+        }
+      ]
+    },
+    "update-source:log-source-resource": {
+      "name": "update-source:log-source-resource",
+      "steps": [
+        {
+          "exec": "aws s3 cp s3://508003923337-log-source-templates/log-source-resource.json sources/LogSources/log-source-resource.json"
+        }
+      ]
+    },
     "update-source:sam": {
       "name": "update-source:sam",
       "steps": [
@@ -218,7 +234,13 @@
           "spawn": "update-source:arn-templates"
         },
         {
+          "spawn": "update-source:log-source-resource"
+        },
+        {
           "spawn": "update-source:stateful-resources"
+        },
+        {
+          "spawn": "update-source:eventbridge-schema"
         }
       ]
     },

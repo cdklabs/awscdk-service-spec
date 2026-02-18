@@ -16,13 +16,13 @@ import {
   UpdatedResource,
   UpdatedService,
   UpdatedTypeDefinition,
-  VendedLog,
   Event,
   EventTypeDefinition,
   EventProperty,
   UpdatedEvent,
   UpdatedEventTypeDefinition,
   UpdatedEventProperty,
+  VendedLogs,
 } from '@aws-cdk/service-spec-types';
 import chalk from 'chalk';
 import { PrintableTree } from './printable-tree';
@@ -72,6 +72,12 @@ export class DiffFormatter {
           .sort(sortByKey((e) => e.entity.name))
           .map((e) => this.renderMetric(e.entity).prefix([' '])),
       ),
+      listWithCaption(
+        'metrics',
+        [...this.dbs[db].follow('serviceHasEvent', s)]
+          .sort(sortByKey((e) => e.entity.name))
+          .map((e) => this.renderEvent(e.entity, db).prefix([' '])),
+      ),
     ]);
   }
 
@@ -96,6 +102,14 @@ export class DiffFormatter {
           (k, u) => this.renderUpdatedMetric(k, u).prefix([' ']),
         ),
       ),
+      listWithCaption(
+        'events',
+        this.renderMapDiff(
+          s.eventDiff,
+          (e, db) => this.renderEvent(e, db).prefix([' ']),
+          (k, u) => this.renderUpdatedEvent(k, u).prefix([' ']),
+        ),
+      ),
     ];
 
     const ret = new PrintableTree(`service ${key}`).addBullets(bullets);
@@ -115,6 +129,8 @@ export class DiffFormatter {
           'tagInformation',
           'arnTemplate',
           'vendedLogs',
+          'primaryIdentifier',
+          'cfnRefIdentifier',
         ]),
       ).indent(META_INDENT),
       listWithCaption('properties', this.renderProperties(r.properties, db)),
@@ -150,13 +166,16 @@ export class DiffFormatter {
       'scrutinizable',
       'tagInformation',
       'arnTemplate',
+      'vendedLogs',
+      'primaryIdentifier',
+      'cfnRefIdentifier',
     ]);
 
     return new PrintableTree(`resource ${key}`).addBullets([
       new PrintableTree(...listFromDiffs(d)).indent(META_INDENT),
       listWithCaption('properties', this.renderPropertyDiff(r.properties)),
       listWithCaption('attributes', this.renderPropertyDiff(r.attributes)),
-      listWithCaption('vendedLogs', this.renderVendedLogsDiff(r.vendedLogs)),
+      listWithCaption('vendedLogs', this.renderVendedLogsArrayDiff(r.vendedLogs)),
       listWithCaption(
         'types',
         this.renderMapDiff(
@@ -334,57 +353,91 @@ export class DiffFormatter {
     });
   }
 
-  private renderVendedLogsDiff(diff: ScalarDiff<VendedLog | undefined> | undefined): PrintableTree[] {
-    if (!diff || (!diff.old && !diff.new)) {
+  private renderVendedLogsArrayDiff(diff: ScalarDiff<VendedLogs[] | undefined> | undefined): PrintableTree[] {
+    if (!diff) {
       return [];
     }
-    const tree: PrintableTree[] = [];
 
-    if (!diff.old && diff.new) {
-      return [this.renderVendedLogsType(diff.new).prefix([chalk.green(ADDITION), ' '], [' '])];
-    }
-    if (diff.old && !diff.new) {
-      return [this.renderVendedLogsType(diff.old).prefix([chalk.red(REMOVAL), ' '], [' '])];
+    if (!diff.old && diff.new && Array.isArray(diff.new)) {
+      return diff.new.map((vl) => this.renderVendedLog(vl).prefix([chalk.green(ADDITION), ' '], [' ']));
     }
 
-    if (diff.old && diff.new) {
-      if (diff.old.permissionsVersion !== diff.new.permissionsVersion) {
-        tree.push(
-          new PrintableTree(`permissionsVersion:`).addBullets([
-            new PrintableTree(`- ${diff.old.permissionsVersion}`).colorize(chalk.red),
-            new PrintableTree(`+ ${diff.new.permissionsVersion}`).colorize(chalk.green),
-          ]),
-        );
+    if (diff.old && Array.isArray(diff.old) && !diff.new) {
+      return diff.old.map((vl) => this.renderVendedLog(vl).prefix([chalk.red(REMOVAL), ' '], [' ']));
+    }
+
+    if (Array.isArray(diff.old) && Array.isArray(diff.new)) {
+      const tree: PrintableTree[] = [];
+      const oldMap = new Map(diff.old.map((vl) => [vl.logType, vl]));
+      const newMap = new Map(diff.new.map((vl) => [vl.logType, vl]));
+
+      const allLogTypes = new Set([...oldMap.keys(), ...newMap.keys()]);
+
+      for (const logType of allLogTypes) {
+        const oldVl = oldMap.get(logType);
+        const newVl = newMap.get(logType);
+
+        if (!oldVl && newVl) {
+          tree.push(this.renderVendedLog(newVl).prefix([chalk.green(ADDITION), ' '], [' ']));
+        } else if (oldVl && !newVl) {
+          tree.push(this.renderVendedLog(oldVl).prefix([chalk.red(REMOVAL), ' '], [' ']));
+        } else if (oldVl && newVl) {
+          const changes = this.compareVendedLogs(oldVl, newVl);
+          if (changes.length > 0) {
+            tree.push(
+              new PrintableTree(`logType: ${logType}`).addBullets(changes).prefix([chalk.yellow(UPDATE), ' '], [' ']),
+            );
+          }
+        }
       }
 
-      this.renderVendedLogListDiff(diff, tree, 'logTypes');
-      this.renderVendedLogListDiff(diff, tree, 'destinations');
+      return tree;
     }
-    return tree;
+    return [];
   }
 
-  private renderVendedLogsType(vendedLogs: VendedLog): PrintableTree {
-    return new PrintableTree(`vendedLogs`).addBullets([
-      new PrintableTree(`permissionsVersion: ${vendedLogs.permissionsVersion}`),
-      new PrintableTree(`logTypes: [${vendedLogs.logTypes.join(', ')}]`),
-      new PrintableTree(`destinations: [${vendedLogs.destinations.join(', ')}]`),
+  private renderVendedLog(vl: VendedLogs): PrintableTree {
+    const destinations = vl.destinations.map((d) => d.destinationType).join(', ');
+    return new PrintableTree(`logType: ${vl.logType}`).addBullets([
+      new PrintableTree(`permissionsVersion: ${vl.permissionsVersion}`),
+      new PrintableTree(`destinations: [${destinations}]`),
     ]);
   }
 
-  private renderVendedLogListDiff(diff: ScalarDiff<VendedLog | undefined>, tree: PrintableTree[], diffShown: string) {
-    if (diff.old && diff.new) {
-      // the array should correspond to the value of diffShown
-      const oldList = new Set(diffShown === 'logTypes' ? diff.new.logTypes : diff.new.destinations);
-      const newList = new Set(diffShown === 'logTypes' ? diff.new.logTypes : diff.new.destinations);
-      const added = [...newList].filter((t) => !oldList.has(t));
-      const removed = [...oldList].filter((t) => !newList.has(t));
-      if (added.length > 0 || removed.length > 0) {
-        const bullets: PrintableTree[] = [];
-        removed.forEach((obj) => bullets.push(new PrintableTree(`- ${obj}`).colorize(chalk.red)));
-        added.forEach((obj) => bullets.push(new PrintableTree(`+ ${obj}`).colorize(chalk.green)));
-        tree.push(new PrintableTree(`${diffShown}:`).addBullets(bullets));
-      }
+  private compareVendedLogs(old: VendedLogs, updated: VendedLogs): PrintableTree[] {
+    const changes: PrintableTree[] = [];
+
+    if (old.permissionsVersion !== updated.permissionsVersion) {
+      changes.push(
+        new PrintableTree(`permissionsVersion:`).addBullets([
+          new PrintableTree(`- ${old.permissionsVersion}`).colorize(chalk.red),
+          new PrintableTree(`+ ${updated.permissionsVersion}`).colorize(chalk.green),
+        ]),
+      );
     }
+
+    const oldDests = new Map(old.destinations.map((d) => [`${d.destinationType}`, d]));
+    const newDests = new Map(updated.destinations.map((d) => [`${d.destinationType}`, d]));
+
+    const added = [...newDests.keys()].filter((k) => !oldDests.has(k));
+    const removed = [...oldDests.keys()].filter((k) => !newDests.has(k));
+
+    if (added.length > 0 || removed.length > 0) {
+      const bullets: PrintableTree[] = [];
+      removed.forEach((k) => {
+        const d = oldDests.get(k)!;
+        const str = d.destinationType;
+        bullets.push(new PrintableTree(`- ${str}`).colorize(chalk.red));
+      });
+      added.forEach((k) => {
+        const d = newDests.get(k)!;
+        const str = d.destinationType;
+        bullets.push(new PrintableTree(`+ ${str}`).colorize(chalk.green));
+      });
+      changes.push(new PrintableTree(`destinations:`).addBullets(bullets));
+    }
+
+    return changes;
   }
 
   private renderEvent(e: Event, db: number): PrintableTree {
@@ -421,7 +474,7 @@ export class DiffFormatter {
   private renderUpdatedEvent(key: string, e: UpdatedEvent): PrintableTree {
     const bullets: PrintableTree[] = [];
 
-    const simpleDiffs = pick(e, ['name', 'description', 'source', 'detailType']);
+    const simpleDiffs = pick(e, ['name', 'description', 'source', 'detailType', 'isLinkedToResource']);
     const simpleTree = new PrintableTree(...listFromDiffs(simpleDiffs));
 
     if (e.rootProperty && e.rootProperty.old && e.rootProperty.new) {

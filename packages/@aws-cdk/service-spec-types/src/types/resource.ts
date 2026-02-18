@@ -61,13 +61,34 @@ export interface Resource extends Entity {
    */
   cloudFormationTransform?: string;
   documentation?: string;
+
+  /**
+   * The primary identifier, or identifiers, in Cloud Control API
+   *
+   * Uniquely identifies a resource in an account.
+   *
+   * This is read from the schema, which always pertains to the CCAPI identifier.
+   * Typically the same as the CloudFormation identifier, but not necessarily.
+   */
   primaryIdentifier?: string[];
+
+  /**
+   * The primary identifier, or identifiers, in CloudFormation
+   *
+   * Whatever gets returned when you call `{ Ref }` a resource. Typically the
+   * value that other resources in the same service expect to see as the way to
+   * reference this resource (name or ARN or Id).
+   *
+   * If missing, the `cfnRefIdentifier` is the same as the (CC-API) `primaryIdentifier`.
+   */
+  cfnRefIdentifier?: string[];
+
   readonly properties: ResourceProperties;
   readonly attributes: Record<string, Attribute>;
   readonly validations?: unknown;
   arnTemplate?: string;
   isStateful?: boolean;
-  vendedLogs?: VendedLog;
+  vendedLogs?: VendedLogs[];
 
   /**
    * Information about the taggability of this resource
@@ -302,11 +323,6 @@ export type ResourceInRegion = Relationship<Region, Resource>;
 
 export type UsesType = Relationship<Resource, TypeDefinition>;
 
-export interface ResourceIdentifier extends Entity {
-  readonly arnTemplate?: string;
-  readonly primaryIdentifier?: string[];
-}
-
 /**
  * Mark a resource as a resource that needs additional scrutiy when added, removed or changed
  *
@@ -421,24 +437,32 @@ export interface RelationshipRef {
   readonly propertyName: string;
 }
 
-export type DestinationService = 'S3' | 'CWL' | 'FH' | 'XRAY';
+/**
+ * Represents a delivery destination that a Cloudformation resource can send logs to
+ */
+export interface DeliveryDestination {
+  /**
+   * The type of service that is ingesting the logs, can be S3 | FH | CWL | XRAY
+   */
+  readonly destinationType: string;
+}
 
 /**
- * Represents the types of logs a Cloudformation Resource can produce and what destinations can consume them
+ * Represents a type of log that a Cloudformation Resource can produce and what destinations can consume them
  */
-export interface VendedLog {
+export interface VendedLogs {
   /**
    * What version of permissions the destination supports V1 | V2
    */
   readonly permissionsVersion: string;
   /**
-   * List of the types of logs a Cloudformation resource can produce
+   * Type of log a Cloudformation resource can produce
    */
-  readonly logTypes: string[];
+  readonly logType: string;
   /**
    * List of the destinations the can consume those logs
    */
-  readonly destinations: DestinationService[];
+  readonly destinations: DeliveryDestination[];
 }
 
 export class RichPropertyType {

@@ -50,6 +50,7 @@ export function importEventBridgeSchema(options: LoadEventBridgeSchmemaOptions) 
     console.log(`The service related to this event schema name ${event.SchemaName} doesn't exist in CF`);
     return eventRet;
   }
+  eventBuilder.linkServiceToEvent(service);
 
   const resource = lookupResource({ service, db, eventSchemaName: event.SchemaName });
 

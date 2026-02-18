@@ -5,9 +5,10 @@ import * as path from 'path';
 const UPDATE_JOB_ID = 'update_source';
 
 interface DataSource {
-  url: string;
+  url?: string;
   target: string;
   isZip?: boolean;
+  scriptPath?: string;
 }
 
 export class Role {
@@ -47,20 +48,33 @@ abstract class SourceUpdate extends Component {
 
     const taskName = `update-source:${options.name}`;
     const workflowName = `update-source-${options.name}`;
-    const needsS3Access = options.sources.some((s) => s.url.startsWith('s3://'));
+    const needsAwsAccess = options.sources.some((s) => s.url?.startsWith('s3://') || s.scriptPath != null);
 
-    if (needsS3Access && !options.awsAuth) {
+    if (needsAwsAccess && !options.awsAuth) {
       throw new Error('S3 source detected. Must provide `awsAuth` option.');
     }
 
     this.task = project.addTask(taskName, {
       steps: options.sources.map((s) => {
-        if (s.url.startsWith('s3://')) {
+        if (s.scriptPath && s.url) {
+          throw new Error('DataSource must have only url or scriptPath, but not both');
+        }
+        if (s.scriptPath) {
+          // Use ts-node for .ts files, node for .js files
+          const executor = s.scriptPath.endsWith('.ts') ? 'ts-node' : 'node';
+          return {
+            exec: `${executor} ${s.scriptPath} ${s.target}`,
+          };
+        }
+        if (s.url && s.url.startsWith('s3://')) {
           return {
             exec: `aws s3 cp ${s.url} ${s.target}`,
           };
         }
-        return new DownloadScript(s.url, s.target, s.isZip);
+        if (s.url) {
+          return new DownloadScript(s.url, s.target, s.isZip);
+        }
+        throw new Error('DataSource must have either url or scriptPath');
       }),
     });
     this.updateAllTask.spawn(this.task);
@@ -70,13 +84,13 @@ abstract class SourceUpdate extends Component {
       name: workflowName,
       permissions: {
         contents: github.workflows.JobPermission.READ,
-        idToken: needsS3Access ? github.workflows.JobPermission.WRITE : github.workflows.JobPermission.NONE,
+        idToken: needsAwsAccess ? github.workflows.JobPermission.WRITE : github.workflows.JobPermission.NONE,
         pullRequests: github.workflows.JobPermission.WRITE,
       },
       task: this.task,
       preBuildSteps: [
         ...project.renderWorkflowSetup(),
-        ...(needsS3Access && options.awsAuth
+        ...(needsAwsAccess && options.awsAuth
           ? [
               {
                 name: 'Federate into AWS',
@@ -215,6 +229,46 @@ export class SingleSource extends SourceUpdate {
     super(project, {
       ...options,
       sources: [getDataSource(options.source, options)],
+    });
+  }
+}
+
+export interface ScriptSourceOptions {
+  /**
+   * The human friendly short name of the source.
+   */
+  readonly name: string;
+  /**
+   * The schedule this source should be updated at.
+   * @default - weekly
+   */
+  readonly schedule?: string;
+  /**
+   * Path to the JavaScript file that will fetch the source.
+   * The script is responsible for downloading/generating the source data.
+   */
+  readonly scriptPath: string;
+  /**
+   * The directory this source is stored in.
+   */
+  readonly dir: string;
+  /**
+   * AWS Authentication config.
+   * Required if the script needs AWS access.
+   */
+  readonly awsAuth?: AwsAuthentication;
+}
+
+export class ScriptSource extends SourceUpdate {
+  public constructor(project: javascript.NodeProject, options: ScriptSourceOptions) {
+    super(project, {
+      ...options,
+      sources: [
+        {
+          scriptPath: options.scriptPath,
+          target: options.dir,
+        },
+      ],
     });
   }
 }

@@ -3,6 +3,7 @@ import { emptyDatabase, SpecDatabase } from '@aws-cdk/service-spec-types';
 import { assertSuccess, Result } from '@cdklabs/tskb';
 import { importArnTemplates } from './importers/import-arn-templates';
 import { importCannedMetrics } from './importers/import-canned-metrics';
+import { importCfnPrimaryIdentifierOverrides } from './importers/import-cfn-primaryidentifier-overrides';
 import { importCloudFormationDocumentation } from './importers/import-cloudformation-docs';
 import { importCloudFormationRegistryResource } from './importers/import-cloudformation-registry';
 import { importEventBridgeSchema } from './importers/import-eventbridge-schema';
@@ -23,6 +24,7 @@ import {
   loadSamSchema,
   loadSamSpec,
   loadOobRelationships,
+  loadCfnPrimaryIdentifierOverrides,
 } from './loaders';
 import { loadDefaultEventBridgeSchema } from './loaders/load-eventbridge-schema';
 import { JsonLensPatcher } from './patching';
@@ -198,10 +200,25 @@ export class DatabaseBuilder {
     });
   }
 
-  public importArnTemplates(filePath: string) {
+  /**
+   * Import patches to primary identifiers
+   */
+  public importCfnPrimaryIdentifierOverrides(specFilePath: string) {
+    return this.addSourceImporter(async (db, report) => {
+      const cfnIdentifiers = this.loadResult(
+        await loadCfnPrimaryIdentifierOverrides(specFilePath, this.options),
+        report,
+      );
+
+      importCfnPrimaryIdentifierOverrides(db, cfnIdentifiers);
+    });
+  }
+
+  public importArnTemplates(filePath: string, overridesFilePath: string) {
     return this.addSourceImporter(async (db, report) => {
       const arnFormatIndex = JSON.parse(await fs.readFile(filePath, { encoding: 'utf-8' }));
-      importArnTemplates(arnFormatIndex, db, report);
+      const overrides = JSON.parse(await fs.readFile(overridesFilePath, { encoding: 'utf-8' }));
+      importArnTemplates({ ...arnFormatIndex, ...overrides }, db, report);
     });
   }
 

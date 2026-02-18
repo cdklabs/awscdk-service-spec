@@ -6,6 +6,7 @@ import {
   EventTypeDefinition,
   ResourceField,
   Resource,
+  Service,
 } from '@aws-cdk/service-spec-types';
 import { jsonschema } from './types';
 
@@ -97,6 +98,7 @@ export class EventBuilder extends PropertyBagBuilder {
       description: options.description,
       rootProperty: { $ref: options.rootProperty.$id },
       resourcesField: [],
+      isLinkedToResource: false,
     });
 
     return new EventBuilder(db, schemaName, options, event);
@@ -116,6 +118,7 @@ export class EventBuilder extends PropertyBagBuilder {
   private typesCreatedHere = new Set<string>();
   private typesToLink: EventTypeDefinition[] = [];
   private resourcesToLink: Array<Resource> = [];
+  private serviceToLink?: Service;
 
   private constructor(
     public readonly db: SpecDatabase,
@@ -138,6 +141,7 @@ export class EventBuilder extends PropertyBagBuilder {
       description: this.options.description,
       rootProperty: { $ref: rootProperty.$id },
       resourcesField: [],
+      isLinkedToResource: false,
     });
 
     (this as any)._propertyBag = this.event;
@@ -151,6 +155,13 @@ export class EventBuilder extends PropertyBagBuilder {
   public linkResourceToEvent(resource: Resource, resourceField: ResourceField) {
     this.resourcesToLink.push(resource);
     this.addResourceField(resourceField);
+    if (this.event) {
+      this.event.isLinkedToResource = true;
+    }
+  }
+
+  public linkServiceToEvent(service: Service) {
+    this.serviceToLink = service;
   }
 
   public eventTypeDefinitionBuilder(
@@ -211,6 +222,10 @@ export class EventBuilder extends PropertyBagBuilder {
 
     for (const resource of this.resourcesToLink) {
       this.db.link('resourceHasEvent', resource, this.event);
+    }
+
+    if (this.serviceToLink != undefined) {
+      this.db.link('serviceHasEvent', this.serviceToLink, this.event);
     }
 
     return this.event;

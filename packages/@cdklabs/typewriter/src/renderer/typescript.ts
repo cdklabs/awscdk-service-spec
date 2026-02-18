@@ -96,47 +96,77 @@ export class TypeScriptRenderer extends Renderer {
   }
 
   protected renderImports(mod: Module) {
-    const selectiveBySource = new Map<string, SelectiveModuleImport[]>();
-    const aliased: AliasedModuleImport[] = [];
+    const importsBySource = new Map<string, { selective: SelectiveModuleImport[]; aliased: AliasedModuleImport[] }>();
+    const renderOrder: Array<{ source: string; type: 'selective' | 'aliased'; index: number }> = [];
 
-    for (const imp of mod.imports) {
-      if (imp instanceof AliasedModuleImport) {
-        aliased.push(imp);
-      } else if (imp instanceof SelectiveModuleImport) {
-        const imports = selectiveBySource.get(imp.moduleSource) ?? [];
-        imports.push(imp);
-        selectiveBySource.set(imp.moduleSource, imports);
+    // Group imports by source and track their original order
+    for (let i = 0; i < mod.imports.length; i++) {
+      const imp = mod.imports[i];
+      const source = imp.moduleSource;
+
+      if (!importsBySource.has(source)) {
+        importsBySource.set(source, { selective: [], aliased: [] });
       }
-    }
 
-    for (const imp of aliased) {
-      this.emit(`import * as ${imp.importAlias} from "${imp.moduleSource}";\n`);
-    }
-
-    for (const [source, imports] of selectiveBySource) {
-      const allImports = new Map<string, string | undefined>();
-      for (const imp of imports) {
-        for (const name of imp.importedNames) {
-          const alias = imp.getAlias(name);
-          const key = alias ? `${name}:${alias}` : name;
-          allImports.set(key, alias);
+      const imports = importsBySource.get(source)!;
+      if (imp instanceof AliasedModuleImport) {
+        imports.aliased.push(imp);
+        renderOrder.push({ source, type: 'aliased', index: i });
+      } else if (imp instanceof SelectiveModuleImport) {
+        imports.selective.push(imp);
+        // Only track the first selective import from each source
+        if (imports.selective.length === 1) {
+          renderOrder.push({ source, type: 'selective', index: i });
         }
       }
-      const sorted = Array.from(allImports.entries()).sort((a, b) => {
-        const nameA = a[0].split(':')[0];
-        const nameB = b[0].split(':')[0];
-        return nameA.localeCompare(nameB);
-      });
-      const names = sorted.map(([key, alias]) => {
-        const name = key.split(':')[0];
-        return alias ? `${name} as ${alias}` : name;
-      });
-      this.emit(`import { ${names.join(', ')} } from "${source}";\n`);
+    }
+
+    // Render imports in their original order, avoiding duplicates
+    const rendered = new Set<string>();
+    for (const { source, type } of renderOrder.sort((a, b) => a.index - b.index)) {
+      const key = `${source}-${type}`;
+      if (rendered.has(key)) continue;
+      rendered.add(key);
+
+      const imports = importsBySource.get(source)!;
+      if (type === 'selective') {
+        this.renderSelectiveImports(source, imports.selective);
+      } else {
+        for (const imp of imports.aliased) {
+          this.emit(`import * as ${imp.importAlias} from "${imp.moduleSource}";\n`);
+        }
+      }
     }
 
     if (mod.imports.length > 0) {
       this.emit('\n');
     }
+  }
+
+  private renderSelectiveImports(source: string, imports: SelectiveModuleImport[]) {
+    // Collect all import names and their aliases
+    const allImports = new Map<string, string | undefined>();
+    for (const imp of imports) {
+      for (const name of imp.importedNames) {
+        const alias = imp.getAlias(name);
+        const key = alias ? `${name}:${alias}` : name;
+        allImports.set(key, alias);
+      }
+    }
+
+    // Sort by original name for consistent output
+    const sorted = Array.from(allImports.entries()).sort((a, b) => {
+      const nameA = a[0].split(':')[0];
+      const nameB = b[0].split(':')[0];
+      return nameA.localeCompare(nameB);
+    });
+
+    const names = sorted.map(([key, alias]) => {
+      const name = key.split(':')[0];
+      return alias ? `${name} as ${alias}` : name;
+    });
+
+    this.emit(`import { ${names.join(', ')} } from "${source}";\n`);
   }
 
   protected emitBlock(header: string, block: () => void) {

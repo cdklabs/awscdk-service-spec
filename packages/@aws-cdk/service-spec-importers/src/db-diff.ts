@@ -59,7 +59,21 @@ export class DbDiff {
       shortName: diffScalar(a, b, 'shortName'),
       metrics: this.diffServiceMetrics(a, b),
       resourceDiff: this.diffServiceResources(a, b),
+      eventDiff: this.diffServiceEvents(a, b),
     } satisfies AllFieldsGiven<UpdatedService>);
+  }
+
+  public diffServiceEvents(a: Service, b: Service): UpdatedService['eventDiff'] {
+    const aEvents = this.db1.follow('serviceHasEvent', a).map((r) => r.entity);
+    const bEvents = this.db2.follow('serviceHasEvent', b).map((r) => r.entity);
+    return collapseEmptyDiff(
+      diffByKey(
+        aEvents,
+        bEvents,
+        (event) => event.name,
+        (x, y) => this.diffEvent(x, y),
+      ),
+    );
   }
 
   public diffServiceMetrics(a: Service, b: Service): UpdatedService['metrics'] {
@@ -116,9 +130,8 @@ export class DbDiff {
       scrutinizable: diffScalar(a, b, 'scrutinizable'),
       vendedLogs: diffField(a, b, 'vendedLogs', jsonEq),
       tagInformation: diffField(a, b, 'tagInformation', jsonEq),
-      primaryIdentifier: collapseEmptyDiff(
-        diffList(a.primaryIdentifier ?? [], b.primaryIdentifier ?? [], (x, y) => x === y),
-      ),
+      primaryIdentifier: diffField(a, b, 'primaryIdentifier', jsonEq),
+      cfnRefIdentifier: diffField(a, b, 'cfnRefIdentifier', jsonEq),
       attributes: collapseEmptyDiff(diffMap(a.attributes, b.attributes, (x, y) => this.diffAttribute(x, y))),
       properties: collapseEmptyDiff(diffMap(a.properties, b.properties, (x, y) => this.diffProperty(x, y))),
       typeDefinitionDiff: this.diffResourceTypeDefinitions(a, b),
@@ -154,7 +167,7 @@ export class DbDiff {
       previousTypes: collapseEmptyDiff(diffList(a.previousTypes ?? [], b.previousTypes ?? [], eqType)),
       type: diffField(a, b, 'type', eqType),
       causesReplacement: diffScalar(a, b, 'causesReplacement'),
-      relationshipRefs: diffField(a, b, 'relationshipRefs', jsonEq),
+      relationshipRefs: collapseEmptyDiff(diffList(a.relationshipRefs ?? [], b.relationshipRefs ?? [], jsonEq)),
     } satisfies DontCareAboutTypes<AllFieldsGiven<Property>>);
 
     if (anyDiffs) {
@@ -209,6 +222,7 @@ export class DbDiff {
       resourcesField: diffField(a, b, 'resourcesField', this.eqEventResourcesField.bind(this)),
       rootProperty: diffField(a, b, 'rootProperty', this.eqEventRootProperty.bind(this)),
       typeDefinitionDiff: this.diffEventTypeDefinitions(a, b),
+      isLinkedToResource: diffScalar(a, b, 'isLinkedToResource'),
     } satisfies AllFieldsGiven<UpdatedEvent>);
   }
 

@@ -25,6 +25,7 @@ export interface UpdatedService {
   readonly cloudFormationNamespace?: ScalarDiff<Service['cloudFormationNamespace']>;
   readonly resourceDiff?: MapDiff<Resource, UpdatedResource>;
   readonly metrics?: MapDiff<Metric, ChangedMetric>;
+  readonly eventDiff?: MapDiff<Event, UpdatedEvent>;
 }
 
 export interface ChangedMetric {
@@ -44,7 +45,8 @@ export interface UpdatedResource {
   readonly scrutinizable?: ScalarDiff<Resource['scrutinizable']>;
   readonly vendedLogs?: ScalarDiff<Resource['vendedLogs']>;
   readonly typeDefinitionDiff?: MapDiff<TypeDefinition, UpdatedTypeDefinition>;
-  readonly primaryIdentifier?: ListDiff<string, void>;
+  readonly primaryIdentifier?: ScalarDiff<string[]>;
+  readonly cfnRefIdentifier?: ScalarDiff<string[]>;
   readonly metrics?: MapDiff<Metric, ChangedMetric>;
   readonly events?: MapDiff<Event, UpdatedEvent>;
 }
@@ -74,6 +76,7 @@ export interface UpdatedEvent {
   readonly resourcesField?: ScalarDiff<Event['resourcesField']>;
   readonly rootProperty?: ScalarDiff<Event['rootProperty']>;
   readonly typeDefinitionDiff?: MapDiff<EventTypeDefinition, UpdatedEventTypeDefinition>;
+  readonly isLinkedToResource?: ScalarDiff<boolean>;
 }
 
 export interface UpdatedEventTypeDefinition {
