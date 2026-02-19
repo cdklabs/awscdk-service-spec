@@ -30,28 +30,46 @@ beforeEach(() => {
 test('adds log type to resource', () => {
   importLogSources(
     db,
-    {
-      SomeTypeS3Logs: {
+    [
+      {
         LogType: 'SOME_LOGS',
         ResourceTypes: ['AWS::Some::Type'],
         Destinations: [
           {
             DestinationType: 'S3',
             PermissionsVersion: 'V2',
+            OutputFormat: ['json', 'plain'],
+          },
+        ],
+        RecordFields: [
+          {
+            Field: 'timestamp',
+            Mandatory: true,
+          },
+          {
+            Field: 'resource_arn',
+            Mandatory: false,
           },
         ],
       },
-      SomeTypeTracesLogs: {
+      {
         LogType: 'TRACES',
         ResourceTypes: ['AWS::Some::Type'],
         Destinations: [
           {
             DestinationType: 'XRAY',
             PermissionsVersion: 'V2',
+            OutputFormat: [],
+          },
+        ],
+        RecordFields: [
+          {
+            Field: 'traces',
+            Mandatory: true,
           },
         ],
       },
-    },
+    ],
     report,
   );
 
@@ -63,8 +81,11 @@ test('adds log type to resource', () => {
       destinations: [
         {
           destinationType: 'S3',
+          outputFormats: ['json', 'plain'],
         },
       ],
+      mandatoryFields: ['timestamp'],
+      optionalFields: ['resource_arn'],
     },
     {
       permissionsVersion: 'V2',
@@ -72,8 +93,10 @@ test('adds log type to resource', () => {
       destinations: [
         {
           destinationType: 'XRAY',
+          outputFormats: [],
         },
       ],
+      mandatoryFields: ['traces'],
     },
   ]);
 });
@@ -81,28 +104,42 @@ test('adds log type to resource', () => {
 test('adds multiple log types to resource and does not add duplicate destinations', () => {
   importLogSources(
     db,
-    {
-      SomeTypeApplicationLogs: {
+    [
+      {
         LogType: 'APPLICATION_LOGS',
         ResourceTypes: ['AWS::Some::Type'],
         Destinations: [
           {
             DestinationType: 'S3',
             PermissionsVersion: 'V2',
+            OutputFormat: ['json', 'w3c'],
+          },
+        ],
+        RecordFields: [
+          {
+            Field: 'resource_arn',
+            Mandatory: true,
           },
         ],
       },
-      SomeTypeEventLogs: {
+      {
         LogType: 'EVENT_LOGS',
         ResourceTypes: ['AWS::Some::Type'],
         Destinations: [
           {
             DestinationType: 'S3',
             PermissionsVersion: 'V2',
+            OutputFormat: ['json', 'w3c', 'parquet'],
+          },
+        ],
+        RecordFields: [
+          {
+            Field: 'resource_arn',
+            Mandatory: true,
           },
         ],
       },
-    },
+    ],
     report,
   );
 
@@ -114,8 +151,10 @@ test('adds multiple log types to resource and does not add duplicate destination
       destinations: [
         {
           destinationType: 'S3',
+          outputFormats: ['json', 'w3c'],
         },
       ],
+      mandatoryFields: ['resource_arn'],
     },
     {
       permissionsVersion: 'V2',
@@ -123,8 +162,10 @@ test('adds multiple log types to resource and does not add duplicate destination
       destinations: [
         {
           destinationType: 'S3',
+          outputFormats: ['json', 'w3c', 'parquet'],
         },
       ],
+      mandatoryFields: ['resource_arn'],
     },
   ]);
 });
@@ -132,18 +173,25 @@ test('adds multiple log types to resource and does not add duplicate destination
 test('adds log types to multiple resources', () => {
   importLogSources(
     db,
-    {
-      MultiTypeApplicationLogs: {
+    [
+      {
         LogType: 'APPLICATION_LOGS',
         ResourceTypes: ['AWS::Some::Type', 'AWS::Other::Type'],
         Destinations: [
           {
             DestinationType: 'S3',
             PermissionsVersion: 'V2',
+            OutputFormat: ['json', 'plain'],
+          },
+        ],
+        RecordFields: [
+          {
+            Field: 'event_timestamp',
+            Mandatory: true,
           },
         ],
       },
-    },
+    ],
     report,
   );
 
@@ -155,8 +203,10 @@ test('adds log types to multiple resources', () => {
       destinations: [
         {
           destinationType: 'S3',
+          outputFormats: ['json', 'plain'],
         },
       ],
+      mandatoryFields: ['event_timestamp'],
     },
   ]);
 
@@ -168,8 +218,10 @@ test('adds log types to multiple resources', () => {
       destinations: [
         {
           destinationType: 'S3',
+          outputFormats: ['json', 'plain'],
         },
       ],
+      mandatoryFields: ['event_timestamp'],
     },
   ]);
 });
@@ -177,18 +229,20 @@ test('adds log types to multiple resources', () => {
 test('does not assign logTypes if resource does not exist in Cloudformation', () => {
   importLogSources(
     db,
-    {
-      SomeTypeLogs: {
+    [
+      {
         LogType: 'SOME_LOGS',
         ResourceTypes: ['AWS::Missing::Type'],
         Destinations: [
           {
             DestinationType: 'S3',
             PermissionsVersion: 'V2',
+            OutputFormat: [],
           },
         ],
+        RecordFields: [],
       },
-    },
+    ],
     report,
   );
 
