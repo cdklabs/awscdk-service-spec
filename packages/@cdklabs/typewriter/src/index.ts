@@ -1,5 +1,6 @@
 export * from './callable';
 export * from './class';
+export * from './enum';
 export * from './interface';
 export * from './external-module';
 export * from './struct';

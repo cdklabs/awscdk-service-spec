@@ -2,6 +2,7 @@ import { Renderer, RenderOptions } from './base';
 import { CallableDeclaration, isCallableDeclaration } from '../callable';
 import { ClassType } from '../class';
 import { Documented } from '../documented';
+import { EnumType } from '../enum';
 import { EsLintRules } from '../eslint-rules';
 import {
   AnonymousInterfaceImplementation,
@@ -259,6 +260,29 @@ export class TypeScriptRenderer extends Renderer {
       this.emitList(members, '\n\n', (m) =>
         m instanceof Property ? this.renderProperty(m, 'interface') : this.renderMethod(m, 'interface'),
       );
+    });
+  }
+
+  protected renderEnum(enumType: EnumType) {
+    const modifiers = enumType.modifiers.length ? enumType.modifiers.join(' ') + ' ' : '';
+
+    this.renderDocs(enumType);
+    this.emit(`${modifiers}enum ${enumType.name}`);
+
+    this.emitBlock(' ', () => {
+      this.emitList(enumType.members, ',\n', (member) => {
+        if (member.docs) {
+          this.emit(`/** ${member.docs} */\n`);
+        }
+        this.emit(member.name);
+        if (member.value !== undefined) {
+          const value = typeof member.value === 'string' ? `"${member.value}"` : member.value;
+          this.emit(` = ${value}`);
+        }
+      });
+      if (enumType.members.length > 0) {
+        this.emit(',');
+      }
     });
   }
 
