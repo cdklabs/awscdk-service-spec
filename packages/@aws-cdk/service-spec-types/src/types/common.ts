@@ -20,6 +20,7 @@ export type PrimitiveType =
 
 export interface StringType {
   readonly type: 'string';
+  readonly allowedValues?: string[];
 }
 /**
  * The "legacy" tag type (used in the old resource spec)
@@ -34,6 +35,7 @@ export interface NumberType {
 
 export interface IntegerType {
   readonly type: 'integer';
+  readonly allowedValues?: number[];
 }
 
 export interface BooleanType {
