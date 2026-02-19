@@ -222,6 +222,12 @@ export class RichTypedField {
     // do much better than full equality.
     if (this.types().some((t) => richType.equals(t))) {
       // Nothing to do, type is already in there.
+      // But if the new type has allowedValues, merge them into the current type.
+      if ((type.type === 'string' || type.type === 'integer') && type.allowedValues) {
+        if (this.field.type.type === type.type) {
+          (this.field.type as any).allowedValues = type.allowedValues;
+        }
+      }
       return false;
     }
 
@@ -583,13 +589,15 @@ export class RichPropertyType {
 
   public stringify(db: SpecDatabase, withId = true): string {
     switch (this.type.type) {
+      case 'string':
+        return this.type.allowedValues ? `string<${this.type.allowedValues.join('|')}>` : 'string';
       case 'integer':
+        return this.type.allowedValues ? `integer<${this.type.allowedValues.join('|')}>` : 'integer';
       case 'boolean':
       case 'date-time':
       case 'json':
       case 'null':
       case 'number':
-      case 'string':
       case 'tag':
         return this.type.type;
       case 'array':

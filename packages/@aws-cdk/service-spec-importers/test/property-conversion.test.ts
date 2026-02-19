@@ -1286,3 +1286,71 @@ test('import immutability on tags', () => {
   const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Test::Resource').only();
   expect(resource.additionalReplacementProperties).toEqual([['Tags', '*', 'Key']]);
 });
+
+test('string enum values are preserved as allowedValues', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      description: 'Test resource',
+      typeName: 'AWS::Some::Type',
+      properties: {
+        Status: { type: 'string', enum: ['Enabled', 'Disabled'] },
+        Name: { type: 'string' },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type').only();
+  expect(resource.properties.Status.type).toEqual({ type: 'string', allowedValues: ['Enabled', 'Disabled'] });
+  expect(resource.properties.Name.type).toEqual({ type: 'string' });
+});
+
+test('integer enum values are preserved as allowedValues', () => {
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      description: 'Test resource',
+      typeName: 'AWS::Some::Type',
+      properties: {
+        Port: { type: 'integer', enum: [80, 443] },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type').only();
+  expect(resource.properties.Port.type).toEqual({ type: 'integer', allowedValues: [80, 443] });
+});
+
+test('allowedValues are merged when re-importing a string property', () => {
+  // First import without enum
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      description: 'Test resource',
+      typeName: 'AWS::Some::Type',
+      properties: {
+        Status: { type: 'string' },
+      },
+    },
+  });
+
+  // Second import with enum
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      description: 'Test resource',
+      typeName: 'AWS::Some::Type',
+      properties: {
+        Status: { type: 'string', enum: ['Enabled', 'Disabled'] },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type').only();
+  expect(resource.properties.Status.type).toEqual({ type: 'string', allowedValues: ['Enabled', 'Disabled'] });
+  expect(resource.properties.Status.previousTypes).toBeUndefined();
+});

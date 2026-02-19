@@ -197,7 +197,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
             if (resolvedSchema.format === 'timestamp') {
               return { type: 'date-time' };
             }
-            return { type: 'string' };
+            return resolvedSchema.enum ? { type: 'string', allowedValues: resolvedSchema.enum } : { type: 'string' };
 
           case 'array':
             // FIXME: insertionOrder, uniqueItems
@@ -219,7 +219,7 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
             return { type: 'number' };
 
           case 'integer':
-            return { type: 'integer' };
+            return resolvedSchema.enum ? { type: 'integer', allowedValues: resolvedSchema.enum } : { type: 'integer' };
 
           case 'null':
             return { type: 'null' };
