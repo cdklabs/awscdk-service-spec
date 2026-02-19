@@ -151,17 +151,17 @@ test('enum with addMember', () => {
 });
 
 test('create enum from an array', () => {
-    const e = new EnumType(scope, {
-      name: 'Pets',
-    });
+  const e = new EnumType(scope, {
+    name: 'Pets',
+  });
 
-    const petArr = ['cat', 'dog', 'fish'];
+  const petArr = ['cat', 'dog', 'fish'];
 
-    for (const pet of petArr) {
-      e.addMember({name: pet});
-    }
+  for (const pet of petArr) {
+    e.addMember({ name: pet });
+  }
 
-    expect(renderer.render(scope)).toMatchInlineSnapshot(`
+  expect(renderer.render(scope)).toMatchInlineSnapshot(`
     "/* eslint-disable prettier/prettier, @stylistic/max-len */
     enum Pets {
       cat,
