@@ -1,20 +1,18 @@
-import { DeliveryDestination, SpecDatabase } from '@aws-cdk/service-spec-types';
+import { DeliveryDestination, SpecDatabase, VendedLogs } from '@aws-cdk/service-spec-types';
 import { failure } from '@cdklabs/tskb';
 import { ProblemReport, ReportAudience } from '../report';
 
 export function importLogSources(
   db: SpecDatabase,
-  logSourceData: Record<
-    string,
-    {
-      LogType: string;
-      ResourceTypes: string[];
-      Destinations: Array<{ DestinationType: string; PermissionsVersion: string }>;
-    }
-  >,
+  logSourceData: Array<{
+    LogType: string;
+    ResourceTypes: string[];
+    Destinations: Array<{ DestinationType: string; PermissionsVersion: string; OutputFormat: string[] }>;
+    RecordFields: Array<{ Field: string; Mandatory: boolean }>;
+  }>,
   report: ProblemReport,
 ) {
-  for (const value of Object.values(logSourceData)) {
+  for (const value of logSourceData) {
     for (const resourceType of value.ResourceTypes) {
       try {
         const resource = db.lookup('resource', 'cloudFormationType', 'equals', resourceType).only();
@@ -31,13 +29,24 @@ export function importLogSources(
 
         const destinations: DeliveryDestination[] = value.Destinations.map((dest) => ({
           destinationType: dest.DestinationType,
+          outputFormats: dest.OutputFormat,
         }));
 
-        const newLog = {
+        const newLog: VendedLogs = {
           permissionsVersion: permissionValue,
           logType: value.LogType,
           destinations: destinations,
         };
+
+        for (const fields of value.RecordFields) {
+          if (fields.Mandatory) {
+            newLog.mandatoryFields ??= [];
+            newLog.mandatoryFields?.push(fields.Field);
+          } else {
+            newLog.optionalFields ??= [];
+            newLog.optionalFields?.push(fields.Field);
+          }
+        }
 
         resource.vendedLogs ??= [];
         resource.vendedLogs.push(newLog);
