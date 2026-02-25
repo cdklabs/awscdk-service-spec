@@ -42,9 +42,28 @@ test('metrics diff only on statistic and ignore dedup key for diff', () => {
   });
 });
 
-test('event diff ignores different $ref IDs when event type definitions have same name', () => {
+test('event diff ignores different $ref IDs when event type definitions have same name or resource in resourcesField has the same name', () => {
   const eventType1 = db1.allocate('eventTypeDefinition', { name: 'WorkSpacesAccess', properties: {} });
   const eventType2 = db2.allocate('eventTypeDefinition', { name: 'WorkSpacesAccess', properties: {} });
+
+  const resource1 = db1.allocate('resource', {
+    cloudFormationType: 'AWS::S3::Bucket',
+    attributes: {},
+    name: 'Type',
+    primaryIdentifier: ['BucketName'],
+    properties: {
+      MyProp: { type: { type: 'string' } },
+    },
+  });
+  const resource2 = db2.allocate('resource', {
+    cloudFormationType: 'AWS::S3::Bucket',
+    attributes: {},
+    name: 'Type',
+    primaryIdentifier: ['BucketName'],
+    properties: {
+      MyProp: { type: { type: 'string' } },
+    },
+  });
 
   const event1 = db1.allocate('event', {
     name: 'aws.workspaces@WorkSpacesAccess',
@@ -52,7 +71,7 @@ test('event diff ignores different $ref IDs when event type definitions have sam
     source: 'aws.workspaces',
     detailType: 'WorkSpaces Access',
     rootProperty: ref(eventType1),
-    resourcesField: [{ type: ref(eventType1), fieldName: 'workspaceId' }],
+    resourcesField: [{ type: ref(eventType1), fieldName: 'workspaceId', resource: ref(resource1) }],
   });
 
   const event2 = db2.allocate('event', {
@@ -61,7 +80,7 @@ test('event diff ignores different $ref IDs when event type definitions have sam
     source: 'aws.workspaces',
     detailType: 'WorkSpaces Access',
     rootProperty: ref(eventType2),
-    resourcesField: [{ type: ref(eventType2), fieldName: 'workspaceId' }],
+    resourcesField: [{ type: ref(eventType2), fieldName: 'workspaceId', resource: ref(resource2) }],
   });
 
   const ed = diff.diffEvent(event1, event2);

@@ -91,6 +91,7 @@ function matchTypeFieldsToResources(resources: Resource[], typeInfos: EventTypeD
 
       if (typeSegment == resourceName) {
         matches.push({
+          resource: ref(resource),
           type: ref(typeFieldName),
         });
       }
@@ -100,8 +101,9 @@ function matchTypeFieldsToResources(resources: Resource[], typeInfos: EventTypeD
 
         if (fieldSegment == resourceName) {
           matches.push({
-            type: ref(typeFieldName),
+            resource: ref(resource),
             fieldName: propertiesFieldName,
+            type: ref(typeFieldName),
           });
         }
       }
