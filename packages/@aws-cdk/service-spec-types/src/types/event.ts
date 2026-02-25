@@ -37,10 +37,6 @@ export interface Event extends Entity {
    * rootProperty has the reference for the root property for this event
    */
   readonly rootProperty: Reference<EventTypeDefinition>;
-  /**
-   * Indicates whether this event is linked to at least a single resource
-   */
-  isLinkedToResource: boolean;
 }
 
 export interface ResourceField {

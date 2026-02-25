@@ -76,7 +76,6 @@ export interface UpdatedEvent {
   readonly resourcesField?: ScalarDiff<Event['resourcesField']>;
   readonly rootProperty?: ScalarDiff<Event['rootProperty']>;
   readonly typeDefinitionDiff?: MapDiff<EventTypeDefinition, UpdatedEventTypeDefinition>;
-  readonly isLinkedToResource?: ScalarDiff<boolean>;
 }
 
 export interface UpdatedEventTypeDefinition {
