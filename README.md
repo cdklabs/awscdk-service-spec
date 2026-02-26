@@ -1,6 +1,6 @@
 # AWS CDK Service Specification
 
-Source of truth for CDK code generation.
+Test Source of truth for CDK code generation.
 
 ## Packages
 
