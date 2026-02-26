@@ -38,7 +38,7 @@ import {
 } from './diff-helpers';
 
 export class DbDiff {
-  constructor(private readonly db1: SpecDatabase, private readonly db2: SpecDatabase) { }
+  constructor(private readonly db1: SpecDatabase, private readonly db2: SpecDatabase) {}
 
   public diff(): SpecDatabaseDiff {
     return {
