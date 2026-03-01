@@ -10,6 +10,7 @@
     ".github/workflows/release.yml",
     ".github/workflows/test-aws-cdk-integration.yml",
     ".github/workflows/update-source-arn-templates.yml",
+    ".github/workflows/update-source-aws-partitions.yml",
     ".github/workflows/update-source-cfn-schema.yml",
     ".github/workflows/update-source-documentation.yml",
     ".github/workflows/update-source-eventbridge-schema.yml",

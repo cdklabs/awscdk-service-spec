@@ -153,6 +153,14 @@
         }
       ]
     },
+    "update-source:aws-partitions": {
+      "name": "update-source:aws-partitions",
+      "steps": [
+        {
+          "exec": "node ./scripts/download.task.js https://raw.githubusercontent.com/aws/aws-sdk-js-v3/main/packages/util-endpoints/src/lib/aws/partitions.json sources/AwsPartitions/partitions.json"
+        }
+      ]
+    },
     "update-source:cfn-schema": {
       "name": "update-source:cfn-schema",
       "steps": [
@@ -238,6 +246,9 @@
         },
         {
           "spawn": "update-source:stateful-resources"
+        },
+        {
+          "spawn": "update-source:aws-partitions"
         },
         {
           "spawn": "update-source:eventbridge-schema"

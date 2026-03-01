@@ -12,6 +12,7 @@
 /.github/workflows/release.yml linguist-generated
 /.github/workflows/test-aws-cdk-integration.yml linguist-generated
 /.github/workflows/update-source-arn-templates.yml linguist-generated
+/.github/workflows/update-source-aws-partitions.yml linguist-generated
 /.github/workflows/update-source-cfn-schema.yml linguist-generated
 /.github/workflows/update-source-documentation.yml linguist-generated
 /.github/workflows/update-source-eventbridge-schema.yml linguist-generated

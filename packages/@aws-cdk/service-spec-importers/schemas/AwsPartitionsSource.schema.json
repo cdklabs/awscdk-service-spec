@@ -1,0 +1,109 @@
+{
+  "$ref": "#/definitions/AwsPartitionsSource",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "AwsPartitionData": {
+      "additionalProperties": false,
+      "description": "Data for a single AWS partition",
+      "properties": {
+        "id": {
+          "description": "Partition identifier (e.g., \"aws\", \"aws-cn\", \"aws-us-gov\")",
+          "type": "string"
+        },
+        "outputs": {
+          "$ref": "#/definitions/AwsPartitionOutputs",
+          "description": "Partition-level configuration outputs"
+        },
+        "regionRegex": {
+          "description": "Regex pattern for matching region names in this partition",
+          "type": "string"
+        },
+        "regions": {
+          "additionalProperties": {
+            "$ref": "#/definitions/AwsRegionData"
+          },
+          "description": "Map of region names to region metadata",
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "regionRegex",
+        "regions",
+        "outputs"
+      ],
+      "type": "object"
+    },
+    "AwsPartitionOutputs": {
+      "additionalProperties": false,
+      "description": "Partition-level configuration outputs",
+      "properties": {
+        "dnsSuffix": {
+          "description": "DNS suffix for the partition (e.g., \"amazonaws.com\")",
+          "type": "string"
+        },
+        "dualStackDnsSuffix": {
+          "description": "Dual-stack DNS suffix for the partition",
+          "type": "string"
+        },
+        "implicitGlobalRegion": {
+          "description": "The implicit global region for this partition",
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the partition",
+          "type": "string"
+        },
+        "supportsDualStack": {
+          "description": "Whether the partition supports dual-stack endpoints",
+          "type": "boolean"
+        },
+        "supportsFIPS": {
+          "description": "Whether the partition supports FIPS endpoints",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "dnsSuffix",
+        "dualStackDnsSuffix",
+        "supportsFIPS",
+        "supportsDualStack",
+        "implicitGlobalRegion"
+      ],
+      "type": "object"
+    },
+    "AwsPartitionsSource": {
+      "additionalProperties": false,
+      "description": "AWS Partitions source data from AWS SDK JS v3 partitions.json",
+      "properties": {
+        "partitions": {
+          "description": "Array of AWS partition definitions",
+          "items": {
+            "$ref": "#/definitions/AwsPartitionData"
+          },
+          "type": "array"
+        },
+        "version": {
+          "description": "Schema version of the partitions data",
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "partitions"
+      ],
+      "type": "object"
+    },
+    "AwsRegionData": {
+      "additionalProperties": false,
+      "description": "Metadata for a single AWS region",
+      "properties": {
+        "description": {
+          "description": "Human-readable description of the region",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  }
+}
