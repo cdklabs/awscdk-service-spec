@@ -29,7 +29,7 @@
     "projen": "npx projen"
   },
   "devDependencies": {
-    "@aws-sdk/client-schemas": "^3.998.0",
+    "@aws-sdk/client-schemas": "^3.1000.0",
     "@stylistic/eslint-plugin": "^2",
     "@types/node": "^18",
     "@typescript-eslint/eslint-plugin": "^6",
