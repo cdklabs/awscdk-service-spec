@@ -270,16 +270,21 @@ export class DbDiff {
   }
 
   private eqEventRootProperty(a: Reference<EventTypeDefinition>, b: Reference<EventTypeDefinition>): boolean {
-    return this.eqEventPropertyType({ type: 'ref', reference: a }, { type: 'ref', reference: b });
+    const typeA = this.db1.get('eventTypeDefinition', a.$ref);
+    const typeB = this.db2.get('eventTypeDefinition', b.$ref);
+
+    return typeA.name === typeB.name;
   }
 
   private eqEventResourcesField(a: ResourceField[], b: ResourceField[]): boolean {
     if (a.length !== b.length) return false;
     for (let i = 0; i < a.length; i++) {
-      if (
-        !this.eqEventPropertyType({ type: 'ref', reference: a[i].type }, { type: 'ref', reference: b[i].type }) ||
-        a[i].fieldName !== b[i].fieldName
-      ) {
+      const resourceA = this.db1.get('resource', a[i].resource.$ref);
+      const resourceB = this.db2.get('resource', b[i].resource.$ref);
+
+      const typeA = this.db1.get('eventTypeDefinition', a[i].type.$ref);
+      const typeB = this.db2.get('eventTypeDefinition', b[i].type.$ref);
+      if (typeA.name !== typeB.name || resourceA.name !== resourceB.name || a[i].fieldName !== b[i].fieldName) {
         return false;
       }
     }
@@ -298,10 +303,6 @@ export class DbDiff {
     if (type.type === 'date-time') return 'date-time';
     if (type.type === 'null') return 'null';
     if (type.type === 'tag') return 'tag';
-    if (type.type === 'ref') {
-      const entity = db.get('eventTypeDefinition', type.reference.$ref);
-      return `ref:${entity.name}`;
-    }
     if (type.type === 'array') {
       return `array<${this.stringifyGenericType(type.element, db)}>`;
     }
@@ -312,7 +313,7 @@ export class DbDiff {
       const types = type.types.map((t) => this.stringifyGenericType(t, db)).sort();
       return `union<${types.join('|')}>`;
     }
-    return 'unknown';
+    throw Error(`type ${type.type} isn't supported`);
   }
 
   /**

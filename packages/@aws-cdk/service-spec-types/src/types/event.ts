@@ -42,6 +42,7 @@ export interface Event extends Entity {
 export interface ResourceField {
   type: Reference<EventTypeDefinition>;
   fieldName?: string;
+  resource: Reference<Resource>;
 }
 
 export type ResourceHasEvent = Relationship<Resource, Event>;
