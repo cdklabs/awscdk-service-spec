@@ -1,6 +1,7 @@
 import { IndentedStringBuilder } from './indented-string-builder';
 import { FreeFunction } from '../callable';
 import { ClassType } from '../class';
+import { EnumType } from '../enum';
 import { InterfaceType } from '../interface';
 import { Module } from '../module';
 import { MonkeyPatchedType } from '../monkey-patched-type';
@@ -54,6 +55,9 @@ export abstract class Renderer {
       case DeclarationKind.Interface:
         this.renderInterface(decl as InterfaceType);
         break;
+      case DeclarationKind.Enum:
+        this.renderEnum(decl as EnumType);
+        break;
       case DeclarationKind.Function:
         this.renderFunction(decl as FreeFunction);
         break;
@@ -77,6 +81,11 @@ export abstract class Renderer {
    * Render an interface.
    */
   protected abstract renderInterface(interfaceType: InterfaceType): void;
+
+  /**
+   * Render an enum.
+   */
+  protected abstract renderEnum(enumType: EnumType): void;
 
   /**
    * Render a callable.

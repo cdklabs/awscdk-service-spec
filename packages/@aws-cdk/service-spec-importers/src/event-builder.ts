@@ -98,7 +98,6 @@ export class EventBuilder extends PropertyBagBuilder {
       description: options.description,
       rootProperty: { $ref: options.rootProperty.$id },
       resourcesField: [],
-      isLinkedToResource: false,
     });
 
     return new EventBuilder(db, schemaName, options, event);
@@ -141,7 +140,6 @@ export class EventBuilder extends PropertyBagBuilder {
       description: this.options.description,
       rootProperty: { $ref: rootProperty.$id },
       resourcesField: [],
-      isLinkedToResource: false,
     });
 
     (this as any)._propertyBag = this.event;
@@ -155,9 +153,6 @@ export class EventBuilder extends PropertyBagBuilder {
   public linkResourceToEvent(resource: Resource, resourceField: ResourceField) {
     this.resourcesToLink.push(resource);
     this.addResourceField(resourceField);
-    if (this.event) {
-      this.event.isLinkedToResource = true;
-    }
   }
 
   public linkServiceToEvent(service: Service) {
