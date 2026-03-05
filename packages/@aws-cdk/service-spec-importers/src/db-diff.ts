@@ -295,14 +295,9 @@ export class DbDiff {
    * Stringify a generic property type for comparison.
    */
   private stringifyGenericType(type: EventProperty['type'], db: SpecDatabase): string {
-    if (type.type === 'string') return 'string';
-    if (type.type === 'number') return 'number';
-    if (type.type === 'integer') return 'integer';
-    if (type.type === 'boolean') return 'boolean';
-    if (type.type === 'json') return 'json';
-    if (type.type === 'date-time') return 'date-time';
-    if (type.type === 'null') return 'null';
-    if (type.type === 'tag') return 'tag';
+    if (['string', 'number', 'integer', 'boolean', 'json', 'date-time', 'null', 'tag', 'ref'].includes(type.type)) {
+      return type.type;
+    }
     if (type.type === 'array') {
       return `array<${this.stringifyGenericType(type.element, db)}>`;
     }
@@ -313,7 +308,7 @@ export class DbDiff {
       const types = type.types.map((t) => this.stringifyGenericType(t, db)).sort();
       return `union<${types.join('|')}>`;
     }
-    throw Error(`type ${type.type} isn't supported`);
+    throw Error(`type ${type} isn't supported`);
   }
 
   /**
