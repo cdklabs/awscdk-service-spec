@@ -39,7 +39,7 @@ export DeliveryDestinations {
 
 ### VendedLogs Interface
 
-The minimum information needed to set up a vended logs delivery is `logType` and `destinationType`. `permissionsVersion` is also required but only for S3 destinations. These are the only mandatory properties.
+The minimum information needed to set up a vended logs delivery is `logType` and `destinationType`. `permissionsVersion` is also required but only for S3 destinations and it does not vary based on destination. These are the only mandatory properties.
 
 `mandatoryFields` and `optionalFields` together represent `RecordFields`. They are split so that `mandatoryFields` can be sent directly to the `CfnDelivery` object in the `VendedLogsMixin` — this prevents users from accidentally omitting a required field. Both are optional on the interface because not every log type has them.
 
