@@ -522,13 +522,13 @@ export class DiffFormatter {
     propsTree.emit(`\nrootProperty: ${rootTypeDef.name}`);
 
     if (e.resourcesField && e.resourcesField.length > 0) {
-      const resourceFields = e.resourcesField
-        .map((rf) => {
-          const typeDef = this.dbs[db].get('eventTypeDefinition', rf.type.$ref);
-          return rf.fieldName ? `${typeDef.name}.${rf.fieldName}` : typeDef.name;
-        })
-        .join(', ');
-      propsTree.emit(`\nresourcesField: [${resourceFields}]`);
+      const resourceFields = e.resourcesField.map((rf) => {
+        const typeDef = this.dbs[db].get('eventTypeDefinition', rf.type.$ref);
+        const resource = this.dbs[db].get('resource', rf.resource.$ref);
+
+        return { type: typeDef.name, fieldName: rf.fieldName, resource: resource.name };
+      });
+      propsTree.emit(`\nresourcesFields: ${JSON.stringify(resourceFields, null, 2)}`);
     }
 
     return new PrintableTree(`event ${e.name}`).addBullets([
@@ -557,22 +557,22 @@ export class DiffFormatter {
 
     if (e.resourcesField) {
       if (e.resourcesField.old && e.resourcesField.old.length > 0) {
-        const oldFields = e.resourcesField.old
-          .map((rf) => {
-            const typeDef = this.dbs[OLD_DB].get('eventTypeDefinition', rf.type.$ref);
-            return rf.fieldName ? `${typeDef.name}.${rf.fieldName}` : typeDef.name;
-          })
-          .join(', ');
-        simpleTree.emit(`\n${chalk.red(`- resourcesField: [${oldFields}]`)}`);
+        const oldFields = e.resourcesField.old.map((rf) => {
+          const typeDef = this.dbs[OLD_DB].get('eventTypeDefinition', rf.type.$ref);
+          const resource = this.dbs[OLD_DB].get('resource', rf.resource.$ref);
+
+          return { type: typeDef.name, fieldName: rf.fieldName, resource: resource.name };
+        });
+        simpleTree.emit(`\n${chalk.red(`- resourcesField: ${JSON.stringify(oldFields, null, 2)}`)}`);
       }
       if (e.resourcesField.new && e.resourcesField.new.length > 0) {
-        const newFields = e.resourcesField.new
-          .map((rf) => {
-            const typeDef = this.dbs[NEW_DB].get('eventTypeDefinition', rf.type.$ref);
-            return rf.fieldName ? `${typeDef.name}.${rf.fieldName}` : typeDef.name;
-          })
-          .join(', ');
-        simpleTree.emit(`\n${chalk.green(`+ resourcesField: [${newFields}]`)}`);
+        const newFields = e.resourcesField.new.map((rf) => {
+          const typeDef = this.dbs[NEW_DB].get('eventTypeDefinition', rf.type.$ref);
+          const resource = this.dbs[NEW_DB].get('resource', rf.resource.$ref);
+
+          return { type: typeDef.name, fieldName: rf.fieldName, resource: resource.name };
+        });
+        simpleTree.emit(`\n${chalk.green(`+ resourcesField: ${JSON.stringify(newFields, null, 2)}`)}`);
       }
     }
 
