@@ -159,6 +159,9 @@
         },
         {
           "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type OobRelationshipData --out schemas/OobRelationshipData.schema.json"
+        },
+        {
+          "exec": "ts-json-schema-generator --tsconfig tsconfig.json --type AwsPartitionsSource --out schemas/AwsPartitionsSource.schema.json"
         }
       ]
     },
