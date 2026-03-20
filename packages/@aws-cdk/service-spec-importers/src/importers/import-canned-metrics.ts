@@ -49,7 +49,7 @@ export function importCannedMetrics(
           name: d.dimensionName,
           value: d.dimensionValue,
         }));
-        // Temporary name: PerDim1PerDim2
+        // Temporary name: Dim1PerDim2
         const dimsetName = dimensions.map((d) => d.name).join('Per');
         const dimensionSet = db.allocate(
           'dimensionSet',
