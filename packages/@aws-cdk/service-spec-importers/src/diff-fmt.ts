@@ -1,6 +1,9 @@
 import {
+  ChangedDimensionSet,
   ChangedMetric,
   Deprecation,
+  Dimension,
+  DimensionSet,
   MapDiff,
   Metric,
   Property,
@@ -70,7 +73,7 @@ export class DiffFormatter {
         'metrics',
         [...this.dbs[db].follow('serviceHasMetric', s)]
           .sort(sortByKey((e) => e.entity.name))
-          .map((e) => this.renderMetric(e.entity).prefix([' '])),
+          .map((e) => this.renderMetric(e.entity, db).prefix([' '])),
       ),
       listWithCaption(
         'metrics',
@@ -98,7 +101,7 @@ export class DiffFormatter {
         'metrics',
         this.renderMapDiff(
           s.metrics,
-          (m) => this.renderMetric(m).prefix([' ']),
+          (m, db) => this.renderMetric(m, db).prefix([' ']),
           (k, u) => this.renderUpdatedMetric(k, u).prefix([' ']),
         ),
       ),
@@ -145,7 +148,7 @@ export class DiffFormatter {
         'metrics',
         [...this.dbs[db].follow('resourceHasMetric', r)]
           .sort(sortByKey((e) => e.entity.name))
-          .map((e) => this.renderMetric(e.entity).prefix([' '])),
+          .map((e) => this.renderMetric(e.entity, db).prefix([' '])),
       ),
       listWithCaption(
         'events',
@@ -188,7 +191,7 @@ export class DiffFormatter {
         'metrics',
         this.renderMapDiff(
           r.metrics,
-          (m) => this.renderMetric(m).prefix([' ']),
+          (m, db) => this.renderMetric(m, db).prefix([' ']),
           (k, u) => this.renderUpdatedMetric(k, u).prefix([' ']),
         ),
       ),
@@ -218,14 +221,59 @@ export class DiffFormatter {
     ]);
   }
 
-  private renderMetric(m: Metric): PrintableTree {
-    return new PrintableTree(`${m.namespace} • ${m.name} • ${m.statistic}`);
+  private renderMetric(m: Metric, db: number): PrintableTree {
+    const tree = new PrintableTree(`${m.namespace} • ${m.name} • ${m.statistic}`);
+    if (m.description) {
+      tree.addBullets([new PrintableTree(`description: ${m.description}`).indent(META_INDENT)]);
+    }
+    const dimSets = this.dbs[db].follow('usesDimensionSet', m);
+    if (dimSets.length > 0) {
+      tree.addBullets([
+        listWithCaption(
+          'dimensionSets',
+          dimSets.map((ds) => this.renderDimensionSet(ds.entity).prefix([' '])),
+        ),
+      ]);
+    }
+    return tree;
   }
 
   private renderUpdatedMetric(k: string, u: ChangedMetric): PrintableTree {
+    const d = pick(u, ['statistic', 'description']);
     return new PrintableTree(k).addBullets([
-      new PrintableTree(...listFromDiffs(pick(u, ['statistic']))).indent(META_INDENT),
+      new PrintableTree(...listFromDiffs(d)).indent(META_INDENT),
+      listWithCaption(
+        'dimensionSets',
+        this.renderMapDiff(
+          u.dimensionSets,
+          (ds) => this.renderDimensionSet(ds).prefix([' ']),
+          (key, uds) => this.renderUpdatedDimensionSet(key, uds).prefix([' ']),
+        ),
+      ),
     ]);
+  }
+
+  private renderDimensionSet(ds: DimensionSet): PrintableTree {
+    const dims = ds.dimensions.map((d) => (d.value ? `${d.name}=${d.value}` : d.name)).join(', ');
+    return new PrintableTree(`${ds.name} [${dims}]`);
+  }
+
+  private renderUpdatedDimensionSet(key: string, u: ChangedDimensionSet): PrintableTree {
+    const bullets: PrintableTree[] = [];
+    if (u.name) {
+      bullets.push(new PrintableTree(...listFromDiffs(pick(u, ['name']))).indent(META_INDENT));
+    }
+    if (u.dimensions) {
+      const renderDims = (dims?: Dimension[]) =>
+        (dims ?? []).map((d) => (d.value ? `${d.name}=${d.value}` : d.name)).join(', ');
+      bullets.push(
+        new PrintableTree(
+          chalk.red(`- dimensions: [${renderDims(u.dimensions.old)}]`),
+          chalk.green(`+ dimensions: [${renderDims(u.dimensions.new)}]`),
+        ).indent(META_INDENT),
+      );
+    }
+    return new PrintableTree(key).addBullets(bullets);
   }
   private formatRelRefs(refs?: RelationshipRef[]): string {
     if (!refs?.length) return 'undefined';
