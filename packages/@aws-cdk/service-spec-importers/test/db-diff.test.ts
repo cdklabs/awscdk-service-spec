@@ -43,8 +43,20 @@ test('metrics diff only on statistic and ignore dedup key for diff', () => {
 });
 
 test('metrics diff detects description change', () => {
-  const m1 = db1.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '1', description: 'old desc' });
-  const m2 = db2.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '2', description: 'new desc' });
+  const m1 = db1.allocate('metric', {
+    namespace: 'NS',
+    name: 'Name',
+    statistic: 'Average',
+    dedupKey: '1',
+    description: 'old desc',
+  });
+  const m2 = db2.allocate('metric', {
+    namespace: 'NS',
+    name: 'Name',
+    statistic: 'Average',
+    dedupKey: '2',
+    description: 'new desc',
+  });
 
   const md = diff.diffMetrics([m1], [m2]);
   const changes = Object.values(md?.updated || {});
@@ -58,7 +70,11 @@ test('metrics diff detects dimension set added', () => {
   const m1 = db1.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '1' });
   const m2 = db2.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '2' });
 
-  const ds = db2.allocate('dimensionSet', { dedupKey: 'ds1', name: 'PerInstance', dimensions: [{ name: 'InstanceId' }] });
+  const ds = db2.allocate('dimensionSet', {
+    dedupKey: 'ds1',
+    name: 'PerInstance',
+    dimensions: [{ name: 'InstanceId' }],
+  });
   db2.link('usesDimensionSet', m2, ds);
 
   const md = diff.diffMetrics([m1], [m2]);
@@ -73,7 +89,11 @@ test('metrics diff detects dimension set removed', () => {
   const m1 = db1.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '1' });
   const m2 = db2.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '2' });
 
-  const ds = db1.allocate('dimensionSet', { dedupKey: 'ds1', name: 'PerInstance', dimensions: [{ name: 'InstanceId' }] });
+  const ds = db1.allocate('dimensionSet', {
+    dedupKey: 'ds1',
+    name: 'PerInstance',
+    dimensions: [{ name: 'InstanceId' }],
+  });
   db1.link('usesDimensionSet', m1, ds);
 
   const md = diff.diffMetrics([m1], [m2]);
@@ -88,8 +108,16 @@ test('metrics diff detects dimension set dimensions changed', () => {
   const m1 = db1.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '1' });
   const m2 = db2.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '2' });
 
-  const ds1 = db1.allocate('dimensionSet', { dedupKey: 'ds1', name: 'PerInstance', dimensions: [{ name: 'InstanceId' }] });
-  const ds2 = db2.allocate('dimensionSet', { dedupKey: 'ds2', name: 'PerInstance', dimensions: [{ name: 'InstanceId' }, { name: 'AZ' }] });
+  const ds1 = db1.allocate('dimensionSet', {
+    dedupKey: 'ds1',
+    name: 'PerInstance',
+    dimensions: [{ name: 'InstanceId' }],
+  });
+  const ds2 = db2.allocate('dimensionSet', {
+    dedupKey: 'ds2',
+    name: 'PerInstance',
+    dimensions: [{ name: 'InstanceId' }, { name: 'AZ' }],
+  });
   db1.link('usesDimensionSet', m1, ds1);
   db2.link('usesDimensionSet', m2, ds2);
 
@@ -110,8 +138,16 @@ test('metrics diff reports no change when dimension sets are identical', () => {
   const m1 = db1.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '1' });
   const m2 = db2.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '2' });
 
-  const ds1 = db1.allocate('dimensionSet', { dedupKey: 'ds1', name: 'PerInstance', dimensions: [{ name: 'InstanceId' }] });
-  const ds2 = db2.allocate('dimensionSet', { dedupKey: 'ds2', name: 'PerInstance', dimensions: [{ name: 'InstanceId' }] });
+  const ds1 = db1.allocate('dimensionSet', {
+    dedupKey: 'ds1',
+    name: 'PerInstance',
+    dimensions: [{ name: 'InstanceId' }],
+  });
+  const ds2 = db2.allocate('dimensionSet', {
+    dedupKey: 'ds2',
+    name: 'PerInstance',
+    dimensions: [{ name: 'InstanceId' }],
+  });
   db1.link('usesDimensionSet', m1, ds1);
   db2.link('usesDimensionSet', m2, ds2);
 

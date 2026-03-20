@@ -254,7 +254,7 @@ export class DiffFormatter {
   }
 
   private renderDimensionSet(ds: DimensionSet): PrintableTree {
-    const dims = ds.dimensions.map((d) => d.value ? `${d.name}=${d.value}` : d.name).join(', ');
+    const dims = ds.dimensions.map((d) => (d.value ? `${d.name}=${d.value}` : d.name)).join(', ');
     return new PrintableTree(`${ds.name} [${dims}]`);
   }
 
@@ -264,11 +264,14 @@ export class DiffFormatter {
       bullets.push(new PrintableTree(...listFromDiffs(pick(u, ['name']))).indent(META_INDENT));
     }
     if (u.dimensions) {
-      const renderDims = (dims?: Dimension[]) => (dims ?? []).map((d) => d.value ? `${d.name}=${d.value}` : d.name).join(', ');
-      bullets.push(new PrintableTree(
-        chalk.red(`- dimensions: [${renderDims(u.dimensions.old)}]`),
-        chalk.green(`+ dimensions: [${renderDims(u.dimensions.new)}]`),
-      ).indent(META_INDENT));
+      const renderDims = (dims?: Dimension[]) =>
+        (dims ?? []).map((d) => (d.value ? `${d.name}=${d.value}` : d.name)).join(', ');
+      bullets.push(
+        new PrintableTree(
+          chalk.red(`- dimensions: [${renderDims(u.dimensions.old)}]`),
+          chalk.green(`+ dimensions: [${renderDims(u.dimensions.new)}]`),
+        ).indent(META_INDENT),
+      );
     }
     return new PrintableTree(key).addBullets(bullets);
   }
