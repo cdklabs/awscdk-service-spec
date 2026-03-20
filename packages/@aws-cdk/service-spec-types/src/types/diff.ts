@@ -1,5 +1,5 @@
 import { Event, EventTypeDefinition, EventProperty } from './event';
-import { Metric } from './metrics';
+import { Dimension, DimensionSet, Metric } from './metrics';
 import { Attribute, Property, Resource, Service, TypeDefinition } from './resource';
 
 export interface SpecDatabaseDiff {
@@ -30,6 +30,13 @@ export interface UpdatedService {
 
 export interface ChangedMetric {
   readonly statistic?: ScalarDiff<string>;
+  readonly description?: ScalarDiff<string>;
+  readonly dimensionSets?: MapDiff<DimensionSet, ChangedDimensionSet>;
+}
+
+export interface ChangedDimensionSet {
+  readonly name?: ScalarDiff<string>;
+  readonly dimensions?: ScalarDiff<Dimension[]>;
 }
 
 export interface UpdatedResource {

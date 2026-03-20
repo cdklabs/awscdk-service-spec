@@ -24,6 +24,10 @@ export interface DimensionSet extends Entity {
    */
   dedupKey: string;
   /**
+   * Human-readable name for this dimension set
+   */
+  name: string;
+  /**
    * The dimensions in this set
    */
   dimensions: Dimension[];
@@ -51,6 +55,10 @@ export interface Metric extends Entity {
    * A unique value used to deduplicate the entity
    */
   readonly dedupKey: string;
+  /**
+   * Description of the metric
+   */
+  readonly description?: string;
 }
 export type UsesDimensionSet = Relationship<Metric, DimensionSet>;
 export type ResourceHasMetric = Relationship<Resource, Metric>;

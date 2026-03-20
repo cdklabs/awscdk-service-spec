@@ -1,6 +1,8 @@
 import {
   Attribute,
+  ChangedDimensionSet,
   ChangedMetric,
+  DimensionSet,
   Metric,
   Property,
   PropertyType,
@@ -102,7 +104,29 @@ export class DbDiff {
   private diffMetric(a: Metric, b: Metric): ChangedMetric | undefined {
     return collapseUndefined({
       statistic: diffScalar(a, b, 'statistic'),
+      description: diffScalar(a, b, 'description'),
+      dimensionSets: this.diffMetricDimensionSets(a, b),
     } satisfies AllFieldsGiven<ChangedMetric>);
+  }
+
+  private diffMetricDimensionSets(a: Metric, b: Metric): ChangedMetric['dimensionSets'] {
+    const aDimSets = this.db1.follow('usesDimensionSet', a).map((r) => r.entity);
+    const bDimSets = this.db2.follow('usesDimensionSet', b).map((r) => r.entity);
+    return collapseEmptyDiff(
+      diffByKey(
+        aDimSets,
+        bDimSets,
+        (ds) => ds.name,
+        (x, y) => this.diffDimensionSet(x, y),
+      ),
+    );
+  }
+
+  private diffDimensionSet(a: DimensionSet, b: DimensionSet): ChangedDimensionSet | undefined {
+    return collapseUndefined({
+      name: diffScalar(a, b, 'name'),
+      dimensions: diffField(a, b, 'dimensions', jsonEq),
+    } satisfies AllFieldsGiven<ChangedDimensionSet>);
   }
 
   public diffServiceResources(a: Service, b: Service): UpdatedService['resourceDiff'] {

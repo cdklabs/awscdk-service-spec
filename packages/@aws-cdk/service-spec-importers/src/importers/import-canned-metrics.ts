@@ -49,7 +49,12 @@ export function importCannedMetrics(
           name: d.dimensionName,
           value: d.dimensionValue,
         }));
-        const dimensionSet = db.allocate('dimensionSet', dedup({ dimensions }, ['dimensions'], service.name));
+        // Temporary name: PerDim1PerDim2
+        const dimsetName = dimensions.map((d) => d.name).join('Per');
+        const dimensionSet = db.allocate(
+          'dimensionSet',
+          dedup({ dimensions, name: dimsetName }, ['dimensions'], service.name),
+        );
         db.link('resourceHasDimensionSet', resource, dimensionSet);
         db.link('serviceHasDimensionSet', service, dimensionSet);
 

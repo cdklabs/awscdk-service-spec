@@ -42,6 +42,83 @@ test('metrics diff only on statistic and ignore dedup key for diff', () => {
   });
 });
 
+test('metrics diff detects description change', () => {
+  const m1 = db1.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '1', description: 'old desc' });
+  const m2 = db2.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '2', description: 'new desc' });
+
+  const md = diff.diffMetrics([m1], [m2]);
+  const changes = Object.values(md?.updated || {});
+  expect(changes.length).toBe(1);
+  expect(changes[0]).toMatchObject({
+    description: { old: 'old desc', new: 'new desc' },
+  });
+});
+
+test('metrics diff detects dimension set added', () => {
+  const m1 = db1.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '1' });
+  const m2 = db2.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '2' });
+
+  const ds = db2.allocate('dimensionSet', { dedupKey: 'ds1', name: 'PerInstance', dimensions: [{ name: 'InstanceId' }] });
+  db2.link('usesDimensionSet', m2, ds);
+
+  const md = diff.diffMetrics([m1], [m2]);
+  const changes = Object.values(md?.updated || {});
+  expect(changes.length).toBe(1);
+  expect(changes[0].dimensionSets?.added).toMatchObject({
+    PerInstance: expect.objectContaining({ name: 'PerInstance', dimensions: [{ name: 'InstanceId' }] }),
+  });
+});
+
+test('metrics diff detects dimension set removed', () => {
+  const m1 = db1.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '1' });
+  const m2 = db2.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '2' });
+
+  const ds = db1.allocate('dimensionSet', { dedupKey: 'ds1', name: 'PerInstance', dimensions: [{ name: 'InstanceId' }] });
+  db1.link('usesDimensionSet', m1, ds);
+
+  const md = diff.diffMetrics([m1], [m2]);
+  const changes = Object.values(md?.updated || {});
+  expect(changes.length).toBe(1);
+  expect(changes[0].dimensionSets?.removed).toMatchObject({
+    PerInstance: expect.objectContaining({ name: 'PerInstance' }),
+  });
+});
+
+test('metrics diff detects dimension set dimensions changed', () => {
+  const m1 = db1.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '1' });
+  const m2 = db2.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '2' });
+
+  const ds1 = db1.allocate('dimensionSet', { dedupKey: 'ds1', name: 'PerInstance', dimensions: [{ name: 'InstanceId' }] });
+  const ds2 = db2.allocate('dimensionSet', { dedupKey: 'ds2', name: 'PerInstance', dimensions: [{ name: 'InstanceId' }, { name: 'AZ' }] });
+  db1.link('usesDimensionSet', m1, ds1);
+  db2.link('usesDimensionSet', m2, ds2);
+
+  const md = diff.diffMetrics([m1], [m2]);
+  const changes = Object.values(md?.updated || {});
+  expect(changes.length).toBe(1);
+  expect(changes[0].dimensionSets?.updated).toMatchObject({
+    PerInstance: {
+      dimensions: {
+        old: [{ name: 'InstanceId' }],
+        new: [{ name: 'InstanceId' }, { name: 'AZ' }],
+      },
+    },
+  });
+});
+
+test('metrics diff reports no change when dimension sets are identical', () => {
+  const m1 = db1.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '1' });
+  const m2 = db2.allocate('metric', { namespace: 'NS', name: 'Name', statistic: 'Average', dedupKey: '2' });
+
+  const ds1 = db1.allocate('dimensionSet', { dedupKey: 'ds1', name: 'PerInstance', dimensions: [{ name: 'InstanceId' }] });
+  const ds2 = db2.allocate('dimensionSet', { dedupKey: 'ds2', name: 'PerInstance', dimensions: [{ name: 'InstanceId' }] });
+  db1.link('usesDimensionSet', m1, ds1);
+  db2.link('usesDimensionSet', m2, ds2);
+
+  const md = diff.diffMetrics([m1], [m2]);
+  expect(md).toBeUndefined();
+});
+
 test('event diff ignores different $ref IDs when event type definitions have same name or resource in resourcesField has the same name', () => {
   const eventType1 = db1.allocate('eventTypeDefinition', { name: 'WorkSpacesAccess', properties: {} });
   const eventType2 = db2.allocate('eventTypeDefinition', { name: 'WorkSpacesAccess', properties: {} });
