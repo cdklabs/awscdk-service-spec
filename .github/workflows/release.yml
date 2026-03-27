@@ -62,7 +62,7 @@ jobs:
         working-directory: packages/@cdklabs/tskb
       - name: "@cdklabs/tskb: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7
         with:
           name: cdklabs-tskb_build-artifact
           path: packages/@cdklabs/tskb/dist
@@ -74,7 +74,7 @@ jobs:
         working-directory: packages/@cdklabs/typewriter
       - name: "@cdklabs/typewriter: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7
         with:
           name: cdklabs-typewriter_build-artifact
           path: packages/@cdklabs/typewriter/dist
@@ -86,7 +86,7 @@ jobs:
         working-directory: packages/@aws-cdk/service-spec-types
       - name: "@aws-cdk/service-spec-types: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7
         with:
           name: aws-cdk-service-spec-types_build-artifact
           path: packages/@aws-cdk/service-spec-types/dist
@@ -98,7 +98,7 @@ jobs:
         working-directory: packages/@aws-cdk/service-spec-importers
       - name: "@aws-cdk/service-spec-importers: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7
         with:
           name: aws-cdk-service-spec-importers_build-artifact
           path: packages/@aws-cdk/service-spec-importers/dist
@@ -110,7 +110,7 @@ jobs:
         working-directory: packages/@aws-cdk/aws-service-spec
       - name: "@aws-cdk/aws-service-spec: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7
         with:
           name: aws-cdk-aws-service-spec_build-artifact
           path: packages/@aws-cdk/aws-service-spec/dist
@@ -130,7 +130,7 @@ jobs:
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: cdklabs-tskb_build-artifact
           path: dist
@@ -155,7 +155,7 @@ jobs:
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: cdklabs-tskb_build-artifact
           path: dist
@@ -184,7 +184,7 @@ jobs:
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: cdklabs-typewriter_build-artifact
           path: dist
@@ -209,7 +209,7 @@ jobs:
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: cdklabs-typewriter_build-artifact
           path: dist
@@ -238,7 +238,7 @@ jobs:
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: aws-cdk-service-spec-types_build-artifact
           path: dist
@@ -263,7 +263,7 @@ jobs:
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: aws-cdk-service-spec-types_build-artifact
           path: dist
@@ -292,7 +292,7 @@ jobs:
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: aws-cdk-service-spec-importers_build-artifact
           path: dist
@@ -317,7 +317,7 @@ jobs:
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: aws-cdk-service-spec-importers_build-artifact
           path: dist
@@ -346,7 +346,7 @@ jobs:
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: aws-cdk-aws-service-spec_build-artifact
           path: dist
@@ -371,7 +371,7 @@ jobs:
         with:
           node-version: lts/*
       - name: Download build artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: aws-cdk-aws-service-spec_build-artifact
           path: dist

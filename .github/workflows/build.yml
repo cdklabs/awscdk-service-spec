@@ -38,7 +38,7 @@ jobs:
         working-directory: ./
       - name: Upload patch
         if: steps.self_mutation.outputs.self_mutation_happened
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7
         with:
           name: repo.patch
           path: repo.patch
@@ -50,7 +50,7 @@ jobs:
           cat repo.patch
           exit 1
       - name: Upload head database
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7
         with:
           name: db.head.json.gz
           path: packages/@aws-cdk/aws-service-spec/db.json.gz
@@ -70,7 +70,7 @@ jobs:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           lfs: true
       - name: Download patch
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: repo.patch
           path: ${{ runner.temp }}
@@ -106,7 +106,7 @@ jobs:
         run: npx projen nx compile
         working-directory: packages/@aws-cdk/aws-service-spec
       - name: Upload base database
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7
         with:
           name: db.base.json.gz
           path: packages/@aws-cdk/aws-service-spec/db.json.gz
@@ -136,12 +136,12 @@ jobs:
         run: npx projen nx compile
         working-directory: packages/@aws-cdk/service-spec-importers
       - name: Download base database
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: db.base.json.gz
           path: base
       - name: Download head database
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: db.head.json.gz
           path: head
@@ -151,7 +151,7 @@ jobs:
         continue-on-error: true
       - name: Upload diff
         if: steps.diff-db.outputs.diff-result
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7
         with:
           name: db-diff-${{ github.event.pull_request.head.sha }}
           path: DIFF
