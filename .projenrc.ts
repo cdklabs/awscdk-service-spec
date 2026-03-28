@@ -139,6 +139,7 @@ const serviceSpecSchemaTask = serviceSpecImporters.addTask('gen-schemas', {
     'GetAttAllowList',
     'CfnPrimaryIdentifierOverrides',
     'OobRelationshipData',
+    'AwsPartitionsSource',
   ].map((typeName: string) => ({
     exec: [
       'ts-json-schema-generator',
@@ -272,6 +273,14 @@ new SingleSource(repo, {
   dir: 'sources/StatefulResources',
   source:
     'https://raw.githubusercontent.com/aws-cloudformation/cfn-lint/main/src/cfnlint/data/AdditionalSpecs/StatefulResources.json',
+});
+
+// AWS Partitions and Regions data from AWS SDK JS v3
+new SingleSource(repo, {
+  name: 'aws-partitions',
+  dir: 'sources/AwsPartitions',
+  source:
+    'https://raw.githubusercontent.com/aws/aws-sdk-js-v3/main/packages/util-endpoints/src/lib/aws/partitions.json',
 });
 
 new ScriptSource(repo, {
