@@ -26,6 +26,12 @@
     "strictPropertyInitialization": true,
     "stripInternal": true,
     "target": "ES2022",
+    "types": [
+      "fs-extra",
+      "glob",
+      "jest",
+      "node"
+    ],
     "skipLibCheck": true,
     "composite": true
   },

@@ -14,7 +14,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           lfs: true
       - name: Set git identity
@@ -22,9 +22,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Setup Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: lts/*
+          package-manager-cache: false
       - name: Install dependencies
         run: yarn install --check-files --frozen-lockfile
       - name: Federate into AWS
@@ -38,7 +39,7 @@ jobs:
         run: npx projen update-source:eventbridge-schema
       - name: Create Pull Request
         id: create-pr
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.PROJEN_GITHUB_TOKEN }}
           commit-message: |-

@@ -25,7 +25,10 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "stripInternal": true,
-    "target": "ES2022"
+    "target": "ES2022",
+    "types": [
+      "node"
+    ]
   },
   "include": [],
   "exclude": [],

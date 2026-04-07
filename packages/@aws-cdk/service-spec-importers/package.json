@@ -68,6 +68,13 @@
     "glob": "^8",
     "sort-json": "^2.0.1"
   },
+  "devEngines": {
+    "packageManager": {
+      "name": "yarn",
+      "version": "<2.0.0",
+      "onFail": "ignore"
+    }
+  },
   "main": "lib/index.js",
   "license": "Apache-2.0",
   "publishConfig": {
