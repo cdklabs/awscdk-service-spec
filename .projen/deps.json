@@ -6,7 +6,7 @@
     },
     {
       "name": "@stylistic/eslint-plugin",
-      "version": "^2",
+      "version": "^3",
       "type": "build"
     },
     {
@@ -15,12 +15,10 @@
     },
     {
       "name": "@typescript-eslint/eslint-plugin",
-      "version": "^6",
       "type": "build"
     },
     {
       "name": "@typescript-eslint/parser",
-      "version": "^6",
       "type": "build"
     },
     {
