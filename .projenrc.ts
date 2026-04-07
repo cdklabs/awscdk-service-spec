@@ -17,9 +17,9 @@ const repo = new YarnMonorepo({
     'cdklabs-projen-project-types',
     'node-fetch@^2',
     'eslint',
-    '@typescript-eslint/parser@^6',
-    '@typescript-eslint/eslint-plugin@^6',
-    '@stylistic/eslint-plugin@^2',
+    '@typescript-eslint/parser',
+    '@typescript-eslint/eslint-plugin',
+    '@stylistic/eslint-plugin@^3',
     'eslint-plugin-import',
     '@aws-sdk/client-schemas',
   ],
@@ -119,6 +119,9 @@ const serviceSpecImporters = new TypeScriptWorkspace({
       skipLibCheck: true,
       target: 'ES2022',
       lib: ['es2022'],
+      // ts-json-schema-generator creates its own TS program and can't resolve
+      // hoisted @types packages without explicit typeRoots
+      typeRoots: ['../../../node_modules/@types'],
     },
   },
 });

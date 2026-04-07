@@ -26,7 +26,16 @@
     "strictPropertyInitialization": true,
     "stripInternal": true,
     "target": "ES2022",
+    "types": [
+      "fs-extra",
+      "glob",
+      "jest",
+      "node"
+    ],
     "skipLibCheck": true,
+    "typeRoots": [
+      "../../../node_modules/@types"
+    ],
     "composite": true
   },
   "include": [

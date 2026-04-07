@@ -21,7 +21,7 @@ jobs:
       CI: "true"
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           lfs: true
@@ -30,9 +30,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: lts/*
+          package-manager-cache: false
       - name: Install dependencies
         run: yarn install --check-files --frozen-lockfile
       - name: release
@@ -126,9 +127,10 @@ jobs:
     environment: release
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-cdklabs-tskb == 'true' }}
     steps:
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: lts/*
+          package-manager-cache: "false"
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
@@ -151,9 +153,10 @@ jobs:
     environment: release
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-cdklabs-tskb == 'true' }}
     steps:
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: lts/*
+          package-manager-cache: "false"
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
@@ -180,9 +183,10 @@ jobs:
     environment: release
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-cdklabs-typewriter == 'true' }}
     steps:
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: lts/*
+          package-manager-cache: "false"
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
@@ -205,9 +209,10 @@ jobs:
     environment: release
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-cdklabs-typewriter == 'true' }}
     steps:
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: lts/*
+          package-manager-cache: "false"
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
@@ -234,9 +239,10 @@ jobs:
     environment: release
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-service-spec-types == 'true' }}
     steps:
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: lts/*
+          package-manager-cache: "false"
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
@@ -259,9 +265,10 @@ jobs:
     environment: release
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-service-spec-types == 'true' }}
     steps:
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: lts/*
+          package-manager-cache: "false"
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
@@ -288,9 +295,10 @@ jobs:
     environment: release
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-service-spec-importers == 'true' }}
     steps:
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: lts/*
+          package-manager-cache: "false"
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
@@ -313,9 +321,10 @@ jobs:
     environment: release
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-service-spec-importers == 'true' }}
     steps:
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: lts/*
+          package-manager-cache: "false"
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
@@ -342,9 +351,10 @@ jobs:
     environment: release
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-aws-service-spec == 'true' }}
     steps:
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: lts/*
+          package-manager-cache: "false"
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
@@ -367,9 +377,10 @@ jobs:
     environment: release
     if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-aws-service-spec == 'true' }}
     steps:
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: lts/*
+          package-manager-cache: "false"
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:

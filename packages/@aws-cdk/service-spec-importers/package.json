@@ -53,8 +53,8 @@
     "prettier": "^2.8.8",
     "source-map-support": "^0.5.21",
     "ts-jest": "^29.4.9",
-    "ts-json-schema-generator": "^1.5.1",
-    "typescript": "^4.9.5"
+    "ts-json-schema-generator": "^2.9.0",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@aws-cdk/service-spec-types": "^0.0.0",
@@ -67,6 +67,13 @@
     "fs-extra": "^11.3.4",
     "glob": "^8",
     "sort-json": "^2.0.1"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "yarn",
+      "version": "<2.0.0",
+      "onFail": "ignore"
+    }
   },
   "main": "lib/index.js",
   "license": "Apache-2.0",
