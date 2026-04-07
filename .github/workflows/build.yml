@@ -21,13 +21,15 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           lfs: true
+      - name: Enable corepack
+        run: corepack enable
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
           package-manager-cache: false
       - name: Install dependencies
-        run: yarn install --check-files
+        run: yarn install --no-immutable
       - name: build
         run: npx projen build
       - name: Find mutations
@@ -96,13 +98,20 @@ jobs:
     if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.base.ref }}
           repository: ${{ github.event.pull_request.base.repo.full_name }}
           lfs: true
+      - name: Enable corepack
+        run: corepack enable
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+          package-manager-cache: false
       - name: Install dependencies
-        run: yarn install --check-files
+        run: yarn install --immutable
       - name: Build base database
         run: npx projen nx compile
         working-directory: packages/@aws-cdk/aws-service-spec
@@ -126,13 +135,19 @@ jobs:
     if: "!(needs.build.outputs.self_mutation_happened) && (github.event_name == 'pull_request' || github.event_name == 'pull_request_target')"
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
-          lfs: false
+      - name: Enable corepack
+        run: corepack enable
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+          package-manager-cache: false
       - name: Install dependencies
-        run: yarn install --check-files
+        run: yarn install --immutable
       - name: Build diff-db
         run: npx projen nx compile
         working-directory: packages/@aws-cdk/service-spec-importers

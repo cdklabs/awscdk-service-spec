@@ -35,7 +35,7 @@ jobs:
           node-version: lts/*
           package-manager-cache: false
       - name: Install dependencies
-        run: yarn install --check-files --frozen-lockfile
+        run: yarn install --immutable
       - name: release
         run: npx projen release
       - id: check-publish-cdklabs-tskb
