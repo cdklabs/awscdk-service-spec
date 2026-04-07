@@ -31,6 +31,9 @@
       "node"
     ],
     "skipLibCheck": true,
+    "typeRoots": [
+      "../../../node_modules/@types"
+    ],
     "composite": true,
     "outDir": "lib"
   },

@@ -119,6 +119,9 @@ const serviceSpecImporters = new TypeScriptWorkspace({
       skipLibCheck: true,
       target: 'ES2022',
       lib: ['es2022'],
+      // ts-json-schema-generator creates its own TS program and can't resolve
+      // hoisted @types packages without explicit typeRoots
+      typeRoots: ['../../../node_modules/@types'],
     },
   },
 });
