@@ -18,7 +18,9 @@ import {
   TypeDefinition,
   PropertyType,
   Region,
+  Partition,
   HasResource,
+  HasRegion,
   RegionHasResource,
   RegionHasService,
   UsesType,
@@ -32,6 +34,9 @@ export function emptyDatabase() {
       }),
       region: entityCollection<Region>().index({
         name: fieldIndex('name', stringCmp),
+      }),
+      partition: entityCollection<Partition>().index({
+        partition: fieldIndex('partition', stringCmp),
       }),
       service: entityCollection<Service>().index({
         name: fieldIndex('name', stringCmp),
@@ -54,6 +59,7 @@ export function emptyDatabase() {
     },
     (r) => ({
       hasResource: r.relationship<HasResource>('service', 'resource'),
+      hasRegion: r.relationship<HasRegion>('partition', 'region'),
       regionHasResource: r.relationship<RegionHasResource>('region', 'resource'),
       regionHasService: r.relationship<RegionHasService>('region', 'service'),
       usesType: r.relationship<UsesType>('resource', 'typeDefinition'),
