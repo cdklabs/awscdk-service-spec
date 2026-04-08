@@ -9,6 +9,7 @@ export interface DiffDbOptions {
 }
 
 export class DiffDb extends pj.Component {
+  private readonly root: yarn.Monorepo;
   private readonly workflow: pj.github.GithubWorkflow;
   private readonly serviceSpec: yarn.TypeScriptWorkspace;
   private readonly importers: yarn.TypeScriptWorkspace;
@@ -17,6 +18,7 @@ export class DiffDb extends pj.Component {
   public constructor(root: yarn.Monorepo, options: DiffDbOptions) {
     super(root);
 
+    this.root = root;
     this.workflow = root.github?.tryFindWorkflow('build')!;
     this.serviceSpec = options.serviceSpec;
     this.importers = options.serviceSpecImporters;
@@ -53,23 +55,19 @@ export class DiffDb extends pj.Component {
       permissions: {},
       if: "github.event_name == 'pull_request' || github.event_name == 'pull_request_target'",
       steps: [
-        {
+        pj.github.WorkflowSteps.checkout({
           name: 'Checkout',
-          uses: 'actions/checkout@v3',
           with: {
             ref: '${{ github.event.pull_request.base.ref }}',
             repository: '${{ github.event.pull_request.base.repo.full_name }}',
             lfs: true,
           },
-        },
-        {
-          name: 'Install dependencies',
-          run: 'yarn install --check-files',
-        },
+        }),
+        ...this.root.renderWorkflowSetup(),
         {
           name: 'Build base database',
           workingDirectory: this.path(this.serviceSpec.outdir),
-          run: 'npx projen nx compile',
+          run: `${this.serviceSpec.projenCommand} nx compile`,
         },
         pj.github.WorkflowSteps.uploadArtifact({
           name: 'Upload base database',
@@ -94,23 +92,19 @@ export class DiffDb extends pj.Component {
         pullRequests: pj.github.workflows.JobPermission.WRITE,
       },
       steps: [
-        {
+        pj.github.WorkflowSteps.checkout({
           name: 'Checkout',
-          uses: 'actions/checkout@v3',
           with: {
             ref: '${{ github.event.pull_request.head.ref }}',
             repository: '${{ github.event.pull_request.head.repo.full_name }}',
             lfs: false,
           },
-        },
-        {
-          name: 'Install dependencies',
-          run: 'yarn install --check-files',
-        },
+        }),
+        ...this.root.renderWorkflowSetup(),
         {
           name: 'Build diff-db',
           workingDirectory: this.path(this.importers.outdir),
-          run: 'npx projen nx compile',
+          run: `${this.importers.projenCommand} nx compile`,
         },
         pj.github.WorkflowSteps.downloadArtifact({
           name: 'Download base database',

@@ -25,6 +25,7 @@ const repo = new YarnMonorepo({
   ],
   vscodeWorkspace: true,
   nx: true,
+  yarnBerry: true,
 
   prettier: true,
   prettierOptions: {

@@ -48,7 +48,7 @@
   "devEngines": {
     "packageManager": {
       "name": "yarn",
-      "version": "1.22.22",
+      "version": ">=4.0.1",
       "onFail": "ignore"
     }
   },
@@ -58,6 +58,7 @@
     "access": "public"
   },
   "version": "0.0.0",
+  "packageManager": "yarn@4.13.0",
   "jest": {
     "coverageProvider": "v8",
     "testMatch": [

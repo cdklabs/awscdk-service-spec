@@ -43,20 +43,20 @@ export class AwsCdkIntegrationTest extends pj.Component {
         contents: pj.github.workflows.JobPermission.READ,
       },
       steps: [
-        {
+        pj.github.WorkflowSteps.checkout({
           name: `Checkout ${root.name}`,
-          uses: 'actions/checkout@v3',
           with: {
             path: root.name,
             ref: '${{ github.event.pull_request.head.ref }}',
             repository: '${{ github.event.pull_request.head.repo.full_name }}',
             lfs: true,
           },
-        },
+        }),
+        ...root.renderWorkflowSetup({ installStepConfiguration: { workingDirectory: root.name } }),
         {
           name: `Build ${root.name}`,
           workingDirectory: root.name,
-          run: ['yarn install --frozen-lockfile', 'yarn compile'].join('\n'),
+          run: root.runTaskCommand(root.compileTask),
         },
         ...checkoutRepository(awsCdkRepo, awsCdkPath),
         ...linkPackage(options.serviceSpec, awsCdkPath),
@@ -80,14 +80,13 @@ function awsCdkLibEnv(): Record<string, string> {
 
 function checkoutRepository(repository: string, path: string): pj.github.workflows.Step[] {
   return [
-    {
+    pj.github.WorkflowSteps.checkout({
       name: `Checkout ${repository}`,
-      uses: 'actions/checkout@v3',
       with: {
         path,
         repository,
       },
-    },
+    }),
   ];
 }
 
@@ -97,11 +96,13 @@ function linkPackage(project: pj.Project, targetPath: string): pj.github.workflo
     {
       name: `Register drop-in ${project.name} replacement`,
       workingDirectory: sourcePath,
+      env: { COREPACK_ENABLE_PROJECT_SPEC: '0' },
       run: 'yarn link',
     },
     {
       name: `Link drop-in ${project.name} replacement`,
       workingDirectory: targetPath,
+      env: { COREPACK_ENABLE_PROJECT_SPEC: '0' },
       run: `yarn link "${project.name}"`,
     },
   ];
@@ -112,6 +113,7 @@ function buildAwsCdkLib(repository: string, path: string): pj.github.workflows.S
     {
       name: `Setup ${repository}`,
       workingDirectory: path,
+      env: { COREPACK_ENABLE_PROJECT_SPEC: '0' },
       run: 'yarn install',
     },
     {
