@@ -103,8 +103,7 @@ export class DiffDb extends pj.Component {
         ...this.root.renderWorkflowSetup(),
         {
           name: 'Build diff-db',
-          workingDirectory: this.path(this.importers.outdir),
-          run: `${this.importers.projenCommand} nx compile`,
+          run: `yarn exec nx run ${this.importers.name}:compile`,
         },
         pj.github.WorkflowSteps.downloadArtifact({
           name: 'Download base database',

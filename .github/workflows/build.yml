@@ -149,8 +149,7 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
       - name: Build diff-db
-        run: yarn projen nx compile
-        working-directory: packages/@aws-cdk/service-spec-importers
+        run: yarn exec nx run @aws-cdk/service-spec-importers:compile
       - name: Download base database
         uses: actions/download-artifact@v8
         with:
