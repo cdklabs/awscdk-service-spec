@@ -248,7 +248,8 @@
       "name": "upgrade",
       "description": "Upgrade dependencies in all workspaces",
       "env": {
-        "CI": "0"
+        "CI": "0",
+        "YARN_ENABLE_IMMUTABLE_INSTALLS": "false"
       },
       "steps": [
         {

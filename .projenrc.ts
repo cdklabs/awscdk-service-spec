@@ -290,4 +290,8 @@ new ScriptSource(repo, {
   },
 });
 
+// Patch: yarn berry treats CI=0 as truthy, so we need --no-immutable explicitly
+const upgradeTask = repo.tasks.tryFind('upgrade')!;
+upgradeTask.env('YARN_ENABLE_IMMUTABLE_INSTALLS', 'false');
+
 repo.synth();
