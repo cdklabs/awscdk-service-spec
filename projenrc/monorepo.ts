@@ -1,5 +1,4 @@
 import { yarn } from 'cdklabs-projen-project-types';
-import { TypeScriptWorkspace } from './workspace';
 
 export interface YarnMonoRepoOptions extends yarn.CdkLabsMonorepoOptions {
   /**
@@ -9,11 +8,6 @@ export interface YarnMonoRepoOptions extends yarn.CdkLabsMonorepoOptions {
 }
 
 export class YarnMonorepo extends yarn.CdkLabsMonorepo {
-  get subprojects(): TypeScriptWorkspace[] {
-    // @ts-ignore
-    return [...this.projects];
-  }
-
   public constructor(options: YarnMonoRepoOptions) {
     super(options);
 
