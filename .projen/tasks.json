@@ -252,11 +252,12 @@
       "description": "Upgrade dependencies in all workspaces",
       "env": {
         "CI": "0",
-        "YARN_ENABLE_IMMUTABLE_INSTALLS": "false"
+        "YARN_ENABLE_IMMUTABLE_INSTALLS": "false",
+        "YARN_NPM_MINIMAL_AGE_GATE": "4320"
       },
       "steps": [
         {
-          "exec": "yarn dlx npm-check-updates@20 --dep=dev,optional,peer,prod,bundle --upgrade --target=minor"
+          "exec": "yarn dlx npm-check-updates@20 --dep=dev,optional,peer,prod,bundle --upgrade --target=minor --cooldown=3"
         },
         {
           "exec": "yarn workspaces foreach --all --exclude . --topological-dev run check-for-updates"

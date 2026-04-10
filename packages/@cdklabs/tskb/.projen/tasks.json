@@ -47,7 +47,8 @@
     "check-for-updates": {
       "name": "check-for-updates",
       "env": {
-        "CI": "0"
+        "CI": "0",
+        "YARN_ENABLE_IMMUTABLE_INSTALLS": "false"
       },
       "steps": [
         {
