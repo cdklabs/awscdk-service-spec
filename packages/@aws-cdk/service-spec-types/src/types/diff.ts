@@ -30,6 +30,7 @@ export interface UpdatedService {
 
 export interface ChangedMetric {
   readonly statistic?: ScalarDiff<string>;
+  readonly previousStatistics?: ScalarDiff<string[]>;
   readonly description?: ScalarDiff<string>;
   readonly dimensionSets?: MapDiff<DimensionSet, ChangedDimensionSet>;
 }

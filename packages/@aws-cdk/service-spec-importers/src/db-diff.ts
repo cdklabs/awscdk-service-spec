@@ -104,6 +104,7 @@ export class DbDiff {
   private diffMetric(a: Metric, b: Metric): ChangedMetric | undefined {
     return collapseUndefined({
       statistic: diffScalar(a, b, 'statistic'),
+      previousStatistics: diffField(a, b, 'previousStatistics', jsonEq, []),
       description: diffScalar(a, b, 'description'),
       dimensionSets: this.diffMetricDimensionSets(a, b),
     } satisfies AllFieldsGiven<ChangedMetric>);

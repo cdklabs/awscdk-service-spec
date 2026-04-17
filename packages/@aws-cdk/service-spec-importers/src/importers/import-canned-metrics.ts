@@ -68,6 +68,7 @@ export function importCannedMetrics(
               name: metricDef.name,
               namespace: group.namespace,
               statistic: metricDef.defaultStat,
+              previousStatistics: [],
             }),
           );
           db.link('usesDimensionSet', metric, dimensionSet);
