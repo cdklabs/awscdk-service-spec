@@ -52,6 +52,10 @@ export interface Metric extends Entity {
    */
   readonly statistic: string;
   /**
+   * An ordered list of the of the default statistics for this metric
+   */
+  readonly previousStatistics: string[];
+  /**
    * A unique value used to deduplicate the entity
    */
   readonly dedupKey: string;

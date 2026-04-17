@@ -239,7 +239,7 @@ export class DiffFormatter {
   }
 
   private renderUpdatedMetric(k: string, u: ChangedMetric): PrintableTree {
-    const d = pick(u, ['statistic', 'description']);
+    const d = pick(u, ['statistic', 'previousStatistics', 'description']);
     return new PrintableTree(k).addBullets([
       new PrintableTree(...listFromDiffs(d)).indent(META_INDENT),
       listWithCaption(
