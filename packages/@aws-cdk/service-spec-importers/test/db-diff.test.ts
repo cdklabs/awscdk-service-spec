@@ -54,6 +54,30 @@ test('metrics diff only on statistic and ignore dedup key for diff', () => {
   });
 });
 
+test('metrics diff detects previousStatistics change', () => {
+  const m1 = db1.allocate('metric', {
+    namespace: 'NS',
+    name: 'Name',
+    statistic: 'Average',
+    previousStatistics: ['Average'],
+    dedupKey: '1',
+  });
+  const m2 = db2.allocate('metric', {
+    namespace: 'NS',
+    name: 'Name',
+    statistic: 'Average',
+    previousStatistics: ['Average', 'Sum'],
+    dedupKey: '2',
+  });
+
+  const md = diff.diffMetrics([m1], [m2]);
+  const changes = Object.values(md?.updated || {});
+  expect(changes.length).toBe(1);
+  expect(changes[0]).toMatchObject({
+    previousStatistics: { old: ['Average'], new: ['Average', 'Sum'] },
+  });
+});
+
 test('metrics diff detects description change', () => {
   const m1 = db1.allocate('metric', {
     namespace: 'NS',
