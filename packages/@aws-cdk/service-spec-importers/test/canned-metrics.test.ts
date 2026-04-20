@@ -87,6 +87,102 @@ test('adds corresponding metrics to the database', () => {
   expect(db.follow('usesDimensionSet', metrics[1]).length).toBe(1);
 });
 
+test('deduplicates dimension sets with equal dimensions within a service', () => {
+  // GIVEN a second resource in the same service
+  const s = db.lookup('service', 'name', 'equals', 'aws-some')[0];
+  const r2 = db.allocate('resource', {
+    cloudFormationType: 'AWS::Some::Other',
+    attributes: {},
+    name: 'Other',
+    properties: {},
+  });
+  db.link('hasResource', s, r2);
+
+  // WHEN two resources declare a metric with the same dimensions
+  importCannedMetrics(
+    db,
+    [
+      {
+        id: 'AWS::Some',
+        metricTemplates: [
+          {
+            resourceType: 'AWS::Some::Type',
+            namespace: 'AWS/Some',
+            dimensions: [{ dimensionName: 'LoadBalancer' }],
+            metrics: [{ id: 'M1', name: 'M1', defaultStat: 'Sum' }],
+          },
+          {
+            resourceType: 'AWS::Some::Other',
+            namespace: 'AWS/Some',
+            dimensions: [{ dimensionName: 'LoadBalancer' }],
+            metrics: [{ id: 'M2', name: 'M2', defaultStat: 'Sum' }],
+          },
+        ],
+      },
+    ],
+    report,
+  );
+
+  // THEN exactly one dimensionSet exists and both metrics link to it
+  expect(db.all('dimensionSet').length).toBe(1);
+
+  const r1 = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0];
+  const rOther = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Other')[0];
+  const m1Set = db.follow('usesDimensionSet', db.follow('resourceHasMetric', r1)[0].entity)[0].entity;
+  const m2Set = db.follow('usesDimensionSet', db.follow('resourceHasMetric', rOther)[0].entity)[0].entity;
+  expect(m1Set).toBe(m2Set);
+});
+
+test('does not deduplicate equal dimension sets across different services', () => {
+  // GIVEN a second service + resource with the same dimensions
+  const s2 = db.allocate('service', {
+    name: 'aws-other',
+    shortName: 'other',
+    capitalized: 'Other',
+    cloudFormationNamespace: 'AWS::Other',
+  });
+  const r2 = db.allocate('resource', {
+    cloudFormationType: 'AWS::Other::Type',
+    attributes: {},
+    name: 'Type',
+    properties: {},
+  });
+  db.link('hasResource', s2, r2);
+
+  // WHEN both services declare identical dimensions
+  importCannedMetrics(
+    db,
+    [
+      {
+        id: 'AWS::Some',
+        metricTemplates: [
+          {
+            resourceType: 'AWS::Some::Type',
+            namespace: 'AWS/Some',
+            dimensions: [{ dimensionName: 'LoadBalancer' }],
+            metrics: [{ id: 'M', name: 'M', defaultStat: 'Sum' }],
+          },
+        ],
+      },
+      {
+        id: 'AWS::Other',
+        metricTemplates: [
+          {
+            resourceType: 'AWS::Other::Type',
+            namespace: 'AWS/Other',
+            dimensions: [{ dimensionName: 'LoadBalancer' }],
+            metrics: [{ id: 'M', name: 'M', defaultStat: 'Sum' }],
+          },
+        ],
+      },
+    ],
+    report,
+  );
+
+  // THEN each service gets its own dimensionSet (salt = service.name)
+  expect(db.all('dimensionSet').length).toBe(2);
+});
+
 test('does not add metrics for unknown resources', () => {
   // WHEN
   importCannedMetrics(
