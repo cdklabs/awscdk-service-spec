@@ -51,9 +51,11 @@ export function importCannedMetrics(
         }));
         // Temporary name: Dim1PerDim2
         const dimsetName = dimensions.map((d) => d.name).join('Per');
-        const dimensionSet = db.allocate(
+        const dimensionSet = db.findOrAllocate(
           'dimensionSet',
-          dedup({ dimensions, name: dimsetName }, ['dimensions'], service.name),
+          'dedupKey',
+          'equals',
+          dedup({ dimensions, name: dimsetName }, ['dimensions', 'name'], service.name),
         );
         db.link('resourceHasDimensionSet', resource, dimensionSet);
         db.link('serviceHasDimensionSet', service, dimensionSet);
