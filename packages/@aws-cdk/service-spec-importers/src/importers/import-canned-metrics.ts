@@ -2,7 +2,7 @@ import { createHash } from 'crypto';
 import { SpecDatabase } from '@aws-cdk/service-spec-types';
 import { Entity, failure, Plain } from '@cdklabs/tskb';
 import { ProblemReport, ReportAudience } from '../report';
-import { CloudWatchConsoleServiceDirectory } from '../types';
+import { CloudWatchConsoleServiceDirectory, DimensionSetNames } from '../types';
 
 /**
  * Returns a deduplicatable entity
@@ -34,23 +34,32 @@ export function importCannedMetrics(
   db: SpecDatabase,
   serviceDirectoryEntries: CloudWatchConsoleServiceDirectory,
   report: ProblemReport,
+  dimensionSetNames: DimensionSetNames,
 ) {
   const skippedResources = new Set<string>();
 
   for (const { metricTemplates: groups = [] } of serviceDirectoryEntries) {
     for (const group of groups) {
+      // Resolve dimension set name
+      const dimensions = group.dimensions.map((d) => ({
+        name: d.dimensionName,
+        value: d.dimensionValue,
+      }));
+      const dimKey = dimensions
+        .map((d) => d.name)
+        .sort()
+        .join(',');
+      const dimsetName = dimKey === '' ? 'Account' : dimensionSetNames[group.namespace]?.[dimKey];
+      if (!dimsetName) {
+        throw new Error(`No dimension set name found for namespace '${group.namespace}', dimensions '${dimKey}'`);
+      }
+
       try {
         const resourceType = group.resourceType.split('/', 1).at(0)!; // some resource types in this dataset have a custom suffix
         const resource = db.lookup('resource', 'cloudFormationType', 'equals', resourceType).only();
         const service = db.incoming('hasResource', resource).only().entity;
 
-        // Allocate new dimension set, connect to resource & service and fill with dimensions
-        const dimensions = group.dimensions.map((d) => ({
-          name: d.dimensionName,
-          value: d.dimensionValue,
-        }));
-        // Temporary name: Dim1PerDim2
-        const dimsetName = dimensions.map((d) => d.name).join('Per');
+        // Allocate new dimension set, connect to resource & service
         const dimensionSet = db.findOrAllocate(
           'dimensionSet',
           'dedupKey',
@@ -77,7 +86,7 @@ export function importCannedMetrics(
           db.link('resourceHasMetric', resource, metric);
           db.link('serviceHasMetric', service, metric);
         }
-      } catch (unused: any) {
+      } catch {
         skippedResources.add(group.resourceType);
       }
     }

@@ -10,6 +10,16 @@
 
 export type CloudWatchConsoleServiceDirectory = ServiceDirectoryEntry[];
 
+/**
+ * Human-readable names for dimension sets, keyed by CloudWatch namespace and dimension key.
+ */
+export interface DimensionSetNames {
+  [namespace: string]: {
+    /** Alphabetically sorted, comma-separated dimension names (e.g. 'InstanceId,VolumeId') */
+    [dimensionKey: string]: string;
+  };
+}
+
 export interface ServiceDirectoryEntry {
   readonly id: string;
   readonly dashboard?: string;

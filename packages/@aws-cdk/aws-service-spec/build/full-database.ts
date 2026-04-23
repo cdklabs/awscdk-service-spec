@@ -24,9 +24,7 @@ export class FullDatabase extends DatabaseBuilder {
       .importGetAttAllowList(path.join(SOURCES, 'CloudFormationGetAttAllowList/gettatt-allowlist.json'))
       .importArnTemplates(path.join(SOURCES, 'ArnTemplates/arn-templates.json'), path.join(SOURCES, 'ArnTemplates/arn-overrides.json'))
       .importOobRelationships(path.join(SOURCES, 'OobRelationships/relationships.json'), patchOobRelationships)
-      .importCannedMetrics(
-        path.join(SOURCES, 'CloudWatchConsoleServiceDirectory/CloudWatchConsoleServiceDirectory.json'),
-      )
+      .importCannedMetrics(path.join(SOURCES, 'CloudWatchConsoleServiceDirectory'))
       .importLogSources(path.join(SOURCES, 'LogSources/log-source-resource.json'))
       .importScrutinies()
       .importAugmentations()

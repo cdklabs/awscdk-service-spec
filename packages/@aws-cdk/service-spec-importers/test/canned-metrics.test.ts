@@ -62,6 +62,7 @@ test('adds corresponding metrics to the database', () => {
       },
     ],
     report,
+    { 'AWS/Some': { 'Asgard,Astral Plane,Microverse': 'Microverse' } },
   );
 
   // THEN
@@ -121,6 +122,7 @@ test('deduplicates dimension sets with equal dimensions within a service', () =>
       },
     ],
     report,
+    { 'AWS/Some': { LoadBalancer: 'LoadBalancer' } },
   );
 
   // THEN exactly one dimensionSet exists and both metrics link to it
@@ -177,6 +179,10 @@ test('does not deduplicate equal dimension sets across different services', () =
       },
     ],
     report,
+    {
+      'AWS/Some': { LoadBalancer: 'LoadBalancer' },
+      'AWS/Other': { LoadBalancer: 'LoadBalancer' },
+    },
   );
 
   // THEN each service gets its own dimensionSet (salt = service.name)
@@ -216,10 +222,34 @@ test('does not add metrics for unknown resources', () => {
       },
     ],
     report,
+    { 'AWS/Some': { 'Asgard,Astral Plane,Microverse': 'Microverse' } },
   );
 
   // THEN
   const res = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Some::Type')[0];
   const metricEdges = db.follow('resourceHasMetric', res);
   expect(metricEdges.length).toEqual(0);
+});
+
+test('throws an error when dimension set name is not found', () => {
+  expect(() =>
+    importCannedMetrics(
+      db,
+      [
+        {
+          id: 'AWS::Some',
+          metricTemplates: [
+            {
+              resourceType: 'AWS::Some::Type',
+              namespace: 'AWS/Some',
+              dimensions: [{ dimensionName: 'UnknownDim' }],
+              metrics: [{ id: 'M', name: 'M', defaultStat: 'Sum' }],
+            },
+          ],
+        },
+      ],
+      report,
+      { 'AWS/Some': { SomethingElse: 'SomethingElse' } },
+    ),
+  ).toThrow("No dimension set name found for namespace 'AWS/Some', dimensions 'UnknownDim'");
 });
