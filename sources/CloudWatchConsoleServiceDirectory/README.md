@@ -6,6 +6,11 @@ This source of AWS metrics is kindly provided to us by the CloudWatch Explorer t
 
 The source file is generated using the `update-service-directory.sh` script.
 
+## Files
+
+- `CloudWatchConsoleServiceDirectory.json` — the metric templates source data
+- `dimension-sets-names.json` — human-readable names for dimension sets, keyed by namespace and alphabetically sorted dimension names. Must be updated when new dimension sets are added to the service directory.
+
 ## Instructions
 
 Only `metricTemplates` are currently used.

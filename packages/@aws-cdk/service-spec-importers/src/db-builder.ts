@@ -29,6 +29,7 @@ import {
 import { loadDefaultEventBridgeSchema } from './loaders/load-eventbridge-schema';
 import { JsonLensPatcher } from './patching';
 import { ProblemReport, ReportAudience } from './report';
+import { DimensionSetNames } from './types';
 
 export interface DatabaseBuilderOptions {
   /**
@@ -179,13 +180,19 @@ export class DatabaseBuilder {
   /**
    * Import canned metrics from the CloudWatch Console Service Directory
    */
-  public importCannedMetrics(filePath: string) {
+  public importCannedMetrics(directoryPath: string) {
     return this.addSourceImporter(async (db, report) => {
       const cloudWatchServiceDirectory = this.loadResult(
-        await loadDefaultCloudWatchConsoleServiceDirectory(filePath, this.options),
+        await loadDefaultCloudWatchConsoleServiceDirectory(
+          `${directoryPath}/CloudWatchConsoleServiceDirectory.json`,
+          this.options,
+        ),
         report,
       );
-      importCannedMetrics(db, cloudWatchServiceDirectory, report);
+      const dimensionSetNames: DimensionSetNames = JSON.parse(
+        await fs.readFile(`${directoryPath}/dimension-sets-names.json`, 'utf-8'),
+      );
+      importCannedMetrics(db, cloudWatchServiceDirectory, report, dimensionSetNames);
     });
   }
 
