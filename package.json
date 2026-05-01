@@ -29,7 +29,7 @@
     "projen": "projen"
   },
   "devDependencies": {
-    "@aws-sdk/client-schemas": "^3.1037.0",
+    "@aws-sdk/client-schemas": "^3.1038.0",
     "@stylistic/eslint-plugin": "^3",
     "@types/node": "^18",
     "@typescript-eslint/eslint-plugin": "^8",
