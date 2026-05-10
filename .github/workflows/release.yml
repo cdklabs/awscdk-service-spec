@@ -235,6 +235,8 @@ jobs:
     needs:
       - release
       - aws-cdk-service-spec-types_release_npm
+      - cdklabs-tskb_release_github
+      - cdklabs-tskb_release_npm
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -259,7 +261,10 @@ jobs:
         run: errout=$(mktemp); gh release create $(cat dist/releasetag.txt) -R $GITHUB_REPOSITORY -F dist/changelog.md -t $(cat dist/releasetag.txt) --target $GITHUB_SHA 2> $errout && true; exitcode=$?; if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" $errout; then cat $errout; exit $exitcode; fi
   aws-cdk-service-spec-types_release_npm:
     name: "@aws-cdk/service-spec-types: Publish to npm"
-    needs: release
+    needs:
+      - release
+      - cdklabs-tskb_release_github
+      - cdklabs-tskb_release_npm
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -291,6 +296,10 @@ jobs:
     needs:
       - release
       - aws-cdk-service-spec-importers_release_npm
+      - cdklabs-tskb_release_github
+      - cdklabs-tskb_release_npm
+      - aws-cdk-service-spec-types_release_github
+      - aws-cdk-service-spec-types_release_npm
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -315,7 +324,12 @@ jobs:
         run: errout=$(mktemp); gh release create $(cat dist/releasetag.txt) -R $GITHUB_REPOSITORY -F dist/changelog.md -t $(cat dist/releasetag.txt) --target $GITHUB_SHA 2> $errout && true; exitcode=$?; if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" $errout; then cat $errout; exit $exitcode; fi
   aws-cdk-service-spec-importers_release_npm:
     name: "@aws-cdk/service-spec-importers: Publish to npm"
-    needs: release
+    needs:
+      - release
+      - cdklabs-tskb_release_github
+      - cdklabs-tskb_release_npm
+      - aws-cdk-service-spec-types_release_github
+      - aws-cdk-service-spec-types_release_npm
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -347,6 +361,10 @@ jobs:
     needs:
       - release
       - aws-cdk-aws-service-spec_release_npm
+      - cdklabs-tskb_release_github
+      - cdklabs-tskb_release_npm
+      - aws-cdk-service-spec-types_release_github
+      - aws-cdk-service-spec-types_release_npm
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -371,7 +389,12 @@ jobs:
         run: errout=$(mktemp); gh release create $(cat dist/releasetag.txt) -R $GITHUB_REPOSITORY -F dist/changelog.md -t $(cat dist/releasetag.txt) --target $GITHUB_SHA 2> $errout && true; exitcode=$?; if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" $errout; then cat $errout; exit $exitcode; fi
   aws-cdk-aws-service-spec_release_npm:
     name: "@aws-cdk/aws-service-spec: Publish to npm"
-    needs: release
+    needs:
+      - release
+      - cdklabs-tskb_release_github
+      - cdklabs-tskb_release_npm
+      - aws-cdk-service-spec-types_release_github
+      - aws-cdk-service-spec-types_release_npm
     runs-on: ubuntu-latest
     permissions:
       id-token: write
