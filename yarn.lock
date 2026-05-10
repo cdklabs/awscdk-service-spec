@@ -58,7 +58,7 @@ __metadata:
     eslint-plugin-import: "npm:^2.32.0"
     eslint-plugin-prettier: "npm:^4.2.5"
     fast-json-patch: "npm:^3.1.1"
-    fs-extra: "npm:^11.3.4"
+    fs-extra: "npm:^11.3.5"
     glob: "npm:^8"
     jest: "npm:^29.7.0"
     jest-junit: "npm:^16"
@@ -147,9 +147,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-schemas@npm:^3.1043.0":
-  version: 3.1043.0
-  resolution: "@aws-sdk/client-schemas@npm:3.1043.0"
+"@aws-sdk/client-schemas@npm:^3.1044.0":
+  version: 3.1044.0
+  resolution: "@aws-sdk/client-schemas@npm:3.1044.0"
   dependencies:
     "@aws-crypto/sha256-browser": "npm:5.2.0"
     "@aws-crypto/sha256-js": "npm:5.2.0"
@@ -192,7 +192,7 @@ __metadata:
     "@smithy/util-utf8": "npm:^4.2.2"
     "@smithy/util-waiter": "npm:^4.3.0"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/a34041753bec5519ec18f54ffbac9a5d0f7fd958d304d2c3b2482bfa46c064ae7f99979ad886ad0ee6333d9b011e452f5aee39dea68976a812b0393fa75a6cf3
+  checksum: 10c0/968419f3590052460ced851068589a7ae9b8bfbbe4c6ce9b7c7f36b435444f53270ef7ed0a8d39d0bfd73c11da8162caeab419fdf5f4f8f0de1490607943c3d4
   languageName: node
   linkType: hard
 
@@ -3214,13 +3214,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "awscdk-service-spec@workspace:."
   dependencies:
-    "@aws-sdk/client-schemas": "npm:^3.1043.0"
+    "@aws-sdk/client-schemas": "npm:^3.1044.0"
     "@stylistic/eslint-plugin": "npm:^3"
     "@types/node": "npm:^18"
     "@typescript-eslint/eslint-plugin": "npm:^8"
     "@typescript-eslint/parser": "npm:^8"
     "@yarnpkg/types": "npm:^4.0.1"
-    cdklabs-projen-project-types: "npm:^0.3.29"
+    cdklabs-projen-project-types: "npm:^0.3.30"
     constructs: "npm:^10.0.0"
     eslint: "npm:^8.57.1"
     eslint-config-prettier: "npm:^8.10.2"
@@ -3229,7 +3229,7 @@ __metadata:
     node-fetch: "npm:^2"
     nx: "npm:^22.7.1"
     prettier: "npm:^2.8.8"
-    projen: "npm:^0.99.52"
+    projen: "npm:^0.99.53"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.9.3"
   languageName: unknown
@@ -3581,15 +3581,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cdklabs-projen-project-types@npm:^0.3.29":
-  version: 0.3.29
-  resolution: "cdklabs-projen-project-types@npm:0.3.29"
+"cdklabs-projen-project-types@npm:^0.3.30":
+  version: 0.3.30
+  resolution: "cdklabs-projen-project-types@npm:0.3.30"
   dependencies:
     yaml: "npm:^2.8.3"
   peerDependencies:
     constructs: ^10.0.0
     projen: ">=0.99.48 <1.0.0"
-  checksum: 10c0/ed16c1f52aec0b6d911ec6d0c716f6bb82bb07161d935f0f73476516298cbf671f0c8759397f6c908fd4ea8b5690b05ee0fff2fdc697811f0651085334ce6615
+  checksum: 10c0/4704773855f04693e7f19ad402043e2b8ca4b4e47c9762c8b94bbf457766317a7e5549edd1dc815cd7dcf1febaec8e4e078aebbd6ed7f4ceeddce3a968983425
   languageName: node
   linkType: hard
 
@@ -5215,14 +5215,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fs-extra@npm:^11.3.4":
-  version: 11.3.4
-  resolution: "fs-extra@npm:11.3.4"
+"fs-extra@npm:^11.3.5":
+  version: 11.3.5
+  resolution: "fs-extra@npm:11.3.5"
   dependencies:
     graceful-fs: "npm:^4.2.0"
     jsonfile: "npm:^6.0.1"
     universalify: "npm:^2.0.0"
-  checksum: 10c0/e08276f767a62496ae97d711aaa692c6a478177f24a85979b6a2881c9db9c68b8c2ad5da0bcf92c0b2a474cea6e935ec245656441527958fd8372cb647087df0
+  checksum: 10c0/33e80bad6b5d17308faa197e5ede99ecba4b6f6cb4aa4645d52745476c75afc57665bdf39ec75b2ebb38b97b7110f634a8dcc0a546e248eb4de059275cf5ac90
   languageName: node
   linkType: hard
 
@@ -8095,9 +8095,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"projen@npm:^0.99.52":
-  version: 0.99.52
-  resolution: "projen@npm:0.99.52"
+"projen@npm:^0.99.53":
+  version: 0.99.53
+  resolution: "projen@npm:0.99.53"
   dependencies:
     "@iarna/toml": "npm:^2.2.5"
     case: "npm:^1.6.3"
@@ -8118,7 +8118,7 @@ __metadata:
     constructs: ^10.0.0
   bin:
     projen: bin/projen
-  checksum: 10c0/94c00547009be2fe85d18ef712381168167ab4a65c78bd6c7c68b662874c8357652ebddeb7e401b16cdf21124fe0731b3c0a820e9b3051a144f2f81925a4d73a
+  checksum: 10c0/a287fe450ba9052d6d2b697f49eda8cce5cc572d61476006fb9deec53fd658f7d40cf38f3aba612862297e906937d451fd84e370aec576a413ff76118c00570a
   languageName: node
   linkType: hard
 
