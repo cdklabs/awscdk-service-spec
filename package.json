@@ -29,13 +29,13 @@
     "projen": "projen"
   },
   "devDependencies": {
-    "@aws-sdk/client-schemas": "^3.1044.0",
+    "@aws-sdk/client-schemas": "^3.1045.0",
     "@stylistic/eslint-plugin": "^3",
     "@types/node": "^18",
     "@typescript-eslint/eslint-plugin": "^8",
     "@typescript-eslint/parser": "^8",
     "@yarnpkg/types": "^4.0.1",
-    "cdklabs-projen-project-types": "^0.3.30",
+    "cdklabs-projen-project-types": "^0.3.31",
     "constructs": "^10.0.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^8.10.2",
@@ -44,7 +44,7 @@
     "node-fetch": "^2",
     "nx": "^22.7.1",
     "prettier": "^2.8.8",
-    "projen": "^0.99.53",
+    "projen": "^0.99.57",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
