@@ -4,7 +4,12 @@ name: release
 on:
   schedule:
     - cron: 11 2 * * 3,6
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Dry run (skip actual publishing)
+        required: false
+        type: boolean
 jobs:
   release:
     runs-on: awscdk-service-spec_ubuntu-latest_32-core
