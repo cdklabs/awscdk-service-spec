@@ -3229,7 +3229,7 @@ __metadata:
     node-fetch: "npm:^2"
     nx: "npm:^22.7.1"
     prettier: "npm:^2.8.8"
-    projen: "npm:^0.99.58"
+    projen: "npm:^0.99.60"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.9.3"
   languageName: unknown
@@ -8095,9 +8095,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"projen@npm:^0.99.58":
-  version: 0.99.58
-  resolution: "projen@npm:0.99.58"
+"projen@npm:^0.99.60":
+  version: 0.99.60
+  resolution: "projen@npm:0.99.60"
   dependencies:
     "@iarna/toml": "npm:^2.2.5"
     case: "npm:^1.6.3"
@@ -8109,7 +8109,7 @@ __metadata:
     fast-json-patch: "npm:^3.1.1"
     ini: "npm:^2.0.0"
     parse-conflict-json: "npm:^4.0.0"
-    semver: "npm:^7.7.4"
+    semver: "npm:^7.8.0"
     shx: "npm:^0.4.0"
     xmlbuilder2: "npm:^4.0.3"
     yaml: "npm:^2.2.2"
@@ -8118,7 +8118,7 @@ __metadata:
     constructs: ^10.0.0
   bin:
     projen: bin/projen
-  checksum: 10c0/957eab35bc53fc0aadff0096469fba79e7d4bc849ef0026c24b9219e552d9c15be50a70c708d7d3e9a07d8ff4a334ade4046393f3d0c93525400626b7d2675f2
+  checksum: 10c0/34ea9116e22cddaaf699133afbd2a1cbbe820ff5ecb42a595a099b1fa37b96dbb554ae50e8343f3cc1a653c9b225951d66ef002b4a06e17b3a06d48cd2cdf33c
   languageName: node
   linkType: hard
 
@@ -8542,6 +8542,15 @@ __metadata:
   bin:
     semver: bin/semver.js
   checksum: 10c0/e3d79b609071caa78bcb6ce2ad81c7966a46a7431d9d58b8800cfa9cb6a63699b3899a0e4bcce36167a284578212d9ae6942b6929ba4aa5015c079a67751d42d
+  languageName: node
+  linkType: hard
+
+"semver@npm:^7.8.0":
+  version: 7.8.0
+  resolution: "semver@npm:7.8.0"
+  bin:
+    semver: bin/semver.js
+  checksum: 10c0/8f096ca9b80ffd47b308d03f9ce8c873e27e2983f36023c559cdc92c51e8433fc23ebbfe57ec9623fc155636a6961ee989501099841ae4bb1babc8d2b3f048cd
   languageName: node
   linkType: hard
 
