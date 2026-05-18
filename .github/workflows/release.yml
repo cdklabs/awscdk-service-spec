@@ -10,6 +10,18 @@ on:
         description: Dry run (skip actual publishing)
         required: false
         type: boolean
+      package:
+        description: Select specific package to release
+        required: false
+        type: choice
+        options:
+          - "*all packages*"
+          - "@cdklabs/tskb"
+          - "@cdklabs/typewriter"
+          - "@aws-cdk/service-spec-types"
+          - "@aws-cdk/service-spec-importers"
+          - "@aws-cdk/aws-service-spec"
+        default: "*all packages*"
 jobs:
   release:
     runs-on: awscdk-service-spec_ubuntu-latest_32-core
@@ -132,7 +144,7 @@ jobs:
     permissions:
       contents: write
     environment: release
-    if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-cdklabs-tskb == 'true' }}
+    if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-cdklabs-tskb == 'true' && (!github.event.inputs.package || github.event.inputs.package == '*all packages*' || contains(fromJSON('["@cdklabs/tskb","@aws-cdk/service-spec-types","@aws-cdk/service-spec-importers","@aws-cdk/aws-service-spec"]'), github.event.inputs.package)) }}
     steps:
       - uses: actions/setup-node@v6
         with:
@@ -159,7 +171,7 @@ jobs:
       id-token: write
       contents: read
     environment: release
-    if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-cdklabs-tskb == 'true' }}
+    if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-cdklabs-tskb == 'true' && (!github.event.inputs.package || github.event.inputs.package == '*all packages*' || contains(fromJSON('["@cdklabs/tskb","@aws-cdk/service-spec-types","@aws-cdk/service-spec-importers","@aws-cdk/aws-service-spec"]'), github.event.inputs.package)) }}
     steps:
       - uses: actions/setup-node@v6
         with:
@@ -190,7 +202,7 @@ jobs:
     permissions:
       contents: write
     environment: release
-    if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-cdklabs-typewriter == 'true' }}
+    if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-cdklabs-typewriter == 'true' && (!github.event.inputs.package || github.event.inputs.package == '*all packages*' || contains(fromJSON('["@cdklabs/typewriter"]'), github.event.inputs.package)) }}
     steps:
       - uses: actions/setup-node@v6
         with:
@@ -217,7 +229,7 @@ jobs:
       id-token: write
       contents: read
     environment: release
-    if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-cdklabs-typewriter == 'true' }}
+    if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-cdklabs-typewriter == 'true' && (!github.event.inputs.package || github.event.inputs.package == '*all packages*' || contains(fromJSON('["@cdklabs/typewriter"]'), github.event.inputs.package)) }}
     steps:
       - uses: actions/setup-node@v6
         with:
@@ -250,7 +262,7 @@ jobs:
     permissions:
       contents: write
     environment: release
-    if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-service-spec-types == 'true' }}
+    if: ${{ !cancelled() && !failure() && needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-service-spec-types == 'true' && (!github.event.inputs.package || github.event.inputs.package == '*all packages*' || contains(fromJSON('["@aws-cdk/service-spec-types","@aws-cdk/service-spec-importers","@aws-cdk/aws-service-spec"]'), github.event.inputs.package)) }}
     steps:
       - uses: actions/setup-node@v6
         with:
@@ -280,7 +292,7 @@ jobs:
       id-token: write
       contents: read
     environment: release
-    if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-service-spec-types == 'true' }}
+    if: ${{ !cancelled() && !failure() && needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-service-spec-types == 'true' && (!github.event.inputs.package || github.event.inputs.package == '*all packages*' || contains(fromJSON('["@aws-cdk/service-spec-types","@aws-cdk/service-spec-importers","@aws-cdk/aws-service-spec"]'), github.event.inputs.package)) }}
     steps:
       - uses: actions/setup-node@v6
         with:
@@ -315,7 +327,7 @@ jobs:
     permissions:
       contents: write
     environment: release
-    if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-service-spec-importers == 'true' }}
+    if: ${{ !cancelled() && !failure() && needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-service-spec-importers == 'true' && (!github.event.inputs.package || github.event.inputs.package == '*all packages*' || contains(fromJSON('["@aws-cdk/service-spec-importers"]'), github.event.inputs.package)) }}
     steps:
       - uses: actions/setup-node@v6
         with:
@@ -347,7 +359,7 @@ jobs:
       id-token: write
       contents: read
     environment: release
-    if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-service-spec-importers == 'true' }}
+    if: ${{ !cancelled() && !failure() && needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-service-spec-importers == 'true' && (!github.event.inputs.package || github.event.inputs.package == '*all packages*' || contains(fromJSON('["@aws-cdk/service-spec-importers"]'), github.event.inputs.package)) }}
     steps:
       - uses: actions/setup-node@v6
         with:
@@ -382,7 +394,7 @@ jobs:
     permissions:
       contents: write
     environment: release
-    if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-aws-service-spec == 'true' }}
+    if: ${{ !cancelled() && !failure() && needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-aws-service-spec == 'true' && (!github.event.inputs.package || github.event.inputs.package == '*all packages*' || contains(fromJSON('["@aws-cdk/aws-service-spec"]'), github.event.inputs.package)) }}
     steps:
       - uses: actions/setup-node@v6
         with:
@@ -414,7 +426,7 @@ jobs:
       id-token: write
       contents: read
     environment: release
-    if: ${{ needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-aws-service-spec == 'true' }}
+    if: ${{ !cancelled() && !failure() && needs.release.outputs.latest_commit == github.sha && needs.release.outputs.publish-aws-cdk-aws-service-spec == 'true' && (!github.event.inputs.package || github.event.inputs.package == '*all packages*' || contains(fromJSON('["@aws-cdk/aws-service-spec"]'), github.event.inputs.package)) }}
     steps:
       - uses: actions/setup-node@v6
         with:
