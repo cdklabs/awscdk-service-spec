@@ -158,9 +158,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-schemas@npm:^3.1050.0":
-  version: 3.1050.0
-  resolution: "@aws-sdk/client-schemas@npm:3.1050.0"
+"@aws-sdk/client-schemas@npm:^3.1051.0":
+  version: 3.1051.0
+  resolution: "@aws-sdk/client-schemas@npm:3.1051.0"
   dependencies:
     "@aws-crypto/sha256-browser": "npm:5.2.0"
     "@aws-crypto/sha256-js": "npm:5.2.0"
@@ -172,7 +172,7 @@ __metadata:
     "@smithy/node-http-handler": "npm:^4.7.2"
     "@smithy/types": "npm:^4.14.1"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/2d8cb3ab5b340562722595fb03d508bb50ed3877ae438d42966d423f1d08ecd53a83800489fd79f74155380675c3fb25fb71388d80123437f9e17673dc70a4f9
+  checksum: 10c0/b0f23b2cf9dd0574d574af202bcc763ec2477041c6e67185d0a0a498e7e825037b5d46a308a552ef5954407861868e94e85ccb77b1ee627bd1bb375407ad394d
   languageName: node
   linkType: hard
 
@@ -2630,7 +2630,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "awscdk-service-spec@workspace:."
   dependencies:
-    "@aws-sdk/client-schemas": "npm:^3.1050.0"
+    "@aws-sdk/client-schemas": "npm:^3.1051.0"
     "@stylistic/eslint-plugin": "npm:^3"
     "@types/node": "npm:^18"
     "@typescript-eslint/eslint-plugin": "npm:^8"
@@ -2645,7 +2645,7 @@ __metadata:
     node-fetch: "npm:^2"
     nx: "npm:^22.7.2"
     prettier: "npm:^2.8.8"
-    projen: "npm:^0.99.62"
+    projen: "npm:^0.99.63"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.9.3"
   languageName: unknown
@@ -7494,9 +7494,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"projen@npm:^0.99.62":
-  version: 0.99.62
-  resolution: "projen@npm:0.99.62"
+"projen@npm:^0.99.63":
+  version: 0.99.63
+  resolution: "projen@npm:0.99.63"
   dependencies:
     "@iarna/toml": "npm:^2.2.5"
     case: "npm:^1.6.3"
@@ -7517,7 +7517,7 @@ __metadata:
     constructs: ^10.0.0
   bin:
     projen: bin/projen
-  checksum: 10c0/87a96e77242ab743d9369be2c537583ee940e2d95a0386c7e3358c2cd407d7363a199fa977f2b9197121eef14fe5f4bb4bd067e23e4145e1af77052ae3f84682
+  checksum: 10c0/7a01a71562b3f3a6dff3bfdb7d5c53fafb787d6aa375e0113ae221a77e8fae196df4f473a9bc608842ca507968a6440e5e4953c577987c9d0fe64ba920089e32
   languageName: node
   linkType: hard
 
