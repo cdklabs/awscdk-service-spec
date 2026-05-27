@@ -23,6 +23,9 @@
     },
     "build:db": {
       "name": "build:db",
+      "env": {
+        "NODE_OPTIONS": "--max-old-space-size=8192"
+      },
       "steps": [
         {
           "exec": "ts-node build/build-db.ts"
