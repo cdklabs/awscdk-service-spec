@@ -189,7 +189,7 @@ awsServiceSpec.tsconfigDev.addInclude('build');
 awsServiceSpec.compileTask.prependSpawn(
   awsServiceSpec.tasks.addTask('build:db', {
     exec: `ts-node build/build-db.ts`,
-    env: { NODE_OPTIONS: '--max-old-space-size=8192' },
+    env: { NODE_OPTIONS: '--max-old-space-size=16384' },
   }),
 );
 
