@@ -153,8 +153,9 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
-          name: cdklabs-tskb_build-artifact
+          artifact-ids: ${{ needs.release.outputs.artifact_id }}
           path: dist
+          name: cdklabs-tskb_build-artifact
       - name: Restore build artifact permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
@@ -180,8 +181,9 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
-          name: cdklabs-tskb_build-artifact
+          artifact-ids: ${{ needs.release.outputs.artifact_id }}
           path: dist
+          name: cdklabs-tskb_build-artifact
       - name: Restore build artifact permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
@@ -211,8 +213,9 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
-          name: cdklabs-typewriter_build-artifact
+          artifact-ids: ${{ needs.release.outputs.artifact_id }}
           path: dist
+          name: cdklabs-typewriter_build-artifact
       - name: Restore build artifact permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
@@ -238,8 +241,9 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
-          name: cdklabs-typewriter_build-artifact
+          artifact-ids: ${{ needs.release.outputs.artifact_id }}
           path: dist
+          name: cdklabs-typewriter_build-artifact
       - name: Restore build artifact permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
@@ -270,8 +274,9 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
-          name: aws-cdk-service-spec-types_build-artifact
+          artifact-ids: ${{ needs.release.outputs.artifact_id }}
           path: dist
+          name: aws-cdk-service-spec-types_build-artifact
       - name: Restore build artifact permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
@@ -299,8 +304,9 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
-          name: aws-cdk-service-spec-types_build-artifact
+          artifact-ids: ${{ needs.release.outputs.artifact_id }}
           path: dist
+          name: aws-cdk-service-spec-types_build-artifact
       - name: Restore build artifact permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
@@ -333,8 +339,9 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
-          name: aws-cdk-service-spec-importers_build-artifact
+          artifact-ids: ${{ needs.release.outputs.artifact_id }}
           path: dist
+          name: aws-cdk-service-spec-importers_build-artifact
       - name: Restore build artifact permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
@@ -364,8 +371,9 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
-          name: aws-cdk-service-spec-importers_build-artifact
+          artifact-ids: ${{ needs.release.outputs.artifact_id }}
           path: dist
+          name: aws-cdk-service-spec-importers_build-artifact
       - name: Restore build artifact permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
@@ -398,8 +406,9 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
-          name: aws-cdk-aws-service-spec_build-artifact
+          artifact-ids: ${{ needs.release.outputs.artifact_id }}
           path: dist
+          name: aws-cdk-aws-service-spec_build-artifact
       - name: Restore build artifact permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
@@ -429,8 +438,9 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
-          name: aws-cdk-aws-service-spec_build-artifact
+          artifact-ids: ${{ needs.release.outputs.artifact_id }}
           path: dist
+          name: aws-cdk-aws-service-spec_build-artifact
       - name: Restore build artifact permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
