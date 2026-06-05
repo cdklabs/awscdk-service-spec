@@ -158,21 +158,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-schemas@npm:^3.1057.0":
-  version: 3.1057.0
-  resolution: "@aws-sdk/client-schemas@npm:3.1057.0"
+"@aws-sdk/client-schemas@npm:^3.1058.0":
+  version: 3.1058.0
+  resolution: "@aws-sdk/client-schemas@npm:3.1058.0"
   dependencies:
     "@aws-crypto/sha256-browser": "npm:5.2.0"
     "@aws-crypto/sha256-js": "npm:5.2.0"
     "@aws-sdk/core": "npm:^3.974.15"
-    "@aws-sdk/credential-provider-node": "npm:^3.972.47"
+    "@aws-sdk/credential-provider-node": "npm:^3.972.48"
     "@aws-sdk/types": "npm:^3.973.9"
     "@smithy/core": "npm:^3.24.5"
     "@smithy/fetch-http-handler": "npm:^5.4.5"
     "@smithy/node-http-handler": "npm:^4.7.5"
     "@smithy/types": "npm:^4.14.2"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/99d17e650238a6ecc35f12daf581b9ccbbfd9fc4fdb3f66dfcf62d22f9cda04b645d6116a070b9ef2a8f464e50444e60fdaa42ad9010ebb8e6d7d1fae76ae5a7
+  checksum: 10c0/5fc9f216c3862d08983e25325d97e9748c7b831046e0ccc6bf1099dfd7611ec7ea5ecf63be86c2f5ef3ab7e225d96622e1890600ac9fdd8f535cbf44e0ff1d15
   languageName: node
   linkType: hard
 
@@ -255,9 +255,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/credential-provider-node@npm:^3.972.47":
-  version: 3.972.47
-  resolution: "@aws-sdk/credential-provider-node@npm:3.972.47"
+"@aws-sdk/credential-provider-node@npm:^3.972.48":
+  version: 3.972.48
+  resolution: "@aws-sdk/credential-provider-node@npm:3.972.48"
   dependencies:
     "@aws-sdk/credential-provider-env": "npm:^3.972.41"
     "@aws-sdk/credential-provider-http": "npm:^3.972.43"
@@ -270,7 +270,7 @@ __metadata:
     "@smithy/credential-provider-imds": "npm:^4.3.6"
     "@smithy/types": "npm:^4.14.2"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/1464a1d67723b0551e0ab1b519dc293275392d83ad9fa20db1b3b81446afed1d6beb30f3e755be9911518ed2b57e00b724fe934e029f9bdc3d1c7c1b0aa7287e
+  checksum: 10c0/d899b2f8040c318f82b3438ef5e166ba211062bcdc662c2553f3496cc3ade86a734ee9b9f3c1548fb9ba1f2b7a260459e5e10f38378aba08925913a00a0f1e2a
   languageName: node
   linkType: hard
 
@@ -2608,7 +2608,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "awscdk-service-spec@workspace:."
   dependencies:
-    "@aws-sdk/client-schemas": "npm:^3.1057.0"
+    "@aws-sdk/client-schemas": "npm:^3.1058.0"
     "@stylistic/eslint-plugin": "npm:^3"
     "@types/node": "npm:^18"
     "@typescript-eslint/eslint-plugin": "npm:^8"
