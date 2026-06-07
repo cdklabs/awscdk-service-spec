@@ -229,6 +229,7 @@ jobs:
     permissions:
       contents: write
     environment: release
+    if: ${{ !cancelled() && !failure() && needs.cdklabs-tskb_release.result == 'success' }}
     steps:
       - uses: actions/setup-node@v6
         with:
@@ -255,6 +256,7 @@ jobs:
       id-token: write
       contents: read
     environment: release
+    if: ${{ !cancelled() && !failure() && needs.cdklabs-tskb_release.result == 'success' }}
     steps:
       - uses: actions/setup-node@v6
         with:
@@ -301,6 +303,7 @@ jobs:
     permissions:
       contents: write
     environment: release
+    if: ${{ !cancelled() && !failure() && needs.cdklabs-typewriter_release.result == 'success' }}
     steps:
       - uses: actions/setup-node@v6
         with:
@@ -327,6 +330,7 @@ jobs:
       id-token: write
       contents: read
     environment: release
+    if: ${{ !cancelled() && !failure() && needs.cdklabs-typewriter_release.result == 'success' }}
     steps:
       - uses: actions/setup-node@v6
         with:
@@ -373,6 +377,7 @@ jobs:
     permissions:
       contents: write
     environment: release
+    if: ${{ !cancelled() && !failure() && needs.aws-cdk-service-spec-types_release.result == 'success' }}
     steps:
       - uses: actions/setup-node@v6
         with:
@@ -401,6 +406,7 @@ jobs:
       id-token: write
       contents: read
     environment: release
+    if: ${{ !cancelled() && !failure() && needs.aws-cdk-service-spec-types_release.result == 'success' }}
     steps:
       - uses: actions/setup-node@v6
         with:
@@ -447,6 +453,7 @@ jobs:
     permissions:
       contents: write
     environment: release
+    if: ${{ !cancelled() && !failure() && needs.aws-cdk-service-spec-importers_release.result == 'success' }}
     steps:
       - uses: actions/setup-node@v6
         with:
@@ -476,6 +483,7 @@ jobs:
       id-token: write
       contents: read
     environment: release
+    if: ${{ !cancelled() && !failure() && needs.aws-cdk-service-spec-importers_release.result == 'success' }}
     steps:
       - uses: actions/setup-node@v6
         with:
@@ -522,6 +530,7 @@ jobs:
     permissions:
       contents: write
     environment: release
+    if: ${{ !cancelled() && !failure() && needs.aws-cdk-aws-service-spec_release.result == 'success' }}
     steps:
       - uses: actions/setup-node@v6
         with:
@@ -551,6 +560,7 @@ jobs:
       id-token: write
       contents: read
     environment: release
+    if: ${{ !cancelled() && !failure() && needs.aws-cdk-aws-service-spec_release.result == 'success' }}
     steps:
       - uses: actions/setup-node@v6
         with:
