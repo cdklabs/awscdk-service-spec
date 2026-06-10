@@ -1,10 +1,13 @@
 import { emptyDatabase } from '@aws-cdk/service-spec-types';
+import { EventBuilder } from '../src/event-builder';
 import { importEventBridgeSchema } from '../src/importers/import-eventbridge-schema';
 import { ProblemReport } from '../src/report';
 import { EventBridgeSchema } from '../src/types';
 
 let db: ReturnType<typeof emptyDatabase>;
 let report: ProblemReport;
+const spy = jest.spyOn(EventBuilder.prototype, 'eventTypeDefinitionBuilder');
+
 beforeEach(() => {
   db = emptyDatabase();
   report = new ProblemReport();
@@ -122,6 +125,94 @@ test('EventBridge event with matching resource', () => {
   const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Test::HookVersion').only();
   const resourceHasEvent = db.follow('resourceHasEvent', resource).only();
   expect(resourceHasEvent.entity).toMatchObject(event);
+});
+
+test.only('EventBridge event with cyclic event type', () => {
+  importEventBridgeSchema({
+    db,
+    report,
+    event: {
+      SchemaName: 'aws.test@ObjectCreated',
+      Description: 'Schema for event type ObjectCreated, published by AWS service aws.s3',
+      Content: {
+        components: {
+          schemas: {
+            AWSEvent: {
+              'x-amazon-events-detail-type': 'Object Created',
+              'x-amazon-events-source': 'aws.test',
+              properties: {
+                detail: {
+                  $ref: '#/components/schemas/ObjectCreated',
+                },
+              },
+            },
+            ObjectCreated: {
+              type: 'object',
+              required: ['HookVersion'],
+              properties: {
+                filter: {
+                  $ref: '#/components/schemas/ObjectCreated',
+                },
+                'request-id': {
+                  type: 'string',
+                },
+              },
+            },
+          },
+        },
+      },
+    } as EventBridgeSchema,
+  });
+  expect(spy).toHaveBeenCalledTimes(2);
+
+  // const event = db.lookup('event', 'name', 'equals', 'aws.test@ObjectCreated').only();
+  //
+  // // check types
+  // expect(db.all('eventTypeDefinition')).toHaveLength(2);
+  //
+  // const rootType = db.get('eventTypeDefinition', event.rootProperty.$ref);
+  // expect(rootType).toMatchObject({
+  //   name: 'ObjectCreated',
+  //   properties: {
+  //     hookVersion: { type: { type: 'ref' } },
+  //     'request-id': { type: { type: 'string' } },
+  //   },
+  // });
+  //
+  // // @ts-ignore
+  // const referenceType = db.get('eventTypeDefinition', rootType.properties.hookVersion.type.reference);
+  // expect(referenceType).toMatchObject({
+  //   name: 'HookVersion',
+  //   properties: {
+  //     name: { type: { type: 'string' } },
+  //   },
+  // });
+  //
+  // const eventTypes = db.follow('eventUsesType', event).map((x) => x.entity);
+  // expect(eventTypes).toHaveLength(2);
+  // expect(eventTypes).toContain(referenceType);
+  // expect(eventTypes).toContain(rootType);
+  //
+  // // check the event
+  // expect(event).toMatchObject({
+  //   name: 'aws.test@ObjectCreated',
+  //   source: 'aws.test',
+  //   detailType: 'Object Created',
+  //   description: 'Schema for event type ObjectCreated, published by AWS service aws.s3',
+  //   rootProperty: { $ref: rootType.$id },
+  //   resourcesField: [
+  //     {
+  //       type: {
+  //         $ref: referenceType.$id,
+  //       },
+  //     },
+  //   ],
+  // });
+  //
+  // // Check the relationship between resource and events
+  // const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Test::HookVersion').only();
+  // const resourceHasEvent = db.follow('resourceHasEvent', resource).only();
+  // expect(resourceHasEvent.entity).toMatchObject(event);
 });
 
 test('EventBridge event have hyphens field name with matching resource', () => {
