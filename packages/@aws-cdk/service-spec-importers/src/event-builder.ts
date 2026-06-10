@@ -173,11 +173,11 @@ export class EventBuilder extends PropertyBagBuilder {
       // check if the schema matches the type definition. If the schema includes new
       // properties, we want to add them to the type definition.
       if (!Object.keys(properties).every((element) => Object.keys(existing.properties).includes(element))) {
-        console.log("HEEOLRJ")
+        console.log('HEEOLRJ');
         return {
           eventTypeDefinitionBuilder: new EventTypeDefinitionBuilder(this.db, existing),
           freshInDb: true,
-           // freshInSession: true,
+          // freshInSession: true,
           freshInSession,
         };
       }
