@@ -158,9 +158,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-schemas@npm:^3.1066.0":
-  version: 3.1066.0
-  resolution: "@aws-sdk/client-schemas@npm:3.1066.0"
+"@aws-sdk/client-schemas@npm:^3.1067.0":
+  version: 3.1067.0
+  resolution: "@aws-sdk/client-schemas@npm:3.1067.0"
   dependencies:
     "@aws-crypto/sha256-browser": "npm:5.2.0"
     "@aws-crypto/sha256-js": "npm:5.2.0"
@@ -172,7 +172,7 @@ __metadata:
     "@smithy/node-http-handler": "npm:^4.7.6"
     "@smithy/types": "npm:^4.14.3"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/0161f33a86085f12cb151e9353bc6b7d3b232a39e5418a9fe31bfeb392f7b945948e810fdd0ceec90e9c99353990e7cb189054b1ab5461cb52e5cf409816b3e8
+  checksum: 10c0/040715fc19f0727236782ad2d9e4cedd5d2b0b62d4c294c4a59ab9716f2f23606feb1f19dfb71ee913aca410b2e3dc2b2b8fdae49f8be84a57997fc2945e31ee
   languageName: node
   linkType: hard
 
@@ -2608,13 +2608,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "awscdk-service-spec@workspace:."
   dependencies:
-    "@aws-sdk/client-schemas": "npm:^3.1066.0"
+    "@aws-sdk/client-schemas": "npm:^3.1067.0"
     "@stylistic/eslint-plugin": "npm:^3"
     "@types/node": "npm:^18"
     "@typescript-eslint/eslint-plugin": "npm:^8"
     "@typescript-eslint/parser": "npm:^8"
     "@yarnpkg/types": "npm:^4.0.1"
-    cdklabs-projen-project-types: "npm:^0.5.1"
+    cdklabs-projen-project-types: "npm:^0.5.2"
     constructs: "npm:^10.0.0"
     eslint: "npm:^8.57.1"
     eslint-config-prettier: "npm:^8.10.2"
@@ -2623,7 +2623,7 @@ __metadata:
     node-fetch: "npm:^2"
     nx: "npm:^22.7.5"
     prettier: "npm:^2.8.8"
-    projen: "npm:^0.99.71"
+    projen: "npm:^0.99.73"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.9.3"
   languageName: unknown
@@ -2975,15 +2975,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cdklabs-projen-project-types@npm:^0.5.1":
-  version: 0.5.1
-  resolution: "cdklabs-projen-project-types@npm:0.5.1"
+"cdklabs-projen-project-types@npm:^0.5.2":
+  version: 0.5.2
+  resolution: "cdklabs-projen-project-types@npm:0.5.2"
   dependencies:
     yaml: "npm:^2.9.0"
   peerDependencies:
     constructs: ^10.0.0
     projen: ">=0.99.68 <1.0.0"
-  checksum: 10c0/f25eecacc7839e9f439ed5a1aaa05a5e48264311e3f85d2c60772dc74d166f8a5bc007c1f04a72e31d1b828e02b8a7ad544f1b59991391143678e3064ef399ab
+  checksum: 10c0/9cafbb36f31e3f5245c5158bda1c38a6ae4026bded7a7b4bad8e853110b0b8c40b153841933e98abfc35048d8b7d4751c25e18fc943a8e030460933d8c106924
   languageName: node
   linkType: hard
 
@@ -7481,9 +7481,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"projen@npm:^0.99.71":
-  version: 0.99.71
-  resolution: "projen@npm:0.99.71"
+"projen@npm:^0.99.73":
+  version: 0.99.73
+  resolution: "projen@npm:0.99.73"
   dependencies:
     "@iarna/toml": "npm:^2.2.5"
     case: "npm:^1.6.3"
@@ -7495,7 +7495,7 @@ __metadata:
     fast-json-patch: "npm:^3.1.1"
     ini: "npm:^2.0.0"
     parse-conflict-json: "npm:^4.0.0"
-    semver: "npm:^7.8.2"
+    semver: "npm:^7.8.3"
     shx: "npm:^0.4.0"
     xmlbuilder2: "npm:^4.0.3"
     yaml: "npm:^2.2.2"
@@ -7504,7 +7504,7 @@ __metadata:
     constructs: ^10.5.0
   bin:
     projen: bin/projen
-  checksum: 10c0/593453ab979c075ea1ed2c7ef2a77e484c2b08bb852ad08223dd1a324876a5cdb47c018665c776ec682937707211e860f490270b9d6f38695653ad12ba84d175
+  checksum: 10c0/1186920dd1f2b4a57e392ca78825dd73358377262420478f8aa24b416cb509e5d4bef3782c94dc56eb12e09670d830851202a86709aece1c8b4468c05e0386b3
   languageName: node
   linkType: hard
 
@@ -7940,12 +7940,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.8.2":
-  version: 7.8.2
-  resolution: "semver@npm:7.8.2"
+"semver@npm:^7.8.3":
+  version: 7.8.4
+  resolution: "semver@npm:7.8.4"
   bin:
     semver: bin/semver.js
-  checksum: 10c0/8e8c193fa75b938e5b3ccf6707c6447e4b34f73e493e72b03f3185393489f45e049144052f624217c346d6c6e0a301dda8eeab2f14413e337218ecb1cbd2de16
+  checksum: 10c0/81b7c296fd7927b80f67fa516b75fa1017caac8167795320de28e76ccbc6f7f01763c30ecd10d6a0d8fd089708ab0548a5aebb94b0870e99c2a2b4600a46389b
   languageName: node
   linkType: hard
 
