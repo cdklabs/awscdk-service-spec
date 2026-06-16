@@ -158,9 +158,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-schemas@npm:^3.1067.0":
-  version: 3.1067.0
-  resolution: "@aws-sdk/client-schemas@npm:3.1067.0"
+"@aws-sdk/client-schemas@npm:^3.1068.0":
+  version: 3.1068.0
+  resolution: "@aws-sdk/client-schemas@npm:3.1068.0"
   dependencies:
     "@aws-crypto/sha256-browser": "npm:5.2.0"
     "@aws-crypto/sha256-js": "npm:5.2.0"
@@ -172,7 +172,7 @@ __metadata:
     "@smithy/node-http-handler": "npm:^4.7.6"
     "@smithy/types": "npm:^4.14.3"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/040715fc19f0727236782ad2d9e4cedd5d2b0b62d4c294c4a59ab9716f2f23606feb1f19dfb71ee913aca410b2e3dc2b2b8fdae49f8be84a57997fc2945e31ee
+  checksum: 10c0/c27b8eb62ee79f8debecaeccf35d777a92632d060a4e53f6ef4daace19bfd0cbf8372c2ce597654fdda1f2eba9256a9ab4616a927e9dda4d7e4e29a6915ae0bc
   languageName: node
   linkType: hard
 
@@ -2608,7 +2608,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "awscdk-service-spec@workspace:."
   dependencies:
-    "@aws-sdk/client-schemas": "npm:^3.1067.0"
+    "@aws-sdk/client-schemas": "npm:^3.1068.0"
     "@stylistic/eslint-plugin": "npm:^3"
     "@types/node": "npm:^18"
     "@typescript-eslint/eslint-plugin": "npm:^8"
@@ -2623,7 +2623,7 @@ __metadata:
     node-fetch: "npm:^2"
     nx: "npm:^22.7.5"
     prettier: "npm:^2.8.8"
-    projen: "npm:^0.99.73"
+    projen: "npm:^0.99.74"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.9.3"
   languageName: unknown
@@ -7481,9 +7481,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"projen@npm:^0.99.73":
-  version: 0.99.73
-  resolution: "projen@npm:0.99.73"
+"projen@npm:^0.99.74":
+  version: 0.99.74
+  resolution: "projen@npm:0.99.74"
   dependencies:
     "@iarna/toml": "npm:^2.2.5"
     case: "npm:^1.6.3"
@@ -7495,7 +7495,7 @@ __metadata:
     fast-json-patch: "npm:^3.1.1"
     ini: "npm:^2.0.0"
     parse-conflict-json: "npm:^4.0.0"
-    semver: "npm:^7.8.3"
+    semver: "npm:^7.8.4"
     shx: "npm:^0.4.0"
     xmlbuilder2: "npm:^4.0.3"
     yaml: "npm:^2.2.2"
@@ -7504,7 +7504,7 @@ __metadata:
     constructs: ^10.5.0
   bin:
     projen: bin/projen
-  checksum: 10c0/1186920dd1f2b4a57e392ca78825dd73358377262420478f8aa24b416cb509e5d4bef3782c94dc56eb12e09670d830851202a86709aece1c8b4468c05e0386b3
+  checksum: 10c0/0746633bcd14e496d09108554b851068af1368276adc9f248a205e3466579e2aeaa93f02fc9a6d4654acb6429b754e782a2cdf5a67bfe7669d994e08fa71a6c1
   languageName: node
   linkType: hard
 
@@ -7940,7 +7940,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.8.3":
+"semver@npm:^7.8.4":
   version: 7.8.4
   resolution: "semver@npm:7.8.4"
   bin:
