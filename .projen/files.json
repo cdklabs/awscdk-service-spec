@@ -32,7 +32,8 @@
     "awscdk-service-spec.code-workspace",
     "LICENSE",
     "nx.json",
-    "tsconfig.dev.json",
+    "projenrc/tsconfig.json",
+    "test/tsconfig.json",
     "tsconfig.json",
     "yarn.config.cjs"
   ],

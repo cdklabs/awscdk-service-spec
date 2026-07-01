@@ -42,7 +42,9 @@
     "src/**/*.ts",
     "src/**/*.json"
   ],
-  "exclude": [],
+  "exclude": [
+    "node_modules"
+  ],
   "references": [
     {
       "path": "../service-spec-types"
