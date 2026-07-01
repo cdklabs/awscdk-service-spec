@@ -31,7 +31,9 @@
     ]
   },
   "include": [],
-  "exclude": [],
+  "exclude": [
+    "node_modules"
+  ],
   "references": [
     {
       "path": "packages/@cdklabs/tskb"

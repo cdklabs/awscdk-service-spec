@@ -35,6 +35,8 @@
   "include": [
     "src/**/*.ts"
   ],
-  "exclude": [],
+  "exclude": [
+    "node_modules"
+  ],
   "references": []
 }
