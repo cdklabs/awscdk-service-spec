@@ -35,7 +35,9 @@
   "include": [
     "src/**/*.ts"
   ],
-  "exclude": [],
+  "exclude": [
+    "node_modules"
+  ],
   "references": [
     {
       "path": "../../@cdklabs/tskb"
