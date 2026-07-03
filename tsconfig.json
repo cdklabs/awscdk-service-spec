@@ -30,8 +30,13 @@
       "node"
     ]
   },
-  "include": [],
-  "exclude": [],
+  "include": [
+    ".projenrc.ts",
+    "projenrc/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
   "references": [
     {
       "path": "packages/@cdklabs/tskb"
