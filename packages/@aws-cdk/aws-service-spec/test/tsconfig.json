@@ -9,15 +9,13 @@
   },
   "include": [
     "**/*.ts",
-    "build"
+    "build",
+    "../src/**/*.ts"
   ],
   "exclude": [
     "node_modules"
   ],
   "references": [
-    {
-      "path": ".."
-    },
     {
       "path": "../../../@cdklabs/tskb"
     },

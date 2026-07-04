@@ -9,15 +9,14 @@
   },
   "include": [
     "**/*.ts",
-    "src/**/*.json"
+    "src/**/*.json",
+    "../src/**/*.ts",
+    "../src/**/*.json"
   ],
   "exclude": [
     "node_modules"
   ],
   "references": [
-    {
-      "path": ".."
-    },
     {
       "path": "../../service-spec-types"
     },
