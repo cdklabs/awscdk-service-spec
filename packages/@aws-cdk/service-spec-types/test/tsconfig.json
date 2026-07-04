@@ -8,15 +8,13 @@
     "outDir": "lib"
   },
   "include": [
-    "**/*.ts"
+    "**/*.ts",
+    "../src/**/*.ts"
   ],
   "exclude": [
     "node_modules"
   ],
   "references": [
-    {
-      "path": ".."
-    },
     {
       "path": "../../../@cdklabs/tskb"
     }
