@@ -101,9 +101,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@aws-sdk/client-schemas@npm:^3.1083.0":
-  version: 3.1083.0
-  resolution: "@aws-sdk/client-schemas@npm:3.1083.0"
+"@aws-sdk/client-schemas@npm:^3.1084.0":
+  version: 3.1084.0
+  resolution: "@aws-sdk/client-schemas@npm:3.1084.0"
   dependencies:
     "@aws-sdk/core": "npm:^3.975.1"
     "@aws-sdk/credential-provider-node": "npm:^3.972.66"
@@ -113,7 +113,7 @@ __metadata:
     "@smithy/node-http-handler": "npm:^4.9.4"
     "@smithy/types": "npm:^4.16.0"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/14f3d01d7613e9ae67d37f0db3c1a0db6122d4324bec60afb0b734316e4f5cd3d2adcb93e522093a6649489b5d1cbdbeac66d23231817b779acc51eb6cd0d5d5
+  checksum: 10c0/a67f7211aa1a4f94e156b7f00c57e351fd4b68dca3d2697f093bac1893107f753dd30e2c006aa7a01bdaa61ad107012c9b004130148017ad13073822e3de4805
   languageName: node
   linkType: hard
 
@@ -2481,7 +2481,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "awscdk-service-spec@workspace:."
   dependencies:
-    "@aws-sdk/client-schemas": "npm:^3.1083.0"
+    "@aws-sdk/client-schemas": "npm:^3.1084.0"
     "@stylistic/eslint-plugin": "npm:^3"
     "@types/node": "npm:^18"
     "@typescript-eslint/eslint-plugin": "npm:^8"
@@ -2496,7 +2496,7 @@ __metadata:
     node-fetch: "npm:^2"
     nx: "npm:^22.7.6"
     prettier: "npm:^2.8.8"
-    projen: "npm:^0.101.6"
+    projen: "npm:^0.101.8"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.9.3"
   languageName: unknown
@@ -7273,9 +7273,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"projen@npm:^0.101.6":
-  version: 0.101.6
-  resolution: "projen@npm:0.101.6"
+"projen@npm:^0.101.8":
+  version: 0.101.8
+  resolution: "projen@npm:0.101.8"
   dependencies:
     "@iarna/toml": "npm:^2.2.5"
     case: "npm:^1.6.3"
@@ -7296,7 +7296,7 @@ __metadata:
     constructs: ^10.5.0
   bin:
     projen: bin/projen
-  checksum: 10c0/4907cef14094cb096e645947ad63774adfe939c92b7813caf4e934e7097db9772fba29e906d0089b2ebc621460217969bf5505eaf2fef8bc00d28f99ee3726a8
+  checksum: 10c0/d52fdda50ae703dca5a2bcedce8424f6bb8781b0f5244cad92df6bdb15e76f4bbf7acaf6ab875304acc7abc580d6995be9d38d0a759b2ca7a6042a894ad7a9a3
   languageName: node
   linkType: hard
 
