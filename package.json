@@ -42,7 +42,7 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^4.2.5",
     "node-fetch": "^2",
-    "nx": "^22.7.6",
+    "nx": "^22.7.7",
     "prettier": "^2.8.8",
     "projen": "^0.101.11",
     "ts-node": "^10.9.2",
