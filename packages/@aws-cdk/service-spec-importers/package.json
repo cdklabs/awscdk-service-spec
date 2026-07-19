@@ -16,6 +16,7 @@
     "build": "projen build",
     "build:db": "projen build:db",
     "bump": "projen bump",
+    "bump:releasable-commits": "projen bump:releasable-commits",
     "check-for-updates": "projen check-for-updates",
     "compile": "projen compile",
     "default": "projen default",
