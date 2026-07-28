@@ -139,6 +139,11 @@ export class DiffDb extends pj.Component {
           if: 'steps.diff-db.outputs.diff-result',
           env: {
             DIFF_LIMIT: String(200_000), // @see https://github.com/dead-claudia/github-limits?tab=readme-ov-file#pr-body
+            // Pass GitHub context through env vars instead of interpolating
+            // `${{ ... }}` expressions directly into the shell script (flagged by
+            // cdklabs-projen-project-types' CheckGhaExpressions).
+            REPOSITORY: '${{ github.repository }}',
+            RUN_ID: '${{ github.run_id }}',
           },
           run: [
             'if [ $(wc -c < DIFF) -gt $DIFF_LIMIT ]; then',
@@ -147,7 +152,7 @@ export class DiffDb extends pj.Component {
             '  echo "" >> PR.md',
             'fi',
             `echo '**${this.serviceSpec.name}**: Model database diff detected' >> PR.md`,
-            'echo "[📁 Download full diff](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> PR.md',
+            'echo "[📁 Download full diff](https://github.com/${REPOSITORY}/actions/runs/${RUN_ID})" >> PR.md',
             "echo '```' >> PR.md",
             'head -c $DIFF_LIMIT DIFF >> PR.md',
             'if [ $(wc -c < DIFF) -gt $DIFF_LIMIT ]; then',
