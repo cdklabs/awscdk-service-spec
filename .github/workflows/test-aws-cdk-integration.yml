@@ -17,6 +17,7 @@ jobs:
       NODE_OPTIONS: --max-old-space-size=8196
     steps:
       - name: Checkout awscdk-service-spec
+        id: checkout_awscdk-service-spec
         uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.ref }}
@@ -24,48 +25,59 @@ jobs:
           path: awscdk-service-spec
           lfs: true
       - name: Enable corepack
+        id: enable_corepack
         run: corepack enable
       - name: Setup Node.js
+        id: setup_node_js
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
           package-manager-cache: false
       - name: Install dependencies
+        id: install_dependencies
         run: yarn install --immutable
         working-directory: awscdk-service-spec
       - name: Build awscdk-service-spec
+        id: build_awscdk-service-spec
         run: yarn projen compile
         working-directory: awscdk-service-spec
       - name: Checkout aws/aws-cdk
+        id: checkout_aws_aws-cdk
         uses: actions/checkout@v6
         with:
           repository: aws/aws-cdk
           path: aws-cdk
       - name: Register drop-in @aws-cdk/aws-service-spec replacement
+        id: register_drop-in_aws-cdk_aws-service-spec_replacement
         env:
           COREPACK_ENABLE_PROJECT_SPEC: "0"
         run: yarn link
         working-directory: awscdk-service-spec/packages/@aws-cdk/aws-service-spec
       - name: Link drop-in @aws-cdk/aws-service-spec replacement
+        id: link_drop-in_aws-cdk_aws-service-spec_replacement
         env:
           COREPACK_ENABLE_PROJECT_SPEC: "0"
         run: yarn link "@aws-cdk/aws-service-spec"
         working-directory: aws-cdk
       - name: Register drop-in @aws-cdk/service-spec-types replacement
+        id: register_drop-in_aws-cdk_service-spec-types_replacement
         env:
           COREPACK_ENABLE_PROJECT_SPEC: "0"
         run: yarn link
         working-directory: awscdk-service-spec/packages/@aws-cdk/service-spec-types
       - name: Link drop-in @aws-cdk/service-spec-types replacement
+        id: link_drop-in_aws-cdk_service-spec-types_replacement
         env:
           COREPACK_ENABLE_PROJECT_SPEC: "0"
         run: yarn link "@aws-cdk/service-spec-types"
         working-directory: aws-cdk
       - name: Setup aws/aws-cdk
+        id: setup_aws_aws-cdk
         env:
           COREPACK_ENABLE_PROJECT_SPEC: "0"
         run: yarn install
         working-directory: aws-cdk
       - name: Build aws/aws-cdk
+        id: build_aws_aws-cdk
         run: npx lerna run build --no-bail --scope aws-cdk-lib --scope @aws-cdk/mixins-preview --include-dependencies
         working-directory: aws-cdk
