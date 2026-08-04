@@ -38,24 +38,30 @@ jobs:
       CI: "true"
     steps:
       - name: Checkout
+        id: checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
           lfs: true
       - name: Set git identity
+        id: set_git_identity
         run: |-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Enable corepack
+        id: enable_corepack
         run: corepack enable
       - name: Setup Node.js
+        id: setup_node_js
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
           package-manager-cache: false
       - name: Install dependencies
+        id: install_dependencies
         run: yarn install --immutable
       - name: release
+        id: release
         run: yarn projen release
       - id: check-publish-cdklabs-tskb
         run: (git ls-remote -q --exit-code --tags origin $(cat dist/releasetag.txt) && (echo "publish=false" >> $GITHUB_OUTPUT)) || echo "publish=true" >> $GITHUB_OUTPUT
@@ -145,6 +151,7 @@ jobs:
     if: ${{ needs.release.outputs.latest_commit == github.sha }}
     steps:
       - name: "@cdklabs/tskb: Check publish"
+        id: cdklabs_tskb_check_publish
         run: |-
           should_publish="${{ needs.release.outputs.publish-cdklabs-tskb }}"
           package_filter="${{ (!github.event.inputs.package || github.event.inputs.package == '*all packages*' || contains(fromJSON('["@cdklabs/tskb","@aws-cdk/service-spec-types","@aws-cdk/service-spec-importers","@aws-cdk/aws-service-spec"]'), github.event.inputs.package)) }}"
@@ -157,6 +164,7 @@ jobs:
             echo "@cdklabs/tskb" >> publish.txt
           fi
       - name: "@cdklabs/typewriter: Check publish"
+        id: cdklabs_typewriter_check_publish
         run: |-
           should_publish="${{ needs.release.outputs.publish-cdklabs-typewriter }}"
           package_filter="${{ (!github.event.inputs.package || github.event.inputs.package == '*all packages*' || contains(fromJSON('["@cdklabs/typewriter"]'), github.event.inputs.package)) }}"
@@ -169,6 +177,7 @@ jobs:
             echo "@cdklabs/typewriter" >> publish.txt
           fi
       - name: "@aws-cdk/service-spec-types: Check publish"
+        id: aws-cdk_service-spec-types_check_publish
         run: |-
           should_publish="${{ needs.release.outputs.publish-aws-cdk-service-spec-types }}"
           package_filter="${{ (!github.event.inputs.package || github.event.inputs.package == '*all packages*' || contains(fromJSON('["@aws-cdk/service-spec-types","@aws-cdk/service-spec-importers","@aws-cdk/aws-service-spec"]'), github.event.inputs.package)) }}"
@@ -181,6 +190,7 @@ jobs:
             echo "@aws-cdk/service-spec-types" >> publish.txt
           fi
       - name: "@aws-cdk/service-spec-importers: Check publish"
+        id: aws-cdk_service-spec-importers_check_publish
         run: |-
           should_publish="${{ needs.release.outputs.publish-aws-cdk-service-spec-importers }}"
           package_filter="${{ (!github.event.inputs.package || github.event.inputs.package == '*all packages*' || contains(fromJSON('["@aws-cdk/service-spec-importers"]'), github.event.inputs.package)) }}"
@@ -193,6 +203,7 @@ jobs:
             echo "@aws-cdk/service-spec-importers" >> publish.txt
           fi
       - name: "@aws-cdk/aws-service-spec: Check publish"
+        id: aws-cdk_aws-service-spec_check_publish
         run: |-
           should_publish="${{ needs.release.outputs.publish-aws-cdk-aws-service-spec }}"
           package_filter="${{ (!github.event.inputs.package || github.event.inputs.package == '*all packages*' || contains(fromJSON('["@aws-cdk/aws-service-spec"]'), github.event.inputs.package)) }}"
@@ -221,7 +232,8 @@ jobs:
     permissions: {}
     if: ${{ contains(fromJSON(needs.release_gate.outputs.packages_to_publish), '@cdklabs/tskb') }}
     steps:
-      - run: echo "Releasing @cdklabs/tskb..."
+      - id: auto_5ebb19c5
+        run: echo "Releasing @cdklabs/tskb..."
   cdklabs-tskb_release_github:
     name: "@cdklabs/tskb: Publish to GitHub Releases"
     needs: cdklabs-tskb_release_npm
@@ -236,14 +248,17 @@ jobs:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
+        id: download_build_artifacts
         uses: actions/download-artifact@v8
         with:
           path: dist
           name: cdklabs-tskb_build-artifact
       - name: Restore build artifact permissions
+        id: restore_build_artifact_permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
       - name: Release
+        id: release
         if: ${{ !inputs.dry_run }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -263,14 +278,17 @@ jobs:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
+        id: download_build_artifacts
         uses: actions/download-artifact@v8
         with:
           path: dist
           name: cdklabs-tskb_build-artifact
       - name: Restore build artifact permissions
+        id: restore_build_artifact_permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
       - name: Release
+        id: release
         env:
           NPM_DIST_TAG: latest
           NPM_REGISTRY: registry.npmjs.org
@@ -287,7 +305,8 @@ jobs:
     permissions: {}
     if: ${{ !cancelled() && !failure() }}
     steps:
-      - run: echo "All publish jobs complete"
+      - id: auto_9c3c4914
+        run: echo "All publish jobs complete"
   cdklabs-typewriter_release:
     name: "@cdklabs/typewriter: Release"
     needs: release_gate
@@ -295,7 +314,8 @@ jobs:
     permissions: {}
     if: ${{ contains(fromJSON(needs.release_gate.outputs.packages_to_publish), '@cdklabs/typewriter') }}
     steps:
-      - run: echo "Releasing @cdklabs/typewriter..."
+      - id: auto_5e8f35bb
+        run: echo "Releasing @cdklabs/typewriter..."
   cdklabs-typewriter_release_github:
     name: "@cdklabs/typewriter: Publish to GitHub Releases"
     needs: cdklabs-typewriter_release_npm
@@ -310,14 +330,17 @@ jobs:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
+        id: download_build_artifacts
         uses: actions/download-artifact@v8
         with:
           path: dist
           name: cdklabs-typewriter_build-artifact
       - name: Restore build artifact permissions
+        id: restore_build_artifact_permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
       - name: Release
+        id: release
         if: ${{ !inputs.dry_run }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -337,14 +360,17 @@ jobs:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
+        id: download_build_artifacts
         uses: actions/download-artifact@v8
         with:
           path: dist
           name: cdklabs-typewriter_build-artifact
       - name: Restore build artifact permissions
+        id: restore_build_artifact_permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
       - name: Release
+        id: release
         env:
           NPM_DIST_TAG: latest
           NPM_REGISTRY: registry.npmjs.org
@@ -361,7 +387,8 @@ jobs:
     permissions: {}
     if: ${{ !cancelled() && !failure() }}
     steps:
-      - run: echo "All publish jobs complete"
+      - id: auto_9c3c4914
+        run: echo "All publish jobs complete"
   aws-cdk-service-spec-types_release:
     name: "@aws-cdk/service-spec-types: Release"
     needs: release_gate
@@ -369,7 +396,8 @@ jobs:
     permissions: {}
     if: ${{ contains(fromJSON(needs.release_gate.outputs.packages_to_publish), '@aws-cdk/service-spec-types') }}
     steps:
-      - run: echo "Releasing @aws-cdk/service-spec-types..."
+      - id: auto_5b47878d
+        run: echo "Releasing @aws-cdk/service-spec-types..."
   aws-cdk-service-spec-types_release_github:
     name: "@aws-cdk/service-spec-types: Publish to GitHub Releases"
     needs: aws-cdk-service-spec-types_release_npm
@@ -384,14 +412,17 @@ jobs:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
+        id: download_build_artifacts
         uses: actions/download-artifact@v8
         with:
           path: dist
           name: aws-cdk-service-spec-types_build-artifact
       - name: Restore build artifact permissions
+        id: restore_build_artifact_permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
       - name: Release
+        id: release
         if: ${{ !inputs.dry_run }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -413,14 +444,17 @@ jobs:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
+        id: download_build_artifacts
         uses: actions/download-artifact@v8
         with:
           path: dist
           name: aws-cdk-service-spec-types_build-artifact
       - name: Restore build artifact permissions
+        id: restore_build_artifact_permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
       - name: Release
+        id: release
         env:
           NPM_DIST_TAG: latest
           NPM_REGISTRY: registry.npmjs.org
@@ -437,7 +471,8 @@ jobs:
     permissions: {}
     if: ${{ !cancelled() && !failure() }}
     steps:
-      - run: echo "All publish jobs complete"
+      - id: auto_9c3c4914
+        run: echo "All publish jobs complete"
   aws-cdk-service-spec-importers_release:
     name: "@aws-cdk/service-spec-importers: Release"
     needs: release_gate
@@ -445,7 +480,8 @@ jobs:
     permissions: {}
     if: ${{ contains(fromJSON(needs.release_gate.outputs.packages_to_publish), '@aws-cdk/service-spec-importers') }}
     steps:
-      - run: echo "Releasing @aws-cdk/service-spec-importers..."
+      - id: auto_fd303128
+        run: echo "Releasing @aws-cdk/service-spec-importers..."
   aws-cdk-service-spec-importers_release_github:
     name: "@aws-cdk/service-spec-importers: Publish to GitHub Releases"
     needs: aws-cdk-service-spec-importers_release_npm
@@ -460,14 +496,17 @@ jobs:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
+        id: download_build_artifacts
         uses: actions/download-artifact@v8
         with:
           path: dist
           name: aws-cdk-service-spec-importers_build-artifact
       - name: Restore build artifact permissions
+        id: restore_build_artifact_permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
       - name: Release
+        id: release
         if: ${{ !inputs.dry_run }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -490,14 +529,17 @@ jobs:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
+        id: download_build_artifacts
         uses: actions/download-artifact@v8
         with:
           path: dist
           name: aws-cdk-service-spec-importers_build-artifact
       - name: Restore build artifact permissions
+        id: restore_build_artifact_permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
       - name: Release
+        id: release
         env:
           NPM_DIST_TAG: latest
           NPM_REGISTRY: registry.npmjs.org
@@ -514,7 +556,8 @@ jobs:
     permissions: {}
     if: ${{ !cancelled() && !failure() }}
     steps:
-      - run: echo "All publish jobs complete"
+      - id: auto_9c3c4914
+        run: echo "All publish jobs complete"
   aws-cdk-aws-service-spec_release:
     name: "@aws-cdk/aws-service-spec: Release"
     needs: release_gate
@@ -522,7 +565,8 @@ jobs:
     permissions: {}
     if: ${{ contains(fromJSON(needs.release_gate.outputs.packages_to_publish), '@aws-cdk/aws-service-spec') }}
     steps:
-      - run: echo "Releasing @aws-cdk/aws-service-spec..."
+      - id: auto_561d0c74
+        run: echo "Releasing @aws-cdk/aws-service-spec..."
   aws-cdk-aws-service-spec_release_github:
     name: "@aws-cdk/aws-service-spec: Publish to GitHub Releases"
     needs: aws-cdk-aws-service-spec_release_npm
@@ -537,14 +581,17 @@ jobs:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
+        id: download_build_artifacts
         uses: actions/download-artifact@v8
         with:
           path: dist
           name: aws-cdk-aws-service-spec_build-artifact
       - name: Restore build artifact permissions
+        id: restore_build_artifact_permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
       - name: Release
+        id: release
         if: ${{ !inputs.dry_run }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -567,14 +614,17 @@ jobs:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
+        id: download_build_artifacts
         uses: actions/download-artifact@v8
         with:
           path: dist
           name: aws-cdk-aws-service-spec_build-artifact
       - name: Restore build artifact permissions
+        id: restore_build_artifact_permissions
         run: cd dist && setfacl --restore=permissions-backup.acl
         continue-on-error: true
       - name: Release
+        id: release
         env:
           NPM_DIST_TAG: latest
           NPM_REGISTRY: registry.npmjs.org
@@ -591,4 +641,5 @@ jobs:
     permissions: {}
     if: ${{ !cancelled() && !failure() }}
     steps:
-      - run: echo "All publish jobs complete"
+      - id: auto_9c3c4914
+        run: echo "All publish jobs complete"

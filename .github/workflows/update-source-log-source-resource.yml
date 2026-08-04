@@ -14,23 +14,29 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout
+        id: checkout
         uses: actions/checkout@v6
         with:
           lfs: true
       - name: Set git identity
+        id: set_git_identity
         run: |-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Enable corepack
+        id: enable_corepack
         run: corepack enable
       - name: Setup Node.js
+        id: setup_node_js
         uses: actions/setup-node@v6
         with:
           node-version: lts/*
           package-manager-cache: false
       - name: Install dependencies
+        id: install_dependencies
         run: yarn install --immutable
       - name: Federate into AWS
+        id: federate_into_aws
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-region: us-east-1
@@ -38,6 +44,7 @@ jobs:
           role-session-name: awscdk-service-spec
           role-duration-seconds: 900
       - name: update-source:log-source-resource
+        id: update-source_log-source-resource
         run: yarn projen update-source:log-source-resource
       - name: Create Pull Request
         id: create-pr
@@ -74,6 +81,7 @@ jobs:
           committer: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
           signoff: true
       - name: add-instructions
+        id: add-instructions
         if: ${{ steps.create-pr.outputs.pull-request-number }}
         env:
           GH_TOKEN: ${{ github.token }}
