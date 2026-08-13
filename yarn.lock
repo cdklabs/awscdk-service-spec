@@ -2505,7 +2505,7 @@ __metadata:
     node-fetch: "npm:^2"
     nx: "npm:^22.7.8"
     prettier: "npm:^2.8.8"
-    projen: "npm:^0.101.30"
+    projen: "npm:^0.101.31"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.9.3"
   languageName: unknown
@@ -7297,9 +7297,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"projen@npm:^0.101.30":
-  version: 0.101.30
-  resolution: "projen@npm:0.101.30"
+"projen@npm:^0.101.31":
+  version: 0.101.31
+  resolution: "projen@npm:0.101.31"
   dependencies:
     "@iarna/toml": "npm:^2.2.5"
     case: "npm:^1.6.3"
@@ -7320,7 +7320,7 @@ __metadata:
     constructs: ^10.5.0
   bin:
     projen: bin/projen
-  checksum: 10c0/3afe13e82f20eb273354669f86f5a96aa826eca67af82f80b43b7c458bf4baf7848816250661630abf6b11c6a30e2a44e3cf57c5ac242582be3d8f12ab6aa9ca
+  checksum: 10c0/66a05bb02da17b1aebb734c67497c62ba60a5db5753a43b44a2e7d2b9625563308b9f62a0e7c7d897b3edcc7db5240c34c396aa2ccad60f37e89852adb281495
   languageName: node
   linkType: hard
 
