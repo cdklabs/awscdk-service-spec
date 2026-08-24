@@ -101,9 +101,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@aws-sdk/client-schemas@npm:^3.1114.0":
-  version: 3.1114.0
-  resolution: "@aws-sdk/client-schemas@npm:3.1114.0"
+"@aws-sdk/client-schemas@npm:^3.1115.0":
+  version: 3.1115.0
+  resolution: "@aws-sdk/client-schemas@npm:3.1115.0"
   dependencies:
     "@aws-sdk/core": "npm:^3.977.8"
     "@aws-sdk/credential-provider-node": "npm:^3.972.80"
@@ -113,7 +113,7 @@ __metadata:
     "@smithy/node-http-handler": "npm:^4.9.13"
     "@smithy/types": "npm:^4.16.1"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/3e941cc513fd5a64bdab99dccf16605f492b316f508e5e59d9f8c1a6a81ab9fd982382e02d59a131436f0c645c5c3925eb13eb51b78f65ae6b5122599218a10e
+  checksum: 10c0/e1758901864c33cf1a6702b199b1ee18163999b8d986f01991a7c071546166c2e7acbbcaf2636f1abd5e28f7aded4ae95a49fe0b514af9ced21b932c6b5edf1c
   languageName: node
   linkType: hard
 
@@ -2490,13 +2490,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "awscdk-service-spec@workspace:."
   dependencies:
-    "@aws-sdk/client-schemas": "npm:^3.1114.0"
+    "@aws-sdk/client-schemas": "npm:^3.1115.0"
     "@stylistic/eslint-plugin": "npm:^3"
     "@types/node": "npm:^18"
     "@typescript-eslint/eslint-plugin": "npm:^8"
     "@typescript-eslint/parser": "npm:^8"
     "@yarnpkg/types": "npm:^4.0.1"
-    cdklabs-projen-project-types: "npm:^0.6.11"
+    cdklabs-projen-project-types: "npm:^0.6.12"
     constructs: "npm:^10.0.0"
     eslint: "npm:^8.57.1"
     eslint-config-prettier: "npm:^8.10.2"
@@ -2505,7 +2505,7 @@ __metadata:
     node-fetch: "npm:^2"
     nx: "npm:^22.7.8"
     prettier: "npm:^2.8.8"
-    projen: "npm:^0.101.33"
+    projen: "npm:^0.101.36"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.9.3"
   languageName: unknown
@@ -2858,15 +2858,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cdklabs-projen-project-types@npm:^0.6.11":
-  version: 0.6.11
-  resolution: "cdklabs-projen-project-types@npm:0.6.11"
+"cdklabs-projen-project-types@npm:^0.6.12":
+  version: 0.6.12
+  resolution: "cdklabs-projen-project-types@npm:0.6.12"
   dependencies:
     yaml: "npm:^2.9.0"
   peerDependencies:
     constructs: ^10.0.0
     projen: ">=0.101.15 <1.0.0"
-  checksum: 10c0/21f3a05eddde8054b1f07dd849be9464bf439fb7d8feb45926ac5f0f52ceec52c8ba6a61c9873c576bb93f0d96130492aaaadd3caa392ff62d6f629046a01f9e
+  checksum: 10c0/ec2cdd1ac3f16aabbf40c2a88ea4047c88c504cd9f47c7dbf0b7b121ebce19523eebeb07597c4c5a62d2ebaf5e32dbb7f0bfc74447f9d037b2927f2a4e78be0d
   languageName: node
   linkType: hard
 
@@ -7297,9 +7297,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"projen@npm:^0.101.33":
-  version: 0.101.33
-  resolution: "projen@npm:0.101.33"
+"projen@npm:^0.101.36":
+  version: 0.101.36
+  resolution: "projen@npm:0.101.36"
   dependencies:
     "@iarna/toml": "npm:^2.2.5"
     case: "npm:^1.6.3"
@@ -7320,7 +7320,7 @@ __metadata:
     constructs: ^10.5.0
   bin:
     projen: bin/projen
-  checksum: 10c0/56bde38578c10fb5205a76232b2384244829343595cb1f2e62b67595edc6fb39c47857d9deb0c2b7c81104b3689e8c4ed8fd7de115dc9fd5b2effa5bce29cc71
+  checksum: 10c0/176b3503fcc76c12a0c777f1462776e6406e9feaa87b003e99ff642f58ad14d830ae5e05254fa1246cdb41d9fc5f14534705200ab648278451110e3dff47209b
   languageName: node
   linkType: hard
 
