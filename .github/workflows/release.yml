@@ -39,7 +39,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
           lfs: true
@@ -53,7 +53,7 @@ jobs:
         run: corepack enable
       - name: Setup Node.js
         id: setup_node_js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@v7.0.0
         with:
           node-version: lts/*
           package-manager-cache: false
@@ -88,7 +88,7 @@ jobs:
         working-directory: packages/@cdklabs/tskb
       - name: "@cdklabs/tskb: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: cdklabs-tskb_build-artifact
           path: packages/@cdklabs/tskb/dist
@@ -100,7 +100,7 @@ jobs:
         working-directory: packages/@cdklabs/typewriter
       - name: "@cdklabs/typewriter: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: cdklabs-typewriter_build-artifact
           path: packages/@cdklabs/typewriter/dist
@@ -112,7 +112,7 @@ jobs:
         working-directory: packages/@aws-cdk/service-spec-types
       - name: "@aws-cdk/service-spec-types: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: aws-cdk-service-spec-types_build-artifact
           path: packages/@aws-cdk/service-spec-types/dist
@@ -124,7 +124,7 @@ jobs:
         working-directory: packages/@aws-cdk/service-spec-importers
       - name: "@aws-cdk/service-spec-importers: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: aws-cdk-service-spec-importers_build-artifact
           path: packages/@aws-cdk/service-spec-importers/dist
@@ -136,7 +136,7 @@ jobs:
         working-directory: packages/@aws-cdk/aws-service-spec
       - name: "@aws-cdk/aws-service-spec: Upload artifact"
         if: ${{ steps.git_remote.outputs.latest_commit == github.sha }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: aws-cdk-aws-service-spec_build-artifact
           path: packages/@aws-cdk/aws-service-spec/dist
@@ -243,13 +243,13 @@ jobs:
     environment: release
     if: ${{ !cancelled() && !failure() && needs.cdklabs-tskb_release.result == 'success' }}
     steps:
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.0.0
         with:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
         id: download_build_artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           path: dist
           name: cdklabs-tskb_build-artifact
@@ -283,13 +283,13 @@ jobs:
     environment: release
     if: ${{ !cancelled() && !failure() && needs.cdklabs-tskb_release.result == 'success' }}
     steps:
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.0.0
         with:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
         id: download_build_artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           path: dist
           name: cdklabs-tskb_build-artifact
@@ -335,13 +335,13 @@ jobs:
     environment: release
     if: ${{ !cancelled() && !failure() && needs.cdklabs-typewriter_release.result == 'success' }}
     steps:
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.0.0
         with:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
         id: download_build_artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           path: dist
           name: cdklabs-typewriter_build-artifact
@@ -375,13 +375,13 @@ jobs:
     environment: release
     if: ${{ !cancelled() && !failure() && needs.cdklabs-typewriter_release.result == 'success' }}
     steps:
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.0.0
         with:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
         id: download_build_artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           path: dist
           name: cdklabs-typewriter_build-artifact
@@ -427,13 +427,13 @@ jobs:
     environment: release
     if: ${{ !cancelled() && !failure() && needs.aws-cdk-service-spec-types_release.result == 'success' }}
     steps:
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.0.0
         with:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
         id: download_build_artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           path: dist
           name: aws-cdk-service-spec-types_build-artifact
@@ -469,13 +469,13 @@ jobs:
     environment: release
     if: ${{ !cancelled() && !failure() && needs.aws-cdk-service-spec-types_release.result == 'success' }}
     steps:
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.0.0
         with:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
         id: download_build_artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           path: dist
           name: aws-cdk-service-spec-types_build-artifact
@@ -521,13 +521,13 @@ jobs:
     environment: release
     if: ${{ !cancelled() && !failure() && needs.aws-cdk-service-spec-importers_release.result == 'success' }}
     steps:
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.0.0
         with:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
         id: download_build_artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           path: dist
           name: aws-cdk-service-spec-importers_build-artifact
@@ -564,13 +564,13 @@ jobs:
     environment: release
     if: ${{ !cancelled() && !failure() && needs.aws-cdk-service-spec-importers_release.result == 'success' }}
     steps:
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.0.0
         with:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
         id: download_build_artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           path: dist
           name: aws-cdk-service-spec-importers_build-artifact
@@ -616,13 +616,13 @@ jobs:
     environment: release
     if: ${{ !cancelled() && !failure() && needs.aws-cdk-aws-service-spec_release.result == 'success' }}
     steps:
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.0.0
         with:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
         id: download_build_artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           path: dist
           name: aws-cdk-aws-service-spec_build-artifact
@@ -659,13 +659,13 @@ jobs:
     environment: release
     if: ${{ !cancelled() && !failure() && needs.aws-cdk-aws-service-spec_release.result == 'success' }}
     steps:
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7.0.0
         with:
           node-version: lts/*
           package-manager-cache: false
       - name: Download build artifacts
         id: download_build_artifacts
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           path: dist
           name: aws-cdk-aws-service-spec_build-artifact
