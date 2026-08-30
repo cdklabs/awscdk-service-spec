@@ -101,9 +101,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@aws-sdk/client-schemas@npm:^3.1118.0":
-  version: 3.1118.0
-  resolution: "@aws-sdk/client-schemas@npm:3.1118.0"
+"@aws-sdk/client-schemas@npm:^3.1119.0":
+  version: 3.1119.0
+  resolution: "@aws-sdk/client-schemas@npm:3.1119.0"
   dependencies:
     "@aws-sdk/core": "npm:^3.977.9"
     "@aws-sdk/credential-provider-node": "npm:^3.972.81"
@@ -113,7 +113,7 @@ __metadata:
     "@smithy/node-http-handler": "npm:^4.11.3"
     "@smithy/types": "npm:^4.17.2"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/be4b6c6116692a033853e1b91fa4f32680ce168679cc7aff61e36736823e63668c989e7b518a1629134f8622b023fd313780de6be81b3c2297285a1f950f06c5
+  checksum: 10c0/bfd8914c79be06ece67e7d205cc8ecf278d5ab887d1443ec46427ec19cc5c4a488742958a04e9fef15e30f6873181d0de7f0387f0a4b7124fba281bcda7bac5f
   languageName: node
   linkType: hard
 
@@ -2593,7 +2593,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "awscdk-service-spec@workspace:."
   dependencies:
-    "@aws-sdk/client-schemas": "npm:^3.1118.0"
+    "@aws-sdk/client-schemas": "npm:^3.1119.0"
     "@stylistic/eslint-plugin": "npm:^3"
     "@types/node": "npm:^18"
     "@typescript-eslint/eslint-plugin": "npm:^8"
@@ -2608,7 +2608,7 @@ __metadata:
     node-fetch: "npm:^2"
     nx: "npm:^22.7.8"
     prettier: "npm:^2.8.8"
-    projen: "npm:^0.103.3"
+    projen: "npm:^0.103.5"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.9.3"
   languageName: unknown
@@ -7398,9 +7398,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"projen@npm:^0.103.3":
-  version: 0.103.3
-  resolution: "projen@npm:0.103.3"
+"projen@npm:^0.103.5":
+  version: 0.103.5
+  resolution: "projen@npm:0.103.5"
   dependencies:
     "@iarna/toml": "npm:^2.2.5"
     case: "npm:^1.6.3"
@@ -7413,6 +7413,7 @@ __metadata:
     fast-json-patch: "npm:^3.1.1"
     ini: "npm:^2.0.0"
     parse-conflict-json: "npm:^4.0.0"
+    properties-file: "npm:^5.0.6"
     semver: "npm:^7.8.5"
     xmlbuilder2: "npm:^4.0.3"
     yaml: "npm:^2.2.2"
@@ -7421,7 +7422,7 @@ __metadata:
     constructs: ^10.5.0
   bin:
     projen: bin/projen
-  checksum: 10c0/d0ef397d71dc8292d1e9d389c3116ff409b5a56c3cec84c70fe8ef7891bb9c18fc3a681ba1b01cab1d71821cb98c861f14b4603fe2478171c2fa0530eff7952d
+  checksum: 10c0/38d188f45392d9ef1c242a6698790940c7e07691bd5702562fd72c8f1800df5c3b42b4d975cb1e599026d95cbefe567f054fbbf5cf420d666654a6b5e1701ea8
   languageName: node
   linkType: hard
 
@@ -7432,6 +7433,13 @@ __metadata:
     kleur: "npm:^3.0.3"
     sisteransi: "npm:^1.0.5"
   checksum: 10c0/16f1ac2977b19fe2cf53f8411cc98db7a3c8b115c479b2ca5c82b5527cd937aa405fa04f9a5960abeb9daef53191b53b4d13e35c1f5d50e8718c76917c5f1ea4
+  languageName: node
+  linkType: hard
+
+"properties-file@npm:^5.0.6":
+  version: 5.0.6
+  resolution: "properties-file@npm:5.0.6"
+  checksum: 10c0/70e19a410d35bfda07b0e7a81f9bd6a635ac246d80782ada110687f73190ef61c1c05dae59e0a09463a71bf17fe45895c4051fb2736f13f2f14c32aa2386317c
   languageName: node
   linkType: hard
 
