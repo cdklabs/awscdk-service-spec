@@ -265,14 +265,9 @@ jobs:
           CHANGELOG_FILE: dist/changelog.md
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |-
-          errout=$(mktemp)
-          tag=$(cat "$RELEASE_TAG_FILE")
-          gh release create "$tag" -R "$GITHUB_REPOSITORY" -F "$CHANGELOG_FILE" -t "$tag" --target "$GITHUB_SHA" ${PRERELEASE:+-p} 2> "$errout" && true
-          exitcode=$?
-          if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" "$errout"; then
-            cat "$errout"
-            exit $exitcode
-          fi
+          tag=$(cat "$RELEASE_TAG_FILE") &&
+          gh release view "$tag" -R "$GITHUB_REPOSITORY" 2>/dev/null ||
+          gh release create "$tag" -R "$GITHUB_REPOSITORY" -F "$CHANGELOG_FILE" -t "$tag" --target "$GITHUB_SHA"
   cdklabs-tskb_release_npm:
     name: "@cdklabs/tskb: Publish to npm"
     needs: cdklabs-tskb_release
@@ -357,14 +352,9 @@ jobs:
           CHANGELOG_FILE: dist/changelog.md
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |-
-          errout=$(mktemp)
-          tag=$(cat "$RELEASE_TAG_FILE")
-          gh release create "$tag" -R "$GITHUB_REPOSITORY" -F "$CHANGELOG_FILE" -t "$tag" --target "$GITHUB_SHA" ${PRERELEASE:+-p} 2> "$errout" && true
-          exitcode=$?
-          if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" "$errout"; then
-            cat "$errout"
-            exit $exitcode
-          fi
+          tag=$(cat "$RELEASE_TAG_FILE") &&
+          gh release view "$tag" -R "$GITHUB_REPOSITORY" 2>/dev/null ||
+          gh release create "$tag" -R "$GITHUB_REPOSITORY" -F "$CHANGELOG_FILE" -t "$tag" --target "$GITHUB_SHA"
   cdklabs-typewriter_release_npm:
     name: "@cdklabs/typewriter: Publish to npm"
     needs: cdklabs-typewriter_release
@@ -449,14 +439,9 @@ jobs:
           CHANGELOG_FILE: dist/changelog.md
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |-
-          errout=$(mktemp)
-          tag=$(cat "$RELEASE_TAG_FILE")
-          gh release create "$tag" -R "$GITHUB_REPOSITORY" -F "$CHANGELOG_FILE" -t "$tag" --target "$GITHUB_SHA" ${PRERELEASE:+-p} 2> "$errout" && true
-          exitcode=$?
-          if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" "$errout"; then
-            cat "$errout"
-            exit $exitcode
-          fi
+          tag=$(cat "$RELEASE_TAG_FILE") &&
+          gh release view "$tag" -R "$GITHUB_REPOSITORY" 2>/dev/null ||
+          gh release create "$tag" -R "$GITHUB_REPOSITORY" -F "$CHANGELOG_FILE" -t "$tag" --target "$GITHUB_SHA"
   aws-cdk-service-spec-types_release_npm:
     name: "@aws-cdk/service-spec-types: Publish to npm"
     needs:
@@ -543,14 +528,9 @@ jobs:
           CHANGELOG_FILE: dist/changelog.md
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |-
-          errout=$(mktemp)
-          tag=$(cat "$RELEASE_TAG_FILE")
-          gh release create "$tag" -R "$GITHUB_REPOSITORY" -F "$CHANGELOG_FILE" -t "$tag" --target "$GITHUB_SHA" ${PRERELEASE:+-p} 2> "$errout" && true
-          exitcode=$?
-          if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" "$errout"; then
-            cat "$errout"
-            exit $exitcode
-          fi
+          tag=$(cat "$RELEASE_TAG_FILE") &&
+          gh release view "$tag" -R "$GITHUB_REPOSITORY" 2>/dev/null ||
+          gh release create "$tag" -R "$GITHUB_REPOSITORY" -F "$CHANGELOG_FILE" -t "$tag" --target "$GITHUB_SHA"
   aws-cdk-service-spec-importers_release_npm:
     name: "@aws-cdk/service-spec-importers: Publish to npm"
     needs:
@@ -638,14 +618,9 @@ jobs:
           CHANGELOG_FILE: dist/changelog.md
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |-
-          errout=$(mktemp)
-          tag=$(cat "$RELEASE_TAG_FILE")
-          gh release create "$tag" -R "$GITHUB_REPOSITORY" -F "$CHANGELOG_FILE" -t "$tag" --target "$GITHUB_SHA" ${PRERELEASE:+-p} 2> "$errout" && true
-          exitcode=$?
-          if [ $exitcode -ne 0 ] && ! grep -q "Release.tag_name already exists" "$errout"; then
-            cat "$errout"
-            exit $exitcode
-          fi
+          tag=$(cat "$RELEASE_TAG_FILE") &&
+          gh release view "$tag" -R "$GITHUB_REPOSITORY" 2>/dev/null ||
+          gh release create "$tag" -R "$GITHUB_REPOSITORY" -F "$CHANGELOG_FILE" -t "$tag" --target "$GITHUB_SHA"
   aws-cdk-aws-service-spec_release_npm:
     name: "@aws-cdk/aws-service-spec: Publish to npm"
     needs:
