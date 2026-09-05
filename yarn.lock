@@ -25,7 +25,7 @@ __metadata:
     eslint-plugin-prettier: "npm:^4.2.5"
     jest: "npm:^29.7.0"
     jest-junit: "npm:^17"
-    nx: "npm:^22.7.8"
+    nx: "npm:^22.7.9"
     prettier: "npm:^2.8.8"
     source-map-support: "npm:^0.5.21"
     ts-jest: "npm:^29.4.12"
@@ -62,7 +62,7 @@ __metadata:
     glob: "npm:^8"
     jest: "npm:^29.7.0"
     jest-junit: "npm:^17"
-    nx: "npm:^22.7.8"
+    nx: "npm:^22.7.9"
     prettier: "npm:^2.8.8"
     sort-json: "npm:^2.0.1"
     source-map-support: "npm:^0.5.21"
@@ -94,16 +94,16 @@ __metadata:
     eslint-plugin-prettier: "npm:^4.2.5"
     jest: "npm:^29.7.0"
     jest-junit: "npm:^17"
-    nx: "npm:^22.7.8"
+    nx: "npm:^22.7.9"
     prettier: "npm:^2.8.8"
     ts-jest: "npm:^29.4.12"
     typescript: "npm:^5.9.3"
   languageName: unknown
   linkType: soft
 
-"@aws-sdk/client-schemas@npm:^3.1123.0":
-  version: 3.1123.0
-  resolution: "@aws-sdk/client-schemas@npm:3.1123.0"
+"@aws-sdk/client-schemas@npm:^3.1124.0":
+  version: 3.1124.0
+  resolution: "@aws-sdk/client-schemas@npm:3.1124.0"
   dependencies:
     "@aws-sdk/core": "npm:^3.977.9"
     "@aws-sdk/credential-provider-node": "npm:^3.972.82"
@@ -113,7 +113,7 @@ __metadata:
     "@smithy/node-http-handler": "npm:^4.11.3"
     "@smithy/types": "npm:^4.17.2"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/a936555cced171e59c449a18d962e82da4ef0f83b5244e0c442e3cd1bf3399aad1ac1e30456a3bfeff5a3324030495917451cff450544e8ce24b7ca083d812bd
+  checksum: 10c0/d0bac579ec2f973371e37bef15448f570a41a66f79f3f066fdd4fb2cc682e231b22f54c0cde65a083fa959502487a7e4abd46adb52252837c29f3c8e9d5ab8f5
   languageName: node
   linkType: hard
 
@@ -789,7 +789,7 @@ __metadata:
     eslint-plugin-prettier: "npm:^4.2.5"
     jest: "npm:^29.7.0"
     jest-junit: "npm:^17"
-    nx: "npm:^22.7.8"
+    nx: "npm:^22.7.9"
     prettier: "npm:^2.8.8"
     ts-jest: "npm:^29.4.12"
     typescript: "npm:^5.9.3"
@@ -813,7 +813,7 @@ __metadata:
     eslint-plugin-prettier: "npm:^4.2.5"
     jest: "npm:^29.7.0"
     jest-junit: "npm:^17"
-    nx: "npm:^22.7.8"
+    nx: "npm:^22.7.9"
     prettier: "npm:^2.8.8"
     ts-jest: "npm:^29.4.12"
     typescript: "npm:^5.9.3"
@@ -1479,72 +1479,72 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/nx-darwin-arm64@npm:22.7.8":
-  version: 22.7.8
-  resolution: "@nx/nx-darwin-arm64@npm:22.7.8"
+"@nx/nx-darwin-arm64@npm:22.7.9":
+  version: 22.7.9
+  resolution: "@nx/nx-darwin-arm64@npm:22.7.9"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@nx/nx-darwin-x64@npm:22.7.8":
-  version: 22.7.8
-  resolution: "@nx/nx-darwin-x64@npm:22.7.8"
+"@nx/nx-darwin-x64@npm:22.7.9":
+  version: 22.7.9
+  resolution: "@nx/nx-darwin-x64@npm:22.7.9"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@nx/nx-freebsd-x64@npm:22.7.8":
-  version: 22.7.8
-  resolution: "@nx/nx-freebsd-x64@npm:22.7.8"
+"@nx/nx-freebsd-x64@npm:22.7.9":
+  version: 22.7.9
+  resolution: "@nx/nx-freebsd-x64@npm:22.7.9"
   conditions: os=freebsd & cpu=x64
   languageName: node
   linkType: hard
 
-"@nx/nx-linux-arm-gnueabihf@npm:22.7.8":
-  version: 22.7.8
-  resolution: "@nx/nx-linux-arm-gnueabihf@npm:22.7.8"
+"@nx/nx-linux-arm-gnueabihf@npm:22.7.9":
+  version: 22.7.9
+  resolution: "@nx/nx-linux-arm-gnueabihf@npm:22.7.9"
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
-"@nx/nx-linux-arm64-gnu@npm:22.7.8":
-  version: 22.7.8
-  resolution: "@nx/nx-linux-arm64-gnu@npm:22.7.8"
+"@nx/nx-linux-arm64-gnu@npm:22.7.9":
+  version: 22.7.9
+  resolution: "@nx/nx-linux-arm64-gnu@npm:22.7.9"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@nx/nx-linux-arm64-musl@npm:22.7.8":
-  version: 22.7.8
-  resolution: "@nx/nx-linux-arm64-musl@npm:22.7.8"
+"@nx/nx-linux-arm64-musl@npm:22.7.9":
+  version: 22.7.9
+  resolution: "@nx/nx-linux-arm64-musl@npm:22.7.9"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@nx/nx-linux-x64-gnu@npm:22.7.8":
-  version: 22.7.8
-  resolution: "@nx/nx-linux-x64-gnu@npm:22.7.8"
+"@nx/nx-linux-x64-gnu@npm:22.7.9":
+  version: 22.7.9
+  resolution: "@nx/nx-linux-x64-gnu@npm:22.7.9"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@nx/nx-linux-x64-musl@npm:22.7.8":
-  version: 22.7.8
-  resolution: "@nx/nx-linux-x64-musl@npm:22.7.8"
+"@nx/nx-linux-x64-musl@npm:22.7.9":
+  version: 22.7.9
+  resolution: "@nx/nx-linux-x64-musl@npm:22.7.9"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@nx/nx-win32-arm64-msvc@npm:22.7.8":
-  version: 22.7.8
-  resolution: "@nx/nx-win32-arm64-msvc@npm:22.7.8"
+"@nx/nx-win32-arm64-msvc@npm:22.7.9":
+  version: 22.7.9
+  resolution: "@nx/nx-win32-arm64-msvc@npm:22.7.9"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@nx/nx-win32-x64-msvc@npm:22.7.8":
-  version: 22.7.8
-  resolution: "@nx/nx-win32-x64-msvc@npm:22.7.8"
+"@nx/nx-win32-x64-msvc@npm:22.7.9":
+  version: 22.7.9
+  resolution: "@nx/nx-win32-x64-msvc@npm:22.7.9"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -2593,7 +2593,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "awscdk-service-spec@workspace:."
   dependencies:
-    "@aws-sdk/client-schemas": "npm:^3.1123.0"
+    "@aws-sdk/client-schemas": "npm:^3.1124.0"
     "@stylistic/eslint-plugin": "npm:^3"
     "@types/node": "npm:^18"
     "@typescript-eslint/eslint-plugin": "npm:^8"
@@ -2606,9 +2606,9 @@ __metadata:
     eslint-plugin-import: "npm:^2.32.0"
     eslint-plugin-prettier: "npm:^4.2.5"
     node-fetch: "npm:^2"
-    nx: "npm:^22.7.8"
+    nx: "npm:^22.7.9"
     prettier: "npm:^2.8.8"
-    projen: "npm:^0.103.12"
+    projen: "npm:^0.103.13"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.9.3"
   languageName: unknown
@@ -6794,25 +6794,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nx@npm:^22.7.8":
-  version: 22.7.8
-  resolution: "nx@npm:22.7.8"
+"nx@npm:^22.7.9":
+  version: 22.7.9
+  resolution: "nx@npm:22.7.9"
   dependencies:
     "@emnapi/core": "npm:1.4.5"
     "@emnapi/runtime": "npm:1.4.5"
     "@emnapi/wasi-threads": "npm:1.0.4"
     "@jest/diff-sequences": "npm:30.0.1"
     "@napi-rs/wasm-runtime": "npm:0.2.4"
-    "@nx/nx-darwin-arm64": "npm:22.7.8"
-    "@nx/nx-darwin-x64": "npm:22.7.8"
-    "@nx/nx-freebsd-x64": "npm:22.7.8"
-    "@nx/nx-linux-arm-gnueabihf": "npm:22.7.8"
-    "@nx/nx-linux-arm64-gnu": "npm:22.7.8"
-    "@nx/nx-linux-arm64-musl": "npm:22.7.8"
-    "@nx/nx-linux-x64-gnu": "npm:22.7.8"
-    "@nx/nx-linux-x64-musl": "npm:22.7.8"
-    "@nx/nx-win32-arm64-msvc": "npm:22.7.8"
-    "@nx/nx-win32-x64-msvc": "npm:22.7.8"
+    "@nx/nx-darwin-arm64": "npm:22.7.9"
+    "@nx/nx-darwin-x64": "npm:22.7.9"
+    "@nx/nx-freebsd-x64": "npm:22.7.9"
+    "@nx/nx-linux-arm-gnueabihf": "npm:22.7.9"
+    "@nx/nx-linux-arm64-gnu": "npm:22.7.9"
+    "@nx/nx-linux-arm64-musl": "npm:22.7.9"
+    "@nx/nx-linux-x64-gnu": "npm:22.7.9"
+    "@nx/nx-linux-x64-musl": "npm:22.7.9"
+    "@nx/nx-win32-arm64-msvc": "npm:22.7.9"
+    "@nx/nx-win32-x64-msvc": "npm:22.7.9"
     "@tybys/wasm-util": "npm:0.9.0"
     "@yarnpkg/lockfile": "npm:1.1.0"
     "@zkochan/js-yaml": "npm:0.0.7"
@@ -6954,7 +6954,7 @@ __metadata:
   bin:
     nx: ./dist/bin/nx.js
     nx-cloud: ./dist/bin/nx-cloud.js
-  checksum: 10c0/f35026ba49dff1754fe7134a786237352a8908462d9a4649a8eb47814b7eb0e550cf009bddeb86e6883b146ac735dc2f8a8073824a2355cc18686b5b81f99556
+  checksum: 10c0/d5280116602b35738f7fade4aff72a061a21de001ac2420771067867bb09cd131367e4f01b0bdf44587083f1ffd84cd0d4524265eae7d17d540211e13cf06a11
   languageName: node
   linkType: hard
 
@@ -7398,9 +7398,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"projen@npm:^0.103.12":
-  version: 0.103.12
-  resolution: "projen@npm:0.103.12"
+"projen@npm:^0.103.13":
+  version: 0.103.13
+  resolution: "projen@npm:0.103.13"
   dependencies:
     "@iarna/toml": "npm:^2.2.5"
     case: "npm:^1.6.3"
@@ -7422,7 +7422,7 @@ __metadata:
     constructs: ^10.5.0
   bin:
     projen: bin/projen
-  checksum: 10c0/6e3d9cb6b32fa3733fa85216ff5ed6d6e7c6e6637f513557371484aaa51f3d232cd48055b6a853fd214b231bc093d7b84c1380b1cc0681d8abca27b01f6cd7c4
+  checksum: 10c0/f6c5853751efc2cefbffb67911faf1818b9851573eb04ea737d4e95dec0a451112703c49a022d6e150c5009faea5b31a6a4c7c19da12b8ad8dfac7ce4f9a4b9f
   languageName: node
   linkType: hard
 
