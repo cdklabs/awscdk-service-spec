@@ -29,7 +29,7 @@
     "projen": "projen"
   },
   "devDependencies": {
-    "@aws-sdk/client-schemas": "^3.1128.0",
+    "@aws-sdk/client-schemas": "^3.1129.0",
     "@stylistic/eslint-plugin": "^3",
     "@types/node": "^18",
     "@typescript-eslint/eslint-plugin": "^8",
@@ -42,9 +42,9 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^4.2.5",
     "node-fetch": "^2",
-    "nx": "^22.7.9",
+    "nx": "^22.7.11",
     "prettier": "^2.8.8",
-    "projen": "^0.103.20",
+    "projen": "^0.103.22",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
