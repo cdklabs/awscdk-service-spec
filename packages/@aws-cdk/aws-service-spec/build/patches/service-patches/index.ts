@@ -22,6 +22,7 @@ import './dms';
 import './elasticsearch';
 import './ec2';
 import './iot1click';
+import './medialive';
 import './opensearch';
 import './rds';
 import './resiliencehub';
