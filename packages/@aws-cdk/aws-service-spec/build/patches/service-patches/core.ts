@@ -104,6 +104,46 @@ export function renameDefinition(
 }
 
 /**
+ * Undo an upstream merge of several type definitions into one.
+ *
+ * `targets` maps the JSON pointer of each property that references the merged
+ * definition to the definition name that property used before the merge. Each
+ * old name is added back as a copy of the merged definition (if it does not
+ * exist yet), and each listed reference is pointed back at its old name.
+ *
+ * This is the many-to-one counterpart of `renameDefinition`: a rename cannot
+ * restore two old names that now share one definition.
+ *
+ * NOTE: returns a new patcher. Still needs to be applied to a lens.
+ */
+export function splitDefinition(
+  mergedName: string,
+  targets: Record<string, string>,
+  reason: patching.Reason,
+): patching.JsonObjectPatcher {
+  return (lens) => {
+    if (lens.jsonPointer === '/definitions' && lens.value[mergedName] !== undefined) {
+      for (const oldName of new Set(Object.values(targets))) {
+        if (lens.value[oldName] === undefined) {
+          lens.addProperty(reason.reason, oldName, structuredClone(lens.value[mergedName]));
+        }
+      }
+    }
+    const oldName = targets[lens.jsonPointer];
+    if (oldName && lens.value.$ref === `#/definitions/${mergedName}`) {
+      lens.recordPatch(reason.reason, {
+        op: 'replace',
+        path: lens.jsonPointer,
+        value: {
+          ...lens.value,
+          $ref: `#/definitions/${oldName}`,
+        },
+      });
+    }
+  };
+}
+
+/**
  * Replace the a type definition, only if the definition actually exists.
  *
  * NOTE: returns a new patcher. Still needs to be applied to a lens.
