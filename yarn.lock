@@ -101,9 +101,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@aws-sdk/client-schemas@npm:^3.1146.0":
-  version: 3.1146.0
-  resolution: "@aws-sdk/client-schemas@npm:3.1146.0"
+"@aws-sdk/client-schemas@npm:^3.1147.0":
+  version: 3.1147.0
+  resolution: "@aws-sdk/client-schemas@npm:3.1147.0"
   dependencies:
     "@aws-sdk/core": "npm:^3.978.1"
     "@aws-sdk/credential-provider-node": "npm:^3.972.84"
@@ -113,7 +113,7 @@ __metadata:
     "@smithy/node-http-handler": "npm:^4.12.1"
     "@smithy/types": "npm:^4.19.0"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/b8ac6ae87da96ed4bcb64aca6851cc9744ddf1b2d476175caa4f314b226df19f29a53ae669e7168bbda9596f579f1591ef9e1fd902dbbee4fc406227ed63a90b
+  checksum: 10c0/540bef423aeda81a28150768f59710aaeb03c4f72105a3b9e31c076dfc847fbe37139be02402783fb74890c000cbf56c61670bb6b531f240fc4ed90a3664aecf
   languageName: node
   linkType: hard
 
@@ -2622,7 +2622,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "awscdk-service-spec@workspace:."
   dependencies:
-    "@aws-sdk/client-schemas": "npm:^3.1146.0"
+    "@aws-sdk/client-schemas": "npm:^3.1147.0"
     "@stylistic/eslint-plugin": "npm:^3"
     "@types/node": "npm:^18"
     "@typescript-eslint/eslint-plugin": "npm:^8"
