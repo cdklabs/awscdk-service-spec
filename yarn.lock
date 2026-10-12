@@ -101,9 +101,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@aws-sdk/client-schemas@npm:^3.1147.0":
-  version: 3.1147.0
-  resolution: "@aws-sdk/client-schemas@npm:3.1147.0"
+"@aws-sdk/client-schemas@npm:^3.1148.0":
+  version: 3.1148.0
+  resolution: "@aws-sdk/client-schemas@npm:3.1148.0"
   dependencies:
     "@aws-sdk/core": "npm:^3.978.1"
     "@aws-sdk/credential-provider-node": "npm:^3.972.84"
@@ -113,7 +113,7 @@ __metadata:
     "@smithy/node-http-handler": "npm:^4.12.1"
     "@smithy/types": "npm:^4.19.0"
     tslib: "npm:^2.6.2"
-  checksum: 10c0/540bef423aeda81a28150768f59710aaeb03c4f72105a3b9e31c076dfc847fbe37139be02402783fb74890c000cbf56c61670bb6b531f240fc4ed90a3664aecf
+  checksum: 10c0/05949ce9c23e426cb86b0bf895787513280fa8b7bf7e163e8f2e9f7d0269f84d6b12a42d2df75b466d6ab27ab9d7154e122afd365e4aeee1b62323a68d6fc431
   languageName: node
   linkType: hard
 
@@ -2622,7 +2622,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "awscdk-service-spec@workspace:."
   dependencies:
-    "@aws-sdk/client-schemas": "npm:^3.1147.0"
+    "@aws-sdk/client-schemas": "npm:^3.1148.0"
     "@stylistic/eslint-plugin": "npm:^3"
     "@types/node": "npm:^18"
     "@typescript-eslint/eslint-plugin": "npm:^8"
@@ -2637,7 +2637,7 @@ __metadata:
     node-fetch: "npm:^2"
     nx: "npm:^22.7.12"
     prettier: "npm:^2.8.8"
-    projen: "npm:^0.104.1"
+    projen: "npm:^0.104.2"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.9.3"
   languageName: unknown
@@ -6890,9 +6890,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"projen@npm:^0.104.1":
-  version: 0.104.1
-  resolution: "projen@npm:0.104.1"
+"projen@npm:^0.104.2":
+  version: 0.104.2
+  resolution: "projen@npm:0.104.2"
   dependencies:
     "@iarna/toml": "npm:^2.2.5"
     case: "npm:^1.6.3"
@@ -6914,7 +6914,7 @@ __metadata:
     constructs: ^10.5.0
   bin:
     projen: bin/projen
-  checksum: 10c0/2c481a7076f5cf20351ee5f925778f023db4cc92867686abbc5079e0ecf897c825c440e4f0c672b31742f9688327772d755826893add5096797a9bf015eded15
+  checksum: 10c0/22f4827344634520609ee00db76a6dcec82553dd40964eb6e3f20b3ae91b85a90bca538e45c89ae55a46f3d5217c645956ddd677f66b49cca790883902afb561
   languageName: node
   linkType: hard
 
