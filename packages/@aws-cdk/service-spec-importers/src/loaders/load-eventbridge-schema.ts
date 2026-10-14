@@ -8,11 +8,10 @@ import { EventBridgeSchema } from '../types';
 
 const glob = util.promisify(_glob.glob);
 
-// These schemas are duplicated: a legacy version without dashes and a newer version with dashes.
-// e.g. old: aws.ec2@EBSMultiVolumeSnapshotsCompletionStatus.json
-//      new: aws.ec2@EBSMulti-VolumeSnapshotsCompletionStatus.json
-// Only the new (dashed) version receives updates, so we exclude the old ones.
 const EXCLUDED_FILES = [
+  // Legacy duplicates: each of these has a newer hyphenated version that receives
+  // updates (e.g. aws.ec2@EBSMulti-VolumeSnapshotsCompletionStatus.json), so we
+  // exclude the stale undashed copy.
   'aws.ec2@EBSMultiVolumeSnapshotsCompletionStatus.json',
   'aws.securityhub@SecurityHubFindingsCustomAction.json',
   'aws.securityhub@SecurityHubFindingsImported.json',
@@ -23,6 +22,11 @@ const EXCLUDED_FILES = [
   'aws.codedeploy@CodeDeployInstanceStateChangeNotification.json',
   'aws.ec2@EC2FastLaunchStateChangeNotification.json',
   'aws.ec2@EC2InstanceStateChangeNotification.json',
+
+  // Unknown problems: these trigger failures in the downstream aws-cdk codegen /
+  // awslint build (TS/jsii compile errors, namespace collisions, and an aggregate
+  // awslint stack overflow). Root causes are not fully understood/resolved upstream;
+  // excluding them keeps the generated event types building. See PR discussion.
   'aws.kinesis@AWSAPICallviaCloudTrail.json',
   'aws.rekognition@AWSAPICallviaCloudTrail.json',
   'aws.iot@AWSAPICallviaCloudTrail.json',
@@ -31,8 +35,14 @@ const EXCLUDED_FILES = [
   'aws.iot@AWSInsightviaCloudTrail.json',
   'aws.iot@AWSNetworkActivityEventviaCloudTrail.json',
   'aws.iot@AWSServiceEventviaCloudTrail.json',
+  'aws.iot@AWSMcpEventviaCloudTrail.json',
   'aws.directconnect@AWSAPICallviaCloudTrail.json',
   'aws.ec2@EBSFailoverNotification.json',
+  'aws.amplifyuibuilder@AWSAPICallviaCloudTrail.json',
+  'aws.iottwinmaker@AWSAPICallviaCloudTrail.json',
+  'aws.rdsdata@AWSAPICallviaCloudTrail.json',
+  'aws.rdsdataapi@AWSAPICallviaCloudTrail.json',
+  'aws.wafv2@AWSAPICallviaCloudTrail.json',
 ];
 
 export interface EventBridgeSchemas {
