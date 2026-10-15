@@ -1354,3 +1354,50 @@ test('allowedValues are merged when re-importing a string property', () => {
   expect(resource.properties.Status.type).toEqual({ type: 'string', allowedValues: ['Enabled', 'Disabled'] });
   expect(resource.properties.Status.previousTypes).toBeUndefined();
 });
+
+describe('recursive type definitions', () => {
+  function stepProperties() {
+    const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::Recursive::Type').only();
+    const steps = resource.properties.Steps.type as ArrayType<DefinitionReference>;
+    const step = db.get('typeDefinition', steps.element.reference.$ref);
+    const block = db.get('typeDefinition', (step.properties.Block.type as DefinitionReference).reference.$ref);
+    return { step, block };
+  }
+
+  test('a type that refers back to itself through another type', () => {
+    importCloudFormationRegistryResource({
+      db,
+      report,
+      resource: {
+        typeName: 'AWS::Recursive::Type',
+        description: 'Resource Type Description',
+        definitions: {
+          Step: {
+            type: 'object',
+            properties: {
+              Name: { type: 'string' },
+              Block: { $ref: '#/definitions/Block' },
+            },
+            additionalProperties: false,
+          },
+          Block: {
+            type: 'object',
+            properties: {
+              Steps: { type: 'array', items: { $ref: '#/definitions/Step' } },
+              TimeoutMinutes: { type: 'number' },
+            },
+            additionalProperties: false,
+          },
+        },
+        properties: {
+          Steps: { type: 'array', items: { $ref: '#/definitions/Step' } },
+        },
+      },
+    });
+
+    const { step, block } = stepProperties();
+    expect(Object.keys(step.properties)).toEqual(['Name', 'Block']);
+    // Re-entering Block while it is still being converted would re-add Steps after TimeoutMinutes
+    expect(Object.keys(block.properties)).toEqual(['Steps', 'TimeoutMinutes']);
+  });
+});
