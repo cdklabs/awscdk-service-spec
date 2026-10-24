@@ -141,8 +141,24 @@ export namespace jsonschema {
   /**
    * Determines whether or not the provided schema represents an `allOf` type operator.
    */
-  export function isAllOf(x: Schema): x is AllOf<any> {
-    return !isAnyType(x) && 'allOf' in x;
+  export function isAllOf(x: Schema | CommonTypeCombinatorFields): x is AllOf<any> {
+    if (x && !isAnyType(x) && 'allOf' in x) {
+      for (const elem of x.allOf!) {
+        if (
+          elem &&
+          !isAnyType(elem) &&
+          (isTypeDefined(elem) ||
+            isReference(elem) ||
+            isAnyOf(elem) ||
+            isOneOf(elem) ||
+            isAllOf(elem) ||
+            containsRelationship(elem))
+        ) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   export interface MapLikeObject extends Annotatable {
@@ -177,6 +193,7 @@ export namespace jsonschema {
     readonly required?: string[];
     readonly oneOf?: (CommonTypeCombinatorFields | RecordLikeObject)[];
     readonly anyOf?: (CommonTypeCombinatorFields | RecordLikeObject)[];
+    readonly allOf?: (CommonTypeCombinatorFields | RecordLikeObject)[];
     /**
      * FIXME: should be required but some service teams have omitted it.
      */
