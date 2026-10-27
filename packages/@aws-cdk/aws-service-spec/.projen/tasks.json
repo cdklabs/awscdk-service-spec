@@ -31,7 +31,8 @@
         {
           "exec": "ts-node build/build-db.ts"
         }
-      ]
+      ],
+      "shell": "system"
     },
     "bump": {
       "name": "bump",
