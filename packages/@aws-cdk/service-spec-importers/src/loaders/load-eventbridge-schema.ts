@@ -9,6 +9,31 @@ import { EventBridgeSchema } from '../types';
 const glob = util.promisify(_glob.glob);
 
 /**
+ * Schemas whose generated aws-cdk code fails the mixins-preview build. Excluded
+ * until the aws-cdk code generator handles them:
+ * - kinesis: a nested type named `Record` shadows TypeScript's `Record<K, V>`
+ *   (`error TS2315: Type 'Record' is not generic`).
+ * - rekognition: properties named `getRequestMetadata` are rejected by jsii,
+ *   because `getXxx` names conflict with Java getters (`JSII5000`).
+ * - iot: an `aws_iot.events` module emits to the same Go package as
+ *   `aws_iotevents` (`JSII4010`).
+ * - directconnect, ec2 EBSFailoverNotification: properties with the same name
+ *   as their declaring interface, e.g. `Connections.connections` (`JSII5019`).
+ */
+const UNSUPPORTED_SCHEMAS = [
+  'aws.kinesis@AWSAPICallviaCloudTrail.json',
+  'aws.rekognition@AWSAPICallviaCloudTrail.json',
+  'aws.iot@AWSAPICallviaCloudTrail.json',
+  'aws.iot@AWSConsoleActionviaCloudTrail.json',
+  'aws.iot@AWSConsoleSignInviaCloudTrail.json',
+  'aws.iot@AWSInsightviaCloudTrail.json',
+  'aws.iot@AWSNetworkActivityEventviaCloudTrail.json',
+  'aws.iot@AWSServiceEventviaCloudTrail.json',
+  'aws.directconnect@AWSAPICallviaCloudTrail.json',
+  'aws.ec2@EBSFailoverNotification.json',
+];
+
+/**
  * Drops legacy schema files that have a newer dashed copy in the same directory.
  *
  * Some schemas exist twice: an old file without dashes and a newer file with
@@ -68,7 +93,9 @@ function loadEventBridgeSchemaDirectory(
       errorRootDirectory: baseDir,
     });
 
-    const files = withoutLegacyDuplicates(await glob(path.join(directory, '*.json')));
+    const files = withoutLegacyDuplicates(await glob(path.join(directory, '*.json'))).filter(
+      (file) => !UNSUPPORTED_SCHEMAS.includes(path.basename(file)),
+    );
     return loader.loadFiles(files, problemReportCombiner(options.report, options.failureAudience));
   };
 }
