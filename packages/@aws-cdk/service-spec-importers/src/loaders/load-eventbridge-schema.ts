@@ -8,6 +8,23 @@ import { EventBridgeSchema } from '../types';
 
 const glob = util.promisify(_glob.glob);
 
+// These schemas are duplicated: a legacy version without dashes and a newer version with dashes.
+// e.g. old: aws.ec2@EBSMultiVolumeSnapshotsCompletionStatus.json
+//      new: aws.ec2@EBSMulti-VolumeSnapshotsCompletionStatus.json
+// Only the new (dashed) version receives updates, so we exclude the old ones.
+const EXCLUDED_FILES = [
+  'aws.ec2@EBSMultiVolumeSnapshotsCompletionStatus.json',
+  'aws.securityhub@SecurityHubFindingsCustomAction.json',
+  'aws.securityhub@SecurityHubFindingsImported.json',
+  'aws.xray@AWSXRayInsightUpdate.json',
+  'aws.autoscaling@EC2InstanceLaunchLifecycleAction.json',
+  'aws.autoscaling@EC2InstanceTerminateLifecycleAction.json',
+  'aws.codedeploy@CodeDeployDeploymentStateChangeNotification.json',
+  'aws.codedeploy@CodeDeployInstanceStateChangeNotification.json',
+  'aws.ec2@EC2FastLaunchStateChangeNotification.json',
+  'aws.ec2@EC2InstanceStateChangeNotification.json',
+];
+
 export interface EventBridgeSchemas {
   readonly regionName: string;
   readonly events: Array<EventBridgeSchema>;
@@ -37,7 +54,9 @@ function loadEventBridgeSchemaDirectory(
       errorRootDirectory: baseDir,
     });
 
-    const files = await glob(path.join(directory, '*.json'));
+    const files = (await glob(path.join(directory, '*.json'))).filter(
+      (file) => !EXCLUDED_FILES.includes(path.basename(file)),
+    );
     return loader.loadFiles(files, problemReportCombiner(options.report, options.failureAudience));
   };
 }
