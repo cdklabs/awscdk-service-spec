@@ -32,8 +32,5 @@ test('keeps files whose names differ only in letter case', () => {
       'us-east-1/aws.s3@AWSAPICallViaCloudTrail.json',
       'us-east-1/aws.s3@AWSAPICallviaCloudTrail.json',
     ]),
-  ).toEqual([
-    'us-east-1/aws.s3@AWSAPICallViaCloudTrail.json',
-    'us-east-1/aws.s3@AWSAPICallviaCloudTrail.json',
-  ]);
+  ).toEqual(['us-east-1/aws.s3@AWSAPICallViaCloudTrail.json', 'us-east-1/aws.s3@AWSAPICallviaCloudTrail.json']);
 });
