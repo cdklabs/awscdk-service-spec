@@ -8,32 +8,36 @@ import { EventBridgeSchema } from '../types';
 
 const glob = util.promisify(_glob.glob);
 
-// These schemas are duplicated: a legacy version without dashes and a newer version with dashes.
-// e.g. old: aws.ec2@EBSMultiVolumeSnapshotsCompletionStatus.json
-//      new: aws.ec2@EBSMulti-VolumeSnapshotsCompletionStatus.json
-// Only the new (dashed) version receives updates, so we exclude the old ones.
-const EXCLUDED_FILES = [
-  'aws.ec2@EBSMultiVolumeSnapshotsCompletionStatus.json',
-  'aws.securityhub@SecurityHubFindingsCustomAction.json',
-  'aws.securityhub@SecurityHubFindingsImported.json',
-  'aws.xray@AWSXRayInsightUpdate.json',
-  'aws.autoscaling@EC2InstanceLaunchLifecycleAction.json',
-  'aws.autoscaling@EC2InstanceTerminateLifecycleAction.json',
-  'aws.codedeploy@CodeDeployDeploymentStateChangeNotification.json',
-  'aws.codedeploy@CodeDeployInstanceStateChangeNotification.json',
-  'aws.ec2@EC2FastLaunchStateChangeNotification.json',
-  'aws.ec2@EC2InstanceStateChangeNotification.json',
-  'aws.kinesis@AWSAPICallviaCloudTrail.json',
-  'aws.rekognition@AWSAPICallviaCloudTrail.json',
-  'aws.iot@AWSAPICallviaCloudTrail.json',
-  'aws.iot@AWSConsoleActionviaCloudTrail.json',
-  'aws.iot@AWSConsoleSignInviaCloudTrail.json',
-  'aws.iot@AWSInsightviaCloudTrail.json',
-  'aws.iot@AWSNetworkActivityEventviaCloudTrail.json',
-  'aws.iot@AWSServiceEventviaCloudTrail.json',
-  'aws.directconnect@AWSAPICallviaCloudTrail.json',
-  'aws.ec2@EBSFailoverNotification.json',
-];
+/**
+ * Drops legacy schema files that have a newer dashed copy in the same directory.
+ *
+ * Some schemas exist twice: an old file without dashes and a newer file with
+ * dashes, for example `aws.ec2@EBSMultiVolumeSnapshotsCompletionStatus.json` and
+ * `aws.ec2@EBSMulti-VolumeSnapshotsCompletionStatus.json`. Only the dashed file
+ * receives updates. Code generation removes each dash and uppercases the letter
+ * after it, so both files become the same class name and generation fails.
+ *
+ * A file without a dashed copy is kept, so a service that only has the old file
+ * keeps its events.
+ */
+export function withoutLegacyDuplicates(files: string[]): string[] {
+  const dashedNames = new Set(
+    files
+      .map((file) => path.basename(file))
+      .filter((name) => name.includes('-'))
+      .map(dashesToCamelCase),
+  );
+  return files.filter((file) => {
+    const name = path.basename(file);
+    return name.includes('-') || !dashedNames.has(name);
+  });
+}
+
+// Same conversion the code generator applies to event names:
+// 'EC2Instance-launchLifecycleAction' -> 'EC2InstanceLaunchLifecycleAction'.
+function dashesToCamelCase(name: string): string {
+  return name.replace(/-([a-zA-Z])/g, (_, letter: string) => letter.toUpperCase());
+}
 
 export interface EventBridgeSchemas {
   readonly regionName: string;
@@ -64,9 +68,7 @@ function loadEventBridgeSchemaDirectory(
       errorRootDirectory: baseDir,
     });
 
-    const files = (await glob(path.join(directory, '*.json'))).filter(
-      (file) => !EXCLUDED_FILES.includes(path.basename(file)),
-    );
+    const files = withoutLegacyDuplicates(await glob(path.join(directory, '*.json')));
     return loader.loadFiles(files, problemReportCombiner(options.report, options.failureAudience));
   };
 }
