@@ -58,6 +58,41 @@ jobs:
           name: db.head.json.gz
           path: packages/@aws-cdk/aws-service-spec/db.json.gz
           overwrite: true
+      - name: Upload released database
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: db.released.json.gz
+          path: sources/ReleasedDatabase/db.json.gz
+          overwrite: true
+      - name: Verify released database
+        run: |-
+          if ! echo "3f9adee9f3594d07ebbde5c741b515d68feb3914741e603ddb3bc070867c7ee0  sources/ReleasedDatabase/db.json.gz" | sha256sum --check --strict; then
+            echo "::error::sources/ReleasedDatabase/db.json.gz does not have the sha256 that .projenrc.ts pins in RELEASED_SERVICE_SPEC_SHA256. Update the version, the integrity and the sha256 together, see README.md."
+            exit 1
+          fi
+      - name: Check L1 compatibility
+        run: packages/@aws-cdk/service-spec-importers/bin/diff-db --l1-compat sources/ReleasedDatabase/db.json.gz packages/@aws-cdk/aws-service-spec/db.json.gz
+      - if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        name: Checkout base branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
+          repository: ${{ github.repository }}
+          path: base-branch
+      - name: Check L1 compatibility with the base branch released database
+        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        run: |-
+          if [ ! -f base-branch/sources/ReleasedDatabase/db.json.gz ]; then
+            echo "The base branch has no released database to compare with."
+          else
+            git -C base-branch lfs pull --include=sources/ReleasedDatabase/db.json.gz
+            if cmp -s base-branch/sources/ReleasedDatabase/db.json.gz sources/ReleasedDatabase/db.json.gz; then
+              echo "The released database is the same as on the base branch."
+            else
+              echo "The released database changed from $(cat base-branch/sources/ReleasedDatabase/VERSION) (sha256 $(sha256sum < base-branch/sources/ReleasedDatabase/db.json.gz | cut -d ' ' -f 1)) on the base branch to $(cat sources/ReleasedDatabase/VERSION) (sha256 $(sha256sum < sources/ReleasedDatabase/db.json.gz | cut -d ' ' -f 1)) in this change. Compared with the released database of the base branch:"
+              packages/@aws-cdk/service-spec-importers/bin/diff-db --l1-compat base-branch/sources/ReleasedDatabase/db.json.gz packages/@aws-cdk/aws-service-spec/db.json.gz
+            fi
+          fi
   self-mutation:
     needs: build
     runs-on: ubuntu-latest
@@ -131,6 +166,22 @@ jobs:
           name: db.base.json.gz
           path: packages/@aws-cdk/aws-service-spec/db.json.gz
           overwrite: true
+      - name: Collect base released database
+        id: collect_base_released_database
+        run: |-
+          mkdir -p base-released
+          if [ -f sources/ReleasedDatabase/db.json.gz ]; then
+            cp sources/ReleasedDatabase/db.json.gz sources/ReleasedDatabase/VERSION base-released/
+          else
+            echo none > base-released/VERSION
+          fi
+      - name: Upload base released database
+        id: upload_base_released_database
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: db.base-released
+          path: base-released
+          overwrite: true
   diff-db:
     needs:
       - build
@@ -177,10 +228,40 @@ jobs:
         with:
           name: db.head.json.gz
           path: head
+      - name: Download released database
+        id: download_released_database
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: db.released.json.gz
+          path: released
+      - name: Download base released database
+        id: download_base_released_database
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: db.base-released
+          path: base-released
       - name: Diff databases
         id: diff-db
         run: packages/@aws-cdk/service-spec-importers/bin/diff-db base/db.json.gz head/db.json.gz > DIFF || echo "diff-result=true" >> $GITHUB_OUTPUT
         continue-on-error: true
+      - name: Check L1 compatibility
+        id: l1-compat
+        run: |-
+          packages/@aws-cdk/service-spec-importers/bin/diff-db --l1-compat released/db.json.gz head/db.json.gz > L1-COMPAT || echo "l1-compat-failed=true" >> $GITHUB_OUTPUT
+          cat L1-COMPAT
+      - name: Check L1 compatibility with the base branch released database
+        id: l1-compat-base
+        run: |-
+          if [ ! -f base-released/db.json.gz ]; then
+            echo "The base branch has no released database to compare with." > L1-COMPAT-BASE
+          elif cmp -s base-released/db.json.gz released/db.json.gz; then
+            touch L1-COMPAT-BASE
+          else
+            echo "The released database changed from $(cat base-released/VERSION) (sha256 $(sha256sum < base-released/db.json.gz | cut -d ' ' -f 1)) on the base branch to $(cat sources/ReleasedDatabase/VERSION) (sha256 $(sha256sum < released/db.json.gz | cut -d ' ' -f 1)) in this change. Compared with the released database of the base branch:" > L1-COMPAT-BASE
+            packages/@aws-cdk/service-spec-importers/bin/diff-db --l1-compat base-released/db.json.gz head/db.json.gz >> L1-COMPAT-BASE || echo "l1-compat-failed=true" >> $GITHUB_OUTPUT
+            echo "" >> L1-COMPAT-BASE
+          fi
+          cat L1-COMPAT-BASE
       - name: Upload diff
         id: upload_diff
         if: steps.diff-db.outputs.diff-result
@@ -203,6 +284,9 @@ jobs:
             echo "" >> PR.md
           fi
           echo '**@aws-cdk/aws-service-spec**: Model database diff detected' >> PR.md
+          echo '```' >> PR.md
+          cat L1-COMPAT-BASE L1-COMPAT >> PR.md
+          echo '```' >> PR.md
           echo "[📁 Download full diff](https://github.com/${REPOSITORY}/actions/runs/${RUN_ID})" >> PR.md
           echo '```' >> PR.md
           head -c $DIFF_LIMIT DIFF >> PR.md
@@ -227,3 +311,10 @@ jobs:
           comment-tag: diff-db
           message: "**@aws-cdk/aws-service-spec**: No model change detected"
           mode: upsert
+      - name: Fail on lost type history
+        id: fail_on_lost_type_history
+        if: "!cancelled() && (steps.l1-compat.outputs.l1-compat-failed || steps.l1-compat-base.outputs.l1-compat-failed)"
+        run: |-
+          echo "::error::The L1 compatibility check failed: the new database lost released type names or fields, or the check did not run."
+          cat L1-COMPAT-BASE L1-COMPAT
+          exit 1

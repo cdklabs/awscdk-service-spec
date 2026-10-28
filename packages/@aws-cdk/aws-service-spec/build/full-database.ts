@@ -8,6 +8,7 @@ import { patchSamTemplateSpec } from './patches/sam-patches';
 import { Scrutinies } from './scrutinies';
 
 const SOURCES = path.join(__dirname, '../../../../sources');
+const RELEASED_DATABASE = path.join(SOURCES, 'ReleasedDatabase/db.json.gz');
 
 export class FullDatabase extends DatabaseBuilder {
   public defaultProblemGrouping = new ReportAudience('CDK_Team');
@@ -19,6 +20,7 @@ export class FullDatabase extends DatabaseBuilder {
       .importSamResourceSpec(path.join(SOURCES, 'CloudFormationResourceSpecification/us-east-1/100_sam'))
       .importCloudFormationRegistryResources(path.join(SOURCES, 'CloudFormationSchema'), patchCloudFormationRegistry)
       .importSamJsonSchema(path.join(SOURCES, 'SAMSpec/sam.schema.json'), patchSamTemplateSpec)
+      .importTypeHistory(RELEASED_DATABASE)
       .importCloudFormationDocs(path.join(SOURCES, 'CloudFormationDocumentation/CloudFormationDocumentation.json'))
       .importStatefulResources(path.join(SOURCES, 'StatefulResources/StatefulResources.json'))
       .importGetAttAllowList(path.join(SOURCES, 'CloudFormationGetAttAllowList/gettatt-allowlist.json'))
@@ -29,7 +31,8 @@ export class FullDatabase extends DatabaseBuilder {
       .importScrutinies()
       .importAugmentations()
       .importEventBridgeSchema(path.join(SOURCES, 'EventBridgeSchema'))
-      .importCfnPrimaryIdentifierOverrides(path.join(SOURCES, 'CloudFormationRefOverrides/ref-overrides.json'));
+      .importCfnPrimaryIdentifierOverrides(path.join(SOURCES, 'CloudFormationRefOverrides/ref-overrides.json'))
+      .reportL1Compatibility(RELEASED_DATABASE);
   }
 
   /**

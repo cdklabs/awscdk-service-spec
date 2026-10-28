@@ -3,7 +3,7 @@ import * as path from 'path';
 import { Failure, errorMessage, failure } from '@cdklabs/tskb';
 import { PatchReport, formatPatchReport } from '../patching';
 
-export type ReportType = 'interpreting' | 'loading' | 'patch';
+export type ReportType = 'interpreting' | 'loading' | 'patch' | 'l1-compatibility';
 
 interface Report {
   readonly type: ReportType;
@@ -22,6 +22,7 @@ export class ProblemReport {
     interpreting: 0,
     loading: 0,
     patch: 0,
+    'l1-compatibility': 0,
   };
   public readonly patchesApplied = new Array<PatchReport>();
   private readonly reportMap = new Map<string, Report[]>();
@@ -67,7 +68,7 @@ export class ProblemReport {
       `CDK found the following issues while trying to read the CloudFormation resource definition for ${service}:`,
     );
 
-    const reportTypeOrder: ReportType[] = ['interpreting', 'loading', 'patch'];
+    const reportTypeOrder: ReportType[] = ['interpreting', 'loading', 'patch', 'l1-compatibility'];
     for (const type of reportTypeOrder) {
       const thisType = reportList.filter((r) => r.type === type);
       if (thisType.length === 0) {
