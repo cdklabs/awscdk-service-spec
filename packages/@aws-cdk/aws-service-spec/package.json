@@ -12,6 +12,7 @@
     "bump": "projen bump",
     "bump:releasable-commits": "projen bump:releasable-commits",
     "check-for-updates": "projen check-for-updates",
+    "check-input-fields": "projen check-input-fields",
     "compile": "projen compile",
     "default": "projen default",
     "eslint": "projen eslint",

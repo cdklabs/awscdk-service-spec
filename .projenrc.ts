@@ -192,6 +192,13 @@ awsServiceSpec.compileTask.prependSpawn(
   }),
 );
 
+awsServiceSpec.tasks.addTask('check-input-fields', {
+  description:
+    'Fail if the L1 that CDK renders from a database (default: db.json.gz) misses a field that the CloudFormation schemas accept as input',
+  exec: 'ts-node build/check-input-fields.ts',
+  receiveArgs: true,
+});
+
 awsServiceSpec.gitignore.addPatterns('db.json');
 awsServiceSpec.gitignore.addPatterns('db.json.gz');
 awsServiceSpec.gitignore.addPatterns('build-report');

@@ -101,6 +101,16 @@
         }
       ]
     },
+    "check-input-fields": {
+      "name": "check-input-fields",
+      "description": "Fail if the L1 that CDK renders from a database (default: db.json.gz) misses a field that the CloudFormation schemas accept as input",
+      "steps": [
+        {
+          "exec": "ts-node build/check-input-fields.ts",
+          "receiveArgs": true
+        }
+      ]
+    },
     "compile": {
       "name": "compile",
       "description": "Only compile",

@@ -240,12 +240,16 @@ export class RichTypedField {
     // Special case: if the new type is `string` and the old type is `json`, we assume this is a correction
     // of a bug; the old type was incorrectly typed as Json, and we're now correcting this. Since this was a
     // bug, we don't need to keep the old type: it was never accurate.
-    //
-    // We could be more broad, and only maintain type history if we go from
-    // `json` -> `named type`, or `named type` -> `named type`.  For now I'm
-    // wary of destroying too much information; we'll just do the fix specifically
-    // for `json` -> `string`.
     if (type.type === 'string' && this.field.type.type === 'json') {
+      this.field.type = type;
+      return true;
+    }
+
+    // Special case: if the new type is another type definition than the current one, in the same lists and
+    // maps, the source renamed the type definition or merged it with another one. The new type definition
+    // replaces the old one. Kept first in the history, the old one would be rendered with the fields it had
+    // back then, without the fields the source added since.
+    if (isOtherTypeDefinition(this.field.type, type)) {
       this.field.type = type;
       return true;
     }
@@ -257,6 +261,16 @@ export class RichTypedField {
     this.field.type = type;
     return true;
   }
+}
+
+/**
+ * Whether `next` refers to another type definition than `current`, inside the same lists and maps
+ */
+function isOtherTypeDefinition(current: PropertyType, next: PropertyType): boolean {
+  if ((current.type === 'array' || current.type === 'map') && next.type === current.type) {
+    return isOtherTypeDefinition(current.element, next.element);
+  }
+  return current.type === 'ref' && next.type === 'ref' && current.reference.$ref !== next.reference.$ref;
 }
 
 export class RichProperty extends RichTypedField {
