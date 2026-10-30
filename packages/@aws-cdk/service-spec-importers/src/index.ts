@@ -4,3 +4,4 @@ export * from './report/problem-report';
 export * as patching from './patching';
 export * as patches from './patches';
 export * as types from './types';
+export * from './l1-input-fields';

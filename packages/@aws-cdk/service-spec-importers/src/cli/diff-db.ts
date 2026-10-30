@@ -1,8 +1,9 @@
 import { emptyDatabase, loadDatabase } from '@aws-cdk/service-spec-types';
 import { Command } from 'commander';
-import { handleFailure } from './util';
+import { CliError, handleFailure } from './util';
 import { DbDiff } from '../db-diff';
 import { DiffFormatter } from '../diff-fmt';
+import { compareL1, formatL1Changes } from '../l1-changes';
 
 async function main() {
   const program = new Command();
@@ -13,9 +14,23 @@ async function main() {
     .argument('<db1>', 'First database file')
     .argument('[db2]', 'Second database file')
     .option('-j, --json', 'Output json', false)
+    .option(
+      '--l1-changes',
+      'Report the struct renames and merges, removed fields, requiredness changes and other changes in the L1 code CDK renders from <db1> and from <db2>, instead of the database differences',
+      false,
+    )
     .parse();
   const options = program.opts();
   const args = program.args;
+
+  if (options.l1Changes) {
+    if (!args[1]) {
+      throw new CliError('--l1-changes needs two databases: the base database and the new database');
+    }
+    const changes = compareL1(await loadDatabase(args[0]), await loadDatabase(args[1]));
+    console.log(options.json ? JSON.stringify(changes, undefined, 2) : formatL1Changes(changes));
+    return;
+  }
 
   let db1;
   let db2;

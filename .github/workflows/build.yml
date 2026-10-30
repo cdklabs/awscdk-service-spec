@@ -58,6 +58,9 @@ jobs:
           name: db.head.json.gz
           path: packages/@aws-cdk/aws-service-spec/db.json.gz
           overwrite: true
+      - name: Check L1 input fields
+        working-directory: packages/@aws-cdk/aws-service-spec
+        run: npx projen check-input-fields
   self-mutation:
     needs: build
     runs-on: ubuntu-latest
@@ -150,6 +153,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
+          lfs: true
       - name: Enable corepack
         id: enable_corepack
         run: corepack enable
@@ -181,6 +185,21 @@ jobs:
         id: diff-db
         run: packages/@aws-cdk/service-spec-importers/bin/diff-db base/db.json.gz head/db.json.gz > DIFF || echo "diff-result=true" >> $GITHUB_OUTPUT
         continue-on-error: true
+      - name: Report L1 changes
+        id: report_l1_changes
+        run: |-
+          if ! packages/@aws-cdk/service-spec-importers/bin/diff-db --l1-changes base/db.json.gz head/db.json.gz > L1-CHANGES; then
+            echo "The L1 change report failed, see the job log." > L1-CHANGES
+          fi
+          cat L1-CHANGES
+      - name: Check L1 input fields
+        id: l1-input-fields
+        run: |-
+          if ! npx projen check-input-fields "$GITHUB_WORKSPACE/head/db.json.gz" > "$GITHUB_WORKSPACE/L1-INPUT-FIELDS"; then
+            echo "failed=true" >> $GITHUB_OUTPUT
+          fi
+          cat "$GITHUB_WORKSPACE/L1-INPUT-FIELDS"
+        working-directory: packages/@aws-cdk/aws-service-spec
       - name: Upload diff
         id: upload_diff
         if: steps.diff-db.outputs.diff-result
@@ -203,6 +222,11 @@ jobs:
             echo "" >> PR.md
           fi
           echo '**@aws-cdk/aws-service-spec**: Model database diff detected' >> PR.md
+          echo '```' >> PR.md
+          cat L1-CHANGES >> PR.md
+          echo "" >> PR.md
+          cat L1-INPUT-FIELDS >> PR.md
+          echo '```' >> PR.md
           echo "[📁 Download full diff](https://github.com/${REPOSITORY}/actions/runs/${RUN_ID})" >> PR.md
           echo '```' >> PR.md
           head -c $DIFF_LIMIT DIFF >> PR.md
@@ -214,7 +238,7 @@ jobs:
       - name: Comment diff
         id: comment_diff
         if: steps.diff-db.outputs.diff-result
-        uses: thollander/actions-comment-pull-request@v3
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b
         with:
           comment-tag: diff-db
           mode: recreate
@@ -222,8 +246,15 @@ jobs:
       - name: Delete outdated diff
         id: delete_outdated_diff
         if: "!(steps.diff-db.outputs.diff-result)"
-        uses: thollander/actions-comment-pull-request@v3
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b
         with:
           comment-tag: diff-db
           message: "**@aws-cdk/aws-service-spec**: No model change detected"
           mode: upsert
+      - name: Fail on missing L1 input fields
+        id: fail_on_missing_l1_input_fields
+        if: "!cancelled() && steps.l1-input-fields.outputs.failed"
+        run: |-
+          echo "::error::The L1 misses fields that CloudFormation accepts as input, or the check did not run."
+          cat L1-INPUT-FIELDS
+          exit 1
