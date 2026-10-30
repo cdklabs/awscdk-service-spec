@@ -35,6 +35,10 @@ export function relationshipCollection<R extends Relationship<any, any, any>>(
 ): RelationshipCollection<R> {
   const forward = new Map<string, Array<Rel<any>>>();
   const backward = new Map<string, Array<Rel<any>>>();
+  // The serialized links in each forward list, so that add() checks for a duplicate without
+  // serializing the whole list. Keyed by the list itself, so a list that is replaced or cleared
+  // takes its keys with it.
+  const forwardKeys = new WeakMap<Array<Rel<any>>, Set<string>>();
 
   function add(fromId: string, toId: string, attrs: any) {
     let f = forward.get(fromId);
@@ -47,13 +51,18 @@ export function relationshipCollection<R extends Relationship<any, any, any>>(
       b = [];
       backward.set(toId, b);
     }
+    let keys = forwardKeys.get(f);
+    if (!keys) {
+      keys = new Set(f.map((x) => JSON.stringify(x)));
+      forwardKeys.set(f, keys);
+    }
 
     // Behaves like a set, only add new relationship if it is structurally distinct
     const forwardRel = { $id: toId, ...attrs };
     const forwardRelStr = JSON.stringify(forwardRel);
-    const existingRelationship = f.find((x) => JSON.stringify(x) === forwardRelStr);
 
-    if (!existingRelationship) {
+    if (!keys.has(forwardRelStr)) {
+      keys.add(forwardRelStr);
       f.push(forwardRel);
       b.push({ $id: fromId, ...attrs });
     }
