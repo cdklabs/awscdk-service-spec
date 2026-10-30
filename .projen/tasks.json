@@ -216,6 +216,14 @@
         }
       ]
     },
+    "update-source:released-database": {
+      "name": "update-source:released-database",
+      "steps": [
+        {
+          "exec": "node ./scripts/download.task.js https://registry.npmjs.org/@aws-cdk/aws-service-spec/-/aws-service-spec-0.1.222.tgz sources/ReleasedDatabase/db.json.gz --tarball-entry package/db.json.gz --integrity sha512-gN3Y/KT/9fEc7hJK3D4ojf6zYRHm/uiAeNWrv7LI+hjQwXwIMJniLu9WLCuRKz46/q5X5lBhUmWivpG8WGzEPw=="
+        }
+      ]
+    },
     "update-source:sam": {
       "name": "update-source:sam",
       "steps": [
@@ -263,6 +271,9 @@
         },
         {
           "spawn": "update-source:stateful-resources"
+        },
+        {
+          "spawn": "update-source:released-database"
         },
         {
           "spawn": "update-source:eventbridge-schema"

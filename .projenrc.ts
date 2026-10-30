@@ -7,6 +7,25 @@ const workflowRunsOn = [
   'awscdk-service-spec_ubuntu-latest_32-core',
 ];
 
+/**
+ * The @aws-cdk/aws-service-spec version that aws-cdk-lib currently generates its L1s from.
+ *
+ * Its type history is the base of every build, so the types released in L1s survive schema renames.
+ * Bump it after each L1 update in aws-cdk, see "Released type history" in README.md.
+ */
+const RELEASED_SERVICE_SPEC_VERSION = '0.1.222';
+/**
+ * The npm `dist.integrity` of that version's tarball. Bump it together with the version and the sha256.
+ */
+const RELEASED_SERVICE_SPEC_INTEGRITY =
+  'sha512-gN3Y/KT/9fEc7hJK3D4ojf6zYRHm/uiAeNWrv7LI+hjQwXwIMJniLu9WLCuRKz46/q5X5lBhUmWivpG8WGzEPw==';
+/**
+ * The sha256 of that version's `db.json.gz`, which the build job checks. Bump it together with the version and the
+ * integrity.
+ */
+const RELEASED_SERVICE_SPEC_SHA256 = '3f9adee9f3594d07ebbde5c741b515d68feb3914741e603ddb3bc070867c7ee0';
+const RELEASED_DATABASE_DIR = 'sources/ReleasedDatabase';
+
 const repo = new YarnMonorepo({
   name: 'awscdk-service-spec',
   description: "Monorepo for the AWS CDK's service spec",
@@ -38,7 +57,7 @@ const repo = new YarnMonorepo({
   workflowRunsOn,
   gitignore: ['.DS_Store'],
   gitOptions: {
-    lfsPatterns: ['sources/**/*.json'],
+    lfsPatterns: ['sources/**/*.json', 'sources/**/*.json.gz'],
   },
 
   tsconfig: {
@@ -210,6 +229,8 @@ new DiffDb(repo, {
   workflowRunsOn,
   serviceSpec: awsServiceSpec,
   serviceSpecImporters,
+  releasedDatabaseDir: RELEASED_DATABASE_DIR,
+  releasedDatabaseSha256: RELEASED_SERVICE_SPEC_SHA256,
 });
 
 // Update sources
@@ -277,6 +298,19 @@ new SingleSource(repo, {
   source:
     'https://raw.githubusercontent.com/aws-cloudformation/cfn-lint/main/src/cfnlint/data/AdditionalSpecs/StatefulResources.json',
 });
+
+new SingleSource(repo, {
+  name: 'released-database',
+  dir: RELEASED_DATABASE_DIR,
+  fileName: 'db.json.gz',
+  source: `https://registry.npmjs.org/@aws-cdk/aws-service-spec/-/aws-service-spec-${RELEASED_SERVICE_SPEC_VERSION}.tgz`,
+  tarballEntry: 'package/db.json.gz',
+  integrity: RELEASED_SERVICE_SPEC_INTEGRITY,
+  // A new released database changes the baseline of the L1 compatibility check, so a maintainer approves it
+  autoApprove: false,
+});
+// The pull request checks read the version from here
+new pj.TextFile(repo, `${RELEASED_DATABASE_DIR}/VERSION`, { lines: [RELEASED_SERVICE_SPEC_VERSION] });
 
 new ScriptSource(repo, {
   name: 'eventbridge-schema',
