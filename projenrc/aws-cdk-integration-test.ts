@@ -2,6 +2,14 @@ import * as pj from 'projen';
 import { yarn } from 'cdklabs-projen-project-types';
 import path from 'path';
 
+/**
+ * Node.js version used to build awscdk-service-spec and aws-cdk in the integration test.
+ *
+ * Pinned rather than `lts/*`, so a new Node.js release cannot change the aws-cdk build under every pull request.
+ * Keep it on a version that jsii supports.
+ */
+const NODE_VERSION = '24';
+
 export interface AwsCdkIntegrationTestOptions {
   readonly workflowRunsOn: string[];
   readonly serviceSpec: yarn.TypeScriptWorkspace;
@@ -52,7 +60,10 @@ export class AwsCdkIntegrationTest extends pj.Component {
             lfs: true,
           },
         }),
-        ...root.renderWorkflowSetup({ installStepConfiguration: { workingDirectory: root.name } }),
+        ...withNodeVersion(
+          root.renderWorkflowSetup({ installStepConfiguration: { workingDirectory: root.name } }),
+          NODE_VERSION,
+        ),
         {
           name: `Build ${root.name}`,
           workingDirectory: root.name,
@@ -76,6 +87,16 @@ function awsCdkLibEnv(): Record<string, string> {
     CI: '1',
     NODE_OPTIONS: '--max-old-space-size=8196',
   };
+}
+
+function withNodeVersion(steps: pj.github.workflows.JobStep[], nodeVersion: string): pj.github.workflows.JobStep[] {
+  const setupNode = steps.filter((step) => step.uses?.startsWith('actions/setup-node@'));
+  if (setupNode.length !== 1) {
+    throw new Error(`Expected exactly one actions/setup-node step in the workflow setup, found ${setupNode.length}`);
+  }
+  return steps.map((step) =>
+    step === setupNode[0] ? { ...step, with: { ...step.with, 'node-version': nodeVersion } } : step,
+  );
 }
 
 function checkoutRepository(repository: string, path: string): pj.github.workflows.Step[] {
