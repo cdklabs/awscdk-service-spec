@@ -1,13 +1,12 @@
 import { Component, Task, github, javascript } from 'projen';
-import { DownloadScript } from './download-script';
+import { DownloadOptions, DownloadScript } from './download-script';
 import * as path from 'path';
 
 const UPDATE_JOB_ID = 'update_source';
 
-interface DataSource {
+interface DataSource extends DownloadOptions {
   url?: string;
   target: string;
-  isZip?: boolean;
   scriptPath?: string;
 }
 
@@ -29,6 +28,11 @@ export interface SourceUpdateOptions {
   readonly sources: DataSource[];
   readonly schedule?: string;
   readonly awsAuth?: AwsAuthentication;
+  /**
+   * Label the update pull request for automatic approval.
+   * @default true
+   */
+  readonly autoApprove?: boolean;
 }
 
 abstract class SourceUpdate extends Component {
@@ -72,7 +76,7 @@ abstract class SourceUpdate extends Component {
           };
         }
         if (s.url) {
-          return new DownloadScript(s.url, s.target, s.isZip);
+          return new DownloadScript(s.url, s.target, s);
         }
         throw new Error('DataSource must have either url or scriptPath');
       }),
@@ -116,7 +120,7 @@ abstract class SourceUpdate extends Component {
           ].join('\n'),
           workflowName,
           credentials: project.github.projenCredentials,
-          labels: ['auto-approve'],
+          labels: options.autoApprove === false ? [] : ['auto-approve'],
           baseBranch: 'main',
           branchName: `update-source/${options.name}`,
         }),
@@ -189,6 +193,22 @@ interface BaseSourceOptions {
    * @default SourceProcessing.NONE
    */
   readonly postProcessing?: SourceProcessing;
+  /**
+   * Save only this file of the downloaded gzipped tarball (as `fileName`).
+   * @default - save the downloaded file
+   */
+  readonly tarballEntry?: string;
+  /**
+   * The expected digest of the download, in the format of npm's `dist.integrity` (`sha512-<base64>`).
+   * The update fails if the download has another digest.
+   * @default - not checked
+   */
+  readonly integrity?: string;
+  /**
+   * Label the update pull request for automatic approval.
+   * @default true
+   */
+  readonly autoApprove?: boolean;
   /**
    * AWS Authentication config.
    * Required with S3 sources.
@@ -286,5 +306,7 @@ function getDataSource(url: string, options: BaseSourceOptions) {
     target: path.join(options.dir, options.fileName ?? path.basename(url)),
     url,
     isZip: false,
+    tarballEntry: options.tarballEntry,
+    integrity: options.integrity,
   };
 }

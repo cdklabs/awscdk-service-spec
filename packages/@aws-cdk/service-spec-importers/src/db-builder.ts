@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
-import { emptyDatabase, SpecDatabase } from '@aws-cdk/service-spec-types';
-import { assertSuccess, Result } from '@cdklabs/tskb';
+import { emptyDatabase, loadDatabase, SpecDatabase } from '@aws-cdk/service-spec-types';
+import { assertSuccess, failure, Result } from '@cdklabs/tskb';
 import { importArnTemplates } from './importers/import-arn-templates';
 import { importCannedMetrics } from './importers/import-canned-metrics';
 import { importCfnPrimaryIdentifierOverrides } from './importers/import-cfn-primaryidentifier-overrides';
@@ -13,6 +13,8 @@ import { importOobRelationships } from './importers/import-oob-relationships';
 import { ResourceSpecImporter, SAMSpecImporter } from './importers/import-resource-spec';
 import { SamResources } from './importers/import-sam';
 import { importStatefulResources } from './importers/import-stateful-resources';
+import { importTypeHistory } from './importers/import-type-history';
+import { compareL1, L1Change } from './l1-compat';
 import {
   loadDefaultCloudFormationDocs,
   loadDefaultCloudFormationRegistryResources,
@@ -158,6 +160,36 @@ export class DatabaseBuilder {
   }
 
   /**
+   * Make the type history of a released database the oldest part of every type history
+   *
+   * Call this after the sources that define resources and types, so that released fields are only kept where a
+   * current type still has them.
+   *
+   * Fields that a released type keeps at a position whose current types lack them go into the build report and the
+   * build log. The L1 compatibility check cannot see them, because the type has the field in both databases.
+   */
+  public importTypeHistory(releasedDatabasePath: string) {
+    return this.addSourceImporter(async (db, report) => {
+      const changes = importTypeHistory(db, await loadReleasedDatabase(releasedDatabasePath));
+      reportL1Changes(report, changes);
+      for (const change of changes) {
+        console.log(l1ChangeMessage(change));
+      }
+    });
+  }
+
+  /**
+   * Report how the L1 code rendered from this database differs from the code rendered from a released database
+   *
+   * Lost released type history and CloudFormation changes go into the build report.
+   */
+  public reportL1Compatibility(releasedDatabasePath: string) {
+    return this.addSourceImporter(async (db, report) => {
+      reportL1Changes(report, compareL1(await loadReleasedDatabase(releasedDatabasePath), db));
+    });
+  }
+
+  /**
    * Import the CloudFormation Documentation
    */
   public importCloudFormationDocs(filePath: string) {
@@ -273,5 +305,32 @@ export class DatabaseBuilder {
     report.reportPatch(this.defaultProblemGrouping, ...result.patchesApplied);
 
     return result.value;
+  }
+}
+
+function reportL1Changes(report: ProblemReport, changes: L1Change[]) {
+  for (const change of changes) {
+    if (change.kind !== 'addition') {
+      report.reportFailure(
+        ReportAudience.fromCloudFormationResource(change.resource),
+        'l1-compatibility',
+        failure(l1ChangeMessage(change)),
+      );
+    }
+  }
+}
+
+function l1ChangeMessage(change: L1Change) {
+  const what = change.kind === 'loss' ? 'Rename or merge loss' : 'CloudFormation change';
+  return `${what} in ${change.resource} ${change.element}: ${change.description}`;
+}
+
+async function loadReleasedDatabase(path: string): Promise<SpecDatabase> {
+  try {
+    return await loadDatabase(path);
+  } catch (e: any) {
+    throw new Error(
+      `Could not load the released database ${path} (if it is a Git LFS pointer, run 'git lfs pull'): ${e.message}`,
+    );
   }
 }

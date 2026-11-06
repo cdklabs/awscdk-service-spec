@@ -6,6 +6,7 @@ import {
   ResourceProperties,
   RichProperty,
   RichPropertyType,
+  Service,
   SpecDatabase,
   TagInformation,
   TypeDefinition,
@@ -39,6 +40,8 @@ export class SpecBuilder {
       if (!resource.primaryIdentifier) {
         resource.primaryIdentifier = options.primaryIdentifier;
       }
+      // A source without regions (like the legacy spec) may have created the resource
+      this.linkRegion(options.region, resource, this.allocateService(typeName));
 
       return new ResourceBuilder(this.db, resource);
     }
@@ -54,14 +57,17 @@ export class SpecBuilder {
 
     const service = this.allocateService(typeName);
     this.db.link('hasResource', service, resource);
+    this.linkRegion(options.region, resource, service);
 
-    if (options.region) {
-      const region = this.allocateRegion(options.region);
+    return new ResourceBuilder(this.db, resource);
+  }
+
+  private linkRegion(regionName: string | undefined, resource: Resource, service: Service) {
+    if (regionName) {
+      const region = this.allocateRegion(regionName);
       this.db.link('regionHasResource', region, resource);
       this.db.link('regionHasService', region, service);
     }
-
-    return new ResourceBuilder(this.db, resource);
   }
 
   private allocateService(resourceTypeName: string, resourceTypeNameSeparator = '::') {
