@@ -12,6 +12,7 @@ jobs:
       contents: write
     outputs:
       self_mutation_happened: ${{ steps.self_mutation.outputs.self_mutation_happened }}
+      type_gate_failed: ${{ steps.type_gate.outputs.failed }}
     env:
       CI: "true"
     steps:
@@ -58,6 +59,44 @@ jobs:
           name: db.head.json.gz
           path: packages/@aws-cdk/aws-service-spec/db.json.gz
           overwrite: true
+      - name: Check type history
+        id: type_gate
+        working-directory: packages/@aws-cdk/aws-service-spec
+        run: |-
+          if ! npx projen type-gate --entries-file "$RUNNER_TEMP/type-mapping-entries.txt"; then
+            if [ -f "$RUNNER_TEMP/type-mapping-entries.txt" ]; then
+              echo "failed=true" >> $GITHUB_OUTPUT
+            fi
+            exit 1
+          fi
+      - if: failure() && steps.type_gate.outputs.failed == 'true'
+        name: Upload type mapping entries
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: type-mapping-entries
+          path: ${{ runner.temp }}/type-mapping-entries.txt
+          overwrite: true
+      - if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        name: Checkout base branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
+          repository: ${{ github.repository }}
+          path: base-branch
+          persist-credentials: false
+      - name: Check released database
+        id: released_database
+        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        env:
+          PULL_REQUEST: ${{ github.event.pull_request.number }}
+        run: node scripts/check-released-database-bump.js base-branch
+      - name: Pull the base branch released database
+        if: steps.released_database.outputs.base-baseline == 'true'
+        run: git -C base-branch lfs pull --include=sources/ReleasedDatabase/db.json.gz
+      - name: Check type history against the base branch released database
+        if: steps.released_database.outputs.base-baseline == 'true'
+        working-directory: packages/@aws-cdk/aws-service-spec
+        run: npx projen type-gate --snapshot "$GITHUB_WORKSPACE/base-branch/sources/ReleasedDatabase/db.json.gz" --pins "$GITHUB_WORKSPACE/base-branch/packages/@aws-cdk/aws-service-spec/build/released-database.json"
   self-mutation:
     needs: build
     runs-on: ubuntu-latest
@@ -181,6 +220,13 @@ jobs:
         id: diff-db
         run: packages/@aws-cdk/service-spec-importers/bin/diff-db base/db.json.gz head/db.json.gz > DIFF || echo "diff-result=true" >> $GITHUB_OUTPUT
         continue-on-error: true
+      - name: Report L1 changes
+        id: report_l1_changes
+        run: |-
+          if ! packages/@aws-cdk/service-spec-importers/bin/diff-db --l1-changes base/db.json.gz head/db.json.gz > L1-CHANGES; then
+            echo "The L1 change report failed, see the job log." > L1-CHANGES
+          fi
+          cat L1-CHANGES
       - name: Upload diff
         id: upload_diff
         if: steps.diff-db.outputs.diff-result
@@ -203,6 +249,9 @@ jobs:
             echo "" >> PR.md
           fi
           echo '**@aws-cdk/aws-service-spec**: Model database diff detected' >> PR.md
+          echo '```' >> PR.md
+          cat L1-CHANGES >> PR.md
+          echo '```' >> PR.md
           echo "[📁 Download full diff](https://github.com/${REPOSITORY}/actions/runs/${RUN_ID})" >> PR.md
           echo '```' >> PR.md
           head -c $DIFF_LIMIT DIFF >> PR.md
@@ -214,7 +263,7 @@ jobs:
       - name: Comment diff
         id: comment_diff
         if: steps.diff-db.outputs.diff-result
-        uses: thollander/actions-comment-pull-request@v3
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b
         with:
           comment-tag: diff-db
           mode: recreate
@@ -222,7 +271,7 @@ jobs:
       - name: Delete outdated diff
         id: delete_outdated_diff
         if: "!(steps.diff-db.outputs.diff-result)"
-        uses: thollander/actions-comment-pull-request@v3
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b
         with:
           comment-tag: diff-db
           message: "**@aws-cdk/aws-service-spec**: No model change detected"

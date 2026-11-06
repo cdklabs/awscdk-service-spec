@@ -46,3 +46,4 @@
 /yarn.config.cjs linguist-generated
 /yarn.lock linguist-generated
 sources/**/*.json filter=lfs diff=lfs merge=lfs -text linguist-generated=true
+sources/**/*.json.gz filter=lfs diff=lfs merge=lfs -text linguist-generated=true
