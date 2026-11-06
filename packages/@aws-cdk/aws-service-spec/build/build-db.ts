@@ -8,13 +8,19 @@ async function main() {
   const buildReport = 'build-report';
 
   process.stdout.write('Importing default sources... ');
-  const { db, report } = await new FullDatabase(emptyDatabase(), {
+  const { db, report, typeHistory } = await new FullDatabase(emptyDatabase(), {
     // @TODO: Switch this to 'true' once validation passes (this will never happen)
     validate: false,
     debug: Boolean(process.env.DEBUG),
   }).build();
   const importResult = report.totalCount ? `WARN (${report.totalCount} problems encountered)` : 'OK';
   process.stdout.write(`${importResult}\n`);
+  const undecided = typeHistory!.result.undecided.length;
+  if (undecided > 0) {
+    process.stdout.write(
+      `Type history: ${undecided} released types undecided, 'npx projen type-gate' prints the mapping entries that decide them\n`,
+    );
+  }
 
   process.stdout.write(`Writing database to file ${outputFile}... `);
   const data = JSON.stringify(db.save());

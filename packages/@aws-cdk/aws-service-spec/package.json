@@ -22,6 +22,7 @@
     "pre-compile": "projen pre-compile",
     "test": "projen test",
     "test:watch": "projen test:watch",
+    "type-gate": "projen type-gate",
     "unbump": "projen unbump",
     "watch": "projen watch",
     "projen": "projen"
