@@ -189,6 +189,10 @@ awsServiceSpec.tsconfigDev.addInclude('build');
 awsServiceSpec.compileTask.prependSpawn(
   awsServiceSpec.tasks.addTask('build:db', {
     exec: `ts-node build/build-db.ts`,
+    // projen's built-in shell reports a process killed by a signal (for example
+    // a Node.js out-of-memory crash) as exit code 0. The system shell reports it
+    // as a failure, so a crashed import fails the build instead of passing silently.
+    shell: pj.TaskShell.system(),
   }),
 );
 
