@@ -617,6 +617,41 @@ describe('a kept struct below a list or map change', () => {
     expect(settled(result)).toEqual(['rename Settings -> NewSettings at property Settings']);
   });
 
+  test.each([
+    ['reused by a field the L1 does not render', { Dest: object({ State: { type: 'string' } }) }],
+    ['not reused', { Other: object({ State: { type: 'string' } }) }],
+  ])('a rename stays settled where its released name is %s', (_, extraDefinition) => {
+    // CloudFormation's Settings is now a union, so the kept Settings keeps exactly its released fields and the L1
+    // does not render Extra
+    const extraType = Object.keys(extraDefinition)[0];
+    importRegistry(released, {
+      properties: { Settings: { $ref: '#/definitions/Settings' }, Backup: { $ref: '#/definitions/Dest' } },
+      definitions: {
+        Settings: object({ Url: { type: 'string' } }),
+        Dest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+      },
+    });
+    importRegistry(db, {
+      properties: {
+        Settings: { anyOf: [{ $ref: '#/definitions/Settings' }, { type: 'string' }] },
+        Backup: { $ref: '#/definitions/DestRequest' },
+      },
+      definitions: {
+        Settings: object({ Url: { type: 'string' }, Extra: { $ref: `#/definitions/${extraType}` } }),
+        DestRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        ...extraDefinition,
+      },
+    });
+
+    const result = run();
+
+    expect(cases(result)).toEqual([]);
+    expect(settled(result)).toEqual(['rename Dest -> DestRequest at property Backup']);
+    expect(fields('Settings')).toEqual({ Url: 'string' });
+    expect(history(resource(db).properties.Backup)).toEqual(['Dest', 'DestRequest']);
+    expect(fields('Dest')).toEqual({ Url: 'string', Port: 'integer' });
+  });
+
   test('renders a new field typed with a released name that CloudFormation gave another struct', () => {
     importRegistry(released, {
       properties: { Settings: { $ref: '#/definitions/Settings' }, Backup: { $ref: '#/definitions/Dest' } },

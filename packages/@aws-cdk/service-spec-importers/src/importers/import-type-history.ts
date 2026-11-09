@@ -134,6 +134,23 @@ export function importTypeHistory(
 type Field = Property | Attribute;
 
 /**
+ * A field of a current type definition
+ */
+interface CurrentField {
+  readonly typeDef: TypeDefinition;
+  readonly name: string;
+}
+
+/**
+ * A place CloudFormation's newest types reach: a property, an attribute, or a field of a type definition they reach
+ */
+interface CloudFormationPosition {
+  readonly label: string;
+  readonly field: Field;
+  readonly within?: CurrentField;
+}
+
+/**
  * - `same`: CloudFormation's type there has the released name.
  * - `paired`: CloudFormation's type there has another name and is paired with the released type.
  * - `not-a-type`: CloudFormation's type there has another shape, even inside its lists and maps, so it has no type
@@ -167,6 +184,8 @@ interface Position {
   readonly currentTypes: TypeDefinition[];
   /** Whether CloudFormation's type equals the released newest type here */
   readonly rule1: boolean;
+  /** For a position that only the current sources have: the current type definition and field it is, if a field */
+  readonly within?: CurrentField;
   /** The use of the parent type definition this position is a field of */
   readonly parentUse?: Use;
   readonly uses: Use[];
@@ -361,7 +380,7 @@ class ResourceTypeHistory {
     const cloudFormationPositions = this.cloudFormationPositions();
     for (const [releasedType, uses] of this.uses) {
       const current = this.currentByName.get(releasedType.name);
-      for (const { label, field } of (current && cloudFormationPositions.get(current)) || []) {
+      for (const { label, field, within } of (current && cloudFormationPositions.get(current)) || []) {
         if (visited.has(field)) {
           continue;
         }
@@ -372,6 +391,7 @@ class ResourceTypeHistory {
           cfnType,
           currentTypes: [current!],
           rule1: true,
+          within,
           uses: [],
         };
         const use: Use = { released: releasedType, position, candidates: [current!], status: 'same', cfn: current };
@@ -386,27 +406,41 @@ class ResourceTypeHistory {
    * Where CloudFormation's types refer to each current type definition: the newest types of the properties and
    * attributes, and of the fields of the type definitions those reach
    */
-  private cloudFormationPositions(): Map<TypeDefinition, Array<{ label: string; field: Field }>> {
-    const positions = new Map<TypeDefinition, Array<{ label: string; field: Field }>>();
-    const queue = new Array<{ label: string; field: Field }>();
+  private cloudFormationPositions(): Map<TypeDefinition, CloudFormationPosition[]> {
+    const positions = new Map<TypeDefinition, CloudFormationPosition[]>();
+    const queue = new Array<CloudFormationPosition>();
     for (const bag of ['properties', 'attributes'] as const) {
       for (const [name, field] of Object.entries(this.resource[bag])) {
         queue.push({ label: `${bag === 'properties' ? 'property' : 'attribute'} ${name}`, field });
       }
     }
     while (queue.length > 0) {
-      const { label, field } = queue.shift()!;
-      for (const typeDef of unique(referencedStructs(this.db, last(new RichTypedField(field).types())))) {
+      const position = queue.shift()!;
+      for (const typeDef of unique(referencedStructs(this.db, last(new RichTypedField(position.field).types())))) {
         if (!positions.has(typeDef)) {
           positions.set(typeDef, []);
           for (const [name, nested] of Object.entries(typeDef.properties)) {
-            queue.push({ label: `${label}.${name}`, field: nested });
+            queue.push({ label: `${position.label}.${name}`, field: nested, within: { typeDef, name } });
           }
         }
-        positions.get(typeDef)!.push({ label, field });
+        positions.get(typeDef)!.push(position);
       }
     }
     return positions;
+  }
+
+  /**
+   * Whether the L1 renders a position: a field of a current type definition that keeps a released one is rendered
+   * only if the kept type definition keeps that field
+   */
+  private rendered(position: Position) {
+    if (!position.within) {
+      return true;
+    }
+    const { typeDef, name } = position.within;
+    const released = this.releasedByName.get(typeDef.name);
+    const decision = released && this.currentByName.get(typeDef.name) === typeDef && this.decisions.get(released);
+    return !decision || decision.stays.length === 0 || decision.fields.includes(name);
   }
 
   private classify(
@@ -456,7 +490,8 @@ class ResourceTypeHistory {
   /**
    * Decide every released type definition, until no decision drops a position another decision depends on
    *
-   * A position whose parent type definition the L1 no longer renders there does not count.
+   * A position whose parent type definition the L1 no longer renders there does not count, and neither does a
+   * position that only the current sources have at a field the kept type definition leaves out.
    */
   private decideAll() {
     this.active = new Set(this.positions);
@@ -470,7 +505,8 @@ class ResourceTypeHistory {
       }
       const next = new Set(
         [...this.active].filter(
-          (p) => !p.parentUse || (this.active.has(p.parentUse.position) && this.stays(p.parentUse)),
+          (p) =>
+            (!p.parentUse || (this.active.has(p.parentUse.position) && this.stays(p.parentUse))) && this.rendered(p),
         ),
       );
       if (next.size === this.active.size) {
