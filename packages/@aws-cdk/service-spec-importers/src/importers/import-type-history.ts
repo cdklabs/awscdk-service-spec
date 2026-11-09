@@ -231,6 +231,8 @@ class ResourceTypeHistory {
   private readonly targets = new Map<string, TypeDefinition>();
   private decisions = new Map<TypeDefinition, Decision>();
   private active = new Set<Position>();
+  /** The current type definitions that the L1 renders, see `renderedCurrentTypes()` */
+  private renderedTypes = new Set<TypeDefinition>();
 
   constructor(
     private readonly db: SpecDatabase,
@@ -534,12 +536,12 @@ class ResourceTypeHistory {
           this.decisions.set(releasedType, this.decide(releasedType, activeUses));
         }
       }
-      const renderedTypes = this.renderedCurrentTypes();
+      this.renderedTypes = this.renderedCurrentTypes();
       const next = new Set(
         [...this.active].filter(
           (p) =>
             (!p.parentUse || (this.active.has(p.parentUse.position) && this.stays(p.parentUse))) &&
-            this.rendered(p, renderedTypes),
+            this.rendered(p, this.renderedTypes),
         ),
       );
       if (next.size === this.active.size) {
@@ -737,6 +739,9 @@ class ResourceTypeHistory {
         continue;
       }
       const target = this.target(releasedType);
+      // The current type definition of the released name types the fields only where the L1 renders it; elsewhere
+      // CloudFormation's types at the positions do
+      const ownFields = this.renderedTypes.has(target);
       plans.set(
         releasedType,
         decision.fields.map((name) => {
@@ -746,7 +751,7 @@ class ResourceTypeHistory {
           return {
             name,
             required: decision.stays.every((u, i) => (u.unreached ? releasedRequired : atPositions[i]?.required)),
-            source: target.properties[name] ?? atPositions.find(isDefined),
+            source: (ownFields ? target.properties[name] : undefined) ?? atPositions.find(isDefined),
           };
         }),
       );
@@ -754,8 +759,10 @@ class ResourceTypeHistory {
 
     for (const [releasedType, plan] of plans) {
       const target = this.target(releasedType);
-      for (const name of Object.keys(target.properties)) {
-        if (!plan.some((p) => p.name === name)) {
+      for (const [name, field] of Object.entries(target.properties)) {
+        const planned = plan.find((p) => p.name === name);
+        // A field the released type does not have is CloudFormation's field at its positions
+        if (!planned || (!releasedType.properties[name] && planned.source && planned.source !== field)) {
           delete target.properties[name];
         }
       }

@@ -716,6 +716,47 @@ describe('a kept struct below a union change', () => {
 
     expect(cases(result)).toEqual(expected);
   });
+
+  test('a renamed struct takes its new fields from CloudFormation where the L1 does not render its current namesake', () => {
+    // CloudFormation's Dest is only below Settings.Extra, which the L1 does not render, so its X: Foo is nowhere in
+    // the L1 and does not count for Foo
+    importRegistry(released, {
+      properties: {
+        Settings: { $ref: '#/definitions/Settings' },
+        Backup: { $ref: '#/definitions/Dest' },
+        Other: { $ref: '#/definitions/Foo' },
+      },
+      definitions: {
+        Settings: object({ Url: { type: 'string' } }),
+        Dest: object({ Url: { type: 'string' } }),
+        Foo: object({ A: { type: 'string' }, B: { type: 'string' } }),
+      },
+    });
+    importRegistry(db, {
+      properties: {
+        Settings: { anyOf: [{ $ref: '#/definitions/Settings' }, { type: 'string' }] },
+        Backup: { $ref: '#/definitions/DestRequest' },
+        Other: { $ref: '#/definitions/FooRequest' },
+      },
+      definitions: {
+        Settings: object({ Url: { type: 'string' }, Extra: { $ref: '#/definitions/Dest' } }),
+        Dest: object({ Url: { type: 'string' }, X: { $ref: '#/definitions/Foo' } }),
+        Foo: object({ A: { type: 'string' }, C: { type: 'string' } }),
+        DestRequest: object({ Url: { type: 'string' }, X: { type: 'string' } }),
+        FooRequest: object({ A: { type: 'string' } }),
+      },
+    });
+
+    const result = run();
+
+    expect(fields('Dest')).toEqual({ Url: 'string', X: 'string' });
+    expect(cases(result)).toEqual([]);
+    expect(settled(result)).toEqual([
+      'rename Dest -> DestRequest at property Backup',
+      'rename Foo -> FooRequest at property Other',
+    ]);
+    expect(fields('Foo')).toEqual({ A: 'string' });
+  });
 });
 
 describe('released names below a changed position', () => {
