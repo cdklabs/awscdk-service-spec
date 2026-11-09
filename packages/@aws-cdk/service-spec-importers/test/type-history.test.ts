@@ -821,11 +821,11 @@ describe('a kept struct below a union change', () => {
       ['a list of a union', { type: 'array', items: settingsV2OrString } as any],
       ['a map of a union', { type: 'object', patternProperties: { '.*': settingsV2OrString } } as any],
     ];
-    const setup = (settings: jsonschema.Schema, nested: boolean) => {
+    const setup = (settings: jsonschema.Schema, nested: boolean, property = 'Top') => {
       const inOuter = (s: jsonschema.Schema): jsonschema.Schema => (nested ? { $ref: '#/definitions/Outer' } : s);
       const releasedSettings: jsonschema.Schema = { $ref: '#/definitions/Settings' };
       importRegistry(released, {
-        properties: { Top: inOuter(releasedSettings), Backup: { $ref: '#/definitions/Dest' } },
+        properties: { [property]: inOuter(releasedSettings), Backup: { $ref: '#/definitions/Dest' } },
         definitions: {
           ...(nested ? { Outer: object({ Settings: releasedSettings }) } : {}),
           Settings: object({ Url: { type: 'string' } }),
@@ -833,7 +833,7 @@ describe('a kept struct below a union change', () => {
         },
       });
       importRegistry(db, {
-        properties: { Top: inOuter(settings), Backup: { $ref: '#/definitions/DestRequest' } },
+        properties: { [property]: inOuter(settings), Backup: { $ref: '#/definitions/DestRequest' } },
         definitions: {
           ...(nested ? { Outer: object({ Settings: settings }) } : {}),
           SettingsV2: object({ Url: { type: 'string' }, Extra: { $ref: '#/definitions/Dest' } }),
@@ -871,6 +871,18 @@ describe('a kept struct below a union change', () => {
         expect(cases(result)).toEqual(['unsettled-split Dest at property Backup, property Top.Extra']);
       },
     );
+
+    test('a rename stays settled where the tag property turns into a union', () => {
+      // The tag property renders only the oldest type of its history, so nothing renders SettingsV2
+      setup(settingsV2OrString, false, 'Tags');
+
+      const result = run();
+
+      expect(resource(db).tagInformation?.tagPropertyName).toEqual('Tags');
+      expect(new L1View(db, resource(db)).structs.has('SettingsV2')).toBe(false);
+      expect(cases(result)).toEqual([]);
+      expect(settled(result)).toEqual(['rename Dest -> DestRequest at property Backup']);
+    });
   });
 
   test.each([
