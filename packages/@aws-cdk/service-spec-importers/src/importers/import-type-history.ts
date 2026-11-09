@@ -88,9 +88,11 @@ export interface TypeHistoryResult {
  * 3. A kept type definition takes, at each position where the L1 renders it, the fields of CloudFormation's type
  *    there (the struct inside, where CloudFormation put it into lists or maps or took it out) plus its own released
  *    fields that a current type at that position still has; where CloudFormation's type there, inside any lists and
- *    maps, is not a type definition, exactly its released fields. Positions where CloudFormation uses a current
- *    type of the released name and the released L1 does not count too. Where its positions need different fields,
- *    the matcher cannot decide. A field is required if CloudFormation requires it at every position.
+ *    maps, is not a type definition, exactly its released fields. A position where CloudFormation uses a current type
+ *    of the released name that the released L1 lacks counts too, but only where the L1 renders it: not at or below a
+ *    field its kept parent type does not keep, at any depth, such as one below a position CloudFormation turned into
+ *    a union. Where its positions need different fields, the matcher cannot decide. A field is required if
+ *    CloudFormation requires it at every position.
  * 4. Released resources, properties, attributes and fields that no current source has are not kept. A kept released
  *    field keeps its released history first, even where no position reaches it.
  *
