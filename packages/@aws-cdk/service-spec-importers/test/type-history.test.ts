@@ -761,14 +761,22 @@ describe('a kept struct below a union change', () => {
   });
 
   test.each([
-    ['only below a field the L1 does not render', {}, []],
+    [
+      'only below a field the L1 does not render',
+      {},
+      [],
+      ['rename Dest -> DestRequest at property Backup'],
+      { Url: 'string', Port: 'integer' },
+    ],
     [
       // Other renders Mid, so the L1 renders Dest at Other.Inner with CloudFormation's other fields
       'also at a property the L1 renders',
       { Other: { $ref: '#/definitions/Mid' } },
       ['unsettled-split Dest at property Backup, property Other.Inner'],
+      [],
+      { Url: 'string', Port: 'integer', State: 'string' },
     ],
-  ])('a released name reused two levels below a union position is compared %s', (_, otherProperty, expected) => {
+  ])('a released name reused two levels below a union position is compared %s', (_, other, expected, renames, dest) => {
     // The kept Settings keeps exactly {Url}, so the L1 renders neither Extra nor Mid.Inner below it
     importRegistry(released, {
       properties: { Settings: { $ref: '#/definitions/Settings' }, Backup: { $ref: '#/definitions/Dest' } },
@@ -781,7 +789,7 @@ describe('a kept struct below a union change', () => {
       properties: {
         Settings: { anyOf: [{ $ref: '#/definitions/Settings' }, { type: 'string' }] },
         Backup: { $ref: '#/definitions/DestRequest' },
-        ...otherProperty,
+        ...other,
       },
       definitions: {
         Settings: object({ Url: { type: 'string' }, Extra: { $ref: '#/definitions/Mid' } }),
@@ -794,6 +802,9 @@ describe('a kept struct below a union change', () => {
     const result = run();
 
     expect(cases(result)).toEqual(expected);
+    expect(settled(result)).toEqual(renames);
+    expect(fields('Settings')).toEqual({ Url: 'string' });
+    expect(fields('Dest')).toEqual(dest);
   });
 
   test('a case names the path where the L1 renders a struct, not one below a field it does not render', () => {
@@ -997,6 +1008,30 @@ describe('a released name that CloudFormation also uses elsewhere', () => {
 
     expect(cases(result)).toEqual([]);
     expect(fields('Destination')).toEqual({ Url: 'string' });
+  });
+
+  test('is compared at the fields of a struct that only an attribute reaches', () => {
+    importRegistry(released, {
+      properties: { Settings: { $ref: '#/definitions/Destination' } },
+      definitions: { Destination: object({ Url: { type: 'string' }, Port: { type: 'integer' } }) },
+    });
+    importRegistry(db, {
+      properties: {
+        Settings: { $ref: '#/definitions/DestinationRequest' },
+        Status: { $ref: '#/definitions/Status' },
+      },
+      readOnlyProperties: ['/properties/Status'],
+      definitions: {
+        DestinationRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        Status: object({ Last: { $ref: '#/definitions/Destination' } }),
+        Destination: object({ State: { type: 'string' } }),
+      },
+    });
+
+    const result = run();
+
+    expect(Object.keys(resource(db).attributes)).toContain('Status');
+    expect(cases(result)).toEqual(['unsettled-split Destination at attribute Status.Last, property Settings']);
   });
 });
 
