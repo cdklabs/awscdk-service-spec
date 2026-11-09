@@ -3,6 +3,7 @@ import { importCloudFormationRegistryResource } from '../src/importers/import-cl
 import { ResourceSpecImporter } from '../src/importers/import-resource-spec';
 import { importTypeHistory, TypeHistoryResult, UndecidedCase } from '../src/importers/import-type-history';
 import { compareL1 } from '../src/l1-changes';
+import { L1View } from '../src/l1-view';
 import { ProblemReport } from '../src/report';
 import { typeGate } from '../src/type-gate';
 import { TypeMapping, TypeMappingKind } from '../src/type-mappings';
@@ -760,6 +761,67 @@ describe('a kept struct below a union change', () => {
     expect(fields('Dest')).toEqual({ Url: 'string', Port: 'integer' });
   });
 
+  describe('where CloudFormation gives the union a member of another name', () => {
+    const settingsV2OrString: jsonschema.Schema = {
+      anyOf: [{ $ref: '#/definitions/SettingsV2' }, { type: 'string' }],
+    } as any;
+    const shapes: Array<[string, jsonschema.Schema]> = [
+      ['a union', settingsV2OrString],
+      ['a list of a union', { type: 'array', items: settingsV2OrString } as any],
+      ['a map of a union', { type: 'object', patternProperties: { '.*': settingsV2OrString } } as any],
+    ];
+    const setup = (settings: jsonschema.Schema, nested: boolean) => {
+      const inOuter = (s: jsonschema.Schema): jsonschema.Schema => (nested ? { $ref: '#/definitions/Outer' } : s);
+      const releasedSettings: jsonschema.Schema = { $ref: '#/definitions/Settings' };
+      importRegistry(released, {
+        properties: { Top: inOuter(releasedSettings), Backup: { $ref: '#/definitions/Dest' } },
+        definitions: {
+          ...(nested ? { Outer: object({ Settings: releasedSettings }) } : {}),
+          Settings: object({ Url: { type: 'string' } }),
+          Dest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        },
+      });
+      importRegistry(db, {
+        properties: { Top: inOuter(settings), Backup: { $ref: '#/definitions/DestRequest' } },
+        definitions: {
+          ...(nested ? { Outer: object({ Settings: settings }) } : {}),
+          SettingsV2: object({ Url: { type: 'string' }, Extra: { $ref: '#/definitions/Dest' } }),
+          DestRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+          Dest: object({ State: { type: 'string' } }),
+        },
+      });
+    };
+
+    test.each(shapes)('a rename stays settled where a field turns into %s', (_, settings) => {
+      // The kept Outer renders the released Settings {Url} at Settings, and nothing renders SettingsV2
+      setup(settings, true);
+
+      const result = run();
+
+      expect(new L1View(db, resource(db)).structs.has('SettingsV2')).toBe(false);
+      expect(cases(result)).toEqual([]);
+      expect(settled(result)).toEqual(['rename Dest -> DestRequest at property Backup']);
+      expect(fields('Settings')).toEqual({ Url: 'string' });
+      expect(fields('Dest')).toEqual({ Url: 'string', Port: 'integer' });
+    });
+
+    test.each(shapes)(
+      'the released name is compared below the member where a property turns into %s',
+      (_, settings) => {
+        // A property renders the later types of its history as structs too, so the L1 renders SettingsV2 with Extra
+        setup(settings, false);
+
+        const result = run();
+
+        expect(Object.keys(new L1View(db, resource(db)).structs.get('SettingsV2')!.properties)).toEqual([
+          'Url',
+          'Extra',
+        ]);
+        expect(cases(result)).toEqual(['unsettled-split Dest at property Backup, property Top.Extra']);
+      },
+    );
+  });
+
   test.each([
     [
       'only below a field the L1 does not render',
@@ -992,6 +1054,40 @@ describe('a released name that CloudFormation also uses elsewhere', () => {
 
     expect(fields('Settings')).toEqual({ Url: 'string', Extra: 'Dest' });
     expect(cases(result)).toEqual(['unsettled-split Dest at property Backup, property Settings.Extra']);
+  });
+
+  test('is compared below a union member that follows CloudFormation by entry while another member stays', () => {
+    // With the entry, the L1 renders CloudFormation's union at Target, SqsTarget.Extra included
+    importRegistry(released, {
+      properties: {
+        Target: { anyOf: [{ $ref: '#/definitions/Queue' }, { $ref: '#/definitions/Topic' }] },
+        Backup: { $ref: '#/definitions/Dest' },
+      },
+      definitions: {
+        Queue: object({ Arn: { type: 'string' } }),
+        Topic: object({ Url: { type: 'string' } }),
+        Dest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+      },
+    });
+    importRegistry(db, {
+      properties: {
+        Target: { anyOf: [{ $ref: '#/definitions/SqsTarget' }, { $ref: '#/definitions/SnsTarget' }] },
+        Backup: { $ref: '#/definitions/DestRequest' },
+      },
+      definitions: {
+        SqsTarget: object({ Arn: { type: 'string' }, Extra: { $ref: '#/definitions/Dest' } }),
+        SnsTarget: object({ Url: { type: 'string' } }),
+        DestRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        Dest: object({ State: { type: 'string' } }),
+      },
+    });
+
+    const result = run([
+      mapping({ resource: RESOURCE, oldType: 'Queue', newTypes: [], kind: 'follow-cloudformation' }),
+    ]);
+
+    expect(history(resource(db).properties.Target)).toEqual(['SqsTarget | SnsTarget']);
+    expect(cases(result)).toEqual(['unsettled-split Dest at property Backup, property Target.Extra']);
   });
 
   test('stays settled where the other use has the same fields', () => {

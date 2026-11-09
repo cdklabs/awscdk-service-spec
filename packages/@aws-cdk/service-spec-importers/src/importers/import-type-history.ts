@@ -472,47 +472,60 @@ class ResourceTypeHistory {
    * fields the L1 renders, each with the first place the L1 renders it, so a field below one the L1 leaves out, at any
    * depth, is not among them
    *
-   * Where the L1 renders a kept type definition paired with CloudFormation's type at a position, it renders the
-   * fields of CloudFormation's type that the kept one keeps. Elsewhere it renders the fields of CloudFormation's type,
-   * except those that a kept type definition of its name leaves out.
+   * Where the L1 renders kept type definitions at a position, it renders the fields of the CloudFormation types they
+   * are paired with that the kept ones keep. A resource property, other than the tags, also renders the later types
+   * of its history as structs of their own, CloudFormation's among them, so there the L1 also renders the fields of
+   * each CloudFormation type, except those that a kept type definition of its name leaves out. Elsewhere it renders
+   * those fields only where no kept type definition is rendered.
    */
   private renderedCurrentFields(): Map<string, string> {
     const keptAt = new Map<Field, Use[]>();
     for (const position of this.positions) {
-      if (position.currentField && this.active.has(position)) {
-        const staying = position.uses.filter((u) => u.cfn && this.stays(u));
+      // Where a use follows CloudFormation, the position renders CloudFormation's type
+      const staying = position.uses.filter((u) => this.stays(u));
+      const follows = position.uses.some((u) => this.follows(u));
+      if (position.currentField && this.active.has(position) && staying.length > 0 && !follows) {
         keptAt.set(position.currentField, [...(keptAt.get(position.currentField) ?? []), ...staying]);
       }
     }
 
     const rendered = new Map<string, string>();
     const walked = new Set<string>();
-    const queue = new Array<{ label: string; field: Field }>();
-    for (const bag of ['properties', 'attributes'] as const) {
-      for (const [name, field] of Object.entries(this.resource[bag])) {
-        queue.push({ label: `${bag === 'properties' ? 'property' : 'attribute'} ${name}`, field });
-      }
+    const queue = new Array<{ label: string; field: Field; rendersHistory?: boolean }>();
+    const tags = this.resource.tagInformation?.tagPropertyName;
+    for (const [name, field] of Object.entries(this.resource.properties)) {
+      queue.push({ label: `property ${name}`, field, rendersHistory: name !== tags });
+    }
+    for (const [name, field] of Object.entries(this.resource.attributes)) {
+      queue.push({ label: `attribute ${name}`, field });
     }
     while (queue.length > 0) {
-      const { label, field } = queue.shift()!;
+      const { label, field, rendersHistory } = queue.shift()!;
       for (const typeDef of referencedStructs(this.db, last(new RichTypedField(field).types()))) {
-        const kept = unique((keptAt.get(field) ?? []).filter((u) => u.cfn === typeDef).map((u) => u.released));
-        const view = `${typeDef.$id} ${kept.map((r) => r.$id).join(',')}`;
-        if (walked.has(view)) {
-          continue;
-        }
-        walked.add(view);
-        for (const [name, nested] of Object.entries(typeDef.properties)) {
-          const keeps =
-            kept.length > 0
-              ? kept.some((r) => this.decisions.get(r)!.fields.includes(name))
-              : this.keepsField(typeDef, name);
-          if (keeps) {
-            const key = fieldKey({ typeDef, name });
-            if (!rendered.has(key)) {
-              rendered.set(key, `${label}.${name}`);
+        const staying = keptAt.get(field);
+        const kept = unique((staying ?? []).filter((u) => u.cfn === typeDef).map((u) => u.released));
+        const views = [
+          ...(kept.length > 0 ? [kept] : []),
+          ...(!staying || rendersHistory ? [[] as TypeDefinition[]] : []),
+        ];
+        for (const view of views) {
+          const key = `${typeDef.$id} ${view.map((r) => r.$id).join(',')}`;
+          if (walked.has(key)) {
+            continue;
+          }
+          walked.add(key);
+          for (const [name, nested] of Object.entries(typeDef.properties)) {
+            const keeps =
+              view.length > 0
+                ? view.some((r) => this.decisions.get(r)!.fields.includes(name))
+                : this.keepsField(typeDef, name);
+            if (keeps) {
+              const fieldId = fieldKey({ typeDef, name });
+              if (!rendered.has(fieldId)) {
+                rendered.set(fieldId, `${label}.${name}`);
+              }
+              queue.push({ label: `${label}.${name}`, field: nested });
             }
-            queue.push({ label: `${label}.${name}`, field: nested });
           }
         }
       }
