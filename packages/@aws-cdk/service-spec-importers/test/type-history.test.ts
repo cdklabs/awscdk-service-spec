@@ -1107,39 +1107,50 @@ describe('a released name that CloudFormation also uses elsewhere', () => {
     expect(cases(result)).toEqual(['unsettled-split Dest at property Backup, property Settings.Extra']);
   });
 
-  test('is compared below a union member that follows CloudFormation by entry while another member stays', () => {
-    // With the entry, the L1 renders CloudFormation's union at Target, SqsTarget.Extra included
-    importRegistry(released, {
-      properties: {
-        Target: { anyOf: [{ $ref: '#/definitions/Queue' }, { $ref: '#/definitions/Topic' }] },
-        Backup: { $ref: '#/definitions/Dest' },
-      },
-      definitions: {
-        Queue: object({ Arn: { type: 'string' } }),
-        Topic: object({ Url: { type: 'string' } }),
-        Dest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-      },
-    });
-    importRegistry(db, {
-      properties: {
-        Target: { anyOf: [{ $ref: '#/definitions/SqsTarget' }, { $ref: '#/definitions/SnsTarget' }] },
-        Backup: { $ref: '#/definitions/DestRequest' },
-      },
-      definitions: {
-        SqsTarget: object({ Arn: { type: 'string' }, Extra: { $ref: '#/definitions/Dest' } }),
-        SnsTarget: object({ Url: { type: 'string' } }),
-        DestRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-        Dest: object({ State: { type: 'string' } }),
-      },
-    });
+  test.each([
+    ['a property', false],
+    ['a struct field', true],
+  ])(
+    'is compared below a union member that follows CloudFormation by entry at %s while another member stays',
+    (_, nested) => {
+      // With the entry, the L1 renders CloudFormation's union at Target, SqsTarget.Extra included
+      const inOuter = (s: jsonschema.Schema): jsonschema.Schema => (nested ? { $ref: '#/definitions/Outer' } : s);
+      const releasedTarget: jsonschema.Schema = {
+        anyOf: [{ $ref: '#/definitions/Queue' }, { $ref: '#/definitions/Topic' }],
+      } as any;
+      const currentTarget: jsonschema.Schema = {
+        anyOf: [{ $ref: '#/definitions/SqsTarget' }, { $ref: '#/definitions/SnsTarget' }],
+      } as any;
+      importRegistry(released, {
+        properties: { Top: inOuter(releasedTarget), Backup: { $ref: '#/definitions/Dest' } },
+        definitions: {
+          ...(nested ? { Outer: object({ Target: releasedTarget }) } : {}),
+          Queue: object({ Arn: { type: 'string' } }),
+          Topic: object({ Url: { type: 'string' } }),
+          Dest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        },
+      });
+      importRegistry(db, {
+        properties: { Top: inOuter(currentTarget), Backup: { $ref: '#/definitions/DestRequest' } },
+        definitions: {
+          ...(nested ? { Outer: object({ Target: currentTarget }) } : {}),
+          SqsTarget: object({ Arn: { type: 'string' }, Extra: { $ref: '#/definitions/Dest' } }),
+          SnsTarget: object({ Url: { type: 'string' } }),
+          DestRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+          Dest: object({ State: { type: 'string' } }),
+        },
+      });
 
-    const result = run([
-      mapping({ resource: RESOURCE, oldType: 'Queue', newTypes: [], kind: 'follow-cloudformation' }),
-    ]);
+      const result = run([
+        mapping({ resource: RESOURCE, oldType: 'Queue', newTypes: [], kind: 'follow-cloudformation' }),
+      ]);
 
-    expect(history(resource(db).properties.Target)).toEqual(['SqsTarget | SnsTarget']);
-    expect(cases(result)).toEqual(['unsettled-split Dest at property Backup, property Target.Extra']);
-  });
+      const target = nested ? typeDefinition('Outer').properties.Target : resource(db).properties.Top;
+      expect(history(target)).toEqual(['SqsTarget | SnsTarget']);
+      const at = nested ? 'property Top.Target.Extra' : 'property Top.Extra';
+      expect(cases(result)).toEqual([`unsettled-split Dest at property Backup, ${at}`]);
+    },
+  );
 
   test('stays settled where the other use has the same fields', () => {
     importRegistry(released, {
