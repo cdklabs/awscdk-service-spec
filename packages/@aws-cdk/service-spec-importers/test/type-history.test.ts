@@ -617,6 +617,35 @@ describe('a kept struct below a list or map change', () => {
     expect(settled(result)).toEqual(['rename Settings -> NewSettings at property Settings']);
   });
 
+  test('renders a new field typed with a released name that CloudFormation gave another struct', () => {
+    importRegistry(released, {
+      properties: { Settings: { $ref: '#/definitions/Settings' }, Backup: { $ref: '#/definitions/Dest' } },
+      definitions: {
+        Settings: object({ Url: { type: 'string' } }),
+        Dest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+      },
+    });
+    importRegistry(db, {
+      properties: {
+        Settings: { type: 'array', items: { $ref: '#/definitions/Settings' } },
+        Backup: { $ref: '#/definitions/DestRequest' },
+      },
+      definitions: {
+        Settings: object({ Url: { type: 'string' }, Extra: { $ref: '#/definitions/Dest' } }),
+        DestRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        Dest: object({ State: { type: 'string' } }),
+      },
+    });
+
+    const result = run();
+
+    // The kept Settings renders Extra, so Dest is rendered there with CloudFormation's other fields
+    expect(fields('Settings')).toEqual({ Url: 'string', Extra: 'Dest' });
+    expect(cases(result)).toEqual(['unsettled-split Dest at property Backup, property Settings.Extra']);
+  });
+});
+
+describe('a kept struct below a union change', () => {
   test.each([
     ['reused by a field the L1 does not render', { Dest: object({ State: { type: 'string' } }) }],
     ['not reused', { Other: object({ State: { type: 'string' } }) }],
@@ -686,33 +715,6 @@ describe('a kept struct below a list or map change', () => {
     const result = run();
 
     expect(cases(result)).toEqual(expected);
-  });
-
-  test('renders a new field typed with a released name that CloudFormation gave another struct', () => {
-    importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' }, Backup: { $ref: '#/definitions/Dest' } },
-      definitions: {
-        Settings: object({ Url: { type: 'string' } }),
-        Dest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-      },
-    });
-    importRegistry(db, {
-      properties: {
-        Settings: { type: 'array', items: { $ref: '#/definitions/Settings' } },
-        Backup: { $ref: '#/definitions/DestRequest' },
-      },
-      definitions: {
-        Settings: object({ Url: { type: 'string' }, Extra: { $ref: '#/definitions/Dest' } }),
-        DestRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-        Dest: object({ State: { type: 'string' } }),
-      },
-    });
-
-    const result = run();
-
-    // The kept Settings renders Extra, so Dest is rendered there with CloudFormation's other fields
-    expect(fields('Settings')).toEqual({ Url: 'string', Extra: 'Dest' });
-    expect(cases(result)).toEqual(['unsettled-split Dest at property Backup, property Settings.Extra']);
   });
 });
 
@@ -804,6 +806,32 @@ describe('a released name that CloudFormation also uses elsewhere', () => {
     expect(history(resource(db).properties.Settings)).toEqual(['DestinationRequest']);
     expect(history(resource(db).properties.Status)).toEqual(['Destination']);
     expect(fields('Destination')).toEqual({ State: 'string' });
+  });
+
+  test('is compared at the fields of a struct that follows CloudFormation by entry', () => {
+    // With the entry, the L1 renders CloudFormation's Settings, Extra included, so Dest is rendered there
+    importRegistry(released, {
+      properties: { Settings: { $ref: '#/definitions/Settings' }, Backup: { $ref: '#/definitions/Dest' } },
+      definitions: {
+        Settings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        Dest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+      },
+    });
+    importRegistry(db, {
+      properties: { Settings: { $ref: '#/definitions/Settings' }, Backup: { $ref: '#/definitions/DestRequest' } },
+      definitions: {
+        Settings: object({ Url: { type: 'string' }, Extra: { $ref: '#/definitions/Dest' } }),
+        DestRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        Dest: object({ State: { type: 'string' } }),
+      },
+    });
+
+    const result = run([
+      mapping({ resource: RESOURCE, oldType: 'Settings', newTypes: [], kind: 'follow-cloudformation' }),
+    ]);
+
+    expect(fields('Settings')).toEqual({ Url: 'string', Extra: 'Dest' });
+    expect(cases(result)).toEqual(['unsettled-split Dest at property Backup, property Settings.Extra']);
   });
 
   test('stays settled where the other use has the same fields', () => {
