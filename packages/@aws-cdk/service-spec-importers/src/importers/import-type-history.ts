@@ -465,12 +465,12 @@ class ResourceTypeHistory {
   }
 
   /**
-   * Whether the L1 renders a field of a current type definition: not if it keeps a released type definition that
-   * leaves the field out
+   * Whether the L1 renders a field of a current type definition of the resource: not if it keeps a released type
+   * definition of its name that leaves the field out
    */
   private keepsField(typeDef: TypeDefinition, name: string) {
     const released = this.releasedByName.get(typeDef.name);
-    const decision = released && this.currentByName.get(typeDef.name) === typeDef && this.decisions.get(released);
+    const decision = released && this.decisions.get(released);
     return !decision || decision.stays.length === 0 || decision.fields.includes(name);
   }
 
