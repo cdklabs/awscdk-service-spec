@@ -252,8 +252,8 @@ class ResourceTypeHistory {
   private readonly targets = new Map<string, TypeDefinition>();
   private decisions = new Map<TypeDefinition, Decision>();
   private active = new Set<Position>();
-  /** The current type definitions that the L1 renders, see `renderedCurrentTypes()` */
-  private renderedTypes = new Map<TypeDefinition, string>();
+  /** The fields of current type definitions that the L1 renders, see `renderedCurrentFields()` */
+  private renderedFields = new Map<string, string>();
 
   constructor(
     private readonly db: SpecDatabase,
@@ -453,33 +453,40 @@ class ResourceTypeHistory {
   }
 
   /**
-   * Whether the L1 renders a position: a field of a current type definition is rendered only if the L1 renders that
-   * type definition and keeps the field
+   * Whether the L1 renders a position: a field of a current type definition is rendered only if the L1 renders it
    */
   private rendered(position: Position) {
-    if (!position.within) {
-      return true;
-    }
-    const { typeDef, name } = position.within;
-    return this.renderedTypes.has(typeDef) && this.keepsField(typeDef, name);
+    return !position.within || this.renderedFields.has(fieldKey(position.within));
   }
 
   /**
-   * Where the L1 renders a position: for a field of a current type definition, below the first place the L1 renders
-   * that type definition, which need not be the first place CloudFormation's types reach it
+   * Where the L1 renders a position: for a field of a current type definition, the first place the L1 renders that
+   * field, which need not be the first place CloudFormation's types reach it
    */
   private label(position: Position) {
-    const parent = position.within && this.renderedTypes.get(position.within.typeDef);
-    return parent ? `${parent}.${position.within!.name}` : position.label;
+    return (position.within && this.renderedFields.get(fieldKey(position.within))) ?? position.label;
   }
 
   /**
-   * The current type definitions that CloudFormation's types reach through the properties, attributes and fields the
-   * L1 renders, each with the first place it renders them, so a struct below a field the L1 leaves out, at any depth,
-   * is not among them
+   * The fields of current type definitions that CloudFormation's types reach through the properties, attributes and
+   * fields the L1 renders, each with the first place the L1 renders it, so a field below one the L1 leaves out, at any
+   * depth, is not among them
+   *
+   * Where the L1 renders a kept type definition paired with CloudFormation's type at a position, it renders the
+   * fields of CloudFormation's type that the kept one keeps. Elsewhere it renders the fields of CloudFormation's type,
+   * except those that a kept type definition of its name leaves out.
    */
-  private renderedCurrentTypes(): Map<TypeDefinition, string> {
-    const rendered = new Map<TypeDefinition, string>();
+  private renderedCurrentFields(): Map<string, string> {
+    const keptAt = new Map<Field, Use[]>();
+    for (const position of this.positions) {
+      if (position.currentField && this.active.has(position)) {
+        const staying = position.uses.filter((u) => u.cfn && this.stays(u));
+        keptAt.set(position.currentField, [...(keptAt.get(position.currentField) ?? []), ...staying]);
+      }
+    }
+
+    const rendered = new Map<string, string>();
+    const walked = new Set<string>();
     const queue = new Array<{ label: string; field: Field }>();
     for (const bag of ['properties', 'attributes'] as const) {
       for (const [name, field] of Object.entries(this.resource[bag])) {
@@ -489,12 +496,23 @@ class ResourceTypeHistory {
     while (queue.length > 0) {
       const { label, field } = queue.shift()!;
       for (const typeDef of referencedStructs(this.db, last(new RichTypedField(field).types()))) {
-        if (!rendered.has(typeDef)) {
-          rendered.set(typeDef, label);
-          for (const [name, nested] of Object.entries(typeDef.properties)) {
-            if (this.keepsField(typeDef, name)) {
-              queue.push({ label: `${label}.${name}`, field: nested });
+        const kept = unique((keptAt.get(field) ?? []).filter((u) => u.cfn === typeDef).map((u) => u.released));
+        const view = `${typeDef.$id} ${kept.map((r) => r.$id).join(',')}`;
+        if (walked.has(view)) {
+          continue;
+        }
+        walked.add(view);
+        for (const [name, nested] of Object.entries(typeDef.properties)) {
+          const keeps =
+            kept.length > 0
+              ? kept.some((r) => this.decisions.get(r)!.fields.includes(name))
+              : this.keepsField(typeDef, name);
+          if (keeps) {
+            const key = fieldKey({ typeDef, name });
+            if (!rendered.has(key)) {
+              rendered.set(key, `${label}.${name}`);
             }
+            queue.push({ label: `${label}.${name}`, field: nested });
           }
         }
       }
@@ -572,7 +590,7 @@ class ResourceTypeHistory {
           this.decisions.set(releasedType, this.decide(releasedType, activeUses));
         }
       }
-      this.renderedTypes = this.renderedCurrentTypes();
+      this.renderedFields = this.renderedCurrentFields();
       const next = new Set(
         [...this.active].filter(
           (p) =>
@@ -1048,6 +1066,10 @@ function setRequired(field: Field, required: boolean) {
   } else {
     delete (field as Property).required;
   }
+}
+
+function fieldKey({ typeDef, name }: CurrentField) {
+  return `${typeDef.$id} ${name}`;
 }
 
 function sameSet(a: string[], b: string[]) {

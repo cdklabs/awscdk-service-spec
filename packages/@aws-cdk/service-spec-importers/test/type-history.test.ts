@@ -1032,6 +1032,41 @@ describe('a released name that CloudFormation also uses elsewhere', () => {
     expect(settled(result)).toEqual(['rename A -> B at property First', 'rename B -> C at property Second']);
   });
 
+  test('is compared at a field the L1 renders through a renamed struct that CloudFormation gives another kept name', () => {
+    // At First the L1 renders A with CloudFormation's B's fields, N included, so it renders Dest at First.N, although
+    // the kept B leaves N out
+    importRegistry(released, {
+      properties: {
+        First: { $ref: '#/definitions/A' },
+        Second: { $ref: '#/definitions/B' },
+        Third: { $ref: '#/definitions/Dest' },
+      },
+      definitions: {
+        A: object({ X: { type: 'string' } }),
+        B: object({ Y: { type: 'string' } }),
+        Dest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+      },
+    });
+    importRegistry(db, {
+      properties: {
+        First: { $ref: '#/definitions/B' },
+        Second: { $ref: '#/definitions/C' },
+        Third: { $ref: '#/definitions/DestRequest' },
+      },
+      definitions: {
+        B: object({ X: { type: 'string' }, N: { $ref: '#/definitions/Dest' } }),
+        C: object({ Y: { type: 'string' } }),
+        DestRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        Dest: object({ State: { type: 'string' } }),
+      },
+    });
+
+    const result = run();
+
+    expect(fields('A')).toEqual({ X: 'string', N: 'Dest' });
+    expect(cases(result)).toEqual(['unsettled-split Dest at property First.N, property Third']);
+  });
+
   test('is compared at the fields of a struct that only an attribute reaches', () => {
     importRegistry(released, {
       properties: { Settings: { $ref: '#/definitions/Destination' } },
