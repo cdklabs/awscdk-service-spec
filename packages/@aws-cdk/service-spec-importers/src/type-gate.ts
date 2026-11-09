@@ -29,7 +29,8 @@ const WHY: Record<UndecidedKind, string> = {
 /**
  * The type history gate: it fails when the matcher left a released type definition undecided
  *
- * Settled renames, merges and splits, applied mapping entries and entries that apply nowhere are reported only.
+ * Settled renames, merges and splits, weak matches among them, applied mapping entries and entries that apply nowhere
+ * are reported only.
  */
 export function typeGate(result: TypeHistoryResult, options: TypeGateOptions): TypeGate {
   const failed = result.undecided.length > 0;
@@ -49,6 +50,13 @@ export function typeGate(result: TypeHistoryResult, options: TypeGateOptions): T
       lines.push(
         `  ${s.resource}: ${s.kind} ${s.releasedType} -> ${s.newTypes.join(', ')} (${s.positions.join(', ')})`,
       );
+    }
+  }
+  if (result.weak.length > 0) {
+    lines.push('', 'Weak matches (settled renames, merges and splits sharing fewer than half of the released fields):');
+    for (const w of result.weak) {
+      const share = `shares ${w.shared} of ${w.total} released fields`;
+      lines.push(`  ${w.resource}: ${w.releasedType} -> ${w.newType} ${share} (${w.positions.join(', ')})`);
     }
   }
   if (result.applied.length > 0) {

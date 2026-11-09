@@ -53,6 +53,22 @@ export interface SettledChange {
   readonly positions: string[];
 }
 
+/**
+ * A current type that a settled rename, merge or split pairs with a released type, sharing fewer than half of the
+ * released type's fields (or none, if the released type has none)
+ */
+export interface WeakMatch {
+  readonly resource: string;
+  readonly releasedType: string;
+  readonly newType: string;
+  /** Where CloudFormation renamed the released type to the current type */
+  readonly positions: string[];
+  /** The number of released fields that the current type has */
+  readonly shared: number;
+  /** The number of released fields */
+  readonly total: number;
+}
+
 export interface AppliedMapping {
   readonly entry: TypeMapping;
   /** The positions the entry decided */
@@ -68,6 +84,8 @@ export interface InactiveMapping {
 export interface TypeHistoryResult {
   readonly undecided: UndecidedCase[];
   readonly settled: SettledChange[];
+  /** The settled changes whose current type shares few released fields; they do not fail the gate */
+  readonly weak: WeakMatch[];
   readonly applied: AppliedMapping[];
   readonly inactive: InactiveMapping[];
 }
@@ -104,7 +122,7 @@ export function importTypeHistory(
   released: SpecDatabase,
   mappings: TypeMapping[],
 ): TypeHistoryResult {
-  const result: TypeHistoryResult = { undecided: [], settled: [], applied: [], inactive: [] };
+  const result: TypeHistoryResult = { undecided: [], settled: [], weak: [], applied: [], inactive: [] };
 
   for (const releasedResource of released.all('resource')) {
     const current = db.lookup('resource', 'cloudFormationType', 'equals', releasedResource.cloudFormationType);
@@ -128,6 +146,7 @@ export function importTypeHistory(
     a.resource.localeCompare(b.resource) || a.releasedType.localeCompare(b.releasedType);
   result.undecided.sort(byType);
   result.settled.sort(byType);
+  result.weak.sort((a, b) => byType(a, b) || a.newType.localeCompare(b.newType));
   result.applied.sort((a, b) => mappings.indexOf(a.entry) - mappings.indexOf(b.entry));
   result.inactive.sort((a, b) => mappings.indexOf(a.entry) - mappings.indexOf(b.entry));
   return result;
@@ -670,6 +689,7 @@ class ResourceTypeHistory {
           const kind = newTypes.length > 1 ? 'split' : this.isMergeTarget(renamed[0].cfn!) ? 'merge' : 'rename';
           const positions = unique(renamed.map((u) => this.label(u.position))).sort();
           this.result.settled.push({ resource, kind, releasedType: releasedType.name, newTypes, positions });
+          this.reportWeakMatches(releasedType, renamed);
         }
       }
     }
@@ -682,6 +702,27 @@ class ResourceTypeHistory {
             ? `${entry.newTypes.join(', ')} stands at none of the positions of ${entry.oldType}`
             : `the L1 renders ${entry.oldType} at no position that the current sources have`,
         );
+      }
+    }
+  }
+
+  /**
+   * Report each current type of a settled change that shares fewer than half of the released type's fields, by name,
+   * and each one paired with a released type without fields, since only its position paired them
+   */
+  private reportWeakMatches(releasedType: TypeDefinition, renamed: Use[]) {
+    const releasedFields = Object.keys(releasedType.properties);
+    for (const current of unique(renamed.map((u) => u.cfn!))) {
+      const shared = releasedFields.filter((name) => current.properties[name]).length;
+      if (releasedFields.length === 0 || shared * 2 < releasedFields.length) {
+        this.result.weak.push({
+          resource: this.resource.cloudFormationType,
+          releasedType: releasedType.name,
+          newType: current.name,
+          positions: unique(renamed.filter((u) => u.cfn === current).map((u) => this.label(u.position))).sort(),
+          shared,
+          total: releasedFields.length,
+        });
       }
     }
   }

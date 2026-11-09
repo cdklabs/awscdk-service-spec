@@ -93,6 +93,12 @@ For each case it prints the resource, the positions and the released type, and o
 The step also writes these entries to the `type-mapping-entries` build artifact. Settled renames, merges and splits,
 and the changes to the L1 since the released database, are printed but do not fail the gate.
 
+Among the settled renames, merges and splits, the gate also lists as weak matches each current type that shares fewer
+than half of the released type's fields, by name, and each one paired with a released type without fields (as 0 of
+0), since only its position paired them. Each line gives the resource, both types, the positions and the shared and
+total counts, so a person can check the pair; weak matches do not fail the gate. Pairs a mapping entry decides are
+not listed.
+
 ### Type mappings
 
 [`packages/@aws-cdk/aws-service-spec/build/type-mappings.json`](packages/%40aws-cdk/aws-service-spec/build/type-mappings.json)

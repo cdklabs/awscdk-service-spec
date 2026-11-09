@@ -456,6 +456,85 @@ describe('settled changes pass the gate', () => {
   });
 });
 
+describe('settled renames whose current type shares fewer than half of the released fields', () => {
+  const strings = (names: string[]) => Object.fromEntries(names.map((n) => [n, { type: 'string' as const }]));
+  const setup = (releasedFields: string[], currentFields: string[]) => {
+    importRegistry(released, {
+      properties: { Settings: { $ref: '#/definitions/Old' } },
+      definitions: { Old: object(strings(releasedFields)) },
+    });
+    importRegistry(db, {
+      properties: { Settings: { $ref: '#/definitions/New' } },
+      definitions: { New: object(strings(currentFields)) },
+    });
+  };
+
+  test.each([
+    ['one of five', ['A', 'B', 'C', 'D', 'E'], ['A', 'X'], '1 of 5'],
+    ['two of five', ['A', 'B', 'C', 'D', 'E'], ['A', 'B', 'X'], '2 of 5'],
+    ['none of a released type without fields', [], ['Url'], '0 of 0'],
+  ])('are listed as weak matches when they share %s, and pass the gate', (_, releasedFields, currentFields, count) => {
+    setup(releasedFields, currentFields);
+
+    const result = run();
+
+    expect(settled(result)).toEqual(['rename Old -> New at property Settings']);
+    expect(result.weak).toEqual([
+      {
+        resource: RESOURCE,
+        releasedType: 'Old',
+        newType: 'New',
+        positions: ['property Settings'],
+        shared: Number(count.split(' of ')[0]),
+        total: Number(count.split(' of ')[1]),
+      },
+    ]);
+    const gate = typeGate(result, { mappingFile: MAPPING_FILE, baselineVersion: '1.2.3' });
+    expect(gate.failed).toBe(false);
+    expect(gate.report).toContain(`  ${RESOURCE}: Old -> New shares ${count} released fields (property Settings)`);
+  });
+
+  test.each([
+    ['all fields', ['A', 'B'], ['A', 'B']],
+    ['exactly half', ['A', 'B', 'C', 'D'], ['A', 'B', 'X']],
+  ])('are not listed when they share %s', (_, releasedFields, currentFields) => {
+    setup(releasedFields, currentFields);
+
+    const result = run();
+
+    expect(settled(result)).toEqual(['rename Old -> New at property Settings']);
+    expect(result.weak).toEqual([]);
+    expect(typeGate(result, { mappingFile: MAPPING_FILE, baselineVersion: '1.2.3' }).report).not.toContain('Weak');
+  });
+
+  test('are listed once per current type of a split', () => {
+    importRegistry(released, {
+      properties: { First: { $ref: '#/definitions/Shared' }, Second: { $ref: '#/definitions/Shared' } },
+      definitions: { Shared: object(strings(['A', 'B', 'C', 'D', 'E'])) },
+    });
+    importRegistry(db, {
+      properties: { First: { $ref: '#/definitions/One' }, Second: { $ref: '#/definitions/Two' } },
+      definitions: { One: object(strings(['A', 'X'])), Two: object(strings(['A', 'X'])) },
+    });
+
+    const result = run();
+
+    expect(settled(result)).toEqual(['split Shared -> One, Two at property First, property Second']);
+    expect(
+      result.weak.map((w) => `${w.releasedType} -> ${w.newType} ${w.shared} of ${w.total} at ${w.positions}`),
+    ).toEqual(['Shared -> One 1 of 5 at property First', 'Shared -> Two 1 of 5 at property Second']);
+  });
+
+  test('are not listed when a mapping entry decides them', () => {
+    setup(['A', 'B', 'C', 'D', 'E'], ['A', 'X']);
+
+    const result = run([mapping({ resource: RESOURCE, oldType: 'Old', newTypes: ['New'], kind: 'rename' })]);
+
+    expect(result.applied.map((a) => a.entry.kind)).toEqual(['rename']);
+    expect(result.weak).toEqual([]);
+  });
+});
+
 describe('requiredness follows CloudFormation', () => {
   test('a carried field that CloudFormation requires renders required', () => {
     importRegistry(released, {
