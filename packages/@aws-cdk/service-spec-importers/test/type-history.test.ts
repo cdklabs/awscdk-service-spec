@@ -275,6 +275,57 @@ describe('settled changes pass the gate', () => {
     ]);
   });
 
+  describe('two released types merged into one that gains a required field both gain it', () => {
+    const before: Partial<CloudFormationRegistryResource> = {
+      properties: { First: { $ref: '#/definitions/A' }, Second: { $ref: '#/definitions/B' } },
+      definitions: { A: object({ Url: { type: 'string' } }), B: object({ Url: { type: 'string' } }) },
+    };
+    const merged = (fieldsOfC: jsonschema.ObjectProperties, required?: string[]) => ({
+      properties: { First: { $ref: '#/definitions/C' }, Second: { $ref: '#/definitions/C' } },
+      definitions: { C: object(fieldsOfC, required) },
+    });
+
+    test('in the build that merges them', () => {
+      importRegistry(released, before);
+      importRegistry(db, merged({ Url: { type: 'string' }, X: { type: 'string' } }, ['X']));
+
+      const result = run();
+
+      expect(cases(result)).toEqual([]);
+      expect(gateFails(result)).toBe(false);
+      expect(settled(result)).toEqual(['merge A -> C at property First', 'merge B -> C at property Second']);
+      expect(fields('A')).toEqual({ Url: 'string', X: 'string (required)' });
+      expect(fields('B')).toEqual({ Url: 'string', X: 'string (required)' });
+      expect(compareL1(released, db).addedFields.map((c) => c.element)).toEqual(['field A.X', 'field B.X']);
+    });
+
+    test('in a later build whose released database has the merge', () => {
+      importRegistry(released, before);
+      importRegistry(db, merged({ Url: { type: 'string' } }));
+      run();
+      const baseline = emptyDatabase();
+      baseline.load(JSON.parse(JSON.stringify(db.save())));
+
+      released = baseline;
+      db = emptyDatabase();
+      importRegistry(db, merged({ Url: { type: 'string' }, X: { type: 'string' } }, ['X']));
+      const result = run();
+
+      expect(cases(result)).toEqual([]);
+      expect(gateFails(result)).toBe(false);
+      expect(history(resource(db).properties.First)).toEqual(['A', 'C']);
+      expect(history(resource(db).properties.Second)).toEqual(['B', 'C']);
+      expect(fields('A')).toEqual({ Url: 'string', X: 'string (required)' });
+      expect(fields('B')).toEqual({ Url: 'string', X: 'string (required)' });
+      // C, the later type of both histories, is rendered as a struct of its own and gains X too
+      expect(compareL1(released, db).addedFields.map((c) => c.element)).toEqual([
+        'field A.X',
+        'field B.X',
+        'field C.X',
+      ]);
+    });
+  });
+
   test('a shared released type split into types with the same fields keeps its name', () => {
     importRegistry(released, {
       properties: { First: { $ref: '#/definitions/Shared' }, Second: { $ref: '#/definitions/Shared' } },
