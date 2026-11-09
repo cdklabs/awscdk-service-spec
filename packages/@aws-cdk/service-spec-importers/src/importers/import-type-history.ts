@@ -430,14 +430,45 @@ class ResourceTypeHistory {
   }
 
   /**
-   * Whether the L1 renders a position: a field of a current type definition that keeps a released one is rendered
-   * only if the kept type definition keeps that field
+   * Whether the L1 renders a position: a field of a current type definition is rendered only if the L1 renders that
+   * type definition and keeps the field
    */
-  private rendered(position: Position) {
+  private rendered(position: Position, renderedTypes: Set<TypeDefinition>) {
     if (!position.within) {
       return true;
     }
     const { typeDef, name } = position.within;
+    return renderedTypes.has(typeDef) && this.keepsField(typeDef, name);
+  }
+
+  /**
+   * The current type definitions that CloudFormation's types reach through the properties, attributes and fields the
+   * L1 renders, so a struct below a field the L1 leaves out, at any depth, is not among them
+   */
+  private renderedCurrentTypes(): Set<TypeDefinition> {
+    const rendered = new Set<TypeDefinition>();
+    const queue = [...Object.values(this.resource.properties), ...Object.values(this.resource.attributes)];
+    while (queue.length > 0) {
+      const field = queue.shift()!;
+      for (const typeDef of referencedStructs(this.db, last(new RichTypedField(field).types()))) {
+        if (!rendered.has(typeDef)) {
+          rendered.add(typeDef);
+          for (const [name, nested] of Object.entries(typeDef.properties)) {
+            if (this.keepsField(typeDef, name)) {
+              queue.push(nested);
+            }
+          }
+        }
+      }
+    }
+    return rendered;
+  }
+
+  /**
+   * Whether the L1 renders a field of a current type definition: not if it keeps a released type definition that
+   * leaves the field out
+   */
+  private keepsField(typeDef: TypeDefinition, name: string) {
     const released = this.releasedByName.get(typeDef.name);
     const decision = released && this.currentByName.get(typeDef.name) === typeDef && this.decisions.get(released);
     return !decision || decision.stays.length === 0 || decision.fields.includes(name);
@@ -491,7 +522,7 @@ class ResourceTypeHistory {
    * Decide every released type definition, until no decision drops a position another decision depends on
    *
    * A position whose parent type definition the L1 no longer renders there does not count, and neither does a
-   * position that only the current sources have at a field the kept type definition leaves out.
+   * position that only the current sources have at or below a field a kept type definition leaves out.
    */
   private decideAll() {
     this.active = new Set(this.positions);
@@ -503,10 +534,12 @@ class ResourceTypeHistory {
           this.decisions.set(releasedType, this.decide(releasedType, activeUses));
         }
       }
+      const renderedTypes = this.renderedCurrentTypes();
       const next = new Set(
         [...this.active].filter(
           (p) =>
-            (!p.parentUse || (this.active.has(p.parentUse.position) && this.stays(p.parentUse))) && this.rendered(p),
+            (!p.parentUse || (this.active.has(p.parentUse.position) && this.stays(p.parentUse))) &&
+            this.rendered(p, renderedTypes),
         ),
       );
       if (next.size === this.active.size) {

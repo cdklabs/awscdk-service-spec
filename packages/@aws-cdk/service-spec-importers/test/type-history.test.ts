@@ -652,6 +652,42 @@ describe('a kept struct below a list or map change', () => {
     expect(fields('Dest')).toEqual({ Url: 'string', Port: 'integer' });
   });
 
+  test.each([
+    ['only below a field the L1 does not render', {}, []],
+    [
+      // Other renders Mid, so the L1 renders Dest at Other.Inner with CloudFormation's other fields
+      'also at a property the L1 renders',
+      { Other: { $ref: '#/definitions/Mid' } },
+      ['unsettled-split Dest at property Backup, property Other.Inner'],
+    ],
+  ])('a released name reused two levels below a union position is compared %s', (_, otherProperty, expected) => {
+    // The kept Settings keeps exactly {Url}, so the L1 renders neither Extra nor Mid.Inner below it
+    importRegistry(released, {
+      properties: { Settings: { $ref: '#/definitions/Settings' }, Backup: { $ref: '#/definitions/Dest' } },
+      definitions: {
+        Settings: object({ Url: { type: 'string' } }),
+        Dest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+      },
+    });
+    importRegistry(db, {
+      properties: {
+        Settings: { anyOf: [{ $ref: '#/definitions/Settings' }, { type: 'string' }] },
+        Backup: { $ref: '#/definitions/DestRequest' },
+        ...otherProperty,
+      },
+      definitions: {
+        Settings: object({ Url: { type: 'string' }, Extra: { $ref: '#/definitions/Mid' } }),
+        Mid: object({ Inner: { $ref: '#/definitions/Dest' } }),
+        Dest: object({ State: { type: 'string' } }),
+        DestRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+      },
+    });
+
+    const result = run();
+
+    expect(cases(result)).toEqual(expected);
+  });
+
   test('renders a new field typed with a released name that CloudFormation gave another struct', () => {
     importRegistry(released, {
       properties: { Settings: { $ref: '#/definitions/Settings' }, Backup: { $ref: '#/definitions/Dest' } },
