@@ -71,9 +71,10 @@ The build applies these rules after the sources that define types:
    a list or map, or took it out, the L1 keeps rendering the released type there, and it takes the fields of the
    struct inside, so CloudFormation's new fields are added and the fields it removed leave. Where CloudFormation's
    type there, inside any lists and maps, is not a type definition (for example a union or any JSON), it keeps
-   exactly its released fields. A field is required if CloudFormation requires it at every position. If
-   CloudFormation also uses a type of the released name at a position the released L1 does not have, that position
-   counts too.
+   exactly its released fields. A field is required if CloudFormation requires it at every position. A position where
+   CloudFormation uses a current type of the released name that the released L1 lacks counts too, but only where the
+   L1 renders it: not at or below a field its kept parent type does not keep, at any depth, such as one below a
+   position CloudFormation turned into a union.
 4. Resources, properties, attributes and fields that no current source has leave the L1.
 5. The existing rules for `json` to `string` and `date-time` to `string` changes stay.
 
