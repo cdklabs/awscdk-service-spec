@@ -1010,6 +1010,28 @@ describe('a released name that CloudFormation also uses elsewhere', () => {
     expect(fields('Destination')).toEqual({ Url: 'string' });
   });
 
+  test('takes the field types of its own positions where CloudFormation gives its name to another renamed struct', () => {
+    // At First the L1 renders A, so CloudFormation's B there types none of the kept B's fields
+    importRegistry(released, {
+      properties: { First: { $ref: '#/definitions/A' }, Second: { $ref: '#/definitions/B' } },
+      definitions: { A: object({ X: { type: 'string' } }), B: object({ Y: { type: 'string' } }) },
+    });
+    importRegistry(db, {
+      properties: { First: { $ref: '#/definitions/B' }, Second: { $ref: '#/definitions/C' } },
+      definitions: {
+        B: object({ X: { type: 'string' }, M: { type: 'string' } }),
+        C: object({ Y: { type: 'string' }, M: { type: 'integer' } }),
+      },
+    });
+
+    const result = run();
+
+    expect(fields('B')).toEqual({ Y: 'string', M: 'integer' });
+    expect(fields('A')).toEqual({ X: 'string', M: 'string' });
+    expect(cases(result)).toEqual([]);
+    expect(settled(result)).toEqual(['rename A -> B at property First', 'rename B -> C at property Second']);
+  });
+
   test('is compared at the fields of a struct that only an attribute reaches', () => {
     importRegistry(released, {
       properties: { Settings: { $ref: '#/definitions/Destination' } },
@@ -1210,6 +1232,32 @@ describe('released structs below a kept field that no position reaches', () => {
     run();
 
     expect(fields('OldTarget')).toEqual({ Arn: 'string (required)' });
+    expect(l1Changes()).toEqual([]);
+  });
+
+  test('keep their released types where the current struct of their name is only below a field the L1 does not render', () => {
+    // CloudFormation's Settings is any JSON, and its Inner struct is only below Hidden.Extra, which the L1 does not
+    // render, so nothing CloudFormation has at the L1's positions changes Inner.Value
+    importRegistry(released, {
+      properties: { Settings: { $ref: '#/definitions/Settings' }, Hidden: { $ref: '#/definitions/Hidden' } },
+      definitions: {
+        Settings: object({ Inner: { $ref: '#/definitions/Inner' } }),
+        Inner: object({ Value: {} }),
+        Hidden: object({ Url: { type: 'string' } }),
+      },
+    });
+    importRegistry(db, {
+      properties: { Settings: {}, Hidden: { anyOf: [{ $ref: '#/definitions/Hidden' }, { type: 'string' }] } },
+      definitions: {
+        Hidden: object({ Url: { type: 'string' }, Extra: { $ref: '#/definitions/Inner' } }),
+        Inner: object({ Value: { type: 'string' } }),
+      },
+    });
+
+    const result = run();
+
+    expect(history(typeDefinition('Inner').properties.Value)).toEqual(['json']);
+    expect(cases(result)).toEqual([]);
     expect(l1Changes()).toEqual([]);
   });
 });

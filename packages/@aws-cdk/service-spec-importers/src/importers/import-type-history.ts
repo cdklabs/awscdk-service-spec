@@ -792,14 +792,19 @@ class ResourceTypeHistory {
   private apply() {
     // Plan from the current sources before any of their type definitions change
     const plans = new Map<TypeDefinition, Array<{ name: string; required: boolean; source?: Field }>>();
+    // The kept types whose target, the current type definition of their name, is a type the current sources give one
+    // of their positions, so that its own fields are CloudFormation's there. Otherwise it describes nothing the L1
+    // renders as the kept type, and CloudFormation's types at the positions, or the release, type its fields.
+    const ownFields = new Set<TypeDefinition>();
     for (const [releasedType, decision] of this.decisions) {
       if (decision.stays.length === 0) {
         continue;
       }
       const target = this.target(releasedType);
-      // The current type definition of the released name types the fields only where the L1 renders it; elsewhere
-      // CloudFormation's types at the positions do
-      const ownFields = this.renderedTypes.has(target);
+      const own = decision.stays.some((u) => u.position.currentTypes.includes(target));
+      if (own) {
+        ownFields.add(releasedType);
+      }
       plans.set(
         releasedType,
         decision.fields.map((name) => {
@@ -809,7 +814,7 @@ class ResourceTypeHistory {
           return {
             name,
             required: decision.stays.every((u, i) => (u.unreached ? releasedRequired : atPositions[i]?.required)),
-            source: (ownFields ? target.properties[name] : undefined) ?? atPositions.find(isDefined),
+            source: (own ? target.properties[name] : undefined) ?? atPositions.find(isDefined),
           };
         }),
       );
@@ -856,7 +861,8 @@ class ResourceTypeHistory {
       }
     }
     // A kept released field that no position reached, for example below a position whose CloudFormation type has
-    // another shape, keeps its released history too
+    // another shape, keeps its released history too, followed by the type of the current type definition of its name
+    // where that is a type the current sources give one of its positions
     for (const [releasedType, plan] of plans) {
       const target = this.target(releasedType);
       for (const { name } of plan) {
@@ -867,7 +873,8 @@ class ResourceTypeHistory {
           const cfnType = last(new RichTypedField(field).types());
           const rule1 =
             renderType(this.released, last(new RichTypedField(releasedField).types())) === renderType(this.db, cfnType);
-          this.updateHistory(field, releasedField, [{ currentField: field, cfnType, rule1, uses: [] }]);
+          const current = ownFields.has(releasedType) ? [{ currentField: field, cfnType, rule1, uses: [] }] : [];
+          this.updateHistory(field, releasedField, current);
         }
       }
     }
