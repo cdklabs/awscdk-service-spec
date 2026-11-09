@@ -232,7 +232,7 @@ class ResourceTypeHistory {
   private decisions = new Map<TypeDefinition, Decision>();
   private active = new Set<Position>();
   /** The current type definitions that the L1 renders, see `renderedCurrentTypes()` */
-  private renderedTypes = new Set<TypeDefinition>();
+  private renderedTypes = new Map<TypeDefinition, string>();
 
   constructor(
     private readonly db: SpecDatabase,
@@ -435,29 +435,44 @@ class ResourceTypeHistory {
    * Whether the L1 renders a position: a field of a current type definition is rendered only if the L1 renders that
    * type definition and keeps the field
    */
-  private rendered(position: Position, renderedTypes: Set<TypeDefinition>) {
+  private rendered(position: Position) {
     if (!position.within) {
       return true;
     }
     const { typeDef, name } = position.within;
-    return renderedTypes.has(typeDef) && this.keepsField(typeDef, name);
+    return this.renderedTypes.has(typeDef) && this.keepsField(typeDef, name);
+  }
+
+  /**
+   * Where the L1 renders a position: for a field of a current type definition, below the first place the L1 renders
+   * that type definition, which need not be the first place CloudFormation's types reach it
+   */
+  private label(position: Position) {
+    const parent = position.within && this.renderedTypes.get(position.within.typeDef);
+    return parent ? `${parent}.${position.within!.name}` : position.label;
   }
 
   /**
    * The current type definitions that CloudFormation's types reach through the properties, attributes and fields the
-   * L1 renders, so a struct below a field the L1 leaves out, at any depth, is not among them
+   * L1 renders, each with the first place it renders them, so a struct below a field the L1 leaves out, at any depth,
+   * is not among them
    */
-  private renderedCurrentTypes(): Set<TypeDefinition> {
-    const rendered = new Set<TypeDefinition>();
-    const queue = [...Object.values(this.resource.properties), ...Object.values(this.resource.attributes)];
+  private renderedCurrentTypes(): Map<TypeDefinition, string> {
+    const rendered = new Map<TypeDefinition, string>();
+    const queue = new Array<{ label: string; field: Field }>();
+    for (const bag of ['properties', 'attributes'] as const) {
+      for (const [name, field] of Object.entries(this.resource[bag])) {
+        queue.push({ label: `${bag === 'properties' ? 'property' : 'attribute'} ${name}`, field });
+      }
+    }
     while (queue.length > 0) {
-      const field = queue.shift()!;
+      const { label, field } = queue.shift()!;
       for (const typeDef of referencedStructs(this.db, last(new RichTypedField(field).types()))) {
         if (!rendered.has(typeDef)) {
-          rendered.add(typeDef);
+          rendered.set(typeDef, label);
           for (const [name, nested] of Object.entries(typeDef.properties)) {
             if (this.keepsField(typeDef, name)) {
-              queue.push(nested);
+              queue.push({ label: `${label}.${name}`, field: nested });
             }
           }
         }
@@ -540,8 +555,7 @@ class ResourceTypeHistory {
       const next = new Set(
         [...this.active].filter(
           (p) =>
-            (!p.parentUse || (this.active.has(p.parentUse.position) && this.stays(p.parentUse))) &&
-            this.rendered(p, this.renderedTypes),
+            (!p.parentUse || (this.active.has(p.parentUse.position) && this.stays(p.parentUse))) && this.rendered(p),
         ),
       );
       if (next.size === this.active.size) {
@@ -637,7 +651,7 @@ class ResourceTypeHistory {
     const resource = this.resource.cloudFormationType;
     for (const [releasedType, decision] of this.decisions) {
       if (decision.entry) {
-        const positions = unique(decision.matched!.map((u) => u.position.label)).sort();
+        const positions = unique(decision.matched!.map((u) => this.label(u.position))).sort();
         this.result.applied.push({ entry: decision.entry, positions });
       } else if (decision.undecided) {
         this.result.undecided.push({
@@ -652,7 +666,7 @@ class ResourceTypeHistory {
         if (renamed.length > 0) {
           const newTypes = unique(renamed.map((u) => u.cfn!.name)).sort();
           const kind = newTypes.length > 1 ? 'split' : this.isMergeTarget(renamed[0].cfn!) ? 'merge' : 'rename';
-          const positions = unique(renamed.map((u) => u.position.label)).sort();
+          const positions = unique(renamed.map((u) => this.label(u.position))).sort();
           this.result.settled.push({ resource, kind, releasedType: releasedType.name, newTypes, positions });
         }
       }
@@ -683,8 +697,9 @@ class ResourceTypeHistory {
           : use.position.cfnType
           ? renderType(this.db, use.position.cfnType)
           : 'no type');
-      positions.set(use.position.label, {
-        position: use.position.label,
+      const label = this.label(use.position);
+      positions.set(label, {
+        position: label,
         cloudFormationType,
         fields: [...this.need(use)].sort(),
       });

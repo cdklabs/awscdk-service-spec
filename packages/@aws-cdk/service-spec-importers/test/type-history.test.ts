@@ -717,6 +717,35 @@ describe('a kept struct below a union change', () => {
     expect(cases(result)).toEqual(expected);
   });
 
+  test('a case names the path where the L1 renders a struct, not one below a field it does not render', () => {
+    // CloudFormation reaches Mid first through Settings.Extra, which the L1 does not render, and also through Other.W
+    importRegistry(released, {
+      properties: { Settings: { $ref: '#/definitions/Settings' }, Backup: { $ref: '#/definitions/Dest' } },
+      definitions: {
+        Settings: object({ Url: { type: 'string' } }),
+        Dest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+      },
+    });
+    importRegistry(db, {
+      properties: {
+        Settings: { anyOf: [{ $ref: '#/definitions/Settings' }, { type: 'string' }] },
+        Backup: { $ref: '#/definitions/DestRequest' },
+        Other: { $ref: '#/definitions/Wrap' },
+      },
+      definitions: {
+        Settings: object({ Url: { type: 'string' }, Extra: { $ref: '#/definitions/Mid' } }),
+        Wrap: object({ W: { $ref: '#/definitions/Mid' } }),
+        Mid: object({ Inner: { $ref: '#/definitions/Dest' } }),
+        Dest: object({ State: { type: 'string' } }),
+        DestRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+      },
+    });
+
+    const result = run();
+
+    expect(cases(result)).toEqual(['unsettled-split Dest at property Backup, property Other.W.Inner']);
+  });
+
   test('a renamed struct takes its new fields from CloudFormation where the L1 does not render its current namesake', () => {
     // CloudFormation's Dest is only below Settings.Extra, which the L1 does not render, so its X: Foo is nowhere in
     // the L1 and does not count for Foo
