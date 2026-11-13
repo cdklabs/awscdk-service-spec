@@ -467,7 +467,7 @@ describe('settled changes pass the gate', () => {
   });
 });
 
-describe('merged and split types that gain a field follow CloudFormation, a reported type break', () => {
+describe('merged and split types that gain a field or no longer fit follow CloudFormation, a reported type break', () => {
   describe('two released types merged into one that gains a field both switch to it', () => {
     const before: Partial<CloudFormationRegistryResource> = {
       properties: { First: { $ref: '#/definitions/A' }, Second: { $ref: '#/definitions/B' } },

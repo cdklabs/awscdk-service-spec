@@ -49,7 +49,7 @@ export function typeGate(result: TypeHistoryResult, options: TypeGateOptions): T
     }
   }
   if (result.switched.length > 0) {
-    lines.push('', "Merged and split types that gained a field and follow CloudFormation's types (type breaks):");
+    lines.push('', "Merged and split types that follow CloudFormation's types (type breaks):");
     for (const s of result.switched) {
       lines.push(`  ${s.resource}: ${s.releasedType} -> ${s.newType} (${s.positions.join(', ')})`);
     }
