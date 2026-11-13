@@ -72,7 +72,7 @@ abstract class SourceUpdate extends Component {
           };
         }
         if (s.url) {
-          return new DownloadScript(s.url, s.target, s.isZip);
+          return new DownloadScript(s.url, s.target, { isZip: s.isZip });
         }
         throw new Error('DataSource must have either url or scriptPath');
       }),

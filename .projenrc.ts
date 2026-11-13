@@ -1,6 +1,11 @@
 import * as pj from 'projen';
 import { AwsCdkIntegrationTest, DiffDb, TypeScriptWorkspace, YarnMonorepo } from './projenrc';
+import { addReleasedDatabaseTask, readReleasedDatabasePins } from './projenrc/released-database';
+import { TypeHistoryGate } from './projenrc/type-history-gate';
 import { RegionalSource, Role, ScriptSource, SingleSource, SourceProcessing } from './projenrc/update-sources';
+
+// The released database that every build keeps the L1 types of, see "Released database baseline" in README.md
+const releasedDatabasePins = readReleasedDatabasePins(__dirname);
 
 const workflowRunsOn = [
   // 'ubuntu-latest',
@@ -38,7 +43,7 @@ const repo = new YarnMonorepo({
   workflowRunsOn,
   gitignore: ['.DS_Store'],
   gitOptions: {
-    lfsPatterns: ['sources/**/*.json'],
+    lfsPatterns: ['sources/**/*.json', 'sources/**/*.json.gz'],
   },
 
   tsconfig: {
@@ -192,6 +197,13 @@ awsServiceSpec.compileTask.prependSpawn(
   }),
 );
 
+awsServiceSpec.tasks.addTask('type-gate', {
+  description:
+    'Fail if the build cannot decide how a released L1 type continues, printing the type-mappings.json entries that decide it',
+  exec: 'ts-node build/type-gate.ts',
+  receiveArgs: true,
+});
+
 awsServiceSpec.gitignore.addPatterns('db.json');
 awsServiceSpec.gitignore.addPatterns('db.json.gz');
 awsServiceSpec.gitignore.addPatterns('build-report');
@@ -212,7 +224,14 @@ new DiffDb(repo, {
   serviceSpecImporters,
 });
 
+// Fail where the build cannot decide how a released L1 type continues, and check changes of the released database
+new TypeHistoryGate(repo, { serviceSpec: awsServiceSpec });
+
 // Update sources
+
+// Not scheduled: the pins move to the version each aws-cdk-lib release was built from, see README.md
+addReleasedDatabaseTask(repo, releasedDatabasePins);
+
 new SingleSource(repo, {
   name: 'documentation',
   dir: 'sources/CloudFormationDocumentation',

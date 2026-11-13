@@ -1,0 +1,10 @@
+[
+  {
+    "resource": "AWS::Batch::JobDefinition",
+    "oldType": "ContainerProperties",
+    "newTypes": ["MultiNodeContainerProperties"],
+    "kind": "keep-old",
+    "reason": "The aws-batch L2 sets the fields of both CloudFormation types on the one shared ContainerProperties, at ContainerProperties and at NodeProperties.NodeRangeProperties.Container, so the shared type keeps all its fields.",
+    "pr": "https://github.com/cdklabs/awscdk-service-spec/pull/3015"
+  }
+]

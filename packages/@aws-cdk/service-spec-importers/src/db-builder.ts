@@ -13,6 +13,7 @@ import { importOobRelationships } from './importers/import-oob-relationships';
 import { ResourceSpecImporter, SAMSpecImporter } from './importers/import-resource-spec';
 import { SamResources } from './importers/import-sam';
 import { importStatefulResources } from './importers/import-stateful-resources';
+import { importTypeHistory, TypeHistoryResult } from './importers/import-type-history';
 import {
   loadDefaultCloudFormationDocs,
   loadDefaultCloudFormationRegistryResources,
@@ -28,7 +29,9 @@ import {
 } from './loaders';
 import { loadDefaultEventBridgeSchema } from './loaders/load-eventbridge-schema';
 import { JsonLensPatcher } from './patching';
+import { loadReleasedDatabase, ReleasedDatabase } from './released-database';
 import { ProblemReport, ReportAudience } from './report';
+import { loadTypeMappings } from './type-mappings';
 import { DimensionSetNames } from './types';
 
 export interface DatabaseBuilderOptions {
@@ -47,6 +50,20 @@ export interface DatabaseBuilderOptions {
 
 export type SourceImporter = (db: SpecDatabase, report: ProblemReport) => Promise<void>;
 
+export interface TypeHistoryOptions {
+  /** The released database snapshot (`db.json.gz`) whose L1 types the build keeps */
+  readonly snapshot: string;
+  /** The pin file with the sha256 the snapshot must have */
+  readonly pins: string;
+  /** The type mapping file */
+  readonly mappings: string;
+}
+
+export interface TypeHistory {
+  readonly result: TypeHistoryResult;
+  readonly released: ReleasedDatabase;
+}
+
 export class DatabaseBuilder {
   /**
    * The default grouping for any non-specific import problems
@@ -57,6 +74,8 @@ export class DatabaseBuilder {
    * Stack of importers
    */
   private readonly sourceImporters = new Array<SourceImporter>();
+
+  private typeHistory?: TypeHistory;
 
   constructor(
     protected readonly db: SpecDatabase = emptyDatabase(),
@@ -77,8 +96,11 @@ export class DatabaseBuilder {
   public async build(): Promise<{
     db: SpecDatabase;
     report: ProblemReport;
+    /** The result of `importTypeHistory`, if it is one of the importers */
+    typeHistory?: TypeHistory;
   }> {
     const report = new ProblemReport();
+    this.typeHistory = undefined;
 
     for (const sourceImporter of this.sourceImporters) {
       await sourceImporter(this.db, report);
@@ -87,7 +109,23 @@ export class DatabaseBuilder {
     return {
       db: this.db,
       report: report,
+      typeHistory: this.typeHistory,
     };
+  }
+
+  /**
+   * Keep the L1 types of a released database, as decided by the type mapping file
+   *
+   * Call this after the sources that define resources and types. The build fails if the snapshot does not have the
+   * sha256 of its pin file, or if the mapping file has a malformed entry. Cases the matcher cannot decide are
+   * returned by `build()`, for the type history gate.
+   */
+  public importTypeHistory(options: TypeHistoryOptions) {
+    return this.addSourceImporter(async (db) => {
+      const mappings = await loadTypeMappings(options.mappings);
+      const released = await loadReleasedDatabase(options.snapshot, options.pins);
+      this.typeHistory = { result: importTypeHistory(db, released.db, mappings), released };
+    });
   }
 
   /**
