@@ -18,9 +18,12 @@ import { matchShape, sameNameOrSharedField } from '../type-pairing';
  *
  * - `no-pair`: at a position where CloudFormation changed its type, no current type shares a field with it.
  * - `ambiguous`: at such a position, more than one current type does.
- * - `unsettled-merge`: it was merged into a current type, and its positions need different fields.
- * - `unsettled-split`: it was renamed at a position, and its positions need different fields.
- * - `diverging`: CloudFormation's types at its positions need different fields.
+ * - `unsettled-merge`: it was merged into a current type that has no field it lacks, and its positions need different
+ *   fields.
+ * - `unsettled-split`: CloudFormation gives its positions more than one type, none with a field it lacks, and its
+ *   positions need different fields.
+ * - `diverging`: its positions need different fields, and it is neither a merge nor a split, or it is one that follows
+ *   CloudFormation and the positions where it keeps its name need different fields.
  */
 export type UndecidedKind = 'no-pair' | 'ambiguous' | 'unsettled-merge' | 'unsettled-split' | 'diverging';
 
@@ -69,6 +72,19 @@ export interface WeakMatch {
   readonly total: number;
 }
 
+/**
+ * A merged or split released type definition whose positions now render a CloudFormation type of another name, a
+ * reported type break
+ */
+export interface SwitchedType {
+  readonly resource: string;
+  readonly releasedType: string;
+  /** The CloudFormation type the L1 renders instead */
+  readonly newType: string;
+  /** Where the L1 renders it */
+  readonly positions: string[];
+}
+
 export interface AppliedMapping {
   readonly entry: TypeMapping;
   /** The positions the entry decided */
@@ -86,6 +102,8 @@ export interface TypeHistoryResult {
   readonly settled: SettledChange[];
   /** The settled changes whose current type shares few released fields; they do not fail the gate */
   readonly weak: WeakMatch[];
+  /** The merged and split types that follow CloudFormation's types; they do not fail the gate */
+  readonly switched: SwitchedType[];
   readonly applied: AppliedMapping[];
   readonly inactive: InactiveMapping[];
 }
@@ -114,15 +132,24 @@ export interface TypeHistoryResult {
  * 4. Released resources, properties, attributes and fields that no current source has are not kept. A kept released
  *    field keeps its released history first, even where no position reaches it.
  *
- * The mapping entries decide what the matcher cannot, see `TypeMappingKind`. Undecided type definitions keep their
- * released fields plus all carried ones, and are returned with the entries that would decide them.
+ * Merged and split types follow CloudFormation once they gain a field, as a reported type break. A merge is several
+ * released type definitions that CloudFormation's type at their positions pairs with; a split is a released type
+ * definition whose positions CloudFormation gives more than one type definition. Once the merged type has a field
+ * that one of the merged released types lacks, by name, every one of them renders CloudFormation's type at the
+ * positions where it has another name, and so does every released type merged with one of them. Once one of a split's
+ * types has a field the released type lacks, the released type renders CloudFormation's type at the positions where
+ * it has another name. Elsewhere it keeps its name, with the fields rule 3 gives it there.
+ *
+ * The mapping entries decide what the matcher cannot, and win over the merge and split rule, see `TypeMappingKind`.
+ * Undecided type definitions keep their released fields plus all carried ones, and are returned with the entries that
+ * would decide them.
  */
 export function importTypeHistory(
   db: SpecDatabase,
   released: SpecDatabase,
   mappings: TypeMapping[],
 ): TypeHistoryResult {
-  const result: TypeHistoryResult = { undecided: [], settled: [], weak: [], applied: [], inactive: [] };
+  const result: TypeHistoryResult = { undecided: [], settled: [], weak: [], switched: [], applied: [], inactive: [] };
 
   for (const releasedResource of released.all('resource')) {
     const current = db.lookup('resource', 'cloudFormationType', 'equals', releasedResource.cloudFormationType);
@@ -147,6 +174,7 @@ export function importTypeHistory(
   result.undecided.sort(byType);
   result.settled.sort(byType);
   result.weak.sort((a, b) => byType(a, b) || a.newType.localeCompare(b.newType));
+  result.switched.sort((a, b) => byType(a, b) || a.newType.localeCompare(b.newType));
   result.applied.sort((a, b) => mappings.indexOf(a.entry) - mappings.indexOf(b.entry));
   result.inactive.sort((a, b) => mappings.indexOf(a.entry) - mappings.indexOf(b.entry));
   return result;
@@ -235,6 +263,8 @@ interface Decision {
   /** The fields of the released type in the L1 */
   readonly fields: string[];
   readonly undecided?: UndecidedKind;
+  /** Whether the merge and split rule makes the released type follow CloudFormation */
+  readonly switched?: boolean;
   readonly entry?: TypeMapping;
   /** The uses an entry decided */
   readonly matched?: Use[];
@@ -246,12 +276,14 @@ class ResourceTypeHistory {
   private readonly entries = new Map<string, TypeMapping>();
   private readonly positions = new Array<Position>();
   private readonly uses = new Map<TypeDefinition, Use[]>();
-  /** The released type definitions paired with each current type definition (by current id) */
-  private readonly pairedWith = new Map<string, Set<string>>();
   /** The type definition in `db` for each kept released type definition (by released id) */
   private readonly targets = new Map<string, TypeDefinition>();
   private decisions = new Map<TypeDefinition, Decision>();
   private active = new Set<Position>();
+  /** The current type definitions that several released ones continue as, at the positions that count */
+  private mergeTargets = new Set<TypeDefinition>();
+  /** The released type definitions that follow CloudFormation by the merge and split rule */
+  private switched = new Set<TypeDefinition>();
   /** The fields of current type definitions that the L1 renders, see `renderedCurrentFields()` */
   private renderedFields = new Map<string, string>();
 
@@ -291,13 +323,6 @@ class ResourceTypeHistory {
       }
     }
     this.addCurrentOnlyPositions();
-    for (const use of [...this.uses.values()].flat()) {
-      if (use.cfn) {
-        const paired = this.pairedWith.get(use.cfn.$id) ?? new Set();
-        this.pairedWith.set(use.cfn.$id, paired.add(use.released.$id));
-      }
-    }
-
     this.decideAll();
     this.report();
     this.apply();
@@ -597,6 +622,7 @@ class ResourceTypeHistory {
     this.active = new Set(this.positions);
     for (let i = 0; i <= this.positions.length; i++) {
       this.decisions = new Map();
+      this.findMergesAndSplits();
       for (const [releasedType, uses] of this.uses) {
         const activeUses = uses.filter((u) => this.active.has(u.position));
         if (activeUses.length > 0) {
@@ -632,13 +658,73 @@ class ResourceTypeHistory {
     if (unpaired) {
       return { stays: uses, follows: [], fields: keepAll, undecided: unpaired.status as UndecidedKind };
     }
+    if (this.switched.has(releasedType)) {
+      // Where CloudFormation's type has another name, the L1 renders it; elsewhere the released type stays
+      const follows = uses.filter((u) => u.status === 'paired');
+      const stays = uses.filter((u) => !follows.includes(u));
+      const stayNeeds = stays.map((u) => this.need(u));
+      if (stayNeeds.every((n) => sameSet(n, stayNeeds[0]))) {
+        return { stays, follows, fields: stayNeeds[0] ?? [], switched: true };
+      }
+      return { stays: uses, follows: [], fields: keepAll, undecided: 'diverging' };
+    }
     if (needs.every((n) => sameSet(n, needs[0]))) {
       return { stays: uses, follows: [], fields: needs[0] };
     }
-    const renamed = uses.filter((u) => this.renamedAt(u));
-    const merged = renamed.some((u) => this.isMergeTarget(u.cfn!));
-    const kind = merged ? 'unsettled-merge' : renamed.length > 0 ? 'unsettled-split' : 'diverging';
+    const merged = uses.some((u) => u.cfn && this.mergeTargets.has(u.cfn));
+    const split = cloudFormationTypes(uses).length > 1;
+    const kind = merged ? 'unsettled-merge' : split ? 'unsettled-split' : 'diverging';
     return { stays: uses, follows: [], fields: keepAll, undecided: kind };
+  }
+
+  /**
+   * Find the merges, and the merged and split released type definitions that follow CloudFormation, at the positions
+   * that count
+   *
+   * A released type definition that a mapping entry decides does not follow CloudFormation by this rule, and does not
+   * make the types merged with it follow.
+   */
+  private findMergesAndSplits() {
+    const typesAt = new Map<TypeDefinition, TypeDefinition[]>();
+    const mergedInto = new Map<TypeDefinition, TypeDefinition[]>();
+    for (const [releasedType, uses] of this.uses) {
+      const types = cloudFormationTypes(uses.filter((u) => this.active.has(u.position)));
+      typesAt.set(releasedType, types);
+      for (const current of types) {
+        mergedInto.set(current, [...(mergedInto.get(current) ?? []), releasedType]);
+      }
+    }
+    const merges = [...mergedInto].filter(([, releasedTypes]) => releasedTypes.length > 1);
+    this.mergeTargets = new Set(merges.map(([current]) => current));
+
+    const byRule = (releasedType: TypeDefinition) => !this.entries.has(releasedType.name);
+    const switched = new Set<TypeDefinition>();
+    for (const [releasedType, types] of typesAt) {
+      if (types.length > 1 && types.some((t) => hasNewField(releasedType, t)) && byRule(releasedType)) {
+        switched.add(releasedType);
+      }
+    }
+    // Every released type of a merge follows CloudFormation together
+    const switchAll = (releasedTypes: TypeDefinition[]) => {
+      const added = releasedTypes.filter((r) => byRule(r) && !switched.has(r));
+      added.forEach((r) => switched.add(r));
+      return added.length > 0;
+    };
+    for (const [current, releasedTypes] of merges) {
+      if (releasedTypes.some((r) => hasNewField(r, current))) {
+        switchAll(releasedTypes);
+      }
+    }
+    let grown = true;
+    while (grown) {
+      grown = false;
+      for (const [, releasedTypes] of merges) {
+        if (releasedTypes.some((r) => switched.has(r)) && switchAll(releasedTypes)) {
+          grown = true;
+        }
+      }
+    }
+    this.switched = switched;
   }
 
   /**
@@ -688,7 +774,7 @@ class ResourceTypeHistory {
   }
 
   private isMergeTarget(current: TypeDefinition) {
-    return (this.pairedWith.get(current.$id)?.size ?? 0) > 1;
+    return this.mergeTargets.has(current);
   }
 
   private stays(use: Use) {
@@ -713,6 +799,12 @@ class ResourceTypeHistory {
           positions: this.typePositions(decision.stays),
           entries: this.proposals(releasedType, decision.stays, decision.undecided),
         });
+      } else if (decision.switched) {
+        for (const newType of unique(decision.follows.map((u) => u.cfn!.name)).sort()) {
+          const at = decision.follows.filter((u) => u.cfn!.name === newType);
+          const positions = unique(at.map((u) => this.label(u.position))).sort();
+          this.result.switched.push({ resource, releasedType: releasedType.name, newType, positions });
+        }
       } else {
         const renamed = decision.stays.filter((u) => this.renamedAt(u));
         if (renamed.length > 0) {
@@ -806,7 +898,9 @@ class ResourceTypeHistory {
       case 'ambiguous':
         return [...others.map((n) => entry('rename', [n])), ...keepOrFollow];
       case 'unsettled-merge': {
-        const targets = uses.filter((u) => this.renamedAt(u) && this.isMergeTarget(u.cfn!)).map((u) => u.cfn!.name);
+        const targets = uses
+          .filter((u) => u.cfn && u.cfn.name !== releasedType.name && this.isMergeTarget(u.cfn))
+          .map((u) => u.cfn!.name);
         return [
           ...unique(targets)
             .sort()
@@ -1083,6 +1177,20 @@ function setRequired(field: Field, required: boolean) {
 
 function fieldKey({ typeDef, name }: CurrentField) {
   return `${typeDef.$id} ${name}`;
+}
+
+/**
+ * The type definitions CloudFormation's types give a released type definition at its uses
+ */
+function cloudFormationTypes(uses: Use[]): TypeDefinition[] {
+  return unique(uses.map((u) => u.cfn).filter(isDefined));
+}
+
+/**
+ * Whether a current type definition has a field that a released one lacks, by name
+ */
+function hasNewField(releasedType: TypeDefinition, current: TypeDefinition) {
+  return Object.keys(current.properties).some((name) => !releasedType.properties[name]);
 }
 
 function sameSet(a: string[], b: string[]) {

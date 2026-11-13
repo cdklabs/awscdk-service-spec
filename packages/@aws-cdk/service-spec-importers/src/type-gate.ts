@@ -20,17 +20,17 @@ const WHY: Record<UndecidedKind, string> = {
   'no-pair': 'has no pair: no current type at its position shares a field with it',
   ambiguous: 'has ambiguous candidates: more than one current type at its position shares a field with it',
   'unsettled-merge':
-    'is an unsettled merge: CloudFormation merged it into another type, and its positions need different fields',
+    'is an unsettled merge: CloudFormation merged it, without a new field, and its positions need different fields',
   'unsettled-split':
-    'is an unsettled split: CloudFormation renamed it at a position, and its positions need different fields',
-  diverging: "diverges: CloudFormation's types at its positions need different fields",
+    'is an unsettled split: CloudFormation split it, without a new field, and its positions need different fields',
+  diverging: 'diverges: the positions where it keeps its name need different fields',
 };
 
 /**
  * The type history gate: it fails when the matcher left a released type definition undecided
  *
- * Settled renames, merges and splits, weak matches among them, applied mapping entries and entries that apply nowhere
- * are reported only.
+ * Settled renames, merges and splits, weak matches among them, merged and split types that follow CloudFormation,
+ * applied mapping entries and entries that apply nowhere are reported only.
  */
 export function typeGate(result: TypeHistoryResult, options: TypeGateOptions): TypeGate {
   const failed = result.undecided.length > 0;
@@ -50,6 +50,12 @@ export function typeGate(result: TypeHistoryResult, options: TypeGateOptions): T
       lines.push(
         `  ${s.resource}: ${s.kind} ${s.releasedType} -> ${s.newTypes.join(', ')} (${s.positions.join(', ')})`,
       );
+    }
+  }
+  if (result.switched.length > 0) {
+    lines.push('', "Merged and split types that gained a field and follow CloudFormation's types (type breaks):");
+    for (const s of result.switched) {
+      lines.push(`  ${s.resource}: ${s.releasedType} -> ${s.newType} (${s.positions.join(', ')})`);
     }
   }
   if (result.weak.length > 0) {

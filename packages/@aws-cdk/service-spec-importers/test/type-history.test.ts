@@ -81,7 +81,7 @@ describe('cases the matcher cannot decide fail the gate, and pass with the print
     expect(fields('Topic')).toEqual({ Arn: 'string', Url: 'string' });
   });
 
-  test('a merged released type that is also used where its current type has other fields is an unsettled merge', () => {
+  test('a merged released type whose positions lose different fields, with nothing new, is an unsettled merge', () => {
     const setup = () => {
       importRegistry(released, {
         properties: {
@@ -90,8 +90,8 @@ describe('cases the matcher cannot decide fail the gate, and pass with the print
           Third: { $ref: '#/definitions/FirstSettings' },
         },
         definitions: {
-          FirstSettings: object({ Url: { type: 'string' } }),
-          SecondSettings: object({ Url: { type: 'string' } }),
+          FirstSettings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+          SecondSettings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
         },
       });
       importRegistry(db, {
@@ -101,8 +101,8 @@ describe('cases the matcher cannot decide fail the gate, and pass with the print
           Third: { $ref: '#/definitions/FirstSettings' },
         },
         definitions: {
-          Settings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-          FirstSettings: object({ Url: { type: 'string' } }),
+          Settings: object({ Url: { type: 'string' } }),
+          FirstSettings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
         },
       });
     };
@@ -110,13 +110,14 @@ describe('cases the matcher cannot decide fail the gate, and pass with the print
     const first = runFresh(setup);
     expect(cases(first)).toEqual(['unsettled-merge FirstSettings at property First, property Third']);
     expect(kinds(first.undecided[0])).toEqual(['merge', 'split', 'keep-old', 'follow-cloudformation']);
+    expect(switched(first)).toEqual([]);
 
     const second = runFresh(setup, [chosen(first, 'merge')]);
     expect(cases(second)).toEqual([]);
     expect(history(resource(db).properties.First)).toEqual(['FirstSettings', 'Settings']);
     expect(history(resource(db).properties.Third)).toEqual(['FirstSettings']);
-    expect(fields('FirstSettings')).toEqual({ Url: 'string', Port: 'integer' });
-    expect(fields('SecondSettings')).toEqual({ Url: 'string', Port: 'integer' });
+    expect(fields('FirstSettings')).toEqual({ Url: 'string' });
+    expect(fields('SecondSettings')).toEqual({ Url: 'string' });
   });
 
   test('a shared type renamed at one position to a type with fewer fields is an unsettled split', () => {
@@ -149,50 +150,51 @@ describe('cases the matcher cannot decide fail the gate, and pass with the print
     expect(fields('Shared')).toEqual({ Url: 'string', Port: 'integer' });
   });
 
-  test.each([
-    ['keep-old', { A: 'Check', B: 'Check', C: 'Check' }, { Enabled: 'boolean', Configuration: 'string' }],
-    ['follow-cloudformation', { A: 'Check', B: 'Check', C: 'CustomCheck' }, { Enabled: 'boolean' }],
-  ])(
-    'a shared type whose CloudFormation types at kept positions need different fields diverges (%s)',
-    (kind, rendered, checkFields) => {
-      const setup = () => {
-        // The released C renders Check, but its newest type is already CustomCheck
-        importRegistry(released, divergingChecks('Check'));
-        importRegistry(released, divergingChecks('CustomCheck'));
-        importRegistry(db, divergingChecks('CustomCheck'));
-      };
+  test('a shared type whose positions need different fields, with one CloudFormation type among them, diverges', () => {
+    // CloudFormation's Settings is now any JSON, so the kept Settings.Target keeps exactly the released fields of
+    // OldTarget, while CloudFormation's OldTarget at Other has other fields: neither a merge nor a split
+    const setup = () => {
+      importRegistry(released, {
+        properties: { Settings: { $ref: '#/definitions/Settings' }, Other: { $ref: '#/definitions/OldTarget' } },
+        definitions: { Settings: object({ Target: { $ref: '#/definitions/OldTarget' } }), OldTarget: arn() },
+      });
+      importRegistry(db, {
+        properties: { Settings: {}, Other: { $ref: '#/definitions/OldTarget' } },
+        definitions: { OldTarget: object({ Arn: { type: 'string' }, State: { type: 'string' } }) },
+      });
+    };
 
-      const first = runFresh(setup);
-      expect(cases(first)).toEqual(['diverging Check at property Checks.A, property Checks.B, property Checks.C']);
-      expect(first.undecided[0].positions).toEqual([
-        { position: 'property Checks.A', cloudFormationType: 'Check', fields: ['Enabled'] },
-        { position: 'property Checks.B', cloudFormationType: 'Check', fields: ['Enabled'] },
-        { position: 'property Checks.C', cloudFormationType: 'CustomCheck', fields: ['Configuration', 'Enabled'] },
-      ]);
-      expect(first.undecided[0].entries.map((e) => `${e.kind} ${e.newTypes.join(',')}`)).toEqual([
-        'split CustomCheck',
-        'keep-old CustomCheck',
-        'follow-cloudformation CustomCheck',
-      ]);
+    const first = runFresh(setup);
+    expect(cases(first)).toEqual(['diverging OldTarget at property Other, property Settings.Target']);
+    expect(first.undecided[0].positions).toEqual([
+      { position: 'property Other', cloudFormationType: 'OldTarget', fields: ['Arn', 'State'] },
+      { position: 'property Settings.Target', cloudFormationType: 'no type', fields: ['Arn'] },
+    ]);
+    expect(kinds(first.undecided[0])).toEqual(['keep-old', 'follow-cloudformation']);
+    expect(gateFails(first)).toBe(true);
+    expect(switched(first)).toEqual([]);
 
-      const second = runFresh(setup, [chosen(first, kind as TypeMappingKind)]);
-      expect(cases(second)).toEqual([]);
-      expect(renderedFields('Checks')).toEqual(rendered);
-      expect(fields('Check')).toEqual(checkFields);
-    },
-  );
+    const second = runFresh(setup, [chosen(first, 'keep-old')]);
+    expect(cases(second)).toEqual([]);
+    expect(fields('OldTarget')).toEqual({ Arn: 'string', State: 'string' });
+  });
 
   test('the printed entries are complete and the gate writes them', () => {
     const setup = () => {
-      importRegistry(released, divergingChecks('Check'));
-      importRegistry(released, divergingChecks('CustomCheck'));
-      importRegistry(db, divergingChecks('CustomCheck'));
+      importRegistry(released, {
+        properties: { Settings: { $ref: '#/definitions/Settings' } },
+        definitions: { Settings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }) },
+      });
+      importRegistry(db, {
+        properties: { Settings: { $ref: '#/definitions/Options' } },
+        definitions: { Options: object({ Name: { type: 'string' }, Mode: { type: 'string' } }) },
+      });
     };
     const result = runFresh(setup);
     const gate = typeGate(result, { mappingFile: MAPPING_FILE, baselineVersion: '1.2.3' });
 
     expect(gate.failed).toBe(true);
-    expect(gate.entries).toContain(`${RESOURCE}: Check diverges`);
+    expect(gate.entries).toContain(`${RESOURCE}: Settings has no pair`);
     expect(gate.entries).toContain(`Add one of these entries to ${MAPPING_FILE}:`);
     for (const entry of result.undecided[0].entries) {
       expect(gate.entries).toContain(JSON.stringify(entry));
@@ -267,6 +269,7 @@ describe('settled changes pass the gate', () => {
     const result = run();
 
     expect(cases(result)).toEqual([]);
+    expect(switched(result)).toEqual([]);
     expect(history(resource(db).properties.Burn)[0]).toEqual('BurnSettings');
     expect(history(resource(db).properties.Dvb)[0]).toEqual('DvbSettings');
     expect(settled(result)).toEqual([
@@ -275,55 +278,52 @@ describe('settled changes pass the gate', () => {
     ]);
   });
 
-  describe('two released types merged into one that gains a required field both gain it', () => {
-    const before: Partial<CloudFormationRegistryResource> = {
+  test('two released types merged into one that lost a field keep their names without it', () => {
+    importRegistry(released, {
       properties: { First: { $ref: '#/definitions/A' }, Second: { $ref: '#/definitions/B' } },
-      definitions: { A: object({ Url: { type: 'string' } }), B: object({ Url: { type: 'string' } }) },
-    };
-    const merged = (fieldsOfC: jsonschema.ObjectProperties, required?: string[]) => ({
+      definitions: {
+        A: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        B: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+      },
+    });
+    importRegistry(db, {
       properties: { First: { $ref: '#/definitions/C' }, Second: { $ref: '#/definitions/C' } },
-      definitions: { C: object(fieldsOfC, required) },
+      definitions: { C: object({ Url: { type: 'string' } }) },
     });
 
-    test('in the build that merges them', () => {
-      importRegistry(released, before);
-      importRegistry(db, merged({ Url: { type: 'string' }, X: { type: 'string' } }, ['X']));
+    const result = run();
 
-      const result = run();
+    expect(cases(result)).toEqual([]);
+    expect(switched(result)).toEqual([]);
+    expect(settled(result)).toEqual(['merge A -> C at property First', 'merge B -> C at property Second']);
+    expect(history(resource(db).properties.First)[0]).toEqual('A');
+    expect(history(resource(db).properties.Second)[0]).toEqual('B');
+    expect(fields('A')).toEqual({ Url: 'string' });
+    expect(fields('B')).toEqual({ Url: 'string' });
+    expect(compareL1(released, db).removed.map((c) => c.element)).toEqual(['field A.Port', 'field B.Port']);
+  });
 
-      expect(cases(result)).toEqual([]);
-      expect(gateFails(result)).toBe(false);
-      expect(settled(result)).toEqual(['merge A -> C at property First', 'merge B -> C at property Second']);
-      expect(fields('A')).toEqual({ Url: 'string', X: 'string (required)' });
-      expect(fields('B')).toEqual({ Url: 'string', X: 'string (required)' });
-      expect(compareL1(released, db).addedFields.map((c) => c.element)).toEqual(['field A.X', 'field B.X']);
+  test('a shared released type split into types that lost a field keeps its name without it', () => {
+    importRegistry(released, {
+      properties: { First: { $ref: '#/definitions/Shared' }, Second: { $ref: '#/definitions/Shared' } },
+      definitions: { Shared: object({ Url: { type: 'string' }, Port: { type: 'integer' } }) },
+    });
+    importRegistry(db, {
+      properties: { First: { $ref: '#/definitions/FirstSettings' }, Second: { $ref: '#/definitions/SecondSettings' } },
+      definitions: {
+        FirstSettings: object({ Url: { type: 'string' } }),
+        SecondSettings: object({ Url: { type: 'string' } }),
+      },
     });
 
-    test('in a later build whose released database has the merge', () => {
-      importRegistry(released, before);
-      importRegistry(db, merged({ Url: { type: 'string' } }));
-      run();
-      const baseline = emptyDatabase();
-      baseline.load(JSON.parse(JSON.stringify(db.save())));
+    const result = run();
 
-      released = baseline;
-      db = emptyDatabase();
-      importRegistry(db, merged({ Url: { type: 'string' }, X: { type: 'string' } }, ['X']));
-      const result = run();
-
-      expect(cases(result)).toEqual([]);
-      expect(gateFails(result)).toBe(false);
-      expect(history(resource(db).properties.First)).toEqual(['A', 'C']);
-      expect(history(resource(db).properties.Second)).toEqual(['B', 'C']);
-      expect(fields('A')).toEqual({ Url: 'string', X: 'string (required)' });
-      expect(fields('B')).toEqual({ Url: 'string', X: 'string (required)' });
-      // C, the later type of both histories, is rendered as a struct of its own and gains X too
-      expect(compareL1(released, db).addedFields.map((c) => c.element)).toEqual([
-        'field A.X',
-        'field B.X',
-        'field C.X',
-      ]);
-    });
+    expect(cases(result)).toEqual([]);
+    expect(switched(result)).toEqual([]);
+    expect(history(resource(db).properties.First)[0]).toEqual('Shared');
+    expect(history(resource(db).properties.Second)[0]).toEqual('Shared');
+    expect(fields('Shared')).toEqual({ Url: 'string' });
+    expect(compareL1(released, db).removed.map((c) => c.element)).toEqual(['field Shared.Port']);
   });
 
   test('a shared released type split into types with the same fields keeps its name', () => {
@@ -342,6 +342,7 @@ describe('settled changes pass the gate', () => {
     const result = run();
 
     expect(cases(result)).toEqual([]);
+    expect(switched(result)).toEqual([]);
     expect(history(resource(db).properties.First)[0]).toEqual('Shared');
     expect(history(resource(db).properties.Second)[0]).toEqual('Shared');
     expect(settled(result)).toEqual([
@@ -508,6 +509,261 @@ describe('settled changes pass the gate', () => {
   });
 });
 
+describe('merged and split types that gain a field follow CloudFormation, a reported type break', () => {
+  describe('two released types merged into one that gains a field both switch to it', () => {
+    const before: Partial<CloudFormationRegistryResource> = {
+      properties: { First: { $ref: '#/definitions/A' }, Second: { $ref: '#/definitions/B' } },
+      definitions: { A: object({ Url: { type: 'string' } }), B: object({ Url: { type: 'string' } }) },
+    };
+    const merged = (fieldsOfC: jsonschema.ObjectProperties, required?: string[]) => ({
+      properties: { First: { $ref: '#/definitions/C' }, Second: { $ref: '#/definitions/C' } },
+      definitions: { C: object(fieldsOfC, required) },
+    });
+
+    test('in the build that merges them', () => {
+      importRegistry(released, before);
+      importRegistry(db, merged({ Url: { type: 'string' }, X: { type: 'string' } }, ['X']));
+
+      const result = run();
+
+      expect(cases(result)).toEqual([]);
+      expect(gateFails(result)).toBe(false);
+      expect(settled(result)).toEqual([]);
+      expect(switched(result)).toEqual(['A -> C at property First', 'B -> C at property Second']);
+      expect(history(resource(db).properties.First)).toEqual(['C']);
+      expect(history(resource(db).properties.Second)).toEqual(['C']);
+      expect(fields('C')).toEqual({ Url: 'string', X: 'string (required)' });
+      expect(l1Structs()).toEqual(['C']);
+      expect(l1Renames()).toEqual(['A, B -> C at property First, property Second']);
+    });
+
+    test('in a later build whose released database has the merge', () => {
+      importRegistry(released, before);
+      importRegistry(db, merged({ Url: { type: 'string' } }));
+      run();
+      const baseline = emptyDatabase();
+      baseline.load(JSON.parse(JSON.stringify(db.save())));
+
+      released = baseline;
+      db = emptyDatabase();
+      importRegistry(db, merged({ Url: { type: 'string' }, X: { type: 'string' } }, ['X']));
+      const result = run();
+
+      expect(cases(result)).toEqual([]);
+      expect(gateFails(result)).toBe(false);
+      expect(switched(result)).toEqual(['A -> C at property First', 'B -> C at property Second']);
+      expect(history(resource(db).properties.First)).toEqual(['C']);
+      expect(history(resource(db).properties.Second)).toEqual(['C']);
+      expect(fields('C')).toEqual({ Url: 'string', X: 'string (required)' });
+      expect(l1Renames()).toEqual(['A, B -> C at property First, property Second']);
+    });
+
+    test('unless a merge entry for each keeps their names', () => {
+      importRegistry(released, before);
+      importRegistry(db, merged({ Url: { type: 'string' }, X: { type: 'string' } }, ['X']));
+
+      const result = run([
+        mapping({ resource: RESOURCE, oldType: 'A', newTypes: ['C'], kind: 'merge' }),
+        mapping({ resource: RESOURCE, oldType: 'B', newTypes: ['C'], kind: 'merge' }),
+      ]);
+
+      expect(cases(result)).toEqual([]);
+      expect(switched(result)).toEqual([]);
+      expect(result.applied.map((a) => `${a.entry.kind} ${a.entry.oldType}`)).toEqual(['merge A', 'merge B']);
+      expect(history(resource(db).properties.First)).toEqual(['A', 'C']);
+      expect(history(resource(db).properties.Second)).toEqual(['B', 'C']);
+      expect(fields('A')).toEqual({ Url: 'string', X: 'string (required)' });
+      expect(fields('B')).toEqual({ Url: 'string', X: 'string (required)' });
+      expect(l1Renames()).toEqual([]);
+    });
+  });
+
+  test('every merged type switches when the merged type has a field that one of them lacks', () => {
+    importRegistry(released, {
+      properties: { First: { $ref: '#/definitions/A' }, Second: { $ref: '#/definitions/B' } },
+      definitions: {
+        A: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        B: object({ Url: { type: 'string' } }),
+      },
+    });
+    importRegistry(db, {
+      properties: { First: { $ref: '#/definitions/C' }, Second: { $ref: '#/definitions/C' } },
+      definitions: { C: object({ Url: { type: 'string' }, Port: { type: 'integer' } }) },
+    });
+
+    const result = run();
+
+    expect(cases(result)).toEqual([]);
+    expect(switched(result)).toEqual(['A -> C at property First', 'B -> C at property Second']);
+    expect(history(resource(db).properties.First)).toEqual(['C']);
+    expect(history(resource(db).properties.Second)).toEqual(['C']);
+    expect(l1Renames()).toEqual(['A, B -> C at property First, property Second']);
+  });
+
+  test('a merged type keeps its name where CloudFormation keeps it', () => {
+    importRegistry(released, {
+      properties: {
+        First: { $ref: '#/definitions/FirstSettings' },
+        Second: { $ref: '#/definitions/SecondSettings' },
+        Third: { $ref: '#/definitions/FirstSettings' },
+      },
+      definitions: {
+        FirstSettings: object({ Url: { type: 'string' } }),
+        SecondSettings: object({ Url: { type: 'string' } }),
+      },
+    });
+    importRegistry(db, {
+      properties: {
+        First: { $ref: '#/definitions/Settings' },
+        Second: { $ref: '#/definitions/Settings' },
+        Third: { $ref: '#/definitions/FirstSettings' },
+      },
+      definitions: {
+        Settings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        FirstSettings: object({ Url: { type: 'string' } }),
+      },
+    });
+
+    const result = run();
+
+    expect(cases(result)).toEqual([]);
+    expect(gateFails(result)).toBe(false);
+    expect(switched(result)).toEqual([
+      'FirstSettings -> Settings at property First',
+      'SecondSettings -> Settings at property Second',
+    ]);
+    expect(history(resource(db).properties.First)).toEqual(['Settings']);
+    expect(history(resource(db).properties.Second)).toEqual(['Settings']);
+    expect(history(resource(db).properties.Third)).toEqual(['FirstSettings']);
+    expect(fields('FirstSettings')).toEqual({ Url: 'string' });
+    expect(l1Renames()).toEqual(['FirstSettings, SecondSettings -> Settings at property First, property Second']);
+  });
+
+  test('a released type merged with one whose split follows CloudFormation follows it too', () => {
+    // A is split into C and D, and D has Port; B is merged with A into C, which has nothing new
+    importRegistry(released, {
+      properties: {
+        First: { $ref: '#/definitions/A' },
+        Second: { $ref: '#/definitions/B' },
+        Third: { $ref: '#/definitions/A' },
+      },
+      definitions: { A: object({ Url: { type: 'string' } }), B: object({ Url: { type: 'string' } }) },
+    });
+    importRegistry(db, {
+      properties: {
+        First: { $ref: '#/definitions/C' },
+        Second: { $ref: '#/definitions/C' },
+        Third: { $ref: '#/definitions/D' },
+      },
+      definitions: {
+        C: object({ Url: { type: 'string' } }),
+        D: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+      },
+    });
+
+    const result = run();
+
+    expect(cases(result)).toEqual([]);
+    expect(switched(result)).toEqual([
+      'A -> C at property First',
+      'A -> D at property Third',
+      'B -> C at property Second',
+    ]);
+    expect(history(resource(db).properties.Second)).toEqual(['C']);
+  });
+
+  test('a split position whose type gains a field renders it, and a position CloudFormation kept keeps its name', () => {
+    importRegistry(released, {
+      properties: { First: { $ref: '#/definitions/Shared' }, Second: { $ref: '#/definitions/Shared' } },
+      definitions: { Shared: object({ Url: { type: 'string' } }) },
+    });
+    importRegistry(db, {
+      properties: { First: { $ref: '#/definitions/Shared' }, Second: { $ref: '#/definitions/SecondSettings' } },
+      definitions: {
+        Shared: object({ Url: { type: 'string' } }),
+        SecondSettings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+      },
+    });
+
+    const result = run();
+
+    expect(cases(result)).toEqual([]);
+    expect(gateFails(result)).toBe(false);
+    expect(switched(result)).toEqual(['Shared -> SecondSettings at property Second']);
+    expect(history(resource(db).properties.First)).toEqual(['Shared']);
+    expect(history(resource(db).properties.Second)).toEqual(['SecondSettings']);
+    expect(fields('Shared')).toEqual({ Url: 'string' });
+    expect(fields('SecondSettings')).toEqual({ Url: 'string', Port: 'integer' });
+    expect(l1Renames()).toEqual(['Shared -> SecondSettings at property Second']);
+  });
+
+  test('a split whose positions CloudFormation all renamed renders its types where one gains a field', () => {
+    importRegistry(released, {
+      properties: { First: { $ref: '#/definitions/Shared' }, Second: { $ref: '#/definitions/Shared' } },
+      definitions: { Shared: object({ Url: { type: 'string' } }) },
+    });
+    importRegistry(db, {
+      properties: { First: { $ref: '#/definitions/FirstSettings' }, Second: { $ref: '#/definitions/SecondSettings' } },
+      definitions: {
+        FirstSettings: object({ Url: { type: 'string' } }),
+        SecondSettings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+      },
+    });
+
+    const result = run();
+
+    expect(cases(result)).toEqual([]);
+    expect(gateFails(result)).toBe(false);
+    expect(switched(result)).toEqual([
+      'Shared -> FirstSettings at property First',
+      'Shared -> SecondSettings at property Second',
+    ]);
+    expect(history(resource(db).properties.First)).toEqual(['FirstSettings']);
+    expect(history(resource(db).properties.Second)).toEqual(['SecondSettings']);
+    expect(l1Structs()).toEqual(['FirstSettings', 'SecondSettings']);
+    expect(l1Renames()).toEqual([
+      'Shared -> FirstSettings at property First',
+      'Shared -> SecondSettings at property Second',
+    ]);
+  });
+
+  describe('a shared type where one position of its newest types has a field the others lack', () => {
+    // As IoT AuditCheckConfiguration in 0.1.227: the released C renders Check, but its newest type is already
+    // CustomCheck
+    const setup = () => {
+      importRegistry(released, divergingChecks('Check'));
+      importRegistry(released, divergingChecks('CustomCheck'));
+      importRegistry(db, divergingChecks('CustomCheck'));
+    };
+
+    test('renders the type CloudFormation uses there, and the others keep the released name', () => {
+      const result = runFresh(setup);
+
+      expect(cases(result)).toEqual([]);
+      expect(switched(result)).toEqual(['Check -> CustomCheck at property Checks.C']);
+      expect(renderedFields('Checks')).toEqual({ A: 'Check', B: 'Check', C: 'CustomCheck' });
+      expect(fields('Check')).toEqual({ Enabled: 'boolean' });
+      expect(l1Renames()).toEqual(['Check -> CustomCheck at field Checks.C']);
+
+      const gate = typeGate(result, { mappingFile: MAPPING_FILE, baselineVersion: '1.2.3' });
+      expect(gate.failed).toBe(false);
+      expect(gate.report).toContain(`  ${RESOURCE}: Check -> CustomCheck (property Checks.C)`);
+    });
+
+    test('keeps the released name everywhere with a keep-old entry', () => {
+      const result = runFresh(setup, [
+        mapping({ resource: RESOURCE, oldType: 'Check', newTypes: ['CustomCheck'], kind: 'keep-old' }),
+      ]);
+
+      expect(cases(result)).toEqual([]);
+      expect(switched(result)).toEqual([]);
+      expect(renderedFields('Checks')).toEqual({ A: 'Check', B: 'Check', C: 'Check' });
+      expect(fields('Check')).toEqual({ Enabled: 'boolean', Configuration: 'string' });
+      expect(l1Renames()).toEqual([]);
+    });
+  });
+});
+
 describe('settled renames whose current type shares fewer than half of the released fields', () => {
   const strings = (names: string[]) => Object.fromEntries(names.map((n) => [n, { type: 'string' as const }]));
   const setup = (releasedFields: string[], currentFields: string[]) => {
@@ -566,7 +822,8 @@ describe('settled renames whose current type shares fewer than half of the relea
     });
     importRegistry(db, {
       properties: { First: { $ref: '#/definitions/One' }, Second: { $ref: '#/definitions/Two' } },
-      definitions: { One: object(strings(['A', 'X'])), Two: object(strings(['A', 'X'])) },
+      // A new field would make the split follow CloudFormation's types instead
+      definitions: { One: object(strings(['A'])), Two: object(strings(['A'])) },
     });
 
     const result = run();
@@ -770,9 +1027,12 @@ describe('a kept struct below a list or map change', () => {
 
     const result = run();
 
-    // The kept Settings renders Extra, so Dest is rendered there with CloudFormation's other fields
+    // The kept Settings renders Extra, so Dest is rendered there with CloudFormation's other fields: Dest is split
+    // and gains State, so Backup renders DestRequest
     expect(fields('Settings')).toEqual({ Url: 'string', Extra: 'Dest' });
-    expect(cases(result)).toEqual(['unsettled-split Dest at property Backup, property Settings.Extra']);
+    expect(cases(result)).toEqual([]);
+    expect(switched(result)).toEqual(['Dest -> DestRequest at property Backup']);
+    expect(fields('Dest')).toEqual({ State: 'string' });
   });
 });
 
@@ -868,7 +1128,9 @@ describe('a kept struct below a union change', () => {
           'Url',
           'Extra',
         ]);
-        expect(cases(result)).toEqual(['unsettled-split Dest at property Backup, property Top.Extra']);
+        expect(cases(result)).toEqual([]);
+        expect(switched(result)).toEqual(['Dest -> DestRequest at property Backup']);
+        expect(fields('Dest')).toEqual({ State: 'string' });
       },
     );
 
@@ -894,14 +1156,15 @@ describe('a kept struct below a union change', () => {
       { Url: 'string', Port: 'integer' },
     ],
     [
-      // Other renders Mid, so the L1 renders Dest at Other.Inner with CloudFormation's other fields
+      // Other renders Mid, so the L1 renders Dest at Other.Inner with CloudFormation's other fields: Dest is split
+      // and gains State, so Backup renders DestRequest
       'also at a property the L1 renders',
       { Other: { $ref: '#/definitions/Mid' } },
-      ['unsettled-split Dest at property Backup, property Other.Inner'],
+      ['Dest -> DestRequest at property Backup'],
       [],
-      { Url: 'string', Port: 'integer', State: 'string' },
+      { State: 'string' },
     ],
-  ])('a released name reused two levels below a union position is compared %s', (_, other, expected, renames, dest) => {
+  ])('a released name reused two levels below a union position is compared %s', (_, other, switches, renames, dest) => {
     // The kept Settings keeps exactly {Url}, so the L1 renders neither Extra nor Mid.Inner below it
     importRegistry(released, {
       properties: { Settings: { $ref: '#/definitions/Settings' }, Backup: { $ref: '#/definitions/Dest' } },
@@ -926,14 +1189,16 @@ describe('a kept struct below a union change', () => {
 
     const result = run();
 
-    expect(cases(result)).toEqual(expected);
+    expect(cases(result)).toEqual([]);
+    expect(switched(result)).toEqual(switches);
     expect(settled(result)).toEqual(renames);
     expect(fields('Settings')).toEqual({ Url: 'string' });
     expect(fields('Dest')).toEqual(dest);
   });
 
   test('a case names the path where the L1 renders a struct, not one below a field it does not render', () => {
-    // CloudFormation reaches Mid first through Settings.Extra, which the L1 does not render, and also through Other.W
+    // CloudFormation reaches Mid first through Settings.Extra, which the L1 does not render, and also through Other.W.
+    // CloudFormation's Backup is any JSON, so the kept Backup keeps exactly the released fields of Dest.
     importRegistry(released, {
       properties: { Settings: { $ref: '#/definitions/Settings' }, Backup: { $ref: '#/definitions/Dest' } },
       definitions: {
@@ -944,7 +1209,7 @@ describe('a kept struct below a union change', () => {
     importRegistry(db, {
       properties: {
         Settings: { anyOf: [{ $ref: '#/definitions/Settings' }, { type: 'string' }] },
-        Backup: { $ref: '#/definitions/DestRequest' },
+        Backup: {},
         Other: { $ref: '#/definitions/Wrap' },
       },
       definitions: {
@@ -952,13 +1217,12 @@ describe('a kept struct below a union change', () => {
         Wrap: object({ W: { $ref: '#/definitions/Mid' } }),
         Mid: object({ Inner: { $ref: '#/definitions/Dest' } }),
         Dest: object({ State: { type: 'string' } }),
-        DestRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
       },
     });
 
     const result = run();
 
-    expect(cases(result)).toEqual(['unsettled-split Dest at property Backup, property Other.W.Inner']);
+    expect(cases(result)).toEqual(['diverging Dest at property Backup, property Other.W.Inner']);
   });
 
   test('a renamed struct takes its new fields from CloudFormation where the L1 does not render its current namesake', () => {
@@ -1062,32 +1326,26 @@ describe('released names below a changed position', () => {
 
 describe('a released name that CloudFormation also uses elsewhere', () => {
   test('is compared at the positions where only the current sources use it', () => {
-    const setup = () => {
-      importRegistry(released, {
-        properties: { Settings: { $ref: '#/definitions/Destination' } },
-        definitions: { Destination: object({ Url: { type: 'string' }, Port: { type: 'integer' } }) },
-      });
-      importRegistry(db, {
-        properties: {
-          Settings: { $ref: '#/definitions/DestinationRequest' },
-          Status: { $ref: '#/definitions/Destination' },
-        },
-        definitions: {
-          DestinationRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-          Destination: object({ State: { type: 'string' } }),
-        },
-      });
-    };
+    // CloudFormation's Destination at Status has a field the released one lacks, so the split follows CloudFormation
+    importRegistry(released, {
+      properties: { Settings: { $ref: '#/definitions/Destination' } },
+      definitions: { Destination: object({ Url: { type: 'string' }, Port: { type: 'integer' } }) },
+    });
+    importRegistry(db, {
+      properties: {
+        Settings: { $ref: '#/definitions/DestinationRequest' },
+        Status: { $ref: '#/definitions/Destination' },
+      },
+      definitions: {
+        DestinationRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        Destination: object({ State: { type: 'string' } }),
+      },
+    });
 
-    const first = runFresh(setup);
-    expect(cases(first)).toEqual(['unsettled-split Destination at property Settings, property Status']);
-    expect(first.undecided[0].positions.map((p) => `${p.position}: ${p.cloudFormationType}`)).toEqual([
-      'property Settings: DestinationRequest',
-      'property Status: Destination',
-    ]);
+    const result = run();
 
-    const second = runFresh(setup, [chosen(first, 'split')]);
-    expect(cases(second)).toEqual([]);
+    expect(cases(result)).toEqual([]);
+    expect(switched(result)).toEqual(['Destination -> DestinationRequest at property Settings']);
     expect(history(resource(db).properties.Settings)).toEqual(['DestinationRequest']);
     expect(history(resource(db).properties.Status)).toEqual(['Destination']);
     expect(fields('Destination')).toEqual({ State: 'string' });
@@ -1116,7 +1374,9 @@ describe('a released name that CloudFormation also uses elsewhere', () => {
     ]);
 
     expect(fields('Settings')).toEqual({ Url: 'string', Extra: 'Dest' });
-    expect(cases(result)).toEqual(['unsettled-split Dest at property Backup, property Settings.Extra']);
+    expect(cases(result)).toEqual([]);
+    expect(switched(result)).toEqual(['Dest -> DestRequest at property Backup']);
+    expect(fields('Dest')).toEqual({ State: 'string' });
   });
 
   test.each([
@@ -1159,8 +1419,10 @@ describe('a released name that CloudFormation also uses elsewhere', () => {
 
       const target = nested ? typeDefinition('Outer').properties.Target : resource(db).properties.Top;
       expect(history(target)).toEqual(['SqsTarget | SnsTarget']);
-      const at = nested ? 'property Top.Target.Extra' : 'property Top.Extra';
-      expect(cases(result)).toEqual([`unsettled-split Dest at property Backup, ${at}`]);
+      // Dest is rendered at SqsTarget.Extra with CloudFormation's State, so the split follows CloudFormation
+      expect(cases(result)).toEqual([]);
+      expect(switched(result)).toEqual(['Dest -> DestRequest at property Backup']);
+      expect(fields('Dest')).toEqual({ State: 'string' });
     },
   );
 
@@ -1234,7 +1496,9 @@ describe('a released name that CloudFormation also uses elsewhere', () => {
     const result = run();
 
     expect(fields('A')).toEqual({ X: 'string', N: 'Dest' });
-    expect(cases(result)).toEqual(['unsettled-split Dest at property First.N, property Third']);
+    expect(cases(result)).toEqual([]);
+    expect(switched(result)).toEqual(['Dest -> DestRequest at property Third']);
+    expect(fields('Dest')).toEqual({ State: 'string' });
   });
 
   test('is compared at the fields of a struct that only an attribute reaches', () => {
@@ -1258,7 +1522,9 @@ describe('a released name that CloudFormation also uses elsewhere', () => {
     const result = run();
 
     expect(Object.keys(resource(db).attributes)).toContain('Status');
-    expect(cases(result)).toEqual(['unsettled-split Destination at attribute Status.Last, property Settings']);
+    expect(cases(result)).toEqual([]);
+    expect(switched(result)).toEqual(['Destination -> DestinationRequest at property Settings']);
+    expect(fields('Destination')).toEqual({ State: 'string' });
   });
 });
 
@@ -1411,7 +1677,8 @@ describe('released structs below a kept field that no position reaches', () => {
     };
 
     const first = runFresh(setup);
-    expect(cases(first)).toEqual(['unsettled-split OldTarget at property Backup, property Settings.Target']);
+    // One CloudFormation type among its positions, so neither a merge nor a split
+    expect(cases(first)).toEqual(['diverging OldTarget at property Backup, property Settings.Target']);
     expect(kinds(first.undecided[0])).toEqual(['split', 'keep-old', 'follow-cloudformation']);
 
     for (const kind of kinds(first.undecided[0])) {
@@ -1533,6 +1800,25 @@ function settled(result: TypeHistoryResult) {
   return result.settled.map(
     (s) => `${s.kind} ${s.releasedType} -> ${s.newTypes.join(', ')} at ${s.positions.join(', ')}`,
   );
+}
+
+function switched(result: TypeHistoryResult) {
+  return result.switched.map((s) => `${s.releasedType} -> ${s.newType} at ${s.positions.join(', ')}`);
+}
+
+/**
+ * The struct renames of the L1 change report from the released database, one line per new struct
+ */
+function l1Renames() {
+  const renames = compareL1(released, db).renames;
+  return [...new Set(renames.map((r) => r.to))].map((to) => {
+    const merged = renames.filter((r) => r.to === to);
+    return `${merged.map((r) => r.from).join(', ')} -> ${to} at ${merged.flatMap((r) => r.positions).join(', ')}`;
+  });
+}
+
+function l1Structs() {
+  return [...new L1View(db, resource(db)).structs.keys()].sort();
 }
 
 function chosen(result: TypeHistoryResult, kind: TypeMappingKind): TypeMapping {
