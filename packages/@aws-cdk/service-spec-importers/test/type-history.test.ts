@@ -828,6 +828,51 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
     expect(history(resource(db).properties.PA)[0]).toEqual('A');
   });
 
+  test('types whose rounds do not settle are interdependent even where one answer fits, and pass with an entry', () => {
+    // Node switches where Top.Child or Pt2.N counts, P where Top.Extra counts; only Node switching and P renamed fits,
+    // but the rounds alternate between counting all three positions and none
+    const setup = () => {
+      importRegistry(released, {
+        properties: { Top: { $ref: '#/definitions/Node' }, Pt2: { $ref: '#/definitions/P' } },
+        definitions: {
+          Node: object({
+            Name: { type: 'string' },
+            Child: { $ref: '#/definitions/Node' },
+            Extra: { $ref: '#/definitions/P' },
+          }),
+          P: object({ Name: { type: 'string' }, N: { $ref: '#/definitions/Node' } }),
+        },
+      });
+      importRegistry(db, {
+        properties: { Top: { $ref: '#/definitions/NodeA' }, Pt2: { $ref: '#/definitions/PY' } },
+        definitions: {
+          NodeA: object({
+            Name: { type: 'string' },
+            Child: { $ref: '#/definitions/NodeB' },
+            Extra: { $ref: '#/definitions/PX' },
+          }),
+          NodeB: object({ Name: { type: 'string' }, New: { type: 'string' } }),
+          PX: object({ Name: { type: 'string' }, New: { type: 'string' } }),
+          PY: object({ Name: { type: 'string' }, N: { $ref: '#/definitions/NodeC' } }),
+          NodeC: object({ Name: { type: 'string' }, New: { type: 'string' } }),
+        },
+      });
+    };
+
+    const first = runFresh(setup);
+    expect(cases(first)).toEqual([
+      'interdependent Node at property Pt2.N, property Top, property Top.Child',
+      'interdependent P at property Pt2, property Top.Extra',
+    ]);
+    expect(gateFails(first)).toBe(true);
+
+    const second = runFresh(setup, [chosen(first, 'follow-cloudformation')]);
+    expect(cases(second)).toEqual([]);
+    expect(gateFails(second)).toBe(false);
+    expect(settled(second)).toEqual(['rename P -> PY at property Pt2']);
+    expect(history(resource(db).properties.Top)).toEqual(['NodeA']);
+  });
+
   describe('a merge or split whose positions need different fields, with nothing new, also follows CloudFormation', () => {
     // Released Shared {Url, Port}; CloudFormation keeps Shared {Url, Port} at First and renames Second to a type
     // without Port

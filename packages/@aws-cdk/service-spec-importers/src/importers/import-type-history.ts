@@ -20,8 +20,8 @@ import { matchShape, sameNameOrSharedField } from '../type-pairing';
  * - `ambiguous`: at such a position, more than one current type does.
  * - `diverging`: its positions need different fields, and it is neither a merge nor a split, or it is one that follows
  *   CloudFormation and the positions where it keeps its name need different fields.
- * - `interdependent`: whether it follows CloudFormation depends on whether another type does, which depends on it in
- *   turn, so the merge and split rule gives no single result.
+ * - `interdependent`: whether it follows CloudFormation depends on whether other types do, and the rounds that decide
+ *   them do not settle, so the build does not choose, even where only one result would fit.
  */
 export type UndecidedKind = 'no-pair' | 'ambiguous' | 'diverging' | 'interdependent';
 
@@ -675,7 +675,7 @@ class ResourceTypeHistory {
 
   /**
    * Decide the positions of both rounds, and leave undecided each released type whose positions differ between them,
-   * because whether it follows CloudFormation depends on another type's switch that depends on it in turn
+   * because the rounds that decide whether it follows CloudFormation do not settle
    */
   private decideInterdependent(next: Set<Position>) {
     const changed = new Set([...next, ...this.active].filter((p) => next.has(p) !== this.active.has(p)));

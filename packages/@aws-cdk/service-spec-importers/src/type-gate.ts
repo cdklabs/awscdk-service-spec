@@ -21,7 +21,7 @@ const WHY: Record<UndecidedKind, string> = {
   ambiguous: 'has ambiguous candidates: more than one current type at its position shares a field with it',
   diverging: 'diverges: the positions where it keeps its name need different fields',
   interdependent:
-    'is interdependent: whether it follows CloudFormation depends on another type that depends on it in turn',
+    'is interdependent: whether it follows CloudFormation depends on other types, and the rounds do not settle',
 };
 
 /**

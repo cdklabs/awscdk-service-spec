@@ -97,8 +97,8 @@ Where the rules cannot decide, a person must. The `build` job fails on pull requ
 * **Ambiguous candidates**: at such a position, more than one type does.
 * **Diverging shared type**: the positions where the released type keeps its name need different fields, for example
   where CloudFormation's type at one of them is any JSON and at another a type with other fields.
-* **Interdependent types**: whether a merged or split type follows CloudFormation depends on whether another type
-  does, which depends on it in turn, so the rule gives no single result.
+* **Interdependent types**: whether a merged or split type follows CloudFormation depends on whether other types do,
+  and the rounds that decide them do not settle. The build does not choose, even where only one result would fit.
 
 For each case it prints the resource, the positions and the released type, and one entry per kind that decides it.
 The step also writes these entries to the `type-mapping-entries` build artifact. Settled renames, merges and splits,
