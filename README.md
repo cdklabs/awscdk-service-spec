@@ -80,12 +80,13 @@ The build applies these rules after the sources that define types:
 
 Merged and split types follow CloudFormation once they gain a field. A merge is several released types that
 CloudFormation continues as one type; a split is one released type whose positions CloudFormation now gives more than
-one type. While none of CloudFormation's types there has a field the released type lacks, the released names stay.
-Once one has, the L1 renders CloudFormation's type wherever it has another name: for a merge, at the positions of
-every merged released type together, and for a split, at each position where CloudFormation renamed the type, while a
-position where CloudFormation kept the released name keeps it. The build does this by itself, without a mapping
-entry, and the gate and the L1 change report list each switch as a type break. A field CloudFormation removed, with
-nothing new, does not switch a type.
+one type. While none of CloudFormation's types there has a field the released type lacks, and its positions need the
+same fields, the released names stay. Once one has, or once the positions need different fields (for example a field
+CloudFormation removed at one position only), the L1 renders CloudFormation's type wherever it has another name: for
+a merge, at the positions of every merged released type together, and for a split, at each position where
+CloudFormation renamed the type, while a position where CloudFormation kept the released name keeps it. The build
+does this by itself, without a mapping entry, and the gate and the L1 change report list each switch as a type break.
+A field CloudFormation removed at every position does not switch a type.
 
 ### Type history gate
 
@@ -94,10 +95,6 @@ Where the rules cannot decide, a person must. The `build` job fails on pull requ
 
 * **No pair**: at a position where CloudFormation changed the type, no type shares a field with the released one.
 * **Ambiguous candidates**: at such a position, more than one type does.
-* **Unsettled merge**: CloudFormation merged the released type into another without a new field, and its positions
-  need different fields.
-* **Unsettled split**: CloudFormation gives the positions of the released type several types without a new field, and
-  they need different fields.
 * **Diverging shared type**: the positions where the released type keeps its name need different fields, for example
   where CloudFormation's type at one of them is any JSON and at another a type with other fields.
 
