@@ -179,6 +179,33 @@ describe('cases the matcher cannot decide fail the gate, and pass with the print
     expect(fields('OldTarget')).toEqual({ Arn: 'string', State: 'string' });
   });
 
+  test('a split that follows CloudFormation diverges where the positions that keep its name need different fields', () => {
+    // Third follows Other, while First keeps CloudFormation's Shared, with Mode, and Second, now any JSON, keeps
+    // exactly the released fields
+    importRegistry(released, {
+      properties: {
+        First: { $ref: '#/definitions/Shared' },
+        Second: { $ref: '#/definitions/Shared' },
+        Third: { $ref: '#/definitions/Shared' },
+      },
+      definitions: { Shared: object({ Url: { type: 'string' } }) },
+    });
+    importRegistry(db, {
+      properties: { First: { $ref: '#/definitions/Shared' }, Second: {}, Third: { $ref: '#/definitions/Other' } },
+      definitions: {
+        Shared: object({ Url: { type: 'string' }, Mode: { type: 'string' } }),
+        Other: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+      },
+    });
+
+    const result = run();
+
+    expect(cases(result)).toEqual(['diverging Shared at property First, property Second, property Third']);
+    expect(gateFails(result)).toBe(true);
+    expect(switched(result)).toEqual([]);
+    expect(history(resource(db).properties.Third)[0]).toEqual('Shared');
+  });
+
   test('the printed entries are complete and the gate writes them', () => {
     const setup = () => {
       importRegistry(released, {
