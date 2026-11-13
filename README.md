@@ -97,6 +97,8 @@ Where the rules cannot decide, a person must. The `build` job fails on pull requ
 * **Ambiguous candidates**: at such a position, more than one type does.
 * **Diverging shared type**: the positions where the released type keeps its name need different fields, for example
   where CloudFormation's type at one of them is any JSON and at another a type with other fields.
+* **Interdependent types**: whether a merged or split type follows CloudFormation depends on whether another type
+  does, which depends on it in turn, so the rule gives no single result.
 
 For each case it prints the resource, the positions and the released type, and one entry per kind that decides it.
 The step also writes these entries to the `type-mapping-entries` build artifact. Settled renames, merges and splits,
@@ -107,7 +109,8 @@ Among the settled renames, merges and splits, the gate also lists as weak matche
 than half of the released type's fields, by name, and each one paired with a released type without fields (as 0 of
 0), since only its position paired them. Each line gives the resource, both types, the positions and the shared and
 total counts, so a person can check the pair; weak matches do not fail the gate. Pairs a mapping entry decides are
-not listed.
+not listed, and neither are merged and split types that follow CloudFormation, since the L1 renders CloudFormation's
+own type there.
 
 ### Type mappings
 
@@ -126,7 +129,8 @@ released `oldType`, the current `newTypes`, the `kind`, the `reason` and the `pr
 
 `split`, `replace` and `follow-cloudformation` change the type at some positions, which breaks code that uses the
 released type there. An entry wins over the rule for merged and split types, so `merge` or `keep-old` keeps a
-released name on purpose. A malformed entry fails the build, naming the entry. An entry for a resource or type that the
+released name on purpose. It keeps only the type it names: the other types of a merge still switch when the merged
+type has a field one of them lacks. A malformed entry fails the build, naming the entry. An entry for a resource or type that the
 sources do not have yet applies nowhere and is only reported, so it can merge before the source update that needs it.
 
 When the gate fails on a source update pull request:
