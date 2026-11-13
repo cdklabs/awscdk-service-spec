@@ -19,10 +19,6 @@ export interface TypeGate {
 const WHY: Record<UndecidedKind, string> = {
   'no-pair': 'has no pair: no current type at its position shares a field with it',
   ambiguous: 'has ambiguous candidates: more than one current type at its position shares a field with it',
-  'unsettled-merge':
-    'is an unsettled merge: CloudFormation merged it, without a new field, and its positions need different fields',
-  'unsettled-split':
-    'is an unsettled split: CloudFormation split it, without a new field, and its positions need different fields',
   diverging: 'diverges: the positions where it keeps its name need different fields',
 };
 

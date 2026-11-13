@@ -81,75 +81,6 @@ describe('cases the matcher cannot decide fail the gate, and pass with the print
     expect(fields('Topic')).toEqual({ Arn: 'string', Url: 'string' });
   });
 
-  test('a merged released type whose positions lose different fields, with nothing new, is an unsettled merge', () => {
-    const setup = () => {
-      importRegistry(released, {
-        properties: {
-          First: { $ref: '#/definitions/FirstSettings' },
-          Second: { $ref: '#/definitions/SecondSettings' },
-          Third: { $ref: '#/definitions/FirstSettings' },
-        },
-        definitions: {
-          FirstSettings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-          SecondSettings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-        },
-      });
-      importRegistry(db, {
-        properties: {
-          First: { $ref: '#/definitions/Settings' },
-          Second: { $ref: '#/definitions/Settings' },
-          Third: { $ref: '#/definitions/FirstSettings' },
-        },
-        definitions: {
-          Settings: object({ Url: { type: 'string' } }),
-          FirstSettings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-        },
-      });
-    };
-
-    const first = runFresh(setup);
-    expect(cases(first)).toEqual(['unsettled-merge FirstSettings at property First, property Third']);
-    expect(kinds(first.undecided[0])).toEqual(['merge', 'split', 'keep-old', 'follow-cloudformation']);
-    expect(switched(first)).toEqual([]);
-
-    const second = runFresh(setup, [chosen(first, 'merge')]);
-    expect(cases(second)).toEqual([]);
-    expect(history(resource(db).properties.First)).toEqual(['FirstSettings', 'Settings']);
-    expect(history(resource(db).properties.Third)).toEqual(['FirstSettings']);
-    expect(fields('FirstSettings')).toEqual({ Url: 'string' });
-    expect(fields('SecondSettings')).toEqual({ Url: 'string' });
-  });
-
-  test('a shared type renamed at one position to a type with fewer fields is an unsettled split', () => {
-    const setup = () => {
-      importRegistry(released, {
-        properties: { First: { $ref: '#/definitions/Shared' }, Second: { $ref: '#/definitions/Shared' } },
-        definitions: { Shared: object({ Url: { type: 'string' }, Port: { type: 'integer' } }) },
-      });
-      importRegistry(db, {
-        properties: { First: { $ref: '#/definitions/Shared' }, Second: { $ref: '#/definitions/SecondSettings' } },
-        definitions: {
-          Shared: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-          SecondSettings: object({ Url: { type: 'string' } }),
-        },
-      });
-    };
-
-    const first = runFresh(setup);
-    expect(cases(first)).toEqual(['unsettled-split Shared at property First, property Second']);
-    expect(first.undecided[0].entries.map((e) => `${e.kind} ${e.newTypes.join(',')}`)).toEqual([
-      'split SecondSettings',
-      'keep-old SecondSettings',
-      'follow-cloudformation SecondSettings',
-    ]);
-
-    const second = runFresh(setup, [chosen(first, 'split')]);
-    expect(cases(second)).toEqual([]);
-    expect(history(resource(db).properties.First)).toEqual(['Shared']);
-    expect(history(resource(db).properties.Second)).toEqual(['SecondSettings']);
-    expect(fields('Shared')).toEqual({ Url: 'string', Port: 'integer' });
-  });
-
   test('a shared type whose positions need different fields, with one CloudFormation type among them, diverges', () => {
     // CloudFormation's Settings is now any JSON, so the kept Settings.Target keeps exactly the released fields of
     // OldTarget, while CloudFormation's OldTarget at Other has other fields: neither a merge nor a split
@@ -752,6 +683,169 @@ describe('merged and split types that gain a field follow CloudFormation, a repo
       'Shared -> FirstSettings at property First',
       'Shared -> SecondSettings at property Second',
     ]);
+  });
+
+  describe('a merge or split whose positions need different fields, with nothing new, also follows CloudFormation', () => {
+    // Released Shared {Url, Port}; CloudFormation keeps Shared {Url, Port} at First and renames Second to a type
+    // without Port
+    const fewerFields = (extra: Partial<CloudFormationRegistryResource> = {}) => {
+      importRegistry(released, {
+        properties: { First: { $ref: '#/definitions/Shared' }, Second: { $ref: '#/definitions/Shared' } },
+        definitions: { Shared: object({ Url: { type: 'string' }, Port: { type: 'integer' } }) },
+      });
+      importRegistry(db, {
+        properties: {
+          First: { $ref: '#/definitions/Shared' },
+          Second: { $ref: '#/definitions/SecondSettings' },
+          ...extra.properties,
+        },
+        definitions: {
+          Shared: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+          SecondSettings: object({ Url: { type: 'string' } }),
+          ...extra.definitions,
+        },
+      });
+    };
+
+    test('a shared type renamed at one position to a type with fewer fields follows CloudFormation', () => {
+      fewerFields();
+
+      const result = run();
+
+      expect(cases(result)).toEqual([]);
+      expect(gateFails(result)).toBe(false);
+      expect(switched(result)).toEqual(['Shared -> SecondSettings at property Second']);
+      expect(history(resource(db).properties.First)).toEqual(['Shared']);
+      expect(history(resource(db).properties.Second)).toEqual(['SecondSettings']);
+      expect(fields('Shared')).toEqual({ Url: 'string', Port: 'integer' });
+      expect(fields('SecondSettings')).toEqual({ Url: 'string' });
+      expect(l1Renames()).toEqual(['Shared -> SecondSettings at property Second']);
+    });
+
+    test('a merged released type whose positions lose different fields follows CloudFormation with the merge', () => {
+      importRegistry(released, {
+        properties: {
+          First: { $ref: '#/definitions/FirstSettings' },
+          Second: { $ref: '#/definitions/SecondSettings' },
+          Third: { $ref: '#/definitions/FirstSettings' },
+        },
+        definitions: {
+          FirstSettings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+          SecondSettings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        },
+      });
+      importRegistry(db, {
+        properties: {
+          First: { $ref: '#/definitions/Settings' },
+          Second: { $ref: '#/definitions/Settings' },
+          Third: { $ref: '#/definitions/FirstSettings' },
+        },
+        definitions: {
+          Settings: object({ Url: { type: 'string' } }),
+          FirstSettings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        },
+      });
+
+      const result = run();
+
+      expect(cases(result)).toEqual([]);
+      expect(gateFails(result)).toBe(false);
+      expect(switched(result)).toEqual([
+        'FirstSettings -> Settings at property First',
+        'SecondSettings -> Settings at property Second',
+      ]);
+      expect(history(resource(db).properties.First)).toEqual(['Settings']);
+      expect(history(resource(db).properties.Second)).toEqual(['Settings']);
+      expect(history(resource(db).properties.Third)).toEqual(['FirstSettings']);
+      expect(fields('FirstSettings')).toEqual({ Url: 'string', Port: 'integer' });
+      expect(l1Renames()).toEqual(['FirstSettings, SecondSettings -> Settings at property First, property Second']);
+    });
+
+    test('a merged type whose other position CloudFormation made any JSON follows CloudFormation with the merge', () => {
+      // A has one CloudFormation type, C, so only the merge makes it switch
+      importRegistry(released, {
+        properties: {
+          First: { $ref: '#/definitions/A' },
+          Second: { $ref: '#/definitions/B' },
+          Third: { $ref: '#/definitions/A' },
+        },
+        definitions: {
+          A: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+          B: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        },
+      });
+      importRegistry(db, {
+        properties: { First: { $ref: '#/definitions/C' }, Second: { $ref: '#/definitions/C' }, Third: {} },
+        definitions: { C: object({ Url: { type: 'string' } }) },
+      });
+
+      const result = run();
+
+      expect(cases(result)).toEqual([]);
+      expect(switched(result)).toEqual(['A -> C at property First', 'B -> C at property Second']);
+      expect(history(resource(db).properties.Third)[0]).toEqual('A');
+      expect(fields('A')).toEqual({ Url: 'string', Port: 'integer' });
+      expect(l1Renames()).toEqual(['A, B -> C at property First, property Second']);
+    });
+
+    test('a type merged with one that has no pair keeps its name while that one is undecided', () => {
+      // A has no pair at Third, so the gate fails for A, and B, merged with A into C, stays as it is
+      importRegistry(released, {
+        properties: {
+          First: { $ref: '#/definitions/A' },
+          Second: { $ref: '#/definitions/B' },
+          Third: { $ref: '#/definitions/A' },
+        },
+        definitions: {
+          A: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+          B: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        },
+      });
+      importRegistry(db, {
+        properties: {
+          First: { $ref: '#/definitions/C' },
+          Second: { $ref: '#/definitions/C' },
+          Third: { $ref: '#/definitions/Options' },
+        },
+        definitions: { C: object({ Url: { type: 'string' } }), Options: object({ Name: { type: 'string' } }) },
+      });
+
+      const result = run();
+
+      expect(cases(result)).toEqual(['no-pair A at property First, property Third']);
+      expect(switched(result)).toEqual([]);
+      expect(settled(result)).toEqual(['merge B -> C at property Second']);
+      expect(history(resource(db).properties.Second)[0]).toEqual('B');
+    });
+
+    test('keeps the released name everywhere with a keep-old entry', () => {
+      fewerFields();
+
+      const result = run([
+        mapping({ resource: RESOURCE, oldType: 'Shared', newTypes: ['SecondSettings'], kind: 'keep-old' }),
+      ]);
+
+      expect(cases(result)).toEqual([]);
+      expect(switched(result)).toEqual([]);
+      expect(result.applied.map((a) => `${a.entry.kind} ${a.entry.oldType}`)).toEqual(['keep-old Shared']);
+      expect(history(resource(db).properties.Second)[0]).toEqual('Shared');
+      expect(fields('Shared')).toEqual({ Url: 'string', Port: 'integer' });
+      expect(l1Renames()).toEqual([]);
+    });
+
+    test('follows CloudFormation where its entry applies to none of its positions', () => {
+      // The entry names Other, which CloudFormation uses at Third only, so it decides nothing for Shared
+      fewerFields({
+        properties: { Third: { $ref: '#/definitions/Other' } },
+        definitions: { Other: object({ Name: { type: 'string' } }) },
+      });
+
+      const result = run([mapping({ resource: RESOURCE, oldType: 'Shared', newTypes: ['Other'], kind: 'rename' })]);
+
+      expect(cases(result)).toEqual([]);
+      expect(switched(result)).toEqual(['Shared -> SecondSettings at property Second']);
+      expect(result.inactive.map((i) => i.reason)).toEqual(['Other stands at none of the positions of Shared']);
+    });
   });
 
   describe('a shared type where one position of its newest types has a field the others lack', () => {
