@@ -20,8 +20,10 @@ import { matchShape, sameNameOrSharedField } from '../type-pairing';
  * - `ambiguous`: at such a position, more than one current type does.
  * - `diverging`: its positions need different fields, and it is neither a merge nor a split, or it is one that follows
  *   CloudFormation and the positions where it keeps its name need different fields.
+ * - `interdependent`: whether it follows CloudFormation depends on whether another type does, which depends on it in
+ *   turn, so the merge and split rule gives no single result.
  */
-export type UndecidedKind = 'no-pair' | 'ambiguous' | 'diverging';
+export type UndecidedKind = 'no-pair' | 'ambiguous' | 'diverging' | 'interdependent';
 
 export interface TypePosition {
   /** Where the L1 renders the released type, for example `property Settings.Destination` */
@@ -610,34 +612,90 @@ class ResourceTypeHistory {
   }
 
   /**
-   * Decide every released type definition, until no decision drops a position another decision depends on
+   * Decide every released type definition, until the positions that count are those the decisions render
    *
    * A position whose parent type definition the L1 no longer renders there does not count, and neither does a
-   * position that only the current sources have at or below a field a kept type definition leaves out.
+   * position that only the current sources have at or below a field a kept type definition leaves out. Each round
+   * counts the positions again from all of them, so a position left out because its parent followed CloudFormation in
+   * an earlier round counts again once that parent stays. Where the rounds come back to positions they counted before
+   * without settling, the released types whose positions changed are undecided.
    */
   private decideAll() {
     this.active = new Set(this.positions);
+    const seen = new Set<string>([this.activeKey(this.active)]);
     for (let i = 0; i <= this.positions.length; i++) {
-      this.decisions = new Map();
-      this.findMergesAndSplits();
-      for (const [releasedType, uses] of this.uses) {
-        const activeUses = uses.filter((u) => this.active.has(u.position));
-        if (activeUses.length > 0) {
-          this.decisions.set(releasedType, this.decide(releasedType, activeUses));
-        }
-      }
-      this.renderedFields = this.renderedCurrentFields();
-      const next = new Set(
-        [...this.active].filter(
-          (p) =>
-            (!p.parentUse || (this.active.has(p.parentUse.position) && this.stays(p.parentUse))) && this.rendered(p),
-        ),
-      );
-      if (next.size === this.active.size) {
+      this.decideActive();
+      const next = this.activeFromDecisions();
+      const key = this.activeKey(next);
+      if (key === this.activeKey(this.active)) {
         return;
       }
+      if (seen.has(key)) {
+        this.decideInterdependent(next);
+        return;
+      }
+      seen.add(key);
       this.active = next;
     }
+    // The rounds did not settle within the bound
+    this.decideActive();
+    const next = this.activeFromDecisions();
+    if (this.activeKey(next) !== this.activeKey(this.active)) {
+      this.decideInterdependent(next);
+    }
+  }
+
+  private decideActive() {
+    this.decisions = new Map();
+    this.findMergesAndSplits();
+    for (const [releasedType, uses] of this.uses) {
+      const activeUses = uses.filter((u) => this.active.has(u.position));
+      if (activeUses.length > 0) {
+        this.decisions.set(releasedType, this.decide(releasedType, activeUses));
+      }
+    }
+    this.renderedFields = this.renderedCurrentFields();
+  }
+
+  /**
+   * The positions that count under the current decisions: those the L1 renders, below parent uses that stay
+   */
+  private activeFromDecisions(): Set<Position> {
+    const counts = new Map<Position, boolean>();
+    const count = (p: Position): boolean => {
+      let result = counts.get(p);
+      if (result === undefined) {
+        result = this.rendered(p) && (!p.parentUse || (count(p.parentUse.position) && this.stays(p.parentUse)));
+        counts.set(p, result);
+      }
+      return result;
+    };
+    return new Set(this.positions.filter(count));
+  }
+
+  /**
+   * Decide the positions of both rounds, and leave undecided each released type whose positions differ between them,
+   * because whether it follows CloudFormation depends on another type's switch that depends on it in turn
+   */
+  private decideInterdependent(next: Set<Position>) {
+    const changed = new Set([...next, ...this.active].filter((p) => next.has(p) !== this.active.has(p)));
+    this.active = new Set([...next, ...this.active]);
+    this.decideActive();
+    for (const [releasedType, uses] of this.uses) {
+      if (uses.some((u) => changed.has(u.position))) {
+        const activeUses = uses.filter((u) => this.active.has(u.position));
+        const fields = unique([...Object.keys(releasedType.properties), ...activeUses.flatMap((u) => this.need(u))]);
+        this.decisions.set(releasedType, { stays: activeUses, follows: [], fields, undecided: 'interdependent' });
+      }
+    }
+    this.renderedFields = this.renderedCurrentFields();
+  }
+
+  private activeKey(positions: Set<Position>) {
+    return this.positions
+      .map((p, i) => (positions.has(p) ? i : -1))
+      .filter((i) => i >= 0)
+      .join(',');
   }
 
   private decide(releasedType: TypeDefinition, uses: Use[]): Decision {
@@ -678,8 +736,9 @@ class ResourceTypeHistory {
    *
    * A merge or split follows CloudFormation where one of CloudFormation's types has a field the released type lacks,
    * or where the positions of the released type need different fields. A released type definition that a mapping
-   * entry decides, or that has a position without a pair, does not follow CloudFormation by this rule, and does not
-   * make the types merged with it follow.
+   * entry decides, or that has a position without a pair, does not follow CloudFormation by this rule. Whether a merged
+   * type has a field one of its released types lacks counts every one of them, so such a type still makes the others
+   * follow that way; whether positions need different fields counts only the released types the rule decides.
    */
   private findMergesAndSplits() {
     const usesOf = new Map<TypeDefinition, Use[]>();

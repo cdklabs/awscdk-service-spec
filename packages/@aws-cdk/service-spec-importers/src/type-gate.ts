@@ -20,6 +20,8 @@ const WHY: Record<UndecidedKind, string> = {
   'no-pair': 'has no pair: no current type at its position shares a field with it',
   ambiguous: 'has ambiguous candidates: more than one current type at its position shares a field with it',
   diverging: 'diverges: the positions where it keeps its name need different fields',
+  interdependent:
+    'is interdependent: whether it follows CloudFormation depends on another type that depends on it in turn',
 };
 
 /**

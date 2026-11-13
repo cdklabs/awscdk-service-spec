@@ -536,6 +536,58 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
     });
   });
 
+  test('a merge entry for the merged type that lacks the field keeps only that one, and the other switches', () => {
+    importRegistry(released, {
+      properties: { First: { $ref: '#/definitions/A' }, Second: { $ref: '#/definitions/B' } },
+      definitions: {
+        A: object({ Url: { type: 'string' } }),
+        B: object({ Url: { type: 'string' }, Mode: { type: 'string' } }),
+      },
+    });
+    importRegistry(db, {
+      properties: { First: { $ref: '#/definitions/C' }, Second: { $ref: '#/definitions/C' } },
+      definitions: { C: object({ Url: { type: 'string' }, Mode: { type: 'string' } }) },
+    });
+
+    const result = run([mapping({ resource: RESOURCE, oldType: 'A', newTypes: ['C'], kind: 'merge' })]);
+
+    expect(cases(result)).toEqual([]);
+    expect(result.applied.map((a) => `${a.entry.kind} ${a.entry.oldType}`)).toEqual(['merge A']);
+    expect(switched(result)).toEqual(['B -> C at property Second']);
+    expect(history(resource(db).properties.First)).toEqual(['A', 'C']);
+    expect(history(resource(db).properties.Second)).toEqual(['C']);
+    expect(fields('A')).toEqual({ Url: 'string', Mode: 'string' });
+  });
+
+  test('every split type that gains the same field switches at its own position', () => {
+    importRegistry(released, {
+      properties: { First: { $ref: '#/definitions/Shared' }, Second: { $ref: '#/definitions/Shared' } },
+      definitions: { Shared: object({ Url: { type: 'string' } }) },
+    });
+    importRegistry(db, {
+      properties: { First: { $ref: '#/definitions/FirstSettings' }, Second: { $ref: '#/definitions/SecondSettings' } },
+      definitions: {
+        FirstSettings: object({ Url: { type: 'string' }, X: { type: 'string' } }),
+        SecondSettings: object({ Url: { type: 'string' }, X: { type: 'string' } }),
+      },
+    });
+
+    const result = run();
+
+    expect(cases(result)).toEqual([]);
+    expect(gateFails(result)).toBe(false);
+    expect(switched(result)).toEqual([
+      'Shared -> FirstSettings at property First',
+      'Shared -> SecondSettings at property Second',
+    ]);
+    expect(history(resource(db).properties.First)).toEqual(['FirstSettings']);
+    expect(history(resource(db).properties.Second)).toEqual(['SecondSettings']);
+    expect(l1Renames()).toEqual([
+      'Shared -> FirstSettings at property First',
+      'Shared -> SecondSettings at property Second',
+    ]);
+  });
+
   test('every merged type switches when the merged type has a field that one of them lacks', () => {
     importRegistry(released, {
       properties: { First: { $ref: '#/definitions/A' }, Second: { $ref: '#/definitions/B' } },
@@ -683,6 +735,97 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
       'Shared -> FirstSettings at property First',
       'Shared -> SecondSettings at property Second',
     ]);
+  });
+
+  describe('a split whose only other position is below a type that switches is a plain rename', () => {
+    // X is at Second and at Q.Inner; T switches to T2 at Q, so the L1 does not render Q.Inner and X is renamed at
+    // Second only
+    // With a new field, Z makes X a split that gains one; without, X's positions need different fields
+    const setup = (withT: boolean, zFields: jsonschema.ObjectProperties) => {
+      importRegistry(released, {
+        properties: {
+          Second: { $ref: '#/definitions/X' },
+          ...(withT ? { Q: { $ref: '#/definitions/T' }, Q2: { $ref: '#/definitions/T' } } : {}),
+        },
+        definitions: {
+          T: object({ Inner: { $ref: '#/definitions/X' }, Name: { type: 'string' } }),
+          X: object({ Url: { type: 'string' }, Sub: { $ref: '#/definitions/Leaf' } }),
+          Leaf: object({ A: { type: 'string' } }),
+        },
+      });
+      importRegistry(db, {
+        properties: {
+          Second: { $ref: '#/definitions/Y' },
+          ...(withT ? { Q: { $ref: '#/definitions/T2' }, Q2: { $ref: '#/definitions/T' } } : {}),
+        },
+        definitions: {
+          Y: object({ Url: { type: 'string' }, Sub: { $ref: '#/definitions/Leaf2' } }),
+          Leaf2: object({ A: { type: 'string' }, B: { type: 'string' } }),
+          T2: object({ Inner: { $ref: '#/definitions/Z' }, Name: { type: 'string' }, Extra: { type: 'string' } }),
+          T: object({ Name: { type: 'string' } }),
+          Z: object(zFields),
+        },
+      });
+    };
+
+    test.each([
+      ['alone', false, true, []],
+      ['below a type that switches, where X would gain a field there', true, true, ['T -> T2 at property Q']],
+      ['below a type that switches, where X would need other fields there', true, false, ['T -> T2 at property Q']],
+    ])('keeps the positions below it %s', (_, withT, zNew, switches) => {
+      const url = { Url: { type: 'string' as const } };
+      setup(withT as boolean, zNew ? { ...url, New: { type: 'string' } } : url);
+
+      const result = run();
+
+      expect(cases(result)).toEqual([]);
+      expect(gateFails(result)).toBe(false);
+      expect(switched(result)).toEqual(switches);
+      expect(settled(result)).toEqual([
+        'rename Leaf -> Leaf2 at property Second.Sub',
+        'rename X -> Y at property Second',
+      ]);
+      expect(history(typeDefinition('X').properties.Sub)).toEqual(['Leaf', 'Leaf2']);
+      expect(fields('Leaf')).toEqual({ A: 'string', B: 'string' });
+    });
+  });
+
+  test('two splits that each switch only while the other does not are interdependent, and pass with an entry', () => {
+    // A is split only where B stays (at PB.Inner), and B only where A stays (at PA.InnerB), so either one following
+    // CloudFormation fits the rule, and the rule cannot choose
+    const setup = () => {
+      importRegistry(released, {
+        properties: { PA: { $ref: '#/definitions/A' }, PB: { $ref: '#/definitions/B' } },
+        definitions: {
+          A: object({ Url: { type: 'string' }, InnerB: { $ref: '#/definitions/B' } }),
+          B: object({ Name: { type: 'string' }, Inner: { $ref: '#/definitions/A' } }),
+        },
+      });
+      importRegistry(db, {
+        properties: { PA: { $ref: '#/definitions/A1' }, PB: { $ref: '#/definitions/B1' } },
+        definitions: {
+          A1: object({ Url: { type: 'string' }, InnerB: { $ref: '#/definitions/B2' } }),
+          A2: object({ Url: { type: 'string' }, New: { type: 'string' }, InnerB: { $ref: '#/definitions/B1' } }),
+          B1: object({ Name: { type: 'string' }, Inner: { $ref: '#/definitions/A2' } }),
+          B2: object({ Name: { type: 'string' }, New: { type: 'string' }, Inner: { $ref: '#/definitions/A1' } }),
+        },
+      });
+    };
+
+    const first = runFresh(setup);
+    expect(cases(first)).toEqual([
+      'interdependent A at property PA, property PB.Inner',
+      'interdependent B at property PA.InnerB, property PB',
+    ]);
+    expect(gateFails(first)).toBe(true);
+    expect(typeGate(first, { mappingFile: MAPPING_FILE, baselineVersion: '1.2.3' }).entries).toContain(
+      `${RESOURCE}: A is interdependent`,
+    );
+
+    const second = runFresh(setup, [chosen(first, 'keep-old')]);
+    expect(cases(second)).toEqual([]);
+    expect(switched(second)).toEqual(['B -> B1 at property PB', 'B -> B2 at property PA.InnerB']);
+    expect(history(resource(db).properties.PA)[0]).toEqual('A');
   });
 
   describe('a merge or split whose positions need different fields, with nothing new, also follows CloudFormation', () => {
