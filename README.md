@@ -78,6 +78,15 @@ The build applies these rules after the sources that define types:
 4. Resources, properties, attributes and fields that no current source has leave the L1.
 5. The existing rules for `json` to `string` and `date-time` to `string` changes stay.
 
+Merged and split types follow CloudFormation once they gain a field. A merge is several released types that
+CloudFormation continues as one type; a split is one released type whose positions CloudFormation now gives more than
+one type. While none of CloudFormation's types there has a field the released type lacks, the released names stay.
+Once one has, the L1 renders CloudFormation's type wherever it has another name: for a merge, at the positions of
+every merged released type together, and for a split, at each position where CloudFormation renamed the type, while a
+position where CloudFormation kept the released name keeps it. The build does this by itself, without a mapping
+entry, and the gate and the L1 change report list each switch as a type break. A field CloudFormation removed, with
+nothing new, does not switch a type.
+
 ### Type history gate
 
 Where the rules cannot decide, a person must. The `build` job fails on pull requests and in the merge queue when
@@ -85,13 +94,17 @@ Where the rules cannot decide, a person must. The `build` job fails on pull requ
 
 * **No pair**: at a position where CloudFormation changed the type, no type shares a field with the released one.
 * **Ambiguous candidates**: at such a position, more than one type does.
-* **Unsettled merge**: CloudFormation merged the released type into another, and its positions need different fields.
-* **Unsettled split**: CloudFormation renamed the released type at a position, and its positions need different fields.
-* **Diverging shared type**: CloudFormation's types at the positions of the released type need different fields.
+* **Unsettled merge**: CloudFormation merged the released type into another without a new field, and its positions
+  need different fields.
+* **Unsettled split**: CloudFormation gives the positions of the released type several types without a new field, and
+  they need different fields.
+* **Diverging shared type**: the positions where the released type keeps its name need different fields, for example
+  where CloudFormation's type at one of them is any JSON and at another a type with other fields.
 
 For each case it prints the resource, the positions and the released type, and one entry per kind that decides it.
 The step also writes these entries to the `type-mapping-entries` build artifact. Settled renames, merges and splits,
-and the changes to the L1 since the released database, are printed but do not fail the gate.
+merged and split types that follow CloudFormation, and the changes to the L1 since the released database, are printed
+but do not fail the gate.
 
 Among the settled renames, merges and splits, the gate also lists as weak matches each current type that shares fewer
 than half of the released type's fields, by name, and each one paired with a released type without fields (as 0 of
@@ -115,7 +128,8 @@ released `oldType`, the current `newTypes`, the `kind`, the `reason` and the `pr
 | `follow-cloudformation` | At the positions of the released type, the L1 renders CloudFormation's type |
 
 `split`, `replace` and `follow-cloudformation` change the type at some positions, which breaks code that uses the
-released type there. A malformed entry fails the build, naming the entry. An entry for a resource or type that the
+released type there. An entry wins over the rule for merged and split types, so `merge` or `keep-old` keeps a
+released name on purpose. A malformed entry fails the build, naming the entry. An entry for a resource or type that the
 sources do not have yet applies nowhere and is only reported, so it can merge before the source update that needs it.
 
 When the gate fails on a source update pull request:
