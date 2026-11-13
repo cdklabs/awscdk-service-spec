@@ -214,13 +214,13 @@
     },
     "update-source:released-database": {
       "name": "update-source:released-database",
-      "description": "Download the database of @aws-cdk/aws-service-spec 0.1.227 (the version in packages/@aws-cdk/aws-service-spec/build/released-database.json) into sources/ReleasedDatabase",
+      "description": "Download the database of @aws-cdk/aws-service-spec 0.1.231 (the version in packages/@aws-cdk/aws-service-spec/build/released-database.json) into sources/ReleasedDatabase",
       "steps": [
         {
-          "exec": "node ./scripts/download.task.js https://registry.npmjs.org/@aws-cdk/aws-service-spec/-/aws-service-spec-0.1.227.tgz sources/ReleasedDatabase/db.json.gz --tarball-entry package/db.json.gz --integrity sha512-kYSro1A57ewfcfypEPU+XWq9Blqm0YAD80AbxIwUlEaFQ38oxcXvqN5f3qmHqXyAtMI2Q5F6kjwPV/iP3yUQ2g=="
+          "exec": "node ./scripts/download.task.js https://registry.npmjs.org/@aws-cdk/aws-service-spec/-/aws-service-spec-0.1.231.tgz sources/ReleasedDatabase/db.json.gz --tarball-entry package/db.json.gz --integrity sha512-Cq+z+wDZSujf+2NZlKd5rzrLP40yBWrTpnR5vbeprB2CNRpAFoSv+iwqQEOs3pivn2za41I3Ysas8EyLX0Ot3g=="
         },
         {
-          "exec": "echo 0.1.227 > sources/ReleasedDatabase/VERSION"
+          "exec": "echo 0.1.231 > sources/ReleasedDatabase/VERSION"
         }
       ]
     },
