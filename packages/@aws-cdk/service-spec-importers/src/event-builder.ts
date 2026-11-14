@@ -176,7 +176,7 @@ export class EventBuilder extends PropertyBagBuilder {
         return {
           eventTypeDefinitionBuilder: new EventTypeDefinitionBuilder(this.db, existing),
           freshInDb: true,
-          freshInSession: true,
+          freshInSession,
         };
       }
       return {
