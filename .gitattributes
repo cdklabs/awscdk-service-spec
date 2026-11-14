@@ -17,6 +17,7 @@
 /.github/workflows/update-source-documentation.yml linguist-generated
 /.github/workflows/update-source-eventbridge-schema.yml linguist-generated
 /.github/workflows/update-source-log-source-resource.yml linguist-generated
+/.github/workflows/update-source-released-database.yml linguist-generated
 /.github/workflows/update-source-sam-spec.yml linguist-generated
 /.github/workflows/update-source-sam.yml linguist-generated
 /.github/workflows/update-source-stateful-resources.yml linguist-generated
@@ -42,7 +43,9 @@
 /nx.json linguist-generated
 /package.json linguist-generated
 /projenrc/tsconfig.json linguist-generated linguist-language=JSON-with-Comments
+/sources/ReleasedDatabase/VERSION linguist-generated
 /tsconfig.json linguist-generated linguist-language=JSON-with-Comments
 /yarn.config.cjs linguist-generated
 /yarn.lock linguist-generated
 sources/**/*.json filter=lfs diff=lfs merge=lfs -text linguist-generated=true
+sources/**/*.json.gz filter=lfs diff=lfs merge=lfs -text linguist-generated=true

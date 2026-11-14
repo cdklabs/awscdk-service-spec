@@ -211,6 +211,26 @@ test('a prop+attr of the same name will not be overwritten', () => {
   });
 });
 
+test('a resource first created by the legacy spec is linked to the regions of the registry imports', () => {
+  ResourceSpecImporter.importTypes({
+    db,
+    specification: { ResourceSpecificationVersion: '0', ResourceTypes: { [RESOURCE]: {} }, PropertyTypes: {} },
+  });
+  for (const region of ['us-east-1', 'us-west-2']) {
+    importCloudFormationRegistryResource({
+      db,
+      report,
+      region,
+      resource: { description: 'Test resource', typeName: RESOURCE, properties: {} },
+    });
+  }
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', RESOURCE).only();
+  const service = db.incoming('hasResource', resource).only().entity;
+  expect(db.incoming('regionHasResource', resource).map((r) => r.entity.name)).toEqual(['us-east-1', 'us-west-2']);
+  expect(db.incoming('regionHasService', service).map((r) => r.entity.name)).toEqual(['us-east-1', 'us-west-2']);
+});
+
 function importBoth(options: {
   spec: resourcespec.ResourceType;
   specTypes?: Record<string, resourcespec.PropertyType>;

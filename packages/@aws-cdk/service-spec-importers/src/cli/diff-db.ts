@@ -1,8 +1,9 @@
 import { emptyDatabase, loadDatabase } from '@aws-cdk/service-spec-types';
 import { Command } from 'commander';
-import { handleFailure } from './util';
+import { CliError, handleFailure } from './util';
 import { DbDiff } from '../db-diff';
 import { DiffFormatter } from '../diff-fmt';
+import { compareL1, formatL1Changes, hasL1Loss } from '../l1-compat';
 
 async function main() {
   const program = new Command();
@@ -13,9 +14,24 @@ async function main() {
     .argument('<db1>', 'First database file')
     .argument('[db2]', 'Second database file')
     .option('-j, --json', 'Output json', false)
+    .option(
+      '--l1-compat',
+      'Compare the L1 code CDK renders from <db1> (a released database) and <db2>, instead of the databases. Exits with 1 if <db2> lost released type history',
+      false,
+    )
     .parse();
   const options = program.opts();
   const args = program.args;
+
+  if (options.l1Compat) {
+    if (!args[1]) {
+      throw new CliError('--l1-compat needs two databases: the released database and the new database');
+    }
+    const changes = compareL1(await loadDatabase(args[0]), await loadDatabase(args[1]));
+    console.log(options.json ? JSON.stringify(changes, undefined, 2) : formatL1Changes(changes));
+    process.exitCode = hasL1Loss(changes) ? 1 : 0;
+    return;
+  }
 
   let db1;
   let db2;
