@@ -2,6 +2,7 @@ import {
   Attribute,
   Deprecation,
   Property,
+  PropertyType,
   Resource,
   ResourceProperties,
   RichProperty,
@@ -167,10 +168,17 @@ export class PropertyBagBuilder {
     });
 
     // Special field handling
+    const typeDefinitionsBefore = typeDefinitionIds(new RichProperty(prop).types());
     for (const type of updates.previousTypes ?? []) {
       new RichProperty(prop).updateType(type);
     }
     new RichProperty(prop).updateType(updates.type);
+
+    const typeDefinitionsAfter = new Set(typeDefinitionIds(new RichProperty(prop).types()));
+    const replaced = typeDefinitionsBefore.filter((id) => !typeDefinitionsAfter.has(id));
+    if (replaced.length > 0) {
+      this.typeDefinitionsReplaced(replaced);
+    }
 
     function copyDefined(upds: AllFieldsGiven<Partial<Property>>) {
       for (const [key, value] of Object.entries(upds)) {
@@ -180,6 +188,13 @@ export class PropertyBagBuilder {
       }
     }
   }
+
+  /**
+   * Called with the ids of the type definitions that a merged property no longer refers to
+   *
+   * This happens when a source replaces the type definition of a property (see `RichTypedField.updateType`).
+   */
+  protected typeDefinitionsReplaced(_ids: string[]) {}
 
   /**
    * Remove settings that are equal to their defaults
@@ -206,6 +221,11 @@ export class ResourceBuilder extends PropertyBagBuilder {
   private allProperties: ResourceProperties = {};
 
   private candidateAttributes: ResourceProperties = {};
+
+  /**
+   * Ids of the type definitions that a source replaced in a property or field of this resource
+   */
+  private readonly replacedTypeDefinitions = new Set<string>();
 
   constructor(public readonly db: SpecDatabase, private readonly resource: Resource) {
     super(resource);
@@ -397,13 +417,13 @@ export class ResourceBuilder extends PropertyBagBuilder {
       // properties, we want to add them to the type definition.
       if (!Object.keys(properties).every((element) => Object.keys(existing.properties).includes(element))) {
         return {
-          typeDefinitionBuilder: new TypeDefinitionBuilder(this.db, existing),
+          typeDefinitionBuilder: this.newTypeDefinitionBuilder(existing),
           freshInDb: true,
           freshInSession: true,
         };
       }
       return {
-        typeDefinitionBuilder: new TypeDefinitionBuilder(this.db, existing),
+        typeDefinitionBuilder: this.newTypeDefinitionBuilder(existing),
         freshInDb: false,
         freshInSession,
       };
@@ -417,7 +437,7 @@ export class ResourceBuilder extends PropertyBagBuilder {
     this.db.link('usesType', this.resource, typeDef);
     this.typeDefinitions.set(typeName, typeDef);
 
-    const builder = new TypeDefinitionBuilder(this.db, typeDef);
+    const builder = this.newTypeDefinitionBuilder(typeDef);
     return { typeDefinitionBuilder: builder, freshInDb: true, freshInSession };
   }
 
@@ -432,7 +452,68 @@ export class ResourceBuilder extends PropertyBagBuilder {
       this.commitAttribute(name, attr);
     }
 
+    this.stopRenderingReplacedTypeDefinitions();
+
     return this.resource;
+  }
+
+  protected typeDefinitionsReplaced(ids: string[]) {
+    for (const id of ids) {
+      this.replacedTypeDefinitions.add(id);
+    }
+  }
+
+  private newTypeDefinitionBuilder(typeDef: TypeDefinition) {
+    return new TypeDefinitionBuilder(this.db, typeDef, (ids) => this.typeDefinitionsReplaced(ids));
+  }
+
+  /**
+   * Stop rendering the replaced type definitions that nothing in the resource refers to any more
+   *
+   * The legacy spec flags the type definitions that none of its properties use with `mustRenderForBwCompat`, and
+   * CDK renders those anyway. A type definition that a source replaced with another one is gone from that source,
+   * so CDK stops rendering it, and the type definitions that only it referred to.
+   */
+  private stopRenderingReplacedTypeDefinitions() {
+    if (this.replacedTypeDefinitions.size === 0) {
+      return;
+    }
+
+    const replaced = this.reachableTypeDefinitions([...this.replacedTypeDefinitions]);
+    const inUse = this.reachableTypeDefinitions([
+      ...[...Object.values(this.resource.properties), ...Object.values(this.resource.attributes)].flatMap((prop) =>
+        typeDefinitionIds(new RichProperty(prop).types()),
+      ),
+      ...[...this.typeDefinitions.values()]
+        .filter((typeDef) => typeDef.mustRenderForBwCompat && !replaced.has(typeDef.$id))
+        .map((typeDef) => typeDef.$id),
+    ]);
+
+    for (const id of replaced) {
+      if (!inUse.has(id)) {
+        delete this.db.get('typeDefinition', id).mustRenderForBwCompat;
+      }
+    }
+    this.replacedTypeDefinitions.clear();
+  }
+
+  /**
+   * The given type definitions and the ones that their fields refer to, through any type in the type histories
+   */
+  private reachableTypeDefinitions(ids: string[]): Set<string> {
+    const ret = new Set<string>();
+    const queue = [...ids];
+    while (queue.length > 0) {
+      const id = queue.pop()!;
+      if (ret.has(id)) {
+        continue;
+      }
+      ret.add(id);
+      for (const prop of Object.values(this.db.get('typeDefinition', id).properties)) {
+        queue.push(...typeDefinitionIds(new RichProperty(prop).types()));
+      }
+    }
+    return ret;
   }
 
   private commitAttribute(name: string, attr: Attribute) {
@@ -459,8 +540,20 @@ export type TypeDefinitionFields = Pick<TypeDefinition, 'documentation' | 'mustR
 export class TypeDefinitionBuilder extends PropertyBagBuilder {
   private readonly fields: TypeDefinitionFields = {};
 
-  constructor(public readonly db: SpecDatabase, private readonly typeDef: TypeDefinition) {
+  /**
+   * @param onTypeDefinitionsReplaced called with the ids of the type definitions that a merged field no longer
+   * refers to
+   */
+  constructor(
+    public readonly db: SpecDatabase,
+    private readonly typeDef: TypeDefinition,
+    private readonly onTypeDefinitionsReplaced?: (ids: string[]) => void,
+  ) {
     super(typeDef);
+  }
+
+  protected typeDefinitionsReplaced(ids: string[]) {
+    this.onTypeDefinitionsReplaced?.(ids);
   }
 
   public setFields(fields: TypeDefinitionFields) {
@@ -476,6 +569,25 @@ export class TypeDefinitionBuilder extends PropertyBagBuilder {
 
 function last<A>(xs: A[]): A {
   return xs[xs.length - 1];
+}
+
+/**
+ * The ids of the type definitions that the given types refer to, looking into lists, maps and unions
+ */
+function typeDefinitionIds(types: PropertyType[]): string[] {
+  return types.flatMap((type): string[] => {
+    switch (type.type) {
+      case 'array':
+      case 'map':
+        return typeDefinitionIds([type.element]);
+      case 'union':
+        return typeDefinitionIds(type.types);
+      case 'ref':
+        return [type.reference.$ref];
+      default:
+        return [];
+    }
+  });
 }
 
 /**

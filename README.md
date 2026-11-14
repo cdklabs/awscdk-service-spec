@@ -19,9 +19,16 @@ from older sources.
 * **Properties are added**: new properties are added into existing resources and type definitions. Existing properties (and attributes)
   will never be removed.
 * **Property type information is added**: when a new type is found, the old type is moved to the `previousTypes` array.
-  However, for backwards compatibility reasons, CDK will currently (only) render the oldest type it can find. Newer types can
-  be also rendered in the future, but are not right now. In a model diff, type history is rendered with a `⇐` between them, in order
-  from new to old. If you see `type1 ⇐ type2 ⇐ type3`, then `type3` is the oldest and is the one that will be used by CDK.
+  For backwards compatibility, CDK renders the oldest type it can find, so a property keeps its L1 type when a later
+  source changes it, for example from `json` to a struct or a union, from `integer` to `number`, or from a struct to `json`.
+  In a model diff, type history is rendered with a `⇐` between them, in order from new to old. If you see
+  `type1 ⇐ type2 ⇐ type3`, then `type3` is the oldest and is the one that will be used by CDK.
+* **Renamed and merged structs are replaced**: when a later source gives a property or a field another struct (type
+  definition) than the one it has, also as the element of the same list or map, the source has renamed that struct or
+  merged it with another one. The new struct replaces the old one instead of being added to the type history, so CDK
+  renders the struct that CloudFormation uses now, with its current fields, and no longer renders the old struct when
+  nothing else uses it. Code that names the old struct needs the new name. When regions disagree, the struct of the region
+  imported last wins, like the overwritten attributes below.
 * **Other property attributes are overwritten**: things like documentation, optionality, etc. are overwritten, so newer specifications
   fully overwrite the information from older specifications.
 
@@ -41,6 +48,29 @@ Sources are read in this order:
 | Canned Metrics | An import of an inventory of metrics for various resource types, built by the AWS CloudWatch team for their console | Manual |
 | Scrutinies | A classification of a number of resources and resource properties, indicating whether they contain IAM Policies or not | Manual |
 | Augmentations | A manual declaration of a set of resource-related metrics, used in CDK code generation | Manual |
+
+## L1 changes in pull requests
+
+The `diff-db` job of every pull request compares the L1 code that CDK renders from the database of the base branch with
+the L1 code it renders from the database of the pull request, and adds the result to its pull request comment: renamed and
+merged structs with their field differences, removed fields, requiredness changes and other changes. The report does not
+fail the job. To run it locally:
+
+```sh
+packages/@aws-cdk/service-spec-importers/bin/diff-db --l1-changes <base db.json.gz> <new db.json.gz>
+```
+
+The `build` job fails when the L1 misses a field that a current CloudFormation schema accepts as input, on pull
+requests and in the merge queue, and its log lists the missing fields. When the build passes, the `diff-db` job adds
+the result of the same check to its comment. Fields in the schema's `readOnlyProperties` are not input unless they are
+also in `createOnlyProperties`, and where the L1 type is `json` it accepts every field. A missing field usually means
+that the L1 renders an older type of the property, for example while regions disagree on a renamed struct. The check
+also fails when it finds no schema. To run it locally after a build:
+
+```sh
+cd packages/@aws-cdk/aws-service-spec
+npx projen check-input-fields [<db.json.gz>]
+```
 
 ## Contributing
 
