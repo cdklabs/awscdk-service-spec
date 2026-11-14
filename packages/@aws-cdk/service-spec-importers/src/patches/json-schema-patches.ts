@@ -239,7 +239,7 @@ function deepMerge(x: any, y: any): any {
     if (Array.isArray(v) && Array.isArray(returnObj[k])) {
       returnObj[k].push(...v);
     } else if (typeof v === 'object' && typeof returnObj[k] === 'object') {
-      deepMerge(returnObj[k], v);
+      returnObj[k] = deepMerge(returnObj[k], v);
     } else {
       returnObj[k] = v;
     }
