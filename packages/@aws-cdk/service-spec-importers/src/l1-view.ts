@@ -73,6 +73,14 @@ export class L1View {
 }
 
 /**
+ * How the L1 change report and the type history gate name a resource property or attribute, for example
+ * `property Settings`
+ */
+export function fieldLabel(bag: 'properties' | 'attributes', name: string): string {
+  return `${bag === 'properties' ? 'property' : 'attribute'} ${name}`;
+}
+
+/**
  * The type as L1 code renders it, with structs by name
  *
  * Integers and numbers are the same in L1 code, and allowed values are not rendered.

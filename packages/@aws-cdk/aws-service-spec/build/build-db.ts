@@ -12,10 +12,10 @@ async function main() {
     // @TODO: Switch this to 'true' once validation passes (this will never happen)
     validate: false,
     debug: Boolean(process.env.DEBUG),
-  }).build();
+  }).buildWithTypeHistory();
   const importResult = report.totalCount ? `WARN (${report.totalCount} problems encountered)` : 'OK';
   process.stdout.write(`${importResult}\n`);
-  const undecided = typeHistory!.result.undecided.length;
+  const undecided = typeHistory.result.undecided.length;
   if (undecided > 0) {
     process.stdout.write(
       `Type history: ${undecided} released types undecided, 'npx projen type-gate' prints the mapping entries that decide them\n`,

@@ -1,5 +1,5 @@
 import { PropertyType, SpecDatabase, TypeDefinition } from '@aws-cdk/service-spec-types';
-import { L1View, RenderedField, renderType } from './l1-view';
+import { fieldLabel, L1View, RenderedField, renderType } from './l1-view';
 
 /**
  * A struct that the L1 renders under another name at the same positions, because its source renamed it or merged it
@@ -11,7 +11,11 @@ export interface L1StructRename {
   readonly from: string;
   /** The struct the new database renders instead */
   readonly to: string;
-  /** Where the L1 uses the struct, for example `property Destinations` or `field Settings.Filter` */
+  /**
+   * Where the L1 uses the struct, as the path from a resource property or attribute, for example
+   * `property Destinations` or `property Settings.Filter`, or as `field Struct.Field` below a struct the L1 renders only
+   * as a struct of its own
+   */
   readonly positions: string[];
   /** How the fields of `to` differ from the fields of `from`, for example `Url added` or `Port now required` */
   readonly fieldChanges: string[];
@@ -149,6 +153,8 @@ type Mutable<T> = { -readonly [K in keyof T]: T[K] };
 type MutableL1Changes = Mutable<L1Changes>;
 
 interface StructPair {
+  /** The key of the pair in `ResourceComparison.pairs` and its links */
+  readonly key: string;
   readonly base: TypeDefinition;
   readonly head: TypeDefinition;
   readonly positions: string[];
@@ -162,10 +168,22 @@ interface FieldDifferences {
   readonly type?: string;
 }
 
+/**
+ * A field of a pair of structs where another pair of structs is: `key` is that other pair
+ */
+interface PairLink {
+  readonly name: string;
+  readonly key: string;
+}
+
 class ResourceComparison {
   private readonly resourceType: string;
   private readonly pairs = new Map<string, StructPair>();
   private readonly queue = new Array<StructPair>();
+  /** The pairs at each resource property and attribute */
+  private readonly roots = new Array<{ readonly label: string; readonly key: string }>();
+  /** The pairs at the fields of each pair */
+  private readonly links = new Map<string, PairLink[]>();
 
   constructor(
     private readonly base: L1View,
@@ -177,15 +195,16 @@ class ResourceComparison {
 
   public compare() {
     for (const bag of ['properties', 'attributes'] as const) {
-      const kind = bag === 'properties' ? 'property' : 'attribute';
       for (const [name, baseField] of Object.entries(this.base[bag])) {
-        const element = `${kind} ${name}`;
+        const element = fieldLabel(bag, name);
         const headField = this.head[bag][name];
         if (!headField) {
           this.report(this.changes.removed, element, 'removed');
           continue;
         }
-        const differences = this.compareField(element, baseField, headField);
+        const differences = this.compareField(element, baseField, headField, (key) =>
+          this.roots.push({ label: element, key }),
+        );
         this.reportDifferences(element, differences);
       }
       this.changes.additions += Object.keys(this.head[bag]).filter((name) => !this.base[bag][name]).length;
@@ -201,6 +220,7 @@ class ResourceComparison {
     while (this.queue.length > 0) {
       this.comparePair(this.queue.shift()!);
     }
+    this.placeRenames();
 
     const renamed = [...this.pairs.values()].filter((p) => p.base.name !== p.head.name);
     const renamedFrom = new Set(renamed.map((p) => p.base.name));
@@ -213,16 +233,84 @@ class ResourceComparison {
   }
 
   /**
-   * Compare a rendered property, attribute or field, and pair the structs at the same places in its type
+   * Name each renamed struct's positions as the type history gate does: the path from a resource property or
+   * attribute, for example `property Checks.C`, at every path the L1 renders it
+   *
+   * A struct the L1 renders only as a struct of its own, not at any such path (for example a later type of a
+   * property's history), keeps its positions as `field Struct.Field`.
    */
-  private compareField(position: string, baseField: RenderedField, headField: RenderedField): FieldDifferences {
+  private placeRenames() {
+    const renamed = new Set([...this.pairs].filter(([, p]) => p.base.name !== p.head.name).map(([key]) => key));
+    // Walk only into pairs from which a rename can be reached, so paths are only spelled out where they are printed
+    const leadsToRename = new Set(renamed);
+    let grown = true;
+    while (grown) {
+      grown = false;
+      for (const [key, links] of this.links) {
+        if (!leadsToRename.has(key) && links.some((l) => leadsToRename.has(l.key))) {
+          leadsToRename.add(key);
+          grown = true;
+        }
+      }
+    }
+
+    const paths = new Map<string, string[]>();
+    const walk = (label: string, key: string, ancestry: string[]) => {
+      if (!leadsToRename.has(key)) {
+        return;
+      }
+      if (renamed.has(key)) {
+        paths.set(key, [...(paths.get(key) ?? []), label]);
+      }
+      // Recursive structs stop where they repeat
+      if (ancestry.includes(key)) {
+        return;
+      }
+      for (const link of this.links.get(key) ?? []) {
+        walk(`${label}.${link.name}`, link.key, [...ancestry, key]);
+      }
+    };
+    for (const root of this.roots) {
+      walk(root.label, root.key, []);
+    }
+
+    const reachable = new Set<string>();
+    const queue = this.roots.map((r) => r.key);
+    while (queue.length > 0) {
+      const key = queue.shift()!;
+      if (!reachable.has(key)) {
+        reachable.add(key);
+        queue.push(...(this.links.get(key) ?? []).map((l) => l.key));
+      }
+    }
+    for (const key of renamed) {
+      const pair = this.pairs.get(key)!;
+      const unplaced = [...this.links]
+        .filter(([parent]) => !reachable.has(parent))
+        .flatMap(([parent, links]) =>
+          links.filter((l) => l.key === key).map((l) => `field ${this.pairs.get(parent)!.head.name}.${l.name}`),
+        );
+      pair.positions.splice(0, pair.positions.length, ...unique([...(paths.get(key) ?? []), ...unplaced]));
+    }
+  }
+
+  /**
+   * Compare a rendered property, attribute or field, and pair the structs at the same places in its type, passing
+   * each pair's key to `link`
+   */
+  private compareField(
+    position: string,
+    baseField: RenderedField,
+    headField: RenderedField,
+    link: (key: string) => void,
+  ): FieldDifferences {
     const requiredness =
       baseField.required === headField.required
         ? undefined
         : headField.required
         ? 'now required'
         : 'no longer required';
-    if (this.pairStructs(position, baseField.type, headField.type)) {
+    if (this.pairStructs(position, baseField.type, headField.type, link)) {
       return { requiredness };
     }
     const baseType = renderType(this.base.db, baseField.type);
@@ -235,32 +323,40 @@ class ResourceComparison {
    *
    * Returns false if the types do not have that shape.
    */
-  private pairStructs(position: string, baseType: PropertyType, headType: PropertyType): boolean {
+  private pairStructs(
+    position: string,
+    baseType: PropertyType,
+    headType: PropertyType,
+    link: (key: string) => void,
+  ): boolean {
     if ((baseType.type === 'array' || baseType.type === 'map') && headType.type === baseType.type) {
-      return this.pairStructs(position, baseType.element, headType.element);
+      return this.pairStructs(position, baseType.element, headType.element, link);
     }
     if (baseType.type === 'ref' && headType.type === 'ref') {
-      this.pair(
-        this.base.db.get('typeDefinition', baseType.reference),
-        this.head.db.get('typeDefinition', headType.reference),
-        position,
+      link(
+        this.pair(
+          this.base.db.get('typeDefinition', baseType.reference),
+          this.head.db.get('typeDefinition', headType.reference),
+          position,
+        ),
       );
       return true;
     }
     return false;
   }
 
-  private pair(base: TypeDefinition, head: TypeDefinition, position?: string) {
+  private pair(base: TypeDefinition, head: TypeDefinition, position?: string): string {
     const key = `${base.$id} ${head.$id}`;
     let pair = this.pairs.get(key);
     if (!pair) {
-      pair = { base, head, positions: [] };
+      pair = { key, base, head, positions: [] };
       this.pairs.set(key, pair);
       this.queue.push(pair);
     }
     if (position && !pair.positions.includes(position)) {
       pair.positions.push(position);
     }
+    return key;
   }
 
   private comparePair(pair: StructPair) {
@@ -280,7 +376,9 @@ class ResourceComparison {
         }
         continue;
       }
-      const differences = this.compareField(element, baseField, headField);
+      const differences = this.compareField(element, baseField, headField, (key) =>
+        pushTo(this.links, pair.key, { name, key }),
+      );
       if (renamed) {
         fieldChanges.push(...[differences.requiredness, differences.type].filter(isDefined).map((d) => `${name} ${d}`));
       } else {
@@ -321,6 +419,10 @@ class ResourceComparison {
 
 function unique<A>(xs: A[]): A[] {
   return [...new Set(xs)];
+}
+
+function pushTo<K, V>(map: Map<K, V[]>, key: K, ...values: V[]) {
+  map.set(key, [...(map.get(key) ?? []), ...values]);
 }
 
 function isDefined<A>(x: A | undefined): x is A {

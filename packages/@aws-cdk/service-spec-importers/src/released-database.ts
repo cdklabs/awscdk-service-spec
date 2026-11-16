@@ -62,6 +62,8 @@ export async function readReleasedDatabasePins(pinsPath: string): Promise<Releas
   if (typeof pins !== 'object' || pins === null) {
     throw invalid('expected an object with version, integrity and sha256');
   }
+  // The same rules as projenrc/released-database.ts and scripts/check-released-database-bump.js: change them together
+  // (they run before this package is built, and in a plain node step)
   if (typeof pins.version !== 'string' || !/^\d+\.\d+\.\d+$/.test(pins.version)) {
     throw invalid(`version must be a version like 1.2.3, got ${JSON.stringify(pins.version)}`);
   }

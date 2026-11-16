@@ -42,40 +42,38 @@ export function typeGate(result: TypeHistoryResult, options: TypeGateOptions): T
   if (failed) {
     lines.push('', entries);
   }
-  if (result.settled.length > 0) {
-    lines.push('', 'Settled renames, merges and splits (the L1 keeps the released names):');
-    for (const s of result.settled) {
-      lines.push(
-        `  ${s.resource}: ${s.kind} ${s.releasedType} -> ${s.newTypes.join(', ')} (${s.positions.join(', ')})`,
-      );
+  const section = <A>(title: string, items: A[], format: (item: A) => string) => {
+    if (items.length > 0) {
+      lines.push('', title, ...items.map((item) => `  ${format(item)}`));
     }
-  }
-  if (result.switched.length > 0) {
-    lines.push('', "Merged and split types that follow CloudFormation's types (type breaks):");
-    for (const s of result.switched) {
-      lines.push(`  ${s.resource}: ${s.releasedType} -> ${s.newType} (${s.positions.join(', ')})`);
-    }
-  }
-  if (result.weak.length > 0) {
-    lines.push('', 'Weak matches (settled renames, merges and splits sharing fewer than half of the released fields):');
-    for (const w of result.weak) {
+  };
+  section(
+    'Settled renames, merges and splits (the L1 keeps the released names):',
+    result.settled,
+    (s) => `${s.resource}: ${s.kind} ${s.releasedType} -> ${s.newTypes.join(', ')} (${s.positions.join(', ')})`,
+  );
+  section(
+    "Merged and split types that follow CloudFormation's types (type breaks):",
+    result.switched,
+    (s) => `${s.resource}: ${s.releasedType} -> ${s.newType} (${s.positions.join(', ')})`,
+  );
+  section(
+    'Weak matches (settled renames, merges and splits sharing fewer than half of the released fields):',
+    result.weak,
+    (w) => {
       const share = `shares ${w.shared} of ${w.total} released fields`;
-      lines.push(`  ${w.resource}: ${w.releasedType} -> ${w.newType} ${share} (${w.positions.join(', ')})`);
-    }
-  }
-  if (result.applied.length > 0) {
-    lines.push('', `Applied entries of ${options.mappingFile}:`);
-    for (const a of result.applied) {
-      const { resource, kind, oldType, newTypes } = a.entry;
-      lines.push(`  ${resource}: ${kind} ${oldType} -> ${newTypes.join(', ') || '-'} (${a.positions.join(', ')})`);
-    }
-  }
-  if (result.inactive.length > 0) {
-    lines.push('', `Entries of ${options.mappingFile} that apply nowhere (reported only):`);
-    for (const i of result.inactive) {
-      lines.push(`  ${i.entry.resource}: ${i.entry.kind} ${i.entry.oldType}: ${i.reason}`);
-    }
-  }
+      return `${w.resource}: ${w.releasedType} -> ${w.newType} ${share} (${w.positions.join(', ')})`;
+    },
+  );
+  section(`Applied entries of ${options.mappingFile}:`, result.applied, ({ entry, positions }) => {
+    const { resource, kind, oldType, newTypes } = entry;
+    return `${resource}: ${kind} ${oldType} -> ${newTypes.join(', ') || '-'} (${positions.join(', ')})`;
+  });
+  section(
+    `Entries of ${options.mappingFile} that apply nowhere (reported only):`,
+    result.inactive,
+    (i) => `${i.entry.resource}: ${i.entry.kind} ${i.entry.oldType}: ${i.reason}`,
+  );
 
   return { failed, report: lines.join('\n'), entries };
 }

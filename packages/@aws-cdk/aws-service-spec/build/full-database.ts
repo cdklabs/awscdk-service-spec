@@ -1,5 +1,10 @@
 import * as path from 'node:path';
-import { DatabaseBuilder, DatabaseBuilderOptions, ReportAudience } from '@aws-cdk/service-spec-importers';
+import {
+  DatabaseBuilder,
+  DatabaseBuilderOptions,
+  ReportAudience,
+  TypeHistoryOptions,
+} from '@aws-cdk/service-spec-importers';
 import { patchOobRelationships } from '@aws-cdk/service-spec-importers/src/patches/oob-relationship-patches';
 import { SpecDatabase } from '@aws-cdk/service-spec-types';
 import { Augmentations } from './augmentations';
@@ -18,7 +23,7 @@ export const RELEASED_DATABASE = {
 };
 
 /**
- * The decisions for the released types that the matcher cannot decide
+ * A person's decisions for released types, where the matcher cannot decide or they decide otherwise
  */
 export const TYPE_MAPPINGS = path.join(__dirname, 'type-mappings.json');
 
@@ -28,7 +33,7 @@ export interface FullDatabaseOptions extends DatabaseBuilderOptions {
    *
    * @default RELEASED_DATABASE
    */
-  readonly releasedDatabase?: { readonly snapshot: string; readonly pins: string };
+  readonly releasedDatabase?: Omit<TypeHistoryOptions, 'mappings'>;
 }
 
 export class FullDatabase extends DatabaseBuilder {
@@ -53,6 +58,17 @@ export class FullDatabase extends DatabaseBuilder {
       .importAugmentations()
       .importEventBridgeSchema(path.join(SOURCES, 'EventBridgeSchema'))
       .importCfnPrimaryIdentifierOverrides(path.join(SOURCES, 'CloudFormationRefOverrides/ref-overrides.json'));
+  }
+
+  /**
+   * Build the database with the result of the type history, which the constructor always imports
+   */
+  public async buildWithTypeHistory() {
+    const built = await this.build();
+    if (!built.typeHistory) {
+      throw new Error('The full database imports the type history, but the build returned no result for it');
+    }
+    return { ...built, typeHistory: built.typeHistory };
   }
 
   /**

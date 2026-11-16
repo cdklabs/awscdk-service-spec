@@ -3,7 +3,8 @@ import { promises as fs } from 'node:fs';
 export const TYPE_MAPPING_KINDS = ['rename', 'merge', 'split', 'replace', 'keep-old', 'follow-cloudformation'] as const;
 
 /**
- * How a released type definition continues when the matcher cannot decide it
+ * How a released type definition continues where a person decides it: where the matcher cannot decide, or otherwise
+ * than the matcher would (an entry wins over every rule)
  *
  * - `rename`: the released type continues as the named current type wherever that type stands at its positions.
  * - `merge`: as `rename`, for one of several released types that continue as one current type; one entry each.
@@ -16,7 +17,8 @@ export const TYPE_MAPPING_KINDS = ['rename', 'merge', 'split', 'replace', 'keep-
 export type TypeMappingKind = (typeof TYPE_MAPPING_KINDS)[number];
 
 /**
- * A person's decision for a released type definition that the matcher cannot decide
+ * A person's decision for a released type definition: where the matcher cannot decide, or otherwise than the matcher
+ * would (an entry wins over every rule)
  */
 export interface TypeMapping {
   /** The CloudFormation resource type */

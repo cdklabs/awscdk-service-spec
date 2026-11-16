@@ -157,7 +157,9 @@ packages/@aws-cdk/service-spec-importers/bin/diff-db --l1-changes sources/Releas
 
 It lists renamed and merged structs, removed resources, properties, attributes, fields and structs, requiredness
 changes, type changes, and the fields added to structs that keep their names. The database diff comment on pull
-requests includes it.
+requests includes it. A renamed struct's positions are named as the type history gate names them, by the path from a
+resource property or attribute (for example `property Checks.C`); a change to a struct's own field is named by the
+struct and field (for example `field Check.Configuration`), once for all the struct's positions.
 
 ## Contributing
 

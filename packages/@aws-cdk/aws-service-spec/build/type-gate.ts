@@ -31,15 +31,18 @@ async function main() {
       ? { snapshot: path.resolve(values.snapshot), pins: path.resolve(values.pins) }
       : RELEASED_DATABASE;
 
-  const { db, typeHistory } = await new FullDatabase(emptyDatabase(), { validate: false, releasedDatabase }).build();
-  const gate = typeGate(typeHistory!.result, {
+  const { db, typeHistory } = await new FullDatabase(emptyDatabase(), {
+    validate: false,
+    releasedDatabase,
+  }).buildWithTypeHistory();
+  const gate = typeGate(typeHistory.result, {
     mappingFile: path.relative(ROOT, TYPE_MAPPINGS),
-    baselineVersion: typeHistory!.released.pins.version,
+    baselineVersion: typeHistory.released.pins.version,
   });
 
   console.log(gate.report);
   console.log('');
-  console.log(formatL1Changes(compareL1(typeHistory!.released.db, db)));
+  console.log(formatL1Changes(compareL1(typeHistory.released.db, db)));
   if (gate.failed && values['entries-file']) {
     await writeFile(values['entries-file'], `${gate.entries}\n`);
   }

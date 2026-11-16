@@ -5,27 +5,26 @@ import { PropertyType, RichPropertyType, SpecDatabase, TypeDefinition } from '@a
  *
  * Two types have the same shape if they have the same primitive types (integers and numbers are the same, as in L1
  * code) and matching type definitions in the same arrays, maps and unions. Two unions have the same shape if they
- * have as many members and every member of each has the same shape as a member of the other. `sameTypeDefinition`
- * decides which type definitions match.
+ * have as many members and every member of each has the same shape as a member of the other. Any two type definitions
+ * match.
  */
 export function matchShape(
   fromDb: SpecDatabase,
   from: PropertyType,
   toDb: SpecDatabase,
   to: PropertyType,
-  sameTypeDefinition: (from: TypeDefinition, to: TypeDefinition) => boolean,
 ): Array<[TypeDefinition, TypeDefinition]> | undefined {
   switch (from.type) {
     case 'array':
     case 'map':
-      return to.type === from.type ? matchShape(fromDb, from.element, toDb, to.element, sameTypeDefinition) : undefined;
+      return to.type === from.type ? matchShape(fromDb, from.element, toDb, to.element) : undefined;
     case 'union': {
       if (to.type !== 'union' || to.types.length !== from.types.length) {
         return undefined;
       }
       const matches = from.types.flatMap((fromMember, i) =>
         to.types.flatMap((toMember, j) => {
-          const pairs = matchShape(fromDb, fromMember, toDb, toMember, sameTypeDefinition);
+          const pairs = matchShape(fromDb, fromMember, toDb, toMember);
           return pairs ? [{ i, j, pairs }] : [];
         }),
       );
@@ -40,7 +39,7 @@ export function matchShape(
       }
       const fromTypeDef = fromDb.get('typeDefinition', from.reference);
       const toTypeDef = toDb.get('typeDefinition', to.reference);
-      return sameTypeDefinition(fromTypeDef, toTypeDef) ? [[fromTypeDef, toTypeDef]] : undefined;
+      return [[fromTypeDef, toTypeDef]];
     }
     default:
       return new RichPropertyType(from).javascriptEquals(to) ? [] : undefined;

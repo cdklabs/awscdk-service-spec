@@ -3,14 +3,11 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { gzipSync } from 'node:zlib';
-import { emptyDatabase, SpecDatabase } from '@aws-cdk/service-spec-types';
+import { emptyDatabase } from '@aws-cdk/service-spec-types';
+import { divergingChecks, importRegistry, object, RESOURCE, resourceTypeDefinition, writePins } from './utils';
 import { DatabaseBuilder } from '../src/db-builder';
-import { importCloudFormationRegistryResource } from '../src/importers/import-cloudformation-registry';
-import { ProblemReport } from '../src/report';
 import { typeGate } from '../src/type-gate';
 import { CloudFormationRegistryResource, jsonschema } from '../src/types';
-
-const RESOURCE = 'AWS::Some::Type';
 
 let dir: string;
 let options: { snapshot: string; pins: string; mappings: string };
@@ -23,7 +20,7 @@ beforeEach(() => {
   };
 
   // The released Checks.C renders Check, but its newest type is already CustomCheck
-  writeReleased(checks('Check'), checks('CustomCheck'));
+  writeReleased(divergingChecks('Check'), divergingChecks('CustomCheck'));
   fs.writeFileSync(options.mappings, '[]');
 });
 afterEach(() => {
@@ -38,7 +35,7 @@ test("a split type that gains a field renders CloudFormation's type there withou
   expect(result.switched.map((s) => `${s.releasedType} -> ${s.newType} at ${s.positions.join(', ')}`)).toEqual([
     'Check -> CustomCheck at property Checks.C',
   ]);
-  const checksType = typeNamed(db, 'Checks');
+  const checksType = resourceTypeDefinition(db, 'Checks');
   expect(db.get('typeDefinition', (checksType.properties.A.type as any).reference).name).toEqual('Check');
   expect(db.get('typeDefinition', (checksType.properties.C.type as any).reference).name).toEqual('CustomCheck');
 });
@@ -88,12 +85,12 @@ test('a malformed mapping entry fails the build, naming it', async () => {
 });
 
 test('a snapshot without the pinned sha256 fails the build', async () => {
-  writePins('0'.repeat(64));
+  writePins(options.pins, '0'.repeat(64));
 
   await expect(build()).rejects.toThrow(`but ${options.pins} pins ${'0'.repeat(64)}`);
 });
 
-function build(current = checks('CustomCheck')) {
+function build(current = divergingChecks('CustomCheck')) {
   return new DatabaseBuilder(emptyDatabase(), {})
     .addSourceImporter(async (db) => importRegistry(db, current))
     .importTypeHistory(options)
@@ -110,7 +107,7 @@ function writeReleased(...schemas: Array<Partial<CloudFormationRegistryResource>
   }
   const bytes = gzipSync(JSON.stringify(released.save()));
   fs.writeFileSync(options.snapshot, bytes);
-  writePins(createHash('sha256').update(bytes).digest('hex'));
+  writePins(options.pins, createHash('sha256').update(bytes).digest('hex'));
 }
 
 function settings(fields: jsonschema.ObjectProperties, name = 'Settings'): Partial<CloudFormationRegistryResource> {
@@ -118,45 +115,4 @@ function settings(fields: jsonschema.ObjectProperties, name = 'Settings'): Parti
     properties: { Settings: { $ref: `#/definitions/${name}` } },
     definitions: { [name]: object(fields) },
   };
-}
-
-function typeNamed(db: SpecDatabase, name: string) {
-  const resource = db.lookup('resource', 'cloudFormationType', 'equals', RESOURCE).only();
-  return db.follow('usesType', resource).find((t) => t.entity.name === name)!.entity;
-}
-
-function checks(cType: string): Partial<CloudFormationRegistryResource> {
-  return {
-    properties: { Checks: { $ref: '#/definitions/Checks' } },
-    definitions: {
-      Checks: object({
-        A: { $ref: '#/definitions/Check' },
-        B: { $ref: '#/definitions/Check' },
-        C: { $ref: `#/definitions/${cType}` },
-      }),
-      Check: object({ Enabled: { type: 'boolean' } }),
-      CustomCheck: object({ Enabled: { type: 'boolean' }, Configuration: { type: 'string' } }),
-    },
-  };
-}
-
-function writePins(sha256: string) {
-  fs.writeFileSync(options.pins, JSON.stringify({ version: '1.2.3', integrity: 'sha512-c29tZSBieXRlcw==', sha256 }));
-}
-
-function importRegistry(db: SpecDatabase, schema: Partial<CloudFormationRegistryResource>) {
-  importCloudFormationRegistryResource({
-    db,
-    report: new ProblemReport(),
-    resource: {
-      typeName: RESOURCE,
-      description: 'Test resource',
-      properties: {},
-      ...schema,
-    } as CloudFormationRegistryResource,
-  });
-}
-
-function object(properties: jsonschema.ObjectProperties): jsonschema.RecordLikeObject {
-  return { type: 'object', properties, additionalProperties: false };
 }

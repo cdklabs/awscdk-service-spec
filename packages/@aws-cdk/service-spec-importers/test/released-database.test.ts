@@ -4,6 +4,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { emptyDatabase } from '@aws-cdk/service-spec-types';
+import { writePins } from './utils';
 import { loadReleasedDatabase } from '../src/released-database';
 
 let dir: string;
@@ -21,7 +22,7 @@ afterEach(() => {
 test('a snapshot with the pinned sha256 loads', async () => {
   const bytes = databaseBytes('AWS::Some::Type');
   fs.writeFileSync(snapshot, bytes);
-  writePins({ sha256: sha256(bytes) });
+  writePins(pins, sha256(bytes));
 
   const released = await loadReleasedDatabase(snapshot, pins);
 
@@ -33,7 +34,7 @@ test('a snapshot whose sha256 differs from the pin fails, naming the fix', async
   const pinned = databaseBytes('AWS::Some::Type');
   const other = databaseBytes('AWS::Other::Type');
   fs.writeFileSync(snapshot, other);
-  writePins({ sha256: sha256(pinned) });
+  writePins(pins, sha256(pinned));
 
   await expect(loadReleasedDatabase(snapshot, pins)).rejects.toThrow(
     `${snapshot} has sha256 ${sha256(other)}, but ${pins} pins ${sha256(pinned)}`,
@@ -43,7 +44,7 @@ test('a snapshot whose sha256 differs from the pin fails, naming the fix', async
 
 test('a Git LFS pointer fails, naming the fix', async () => {
   fs.writeFileSync(snapshot, 'version https://git-lfs.github.com/spec/v1\noid sha256:0\nsize 1\n');
-  writePins({ sha256: sha256(databaseBytes('AWS::Some::Type')) });
+  writePins(pins, sha256(databaseBytes('AWS::Some::Type')));
 
   await expect(loadReleasedDatabase(snapshot, pins)).rejects.toThrow(
     `${snapshot} is a Git LFS pointer, not the database: run 'git lfs pull'`,
@@ -71,13 +72,6 @@ function databaseBytes(resourceType: string) {
     properties: {},
   });
   return gzipSync(JSON.stringify(db.save()));
-}
-
-function writePins(override: { sha256: string }) {
-  fs.writeFileSync(
-    pins,
-    JSON.stringify({ version: '1.2.3', integrity: 'sha512-c29tZSBieXRlcw==', ...override }, undefined, 2),
-  );
 }
 
 function sha256(bytes: Buffer) {

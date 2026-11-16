@@ -1,11 +1,11 @@
 import * as pj from 'projen';
 import { AwsCdkIntegrationTest, DiffDb, TypeScriptWorkspace, YarnMonorepo } from './projenrc';
-import { addReleasedDatabaseTask, readReleasedDatabasePins } from './projenrc/released-database';
+import { addReleasedDatabaseTask, readPinsForTasks } from './projenrc/released-database';
 import { TypeHistoryGate } from './projenrc/type-history-gate';
 import { RegionalSource, Role, ScriptSource, SingleSource, SourceProcessing } from './projenrc/update-sources';
 
 // The released database that every build keeps the L1 types of, see "Released database baseline" in README.md
-const releasedDatabasePins = readReleasedDatabasePins(__dirname);
+const releasedDatabasePins = readPinsForTasks(__dirname);
 
 const workflowRunsOn = [
   // 'ubuntu-latest',

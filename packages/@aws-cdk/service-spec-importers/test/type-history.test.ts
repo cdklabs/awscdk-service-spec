@@ -1,15 +1,23 @@
 import { emptyDatabase, Property, RichProperty, RichPropertyType, SpecDatabase } from '@aws-cdk/service-spec-types';
-import { importCloudFormationRegistryResource } from '../src/importers/import-cloudformation-registry';
-import { ResourceSpecImporter } from '../src/importers/import-resource-spec';
+import {
+  divergingChecks,
+  importLegacySpec,
+  importRegistry,
+  int,
+  object,
+  ref,
+  RESOURCE,
+  resourceTypeDefinition,
+  str,
+  strings,
+} from './utils';
 import { importTypeHistory, TypeHistoryResult, UndecidedCase } from '../src/importers/import-type-history';
 import { compareL1 } from '../src/l1-changes';
 import { L1View } from '../src/l1-view';
-import { ProblemReport } from '../src/report';
 import { typeGate } from '../src/type-gate';
 import { TypeMapping, TypeMappingKind } from '../src/type-mappings';
-import { CloudFormationRegistryResource, jsonschema, resourcespec } from '../src/types';
+import { CloudFormationRegistryResource, jsonschema } from '../src/types';
 
-const RESOURCE = 'AWS::Some::Type';
 const MAPPING_FILE = 'build/type-mappings.json';
 
 let released: SpecDatabase;
@@ -20,46 +28,47 @@ beforeEach(() => {
 });
 
 describe('cases the matcher cannot decide fail the gate, and pass with the printed entry', () => {
-  test('a struct replaced by one that shares no field has no pair', () => {
-    const setup = () => {
-      importRegistry(released, {
-        properties: { Settings: { $ref: '#/definitions/Settings' } },
-        definitions: { Settings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }) },
-      });
-      importRegistry(db, {
-        properties: { Settings: { $ref: '#/definitions/Options' } },
-        definitions: { Options: object({ Name: { type: 'string' }, Mode: { type: 'string' } }) },
-      });
-    };
+  // Released Settings {Url, Port}; CloudFormation's Settings is Options {Name, Mode}, which shares no field
+  const noPair = () => {
+    importRegistry(released, {
+      properties: { Settings: ref('Settings') },
+      definitions: { Settings: object({ Url: str(), Port: int() }) },
+    });
+    importRegistry(db, {
+      properties: { Settings: ref('Options') },
+      definitions: { Options: object({ Name: str(), Mode: str() }) },
+    });
+  };
 
-    const first = runFresh(setup);
+  test('a struct replaced by one that shares no field has no pair', () => {
+    const first = runFresh(noPair);
     expect(cases(first)).toEqual(['no-pair Settings at property Settings']);
     expect(kinds(first.undecided[0])).toEqual(['rename', 'replace', 'keep-old', 'follow-cloudformation']);
     expect(gateFails(first)).toBe(true);
 
-    const second = runFresh(setup, [chosen(first, 'replace')]);
+    const second = runFresh(noPair, [chosen(first, 'replace')]);
     expect(cases(second)).toEqual([]);
     expect(gateFails(second)).toBe(false);
     expect(history(resource(db).properties.Settings)).toEqual(['Options']);
-    expect(rendersType('Settings')).toBe(false);
+    expect(l1Structs()).not.toContain('Settings');
   });
 
   test('two current types at one position that both pair are ambiguous candidates', () => {
     const setup = () => {
       importRegistry(released, {
-        properties: { Target: { anyOf: [{ $ref: '#/definitions/Queue' }, { $ref: '#/definitions/Topic' }] } },
+        properties: { Target: { anyOf: [ref('Queue'), ref('Topic')] } },
         definitions: {
-          Queue: object({ Arn: { type: 'string' } }),
-          Topic: object({ Url: { type: 'string' } }),
+          Queue: object({ Arn: str() }),
+          Topic: object({ Url: str() }),
         },
       });
       importRegistry(db, {
         properties: {
-          Target: { anyOf: [{ $ref: '#/definitions/SqsTarget' }, { $ref: '#/definitions/SnsTarget' }] },
+          Target: { anyOf: [ref('SqsTarget'), ref('SnsTarget')] },
         },
         definitions: {
-          SqsTarget: object({ Arn: { type: 'string' }, Region: { type: 'string' } }),
-          SnsTarget: object({ Arn: { type: 'string' }, Url: { type: 'string' } }),
+          SqsTarget: object({ Arn: str(), Region: str() }),
+          SnsTarget: object({ Arn: str(), Url: str() }),
         },
       });
     };
@@ -86,12 +95,12 @@ describe('cases the matcher cannot decide fail the gate, and pass with the print
     // OldTarget, while CloudFormation's OldTarget at Other has other fields: neither a merge nor a split
     const setup = () => {
       importRegistry(released, {
-        properties: { Settings: { $ref: '#/definitions/Settings' }, Other: { $ref: '#/definitions/OldTarget' } },
-        definitions: { Settings: object({ Target: { $ref: '#/definitions/OldTarget' } }), OldTarget: arn() },
+        properties: { Settings: ref('Settings'), Other: ref('OldTarget') },
+        definitions: { Settings: object({ Target: ref('OldTarget') }), OldTarget: arn() },
       });
       importRegistry(db, {
-        properties: { Settings: {}, Other: { $ref: '#/definitions/OldTarget' } },
-        definitions: { OldTarget: object({ Arn: { type: 'string' }, State: { type: 'string' } }) },
+        properties: { Settings: {}, Other: ref('OldTarget') },
+        definitions: { OldTarget: object({ Arn: str(), State: str() }) },
       });
     };
 
@@ -115,17 +124,17 @@ describe('cases the matcher cannot decide fail the gate, and pass with the print
     // exactly the released fields
     importRegistry(released, {
       properties: {
-        First: { $ref: '#/definitions/Shared' },
-        Second: { $ref: '#/definitions/Shared' },
-        Third: { $ref: '#/definitions/Shared' },
+        First: ref('Shared'),
+        Second: ref('Shared'),
+        Third: ref('Shared'),
       },
-      definitions: { Shared: object({ Url: { type: 'string' } }) },
+      definitions: { Shared: object({ Url: str() }) },
     });
     importRegistry(db, {
-      properties: { First: { $ref: '#/definitions/Shared' }, Second: {}, Third: { $ref: '#/definitions/Other' } },
+      properties: { First: ref('Shared'), Second: {}, Third: ref('Other') },
       definitions: {
-        Shared: object({ Url: { type: 'string' }, Mode: { type: 'string' } }),
-        Other: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        Shared: object({ Url: str(), Mode: str() }),
+        Other: object({ Url: str(), Port: int() }),
       },
     });
 
@@ -138,40 +147,30 @@ describe('cases the matcher cannot decide fail the gate, and pass with the print
   });
 
   test('the printed entries are complete and the gate writes them', () => {
-    const setup = () => {
-      importRegistry(released, {
-        properties: { Settings: { $ref: '#/definitions/Settings' } },
-        definitions: { Settings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }) },
-      });
-      importRegistry(db, {
-        properties: { Settings: { $ref: '#/definitions/Options' } },
-        definitions: { Options: object({ Name: { type: 'string' }, Mode: { type: 'string' } }) },
-      });
-    };
-    const result = runFresh(setup);
-    const gate = typeGate(result, { mappingFile: MAPPING_FILE, baselineVersion: '1.2.3' });
+    const result = runFresh(noPair);
+    const output = gate(result);
 
-    expect(gate.failed).toBe(true);
-    expect(gate.entries).toContain(`${RESOURCE}: Settings has no pair`);
-    expect(gate.entries).toContain(`Add one of these entries to ${MAPPING_FILE}:`);
+    expect(output.failed).toBe(true);
+    expect(output.entries).toContain(`${RESOURCE}: Settings has no pair`);
+    expect(output.entries).toContain(`Add one of these entries to ${MAPPING_FILE}:`);
     for (const entry of result.undecided[0].entries) {
-      expect(gate.entries).toContain(JSON.stringify(entry));
+      expect(output.entries).toContain(JSON.stringify(entry));
       expect(Object.keys(entry)).toEqual(['resource', 'oldType', 'newTypes', 'kind', 'reason', 'pr']);
     }
-    expect(gate.report).toContain('Type history gate against the released database 1.2.3: FAIL (1 undecided)');
-    expect(gate.report).toContain(gate.entries);
+    expect(output.report).toContain('Type history gate against the released database 1.2.3: FAIL (1 undecided)');
+    expect(output.report).toContain(output.entries);
   });
 });
 
 describe('settled changes pass the gate', () => {
   test('a rename that adds an optional field keeps the released name with the new field', () => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/SettingsRequest' } },
-      definitions: { SettingsRequest: object({ Url: { type: 'string' } }) },
+      properties: { Settings: ref('SettingsRequest') },
+      definitions: { SettingsRequest: object({ Url: str() }) },
     });
     importRegistry(db, {
-      properties: { Settings: { $ref: '#/definitions/Settings' } },
-      definitions: { Settings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }) },
+      properties: { Settings: ref('Settings') },
+      definitions: { Settings: object({ Url: str(), Port: int() }) },
     });
 
     const result = run();
@@ -185,18 +184,18 @@ describe('settled changes pass the gate', () => {
   test('a kept type at a position whose CloudFormation type did not change carries its new fields', () => {
     // As Batch PodProperties.Metadata, which renders Metadata while CloudFormation has EksMetadata
     importRegistry(released, {
-      properties: { Pod: { $ref: '#/definitions/Pod' } },
-      definitions: { Pod: object({ Metadata: { $ref: '#/definitions/Metadata' } }), Metadata: labels() },
+      properties: { Pod: ref('Pod') },
+      definitions: { Pod: object({ Metadata: ref('Metadata') }), Metadata: labels() },
     });
     importRegistry(released, {
-      properties: { Pod: { $ref: '#/definitions/Pod' } },
-      definitions: { Pod: object({ Metadata: { $ref: '#/definitions/EksMetadata' } }), EksMetadata: labels() },
+      properties: { Pod: ref('Pod') },
+      definitions: { Pod: object({ Metadata: ref('EksMetadata') }), EksMetadata: labels() },
     });
     importRegistry(db, {
-      properties: { Pod: { $ref: '#/definitions/Pod' } },
+      properties: { Pod: ref('Pod') },
       definitions: {
-        Pod: object({ Metadata: { $ref: '#/definitions/EksMetadata' } }),
-        EksMetadata: object({ Labels: map(), Namespace: { type: 'string' }, Annotations: map() }),
+        Pod: object({ Metadata: ref('EksMetadata') }),
+        EksMetadata: object({ Labels: map(), Namespace: str(), Annotations: map() }),
       },
     });
 
@@ -213,15 +212,15 @@ describe('settled changes pass the gate', () => {
 
   test('two released types merged into one with the same fields keep their names', () => {
     importRegistry(released, {
-      properties: { Burn: { $ref: '#/definitions/BurnSettings' }, Dvb: { $ref: '#/definitions/DvbSettings' } },
+      properties: { Burn: ref('BurnSettings'), Dvb: ref('DvbSettings') },
       definitions: {
-        BurnSettings: object({ Font: { type: 'string' } }),
-        DvbSettings: object({ Font: { type: 'string' } }),
+        BurnSettings: object({ Font: str() }),
+        DvbSettings: object({ Font: str() }),
       },
     });
     importRegistry(db, {
-      properties: { Burn: { $ref: '#/definitions/BurnDvbSettings' }, Dvb: { $ref: '#/definitions/BurnDvbSettings' } },
-      definitions: { BurnDvbSettings: object({ Font: { type: 'string' } }) },
+      properties: { Burn: ref('BurnDvbSettings'), Dvb: ref('BurnDvbSettings') },
+      definitions: { BurnDvbSettings: object({ Font: str() }) },
     });
 
     const result = run();
@@ -238,15 +237,15 @@ describe('settled changes pass the gate', () => {
 
   test('two released types merged into one that lost a field keep their names without it', () => {
     importRegistry(released, {
-      properties: { First: { $ref: '#/definitions/A' }, Second: { $ref: '#/definitions/B' } },
+      properties: { First: ref('A'), Second: ref('B') },
       definitions: {
-        A: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-        B: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        A: object({ Url: str(), Port: int() }),
+        B: object({ Url: str(), Port: int() }),
       },
     });
     importRegistry(db, {
-      properties: { First: { $ref: '#/definitions/C' }, Second: { $ref: '#/definitions/C' } },
-      definitions: { C: object({ Url: { type: 'string' } }) },
+      properties: { First: ref('C'), Second: ref('C') },
+      definitions: { C: object({ Url: str() }) },
     });
 
     const result = run();
@@ -263,14 +262,14 @@ describe('settled changes pass the gate', () => {
 
   test('a shared released type split into types that lost a field keeps its name without it', () => {
     importRegistry(released, {
-      properties: { First: { $ref: '#/definitions/Shared' }, Second: { $ref: '#/definitions/Shared' } },
-      definitions: { Shared: object({ Url: { type: 'string' }, Port: { type: 'integer' } }) },
+      properties: { First: ref('Shared'), Second: ref('Shared') },
+      definitions: { Shared: object({ Url: str(), Port: int() }) },
     });
     importRegistry(db, {
-      properties: { First: { $ref: '#/definitions/FirstSettings' }, Second: { $ref: '#/definitions/SecondSettings' } },
+      properties: { First: ref('FirstSettings'), Second: ref('SecondSettings') },
       definitions: {
-        FirstSettings: object({ Url: { type: 'string' } }),
-        SecondSettings: object({ Url: { type: 'string' } }),
+        FirstSettings: object({ Url: str() }),
+        SecondSettings: object({ Url: str() }),
       },
     });
 
@@ -286,14 +285,14 @@ describe('settled changes pass the gate', () => {
 
   test('a shared released type split into types with the same fields keeps its name', () => {
     importRegistry(released, {
-      properties: { First: { $ref: '#/definitions/Shared' }, Second: { $ref: '#/definitions/Shared' } },
-      definitions: { Shared: object({ Url: { type: 'string' } }) },
+      properties: { First: ref('Shared'), Second: ref('Shared') },
+      definitions: { Shared: object({ Url: str() }) },
     });
     importRegistry(db, {
-      properties: { First: { $ref: '#/definitions/FirstSettings' }, Second: { $ref: '#/definitions/SecondSettings' } },
+      properties: { First: ref('FirstSettings'), Second: ref('SecondSettings') },
       definitions: {
-        FirstSettings: object({ Url: { type: 'string' } }),
-        SecondSettings: object({ Url: { type: 'string' } }),
+        FirstSettings: object({ Url: str() }),
+        SecondSettings: object({ Url: str() }),
       },
     });
 
@@ -310,20 +309,20 @@ describe('settled changes pass the gate', () => {
 
   test('a rename that shares one field of five keeps the released name and drops the other fields', () => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Old' } },
+      properties: { Settings: ref('Old') },
       definitions: {
         Old: object({
-          A: { type: 'string' },
-          B: { type: 'string' },
-          C: { type: 'string' },
-          D: { type: 'string' },
-          E: { type: 'string' },
+          A: str(),
+          B: str(),
+          C: str(),
+          D: str(),
+          E: str(),
         }),
       },
     });
     importRegistry(db, {
-      properties: { Settings: { $ref: '#/definitions/New' } },
-      definitions: { New: object({ A: { type: 'string' }, X: { type: 'string' } }) },
+      properties: { Settings: ref('New') },
+      definitions: { New: object({ A: str(), X: str() }) },
     });
 
     const result = run();
@@ -340,16 +339,16 @@ describe('settled changes pass the gate', () => {
 
   test('a revert to the released name keeps the released type', () => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' } },
-      definitions: { Settings: object({ Url: { type: 'string' } }) },
+      properties: { Settings: ref('Settings') },
+      definitions: { Settings: object({ Url: str() }) },
     });
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/SettingsV2' } },
-      definitions: { SettingsV2: object({ Url: { type: 'string' } }) },
+      properties: { Settings: ref('SettingsV2') },
+      definitions: { SettingsV2: object({ Url: str() }) },
     });
     importRegistry(db, {
-      properties: { Settings: { $ref: '#/definitions/Settings' } },
-      definitions: { Settings: object({ Url: { type: 'string' } }) },
+      properties: { Settings: ref('Settings') },
+      definitions: { Settings: object({ Url: str() }) },
     });
 
     const result = run();
@@ -361,15 +360,15 @@ describe('settled changes pass the gate', () => {
 
   test('a container or primitive change at a kept position keeps the released type rendered', () => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' }, Count: { type: 'string' } },
-      definitions: { Settings: object({ Url: { type: 'string' } }) },
+      properties: { Settings: ref('Settings'), Count: str() },
+      definitions: { Settings: object({ Url: str() }) },
     });
     importRegistry(db, {
       properties: {
-        Settings: { type: 'array', items: { $ref: '#/definitions/Settings' } },
-        Count: { type: 'integer' },
+        Settings: { type: 'array', items: ref('Settings') },
+        Count: int(),
       },
-      definitions: { Settings: object({ Url: { type: 'string' } }) },
+      definitions: { Settings: object({ Url: str() }) },
     });
 
     const result = run();
@@ -383,18 +382,18 @@ describe('settled changes pass the gate', () => {
   test('a resource, property, nested field and attribute that CloudFormation removed leave the L1, reported', () => {
     importRegistry(released, {
       properties: {
-        Kept: { type: 'string' },
-        Removed: { type: 'string' },
-        Settings: { $ref: '#/definitions/Settings' },
-        Arn: { type: 'string' },
+        Kept: str(),
+        Removed: str(),
+        Settings: ref('Settings'),
+        Arn: str(),
       },
-      definitions: { Settings: object({ Url: { type: 'string' }, Gone: { type: 'string' } }) },
+      definitions: { Settings: object({ Url: str(), Gone: str() }) },
       readOnlyProperties: ['/properties/Arn'],
     });
-    importRegistry(released, { properties: { Name: { type: 'string' } } }, 'AWS::Some::Removed');
+    importRegistry(released, { properties: { Name: str() } }, 'AWS::Some::Removed');
     importRegistry(db, {
-      properties: { Kept: { type: 'string' }, Settings: { $ref: '#/definitions/Settings' } },
-      definitions: { Settings: object({ Url: { type: 'string' } }) },
+      properties: { Kept: str(), Settings: ref('Settings') },
+      definitions: { Settings: object({ Url: str() }) },
     });
 
     const result = run();
@@ -412,12 +411,12 @@ describe('settled changes pass the gate', () => {
 
   test('an entry naming types the current sources lack applies nowhere and is reported', () => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' } },
-      definitions: { Settings: object({ Url: { type: 'string' } }) },
+      properties: { Settings: ref('Settings') },
+      definitions: { Settings: object({ Url: str() }) },
     });
     importRegistry(db, {
-      properties: { Settings: { $ref: '#/definitions/Settings' } },
-      definitions: { Settings: object({ Url: { type: 'string' } }) },
+      properties: { Settings: ref('Settings') },
+      definitions: { Settings: object({ Url: str() }) },
     });
     const entries = [
       mapping({ resource: 'AWS::Some::Missing', oldType: 'Settings', newTypes: ['Other'], kind: 'rename' }),
@@ -432,12 +431,12 @@ describe('settled changes pass the gate', () => {
       `${RESOURCE} Settings: the current sources do not have NotYetThere`,
     ]);
     expect(history(resource(db).properties.Settings)).toEqual(['Settings']);
-    expect(typeGate(result, { mappingFile: MAPPING_FILE, baselineVersion: '1.2.3' }).failed).toBe(false);
+    expect(gateFails(result)).toBe(false);
   });
 
   test('a json property that CloudFormation now types as a string follows the json-to-string rule', () => {
     importRegistry(released, { properties: { Policy: {} } });
-    importRegistry(db, { properties: { Policy: { type: 'string' } } });
+    importRegistry(db, { properties: { Policy: str() } });
 
     const result = run();
 
@@ -447,16 +446,16 @@ describe('settled changes pass the gate', () => {
 
   test('a released type that only the released database still describes is kept', () => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/SettingsRequest' } },
-      definitions: { SettingsRequest: object({ Url: { type: 'string' } }) },
+      properties: { Settings: ref('SettingsRequest') },
+      definitions: { SettingsRequest: object({ Url: str() }) },
     });
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' } },
-      definitions: { Settings: object({ Url: { type: 'string' } }) },
+      properties: { Settings: ref('Settings') },
+      definitions: { Settings: object({ Url: str() }) },
     });
     importRegistry(db, {
-      properties: { Settings: { $ref: '#/definitions/Settings' } },
-      definitions: { Settings: object({ Url: { type: 'string' } }) },
+      properties: { Settings: ref('Settings') },
+      definitions: { Settings: object({ Url: str() }) },
     });
 
     const result = run();
@@ -470,17 +469,17 @@ describe('settled changes pass the gate', () => {
 describe('merged and split types that gain a field or no longer fit follow CloudFormation, a reported type break', () => {
   describe('two released types merged into one that gains a field both switch to it', () => {
     const before: Partial<CloudFormationRegistryResource> = {
-      properties: { First: { $ref: '#/definitions/A' }, Second: { $ref: '#/definitions/B' } },
-      definitions: { A: object({ Url: { type: 'string' } }), B: object({ Url: { type: 'string' } }) },
+      properties: { First: ref('A'), Second: ref('B') },
+      definitions: { A: object({ Url: str() }), B: object({ Url: str() }) },
     };
     const merged = (fieldsOfC: jsonschema.ObjectProperties, required?: string[]) => ({
-      properties: { First: { $ref: '#/definitions/C' }, Second: { $ref: '#/definitions/C' } },
+      properties: { First: ref('C'), Second: ref('C') },
       definitions: { C: object(fieldsOfC, required) },
     });
 
     test('in the build that merges them', () => {
       importRegistry(released, before);
-      importRegistry(db, merged({ Url: { type: 'string' }, X: { type: 'string' } }, ['X']));
+      importRegistry(db, merged({ Url: str(), X: str() }, ['X']));
 
       const result = run();
 
@@ -497,14 +496,14 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
 
     test('in a later build whose released database has the merge', () => {
       importRegistry(released, before);
-      importRegistry(db, merged({ Url: { type: 'string' } }));
+      importRegistry(db, merged({ Url: str() }));
       run();
       const baseline = emptyDatabase();
       baseline.load(JSON.parse(JSON.stringify(db.save())));
 
       released = baseline;
       db = emptyDatabase();
-      importRegistry(db, merged({ Url: { type: 'string' }, X: { type: 'string' } }, ['X']));
+      importRegistry(db, merged({ Url: str(), X: str() }, ['X']));
       const result = run();
 
       expect(cases(result)).toEqual([]);
@@ -518,7 +517,7 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
 
     test('unless a merge entry for each keeps their names', () => {
       importRegistry(released, before);
-      importRegistry(db, merged({ Url: { type: 'string' }, X: { type: 'string' } }, ['X']));
+      importRegistry(db, merged({ Url: str(), X: str() }, ['X']));
 
       const result = run([
         mapping({ resource: RESOURCE, oldType: 'A', newTypes: ['C'], kind: 'merge' }),
@@ -527,7 +526,7 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
 
       expect(cases(result)).toEqual([]);
       expect(switched(result)).toEqual([]);
-      expect(result.applied.map((a) => `${a.entry.kind} ${a.entry.oldType}`)).toEqual(['merge A', 'merge B']);
+      expect(applied(result)).toEqual(['merge A', 'merge B']);
       expect(history(resource(db).properties.First)).toEqual(['A', 'C']);
       expect(history(resource(db).properties.Second)).toEqual(['B', 'C']);
       expect(fields('A')).toEqual({ Url: 'string', X: 'string (required)' });
@@ -538,21 +537,21 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
 
   test('a merge entry for the merged type that lacks the field keeps only that one, and the other switches', () => {
     importRegistry(released, {
-      properties: { First: { $ref: '#/definitions/A' }, Second: { $ref: '#/definitions/B' } },
+      properties: { First: ref('A'), Second: ref('B') },
       definitions: {
-        A: object({ Url: { type: 'string' } }),
-        B: object({ Url: { type: 'string' }, Mode: { type: 'string' } }),
+        A: object({ Url: str() }),
+        B: object({ Url: str(), Mode: str() }),
       },
     });
     importRegistry(db, {
-      properties: { First: { $ref: '#/definitions/C' }, Second: { $ref: '#/definitions/C' } },
-      definitions: { C: object({ Url: { type: 'string' }, Mode: { type: 'string' } }) },
+      properties: { First: ref('C'), Second: ref('C') },
+      definitions: { C: object({ Url: str(), Mode: str() }) },
     });
 
     const result = run([mapping({ resource: RESOURCE, oldType: 'A', newTypes: ['C'], kind: 'merge' })]);
 
     expect(cases(result)).toEqual([]);
-    expect(result.applied.map((a) => `${a.entry.kind} ${a.entry.oldType}`)).toEqual(['merge A']);
+    expect(applied(result)).toEqual(['merge A']);
     expect(switched(result)).toEqual(['B -> C at property Second']);
     expect(history(resource(db).properties.First)).toEqual(['A', 'C']);
     expect(history(resource(db).properties.Second)).toEqual(['C']);
@@ -561,14 +560,14 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
 
   test('every split type that gains the same field switches at its own position', () => {
     importRegistry(released, {
-      properties: { First: { $ref: '#/definitions/Shared' }, Second: { $ref: '#/definitions/Shared' } },
-      definitions: { Shared: object({ Url: { type: 'string' } }) },
+      properties: { First: ref('Shared'), Second: ref('Shared') },
+      definitions: { Shared: object({ Url: str() }) },
     });
     importRegistry(db, {
-      properties: { First: { $ref: '#/definitions/FirstSettings' }, Second: { $ref: '#/definitions/SecondSettings' } },
+      properties: { First: ref('FirstSettings'), Second: ref('SecondSettings') },
       definitions: {
-        FirstSettings: object({ Url: { type: 'string' }, X: { type: 'string' } }),
-        SecondSettings: object({ Url: { type: 'string' }, X: { type: 'string' } }),
+        FirstSettings: object({ Url: str(), X: str() }),
+        SecondSettings: object({ Url: str(), X: str() }),
       },
     });
 
@@ -590,15 +589,15 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
 
   test('every merged type switches when the merged type has a field that one of them lacks', () => {
     importRegistry(released, {
-      properties: { First: { $ref: '#/definitions/A' }, Second: { $ref: '#/definitions/B' } },
+      properties: { First: ref('A'), Second: ref('B') },
       definitions: {
-        A: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-        B: object({ Url: { type: 'string' } }),
+        A: object({ Url: str(), Port: int() }),
+        B: object({ Url: str() }),
       },
     });
     importRegistry(db, {
-      properties: { First: { $ref: '#/definitions/C' }, Second: { $ref: '#/definitions/C' } },
-      definitions: { C: object({ Url: { type: 'string' }, Port: { type: 'integer' } }) },
+      properties: { First: ref('C'), Second: ref('C') },
+      definitions: { C: object({ Url: str(), Port: int() }) },
     });
 
     const result = run();
@@ -613,24 +612,24 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
   test('a merged type keeps its name where CloudFormation keeps it', () => {
     importRegistry(released, {
       properties: {
-        First: { $ref: '#/definitions/FirstSettings' },
-        Second: { $ref: '#/definitions/SecondSettings' },
-        Third: { $ref: '#/definitions/FirstSettings' },
+        First: ref('FirstSettings'),
+        Second: ref('SecondSettings'),
+        Third: ref('FirstSettings'),
       },
       definitions: {
-        FirstSettings: object({ Url: { type: 'string' } }),
-        SecondSettings: object({ Url: { type: 'string' } }),
+        FirstSettings: object({ Url: str() }),
+        SecondSettings: object({ Url: str() }),
       },
     });
     importRegistry(db, {
       properties: {
-        First: { $ref: '#/definitions/Settings' },
-        Second: { $ref: '#/definitions/Settings' },
-        Third: { $ref: '#/definitions/FirstSettings' },
+        First: ref('Settings'),
+        Second: ref('Settings'),
+        Third: ref('FirstSettings'),
       },
       definitions: {
-        Settings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-        FirstSettings: object({ Url: { type: 'string' } }),
+        Settings: object({ Url: str(), Port: int() }),
+        FirstSettings: object({ Url: str() }),
       },
     });
 
@@ -649,25 +648,53 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
     expect(l1Renames()).toEqual(['FirstSettings, SecondSettings -> Settings at property First, property Second']);
   });
 
+  test('a merge with nothing new follows CloudFormation where one of its types also belongs to a merge that switches', () => {
+    // A and B merge into C, which has X that A lacks, so A and B switch; B and F also merge into D, which has nothing
+    // new for either, so F switches only because B does
+    importRegistry(released, {
+      properties: { First: ref('A'), Second: ref('B'), Third: ref('B'), Fourth: ref('F') },
+      definitions: {
+        A: object({ Url: str() }),
+        B: object({ Url: str(), X: str() }),
+        F: object({ Url: str(), X: str() }),
+      },
+    });
+    importRegistry(db, {
+      properties: { First: ref('C'), Second: ref('C'), Third: ref('D'), Fourth: ref('D') },
+      definitions: { C: object({ Url: str(), X: str() }), D: object({ Url: str(), X: str() }) },
+    });
+
+    const result = run();
+
+    expect(cases(result)).toEqual([]);
+    expect(switched(result)).toEqual([
+      'A -> C at property First',
+      'B -> C at property Second',
+      'B -> D at property Third',
+      'F -> D at property Fourth',
+    ]);
+    expect(history(resource(db).properties.Fourth)).toEqual(['D']);
+  });
+
   test('a released type merged with one whose split follows CloudFormation follows it too', () => {
     // A is split into C and D, and D has Port; B is merged with A into C, which has nothing new
     importRegistry(released, {
       properties: {
-        First: { $ref: '#/definitions/A' },
-        Second: { $ref: '#/definitions/B' },
-        Third: { $ref: '#/definitions/A' },
+        First: ref('A'),
+        Second: ref('B'),
+        Third: ref('A'),
       },
-      definitions: { A: object({ Url: { type: 'string' } }), B: object({ Url: { type: 'string' } }) },
+      definitions: { A: object({ Url: str() }), B: object({ Url: str() }) },
     });
     importRegistry(db, {
       properties: {
-        First: { $ref: '#/definitions/C' },
-        Second: { $ref: '#/definitions/C' },
-        Third: { $ref: '#/definitions/D' },
+        First: ref('C'),
+        Second: ref('C'),
+        Third: ref('D'),
       },
       definitions: {
-        C: object({ Url: { type: 'string' } }),
-        D: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        C: object({ Url: str() }),
+        D: object({ Url: str(), Port: int() }),
       },
     });
 
@@ -684,14 +711,14 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
 
   test('a split position whose type gains a field renders it, and a position CloudFormation kept keeps its name', () => {
     importRegistry(released, {
-      properties: { First: { $ref: '#/definitions/Shared' }, Second: { $ref: '#/definitions/Shared' } },
-      definitions: { Shared: object({ Url: { type: 'string' } }) },
+      properties: { First: ref('Shared'), Second: ref('Shared') },
+      definitions: { Shared: object({ Url: str() }) },
     });
     importRegistry(db, {
-      properties: { First: { $ref: '#/definitions/Shared' }, Second: { $ref: '#/definitions/SecondSettings' } },
+      properties: { First: ref('Shared'), Second: ref('SecondSettings') },
       definitions: {
-        Shared: object({ Url: { type: 'string' } }),
-        SecondSettings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        Shared: object({ Url: str() }),
+        SecondSettings: object({ Url: str(), Port: int() }),
       },
     });
 
@@ -709,14 +736,14 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
 
   test('a split whose positions CloudFormation all renamed renders its types where one gains a field', () => {
     importRegistry(released, {
-      properties: { First: { $ref: '#/definitions/Shared' }, Second: { $ref: '#/definitions/Shared' } },
-      definitions: { Shared: object({ Url: { type: 'string' } }) },
+      properties: { First: ref('Shared'), Second: ref('Shared') },
+      definitions: { Shared: object({ Url: str() }) },
     });
     importRegistry(db, {
-      properties: { First: { $ref: '#/definitions/FirstSettings' }, Second: { $ref: '#/definitions/SecondSettings' } },
+      properties: { First: ref('FirstSettings'), Second: ref('SecondSettings') },
       definitions: {
-        FirstSettings: object({ Url: { type: 'string' } }),
-        SecondSettings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        FirstSettings: object({ Url: str() }),
+        SecondSettings: object({ Url: str(), Port: int() }),
       },
     });
 
@@ -744,25 +771,25 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
     const setup = (withT: boolean, zFields: jsonschema.ObjectProperties) => {
       importRegistry(released, {
         properties: {
-          Second: { $ref: '#/definitions/X' },
-          ...(withT ? { Q: { $ref: '#/definitions/T' }, Q2: { $ref: '#/definitions/T' } } : {}),
+          Second: ref('X'),
+          ...(withT ? { Q: ref('T'), Q2: ref('T') } : {}),
         },
         definitions: {
-          T: object({ Inner: { $ref: '#/definitions/X' }, Name: { type: 'string' } }),
-          X: object({ Url: { type: 'string' }, Sub: { $ref: '#/definitions/Leaf' } }),
-          Leaf: object({ A: { type: 'string' } }),
+          T: object({ Inner: ref('X'), Name: str() }),
+          X: object({ Url: str(), Sub: ref('Leaf') }),
+          Leaf: object({ A: str() }),
         },
       });
       importRegistry(db, {
         properties: {
-          Second: { $ref: '#/definitions/Y' },
-          ...(withT ? { Q: { $ref: '#/definitions/T2' }, Q2: { $ref: '#/definitions/T' } } : {}),
+          Second: ref('Y'),
+          ...(withT ? { Q: ref('T2'), Q2: ref('T') } : {}),
         },
         definitions: {
-          Y: object({ Url: { type: 'string' }, Sub: { $ref: '#/definitions/Leaf2' } }),
-          Leaf2: object({ A: { type: 'string' }, B: { type: 'string' } }),
-          T2: object({ Inner: { $ref: '#/definitions/Z' }, Name: { type: 'string' }, Extra: { type: 'string' } }),
-          T: object({ Name: { type: 'string' } }),
+          Y: object({ Url: str(), Sub: ref('Leaf2') }),
+          Leaf2: object({ A: str(), B: str() }),
+          T2: object({ Inner: ref('Z'), Name: str(), Extra: str() }),
+          T: object({ Name: str() }),
           Z: object(zFields),
         },
       });
@@ -773,8 +800,8 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
       ['below a type that switches, where X would gain a field there', true, true, ['T -> T2 at property Q']],
       ['below a type that switches, where X would need other fields there', true, false, ['T -> T2 at property Q']],
     ])('keeps the positions below it %s', (_, withT, zNew, switches) => {
-      const url = { Url: { type: 'string' as const } };
-      setup(withT as boolean, zNew ? { ...url, New: { type: 'string' } } : url);
+      const url = { Url: str() };
+      setup(withT as boolean, zNew ? { ...url, New: str() } : url);
 
       const result = run();
 
@@ -795,19 +822,19 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
     // CloudFormation fits the rule, and the rule cannot choose
     const setup = () => {
       importRegistry(released, {
-        properties: { PA: { $ref: '#/definitions/A' }, PB: { $ref: '#/definitions/B' } },
+        properties: { PA: ref('A'), PB: ref('B') },
         definitions: {
-          A: object({ Url: { type: 'string' }, InnerB: { $ref: '#/definitions/B' } }),
-          B: object({ Name: { type: 'string' }, Inner: { $ref: '#/definitions/A' } }),
+          A: object({ Url: str(), InnerB: ref('B') }),
+          B: object({ Name: str(), Inner: ref('A') }),
         },
       });
       importRegistry(db, {
-        properties: { PA: { $ref: '#/definitions/A1' }, PB: { $ref: '#/definitions/B1' } },
+        properties: { PA: ref('A1'), PB: ref('B1') },
         definitions: {
-          A1: object({ Url: { type: 'string' }, InnerB: { $ref: '#/definitions/B2' } }),
-          A2: object({ Url: { type: 'string' }, New: { type: 'string' }, InnerB: { $ref: '#/definitions/B1' } }),
-          B1: object({ Name: { type: 'string' }, Inner: { $ref: '#/definitions/A2' } }),
-          B2: object({ Name: { type: 'string' }, New: { type: 'string' }, Inner: { $ref: '#/definitions/A1' } }),
+          A1: object({ Url: str(), InnerB: ref('B2') }),
+          A2: object({ Url: str(), New: str(), InnerB: ref('B1') }),
+          B1: object({ Name: str(), Inner: ref('A2') }),
+          B2: object({ Name: str(), New: str(), Inner: ref('A1') }),
         },
       });
     };
@@ -818,9 +845,7 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
       'interdependent B at property PA.InnerB, property PB',
     ]);
     expect(gateFails(first)).toBe(true);
-    expect(typeGate(first, { mappingFile: MAPPING_FILE, baselineVersion: '1.2.3' }).entries).toContain(
-      `${RESOURCE}: A is interdependent`,
-    );
+    expect(gate(first).entries).toContain(`${RESOURCE}: A is interdependent`);
 
     const second = runFresh(setup, [chosen(first, 'keep-old')]);
     expect(cases(second)).toEqual([]);
@@ -833,28 +858,28 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
     // but the rounds alternate between counting all three positions and none
     const setup = () => {
       importRegistry(released, {
-        properties: { Top: { $ref: '#/definitions/Node' }, Pt2: { $ref: '#/definitions/P' } },
+        properties: { Top: ref('Node'), Pt2: ref('P') },
         definitions: {
           Node: object({
-            Name: { type: 'string' },
-            Child: { $ref: '#/definitions/Node' },
-            Extra: { $ref: '#/definitions/P' },
+            Name: str(),
+            Child: ref('Node'),
+            Extra: ref('P'),
           }),
-          P: object({ Name: { type: 'string' }, N: { $ref: '#/definitions/Node' } }),
+          P: object({ Name: str(), N: ref('Node') }),
         },
       });
       importRegistry(db, {
-        properties: { Top: { $ref: '#/definitions/NodeA' }, Pt2: { $ref: '#/definitions/PY' } },
+        properties: { Top: ref('NodeA'), Pt2: ref('PY') },
         definitions: {
           NodeA: object({
-            Name: { type: 'string' },
-            Child: { $ref: '#/definitions/NodeB' },
-            Extra: { $ref: '#/definitions/PX' },
+            Name: str(),
+            Child: ref('NodeB'),
+            Extra: ref('PX'),
           }),
-          NodeB: object({ Name: { type: 'string' }, New: { type: 'string' } }),
-          PX: object({ Name: { type: 'string' }, New: { type: 'string' } }),
-          PY: object({ Name: { type: 'string' }, N: { $ref: '#/definitions/NodeC' } }),
-          NodeC: object({ Name: { type: 'string' }, New: { type: 'string' } }),
+          NodeB: object({ Name: str(), New: str() }),
+          PX: object({ Name: str(), New: str() }),
+          PY: object({ Name: str(), N: ref('NodeC') }),
+          NodeC: object({ Name: str(), New: str() }),
         },
       });
     };
@@ -878,18 +903,18 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
     // without Port
     const fewerFields = (extra: Partial<CloudFormationRegistryResource> = {}) => {
       importRegistry(released, {
-        properties: { First: { $ref: '#/definitions/Shared' }, Second: { $ref: '#/definitions/Shared' } },
-        definitions: { Shared: object({ Url: { type: 'string' }, Port: { type: 'integer' } }) },
+        properties: { First: ref('Shared'), Second: ref('Shared') },
+        definitions: { Shared: object({ Url: str(), Port: int() }) },
       });
       importRegistry(db, {
         properties: {
-          First: { $ref: '#/definitions/Shared' },
-          Second: { $ref: '#/definitions/SecondSettings' },
+          First: ref('Shared'),
+          Second: ref('SecondSettings'),
           ...extra.properties,
         },
         definitions: {
-          Shared: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-          SecondSettings: object({ Url: { type: 'string' } }),
+          Shared: object({ Url: str(), Port: int() }),
+          SecondSettings: object({ Url: str() }),
           ...extra.definitions,
         },
       });
@@ -913,24 +938,24 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
     test('a merged released type whose positions lose different fields follows CloudFormation with the merge', () => {
       importRegistry(released, {
         properties: {
-          First: { $ref: '#/definitions/FirstSettings' },
-          Second: { $ref: '#/definitions/SecondSettings' },
-          Third: { $ref: '#/definitions/FirstSettings' },
+          First: ref('FirstSettings'),
+          Second: ref('SecondSettings'),
+          Third: ref('FirstSettings'),
         },
         definitions: {
-          FirstSettings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-          SecondSettings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+          FirstSettings: object({ Url: str(), Port: int() }),
+          SecondSettings: object({ Url: str(), Port: int() }),
         },
       });
       importRegistry(db, {
         properties: {
-          First: { $ref: '#/definitions/Settings' },
-          Second: { $ref: '#/definitions/Settings' },
-          Third: { $ref: '#/definitions/FirstSettings' },
+          First: ref('Settings'),
+          Second: ref('Settings'),
+          Third: ref('FirstSettings'),
         },
         definitions: {
-          Settings: object({ Url: { type: 'string' } }),
-          FirstSettings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+          Settings: object({ Url: str() }),
+          FirstSettings: object({ Url: str(), Port: int() }),
         },
       });
 
@@ -953,18 +978,18 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
       // A has one CloudFormation type, C, so only the merge makes it switch
       importRegistry(released, {
         properties: {
-          First: { $ref: '#/definitions/A' },
-          Second: { $ref: '#/definitions/B' },
-          Third: { $ref: '#/definitions/A' },
+          First: ref('A'),
+          Second: ref('B'),
+          Third: ref('A'),
         },
         definitions: {
-          A: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-          B: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+          A: object({ Url: str(), Port: int() }),
+          B: object({ Url: str(), Port: int() }),
         },
       });
       importRegistry(db, {
-        properties: { First: { $ref: '#/definitions/C' }, Second: { $ref: '#/definitions/C' }, Third: {} },
-        definitions: { C: object({ Url: { type: 'string' } }) },
+        properties: { First: ref('C'), Second: ref('C'), Third: {} },
+        definitions: { C: object({ Url: str() }) },
       });
 
       const result = run();
@@ -980,22 +1005,22 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
       // A has no pair at Third, so the gate fails for A, and B, merged with A into C, stays as it is
       importRegistry(released, {
         properties: {
-          First: { $ref: '#/definitions/A' },
-          Second: { $ref: '#/definitions/B' },
-          Third: { $ref: '#/definitions/A' },
+          First: ref('A'),
+          Second: ref('B'),
+          Third: ref('A'),
         },
         definitions: {
-          A: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-          B: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+          A: object({ Url: str(), Port: int() }),
+          B: object({ Url: str(), Port: int() }),
         },
       });
       importRegistry(db, {
         properties: {
-          First: { $ref: '#/definitions/C' },
-          Second: { $ref: '#/definitions/C' },
-          Third: { $ref: '#/definitions/Options' },
+          First: ref('C'),
+          Second: ref('C'),
+          Third: ref('Options'),
         },
-        definitions: { C: object({ Url: { type: 'string' } }), Options: object({ Name: { type: 'string' } }) },
+        definitions: { C: object({ Url: str() }), Options: object({ Name: str() }) },
       });
 
       const result = run();
@@ -1015,7 +1040,7 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
 
       expect(cases(result)).toEqual([]);
       expect(switched(result)).toEqual([]);
-      expect(result.applied.map((a) => `${a.entry.kind} ${a.entry.oldType}`)).toEqual(['keep-old Shared']);
+      expect(applied(result)).toEqual(['keep-old Shared']);
       expect(history(resource(db).properties.Second)[0]).toEqual('Shared');
       expect(fields('Shared')).toEqual({ Url: 'string', Port: 'integer' });
       expect(l1Renames()).toEqual([]);
@@ -1024,8 +1049,8 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
     test('follows CloudFormation where its entry applies to none of its positions', () => {
       // The entry names Other, which CloudFormation uses at Third only, so it decides nothing for Shared
       fewerFields({
-        properties: { Third: { $ref: '#/definitions/Other' } },
-        definitions: { Other: object({ Name: { type: 'string' } }) },
+        properties: { Third: ref('Other') },
+        definitions: { Other: object({ Name: str() }) },
       });
 
       const result = run([mapping({ resource: RESOURCE, oldType: 'Shared', newTypes: ['Other'], kind: 'rename' })]);
@@ -1050,13 +1075,13 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
 
       expect(cases(result)).toEqual([]);
       expect(switched(result)).toEqual(['Check -> CustomCheck at property Checks.C']);
-      expect(renderedFields('Checks')).toEqual({ A: 'Check', B: 'Check', C: 'CustomCheck' });
+      expect(fields('Checks')).toEqual({ A: 'Check', B: 'Check', C: 'CustomCheck' });
       expect(fields('Check')).toEqual({ Enabled: 'boolean' });
-      expect(l1Renames()).toEqual(['Check -> CustomCheck at field Checks.C']);
+      expect(l1Renames()).toEqual(['Check -> CustomCheck at property Checks.C']);
 
-      const gate = typeGate(result, { mappingFile: MAPPING_FILE, baselineVersion: '1.2.3' });
-      expect(gate.failed).toBe(false);
-      expect(gate.report).toContain(`  ${RESOURCE}: Check -> CustomCheck (property Checks.C)`);
+      const output = gate(result);
+      expect(output.failed).toBe(false);
+      expect(output.report).toContain(`  ${RESOURCE}: Check -> CustomCheck (property Checks.C)`);
     });
 
     test('keeps the released name everywhere with a keep-old entry', () => {
@@ -1066,7 +1091,7 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
 
       expect(cases(result)).toEqual([]);
       expect(switched(result)).toEqual([]);
-      expect(renderedFields('Checks')).toEqual({ A: 'Check', B: 'Check', C: 'Check' });
+      expect(fields('Checks')).toEqual({ A: 'Check', B: 'Check', C: 'Check' });
       expect(fields('Check')).toEqual({ Enabled: 'boolean', Configuration: 'string' });
       expect(l1Renames()).toEqual([]);
     });
@@ -1074,14 +1099,13 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
 });
 
 describe('settled renames whose current type shares fewer than half of the released fields', () => {
-  const strings = (names: string[]) => Object.fromEntries(names.map((n) => [n, { type: 'string' as const }]));
   const setup = (releasedFields: string[], currentFields: string[]) => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Old' } },
+      properties: { Settings: ref('Old') },
       definitions: { Old: object(strings(releasedFields)) },
     });
     importRegistry(db, {
-      properties: { Settings: { $ref: '#/definitions/New' } },
+      properties: { Settings: ref('New') },
       definitions: { New: object(strings(currentFields)) },
     });
   };
@@ -1106,9 +1130,9 @@ describe('settled renames whose current type shares fewer than half of the relea
         total: Number(count.split(' of ')[1]),
       },
     ]);
-    const gate = typeGate(result, { mappingFile: MAPPING_FILE, baselineVersion: '1.2.3' });
-    expect(gate.failed).toBe(false);
-    expect(gate.report).toContain(`  ${RESOURCE}: Old -> New shares ${count} released fields (property Settings)`);
+    const output = gate(result);
+    expect(output.failed).toBe(false);
+    expect(output.report).toContain(`  ${RESOURCE}: Old -> New shares ${count} released fields (property Settings)`);
   });
 
   test.each([
@@ -1121,16 +1145,16 @@ describe('settled renames whose current type shares fewer than half of the relea
 
     expect(settled(result)).toEqual(['rename Old -> New at property Settings']);
     expect(result.weak).toEqual([]);
-    expect(typeGate(result, { mappingFile: MAPPING_FILE, baselineVersion: '1.2.3' }).report).not.toContain('Weak');
+    expect(gate(result).report).not.toContain('Weak');
   });
 
   test('are listed once per current type of a split', () => {
     importRegistry(released, {
-      properties: { First: { $ref: '#/definitions/Shared' }, Second: { $ref: '#/definitions/Shared' } },
+      properties: { First: ref('Shared'), Second: ref('Shared') },
       definitions: { Shared: object(strings(['A', 'B', 'C', 'D', 'E'])) },
     });
     importRegistry(db, {
-      properties: { First: { $ref: '#/definitions/One' }, Second: { $ref: '#/definitions/Two' } },
+      properties: { First: ref('One'), Second: ref('Two') },
       // A new field would make the split follow CloudFormation's types instead
       definitions: { One: object(strings(['A'])), Two: object(strings(['A'])) },
     });
@@ -1156,12 +1180,12 @@ describe('settled renames whose current type shares fewer than half of the relea
 describe('requiredness follows CloudFormation', () => {
   test('a carried field that CloudFormation requires renders required', () => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' } },
-      definitions: { Settings: object({ Url: { type: 'string' } }) },
+      properties: { Settings: ref('Settings') },
+      definitions: { Settings: object({ Url: str() }) },
     });
     importRegistry(db, {
-      properties: { Settings: { $ref: '#/definitions/Settings' } },
-      definitions: { Settings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }, ['Port']) },
+      properties: { Settings: ref('Settings') },
+      definitions: { Settings: object({ Url: str(), Port: int() }, ['Port']) },
     });
 
     run();
@@ -1171,12 +1195,12 @@ describe('requiredness follows CloudFormation', () => {
 
   test('a kept field that became required renders required', () => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/SettingsRequest' } },
-      definitions: { SettingsRequest: object({ Url: { type: 'string' } }) },
+      properties: { Settings: ref('SettingsRequest') },
+      definitions: { SettingsRequest: object({ Url: str() }) },
     });
     importRegistry(db, {
-      properties: { Settings: { $ref: '#/definitions/Settings' } },
-      definitions: { Settings: object({ Url: { type: 'string' } }, ['Url']) },
+      properties: { Settings: ref('Settings') },
+      definitions: { Settings: object({ Url: str() }, ['Url']) },
     });
 
     run();
@@ -1186,14 +1210,14 @@ describe('requiredness follows CloudFormation', () => {
 
   test('a field of a shared type is required only where CloudFormation requires it at every position', () => {
     importRegistry(released, {
-      properties: { First: { $ref: '#/definitions/Shared' }, Second: { $ref: '#/definitions/Shared' } },
-      definitions: { Shared: object({ Url: { type: 'string' } }) },
+      properties: { First: ref('Shared'), Second: ref('Shared') },
+      definitions: { Shared: object({ Url: str() }) },
     });
     importRegistry(db, {
-      properties: { First: { $ref: '#/definitions/FirstSettings' }, Second: { $ref: '#/definitions/SecondSettings' } },
+      properties: { First: ref('FirstSettings'), Second: ref('SecondSettings') },
       definitions: {
-        FirstSettings: object({ Url: { type: 'string' } }, ['Url']),
-        SecondSettings: object({ Url: { type: 'string' } }),
+        FirstSettings: object({ Url: str() }, ['Url']),
+        SecondSettings: object({ Url: str() }),
       },
     });
 
@@ -1205,16 +1229,16 @@ describe('requiredness follows CloudFormation', () => {
 });
 
 describe('a kept struct below a list or map change', () => {
-  const urlPort = () => object({ Url: { type: 'string' }, Port: { type: 'integer' } });
-  const urlMode = () => object({ Url: { type: 'string' }, Mode: { type: 'string' } }, ['Mode']);
+  const urlPort = () => object({ Url: str(), Port: int() });
+  const urlMode = () => object({ Url: str(), Mode: str() }, ['Mode']);
 
   test('takes the fields of the struct CloudFormation put into a list', () => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' } },
+      properties: { Settings: ref('Settings') },
       definitions: { Settings: urlPort() },
     });
     importRegistry(db, {
-      properties: { Settings: { type: 'array', items: { $ref: '#/definitions/Settings' } } },
+      properties: { Settings: { type: 'array', items: ref('Settings') } },
       definitions: { Settings: urlMode() },
     });
 
@@ -1230,11 +1254,11 @@ describe('a kept struct below a list or map change', () => {
 
   test('takes the fields of the struct CloudFormation took out of a list', () => {
     importRegistry(released, {
-      properties: { Settings: { type: 'array', items: { $ref: '#/definitions/Settings' } } },
+      properties: { Settings: { type: 'array', items: ref('Settings') } },
       definitions: { Settings: urlPort() },
     });
     importRegistry(db, {
-      properties: { Settings: { $ref: '#/definitions/Settings' } },
+      properties: { Settings: ref('Settings') },
       definitions: { Settings: urlMode() },
     });
 
@@ -1247,12 +1271,12 @@ describe('a kept struct below a list or map change', () => {
 
   test('takes the fields of the struct CloudFormation put into a map', () => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' } },
+      properties: { Settings: ref('Settings') },
       definitions: { Settings: urlPort() },
     });
     importRegistry(db, {
       properties: {
-        Settings: { type: 'object', patternProperties: { '.*': { $ref: '#/definitions/Settings' } } } as any,
+        Settings: { type: 'object', patternProperties: { '.*': ref('Settings') } } as any,
       },
       definitions: { Settings: urlMode() },
     });
@@ -1266,20 +1290,20 @@ describe('a kept struct below a list or map change', () => {
 
   test('keeps a released field that another current type at the position still has', () => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' } },
+      properties: { Settings: ref('Settings') },
       definitions: { Settings: urlPort() },
     });
     // Another region still has the field in a struct outside a list
     importRegistry(
       db,
-      { properties: { Settings: { $ref: '#/definitions/OldSettings' } }, definitions: { OldSettings: urlPort() } },
+      { properties: { Settings: ref('OldSettings') }, definitions: { OldSettings: urlPort() } },
       RESOURCE,
       'region-1',
     );
     importRegistry(
       db,
       {
-        properties: { Settings: { type: 'array', items: { $ref: '#/definitions/Settings' } } },
+        properties: { Settings: { type: 'array', items: ref('Settings') } },
         definitions: { Settings: urlMode() },
       },
       RESOURCE,
@@ -1298,11 +1322,11 @@ describe('a kept struct below a list or map change', () => {
 
   test('keeps its released name when CloudFormation also renamed it', () => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' } },
+      properties: { Settings: ref('Settings') },
       definitions: { Settings: urlPort() },
     });
     importRegistry(db, {
-      properties: { Settings: { type: 'array', items: { $ref: '#/definitions/NewSettings' } } },
+      properties: { Settings: { type: 'array', items: ref('NewSettings') } },
       definitions: { NewSettings: urlMode() },
     });
 
@@ -1316,21 +1340,21 @@ describe('a kept struct below a list or map change', () => {
 
   test('renders a new field typed with a released name that CloudFormation gave another struct', () => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' }, Backup: { $ref: '#/definitions/Dest' } },
+      properties: { Settings: ref('Settings'), Backup: ref('Dest') },
       definitions: {
-        Settings: object({ Url: { type: 'string' } }),
-        Dest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        Settings: object({ Url: str() }),
+        Dest: object({ Url: str(), Port: int() }),
       },
     });
     importRegistry(db, {
       properties: {
-        Settings: { type: 'array', items: { $ref: '#/definitions/Settings' } },
-        Backup: { $ref: '#/definitions/DestRequest' },
+        Settings: { type: 'array', items: ref('Settings') },
+        Backup: ref('DestRequest'),
       },
       definitions: {
-        Settings: object({ Url: { type: 'string' }, Extra: { $ref: '#/definitions/Dest' } }),
-        DestRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-        Dest: object({ State: { type: 'string' } }),
+        Settings: object({ Url: str(), Extra: ref('Dest') }),
+        DestRequest: object({ Url: str(), Port: int() }),
+        Dest: object({ State: str() }),
       },
     });
 
@@ -1347,27 +1371,27 @@ describe('a kept struct below a list or map change', () => {
 
 describe('a kept struct below a union change', () => {
   test.each([
-    ['reused by a field the L1 does not render', { Dest: object({ State: { type: 'string' } }) }],
-    ['not reused', { Other: object({ State: { type: 'string' } }) }],
+    ['reused by a field the L1 does not render', { Dest: object({ State: str() }) }],
+    ['not reused', { Other: object({ State: str() }) }],
   ])('a rename stays settled where its released name is %s', (_, extraDefinition) => {
     // CloudFormation's Settings is now a union, so the kept Settings keeps exactly its released fields and the L1
     // does not render Extra
     const extraType = Object.keys(extraDefinition)[0];
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' }, Backup: { $ref: '#/definitions/Dest' } },
+      properties: { Settings: ref('Settings'), Backup: ref('Dest') },
       definitions: {
-        Settings: object({ Url: { type: 'string' } }),
-        Dest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        Settings: object({ Url: str() }),
+        Dest: object({ Url: str(), Port: int() }),
       },
     });
     importRegistry(db, {
       properties: {
-        Settings: { anyOf: [{ $ref: '#/definitions/Settings' }, { type: 'string' }] },
-        Backup: { $ref: '#/definitions/DestRequest' },
+        Settings: { anyOf: [ref('Settings'), str()] },
+        Backup: ref('DestRequest'),
       },
       definitions: {
-        Settings: object({ Url: { type: 'string' }, Extra: { $ref: `#/definitions/${extraType}` } }),
-        DestRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        Settings: object({ Url: str(), Extra: ref(extraType) }),
+        DestRequest: object({ Url: str(), Port: int() }),
         ...extraDefinition,
       },
     });
@@ -1383,7 +1407,7 @@ describe('a kept struct below a union change', () => {
 
   describe('where CloudFormation gives the union a member of another name', () => {
     const settingsV2OrString: jsonschema.Schema = {
-      anyOf: [{ $ref: '#/definitions/SettingsV2' }, { type: 'string' }],
+      anyOf: [ref('SettingsV2'), str()],
     } as any;
     const shapes: Array<[string, jsonschema.Schema]> = [
       ['a union', settingsV2OrString],
@@ -1391,23 +1415,23 @@ describe('a kept struct below a union change', () => {
       ['a map of a union', { type: 'object', patternProperties: { '.*': settingsV2OrString } } as any],
     ];
     const setup = (settings: jsonschema.Schema, nested: boolean, property = 'Top') => {
-      const inOuter = (s: jsonschema.Schema): jsonschema.Schema => (nested ? { $ref: '#/definitions/Outer' } : s);
-      const releasedSettings: jsonschema.Schema = { $ref: '#/definitions/Settings' };
+      const inOuter = (s: jsonschema.Schema): jsonschema.Schema => (nested ? ref('Outer') : s);
+      const releasedSettings: jsonschema.Schema = ref('Settings');
       importRegistry(released, {
-        properties: { [property]: inOuter(releasedSettings), Backup: { $ref: '#/definitions/Dest' } },
+        properties: { [property]: inOuter(releasedSettings), Backup: ref('Dest') },
         definitions: {
           ...(nested ? { Outer: object({ Settings: releasedSettings }) } : {}),
-          Settings: object({ Url: { type: 'string' } }),
-          Dest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+          Settings: object({ Url: str() }),
+          Dest: object({ Url: str(), Port: int() }),
         },
       });
       importRegistry(db, {
-        properties: { [property]: inOuter(settings), Backup: { $ref: '#/definitions/DestRequest' } },
+        properties: { [property]: inOuter(settings), Backup: ref('DestRequest') },
         definitions: {
           ...(nested ? { Outer: object({ Settings: settings }) } : {}),
-          SettingsV2: object({ Url: { type: 'string' }, Extra: { $ref: '#/definitions/Dest' } }),
-          DestRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-          Dest: object({ State: { type: 'string' } }),
+          SettingsV2: object({ Url: str(), Extra: ref('Dest') }),
+          DestRequest: object({ Url: str(), Port: int() }),
+          Dest: object({ State: str() }),
         },
       });
     };
@@ -1468,7 +1492,7 @@ describe('a kept struct below a union change', () => {
       // Other renders Mid, so the L1 renders Dest at Other.Inner with CloudFormation's other fields: Dest is split
       // and gains State, so Backup renders DestRequest
       'also at a property the L1 renders',
-      { Other: { $ref: '#/definitions/Mid' } },
+      { Other: ref('Mid') },
       ['Dest -> DestRequest at property Backup'],
       [],
       { State: 'string' },
@@ -1476,23 +1500,23 @@ describe('a kept struct below a union change', () => {
   ])('a released name reused two levels below a union position is compared %s', (_, other, switches, renames, dest) => {
     // The kept Settings keeps exactly {Url}, so the L1 renders neither Extra nor Mid.Inner below it
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' }, Backup: { $ref: '#/definitions/Dest' } },
+      properties: { Settings: ref('Settings'), Backup: ref('Dest') },
       definitions: {
-        Settings: object({ Url: { type: 'string' } }),
-        Dest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        Settings: object({ Url: str() }),
+        Dest: object({ Url: str(), Port: int() }),
       },
     });
     importRegistry(db, {
       properties: {
-        Settings: { anyOf: [{ $ref: '#/definitions/Settings' }, { type: 'string' }] },
-        Backup: { $ref: '#/definitions/DestRequest' },
+        Settings: { anyOf: [ref('Settings'), str()] },
+        Backup: ref('DestRequest'),
         ...other,
       },
       definitions: {
-        Settings: object({ Url: { type: 'string' }, Extra: { $ref: '#/definitions/Mid' } }),
-        Mid: object({ Inner: { $ref: '#/definitions/Dest' } }),
-        Dest: object({ State: { type: 'string' } }),
-        DestRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        Settings: object({ Url: str(), Extra: ref('Mid') }),
+        Mid: object({ Inner: ref('Dest') }),
+        Dest: object({ State: str() }),
+        DestRequest: object({ Url: str(), Port: int() }),
       },
     });
 
@@ -1509,23 +1533,23 @@ describe('a kept struct below a union change', () => {
     // CloudFormation reaches Mid first through Settings.Extra, which the L1 does not render, and also through Other.W.
     // CloudFormation's Backup is any JSON, so the kept Backup keeps exactly the released fields of Dest.
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' }, Backup: { $ref: '#/definitions/Dest' } },
+      properties: { Settings: ref('Settings'), Backup: ref('Dest') },
       definitions: {
-        Settings: object({ Url: { type: 'string' } }),
-        Dest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        Settings: object({ Url: str() }),
+        Dest: object({ Url: str(), Port: int() }),
       },
     });
     importRegistry(db, {
       properties: {
-        Settings: { anyOf: [{ $ref: '#/definitions/Settings' }, { type: 'string' }] },
+        Settings: { anyOf: [ref('Settings'), str()] },
         Backup: {},
-        Other: { $ref: '#/definitions/Wrap' },
+        Other: ref('Wrap'),
       },
       definitions: {
-        Settings: object({ Url: { type: 'string' }, Extra: { $ref: '#/definitions/Mid' } }),
-        Wrap: object({ W: { $ref: '#/definitions/Mid' } }),
-        Mid: object({ Inner: { $ref: '#/definitions/Dest' } }),
-        Dest: object({ State: { type: 'string' } }),
+        Settings: object({ Url: str(), Extra: ref('Mid') }),
+        Wrap: object({ W: ref('Mid') }),
+        Mid: object({ Inner: ref('Dest') }),
+        Dest: object({ State: str() }),
       },
     });
 
@@ -1539,28 +1563,28 @@ describe('a kept struct below a union change', () => {
     // the L1 and does not count for Foo
     importRegistry(released, {
       properties: {
-        Settings: { $ref: '#/definitions/Settings' },
-        Backup: { $ref: '#/definitions/Dest' },
-        Other: { $ref: '#/definitions/Foo' },
+        Settings: ref('Settings'),
+        Backup: ref('Dest'),
+        Other: ref('Foo'),
       },
       definitions: {
-        Settings: object({ Url: { type: 'string' } }),
-        Dest: object({ Url: { type: 'string' } }),
-        Foo: object({ A: { type: 'string' }, B: { type: 'string' } }),
+        Settings: object({ Url: str() }),
+        Dest: object({ Url: str() }),
+        Foo: object({ A: str(), B: str() }),
       },
     });
     importRegistry(db, {
       properties: {
-        Settings: { anyOf: [{ $ref: '#/definitions/Settings' }, { type: 'string' }] },
-        Backup: { $ref: '#/definitions/DestRequest' },
-        Other: { $ref: '#/definitions/FooRequest' },
+        Settings: { anyOf: [ref('Settings'), str()] },
+        Backup: ref('DestRequest'),
+        Other: ref('FooRequest'),
       },
       definitions: {
-        Settings: object({ Url: { type: 'string' }, Extra: { $ref: '#/definitions/Dest' } }),
-        Dest: object({ Url: { type: 'string' }, X: { $ref: '#/definitions/Foo' } }),
-        Foo: object({ A: { type: 'string' }, C: { type: 'string' } }),
-        DestRequest: object({ Url: { type: 'string' }, X: { type: 'string' } }),
-        FooRequest: object({ A: { type: 'string' } }),
+        Settings: object({ Url: str(), Extra: ref('Dest') }),
+        Dest: object({ Url: str(), X: ref('Foo') }),
+        Foo: object({ A: str(), C: str() }),
+        DestRequest: object({ Url: str(), X: str() }),
+        FooRequest: object({ A: str() }),
       },
     });
 
@@ -1579,12 +1603,12 @@ describe('a kept struct below a union change', () => {
 describe('released names below a changed position', () => {
   test('a struct renamed below a container change keeps its released name', () => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' } },
-      definitions: { Settings: object({ Target: { $ref: '#/definitions/OldTarget' } }), OldTarget: arn() },
+      properties: { Settings: ref('Settings') },
+      definitions: { Settings: object({ Target: ref('OldTarget') }), OldTarget: arn() },
     });
     importRegistry(db, {
-      properties: { Settings: { type: 'array', items: { $ref: '#/definitions/Settings' } } },
-      definitions: { Settings: object({ Target: { $ref: '#/definitions/NewTarget' } }), NewTarget: arn() },
+      properties: { Settings: { type: 'array', items: ref('Settings') } },
+      definitions: { Settings: object({ Target: ref('NewTarget') }), NewTarget: arn() },
     });
 
     const result = run();
@@ -1598,14 +1622,14 @@ describe('released names below a changed position', () => {
 
   test('a struct renamed below a container change to one that shares no field has no pair', () => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' } },
-      definitions: { Settings: object({ Target: { $ref: '#/definitions/OldTarget' } }), OldTarget: arn() },
+      properties: { Settings: ref('Settings') },
+      definitions: { Settings: object({ Target: ref('OldTarget') }), OldTarget: arn() },
     });
     importRegistry(db, {
-      properties: { Settings: { type: 'array', items: { $ref: '#/definitions/Settings' } } },
+      properties: { Settings: { type: 'array', items: ref('Settings') } },
       definitions: {
-        Settings: object({ Target: { $ref: '#/definitions/NewTarget' } }),
-        NewTarget: object({ Url: { type: 'string' } }),
+        Settings: object({ Target: ref('NewTarget') }),
+        NewTarget: object({ Url: str() }),
       },
     });
 
@@ -1617,12 +1641,12 @@ describe('released names below a changed position', () => {
 
   test('a struct below a position whose CloudFormation type has another shape keeps its released history', () => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' } },
-      definitions: { Settings: object({ Target: { $ref: '#/definitions/OldTarget' } }), OldTarget: arn() },
+      properties: { Settings: ref('Settings') },
+      definitions: { Settings: object({ Target: ref('OldTarget') }), OldTarget: arn() },
     });
     importRegistry(db, {
-      properties: { Settings: { anyOf: [{ $ref: '#/definitions/Settings' }, { type: 'string' }] } },
-      definitions: { Settings: object({ Target: { $ref: '#/definitions/NewTarget' } }), NewTarget: arn() },
+      properties: { Settings: { anyOf: [ref('Settings'), str()] } },
+      definitions: { Settings: object({ Target: ref('NewTarget') }), NewTarget: arn() },
     });
 
     const result = run();
@@ -1637,17 +1661,17 @@ describe('a released name that CloudFormation also uses elsewhere', () => {
   test('is compared at the positions where only the current sources use it', () => {
     // CloudFormation's Destination at Status has a field the released one lacks, so the split follows CloudFormation
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Destination' } },
-      definitions: { Destination: object({ Url: { type: 'string' }, Port: { type: 'integer' } }) },
+      properties: { Settings: ref('Destination') },
+      definitions: { Destination: object({ Url: str(), Port: int() }) },
     });
     importRegistry(db, {
       properties: {
-        Settings: { $ref: '#/definitions/DestinationRequest' },
-        Status: { $ref: '#/definitions/Destination' },
+        Settings: ref('DestinationRequest'),
+        Status: ref('Destination'),
       },
       definitions: {
-        DestinationRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-        Destination: object({ State: { type: 'string' } }),
+        DestinationRequest: object({ Url: str(), Port: int() }),
+        Destination: object({ State: str() }),
       },
     });
 
@@ -1663,18 +1687,18 @@ describe('a released name that CloudFormation also uses elsewhere', () => {
   test('is compared at the fields of a struct that follows CloudFormation by entry', () => {
     // With the entry, the L1 renders CloudFormation's Settings, Extra included, so Dest is rendered there
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' }, Backup: { $ref: '#/definitions/Dest' } },
+      properties: { Settings: ref('Settings'), Backup: ref('Dest') },
       definitions: {
-        Settings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-        Dest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        Settings: object({ Url: str(), Port: int() }),
+        Dest: object({ Url: str(), Port: int() }),
       },
     });
     importRegistry(db, {
-      properties: { Settings: { $ref: '#/definitions/Settings' }, Backup: { $ref: '#/definitions/DestRequest' } },
+      properties: { Settings: ref('Settings'), Backup: ref('DestRequest') },
       definitions: {
-        Settings: object({ Url: { type: 'string' }, Extra: { $ref: '#/definitions/Dest' } }),
-        DestRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-        Dest: object({ State: { type: 'string' } }),
+        Settings: object({ Url: str(), Extra: ref('Dest') }),
+        DestRequest: object({ Url: str(), Port: int() }),
+        Dest: object({ State: str() }),
       },
     });
 
@@ -1695,30 +1719,30 @@ describe('a released name that CloudFormation also uses elsewhere', () => {
     'is compared below a union member that follows CloudFormation by entry at %s while another member stays',
     (_, nested) => {
       // With the entry, the L1 renders CloudFormation's union at Target, SqsTarget.Extra included
-      const inOuter = (s: jsonschema.Schema): jsonschema.Schema => (nested ? { $ref: '#/definitions/Outer' } : s);
+      const inOuter = (s: jsonschema.Schema): jsonschema.Schema => (nested ? ref('Outer') : s);
       const releasedTarget: jsonschema.Schema = {
-        anyOf: [{ $ref: '#/definitions/Queue' }, { $ref: '#/definitions/Topic' }],
+        anyOf: [ref('Queue'), ref('Topic')],
       } as any;
       const currentTarget: jsonschema.Schema = {
-        anyOf: [{ $ref: '#/definitions/SqsTarget' }, { $ref: '#/definitions/SnsTarget' }],
+        anyOf: [ref('SqsTarget'), ref('SnsTarget')],
       } as any;
       importRegistry(released, {
-        properties: { Top: inOuter(releasedTarget), Backup: { $ref: '#/definitions/Dest' } },
+        properties: { Top: inOuter(releasedTarget), Backup: ref('Dest') },
         definitions: {
           ...(nested ? { Outer: object({ Target: releasedTarget }) } : {}),
-          Queue: object({ Arn: { type: 'string' } }),
-          Topic: object({ Url: { type: 'string' } }),
-          Dest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+          Queue: object({ Arn: str() }),
+          Topic: object({ Url: str() }),
+          Dest: object({ Url: str(), Port: int() }),
         },
       });
       importRegistry(db, {
-        properties: { Top: inOuter(currentTarget), Backup: { $ref: '#/definitions/DestRequest' } },
+        properties: { Top: inOuter(currentTarget), Backup: ref('DestRequest') },
         definitions: {
           ...(nested ? { Outer: object({ Target: currentTarget }) } : {}),
-          SqsTarget: object({ Arn: { type: 'string' }, Extra: { $ref: '#/definitions/Dest' } }),
-          SnsTarget: object({ Url: { type: 'string' } }),
-          DestRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-          Dest: object({ State: { type: 'string' } }),
+          SqsTarget: object({ Arn: str(), Extra: ref('Dest') }),
+          SnsTarget: object({ Url: str() }),
+          DestRequest: object({ Url: str(), Port: int() }),
+          Dest: object({ State: str() }),
         },
       });
 
@@ -1737,12 +1761,12 @@ describe('a released name that CloudFormation also uses elsewhere', () => {
 
   test('stays settled where the other use has the same fields', () => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Destination' } },
-      definitions: { Destination: object({ Url: { type: 'string' } }) },
+      properties: { Settings: ref('Destination') },
+      definitions: { Destination: object({ Url: str() }) },
     });
     importRegistry(db, {
-      properties: { Settings: { $ref: '#/definitions/Destination' }, Backup: { $ref: '#/definitions/Destination' } },
-      definitions: { Destination: object({ Url: { type: 'string' } }) },
+      properties: { Settings: ref('Destination'), Backup: ref('Destination') },
+      definitions: { Destination: object({ Url: str() }) },
     });
 
     const result = run();
@@ -1754,14 +1778,14 @@ describe('a released name that CloudFormation also uses elsewhere', () => {
   test('takes the field types of its own positions where CloudFormation gives its name to another renamed struct', () => {
     // At First the L1 renders A, so CloudFormation's B there types none of the kept B's fields
     importRegistry(released, {
-      properties: { First: { $ref: '#/definitions/A' }, Second: { $ref: '#/definitions/B' } },
-      definitions: { A: object({ X: { type: 'string' } }), B: object({ Y: { type: 'string' } }) },
+      properties: { First: ref('A'), Second: ref('B') },
+      definitions: { A: object({ X: str() }), B: object({ Y: str() }) },
     });
     importRegistry(db, {
-      properties: { First: { $ref: '#/definitions/B' }, Second: { $ref: '#/definitions/C' } },
+      properties: { First: ref('B'), Second: ref('C') },
       definitions: {
-        B: object({ X: { type: 'string' }, M: { type: 'string' } }),
-        C: object({ Y: { type: 'string' }, M: { type: 'integer' } }),
+        B: object({ X: str(), M: str() }),
+        C: object({ Y: str(), M: int() }),
       },
     });
 
@@ -1778,27 +1802,27 @@ describe('a released name that CloudFormation also uses elsewhere', () => {
     // the kept B leaves N out
     importRegistry(released, {
       properties: {
-        First: { $ref: '#/definitions/A' },
-        Second: { $ref: '#/definitions/B' },
-        Third: { $ref: '#/definitions/Dest' },
+        First: ref('A'),
+        Second: ref('B'),
+        Third: ref('Dest'),
       },
       definitions: {
-        A: object({ X: { type: 'string' } }),
-        B: object({ Y: { type: 'string' } }),
-        Dest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
+        A: object({ X: str() }),
+        B: object({ Y: str() }),
+        Dest: object({ Url: str(), Port: int() }),
       },
     });
     importRegistry(db, {
       properties: {
-        First: { $ref: '#/definitions/B' },
-        Second: { $ref: '#/definitions/C' },
-        Third: { $ref: '#/definitions/DestRequest' },
+        First: ref('B'),
+        Second: ref('C'),
+        Third: ref('DestRequest'),
       },
       definitions: {
-        B: object({ X: { type: 'string' }, N: { $ref: '#/definitions/Dest' } }),
-        C: object({ Y: { type: 'string' } }),
-        DestRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-        Dest: object({ State: { type: 'string' } }),
+        B: object({ X: str(), N: ref('Dest') }),
+        C: object({ Y: str() }),
+        DestRequest: object({ Url: str(), Port: int() }),
+        Dest: object({ State: str() }),
       },
     });
 
@@ -1812,19 +1836,19 @@ describe('a released name that CloudFormation also uses elsewhere', () => {
 
   test('is compared at the fields of a struct that only an attribute reaches', () => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Destination' } },
-      definitions: { Destination: object({ Url: { type: 'string' }, Port: { type: 'integer' } }) },
+      properties: { Settings: ref('Destination') },
+      definitions: { Destination: object({ Url: str(), Port: int() }) },
     });
     importRegistry(db, {
       properties: {
-        Settings: { $ref: '#/definitions/DestinationRequest' },
-        Status: { $ref: '#/definitions/Status' },
+        Settings: ref('DestinationRequest'),
+        Status: ref('Status'),
       },
       readOnlyProperties: ['/properties/Status'],
       definitions: {
-        DestinationRequest: object({ Url: { type: 'string' }, Port: { type: 'integer' } }),
-        Status: object({ Last: { $ref: '#/definitions/Destination' } }),
-        Destination: object({ State: { type: 'string' } }),
+        DestinationRequest: object({ Url: str(), Port: int() }),
+        Status: object({ Last: ref('Destination') }),
+        Destination: object({ State: str() }),
       },
     });
 
@@ -1843,7 +1867,7 @@ describe('types rendered for backwards compatibility', () => {
       properties: { Name: { PrimitiveType: 'String', UpdateType: 'Mutable' } },
       types: { Unused: { Properties: { Url: { PrimitiveType: 'String', UpdateType: 'Mutable' } } } },
     });
-    importRegistry(db, { properties: { Name: { type: 'string' } } });
+    importRegistry(db, { properties: { Name: str() } });
 
     const result = run();
 
@@ -1859,8 +1883,8 @@ describe('types rendered for backwards compatibility', () => {
       types: { Unused: { Properties: { Url: { PrimitiveType: 'String', UpdateType: 'Mutable' } } } },
     });
     importRegistry(db, {
-      properties: { Name: { type: 'string' }, Other: { $ref: '#/definitions/Unused' } },
-      definitions: { Unused: object({ Url: { type: 'string' } }) },
+      properties: { Name: str(), Other: ref('Unused') },
+      definitions: { Unused: object({ Url: str() }) },
     });
 
     run();
@@ -1875,8 +1899,8 @@ describe('types rendered for backwards compatibility', () => {
       types: { Unused: { Properties: { Url: { PrimitiveType: 'String', UpdateType: 'Mutable' } } } },
     });
     const registry: Partial<CloudFormationRegistryResource> = {
-      properties: { Name: { type: 'string' }, Other: { $ref: '#/definitions/Unused' } },
-      definitions: { Unused: object({ Url: { type: 'string' } }) },
+      properties: { Name: str(), Other: ref('Unused') },
+      definitions: { Unused: object({ Url: str() }) },
     };
     importRegistry(released, registry);
     importRegistry(db, registry);
@@ -1892,13 +1916,13 @@ describe('types rendered for backwards compatibility', () => {
 describe('released structs below a kept field that no position reaches', () => {
   // The kept Settings keeps its released field Target, and CloudFormation gives the name OldTarget to another struct
   const releasedSettings: Partial<CloudFormationRegistryResource> = {
-    properties: { Settings: { $ref: '#/definitions/Settings' } },
-    definitions: { Settings: object({ Target: { $ref: '#/definitions/OldTarget' } }), OldTarget: arn() },
+    properties: { Settings: ref('Settings') },
+    definitions: { Settings: object({ Target: ref('OldTarget') }), OldTarget: arn() },
   };
   const otherOldTarget = {
-    Other: { $ref: '#/definitions/OldTarget' },
+    Other: ref('OldTarget'),
   };
-  const otherOldTargetDefinition = { OldTarget: object({ State: { type: 'string' } }) };
+  const otherOldTargetDefinition = { OldTarget: object({ State: str() }) };
 
   test('are compared with the current struct of their name where CloudFormation gives the position another shape', () => {
     // CloudFormation's Settings is now any JSON
@@ -1934,9 +1958,9 @@ describe('released structs below a kept field that no position reaches', () => {
   test('are compared where CloudFormation makes the position a union', () => {
     importRegistry(released, releasedSettings);
     importRegistry(db, {
-      properties: { Settings: { anyOf: [{ $ref: '#/definitions/Settings' }, { type: 'string' }] }, ...otherOldTarget },
+      properties: { Settings: { anyOf: [ref('Settings'), str()] }, ...otherOldTarget },
       definitions: {
-        Settings: object({ Target: { $ref: '#/definitions/NewTarget' } }),
+        Settings: object({ Target: ref('NewTarget') }),
         NewTarget: arn(),
         ...otherOldTargetDefinition,
       },
@@ -1951,8 +1975,8 @@ describe('released structs below a kept field that no position reaches', () => {
   test('are compared where a keep-old entry decides a released struct without a pair', () => {
     importRegistry(released, releasedSettings);
     importRegistry(db, {
-      properties: { Settings: { $ref: '#/definitions/Options' }, ...otherOldTarget },
-      definitions: { Options: object({ Name: { type: 'string' } }), ...otherOldTargetDefinition },
+      properties: { Settings: ref('Options'), ...otherOldTarget },
+      definitions: { Options: object({ Name: str() }), ...otherOldTargetDefinition },
     });
 
     const result = run([mapping({ resource: RESOURCE, oldType: 'Settings', newTypes: ['Options'], kind: 'keep-old' })]);
@@ -1976,12 +2000,12 @@ describe('released structs below a kept field that no position reaches', () => {
     // Settings becomes any JSON; OldTarget is also rendered at Backup, which CloudFormation renamed to NewTarget
     const setup = () => {
       importRegistry(released, {
-        properties: { Settings: { $ref: '#/definitions/Settings' }, Backup: { $ref: '#/definitions/OldTarget' } },
-        definitions: { Settings: object({ Target: { $ref: '#/definitions/OldTarget' } }), OldTarget: arn() },
+        properties: { Settings: ref('Settings'), Backup: ref('OldTarget') },
+        definitions: { Settings: object({ Target: ref('OldTarget') }), OldTarget: arn() },
       });
       importRegistry(db, {
-        properties: { Settings: {}, Backup: { $ref: '#/definitions/NewTarget' } },
-        definitions: { NewTarget: object({ Arn: { type: 'string' }, Region: { type: 'string' } }) },
+        properties: { Settings: {}, Backup: ref('NewTarget') },
+        definitions: { NewTarget: object({ Arn: str(), Region: str() }) },
       });
     };
 
@@ -2002,10 +2026,10 @@ describe('released structs below a kept field that no position reaches', () => {
 
   test('keep their released requiredness', () => {
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' } },
+      properties: { Settings: ref('Settings') },
       definitions: {
-        Settings: object({ Target: { $ref: '#/definitions/OldTarget' } }),
-        OldTarget: object({ Arn: { type: 'string' } }, ['Arn']),
+        Settings: object({ Target: ref('OldTarget') }),
+        OldTarget: object({ Arn: str() }, ['Arn']),
       },
     });
     importRegistry(db, { properties: { Settings: {} } });
@@ -2020,18 +2044,18 @@ describe('released structs below a kept field that no position reaches', () => {
     // CloudFormation's Settings is any JSON, and its Inner struct is only below Hidden.Extra, which the L1 does not
     // render, so nothing CloudFormation has at the L1's positions changes Inner.Value
     importRegistry(released, {
-      properties: { Settings: { $ref: '#/definitions/Settings' }, Hidden: { $ref: '#/definitions/Hidden' } },
+      properties: { Settings: ref('Settings'), Hidden: ref('Hidden') },
       definitions: {
-        Settings: object({ Inner: { $ref: '#/definitions/Inner' } }),
+        Settings: object({ Inner: ref('Inner') }),
         Inner: object({ Value: {} }),
-        Hidden: object({ Url: { type: 'string' } }),
+        Hidden: object({ Url: str() }),
       },
     });
     importRegistry(db, {
-      properties: { Settings: {}, Hidden: { anyOf: [{ $ref: '#/definitions/Hidden' }, { type: 'string' }] } },
+      properties: { Settings: {}, Hidden: { anyOf: [ref('Hidden'), str()] } },
       definitions: {
-        Hidden: object({ Url: { type: 'string' }, Extra: { $ref: '#/definitions/Inner' } }),
-        Inner: object({ Value: { type: 'string' } }),
+        Hidden: object({ Url: str(), Extra: ref('Inner') }),
+        Inner: object({ Value: str() }),
       },
     });
 
@@ -2044,38 +2068,7 @@ describe('released structs below a kept field that no position reaches', () => {
 });
 
 function arn() {
-  return object({ Arn: { type: 'string' } });
-}
-
-function importLegacySpec(
-  target: SpecDatabase,
-  options: { properties: Record<string, resourcespec.Property>; types: Record<string, resourcespec.PropertyType> },
-) {
-  ResourceSpecImporter.importTypes({
-    db: target,
-    specification: {
-      ResourceSpecificationVersion: '0',
-      ResourceTypes: { [RESOURCE]: { Properties: options.properties } },
-      PropertyTypes: Object.fromEntries(
-        Object.entries(options.types).map(([name, decl]) => [`${RESOURCE}.${name}`, decl]),
-      ),
-    },
-  });
-}
-
-function divergingChecks(cType: 'Check' | 'CustomCheck'): Partial<CloudFormationRegistryResource> {
-  return {
-    properties: { Checks: { $ref: '#/definitions/Checks' } },
-    definitions: {
-      Checks: object({
-        A: { $ref: '#/definitions/Check' },
-        B: { $ref: '#/definitions/Check' },
-        C: { $ref: `#/definitions/${cType}` },
-      }),
-      Check: object({ Enabled: { type: 'boolean' } }),
-      CustomCheck: object({ Enabled: { type: 'boolean' }, Configuration: { type: 'string' } }),
-    },
-  };
+  return object({ Arn: str() });
 }
 
 function labels() {
@@ -2083,7 +2076,7 @@ function labels() {
 }
 
 function map(): jsonschema.Schema {
-  return { type: 'object', patternProperties: { '.*': { type: 'string' } } } as any;
+  return { type: 'object', patternProperties: { '.*': str() } } as any;
 }
 
 function run(mappings: TypeMapping[] = []): TypeHistoryResult {
@@ -2146,36 +2139,21 @@ function mapping(entry: Pick<TypeMapping, 'resource' | 'oldType' | 'newTypes' | 
   return fill({ ...entry, reason: '', pr: '' });
 }
 
+function gate(result: TypeHistoryResult) {
+  return typeGate(result, { mappingFile: MAPPING_FILE, baselineVersion: '1.2.3' });
+}
+
 function gateFails(result: TypeHistoryResult) {
-  return typeGate(result, { mappingFile: MAPPING_FILE, baselineVersion: '1.2.3' }).failed;
+  return gate(result).failed;
+}
+
+function applied(result: TypeHistoryResult) {
+  return result.applied.map((a) => `${a.entry.kind} ${a.entry.oldType}`);
 }
 
 function l1Changes() {
   const changes = compareL1(released, db);
   return [...changes.renames, ...changes.removed, ...changes.requiredness, ...changes.other];
-}
-
-function importRegistry(
-  target: SpecDatabase,
-  schema: Partial<CloudFormationRegistryResource>,
-  typeName = RESOURCE,
-  region?: string,
-) {
-  importCloudFormationRegistryResource({
-    db: target,
-    report: new ProblemReport(),
-    region,
-    resource: {
-      typeName,
-      description: 'Test resource',
-      properties: {},
-      ...schema,
-    } as CloudFormationRegistryResource,
-  });
-}
-
-function object(properties: jsonschema.ObjectProperties, required?: string[]): jsonschema.RecordLikeObject {
-  return { type: 'object', properties, required, additionalProperties: false };
 }
 
 function resource(target: SpecDatabase, typeName = RESOURCE) {
@@ -2184,34 +2162,6 @@ function resource(target: SpecDatabase, typeName = RESOURCE) {
 
 function typeDefinition(name: string) {
   return resourceTypeDefinition(db, name);
-}
-
-function resourceTypeDefinition(target: SpecDatabase, name: string) {
-  const found = target
-    .follow('usesType', resource(target))
-    .map((x) => x.entity)
-    .filter((t) => t.name === name);
-  expect(found).toHaveLength(1);
-  return found[0];
-}
-
-function rendersType(name: string) {
-  const types = new Set<string>();
-  const add = (prop: Pick<Property, 'type' | 'previousTypes'>) => {
-    for (const t of new RichProperty(prop as Property).types()) {
-      types.add(new RichPropertyType(t).stringify(db, false));
-    }
-  };
-  for (const prop of Object.values(resource(db).properties)) {
-    add(prop);
-  }
-  return [...types].some((t) => t.includes(name));
-}
-
-function renderedFields(typeName: string) {
-  return Object.fromEntries(
-    Object.entries(typeDefinition(typeName).properties).map(([name, prop]) => [name, history(prop)[0]]),
-  );
 }
 
 function history(prop: Pick<Property, 'type' | 'previousTypes'>) {

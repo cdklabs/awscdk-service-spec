@@ -147,6 +147,8 @@ function readBaseline(dir) {
     return {};
   }
   const pins = JSON.parse(fs.readFileSync(pinsFile, 'utf-8'));
+  // The same rules as projenrc/released-database.ts and packages/@aws-cdk/service-spec-importers/src/released-database.ts:
+  // change them together (this script runs in a plain node step)
   const valid =
     typeof pins.version === 'string' &&
     /^\d+\.\d+\.\d+$/.test(pins.version) &&
@@ -196,12 +198,19 @@ function setOutput(name, value) {
   }
 }
 
+/**
+ * A check that failed, printed as a GitHub error annotation
+ */
+class CheckFailure extends Error {}
+
+/**
+ * Stop the check with an error annotation; thrown rather than exiting, so `finally` blocks still clean up
+ */
 function fail(message) {
-  console.error(`::error::${message}`);
-  process.exit(1);
+  throw new CheckFailure(message);
 }
 
 main().catch((e) => {
-  console.error(e);
+  console.error(e instanceof CheckFailure ? `::error::${e.message}` : e);
   process.exitCode = 1;
 });

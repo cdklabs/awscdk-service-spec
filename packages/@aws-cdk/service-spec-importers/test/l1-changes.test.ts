@@ -1,11 +1,7 @@
 import { emptyDatabase, SpecDatabase } from '@aws-cdk/service-spec-types';
-import { importCloudFormationRegistryResource } from '../src/importers/import-cloudformation-registry';
-import { ResourceSpecImporter } from '../src/importers/import-resource-spec';
+import { importLegacySpec, importRegistry, object, ref, RESOURCE, str } from './utils';
 import { compareL1, formatL1Changes } from '../src/l1-changes';
-import { ProblemReport } from '../src/report';
-import { CloudFormationRegistryResource, jsonschema, resourcespec } from '../src/types';
-
-const RESOURCE = 'AWS::Some::Type';
+import { CloudFormationRegistryResource } from '../src/types';
 
 let base: SpecDatabase;
 let head: SpecDatabase;
@@ -65,16 +61,49 @@ test('two structs merged into one are reported as a merge', () => {
   const changes = compareL1(base, head);
 
   expect(changes.renames.map((r) => [r.from, r.to, r.positions, r.fieldChanges])).toEqual([
-    ['BurnSettings', 'BurnDvbSettings', ['field Settings.Burn'], ['Rows added']],
-    ['DvbSettings', 'BurnDvbSettings', ['field Settings.Dvb'], []],
+    ['BurnSettings', 'BurnDvbSettings', ['property Settings.Burn'], ['Rows added']],
+    ['DvbSettings', 'BurnDvbSettings', ['property Settings.Dvb'], []],
   ]);
   expect(formatL1Changes(changes)).toContain(
     [
       `  ${RESOURCE}`,
-      '    BurnSettings, DvbSettings -> BurnDvbSettings (merge; field Settings.Burn, field Settings.Dvb)',
+      '    BurnSettings, DvbSettings -> BurnDvbSettings (merge; property Settings.Burn, property Settings.Dvb)',
       '      from BurnSettings: Rows added',
     ].join('\n'),
   );
+});
+
+test('a renamed struct is placed at every path the L1 renders it, as the type history gate names positions', () => {
+  const outers = (inner: string) => ({
+    properties: { First: ref('Outer'), Second: ref('Outer') },
+    definitions: { Outer: object({ Inner: ref(inner) }), [inner]: object({ Url: str() }) },
+  });
+  importRegistry(base, outers('InnerRequest'));
+  importRegistry(head, outers('Inner'));
+
+  expect(compareL1(base, head).renames.map((r) => `${r.from} -> ${r.to} at ${r.positions.join(', ')}`)).toEqual([
+    'InnerRequest -> Inner at property First.Inner, property Second.Inner',
+  ]);
+});
+
+test('a struct renamed below a struct the L1 renders only as a struct of its own keeps its field position', () => {
+  // The base L1 has `settings: SettingsRequestProperty`, and also renders `SettingsProperty`, which no path reaches
+  const history = (target: SpecDatabase, inner: string) => {
+    importLegacySpec(target, {
+      properties: { Settings: { Type: 'SettingsRequest', UpdateType: 'Mutable' } },
+      types: { SettingsRequest: { Properties: { Url: { PrimitiveType: 'String', UpdateType: 'Mutable' } } } },
+    });
+    importRegistry(target, {
+      properties: { Settings: ref('Settings') },
+      definitions: { Settings: object({ Url: str(), Inner: ref(inner) }), [inner]: object({ Name: str() }) },
+    });
+  };
+  history(base, 'InnerRequest');
+  history(head, 'Inner');
+
+  expect(compareL1(base, head).renames.map((r) => `${r.from} -> ${r.to} at ${r.positions.join(', ')}`)).toEqual([
+    'InnerRequest -> Inner at field Settings.Inner',
+  ]);
 });
 
 test('removals, requiredness changes and other changes are reported by resource', () => {
@@ -297,40 +326,3 @@ test('fields added to a struct that keeps its name are listed by name', () => {
     ].join('\n'),
   );
 });
-
-function importRegistry(db: SpecDatabase, schema: Partial<CloudFormationRegistryResource>, typeName = RESOURCE) {
-  importCloudFormationRegistryResource({
-    db,
-    report: new ProblemReport(),
-    resource: {
-      typeName,
-      description: 'Test resource',
-      properties: {},
-      ...schema,
-    } as CloudFormationRegistryResource,
-  });
-}
-
-function importLegacySpec(
-  db: SpecDatabase,
-  options: {
-    properties: Record<string, resourcespec.Property>;
-    attributes?: Record<string, resourcespec.Attribute>;
-    types: Record<string, resourcespec.PropertyType>;
-  },
-) {
-  ResourceSpecImporter.importTypes({
-    db,
-    specification: {
-      ResourceSpecificationVersion: '0',
-      ResourceTypes: { [RESOURCE]: { Properties: options.properties, Attributes: options.attributes } },
-      PropertyTypes: Object.fromEntries(
-        Object.entries(options.types).map(([name, decl]) => [`${RESOURCE}.${name}`, decl]),
-      ),
-    },
-  });
-}
-
-function object(properties: jsonschema.ObjectProperties, required?: string[]): jsonschema.RecordLikeObject {
-  return { type: 'object', properties, required, additionalProperties: false };
-}

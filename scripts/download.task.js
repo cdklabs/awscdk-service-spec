@@ -17,6 +17,12 @@ const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sources-'));
 const tmpDest = path.join(tmpDir, 'data');
 const tmpExtract = path.join(tmpDir, 'extract');
 
+const fail = (message) => {
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+  console.error(message);
+  process.exit(1);
+};
+
 
 const reqHeaders = new Headers();
 reqHeaders.append('pragma', 'no-cache');
@@ -51,15 +57,11 @@ fetch(url, reqOptions).then((res) => {
       if (integrity) {
         const algorithm = /^(sha256|sha384|sha512)-/.exec(integrity)?.[1];
         if (!algorithm) {
-          fs.rmSync(tmpDir, { recursive: true, force: true });
-          console.error(`Unsupported integrity format: ${integrity}`);
-          process.exit(1);
+          fail(`Unsupported integrity format: ${integrity}`);
         }
         const actual = `${algorithm}-${crypto.createHash(algorithm).update(fs.readFileSync(tmpDest)).digest('base64')}`;
         if (actual !== integrity) {
-          fs.rmSync(tmpDir, { recursive: true, force: true });
-          console.error(`Integrity check failed: expected ${integrity}, got ${actual}`);
-          process.exit(1);
+          fail(`Integrity check failed: expected ${integrity}, got ${actual}`);
         }
         console.log(`Integrity ${integrity} verified`);
       }
@@ -88,9 +90,7 @@ fetch(url, reqOptions).then((res) => {
           stdio: [null, null, process.stderr],
         });
         if (status !== 0) {
-          fs.rmSync(tmpDir, { recursive: true, force: true });
-          console.error(`Extracting ${tarballEntry} failed`);
-          process.exit(1);
+          fail(`Extracting ${tarballEntry} failed`);
         }
 
         fs.mkdirSync(path.dirname(destination), { recursive: true });

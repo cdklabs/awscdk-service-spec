@@ -19,11 +19,13 @@ export interface ReleasedDatabasePins {
 }
 
 /**
- * Read the pin file, refusing values that are not a version, an npm sha512 integrity and a sha256
+ * Read the pin file for the projen tasks, refusing values that are not a version, an npm sha512 integrity and a sha256
  *
- * The values end up in a task's command line, so anything else is rejected.
+ * The values end up in a task's command line, so anything else is rejected. The rules are the same as in
+ * `packages/@aws-cdk/service-spec-importers/src/released-database.ts` and `scripts/check-released-database-bump.js`:
+ * change them together (projen runs before that package is built).
  */
-export function readReleasedDatabasePins(root: string): ReleasedDatabasePins {
+export function readPinsForTasks(root: string): ReleasedDatabasePins {
   const file = path.join(root, RELEASED_DATABASE_PINS);
   const pins = JSON.parse(fs.readFileSync(file, 'utf-8'));
   const check = (name: keyof ReleasedDatabasePins, pattern: RegExp) => {
