@@ -144,6 +144,13 @@ jobs:
         id: diff-db
         run: packages/@aws-cdk/service-spec-importers/bin/diff-db base/db.json.gz head/db.json.gz > DIFF || echo "diff-result=true" >> $GITHUB_OUTPUT
         continue-on-error: true
+      - name: Report L1 changes
+        id: report_l1_changes
+        run: |-
+          if ! packages/@aws-cdk/service-spec-importers/bin/diff-db --l1-changes base/db.json.gz head/db.json.gz > L1-CHANGES; then
+            echo "The L1 change report failed, see the job log." > L1-CHANGES
+          fi
+          cat L1-CHANGES
       - name: Upload diff
         id: upload_diff
         if: steps.diff-db.outputs.diff-result
@@ -166,6 +173,9 @@ jobs:
             echo "" >> PR.md
           fi
           echo '**@aws-cdk/aws-service-spec**: Model database diff detected' >> PR.md
+          echo '```' >> PR.md
+          cat L1-CHANGES >> PR.md
+          echo '```' >> PR.md
           echo "[📁 Download full diff](https://github.com/${REPOSITORY}/actions/runs/${RUN_ID})" >> PR.md
           echo '```' >> PR.md
           head -c $DIFF_LIMIT DIFF >> PR.md
@@ -177,7 +187,7 @@ jobs:
       - name: Comment diff
         id: comment_diff
         if: steps.diff-db.outputs.diff-result
-        uses: thollander/actions-comment-pull-request@v3
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b
         with:
           comment-tag: diff-db
           mode: recreate
@@ -185,7 +195,7 @@ jobs:
       - name: Delete outdated diff
         id: delete_outdated_diff
         if: "!(steps.diff-db.outputs.diff-result)"
-        uses: thollander/actions-comment-pull-request@v3
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b
         with:
           comment-tag: diff-db
           message: "**@aws-cdk/aws-service-spec**: No model change detected"

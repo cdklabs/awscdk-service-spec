@@ -2,6 +2,9 @@ import * as pj from 'projen';
 import { yarn } from 'cdklabs-projen-project-types';
 import { relative } from 'node:path';
 
+/** thollander/actions-comment-pull-request at v3.0.1 */
+const COMMENT_PULL_REQUEST_ACTION = 'thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b';
+
 export interface DiffDbOptions {
   readonly workflowRunsOn: string[];
   readonly serviceSpec: yarn.TypeScriptWorkspace;
@@ -31,6 +34,10 @@ export class DiffDb extends pj.Component {
 
   private path(path: string) {
     return relative(this.project.outdir, path);
+  }
+
+  private get diffDb() {
+    return this.path(this.importers.outdir + '/bin/diff-db');
   }
 
   private uploadHeadDatabase() {
@@ -122,9 +129,17 @@ export class DiffDb extends pj.Component {
           name: 'Diff databases',
           id: 'diff-db',
           continueOnError: true,
-          run: `${this.path(
-            this.importers.outdir + '/bin/diff-db',
-          )} base/db.json.gz head/db.json.gz > DIFF || echo "diff-result=true" >> $GITHUB_OUTPUT`,
+          run: `${this.diffDb} base/db.json.gz head/db.json.gz > DIFF || echo "diff-result=true" >> $GITHUB_OUTPUT`,
+        },
+        {
+          // Only reports: the build job's type history gate decides what fails
+          name: 'Report L1 changes',
+          run: [
+            `if ! ${this.diffDb} --l1-changes base/db.json.gz head/db.json.gz > L1-CHANGES; then`,
+            '  echo "The L1 change report failed, see the job log." > L1-CHANGES',
+            'fi',
+            'cat L1-CHANGES',
+          ].join('\n'),
         },
         pj.github.WorkflowSteps.uploadArtifact({
           name: 'Upload diff',
@@ -152,6 +167,9 @@ export class DiffDb extends pj.Component {
             '  echo "" >> PR.md',
             'fi',
             `echo '**${this.serviceSpec.name}**: Model database diff detected' >> PR.md`,
+            "echo '```' >> PR.md",
+            'cat L1-CHANGES >> PR.md',
+            "echo '```' >> PR.md",
             'echo "[📁 Download full diff](https://github.com/${REPOSITORY}/actions/runs/${RUN_ID})" >> PR.md',
             "echo '```' >> PR.md",
             'head -c $DIFF_LIMIT DIFF >> PR.md',
@@ -165,7 +183,7 @@ export class DiffDb extends pj.Component {
         {
           name: 'Comment diff',
           if: 'steps.diff-db.outputs.diff-result',
-          uses: 'thollander/actions-comment-pull-request@v3',
+          uses: COMMENT_PULL_REQUEST_ACTION,
           with: {
             'comment-tag': 'diff-db',
             mode: 'recreate',
@@ -175,7 +193,7 @@ export class DiffDb extends pj.Component {
         {
           name: 'Delete outdated diff',
           if: '!(steps.diff-db.outputs.diff-result)',
-          uses: 'thollander/actions-comment-pull-request@v3',
+          uses: COMMENT_PULL_REQUEST_ACTION,
           with: {
             'comment-tag': 'diff-db',
             message: `**${this.serviceSpec.name}**: No model change detected`,
