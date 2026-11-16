@@ -72,3 +72,44 @@ export function ref(name: string): jsonschema.Reference {
 export function str(): jsonschema.Schema {
   return { type: 'string' };
 }
+
+export function int(): jsonschema.Schema {
+  return { type: 'integer' };
+}
+
+export function bool(): jsonschema.Schema {
+  return { type: 'boolean' };
+}
+
+/** String fields of the given names */
+export function strings(names: string[]): jsonschema.ObjectProperties {
+  return Object.fromEntries(names.map((n) => [n, str()]));
+}
+
+/**
+ * The IoT AuditCheckConfiguration shape: Checks.A and Checks.B are Check, Checks.C is `cType`, and CustomCheck has
+ * a Configuration that Check lacks
+ */
+export function divergingChecks(cType: string): Partial<CloudFormationRegistryResource> {
+  return {
+    properties: { Checks: ref('Checks') },
+    definitions: {
+      Checks: object({ A: ref('Check'), B: ref('Check'), C: ref(cType) }),
+      Check: object({ Enabled: bool() }),
+      CustomCheck: object({ Enabled: bool(), Configuration: str() }),
+    },
+  };
+}
+
+/**
+ * The one type definition of the given name that a resource uses
+ */
+export function resourceTypeDefinition(target: SpecDatabase, name: string, typeName = RESOURCE) {
+  const resource = target.lookup('resource', 'cloudFormationType', 'equals', typeName).only();
+  const found = target
+    .follow('usesType', resource)
+    .map((x) => x.entity)
+    .filter((t) => t.name === name);
+  expect(found).toHaveLength(1);
+  return found[0];
+}
