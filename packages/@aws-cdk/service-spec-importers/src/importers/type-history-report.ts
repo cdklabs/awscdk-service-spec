@@ -4,6 +4,8 @@ import { TypeHistoryResult, TypePosition, UndecidedKind } from './type-history-r
 import { renderedPropertyTypes, renderType } from '../l1-view';
 import { PR_PLACEHOLDER, REASON_PLACEHOLDER, TypeMapping, TypeMappingKind } from '../type-mappings';
 
+const MIXINS = '@aws-cdk/cfn-property-mixins';
+
 /**
  * What the report of one resource's type history reads: the last round of decisions and the resource's entries
  */
@@ -81,7 +83,7 @@ class TypeHistoryReporter {
     for (const [releasedType, decision] of this.round.decisions) {
       switch (decision.kind) {
         case 'entry': {
-          const positions = unique(decision.matched.map((u) => this.label(u.position))).sort();
+          const positions = unique(decision.matched.map((u) => this.useLabel(u))).sort();
           this.result.applied.push({ entry: decision.entry, positions });
           break;
         }
@@ -116,16 +118,24 @@ class TypeHistoryReporter {
     }
     for (const entry of this.entries.values()) {
       if (!this.result.applied.some((a) => a.entry === entry)) {
-        const released = this.releasedByName.get(entry.oldType)!;
-        reportInactive(
-          this.result,
-          entry,
-          this.round.decisions.has(released)
-            ? `${entry.newTypes.join(', ')} stands at none of the positions of ${entry.oldType}`
-            : `the L1 renders ${entry.oldType} at no position that the current sources have`,
-        );
+        reportInactive(this.result, entry, this.inactiveReason(entry));
       }
     }
+  }
+
+  private inactiveReason(entry: TypeMapping) {
+    const decision = this.round.decisions.get(this.releasedByName.get(entry.oldType)!);
+    if (!decision) {
+      return `the L1 renders ${entry.oldType} at no position that the current sources have`;
+    }
+    const uses = [...decision.stays, ...decision.follows];
+    if (uses.every((u) => u.mixinsOnly)) {
+      const at = unique(uses.map((u) => this.label(u.position)))
+        .sort()
+        .join(', ');
+      return `only ${MIXINS} renders ${entry.oldType}, at ${at}, and no CloudFormation type there is paired with it`;
+    }
+    return `${entry.newTypes.join(', ')} stands at none of the positions of ${entry.oldType}`;
   }
 
   /**
@@ -162,7 +172,7 @@ class TypeHistoryReporter {
           : use.position.cfnType
           ? renderType(this.db, use.position.cfnType)
           : 'no type');
-      const label = this.label(use.position);
+      const label = this.useLabel(use);
       positions.set(label, {
         position: label,
         cloudFormationType,
@@ -207,6 +217,14 @@ class TypeHistoryReporter {
    */
   private label(position: Position) {
     return (position.within && this.round.renderedFields.get(fieldKey(position.within))) ?? position.label;
+  }
+
+  /**
+   * Where the L1 renders the released type of a use, naming the package where only cfn-property-mixins renders it
+   */
+  private useLabel(use: Use) {
+    const label = this.label(use.position);
+    return use.mixinsOnly ? `${label} in ${MIXINS} only` : label;
   }
 
   private renamedAt(use: Use) {

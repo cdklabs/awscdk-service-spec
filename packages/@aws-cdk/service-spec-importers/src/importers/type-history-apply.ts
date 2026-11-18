@@ -9,6 +9,7 @@ import {
 } from '@aws-cdk/service-spec-types';
 import { ref } from '@cdklabs/tskb';
 import {
+  constrainingUses,
   Field,
   FieldPlan,
   followsIn,
@@ -100,15 +101,17 @@ class TypeHistoryApplier {
       if (own) {
         ownFields.add(releasedType);
       }
+      // cfn-property-mixins renders every field optional, so a use only it renders does not decide requiredness
+      const deciding = constrainingUses(decision.stays);
       plans.set(
         releasedType,
         decision.fields.map((name) => {
-          const atPositions = decision.stays.map((u) => this.fieldAt(u, name));
+          const atPositions = deciding.map((u) => this.fieldAt(u, name));
           // CloudFormation says nothing about a field its types do not reach, so the release decides there
           const releasedRequired = !!releasedType.properties[name]?.required;
           return {
             name,
-            required: decision.stays.every((u, i) =>
+            required: deciding.every((u, i) =>
               u.position.kind === 'unreached' ? releasedRequired : atPositions[i]?.required,
             ),
             source: (own ? target.properties[name] : undefined) ?? atPositions.find(isDefined),
