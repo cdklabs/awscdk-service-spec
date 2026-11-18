@@ -1,7 +1,7 @@
-import { Resource, SpecDatabase, TypeDefinition } from '@aws-cdk/service-spec-types';
-import { fieldKey, need, Position, reportInactive, Round, Use, unique } from './type-history-model';
+import { Resource, RichTypedField, SpecDatabase, TypeDefinition } from '@aws-cdk/service-spec-types';
+import { Field, fieldKey, need, Position, reportInactive, Round, Use, unique } from './type-history-model';
 import { TypeHistoryResult, TypePosition, UndecidedKind } from './type-history-result';
-import { renderType } from '../l1-view';
+import { renderedPropertyTypes, renderType } from '../l1-view';
 import { PR_PLACEHOLDER, REASON_PLACEHOLDER, TypeMapping, TypeMappingKind } from '../type-mappings';
 
 /**
@@ -23,6 +23,40 @@ export interface TypeHistoryReportContext {
  */
 export function reportTypeHistory(context: TypeHistoryReportContext) {
   new TypeHistoryReporter(context).report();
+}
+
+/**
+ * What the report of one resource's tag type breaks reads, once its decisions are applied to `db`
+ */
+export interface TagBreakReportContext {
+  readonly db: SpecDatabase;
+  readonly released: SpecDatabase;
+  readonly releasedResource: Resource;
+  /** The resource in `db` */
+  readonly resource: Resource;
+  readonly positions: readonly Position[];
+  readonly result: TypeHistoryResult;
+}
+
+/**
+ * Add each position where the L1 renders CloudFormation's type whatever the released history keeps, a modern tag
+ * property, to the result if the type it renders there differs from the one the released L1 renders
+ */
+export function reportTagBreaks(context: TagBreakReportContext) {
+  const { db, released, releasedResource, resource, result } = context;
+  for (const position of context.positions) {
+    if (position.kind !== 'visited' || !position.rendersCloudFormation) {
+      continue;
+    }
+    const { name } = position.owner;
+    const rendered = (r: Resource, field: Field) =>
+      renderedPropertyTypes(r, name, new RichTypedField(field).types(), 'aws-cdk-lib').type;
+    const releasedType = renderType(released, rendered(releasedResource, position.releasedField));
+    const newType = renderType(db, rendered(resource, resource.properties[name]));
+    if (releasedType !== newType) {
+      result.tagBreaks.push({ resource: resource.cloudFormationType, position: position.label, releasedType, newType });
+    }
+  }
 }
 
 class TypeHistoryReporter {

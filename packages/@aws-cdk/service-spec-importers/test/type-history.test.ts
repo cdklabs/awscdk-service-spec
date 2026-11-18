@@ -1467,16 +1467,22 @@ describe('a kept struct below a union change', () => {
       },
     );
 
-    test('a rename stays settled where the tag property turns into a union', () => {
-      // The tag property renders only the oldest type of its history, so nothing renders SettingsV2
+    test('the released name is compared below the member where the tag property turns into a union', () => {
+      // A modern tag property renders the newest type of its history, so the L1 renders SettingsV2 with Extra, as
+      // where a property turns into a union; the mixins still render the released Settings too
       setup(settingsV2OrString, false, 'Tags');
 
       const result = run();
 
       expect(resource(db).tagInformation?.tagPropertyName).toEqual('Tags');
-      expect(new L1View(db, resource(db)).structs.has('SettingsV2')).toBe(false);
+      expect(Object.keys(new L1View(db, resource(db)).structs.get('SettingsV2')!.properties)).toEqual(['Url', 'Extra']);
+      expect(new L1View(db, resource(db), 'cfn-property-mixins').structs.has('Settings')).toBe(true);
       expect(cases(result)).toEqual([]);
-      expect(settled(result)).toEqual(['rename Dest -> DestRequest at property Backup']);
+      expect(settled(result)).toEqual([]);
+      expect(switched(result)).toEqual(['Dest -> DestRequest at property Backup']);
+      expect(tagBreaks(result)).toEqual(['property Tags: Settings -> SettingsV2 | string']);
+      expect(fields('Settings')).toEqual({ Url: 'string' });
+      expect(fields('Dest')).toEqual({ State: 'string' });
     });
   });
 
@@ -2067,6 +2073,86 @@ describe('released structs below a kept field that no position reaches', () => {
   });
 });
 
+describe('a modern tag property renders the newest type of its history, so its type follows CloudFormation', () => {
+  /** `Tags` as a list of the named struct, whose fields are required strings */
+  const tagList = (struct: string, names = ['Key', 'Value']): Partial<CloudFormationRegistryResource> => ({
+    properties: { Tags: { type: 'array', items: ref(struct) } as jsonschema.Schema },
+    definitions: { [struct]: object(strings(names), names) },
+  });
+  const mixinStructs = () => [...new L1View(db, resource(db), 'cfn-property-mixins').structs.keys()].sort();
+
+  test('a struct that CloudFormation renamed there is a type break, not a kept name, and the mixins keep it', () => {
+    importRegistry(released, tagList('PolicyTag'));
+    importRegistry(db, tagList('PolicyTagV2'));
+
+    const result = run();
+
+    expect(cases(result)).toEqual([]);
+    expect(settled(result)).toEqual([]);
+    expect(tagBreaks(result)).toEqual(['property Tags: Array<PolicyTag> -> Array<PolicyTagV2>']);
+    expect(gateFails(result)).toBe(false);
+    expect(gate(result).report).toContain(
+      [
+        "Tag properties that follow CloudFormation's type (type breaks):",
+        `  ${RESOURCE}: property Tags: Array<PolicyTag> -> Array<PolicyTagV2>`,
+      ].join('\n'),
+    );
+    expect(gate(result).report).not.toContain('Settled');
+    expect(l1Renames()).toEqual(['PolicyTag -> PolicyTagV2 at property Tags']);
+    // The released history stays first, so the mixins still render the released struct, with its released fields
+    expect(history(resource(db).properties.Tags)).toEqual(['Array<PolicyTag>', 'Array<PolicyTagV2>']);
+    expect(l1Structs()).toEqual(['PolicyTagV2']);
+    expect(mixinStructs()).toEqual(['PolicyTag', 'PolicyTagV2']);
+    expect(Object.keys(fields('PolicyTag'))).toEqual(['Key', 'Value']);
+  });
+
+  test('a struct only the mixins render keeps its released fields where CloudFormation changed the tag type', () => {
+    // The released L1 renders the newest type, CloudFormation's tags; the mixins also render TagEntry
+    importRegistry(released, tagList('TagEntry'));
+    importRegistry(released, tagList('Tag'));
+    importRegistry(db, tagList('TagEntryV2', ['Key', 'Value', 'Owner']));
+
+    const result = run();
+
+    expect(cases(result)).toEqual([]);
+    expect(settled(result)).toEqual([]);
+    expect(tagBreaks(result)).toEqual(['property Tags: Array<tag> -> Array<TagEntryV2>']);
+    expect(gateFails(result)).toBe(false);
+    expect(history(resource(db).properties.Tags)).toEqual(['Array<TagEntry>', 'Array<tag>', 'Array<TagEntryV2>']);
+    expect(mixinStructs()).toEqual(['TagEntry', 'TagEntryV2']);
+    expect(Object.keys(fields('TagEntry'))).toEqual(['Key', 'Value']);
+  });
+
+  test('a struct only the mixins render stays as released where the tag type is unchanged', () => {
+    importRegistry(released, tagList('TagEntry'));
+    importRegistry(released, tagList('Tag'));
+    importRegistry(db, tagList('Tag'));
+
+    const result = run();
+
+    expect([...cases(result), ...settled(result), ...switched(result), ...tagBreaks(result)]).toEqual([]);
+    expect(history(resource(db).properties.Tags)).toEqual(['Array<TagEntry>', 'Array<tag>']);
+    expect(l1Structs()).toEqual([]);
+    expect(mixinStructs()).toEqual(['TagEntry']);
+    expect(Object.keys(fields('TagEntry'))).toEqual(['Key', 'Value']);
+    expect(l1Changes()).toEqual([]);
+  });
+
+  test('a struct only the mixins render keeps the released fields that a current type of its name lacks', () => {
+    importRegistry(released, tagList('TagEntry'));
+    importRegistry(released, tagList('Tag'));
+    importRegistry(db, tagList('TagEntry', ['Key']));
+    importRegistry(db, tagList('Tag'));
+
+    const result = run();
+
+    expect([...cases(result), ...settled(result), ...switched(result), ...tagBreaks(result)]).toEqual([]);
+    expect(mixinStructs()).toEqual(['TagEntry']);
+    expect(Object.keys(fields('TagEntry'))).toEqual(['Key', 'Value']);
+    expect(l1Changes()).toEqual([]);
+  });
+});
+
 function arn() {
   return object({ Arn: str() });
 }
@@ -2106,6 +2192,10 @@ function settled(result: TypeHistoryResult) {
 
 function switched(result: TypeHistoryResult) {
   return result.switched.map((s) => `${s.releasedType} -> ${s.newType} at ${s.positions.join(', ')}`);
+}
+
+function tagBreaks(result: TypeHistoryResult) {
+  return result.tagBreaks.map((b) => `${b.position}: ${b.releasedType} -> ${b.newType}`);
 }
 
 /**
