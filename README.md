@@ -91,11 +91,15 @@ A field CloudFormation removed at every position does not switch a type.
 Tag properties follow the CDK code generator. A modern tag property, the tag property of a resource that the generator
 makes `ITaggableV2`, renders the newest type of its history, in aws-cdk-lib and in `@aws-cdk/cfn-property-mixins`. A
 legacy one (`ITaggable`, in the generator's table of legacy resources) renders the oldest, as other properties do. So
-where CloudFormation changed the type of a modern tag property, the L1 renders CloudFormation's type there, whatever
-the history keeps: no released name is kept there. The gate lists the change as a type break, without a mapping entry
-and without failing, and the L1 change report as a renamed struct or a type change. The released history still comes
-first, so the structs of its oldest type, which `@aws-cdk/cfn-property-mixins` also renders, keep their released
-fields.
+where CloudFormation changed the type of a modern tag property, the build adds CloudFormation's type to the history
+and the L1 renders it there, whatever the history keeps: no released name is kept there. The gate lists the change as
+a type break without a mapping entry, and the L1 change report as a renamed struct or a type change. (Where
+CloudFormation's type is an older type of the history, the build does not add it again, and the L1 keeps rendering
+the released newest type.) The released history still comes first, so `@aws-cdk/cfn-property-mixins` also renders the
+structs of its oldest type. Such a struct keeps its released fields and takes those its other positions need, without
+deciding the fields or requiredness that aws-cdk-lib renders there. Where one of those positions lacks one of its
+released fields, the gate fails with a diverging shared type, naming the tag property as a position in
+`@aws-cdk/cfn-property-mixins` only.
 
 ### Type history gate
 
