@@ -187,7 +187,7 @@ jobs:
       - name: Comment diff
         id: comment_diff
         if: steps.diff-db.outputs.diff-result
-        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b
+        uses: thollander/actions-comment-pull-request@v3
         with:
           comment-tag: diff-db
           mode: recreate
@@ -195,7 +195,7 @@ jobs:
       - name: Delete outdated diff
         id: delete_outdated_diff
         if: "!(steps.diff-db.outputs.diff-result)"
-        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b
+        uses: thollander/actions-comment-pull-request@v3
         with:
           comment-tag: diff-db
           message: "**@aws-cdk/aws-service-spec**: No model change detected"
