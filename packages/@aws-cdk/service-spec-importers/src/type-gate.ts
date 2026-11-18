@@ -28,7 +28,8 @@ const WHY: Record<UndecidedKind, string> = {
  * The type history gate: it fails when the matcher left a released type definition undecided
  *
  * Settled renames, merges and splits, weak matches among them, merged and split types that follow CloudFormation,
- * applied mapping entries and entries that apply nowhere are reported only.
+ * modern tag properties whose type follows CloudFormation, applied mapping entries and entries that apply nowhere are
+ * reported only.
  */
 export function typeGate(result: TypeHistoryResult, options: TypeGateOptions): TypeGate {
   const failed = result.undecided.length > 0;
@@ -56,6 +57,11 @@ export function typeGate(result: TypeHistoryResult, options: TypeGateOptions): T
     "Merged and split types that follow CloudFormation's types (type breaks):",
     result.switched,
     (s) => `${s.resource}: ${s.releasedType} -> ${s.newType} (${s.positions.join(', ')})`,
+  );
+  section(
+    "Tag properties that follow CloudFormation's type (type breaks):",
+    result.tagBreaks,
+    (b) => `${b.resource}: ${b.position}: ${b.releasedType} -> ${b.newType}`,
   );
   section(
     'Weak matches (settled renames, merges and splits sharing fewer than half of the released fields):',

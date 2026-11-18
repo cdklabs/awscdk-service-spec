@@ -70,6 +70,23 @@ export interface SwitchedType {
   readonly positions: string[];
 }
 
+/**
+ * A modern tag property whose type CloudFormation changed, a reported type break
+ *
+ * The generated packages render the newest type of a modern tag property's history, so there they render
+ * CloudFormation's type, whatever the released history keeps. The released types stay first in the history, so
+ * cfn-property-mixins still renders the structs of the oldest one.
+ */
+export interface TagTypeBreak {
+  readonly resource: string;
+  /** The tag property, for example `property Tags` */
+  readonly position: string;
+  /** The type the released L1 renders there */
+  readonly releasedType: string;
+  /** The type the L1 renders there now, CloudFormation's */
+  readonly newType: string;
+}
+
 export interface AppliedMapping {
   readonly entry: TypeMapping;
   /** The positions the entry decided */
@@ -89,6 +106,8 @@ export interface TypeHistoryResult {
   readonly weak: WeakMatch[];
   /** The merged and split types that follow CloudFormation's types; they do not fail the gate */
   readonly switched: SwitchedType[];
+  /** The modern tag properties that follow CloudFormation's type; they do not fail the gate */
+  readonly tagBreaks: TagTypeBreak[];
   readonly applied: AppliedMapping[];
   readonly inactive: InactiveMapping[];
 }

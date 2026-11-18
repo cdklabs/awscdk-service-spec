@@ -1,7 +1,8 @@
 import { emptyDatabase, SpecDatabase } from '@aws-cdk/service-spec-types';
 import { importLegacySpec, importRegistry, object, ref, RESOURCE, str } from './utils';
 import { compareL1, formatL1Changes } from '../src/l1-changes';
-import { CloudFormationRegistryResource } from '../src/types';
+import { GeneratedPackage, L1View, renderType } from '../src/l1-view';
+import { CloudFormationRegistryResource, jsonschema } from '../src/types';
 
 let base: SpecDatabase;
 let head: SpecDatabase;
@@ -325,4 +326,171 @@ test('fields added to a struct that keeps its name are listed by name', () => {
       '    field Settings.Port',
     ].join('\n'),
   );
+});
+
+describe('tag properties render as the CDK code generator renders them', () => {
+  // In the CDK code generator's table of legacy (ITaggable) resources, with tags in `Tags`
+  const LEGACY = 'AWS::SQS::Queue';
+  // Also in that table; imported here without tag information
+  const LEGACY_UNTAGGED = 'AWS::OpsWorks::Layer';
+
+  /** `Tags` as a required list of the named struct, whose fields are strings */
+  const tagList = (struct: string, fields = ['Key', 'Value'], required: string[] = []) => ({
+    properties: { Tags: { type: 'array', items: ref(struct) } as jsonschema.Schema },
+    definitions: { [struct]: object(Object.fromEntries(fields.map((f) => [f, str()])), required) },
+    required: ['Tags'],
+  });
+  const settingsTags = (versionTwo: boolean): Partial<CloudFormationRegistryResource> =>
+    versionTwo
+      ? {
+          properties: { Tags: { anyOf: [ref('SettingsV2'), str()] } as jsonschema.Schema },
+          definitions: { SettingsV2: object({ Url: str(), Mode: str() }) },
+        }
+      : { properties: { Tags: ref('Settings') }, definitions: { Settings: object({ Url: str() }) } };
+  const untagged = (schema: Partial<CloudFormationRegistryResource>) => ({ ...schema, tagging: { taggable: false } });
+
+  /** Import the schemas one after the other, so that each property's type history has their types, oldest first */
+  const importVersions = (
+    target: SpecDatabase,
+    typeName: string,
+    ...versions: Array<Partial<CloudFormationRegistryResource>>
+  ) => {
+    for (const version of versions) {
+      importRegistry(target, version, typeName);
+    }
+  };
+
+  /** The tag property and the structs that a package renders */
+  const rendered = (target: SpecDatabase, pkg: GeneratedPackage, typeName = RESOURCE) => {
+    const l1 = new L1View(target, target.lookup('resource', 'cloudFormationType', 'equals', typeName).only(), pkg);
+    return {
+      tags: renderType(target, l1.properties.Tags.type),
+      required: l1.properties.Tags.required,
+      structs: [...l1.structs.keys()].sort(),
+    };
+  };
+
+  test('a modern tag property renders the newest type of its history, and the mixins also the oldest one', () => {
+    importVersions(head, RESOURCE, tagList('TagEntry'), tagList('Tag'));
+
+    expect(head.lookup('resource', 'cloudFormationType', 'equals', RESOURCE).only().tagInformation).toBeDefined();
+    expect(rendered(head, 'aws-cdk-lib')).toEqual({ tags: 'Array<tag>', required: false, structs: [] });
+    expect(rendered(head, 'cfn-property-mixins')).toEqual({
+      tags: 'Array<tag>',
+      required: false,
+      structs: ['TagEntry'],
+    });
+  });
+
+  test('a legacy tag property renders the oldest type of its history, and no package renders its later types', () => {
+    importVersions(head, LEGACY, tagList('TagEntry'), tagList('TagEntryV2', ['Key', 'Value', 'Owner']));
+
+    for (const pkg of ['aws-cdk-lib', 'cfn-property-mixins'] as const) {
+      expect(rendered(head, pkg, LEGACY)).toEqual({ tags: 'Array<TagEntry>', required: false, structs: ['TagEntry'] });
+    }
+  });
+
+  test('a resource in the legacy table has a legacy tag property without tag information', () => {
+    importVersions(
+      head,
+      LEGACY_UNTAGGED,
+      untagged(tagList('TagEntry')),
+      untagged(tagList('TagEntryV2', ['Key', 'Value', 'Owner'])),
+    );
+
+    expect(
+      head.lookup('resource', 'cloudFormationType', 'equals', LEGACY_UNTAGGED).only().tagInformation,
+    ).toBeUndefined();
+    for (const pkg of ['aws-cdk-lib', 'cfn-property-mixins'] as const) {
+      expect(rendered(head, pkg, LEGACY_UNTAGGED)).toEqual({
+        tags: 'Array<TagEntry>',
+        required: false,
+        structs: ['TagEntry'],
+      });
+    }
+  });
+
+  test('a modern tag struct that CloudFormation renamed renders under its new name, and the mixins keep the old one', () => {
+    importVersions(head, RESOURCE, tagList('PolicyTag'), tagList('PolicyTagV2'));
+
+    expect(rendered(head, 'aws-cdk-lib')).toEqual({
+      tags: 'Array<PolicyTagV2>',
+      required: false,
+      structs: ['PolicyTagV2'],
+    });
+    expect(rendered(head, 'cfn-property-mixins').structs).toEqual(['PolicyTag', 'PolicyTagV2']);
+  });
+
+  test('a modern tag property whose type CloudFormation changed renders the new type', () => {
+    importVersions(head, RESOURCE, settingsTags(false), settingsTags(true));
+
+    expect(rendered(head, 'aws-cdk-lib')).toEqual({
+      tags: 'SettingsV2 | string',
+      required: false,
+      structs: ['SettingsV2'],
+    });
+    expect(rendered(head, 'cfn-property-mixins').structs).toEqual(['Settings', 'SettingsV2']);
+  });
+
+  test('the report shows a modern tag struct that CloudFormation renamed', () => {
+    importRegistry(base, tagList('PolicyTag'));
+    importVersions(head, RESOURCE, tagList('PolicyTag'), tagList('PolicyTagV2'));
+
+    const changes = compareL1(base, head);
+
+    expect(changes.renames.map((r) => `${r.from} -> ${r.to} at ${r.positions.join(', ')}`)).toEqual([
+      'PolicyTag -> PolicyTagV2 at property Tags',
+    ]);
+    expect([...changes.removed, ...changes.requiredness, ...changes.other]).toEqual([]);
+    expect(formatL1Changes(changes)).toContain(`  ${RESOURCE}\n    PolicyTag -> PolicyTagV2 (property Tags)`);
+  });
+
+  test('the report shows a type change of a modern tag property, and the struct aws-cdk-lib no longer renders', () => {
+    importRegistry(base, settingsTags(false));
+    importVersions(head, RESOURCE, settingsTags(false), settingsTags(true));
+
+    const changes = compareL1(base, head);
+
+    expect(changes.other.map((c) => `${c.element}: ${c.description}`)).toEqual([
+      'property Tags: type changed from Settings to SettingsV2 | string',
+    ]);
+    expect(changes.removed.map((c) => `${c.element}: ${c.description}`)).toEqual([
+      'struct Settings: no longer rendered',
+    ]);
+    expect(changes.renames).toEqual([]);
+  });
+
+  test('the report shows a field added to a struct only the mixins render, which render every field optional', () => {
+    importVersions(base, RESOURCE, tagList('TagEntry'), tagList('Tag'));
+    importVersions(head, RESOURCE, tagList('TagEntry', ['Key', 'Value', 'Owner'], ['Key']), tagList('Tag'));
+
+    const changes = compareL1(base, head);
+
+    expect(changes.addedFields.map((c) => c.element)).toEqual(['field TagEntry.Owner']);
+    expect([...changes.renames, ...changes.removed, ...changes.requiredness, ...changes.other]).toEqual([]);
+  });
+
+  test('the report leaves out the structs that no package renders', () => {
+    importVersions(
+      base,
+      LEGACY_UNTAGGED,
+      untagged(tagList('TagEntry')),
+      untagged(tagList('TagEntryV2', ['Key', 'Value'])),
+    );
+    importVersions(
+      head,
+      LEGACY_UNTAGGED,
+      untagged(tagList('TagEntry')),
+      untagged(tagList('TagEntryV2', ['Key', 'Value', 'Owner'], ['Key'])),
+    );
+
+    expect(compareL1(base, head)).toEqual({
+      renames: [],
+      removed: [],
+      requiredness: [],
+      other: [],
+      addedFields: [],
+      additions: 0,
+    });
+  });
 });

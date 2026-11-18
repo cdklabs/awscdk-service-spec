@@ -1,4 +1,4 @@
-import { Resource, RichTypedField, SpecDatabase, TypeDefinition } from '@aws-cdk/service-spec-types';
+import { PropertyType, Resource, RichTypedField, SpecDatabase, TypeDefinition } from '@aws-cdk/service-spec-types';
 import { applyTypeHistory } from './type-history-apply';
 import {
   cloudFormationTypes,
@@ -30,9 +30,9 @@ import {
   UseStatus,
   VisitedPosition,
 } from './type-history-model';
-import { reportTypeHistory } from './type-history-report';
+import { reportTagBreaks, reportTypeHistory } from './type-history-report';
 import { TypeHistoryResult } from './type-history-result';
-import { fieldLabel, referencedStructs } from '../l1-view';
+import { fieldLabel, referencedStructs, renderedFieldType, renderedPropertyTypes } from '../l1-view';
 import { TypeMapping } from '../type-mappings';
 import { matchShape, sameNameOrSharedField } from '../type-pairing';
 
@@ -44,14 +44,17 @@ export * from './type-history-result';
  * The rules, the merge and split rule and the mapping kinds are stated in "Released database baseline" in README.md.
  * Per resource that both databases have, the steps are:
  *
- * 1. Collect the positions where the released L1 renders a type definition, pair each with CloudFormation's type
- *    there, and add the positions where CloudFormation uses a current type definition of a released name.
+ * 1. Collect the positions where the released L1 renders a type definition, as `renderedPropertyTypes()` and
+ *    `renderedFieldType()` in l1-view.ts say, pair each with CloudFormation's type there, and add the positions where
+ *    CloudFormation uses a current type definition of a released name. A modern tag property renders the newest type
+ *    of its history, so where CloudFormation changed its type the L1 renders CloudFormation's: no released type is
+ *    kept there, and the released types whose structs only cfn-property-mixins renders keep their released fields.
  * 2. Decide every released type definition in rounds: by its mapping entry, else by the merge and split rule, else
  *    from the fields its positions need. Each round counts again the positions the decisions render, until they
  *    settle.
  * 3. Report the undecided, settled, switched and weak cases and the applied and inactive entries.
  * 4. Apply the decisions to `db`: the kept type definitions' fields, the released histories first, and the flags for
- *    backwards compatibility.
+ *    backwards compatibility. Then report the modern tag properties whose rendered type changed, as type breaks.
  *
  * Undecided type definitions keep their released fields plus all carried ones, and are returned with the entries that
  * would decide them.
@@ -61,7 +64,15 @@ export function importTypeHistory(
   released: SpecDatabase,
   mappings: TypeMapping[],
 ): TypeHistoryResult {
-  const result: TypeHistoryResult = { undecided: [], settled: [], weak: [], switched: [], applied: [], inactive: [] };
+  const result: TypeHistoryResult = {
+    undecided: [],
+    settled: [],
+    weak: [],
+    switched: [],
+    tagBreaks: [],
+    applied: [],
+    inactive: [],
+  };
 
   for (const releasedResource of released.all('resource')) {
     const current = db.lookup('resource', 'cloudFormationType', 'equals', releasedResource.cloudFormationType);
@@ -85,6 +96,7 @@ export function importTypeHistory(
   result.settled.sort(byType);
   result.weak.sort((a, b) => byType(a, b) || a.newType.localeCompare(b.newType));
   result.switched.sort((a, b) => byType(a, b) || a.newType.localeCompare(b.newType));
+  result.tagBreaks.sort((a, b) => a.resource.localeCompare(b.resource) || a.position.localeCompare(b.position));
   result.applied.sort((a, b) => mappings.indexOf(a.entry) - mappings.indexOf(b.entry));
   result.inactive.sort((a, b) => mappings.indexOf(a.entry) - mappings.indexOf(b.entry));
   return result;
@@ -144,6 +156,7 @@ class ResourceTypeHistory {
       result: this.result,
     });
     applyTypeHistory({ db, released, releasedResource, resource, positions, round, currentByName });
+    reportTagBreaks({ db, released, releasedResource, resource, positions, result: this.result });
   }
 
   /**
@@ -158,8 +171,9 @@ class ResourceTypeHistory {
     ancestry: string[],
     parentUse?: Use,
   ) {
-    const releasedTypes = new RichTypedField(releasedField).types();
     const cfnType = currentField.type;
+    const typeUnchanged = sameRenderedType(this.released, this.db, releasedField.type, cfnType);
+    const { rendered, mixinsOnly } = this.renderedReleasedTypes(owner, releasedField, cfnType, typeUnchanged);
     const position: VisitedPosition = {
       kind: 'visited',
       label,
@@ -170,25 +184,34 @@ class ResourceTypeHistory {
       currentTypes: unique(
         currentFields.flatMap((f) => new RichTypedField(f).types()).flatMap((t) => referencedStructs(this.db, t)),
       ),
-      typeUnchanged: sameRenderedType(this.released, this.db, releasedField.type, cfnType),
+      typeUnchanged,
+      rendersCloudFormation: !rendered,
       parentUse,
       uses: [],
     };
     this.positions.push(position);
 
-    const rendered = releasedTypes[0];
     // Where CloudFormation put the type into a list or map, or took it out, the structs inside pair and are compared
     // as at any other position, while the L1 keeps rendering the released type
     const pairs =
-      matchShape(this.released, rendered, this.db, cfnType) ??
-      matchShape(this.released, insideContainers(rendered), this.db, insideContainers(cfnType));
-    for (const releasedType of unique(referencedStructs(this.released, rendered))) {
+      rendered &&
+      (matchShape(this.released, rendered, this.db, cfnType) ??
+        matchShape(this.released, insideContainers(rendered), this.db, insideContainers(cfnType)));
+    const renderedStructs = rendered ? unique(referencedStructs(this.released, rendered)) : [];
+    // The mixins render these as structs of their own, not as the position's type, so CloudFormation's type there does
+    // not describe them and they keep their released fields
+    const mixinsStructs = unique(mixinsOnly.flatMap((t) => referencedStructs(this.released, t))).filter(
+      (s) => !renderedStructs.includes(s),
+    );
+    for (const releasedType of [...renderedStructs, ...mixinsStructs]) {
       const candidates = unique((pairs ?? []).filter(([r]) => r === releasedType).map(([, c]) => c));
       const use: Use = {
         released: releasedType,
         position,
         candidates,
-        ...this.classify(releasedType, position, candidates, pairs !== undefined),
+        ...(renderedStructs.includes(releasedType)
+          ? this.classify(releasedType, position, candidates, pairs !== undefined)
+          : { status: 'not-a-type' as const }),
       };
       position.uses.push(use);
       pushTo(this.uses, releasedType, use);
@@ -215,6 +238,33 @@ class ResourceTypeHistory {
   }
 
   /**
+   * The released type the L1 renders at a position once the build has put the released history first, and the
+   * released types only cfn-property-mixins renders the structs of there
+   *
+   * `rendered` is undefined where the L1 renders CloudFormation's type instead, whatever the history keeps: at a modern
+   * tag property whose type CloudFormation changed, which renders the newest type of its history.
+   */
+  private renderedReleasedTypes(
+    owner: Owner,
+    releasedField: Field,
+    cfnType: PropertyType,
+    typeUnchanged: boolean,
+  ): { rendered?: PropertyType; mixinsOnly: PropertyType[] } {
+    if (owner.bag !== 'properties') {
+      return { rendered: renderedFieldType(releasedField), mixinsOnly: [] };
+    }
+    // Where CloudFormation changed the type, the build adds it to the released history
+    const releasedTypes = new RichTypedField(releasedField).types();
+    const history = typeUnchanged ? releasedTypes : [...releasedTypes, cfnType];
+    const lib = renderedPropertyTypes(this.resource, owner.name, history, 'aws-cdk-lib');
+    const mixins = renderedPropertyTypes(this.resource, owner.name, history, 'cfn-property-mixins');
+    return {
+      rendered: lib.type === cfnType ? undefined : lib.type,
+      mixinsOnly: mixins.structTypes.filter((t) => t !== cfnType && !lib.structTypes.includes(t)),
+    };
+  }
+
+  /**
    * Record the released type definitions at the fields of a kept released type that CloudFormation's types do not
    * reach, because CloudFormation's type at its position has another shape or no pair
    *
@@ -230,7 +280,7 @@ class ResourceTypeHistory {
         parentUse,
         uses: [],
       };
-      for (const nested of unique(referencedStructs(this.released, new RichTypedField(field).types()[0]))) {
+      for (const nested of unique(referencedStructs(this.released, renderedFieldType(field)))) {
         const use: Use = { released: nested, position, candidates: [], status: 'not-a-type' };
         position.uses.push(use);
         pushTo(this.uses, nested, use);
@@ -315,10 +365,10 @@ class ResourceTypeHistory {
    * depth, is not among them
    *
    * Where the L1 renders kept type definitions at a position, it renders the fields of the CloudFormation types they
-   * are paired with that the kept ones keep. A resource property, other than the tags, also renders the later types
-   * of its history as structs of their own, CloudFormation's among them, so there the L1 also renders the fields of
-   * each CloudFormation type, except those that a kept type definition of its name leaves out. Elsewhere it renders
-   * those fields only where no kept type definition is rendered.
+   * are paired with that the kept ones keep. A resource property that renders the structs of the newest type of its
+   * history, CloudFormation's (see `rendersNewestType()`), also renders the fields of each CloudFormation type, except
+   * those that a kept type definition of its name leaves out. Elsewhere the L1 renders those fields only where no kept
+   * type definition is rendered.
    */
   private renderedCurrentFields(round: DecidedRound): Map<string, string> {
     const keptAt = new Map<Field, Use[]>();
@@ -334,9 +384,8 @@ class ResourceTypeHistory {
     const rendered = new Map<string, string>();
     const walked = new Set<string>();
     const queue = new Array<{ label: string; field: Field; rendersHistory?: boolean }>();
-    const tags = this.resource.tagInformation?.tagPropertyName;
     for (const [name, field] of Object.entries(this.resource.properties)) {
-      queue.push({ label: fieldLabel('properties', name), field, rendersHistory: name !== tags });
+      queue.push({ label: fieldLabel('properties', name), field, rendersHistory: this.rendersNewestType(name, field) });
     }
     for (const [name, field] of Object.entries(this.resource.attributes)) {
       queue.push({ label: fieldLabel('attributes', name), field });
@@ -373,6 +422,18 @@ class ResourceTypeHistory {
       }
     }
     return rendered;
+  }
+
+  /**
+   * Whether a resource property renders the structs of CloudFormation's type even where a kept released type stays
+   * there: the build puts that type after the released history, and a property other than the tag property renders
+   * the later types of its history as structs of their own, a modern tag property the newest as its type, and a
+   * legacy one neither
+   */
+  private rendersNewestType(name: string, field: Field) {
+    const released = this.releasedResource.properties[name];
+    const history = [...(released ? new RichTypedField(released).types() : []), field.type];
+    return renderedPropertyTypes(this.resource, name, history, 'aws-cdk-lib').structTypes.includes(field.type);
   }
 
   /**
