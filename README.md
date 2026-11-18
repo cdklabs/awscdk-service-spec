@@ -58,9 +58,9 @@ holds its version, the npm integrity of its tarball and the sha256 of its `db.js
 The build applies these rules after the sources that define types:
 
 1. Each property, attribute and nested field that both the released database and the current sources have keeps the
-   released type history first, so the L1 renders the released type. Where CloudFormation's type there equals the
-   released newest type, the history stays as released, and the released type definitions it names are kept even
-   where no current source describes them.
+   released type history first, so the L1 renders the released type (except at a modern tag property, see below).
+   Where CloudFormation's type there equals the released newest type, the history stays as released, and the
+   released type definitions it names are kept even where no current source describes them.
 2. Where CloudFormation changed the type since the release, its type is added to the history. A released type
    definition that CloudFormation no longer has there is paired with the type at the same place in CloudFormation's
    type, if both types have the same lists, maps and unions: the one with the same name, or else the one that shares
@@ -88,6 +88,15 @@ CloudFormation renamed the type, while a position where CloudFormation kept the 
 does this by itself, without a mapping entry, and the gate and the L1 change report list each switch as a type break.
 A field CloudFormation removed at every position does not switch a type.
 
+Tag properties follow the CDK code generator. A modern tag property, the tag property of a resource that the generator
+makes `ITaggableV2`, renders the newest type of its history, in aws-cdk-lib and in `@aws-cdk/cfn-property-mixins`. A
+legacy one (`ITaggable`, in the generator's table of legacy resources) renders the oldest, as other properties do. So
+where CloudFormation changed the type of a modern tag property, the L1 renders CloudFormation's type there, whatever
+the history keeps: no released name is kept there. The gate lists the change as a type break, without a mapping entry
+and without failing, and the L1 change report as a renamed struct or a type change. The released history still comes
+first, so the structs of its oldest type, which `@aws-cdk/cfn-property-mixins` also renders, keep their released
+fields.
+
 ### Type history gate
 
 Where the rules cannot decide, a person must. The `build` job fails on pull requests and in the merge queue when
@@ -102,8 +111,8 @@ Where the rules cannot decide, a person must. The `build` job fails on pull requ
 
 For each case it prints the resource, the positions and the released type, and one entry per kind that decides it.
 The step also writes these entries to the `type-mapping-entries` build artifact. Settled renames, merges and splits,
-merged and split types that follow CloudFormation, and the changes to the L1 since the released database, are printed
-but do not fail the gate.
+merged and split types that follow CloudFormation, modern tag properties whose type follows CloudFormation, and the
+changes to the L1 since the released database, are printed but do not fail the gate.
 
 Among the settled renames, merges and splits, the gate also lists as weak matches each current type that shares fewer
 than half of the released type's fields, by name, and each one paired with a released type without fields (as 0 of
@@ -156,10 +165,13 @@ packages/@aws-cdk/service-spec-importers/bin/diff-db --l1-changes sources/Releas
 ```
 
 It lists renamed and merged structs, removed resources, properties, attributes, fields and structs, requiredness
-changes, type changes, and the fields added to structs that keep their names. The database diff comment on pull
-requests includes it. A renamed struct's positions are named as the type history gate names them, by the path from a
-resource property or attribute (for example `property Checks.C`); a change to a struct's own field is named by the
-struct and field (for example `field Check.Configuration`), once for all the struct's positions.
+changes, type changes, and the fields added to structs that keep their names. It compares what aws-cdk-lib and
+`@aws-cdk/cfn-property-mixins` render, and lists a change in either once: the mixins render every field optional and
+no struct that is kept only for backwards compatibility, and they also render the structs of the oldest type of a
+modern tag property. The database diff comment on pull requests includes it. A renamed struct's positions are named
+as the type history gate names them, by the path from a resource property or attribute (for example
+`property Checks.C`); a change to a struct's own field is named by the struct and field (for example
+`field Check.Configuration`), once for all the struct's positions.
 
 ## Contributing
 
