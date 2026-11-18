@@ -35,7 +35,8 @@ export interface CloudFormationPosition {
  * - `same`: CloudFormation's type there has the released name.
  * - `paired`: CloudFormation's type there has another name and is paired with the released type.
  * - `not-a-type`: CloudFormation's type there has another shape, even inside its lists and maps, so it has no type
- *   definition at that place; also every use at an unreached position.
+ *   definition at that place; also every use at an unreached position, and every use that only cfn-property-mixins
+ *   renders.
  * - `no-pair`: CloudFormation's type there has the same shape, but no type definition at that place shares a field
  *   with the released one.
  * - `ambiguous`: more than one does.
@@ -75,7 +76,8 @@ export interface VisitedPosition extends PositionBase {
   readonly typeUnchanged: boolean;
   /**
    * Whether the L1 renders CloudFormation's type here whatever the released history keeps, as at a modern tag property
-   * whose type CloudFormation changed, so no released type is kept here
+   * whose type CloudFormation changed, so no released type is kept here (except where CloudFormation's type is an older
+   * type of the released history, which the build does not add again, see `importTypeHistory()`)
    */
   readonly rendersCloudFormation: boolean;
   readonly within?: undefined;
@@ -119,6 +121,11 @@ export interface Use {
   readonly status: UseStatus;
   /** CloudFormation's type definition there */
   readonly cfn?: TypeDefinition;
+  /**
+   * Whether only cfn-property-mixins renders the released type here, as a struct of its own: the structs of the
+   * oldest type of a modern tag property, whose type aws-cdk-lib renders as the newest, and the structs below them
+   */
+  readonly mixinsOnly?: boolean;
 }
 
 interface DecisionBase {
@@ -181,6 +188,25 @@ export function need(use: Use): string[] {
   }
   const stillThere = releasedFields.filter((name) => use.position.currentTypes.some((t) => t.properties[name]));
   return unique([...Object.keys(use.cfn.properties), ...stillThere]);
+}
+
+/**
+ * The uses whose needs decide the fields of a released type definition and their requiredness: those that aws-cdk-lib
+ * renders, or all of them where it renders none
+ *
+ * cfn-property-mixins renders every field optional, so a use that only it renders takes the fields the others need,
+ * as long as they include its released ones (see `keepsMixinsFields()`).
+ */
+export function constrainingUses(uses: Use[]): Use[] {
+  const lib = uses.filter((u) => !u.mixinsOnly);
+  return lib.length > 0 ? lib : uses;
+}
+
+/**
+ * Whether fields keep the released fields that each use only cfn-property-mixins renders needs
+ */
+export function keepsMixinsFields(uses: Use[], fields: string[]) {
+  return uses.filter((u) => u.mixinsOnly).every((u) => need(u).every((name) => fields.includes(name)));
 }
 
 /**

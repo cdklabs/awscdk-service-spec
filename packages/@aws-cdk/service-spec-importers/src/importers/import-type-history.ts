@@ -3,6 +3,7 @@ import { applyTypeHistory } from './type-history-apply';
 import {
   cloudFormationTypes,
   CloudFormationPosition,
+  constrainingUses,
   CurrentOnlyPosition,
   DecidedRound,
   Decision,
@@ -13,6 +14,7 @@ import {
   insideContainers,
   isDefined,
   isUnpaired,
+  keepsMixinsFields,
   need,
   ownerKey,
   Owner,
@@ -47,8 +49,13 @@ export * from './type-history-result';
  * 1. Collect the positions where the released L1 renders a type definition, as `renderedPropertyTypes()` and
  *    `renderedFieldType()` in l1-view.ts say, pair each with CloudFormation's type there, and add the positions where
  *    CloudFormation uses a current type definition of a released name. A modern tag property renders the newest type
- *    of its history, so where CloudFormation changed its type the L1 renders CloudFormation's: no released type is
- *    kept there, and the released types whose structs only cfn-property-mixins renders keep their released fields.
+ *    of its history, so where CloudFormation changed its type the build adds CloudFormation's type last and the L1
+ *    renders it there: no released type is kept there. (Where CloudFormation's type is already an older type of the
+ *    released history, the build does not add it again, and the L1 keeps rendering the released newest type there,
+ *    by name and without comparing it with CloudFormation's.) The released types whose structs only
+ *    cfn-property-mixins renders there keep their released fields, plus those their other positions need; they do not
+ *    decide the fields or requiredness aws-cdk-lib renders, and a position that lacks one of their released fields
+ *    leaves them undecided.
  * 2. Decide every released type definition in rounds: by its mapping entry, else by the merge and split rule, else
  *    from the fields its positions need. Each round counts again the positions the decisions render, until they
  *    settle.
@@ -199,7 +206,7 @@ class ResourceTypeHistory {
         matchShape(this.released, insideContainers(rendered), this.db, insideContainers(cfnType)));
     const renderedStructs = rendered ? unique(referencedStructs(this.released, rendered)) : [];
     // The mixins render these as structs of their own, not as the position's type, so CloudFormation's type there does
-    // not describe them and they keep their released fields
+    // not describe them: they keep their released fields, and take those their other uses need
     const mixinsStructs = unique(mixinsOnly.flatMap((t) => referencedStructs(this.released, t))).filter(
       (s) => !renderedStructs.includes(s),
     );
@@ -211,7 +218,7 @@ class ResourceTypeHistory {
         candidates,
         ...(renderedStructs.includes(releasedType)
           ? this.classify(releasedType, position, candidates, pairs !== undefined)
-          : { status: 'not-a-type' as const }),
+          : { status: 'not-a-type' as const, mixinsOnly: true }),
       };
       position.uses.push(use);
       pushTo(this.uses, releasedType, use);
@@ -269,7 +276,8 @@ class ResourceTypeHistory {
    * reach, because CloudFormation's type at its position has another shape or no pair
    *
    * They keep exactly their released fields there, and are compared like any other use, so a current type of their
-   * name that CloudFormation uses elsewhere with other fields leaves them undecided.
+   * name that CloudFormation uses elsewhere with other fields leaves them undecided. Below a struct that only
+   * cfn-property-mixins renders, only it renders them too.
    */
   private visitUnreached(label: string, releasedType: TypeDefinition, ancestry: string[], parentUse: Use) {
     for (const [name, field] of Object.entries(releasedType.properties)) {
@@ -281,7 +289,13 @@ class ResourceTypeHistory {
         uses: [],
       };
       for (const nested of unique(referencedStructs(this.released, renderedFieldType(field)))) {
-        const use: Use = { released: nested, position, candidates: [], status: 'not-a-type' };
+        const use: Use = {
+          released: nested,
+          position,
+          candidates: [],
+          status: 'not-a-type',
+          ...(parentUse.mixinsOnly ? { mixinsOnly: true } : {}),
+        };
         position.uses.push(use);
         pushTo(this.uses, nested, use);
         if (!ancestry.includes(nested.$id)) {
@@ -590,8 +604,12 @@ class ResourceTypeHistory {
       }
     }
 
-    const needs = uses.map((u) => need(u));
-    const keepAll = releasedAnd(releasedType, needs.flat());
+    // A use that only cfn-property-mixins renders takes the fields the others need, if they keep its released ones
+    const needs = constrainingUses(uses).map((u) => need(u));
+    const keepAll = releasedAnd(
+      releasedType,
+      uses.flatMap((u) => need(u)),
+    );
     const unpaired = uses.find(isUnpaired);
     if (unpaired) {
       return { kind: 'undecided', stays: uses, follows: [], fields: keepAll, undecided: unpaired.status };
@@ -600,13 +618,14 @@ class ResourceTypeHistory {
       // Where CloudFormation's type has another name, the L1 renders it; elsewhere the released type stays
       const follows = uses.filter((u) => u.status === 'paired');
       const stays = uses.filter((u) => !follows.includes(u));
-      const stayNeeds = stays.map((u) => need(u));
-      if (stayNeeds.every((n) => sameSet(n, stayNeeds[0]))) {
-        return { kind: 'switched', stays, follows, fields: stayNeeds[0] ?? [] };
+      const stayNeeds = constrainingUses(stays).map((u) => need(u));
+      const fields = stayNeeds[0] ?? [];
+      if (stayNeeds.every((n) => sameSet(n, fields)) && keepsMixinsFields(stays, fields)) {
+        return { kind: 'switched', stays, follows, fields };
       }
       return { kind: 'undecided', stays: uses, follows: [], fields: keepAll, undecided: 'diverging' };
     }
-    if (needs.every((n) => sameSet(n, needs[0]))) {
+    if (needs.every((n) => sameSet(n, needs[0])) && keepsMixinsFields(uses, needs[0])) {
       return { kind: 'kept', stays: uses, follows: [], fields: needs[0] };
     }
     // A merge or split whose positions need different fields follows CloudFormation, so this is neither
@@ -646,7 +665,7 @@ class ResourceTypeHistory {
       return !decidedByEntry && !uses.some(isUnpaired);
     };
     const needsDiffer = (releasedType: TypeDefinition) => {
-      const needs = usesOf.get(releasedType)!.map((u) => need(u));
+      const needs = constrainingUses(usesOf.get(releasedType)!).map((u) => need(u));
       return needs.some((n) => !sameSet(n, needs[0]));
     };
     const switched = new Set<TypeDefinition>();

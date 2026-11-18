@@ -2151,6 +2151,153 @@ describe('a modern tag property renders the newest type of its history, so its t
     expect(Object.keys(fields('TagEntry'))).toEqual(['Key', 'Value']);
     expect(l1Changes()).toEqual([]);
   });
+
+  describe('a struct only the mixins render at the tag property takes the fields its other positions need', () => {
+    const MIXINS_TAGS = 'property Tags in @aws-cdk/cfn-property-mixins only';
+
+    test('where CloudFormation renamed it at both properties', () => {
+      importRegistry(released, {
+        properties: { Tags: { type: 'array', items: ref('PolicyTag') }, Other: ref('PolicyTag') },
+        definitions: { PolicyTag: object(strings(['Key', 'Value']), ['Key', 'Value']) },
+      });
+      importRegistry(db, {
+        properties: { Tags: { type: 'array', items: ref('PolicyTagV2') }, Other: ref('PolicyTagV2') },
+        definitions: { PolicyTagV2: object(strings(['Key', 'Value', 'Owner']), ['Key', 'Value']) },
+      });
+
+      const result = run();
+
+      expect(cases(result)).toEqual([]);
+      expect(gateFails(result)).toBe(false);
+      expect(settled(result)).toEqual(['rename PolicyTag -> PolicyTagV2 at property Other']);
+      expect(tagBreaks(result)).toEqual(['property Tags: Array<PolicyTag> -> Array<PolicyTagV2>']);
+      expect(fields('PolicyTag')).toEqual({ Key: 'string (required)', Value: 'string (required)', Owner: 'string' });
+      expect(history(resource(db).properties.Other)).toEqual(['PolicyTag', 'PolicyTagV2']);
+      expect(history(resource(db).properties.Tags)).toEqual(['Array<PolicyTag>', 'Array<PolicyTagV2>']);
+      expect(mixinStructs()).toEqual(['PolicyTag', 'PolicyTagV2']);
+    });
+
+    test('where CloudFormation renamed it at the tag property only, with requiredness from the other property', () => {
+      importRegistry(released, {
+        properties: { Tags: { type: 'array', items: ref('PolicyTag') }, Other: ref('PolicyTag') },
+        definitions: { PolicyTag: object(strings(['Key', 'Value']), ['Key', 'Value']) },
+      });
+      importRegistry(db, {
+        properties: { Tags: { type: 'array', items: ref('PolicyTagV2') }, Other: ref('PolicyTag') },
+        definitions: {
+          PolicyTagV2: object(strings(['Key', 'Value']), ['Key', 'Value']),
+          PolicyTag: object(strings(['Key', 'Value', 'Owner']), ['Key', 'Value', 'Owner']),
+        },
+      });
+
+      const result = run();
+
+      expect(cases(result)).toEqual([]);
+      expect(gateFails(result)).toBe(false);
+      expect(settled(result)).toEqual([]);
+      expect(tagBreaks(result)).toEqual(['property Tags: Array<PolicyTag> -> Array<PolicyTagV2>']);
+      // aws-cdk-lib renders PolicyTag at Other, where CloudFormation requires Owner
+      expect(fields('PolicyTag')).toEqual({
+        Key: 'string (required)',
+        Value: 'string (required)',
+        Owner: 'string (required)',
+      });
+      expect(mixinStructs()).toEqual(['PolicyTag', 'PolicyTagV2']);
+    });
+
+    test('where a struct below it is renamed at another property', () => {
+      importRegistry(released, {
+        properties: { Tags: { type: 'array', items: ref('PolicyTag') }, Other: ref('Inner') },
+        definitions: {
+          PolicyTag: object({ Key: str(), Value: str(), Meta: ref('Inner') }, ['Key', 'Value']),
+          Inner: object(strings(['A', 'B'])),
+        },
+      });
+      importRegistry(db, {
+        properties: { Tags: { type: 'array', items: ref('PolicyTagV2') }, Other: ref('InnerV2') },
+        definitions: {
+          PolicyTagV2: object({ Key: str(), Value: str(), Meta: ref('InnerV2') }, ['Key', 'Value']),
+          InnerV2: object(strings(['A', 'B', 'C'])),
+        },
+      });
+
+      const result = run();
+
+      expect(cases(result)).toEqual([]);
+      expect(gateFails(result)).toBe(false);
+      expect(settled(result)).toEqual(['rename Inner -> InnerV2 at property Other']);
+      expect(tagBreaks(result)).toEqual(['property Tags: Array<PolicyTag> -> Array<PolicyTagV2>']);
+      expect(Object.keys(fields('Inner'))).toEqual(['A', 'B', 'C']);
+      expect(Object.keys(fields('PolicyTag'))).toEqual(['Key', 'Value', 'Meta']);
+    });
+
+    test('and diverges where the other position lacks its released fields, named as the mixins position', () => {
+      // CloudFormation's TagEntry at Other has none of the fields the mixins render TagEntry with
+      importRegistry(released, tagList('TagEntry'));
+      importRegistry(released, tagList('Tag'));
+      importRegistry(db, {
+        properties: { Tags: { type: 'array', items: ref('TagEntryV2') }, Other: ref('TagEntry') },
+        definitions: {
+          TagEntryV2: object(strings(['Key', 'Value']), ['Key', 'Value']),
+          TagEntry: object(strings(['Name'])),
+        },
+      });
+
+      const result = run();
+
+      expect(cases(result)).toEqual([`diverging TagEntry at property Other, ${MIXINS_TAGS}`]);
+      expect(gateFails(result)).toBe(true);
+      expect(gate(result).report).not.toMatch(/^ {2}property Tags:/m);
+      expect(tagBreaks(result)).toEqual(['property Tags: Array<tag> -> Array<TagEntryV2>']);
+    });
+
+    test('and does not make a split of it at other properties follow CloudFormation', () => {
+      // CloudFormation split Kv at A and B and removed Value at both, which keeps Kv in aws-cdk-lib without Value, but
+      // the mixins render Kv with Value
+      importRegistry(released, {
+        properties: { Tags: { type: 'array', items: ref('Kv') }, A: ref('Kv'), B: ref('Kv') },
+        definitions: { Kv: object(strings(['Key', 'Value']), ['Key']) },
+      });
+      importRegistry(db, {
+        properties: { Tags: { type: 'array', items: ref('KvT') }, A: ref('KvA'), B: ref('KvB') },
+        definitions: {
+          KvT: object(strings(['Key', 'Value']), ['Key']),
+          KvA: object(strings(['Key']), ['Key']),
+          KvB: object(strings(['Key']), ['Key']),
+        },
+      });
+
+      const result = run();
+
+      expect(switched(result)).toEqual([]);
+      expect(cases(result)).toEqual([`diverging Kv at property A, property B, ${MIXINS_TAGS}`]);
+    });
+
+    test('a keep-old entry for it names the tag property as the mixins position', () => {
+      importRegistry(released, tagList('PolicyTag'));
+      importRegistry(db, tagList('PolicyTagV2'));
+      const entry = mapping({ resource: RESOURCE, oldType: 'PolicyTag', newTypes: ['PolicyTagV2'], kind: 'keep-old' });
+
+      const result = run([entry]);
+
+      expect(result.applied.map((a) => a.positions)).toEqual([[MIXINS_TAGS]]);
+      expect(tagBreaks(result)).toEqual(['property Tags: Array<PolicyTag> -> Array<PolicyTagV2>']);
+    });
+
+    test('a rename entry for it applies nowhere, because only the mixins render it', () => {
+      importRegistry(released, tagList('PolicyTag'));
+      importRegistry(db, tagList('PolicyTagV2'));
+      const entry = mapping({ resource: RESOURCE, oldType: 'PolicyTag', newTypes: ['PolicyTagV2'], kind: 'rename' });
+
+      const result = run([entry]);
+
+      expect(applied(result)).toEqual([]);
+      expect(result.inactive.map((i) => i.reason)).toEqual([
+        'only @aws-cdk/cfn-property-mixins renders PolicyTag, at property Tags, and no CloudFormation type there is paired with it',
+      ]);
+      expect(tagBreaks(result)).toEqual(['property Tags: Array<PolicyTag> -> Array<PolicyTagV2>']);
+    });
+  });
 });
 
 function arn() {
