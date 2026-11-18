@@ -2,9 +2,6 @@ import * as pj from 'projen';
 import { yarn } from 'cdklabs-projen-project-types';
 import { relative } from 'node:path';
 
-/** thollander/actions-comment-pull-request at v3.0.1 */
-const COMMENT_PULL_REQUEST_ACTION = 'thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b';
-
 export interface DiffDbOptions {
   readonly workflowRunsOn: string[];
   readonly serviceSpec: yarn.TypeScriptWorkspace;
@@ -183,7 +180,7 @@ export class DiffDb extends pj.Component {
         {
           name: 'Comment diff',
           if: 'steps.diff-db.outputs.diff-result',
-          uses: COMMENT_PULL_REQUEST_ACTION,
+          uses: 'thollander/actions-comment-pull-request@v3',
           with: {
             'comment-tag': 'diff-db',
             mode: 'recreate',
@@ -193,7 +190,7 @@ export class DiffDb extends pj.Component {
         {
           name: 'Delete outdated diff',
           if: '!(steps.diff-db.outputs.diff-result)',
-          uses: COMMENT_PULL_REQUEST_ACTION,
+          uses: 'thollander/actions-comment-pull-request@v3',
           with: {
             'comment-tag': 'diff-db',
             message: `**${this.serviceSpec.name}**: No model change detected`,
