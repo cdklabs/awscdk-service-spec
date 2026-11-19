@@ -235,6 +235,10 @@ function mapValues<A, B>(xs: Record<string, A>, fn: (x: A, key: string) => B): R
  * A copy of `LEGACY_TAGGABLES` in aws-cdk's `tools/@aws-cdk/spec2cdk/lib/cdk/tagging.ts`, entry for entry (taken at
  * aws-cdk v2.277.0). That table decides how aws-cdk-lib and @aws-cdk/cfn-property-mixins render tags, so this copy
  * must follow it: an entry added, changed or removed there is added, changed or removed here.
+ *
+ * CI checks this: the `test-with-new-codegen` job of the `test-aws-cdk-integration` workflow runs
+ * `scripts/check-legacy-taggables.js`, which fails when this table and aws-cdk's differ. The script reads the entry
+ * lines between this declaration and its closing `};`, so keep one entry per line in that form.
  */
 const LEGACY_TAGGABLES: Record<string, [string, TagVariant]> = {
   'AWS::ACMPCA::CertificateAuthority': ['Tags', 'standard'],
