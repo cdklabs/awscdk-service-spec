@@ -134,6 +134,22 @@ describe('removals', () => {
     ]);
   });
 
+  test('a removed service lists each of its resources and its metrics, and its prefix from the base database', () => {
+    importRegistry(base, { properties: { Name: str(), Other: str() } }, 'Dev::Thing::Widget');
+    importRegistry(base, { properties: { Name: str() } }, 'Dev::Thing::Gadget');
+    addMetric(base, 'Requests', { service: 'dev-thing' });
+    importRegistry(base, { properties: { Name: str() } });
+    importRegistry(head, { properties: { Name: str() } });
+
+    const report = findBreakingChanges(base, head);
+    expect(rows()).toEqual([
+      'dev-thing | Dev::Thing | [-] metric AWS/Some Requests | Metric removed',
+      'dev-thing | Dev::Thing::Gadget | [-] Dev::Thing::Gadget | Resource removed',
+      'dev-thing | Dev::Thing::Widget | [-] Dev::Thing::Widget | Resource removed',
+    ]);
+    expect(report.nonStandardServices).toEqual([{ service: 'dev-thing', expected: 'aws-thing', namespace: 'Dev::Thing' }]);
+  });
+
   test('a removed resource is one line, not one per property', () => {
     importRegistry(base, { properties: { Name: str(), Other: str() } }, 'AWS::Some::Gone');
     importRegistry(base, { properties: { Name: str() } });
@@ -740,6 +756,22 @@ describe('output', () => {
     expect(text).toContain(`${SERVICE}: ${RESOURCE}: Mode property no longer allows "a|b".`);
   });
 
+  test('backticks in a change lengthen its code span and the changelog fence', () => {
+    both({ properties: { Name: str(), 'Back`tick': str(), 'Tri```ple': str() } }, { properties: { Name: str() } });
+    const lines = formatBreakingChanges(findBreakingChanges(base, head)).split('\n');
+
+    expect(lines).toContain('| aws-some | AWS::Some::Type | ``[-] Back`tick: string`` | Property removed |');
+    expect(lines).toContain('| aws-some | AWS::Some::Type | ````[-] Tri```ple: string```` | Property removed |');
+    expect(lines.slice(lines.indexOf('**Copy the text below for your L1 PR:**') + 2)).toEqual([
+      '````',
+      CHANGELOG_PARAGRAPH,
+      '',
+      `${SERVICE}: ${RESOURCE}: Back\`tick property removed.  `,
+      `${SERVICE}: ${RESOURCE}: Tri\`\`\`ple property removed.`,
+      '````',
+    ]);
+  });
+
   test('a line break in a name stays on one table row and one changelog line', () => {
     both(
       { properties: { Name: str(), 'New\nLine': str(), 'Odd\rLine': str(), 'Old\r\nLine': str() } },
@@ -863,6 +895,13 @@ describe('diff-db', () => {
       JSON.parse(JSON.stringify(compareL1(base, head))),
     );
     expect(JSON.parse(diffDb(['--breaking-changes', '--json']).stdout)).toEqual(findBreakingChanges(base, head));
+  });
+
+  test('with --json, both options print the L1 changes with the analysis as breakingChanges', () => {
+    expect(JSON.parse(diffDb(['--l1-changes', '--breaking-changes', '--json']).stdout)).toEqual({
+      ...JSON.parse(JSON.stringify(compareL1(base, head))),
+      breakingChanges: findBreakingChanges(base, head),
+    });
   });
 
   test('each option needs two databases', () => {
