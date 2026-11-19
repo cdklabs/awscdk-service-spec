@@ -147,7 +147,9 @@ describe('removals', () => {
       'dev-thing | Dev::Thing::Gadget | [-] Dev::Thing::Gadget | Resource removed',
       'dev-thing | Dev::Thing::Widget | [-] Dev::Thing::Widget | Resource removed',
     ]);
-    expect(report.nonStandardServices).toEqual([{ service: 'dev-thing', expected: 'aws-thing', namespace: 'Dev::Thing' }]);
+    expect(report.nonStandardServices).toEqual([
+      { service: 'dev-thing', expected: 'aws-thing', namespace: 'Dev::Thing' },
+    ]);
   });
 
   test('a removed resource is one line, not one per property', () => {
