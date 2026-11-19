@@ -19,7 +19,8 @@ import { renderType } from './l1-view';
  * - `removed`: a resource, property, attribute, type definition, field of a type definition or metric that the base
  *   database has and the new one lacks
  * - `now-required`: a property or field that was optional
- * - `now-immutable`: a property or field whose update now always replaces the resource, which it did not always do
+ * - `now-immutable`: a property or field whose update now always replaces the resource, which it did not always do,
+ *   or may now replace it, which it never did
  * - `default-changed`: a property or field with a default value in both databases, which differ
  * - `allowed-values-narrowed`: a property or field that no longer allows a value, or allows only some values where it
  *   allowed any
@@ -270,6 +271,14 @@ function propertyChanges(
         `${name}: ${MUTABILITY[replaces[0]]} → ${MUTABILITY[replaces[1]]}`,
         'Property changed to immutable',
         `${name} property is now immutable`,
+      );
+    } else if (replaces[0] === 'no' && replaces[1] === 'maybe') {
+      change(
+        'now-immutable',
+        name,
+        `${name}: ${MUTABILITY.no} → ${MUTABILITY.maybe}`,
+        'Property may require replacement',
+        `${name} property may now require replacement`,
       );
     }
     if (old.defaultValue !== undefined && now.defaultValue !== undefined && old.defaultValue !== now.defaultValue) {

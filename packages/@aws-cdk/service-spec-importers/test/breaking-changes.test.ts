@@ -198,8 +198,18 @@ describe('restrictions', () => {
     expect(rows()).toEqual([`${SERVICE} | ${RESOURCE} | Name: immutable? → immutable | Property changed to immutable`]);
   });
 
-  test('a mutable property that may now cause replacement is not listed: the database does not say when it does', () => {
+  test('a mutable property that may now cause replacement is listed', () => {
     legacyName(base, 'Mutable');
+    legacyName(head, 'Conditional');
+
+    expect(rows()).toEqual([
+      `${SERVICE} | ${RESOURCE} | Name: mutable → immutable? | Property may require replacement`,
+    ]);
+    expect(changelogLines()).toEqual([`${SERVICE}: ${RESOURCE}: Name property may now require replacement.`]);
+  });
+
+  test('a property that always caused replacement and now only may is not listed', () => {
+    legacyName(base, 'Immutable');
     legacyName(head, 'Conditional');
 
     expect(rows()).toEqual([]);
