@@ -2,6 +2,12 @@
 //
 // Usage: node scripts/check-legacy-taggables.js <copy: l1-view.ts> <aws-cdk checkout, or its tagging.ts>
 //
+// CI does not run this file. projenrc/aws-cdk-integration-test.ts embeds its text, at synthesis, in a step of the
+// test-aws-cdk-integration workflow, which passes it to `node -e` from the step's environment. So the step executes
+// nothing from either checkout. After changing this file, run `npx projen` to regenerate that step. The file uses
+// only Node.js built-ins, and must not contain a GitHub Actions expression (a dollar sign and two opening braces),
+// which the runner would evaluate; projen refuses to embed it if it does.
+//
 // Both files are read as text and never imported, compiled or run. Each table is taken from the lines between the
 // constant's declaration, `const LEGACY_TAGGABLES ... = {`, and the first `}` or `};` at the start of a line after it.
 // Every line in between must be one entry, `'<resource type>': ['<tag property>', '<variant>'],`, a blank line or a
@@ -50,7 +56,7 @@ function main(args) {
     throw new CannotCompare(
       e.message,
       `The cause is in aws-cdk, not in this pull request: aws-cdk's table has moved or changed form. ` +
-        `Update scripts/check-legacy-taggables.js to read the new form, ` +
+        `Update scripts/check-legacy-taggables.js to read the new form, run 'npx projen' to regenerate the step, ` +
         `and keep the copy in ${copyFile} equal to aws-cdk's table.`,
     );
   }
@@ -198,8 +204,11 @@ function formatValue([property, variant]) {
   return `['${property}', '${variant}']`;
 }
 
+// Run as a file, argv[1] is this file; run with `node -e`, as the workflow step does, the arguments start at argv[1].
+const args = process.argv.slice(require.main === module ? 2 : 1);
+
 try {
-  process.exitCode = main(process.argv.slice(2));
+  process.exitCode = main(args);
 } catch (e) {
   if (!(e instanceof CannotCompare)) {
     throw e;
