@@ -70,9 +70,10 @@ jobs:
             // with an error, so it never passes without having compared the two tables. Only the object literal is read: an entry
             // that aws-cdk adds to the table in code, such as an assignment after the declaration, is not seen.
             //
-            // Each message is one line that starts with this program's text. Text from the files is printed with its control,
-            // format and separator characters escaped, such as `\r` or `\x1b`, so file content cannot start a new line in the
-            // log, where a line beginning with `::` would be a workflow command.
+            // Each message is one line that starts with this program's own text. Text from the files is printed with its control,
+            // format and separator characters and every `#` escaped, such as `\r`, `\x1b` or `\x23`. So file content cannot write
+            // a workflow command to the log in either syntax the runner reads: `::` at the start of a line, which file content
+            // could reach only by starting a new line, and `##[` anywhere in a line.
             //
             // Exit codes: 0 the tables are equal, 1 they differ, 2 a table could not be read.
             const fs = require('fs');
@@ -87,7 +88,7 @@ jobs:
             const STRING = `(['"])([^'"\\\\]+)\\`;
             const ENTRY = new RegExp(`^${STRING}1\\s*:\\s*\\[\\s*${STRING}3\\s*,\\s*${STRING}5\\s*\\]\\s*,?$`);
             const LINE_END = /\r\n|[\n\r\p{Zl}\p{Zp}]/u;
-            const UNPRINTABLE = /[\p{Cc}\p{Cf}\p{Zl}\p{Zp}]/gu;
+            const ESCAPED = /[\p{Cc}\p{Cf}\p{Zl}\p{Zp}#]/gu;
             const NAMED_ESCAPES = { '\t': '\\t', '\n': '\\n', '\r': '\\r' };
 
             class CannotCompare extends Error {
@@ -269,13 +270,13 @@ jobs:
             }
 
             /**
-             * Write one message as one line, with every control, format and separator character escaped
+             * Write one message as one line, with every control, format and separator character and every `#` escaped
              *
-             * Every message goes through here, because messages quote the files' text, and the runner ends a log line at a
-             * carriage return as well as a line feed.
+             * Every message goes through here, because messages quote the files' text. The runner ends a log line at a carriage
+             * return as well as a line feed, and reads `##[` anywhere in a line as the start of a workflow command.
              */
             function print(write, message) {
-              write(message.replace(UNPRINTABLE, escapeCharacter));
+              write(message.replace(ESCAPED, escapeCharacter));
             }
 
             function escapeCharacter(character) {
