@@ -344,6 +344,106 @@ describe('CDK code breaks', () => {
     ]);
   });
 
+  test('the field changes of a renamed struct are listed by the old struct name, next to the rename', () => {
+    both(
+      {
+        properties: { Settings: ref('OldSettings') },
+        definitions: {
+          OldSettings: object({
+            Url: str(),
+            Port: str(),
+            Mode: { type: 'string', enum: ['A', 'B'] },
+            Timeout: { type: 'integer', default: 5 },
+            Kind: {},
+            Wide: str(),
+          }),
+        },
+      },
+      {
+        properties: { Settings: ref('NewSettings') },
+        definitions: {
+          NewSettings: object(
+            {
+              Url: str(),
+              Mode: { type: 'string', enum: ['A'] },
+              Timeout: { type: 'integer', default: 10 },
+              Kind: str(),
+              Wide: {},
+            },
+            ['Url'],
+          ),
+        },
+        createOnlyProperties: ['/properties/Settings/Url'],
+      },
+    );
+
+    expect(rows()).toEqual([
+      `${SERVICE} | ${RESOURCE} | [-] OldSettings.Port: string | Property removed`,
+      `${SERVICE} | ${RESOURCE} | OldSettings.Url: optional → required | Property changed to required`,
+      `${SERVICE} | ${RESOURCE} | OldSettings.Url: mutable → immutable | Property changed to immutable`,
+      `${SERVICE} | ${RESOURCE} | OldSettings.Timeout: default=5 → default=10 | Default value changed`,
+      `${SERVICE} | ${RESOURCE} | OldSettings.Mode: [-] allowed value "B" | Allowed value removed`,
+      `${SERVICE} | ${RESOURCE} | OldSettings → NewSettings | CDK type renamed`,
+      `${SERVICE} | ${RESOURCE} | OldSettings.Kind: json → string | CDK type changed`,
+    ]);
+    expect(changelogLines()).toEqual([
+      `${SERVICE}: ${RESOURCE}: OldSettings.Port property removed.  `,
+      `${SERVICE}: ${RESOURCE}: OldSettings.Url property is now required.  `,
+      `${SERVICE}: ${RESOURCE}: OldSettings.Url property is now immutable.  `,
+      `${SERVICE}: ${RESOURCE}: OldSettings.Timeout property default value changed from 5 to 10.  `,
+      `${SERVICE}: ${RESOURCE}: OldSettings.Mode property no longer allows "B".  `,
+      `${SERVICE}: ${RESOURCE}: OldSettings type renamed to NewSettings.  `,
+      `${SERVICE}: ${RESOURCE}: OldSettings.Kind property type changed from json to string.`,
+    ]);
+  });
+
+  test('the field changes of each merged struct are listed by its own name', () => {
+    both(
+      {
+        properties: { Settings: ref('Settings') },
+        definitions: {
+          Settings: object({ Burn: ref('BurnSettings'), Dvb: ref('DvbSettings') }),
+          BurnSettings: object({ Font: str(), Size: str() }),
+          DvbSettings: object({ Font: str() }),
+        },
+      },
+      {
+        properties: { Settings: ref('Settings') },
+        definitions: {
+          Settings: object({ Burn: ref('BurnDvbSettings'), Dvb: ref('BurnDvbSettings') }),
+          BurnDvbSettings: object({ Font: str() }, ['Font']),
+        },
+      },
+    );
+
+    expect(rows()).toEqual([
+      `${SERVICE} | ${RESOURCE} | [-] BurnSettings.Size: string | Property removed`,
+      `${SERVICE} | ${RESOURCE} | BurnSettings.Font: optional → required | Property changed to required`,
+      `${SERVICE} | ${RESOURCE} | DvbSettings.Font: optional → required | Property changed to required`,
+      `${SERVICE} | ${RESOURCE} | BurnSettings → BurnDvbSettings | CDK type merged`,
+      `${SERVICE} | ${RESOURCE} | DvbSettings → BurnDvbSettings | CDK type merged`,
+    ]);
+  });
+
+  test('a property that switches to another existing struct lists the fields that struct lacks, once each', () => {
+    both(
+      {
+        properties: { Source: ref('Endpoint'), Target: ref('Address'), Backup: ref('Endpoint') },
+        definitions: { Endpoint: object({ Url: str(), Port: str(), Size: str() }), Address: object({ Url: str() }) },
+      },
+      {
+        properties: { Source: ref('Address'), Target: ref('Address'), Backup: ref('Endpoint') },
+        definitions: { Endpoint: object({ Url: str(), Size: str() }), Address: object({ Url: str() }) },
+      },
+    );
+
+    expect(rows()).toEqual([
+      `${SERVICE} | ${RESOURCE} | [-] Endpoint.Port: string | Property removed`,
+      `${SERVICE} | ${RESOURCE} | [-] Endpoint.Size: string | Property removed`,
+      `${SERVICE} | ${RESOURCE} | Endpoint → Address | CDK type renamed`,
+    ]);
+  });
+
   test('a rendered type that changed is listed, for properties, fields and attributes', () => {
     both(
       {

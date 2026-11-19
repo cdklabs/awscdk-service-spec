@@ -6,10 +6,11 @@ import {
   PropertyType,
   Service,
   SpecDatabase,
+  TypeDefinition,
   UpdatedProperty,
 } from '@aws-cdk/service-spec-types';
 import { DbDiff } from './db-diff';
-import { compareL1, L1Change, L1Changes } from './l1-changes';
+import { compareL1, L1Changes } from './l1-changes';
 import { renderType } from './l1-view';
 
 /**
@@ -96,7 +97,8 @@ export function findBreakingChanges(
   l1Changes: L1Changes = compareL1(base, head),
 ): BreakingChanges {
   const changes = new Array<BreakingChange>();
-  const diff = new DbDiff(base, head).diff();
+  const differ = new DbDiff(base, head);
+  const diff = differ.diff();
   const renamed = new Set(l1Changes.renames.map((r) => `${r.resource} ${r.from}`));
 
   for (const service of Object.values(diff.services.removed ?? {})) {
@@ -140,6 +142,18 @@ export function findBreakingChanges(
     }
   }
 
+  // The model diff pairs type definitions by name, so the fields of a struct the L1 renders under another name are
+  // compared here, by the struct's old name: the fields of `from` that `to` lacks or restricts break the templates and
+  // code that set them where `from` was
+  for (const rename of l1Changes.renames) {
+    const at = { service: serviceOf(head, rename.resource), resource: rename.resource, base };
+    const fields = differ.diffTypeDefinition(
+      typeDefinition(base, rename.resource, rename.from),
+      typeDefinition(head, rename.resource, rename.to),
+    )?.properties;
+    changes.push(...propertyChanges(at, fields, `${rename.from}.`));
+  }
+
   changes.push(...cdkCodeChanges(head, l1Changes));
   changes.sort(
     (a, b) =>
@@ -149,10 +163,12 @@ export function findBreakingChanges(
       compare(a.element, b.element) ||
       compare(a.change, b.change),
   );
+  // A struct changed under its own name that the L1 renders under another name elsewhere can give a change twice
+  const unique = changes.filter((c, i) => i === 0 || JSON.stringify(c) !== JSON.stringify(changes[i - 1]));
 
   return {
-    changes,
-    nonStandardServices: nonStandardServices(base, head, changes, Object.keys(diff.services.added ?? {})),
+    changes: unique,
+    nonStandardServices: nonStandardServices(base, head, unique, Object.keys(diff.services.added ?? {})),
   };
 }
 
@@ -328,18 +344,35 @@ function allowedValueNarrowings(old: PropertyType, now: PropertyType): Narrowing
 }
 
 /**
- * The struct renames and merges, and the rendered types that changed other than by widening, in the L1 change report
+ * The struct renames and merges, and the rendered types that changed other than by widening, in the L1 change report,
+ * including the fields of renamed and merged structs (by the struct's old name)
  */
 function cdkCodeChanges(head: SpecDatabase, l1Changes: L1Changes): BreakingChange[] {
-  const serviceOf = (resourceType: string) =>
-    head.incoming('hasResource', head.lookup('resource', 'cloudFormationType', 'equals', resourceType).only()).only()
-      .entity.name;
-
   const ret = new Array<BreakingChange>();
+  // Rendered types are made of type names, `Array<...>`, `Map<string, ...>` and ` | `, so ` to ` separates them
+  const typeChange = (resource: string, noun: string, name: string, description: string) => {
+    const types = /^type changed from (.+) to (.+)$/.exec(description);
+    if (!types) {
+      throw new Error(`Unexpected L1 change: ${name}: ${description}`);
+    }
+    const [, from, to] = types;
+    if (!widens(from, to)) {
+      ret.push({
+        service: serviceOf(head, resource),
+        resource,
+        kind: 'cdk-type-changed',
+        element: name,
+        change: `${name}: ${from} → ${to}`,
+        explanation: 'CDK type changed',
+        description: `${name} ${noun} type changed from ${from} to ${to}`,
+      });
+    }
+  };
+
   for (const rename of l1Changes.renames) {
     const merged = l1Changes.renames.filter((r) => r.resource === rename.resource && r.to === rename.to).length > 1;
     ret.push({
-      service: serviceOf(rename.resource),
+      service: serviceOf(head, rename.resource),
       resource: rename.resource,
       kind: 'cdk-type-renamed',
       element: rename.from,
@@ -347,43 +380,38 @@ function cdkCodeChanges(head: SpecDatabase, l1Changes: L1Changes): BreakingChang
       explanation: merged ? 'CDK type merged' : 'CDK type renamed',
       description: `${rename.from} type ${merged ? 'merged into' : 'renamed to'} ${rename.to}`,
     });
+    // Field changes read `<field> type changed from A to B`, `<field> now required`, `<field> removed` and so on
+    for (const fieldChange of rename.fieldChanges) {
+      const field = /^(\S+) (type changed from .+)$/.exec(fieldChange);
+      if (field) {
+        typeChange(rename.resource, 'property', `${rename.from}.${field[1]}`, field[2]);
+      }
+    }
   }
   for (const change of l1Changes.other) {
-    const typeChange = parseTypeChange(change);
-    if (widens(typeChange.from, typeChange.to)) {
-      continue;
+    const element = /^(property|attribute|field) (.+)$/.exec(change.element);
+    if (!element) {
+      throw new Error(`Unexpected L1 change: ${change.element}: ${change.description}`);
     }
-    ret.push({
-      service: serviceOf(change.resource),
-      resource: change.resource,
-      kind: 'cdk-type-changed',
-      element: typeChange.name,
-      change: `${typeChange.name}: ${typeChange.from} → ${typeChange.to}`,
-      explanation: 'CDK type changed',
-      description: `${typeChange.name} ${typeChange.noun} type changed from ${typeChange.from} to ${typeChange.to}`,
-    });
+    typeChange(change.resource, element[1] === 'attribute' ? 'attribute' : 'property', element[2], change.description);
   }
   return ret;
 }
 
-/**
- * The element and the types of a type change in the L1 change report, for example `property Policy` with `type changed
- * from json to string`
- *
- * Rendered types are made of type names, `Array<...>`, `Map<string, ...>` and ` | `, so ` to ` separates them.
- */
-function parseTypeChange(change: L1Change) {
-  const types = /^type changed from (.+) to (.+)$/.exec(change.description);
-  const element = /^(property|attribute|field) (.+)$/.exec(change.element);
-  if (!types || !element) {
-    throw new Error(`Unexpected L1 change: ${change.element}: ${change.description}`);
+/** The service of a resource type in a database */
+function serviceOf(db: SpecDatabase, resourceType: string): string {
+  return db.incoming('hasResource', db.lookup('resource', 'cloudFormationType', 'equals', resourceType).only()).only()
+    .entity.name;
+}
+
+/** The type definition of a resource by its name, as the L1 change report names structs */
+function typeDefinition(db: SpecDatabase, resourceType: string, name: string): TypeDefinition {
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', resourceType).only();
+  const found = db.follow('usesType', resource).filter(({ entity }) => entity.name === name);
+  if (found.length !== 1) {
+    throw new Error(`Expected one type definition ${name} of ${resourceType}, found ${found.length}`);
   }
-  return {
-    noun: element[1] === 'attribute' ? 'attribute' : 'property',
-    name: element[2],
-    from: types[1],
-    to: types[2],
-  };
+  return found[0].entity;
 }
 
 /**
