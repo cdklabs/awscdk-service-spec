@@ -47,6 +47,9 @@ jobs:
         with:
           repository: aws/aws-cdk
           path: aws-cdk
+      - name: Check the copied legacy tag table against aws-cdk
+        id: check_the_copied_legacy_tag_table_against_aws-cdk
+        run: node awscdk-service-spec/scripts/check-legacy-taggables.js awscdk-service-spec/packages/@aws-cdk/service-spec-importers/src/l1-view.ts aws-cdk
       - name: Register drop-in @aws-cdk/aws-service-spec replacement
         id: register_drop-in_aws-cdk_aws-service-spec_replacement
         env:
