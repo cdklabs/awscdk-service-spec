@@ -3,10 +3,12 @@
 // Usage: node scripts/check-legacy-taggables.js <copy: l1-view.ts> <aws-cdk checkout, or its tagging.ts>
 //
 // Both files are read as text and never imported, compiled or run. Each table is taken from the lines between the
-// constant's declaration, `const LEGACY_TAGGABLES ... = {`, and the first `};` at the start of a line after it. Every
-// line in between must be one entry, `'<resource type>': ['<tag property>', '<variant>'],`, a blank line or a `//`
-// comment. Anything else, a missing or repeated declaration, a missing closing brace, a repeated resource type or an
-// empty table stops the check with an error, so it never passes without having compared the two tables.
+// constant's declaration, `const LEGACY_TAGGABLES ... = {`, and the first `}` or `};` at the start of a line after it.
+// Every line in between must be one entry, `'<resource type>': ['<tag property>', '<variant>'],`, a blank line or a
+// `//` comment. Anything else, a missing or repeated declaration, a missing closing brace, a repeated resource type, an
+// empty table or an entry-shaped line elsewhere in the file (a table split in two) stops the check with an error, so
+// it never passes without having compared the two tables. Only the object literal is read: an entry that aws-cdk adds
+// to the table in code, such as an assignment after the declaration, is not seen.
 //
 // Exit codes: 0 the tables are equal, 1 they differ, 2 a table could not be read.
 const fs = require('fs');
@@ -21,7 +23,12 @@ const CLOSING = /^\};?\s*$/;
 const STRING = `(['"])([^'"\\\\]+)\\`;
 const ENTRY = new RegExp(`^${STRING}1\\s*:\\s*\\[\\s*${STRING}3\\s*,\\s*${STRING}5\\s*\\]\\s*,?$`);
 
-class CannotCompare extends Error {}
+class CannotCompare extends Error {
+  constructor(message, advice) {
+    super(message);
+    this.advice = advice;
+  }
+}
 
 function main(args) {
   if (args.length !== 2) {
@@ -33,7 +40,20 @@ function main(args) {
   const awsCdkFile = resolveAwsCdkFile(args[1]);
 
   const copy = readTable(copyFile);
-  const awsCdk = readTable(awsCdkFile);
+  let awsCdk;
+  try {
+    awsCdk = readTable(awsCdkFile);
+  } catch (e) {
+    if (!(e instanceof CannotCompare)) {
+      throw e;
+    }
+    throw new CannotCompare(
+      e.message,
+      `The cause is in aws-cdk, not in this pull request: aws-cdk's table has moved or changed form. ` +
+        `Update scripts/check-legacy-taggables.js to read the new form, ` +
+        `and keep the copy in ${copyFile} equal to aws-cdk's table.`,
+    );
+  }
 
   const differences = [];
   for (const type of [...new Set([...copy.keys(), ...awsCdk.keys()])].sort()) {
@@ -108,13 +128,12 @@ function readTable(file) {
   }
 
   const table = new Map();
+  let end = -1;
   for (let i = start + 1; i < lines.length; i++) {
     const line = lines[i];
     if (CLOSING.test(line)) {
-      if (table.size === 0) {
-        throw new CannotCompare(`${CONSTANT} in ${file} has no entries (lines ${start + 1} to ${i + 1})`);
-      }
-      return table;
+      end = i;
+      break;
     }
     const trimmed = line.trim();
     if (trimmed === '' || trimmed.startsWith('//')) {
@@ -130,7 +149,45 @@ function readTable(file) {
     }
     table.set(type, [match[4], match[6]]);
   }
-  throw new CannotCompare(`Cannot find the end of ${CONSTANT} in ${file}: no line '};' after line ${start + 1}`);
+  if (end < 0) {
+    throw new CannotCompare(
+      `Cannot find the end of ${CONSTANT} in ${file}: no line '}' or '};' after line ${start + 1}`,
+    );
+  }
+  if (table.size === 0) {
+    throw new CannotCompare(`${CONSTANT} in ${file} has no entries (lines ${start + 1} to ${end + 1})`);
+  }
+
+  const outside = [];
+  lines.forEach((line, i) => {
+    if ((i < start || i > end) && ENTRY.test(line.trim())) {
+      outside.push(i + 1);
+    }
+  });
+  if (outside.length > 0) {
+    const at = formatLineRanges(outside);
+    throw new CannotCompare(
+      `${file} has ${outside.length} entry-shaped line(s) outside ${CONSTANT}, at lines ${at}; ` +
+        `the table spans lines ${start + 1} to ${end + 1} and may have been split`,
+    );
+  }
+  return table;
+}
+
+/**
+ * Line numbers as ranges, such as `1-3, 7`
+ */
+function formatLineRanges(numbers) {
+  const ranges = [];
+  for (const n of numbers) {
+    const last = ranges[ranges.length - 1];
+    if (last && last[1] === n - 1) {
+      last[1] = n;
+    } else {
+      ranges.push([n, n]);
+    }
+  }
+  return ranges.map(([from, to]) => (from === to ? `${from}` : `${from}-${to}`)).join(', ');
 }
 
 function formatEntry(type, value) {
@@ -147,6 +204,6 @@ try {
   if (!(e instanceof CannotCompare)) {
     throw e;
   }
-  console.error(`${e.message}. The check of ${CONSTANT} did not compare the tables.`);
+  console.error(`${e.message}. The check of ${CONSTANT} did not compare the tables.${e.advice ? ` ${e.advice}` : ''}`);
   process.exitCode = 2;
 }
