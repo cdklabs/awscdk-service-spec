@@ -70,6 +70,7 @@ export class AwsCdkIntegrationTest extends pj.Component {
           run: root.runTaskCommand(root.compileTask),
         },
         ...checkoutRepository(awsCdkRepo, awsCdkPath),
+        ...checkLegacyTaggables(root.name, awsCdkPath),
         ...linkPackage(options.serviceSpec, awsCdkPath),
         ...linkPackage(options.serviceSpecTypes, awsCdkPath),
         ...buildAwsCdkLib(awsCdkRepo, awsCdkPath),
@@ -108,6 +109,22 @@ function checkoutRepository(repository: string, path: string): pj.github.workflo
         repository,
       },
     }),
+  ];
+}
+
+/**
+ * Fail when the copy of the CDK code generator's legacy tag table in service-spec-importers differs from aws-cdk's
+ *
+ * The script reads both files as text, so it runs before anything from aws-cdk is installed or built.
+ */
+function checkLegacyTaggables(rootPath: string, awsCdkPath: string): pj.github.workflows.Step[] {
+  const script = path.join(rootPath, 'scripts', 'check-legacy-taggables.js');
+  const copy = path.join(rootPath, 'packages', '@aws-cdk', 'service-spec-importers', 'src', 'l1-view.ts');
+  return [
+    {
+      name: `Check the copied legacy tag table against ${awsCdkPath}`,
+      run: `node ${script} ${copy} ${awsCdkPath}`,
+    },
   ];
 }
 
