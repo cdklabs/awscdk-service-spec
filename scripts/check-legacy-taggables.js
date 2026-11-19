@@ -8,13 +8,18 @@
 // only Node.js built-ins, and must not contain a GitHub Actions expression (a dollar sign and two opening braces),
 // which the runner would evaluate; projen refuses to embed it if it does.
 //
-// Both files are read as text and never imported, compiled or run. Each table is taken from the lines between the
-// constant's declaration, `const LEGACY_TAGGABLES ... = {`, and the first `}` or `};` at the start of a line after it.
-// Every line in between must be one entry, `'<resource type>': ['<tag property>', '<variant>'],`, a blank line or a
-// `//` comment. Anything else, a missing or repeated declaration, a missing closing brace, a repeated resource type, an
-// empty table or an entry-shaped line elsewhere in the file (a table split in two) stops the check with an error, so
-// it never passes without having compared the two tables. Only the object literal is read: an entry that aws-cdk adds
-// to the table in code, such as an assignment after the declaration, is not seen.
+// Both files are read as text and never imported, compiled or run. Lines end where TypeScript ends them: at a line
+// feed, a carriage return, both together, or a Unicode line or paragraph separator. Each table is taken from the lines
+// between the constant's declaration, `const LEGACY_TAGGABLES ... = {`, and the first `}` or `};` at the start of a
+// line after it. Every line in between must be one entry, `'<resource type>': ['<tag property>', '<variant>'],`, a
+// blank line or a `//` comment. Anything else, a missing or repeated declaration, a missing closing brace, a repeated
+// resource type, an empty table or an entry-shaped line elsewhere in the file (a table split in two) stops the check
+// with an error, so it never passes without having compared the two tables. Only the object literal is read: an entry
+// that aws-cdk adds to the table in code, such as an assignment after the declaration, is not seen.
+//
+// Each message is one line that starts with this program's text. Text from the files is printed with its control,
+// format and separator characters escaped, such as `\r` or `\x1b`, so file content cannot start a new line in the
+// log, where a line beginning with `::` would be a workflow command.
 //
 // Exit codes: 0 the tables are equal, 1 they differ, 2 a table could not be read.
 const fs = require('fs');
@@ -28,6 +33,9 @@ const MENTION = new RegExp(`\\bconst\\s+${CONSTANT}\\b`);
 const CLOSING = /^\};?\s*$/;
 const STRING = `(['"])([^'"\\\\]+)\\`;
 const ENTRY = new RegExp(`^${STRING}1\\s*:\\s*\\[\\s*${STRING}3\\s*,\\s*${STRING}5\\s*\\]\\s*,?$`);
+const LINE_END = /\r\n|[\n\r\p{Zl}\p{Zp}]/u;
+const UNPRINTABLE = /[\p{Cc}\p{Cf}\p{Zl}\p{Zp}]/gu;
+const NAMED_ESCAPES = { '\t': '\\t', '\n': '\\n', '\r': '\\r' };
 
 class CannotCompare extends Error {
   constructor(message, advice) {
@@ -75,17 +83,20 @@ function main(args) {
   }
 
   if (differences.length > 0) {
-    console.error(`${CONSTANT} differs between the copy and aws-cdk:`);
-    console.error(`  copy:    ${copyFile} (${copy.size} entries)`);
-    console.error(`  aws-cdk: ${awsCdkFile} (${awsCdk.size} entries)`);
+    print(console.error, `${CONSTANT} differs between the copy and aws-cdk:`);
+    print(console.error, `  copy:    ${copyFile} (${copy.size} entries)`);
+    print(console.error, `  aws-cdk: ${awsCdkFile} (${awsCdk.size} entries)`);
     for (const difference of differences) {
-      console.error(`  ${difference}`);
+      print(console.error, `  ${difference}`);
     }
-    console.error(`${differences.length} difference(s). Make the copy in ${copyFile} match aws-cdk's table.`);
+    print(console.error, `${differences.length} difference(s). Make the copy in ${copyFile} match aws-cdk's table.`);
     return 1;
   }
 
-  console.log(`${CONSTANT}: the copy in ${copyFile} equals aws-cdk's table in ${awsCdkFile} (${copy.size} entries).`);
+  print(
+    console.log,
+    `${CONSTANT}: the copy in ${copyFile} equals aws-cdk's table in ${awsCdkFile} (${copy.size} entries).`,
+  );
   return 0;
 }
 
@@ -112,7 +123,7 @@ function readTable(file) {
   } catch (e) {
     throw new CannotCompare(`Cannot read ${file}: ${e.message}`);
   }
-  const lines = text.split(/\r?\n/);
+  const lines = text.split(LINE_END);
 
   const declarations = [];
   lines.forEach((line, i) => {
@@ -204,6 +215,22 @@ function formatValue([property, variant]) {
   return `['${property}', '${variant}']`;
 }
 
+/**
+ * Write one message as one line, with every control, format and separator character escaped
+ *
+ * Every message goes through here, because messages quote the files' text, and the runner ends a log line at a
+ * carriage return as well as a line feed.
+ */
+function print(write, message) {
+  write(message.replace(UNPRINTABLE, escapeCharacter));
+}
+
+function escapeCharacter(character) {
+  const code = character.codePointAt(0);
+  const hex = code.toString(16).padStart(code < 0x100 ? 2 : 4, '0');
+  return NAMED_ESCAPES[character] ?? (code < 0x100 ? `\\x${hex}` : code < 0x10000 ? `\\u${hex}` : `\\u{${hex}}`);
+}
+
 // Run as a file, argv[1] is this file; run with `node -e`, as the workflow step does, the arguments start at argv[1].
 const args = process.argv.slice(require.main === module ? 2 : 1);
 
@@ -213,6 +240,9 @@ try {
   if (!(e instanceof CannotCompare)) {
     throw e;
   }
-  console.error(`${e.message}. The check of ${CONSTANT} did not compare the tables.${e.advice ? ` ${e.advice}` : ''}`);
+  print(
+    console.error,
+    `${e.message}. The check of ${CONSTANT} did not compare the tables.${e.advice ? ` ${e.advice}` : ''}`,
+  );
   process.exitCode = 2;
 }
