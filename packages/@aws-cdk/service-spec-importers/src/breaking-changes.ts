@@ -211,7 +211,8 @@ export function formatBreakingChanges(report: BreakingChanges): string {
   const entries =
     report.changes.length > 0
       ? report.changes.map(
-          (c, i, all) => `${c.service}: ${c.resource}: ${c.description}.${i < all.length - 1 ? '  ' : ''}`,
+          (c, i, all) =>
+            `${oneLine(`${c.service}: ${c.resource}: ${c.description}`)}.${i < all.length - 1 ? '  ' : ''}`,
         )
       : ['No breaking changes detected in this release.'];
   const fence = '`'.repeat(Math.max(3, longestBacktickRun(entries.join('\n')) + 1));
@@ -516,9 +517,14 @@ function compare(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0;
 }
 
+/** Text with each line break replaced by a space, so that one change stays on one row or line */
+function oneLine(text: string): string {
+  return text.replace(/\r\n|\r|\n/g, ' ');
+}
+
 /** Text for a markdown table cell */
 function cell(text: string): string {
-  return text.replace(/\r?\n/g, ' ').replace(/\|/g, '\\|');
+  return oneLine(text).replace(/\|/g, '\\|');
 }
 
 /** Text as inline code in a markdown table cell */

@@ -740,6 +740,23 @@ describe('output', () => {
     expect(text).toContain(`${SERVICE}: ${RESOURCE}: Mode property no longer allows "a|b".`);
   });
 
+  test('a line break in a name stays on one table row and one changelog line', () => {
+    both(
+      { properties: { Name: str(), 'New\nLine': str(), 'Odd\rLine': str(), 'Old\r\nLine': str() } },
+      { properties: { Name: str() } },
+    );
+    const text = formatBreakingChanges(findBreakingChanges(base, head));
+
+    expect(text).toContain('| `[-] New Line: string` | Property removed |');
+    expect(text).toContain('| `[-] Odd Line: string` | Property removed |');
+    expect(text).toContain('| `[-] Old Line: string` | Property removed |');
+    expect(changelogLines()).toEqual([
+      `${SERVICE}: ${RESOURCE}: New Line property removed.  `,
+      `${SERVICE}: ${RESOURCE}: Odd Line property removed.  `,
+      `${SERVICE}: ${RESOURCE}: Old Line property removed.`,
+    ]);
+  });
+
   test('changes are ordered by service, resource, kind and name, whatever order the databases have', () => {
     const schemas: Array<[string, Partial<CloudFormationRegistryResource>, Partial<CloudFormationRegistryResource>]> = [
       ['AWS::Zeta::Thing', { properties: { B: str(), A: str() } }, { properties: {} }],
