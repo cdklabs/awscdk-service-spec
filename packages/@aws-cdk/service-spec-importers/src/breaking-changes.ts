@@ -10,7 +10,7 @@ import {
   UpdatedProperty,
 } from '@aws-cdk/service-spec-types';
 import { DbDiff } from './db-diff';
-import { compareL1, L1Changes } from './l1-changes';
+import { compareL1, L1Changes, L1StructRename } from './l1-changes';
 import { renderType } from './l1-view';
 
 /**
@@ -55,7 +55,10 @@ export interface BreakingChange {
   /** The resource type, or the service's CloudFormation namespace for a metric of the service */
   readonly resource: string;
   readonly kind: BreakingChangeKind;
-  /** What changed: a property `Name`, a field `Struct.Field`, an attribute, type, metric or struct; empty for a resource */
+  /**
+   * What changed: a property `Name`, a field `Struct.Field` (or `Property.Field` where a property switched from a struct
+   * that is still used), an attribute, type, metric or struct; empty for a resource
+   */
   readonly element: string;
   /** The change, as the table shows it, for example `Name: optional → required` */
   readonly change: string;
@@ -145,18 +148,21 @@ export function findBreakingChanges(
   }
 
   // The model diff pairs type definitions by name, so the fields of a struct the L1 renders under another name are
-  // compared here, by the struct's old name: the fields of `from` that `to` lacks or restricts break the templates and
-  // code that set them where `from` was
+  // compared here: the fields of `from` that `to` lacks or restricts break the templates and code that set them where
+  // `from` was
   for (const rename of l1Changes.renames) {
     const at = { service: serviceOf(head, rename.resource), resource: rename.resource, base };
     const fields = differ.diffTypeDefinition(
       typeDefinition(base, rename.resource, rename.from),
       typeDefinition(head, rename.resource, rename.to),
     )?.properties;
-    changes.push(...propertyChanges(at, fields, `${rename.from}.`));
+    for (const prefix of renamedFieldPrefixes(head, rename)) {
+      changes.push(...propertyChanges(at, fields, prefix));
+    }
   }
 
   changes.push(...cdkCodeChanges(head, l1Changes));
+  const sortKey = (c: BreakingChange) => JSON.stringify([c.service, c.resource, c.kind, c.element, c.change]);
   changes.sort(
     (a, b) =>
       compare(a.service, b.service) ||
@@ -165,8 +171,9 @@ export function findBreakingChanges(
       compare(a.element, b.element) ||
       compare(a.change, b.change),
   );
-  // A struct changed under its own name that the L1 renders under another name elsewhere can give a change twice
-  const unique = changes.filter((c, i) => i === 0 || JSON.stringify(c) !== JSON.stringify(changes[i - 1]));
+  // The same change can be found twice, for example in a struct changed under its own name and at a property of that
+  // name that switched from the struct; such rows have the same sort key, so they are next to each other
+  const unique = changes.filter((c, i) => i === 0 || sortKey(c) !== sortKey(changes[i - 1]));
 
   return {
     changes: unique,
@@ -356,7 +363,7 @@ function allowedValueNarrowings(old: PropertyType, now: PropertyType): Narrowing
 
 /**
  * The struct renames and merges, and the rendered types that changed other than by widening, in the L1 change report,
- * including the fields of renamed and merged structs (by the struct's old name)
+ * including the fields of renamed and merged structs
  */
 function cdkCodeChanges(head: SpecDatabase, l1Changes: L1Changes): BreakingChange[] {
   const ret = new Array<BreakingChange>();
@@ -395,7 +402,9 @@ function cdkCodeChanges(head: SpecDatabase, l1Changes: L1Changes): BreakingChang
     for (const fieldChange of rename.fieldChanges) {
       const field = /^(\S+) (type changed from .+)$/.exec(fieldChange);
       if (field) {
-        typeChange(rename.resource, 'property', `${rename.from}.${field[1]}`, field[2]);
+        for (const prefix of renamedFieldPrefixes(head, rename)) {
+          typeChange(rename.resource, 'property', `${prefix}${field[1]}`, field[2]);
+        }
       }
     }
   }
@@ -407,6 +416,20 @@ function cdkCodeChanges(head: SpecDatabase, l1Changes: L1Changes): BreakingChang
     typeChange(change.resource, element[1] === 'attribute' ? 'attribute' : 'property', element[2], change.description);
   }
   return ret;
+}
+
+/**
+ * How the field changes of a struct the L1 renders under another name are named: `<from>.` when the new database no
+ * longer has `from` (a rename or a merge), and otherwise each position of the rename (`Source.`, `Settings.Primary.`),
+ * because the places that still use `from` keep it, and the break is where it was replaced
+ */
+function renamedFieldPrefixes(head: SpecDatabase, rename: L1StructRename): string[] {
+  const resource = head.lookup('resource', 'cloudFormationType', 'equals', rename.resource).only();
+  const kept = head.follow('usesType', resource).some(({ entity }) => entity.name === rename.from);
+  if (!kept || rename.positions.length === 0) {
+    return [`${rename.from}.`];
+  }
+  return rename.positions.map((position) => `${position.replace(/^(property|attribute|field) /, '')}.`);
 }
 
 /** The service of a resource type in a database */

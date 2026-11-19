@@ -453,14 +453,72 @@ describe('CDK code breaks', () => {
     ]);
   });
 
-  test('a property that switches to another existing struct lists the fields that struct lacks, once each', () => {
+  test('a property that switches from a struct that is still used lists its field changes by the property', () => {
     both(
       {
-        properties: { Source: ref('Endpoint'), Target: ref('Address'), Backup: ref('Endpoint') },
-        definitions: { Endpoint: object({ Url: str(), Port: str(), Size: str() }), Address: object({ Url: str() }) },
+        properties: { Source: ref('Endpoint'), Backup: ref('Endpoint') },
+        definitions: { Endpoint: object({ Url: str(), Size: str(), Kind: {} }) },
       },
       {
-        properties: { Source: ref('Address'), Target: ref('Address'), Backup: ref('Endpoint') },
+        properties: { Source: ref('Address'), Backup: ref('Endpoint') },
+        definitions: {
+          Endpoint: object({ Url: str(), Size: str(), Kind: {} }),
+          Address: object({ Url: str(), Kind: str() }, ['Url']),
+        },
+      },
+    );
+
+    expect(rows()).toEqual([
+      `${SERVICE} | ${RESOURCE} | [-] Source.Size: string | Property removed`,
+      `${SERVICE} | ${RESOURCE} | Source.Url: optional → required | Property changed to required`,
+      `${SERVICE} | ${RESOURCE} | Endpoint → Address | CDK type renamed`,
+      `${SERVICE} | ${RESOURCE} | Source.Kind: json → string | CDK type changed`,
+    ]);
+    expect(changelogLines()).toEqual([
+      `${SERVICE}: ${RESOURCE}: Source.Size property removed.  `,
+      `${SERVICE}: ${RESOURCE}: Source.Url property is now required.  `,
+      `${SERVICE}: ${RESOURCE}: Endpoint type renamed to Address.  `,
+      `${SERVICE}: ${RESOURCE}: Source.Kind property type changed from json to string.`,
+    ]);
+  });
+
+  test('a struct that is still used and switches at two positions lists its field changes at each', () => {
+    both(
+      {
+        properties: { Source: ref('Endpoint'), Settings: ref('Settings'), Backup: ref('Endpoint') },
+        definitions: {
+          Endpoint: object({ Url: str(), Size: str() }),
+          Settings: object({ Primary: ref('Endpoint') }),
+        },
+      },
+      {
+        properties: { Source: ref('Address'), Settings: ref('Settings'), Backup: ref('Endpoint') },
+        definitions: {
+          Endpoint: object({ Url: str(), Size: str() }),
+          Settings: object({ Primary: ref('Address') }),
+          Address: object({ Url: str() }),
+        },
+      },
+    );
+
+    expect(compareL1(base, head).renames.map((r) => r.positions)).toEqual([
+      ['property Settings.Primary', 'property Source'],
+    ]);
+    expect(rows()).toEqual([
+      `${SERVICE} | ${RESOURCE} | [-] Settings.Primary.Size: string | Property removed`,
+      `${SERVICE} | ${RESOURCE} | [-] Source.Size: string | Property removed`,
+      `${SERVICE} | ${RESOURCE} | Endpoint → Address | CDK type renamed`,
+    ]);
+  });
+
+  test('a change found under the struct name and at a property of the same name is listed once', () => {
+    both(
+      {
+        properties: { Endpoint: ref('Endpoint'), Backup: ref('Endpoint') },
+        definitions: { Endpoint: object({ Url: str(), Port: str(), Size: str() }) },
+      },
+      {
+        properties: { Endpoint: ref('Address'), Backup: ref('Endpoint') },
         definitions: { Endpoint: object({ Url: str(), Size: str() }), Address: object({ Url: str() }) },
       },
     );
