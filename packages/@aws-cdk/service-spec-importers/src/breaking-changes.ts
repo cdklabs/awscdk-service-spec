@@ -87,7 +87,8 @@ export interface BreakingChanges {
  * code fail
  *
  * Template breaks come from the model diff (`DbDiff`): removals, and the properties and fields that became required,
- * immutable, got another default value or fewer allowed values. CDK code breaks come from the L1 change report
+ * immutable, got another default value or fewer allowed values, also between the old and the new struct of each struct
+ * the L1 renders under another name. CDK code breaks come from the L1 change report
  * (`compareL1`, pass it when it is already computed): struct renames and merges, and rendered types that changed other
  * than by widening. Additions, relaxations, deprecations, documentation and anything in a new resource are never
  * listed.
