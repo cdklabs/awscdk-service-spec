@@ -1,5 +1,6 @@
 import * as pj from 'projen';
 import { yarn } from 'cdklabs-projen-project-types';
+import fs from 'fs';
 import path from 'path';
 
 /**
@@ -70,6 +71,7 @@ export class AwsCdkIntegrationTest extends pj.Component {
           run: root.runTaskCommand(root.compileTask),
         },
         ...checkoutRepository(awsCdkRepo, awsCdkPath),
+        ...checkLegacyTaggables(root, awsCdkPath),
         ...linkPackage(options.serviceSpec, awsCdkPath),
         ...linkPackage(options.serviceSpecTypes, awsCdkPath),
         ...buildAwsCdkLib(awsCdkRepo, awsCdkPath),
@@ -108,6 +110,30 @@ function checkoutRepository(repository: string, path: string): pj.github.workflo
         repository,
       },
     }),
+  ];
+}
+
+/**
+ * Fail when the copy of the CDK code generator's legacy tag table in service-spec-importers differs from aws-cdk's
+ *
+ * The comparison program is scripts/check-legacy-taggables.js, read here at synthesis and placed in the step's
+ * environment, from which the step passes it to `node -e`. So the step executes no file from either checkout: the
+ * job checks out pull request code, and running a file from it would be a step that the code can poison. The program
+ * reads both tables as text, so the step runs before anything from aws-cdk is installed or built.
+ */
+function checkLegacyTaggables(root: pj.Project, awsCdkPath: string): pj.github.workflows.Step[] {
+  const programFile = path.join(root.outdir, 'scripts', 'check-legacy-taggables.js');
+  const program = fs.readFileSync(programFile, 'utf-8');
+  if (program.includes('${{')) {
+    throw new Error(`${programFile} contains '\${{', which GitHub Actions would evaluate in the step's environment`);
+  }
+  const copy = path.join(root.name, 'packages', '@aws-cdk', 'service-spec-importers', 'src', 'l1-view.ts');
+  return [
+    {
+      name: `Check the copied legacy tag table against ${awsCdkPath}`,
+      env: { LEGACY_TAGGABLES_CHECK: program },
+      run: `node -e "$LEGACY_TAGGABLES_CHECK" ${copy} ${awsCdkPath}`,
+    },
   ];
 }
 
