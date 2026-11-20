@@ -235,6 +235,10 @@ function mapValues<A, B>(xs: Record<string, A>, fn: (x: A, key: string) => B): R
  * A copy of `LEGACY_TAGGABLES` in aws-cdk's `tools/@aws-cdk/spec2cdk/lib/cdk/tagging.ts`, entry for entry (taken at
  * aws-cdk v2.277.0). That table decides how aws-cdk-lib and @aws-cdk/cfn-property-mixins render tags, so this copy
  * must follow it: an entry added, changed or removed there is added, changed or removed here.
+ *
+ * TODO: This copy is a stopgap. The long-term solution is to store each resource's legacy tag property (its name
+ * and tag variant) in the service-spec database, so that the CDK code generator and this model read it from one
+ * source and the hard-coded tables in both repositories can go.
  */
 const LEGACY_TAGGABLES: Record<string, [string, TagVariant]> = {
   'AWS::ACMPCA::CertificateAuthority': ['Tags', 'standard'],
