@@ -127,7 +127,7 @@ export function findBreakingChanges(
       compareByCodeUnit(a.element, b.element) ||
       compareByCodeUnit(a.description, b.description),
   );
-  // A struct's change is also found at a property of the same name that switched from it; equal ones sort together
+  // A struct's change can also be found at a property of the same name that switched from it; equal ones sort together
   return changes.filter((c, i) => i === 0 || sortKey(c) !== sortKey(changes[i - 1]));
 }
 
