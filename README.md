@@ -86,7 +86,10 @@ CloudFormation removed at one position only), the L1 renders CloudFormation's ty
 a merge, at the positions of every merged released type together, and for a split, at each position where
 CloudFormation renamed the type, while a position where CloudFormation kept the released name keeps it. The build
 does this by itself, without a mapping entry, and the gate and the L1 change report list each switch as a type break.
-A field CloudFormation removed at every position does not switch a type.
+A merged or split type also follows CloudFormation where one of its fields needs different types at its positions,
+such as two types below it that follow CloudFormation, since one field holds one type (where a mapping entry keeps it
+while the field still needs several types, the build fails and names the field). A field CloudFormation removed at
+every position does not switch a type.
 
 Tag properties follow the CDK code generator. A modern tag property, the tag property of a resource that the generator
 makes `ITaggableV2`, renders the newest type of its history, in aws-cdk-lib and in `@aws-cdk/cfn-property-mixins`. A
