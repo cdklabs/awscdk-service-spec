@@ -67,7 +67,10 @@ export interface VisitedPosition extends PositionBase {
   readonly cfnType: PropertyType;
   /** Whether CloudFormation's type renders as the released newest type here, so CloudFormation did not change it */
   readonly typeUnchanged: boolean;
-  /** Whether the L1 renders CloudFormation's type here whatever the history keeps (a changed modern tag property) */
+  /**
+   * Whether the L1 renders the newest type of the history here (a changed modern tag property): CloudFormation's, or,
+   * where the history already has it as an older type, the released newest one, uncompared
+   */
   readonly rendersCloudFormation: boolean;
   readonly within?: undefined;
 }

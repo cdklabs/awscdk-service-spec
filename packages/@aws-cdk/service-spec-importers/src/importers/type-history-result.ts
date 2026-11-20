@@ -90,7 +90,6 @@ export interface TypeHistoryResult {
   readonly undecided: UndecidedCase[];
   readonly settled: SettledChange[];
   readonly weak: WeakMatch[];
-  /** The merged and split types that follow CloudFormation's types */
   readonly switched: SwitchedType[];
   readonly tagBreaks: TagTypeBreak[];
   readonly applied: AppliedMapping[];

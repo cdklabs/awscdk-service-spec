@@ -230,7 +230,7 @@ class ResourceTypeHistory {
 
   /**
    * The released type aws-cdk-lib renders here once the released history comes first, undefined where it renders
-   * CloudFormation's (a changed modern tag property), and the types whose structs only cfn-property-mixins renders
+   * CloudFormation's (`rendersCloudFormation`), and the types whose structs only cfn-property-mixins renders
    */
   private renderedReleasedTypes(
     owner: Owner,
