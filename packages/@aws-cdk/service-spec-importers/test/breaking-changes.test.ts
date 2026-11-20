@@ -835,6 +835,20 @@ describe('output', () => {
       'aws-zeta: AWS::Zeta::Thing: B property removed.',
     ]);
   });
+
+  test('changes are ordered by code unit, so upper case sorts before lower case in every locale', () => {
+    for (const type of ['AWS::Some::Typea', 'AWS::Some::TypeB']) {
+      importRegistry(base, { properties: { Replicas: str(), ReplicaSpecification: str() } }, type);
+      importRegistry(head, { properties: {} }, type);
+    }
+
+    expect(changelogLines()).toEqual([
+      `${SERVICE}: AWS::Some::TypeB: ReplicaSpecification property removed.  `,
+      `${SERVICE}: AWS::Some::TypeB: Replicas property removed.  `,
+      `${SERVICE}: AWS::Some::Typea: ReplicaSpecification property removed.  `,
+      `${SERVICE}: AWS::Some::Typea: Replicas property removed.`,
+    ]);
+  });
 });
 
 describe('diff-db', () => {

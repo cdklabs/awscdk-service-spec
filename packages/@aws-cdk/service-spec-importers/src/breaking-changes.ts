@@ -9,6 +9,7 @@ import {
 } from '@aws-cdk/service-spec-types';
 import { DbDiff } from './db-diff';
 import { compareL1, L1Changes, L1StructRename } from './l1-changes';
+import { compareByCodeUnit } from './report/sorting';
 
 /** The kinds of breaking change, in the order they are listed within a resource */
 export type BreakingChangeKind =
@@ -117,11 +118,11 @@ export function findBreakingChanges(
   const sortKey = (c: BreakingChange) => JSON.stringify([c.service, c.resource, c.kind, c.element, c.description]);
   changes.sort(
     (a, b) =>
-      compare(a.service, b.service) ||
-      compare(a.resource, b.resource) ||
+      compareByCodeUnit(a.service, b.service) ||
+      compareByCodeUnit(a.resource, b.resource) ||
       KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind) ||
-      compare(a.element, b.element) ||
-      compare(a.description, b.description),
+      compareByCodeUnit(a.element, b.element) ||
+      compareByCodeUnit(a.description, b.description),
   );
   // A struct's change can also be found at a property that switched from it; equal changes sort next to each other
   return changes.filter((c, i) => i === 0 || sortKey(c) !== sortKey(changes[i - 1]));
@@ -340,11 +341,6 @@ function removal(service: string, resource: string, element: string, noun: strin
 function metricRemoval(service: string, resource: string, metric: Metric): BreakingChange {
   const name = `${metric.namespace} ${metric.name}`;
   return removal(service, resource, `metric ${name}`, 'metric', name);
-}
-
-/** Compare by code point, so the order does not depend on the locale */
-function compare(a: string, b: string): number {
-  return a < b ? -1 : a > b ? 1 : 0;
 }
 
 function oneLine(text: string): string {
