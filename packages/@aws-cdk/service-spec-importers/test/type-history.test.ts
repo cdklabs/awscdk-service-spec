@@ -1427,6 +1427,39 @@ describe('the result does not depend on the input order or the locale', () => {
     ]);
   });
 
+  test('each current type keeps its own allowed values when a kept field takes the types of its positions', () => {
+    const outputs = ORDERS.map((order) => {
+      runFresh(() => {
+        importRegistry(
+          released,
+          inOrder(order, {
+            properties: { A: ref('P'), B: ref('P') },
+            definitions: { P: object({ Name: str(), F: int() }) },
+          }),
+        );
+        importRegistry(
+          db,
+          inOrder(order, {
+            properties: { A: ref('PA'), B: ref('PB') },
+            definitions: {
+              PA: object({ Name: str(), F: { type: 'string', enum: ['a', 'b'] } }),
+              PB: object({ Name: str(), F: { type: 'string', enum: ['c'] } }),
+            },
+          }),
+        );
+      });
+      // The kept field holds copies, so a later write to it leaves CloudFormation's types as they are
+      expect(typeDefinition('P').properties.F.type).not.toBe(typeDefinition('PA').properties.F.type);
+      return {
+        PA: history(typeDefinition('PA').properties.F),
+        PB: history(typeDefinition('PB').properties.F),
+        P: history(typeDefinition('P').properties.F),
+      };
+    });
+    expect(outputs[0]).toEqual({ PA: ['string<a|b>'], PB: ['string<c>'], P: ['integer', 'string<a|b>'] });
+    expect(outputs[1]).toEqual(outputs[0]);
+  });
+
   test('cases, their positions and type breaks are ordered by code unit, so upper case sorts before lower case', () => {
     // localeCompare sorts DevOps before DMS, and DevSettings before DMSSettings, in every locale
     for (const typeName of ['AWS::DevOps::R', 'AWS::DMS::R']) {
