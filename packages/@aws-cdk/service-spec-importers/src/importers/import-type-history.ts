@@ -459,8 +459,7 @@ class ResourceTypeHistory {
   }
 
   /**
-   * Decide every released type in rounds. A kept type with a field whose positions need several types (`neededTypes()`)
-   * then follows CloudFormation, and the rounds start again.
+   * Decide in rounds; the outermost kept types whose fields need several types follow CloudFormation, then decide again
    */
   private decideAll(): Round {
     // The types that follow CloudFormation for that reason; the set only grows, so the loop ends
