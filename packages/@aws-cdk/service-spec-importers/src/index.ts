@@ -2,6 +2,7 @@ export * from './db-builder';
 export * from './db-diff';
 export * from './importers/import-type-history';
 export * from './l1-changes';
+export * from './released-database';
 export * from './report/problem-report';
 export * from './type-gate';
 export * from './type-mappings';

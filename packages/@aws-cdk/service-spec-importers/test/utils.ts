@@ -1,3 +1,4 @@
+import * as fs from 'node:fs';
 import { SpecDatabase } from '@aws-cdk/service-spec-types';
 import { importCloudFormationRegistryResource } from '../src/importers/import-cloudformation-registry';
 import { ResourceSpecImporter } from '../src/importers/import-resource-spec';
@@ -105,4 +106,9 @@ export function resourceTypeDefinition(target: SpecDatabase, name: string, typeN
     .filter((t) => t.name === name);
   expect(found).toHaveLength(1);
   return found[0];
+}
+
+/** Write a pin file for a released database fixture, version 1.2.3 */
+export function writePins(file: string, sha256: string) {
+  fs.writeFileSync(file, JSON.stringify({ version: '1.2.3', integrity: 'sha512-c29tZSBieXRlcw==', sha256 }));
 }

@@ -1,5 +1,10 @@
 import * as path from 'node:path';
-import { DatabaseBuilder, DatabaseBuilderOptions, ReportAudience } from '@aws-cdk/service-spec-importers';
+import {
+  DatabaseBuilder,
+  DatabaseBuilderOptions,
+  ReportAudience,
+  TypeHistoryOptions,
+} from '@aws-cdk/service-spec-importers';
 import { patchOobRelationships } from '@aws-cdk/service-spec-importers/src/patches/oob-relationship-patches';
 import { SpecDatabase } from '@aws-cdk/service-spec-types';
 import { Augmentations } from './augmentations';
@@ -9,16 +14,31 @@ import { Scrutinies } from './scrutinies';
 
 const SOURCES = path.join(__dirname, '../../../../sources');
 
+/** The released database whose L1 types every build keeps, and its pin file */
+export const RELEASED_DATABASE = {
+  snapshot: path.join(SOURCES, 'ReleasedDatabase/db.json.gz'),
+  pins: path.join(__dirname, 'released-database.json'),
+};
+
+/** See "Type mappings" in README.md */
+export const TYPE_MAPPINGS = path.join(__dirname, 'type-mappings.json');
+
+export interface FullDatabaseOptions extends DatabaseBuilderOptions {
+  /** @default RELEASED_DATABASE */
+  readonly releasedDatabase?: Omit<TypeHistoryOptions, 'mappings'>;
+}
+
 export class FullDatabase extends DatabaseBuilder {
   public defaultProblemGrouping = new ReportAudience('CDK_Team');
 
-  constructor(db: SpecDatabase, options: DatabaseBuilderOptions) {
+  constructor(db: SpecDatabase, options: FullDatabaseOptions) {
     super(db, options);
 
     this.importCloudFormationResourceSpec(path.join(SOURCES, 'CloudFormationResourceSpecification'))
       .importSamResourceSpec(path.join(SOURCES, 'CloudFormationResourceSpecification/us-east-1/100_sam'))
       .importCloudFormationRegistryResources(path.join(SOURCES, 'CloudFormationSchema'), patchCloudFormationRegistry)
       .importSamJsonSchema(path.join(SOURCES, 'SAMSpec/sam.schema.json'), patchSamTemplateSpec)
+      .importTypeHistory({ ...(options.releasedDatabase ?? RELEASED_DATABASE), mappings: TYPE_MAPPINGS })
       .importCloudFormationDocs(path.join(SOURCES, 'CloudFormationDocumentation/CloudFormationDocumentation.json'))
       .importStatefulResources(path.join(SOURCES, 'StatefulResources/StatefulResources.json'))
       .importGetAttAllowList(path.join(SOURCES, 'CloudFormationGetAttAllowList/gettatt-allowlist.json'))
@@ -30,6 +50,15 @@ export class FullDatabase extends DatabaseBuilder {
       .importAugmentations()
       .importEventBridgeSchema(path.join(SOURCES, 'EventBridgeSchema'))
       .importCfnPrimaryIdentifierOverrides(path.join(SOURCES, 'CloudFormationRefOverrides/ref-overrides.json'));
+  }
+
+  /** As `build()`, with the type history result, which the constructor always imports */
+  public async buildWithTypeHistory() {
+    const built = await this.build();
+    if (!built.typeHistory) {
+      throw new Error('The full database imports the type history, but the build returned no result for it');
+    }
+    return { ...built, typeHistory: built.typeHistory };
   }
 
   /**

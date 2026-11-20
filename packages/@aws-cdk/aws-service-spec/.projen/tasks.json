@@ -242,6 +242,16 @@
         }
       ]
     },
+    "type-gate": {
+      "name": "type-gate",
+      "description": "Fail if the build cannot decide how a released L1 type continues, printing the type-mappings.json entries that decide it",
+      "steps": [
+        {
+          "exec": "ts-node build/type-gate.ts",
+          "receiveArgs": true
+        }
+      ]
+    },
     "unbump": {
       "name": "unbump",
       "description": "Restores version to 0.0.0",
