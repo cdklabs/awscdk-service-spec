@@ -25,7 +25,6 @@ import {
   setTypeHistory,
   Use,
 } from './type-history-model';
-import { renderType } from '../l1-view';
 import { compareByCodeUnit } from '../report/sorting';
 
 export interface TypeHistoryApplyContext {
@@ -221,14 +220,21 @@ class TypeHistoryApplier {
       return;
     }
     const rich = new RichTypedField({ type: last(history), previousTypes: history.slice(0, -1) });
-    const changed = positions
-      .filter((p) => !p.typeUnchanged)
-      .map((p) => ({ type: p.cfnType, rendered: renderType(this.db, p.cfnType) }));
-    for (const { type } of changed.sort((a, b) => compareByCodeUnit(a.rendered, b.rendered))) {
-      rich.updateType(type);
+    // In a fixed order, not the schema's; the key keeps integer and number apart, which the L1 renders alike
+    const key = (p: { currentField: Field }) =>
+      new RichTypedField(p.currentField)
+        .types()
+        .reverse()
+        .map((t) => new RichPropertyType(t).stringify(this.db, false))
+        .join(' <- ');
+    const sorted = positions
+      .map((p) => ({ ...p, key: key(p) }))
+      .sort((a, b) => compareByCodeUnit(a.key, b.key));
+    for (const p of sorted.filter((q) => !q.typeUnchanged)) {
+      rich.updateType(p.cfnType);
     }
     // A type that both have keeps the details of the current one, like its allowed values
-    const currentTypes = positions.flatMap((p) => new RichTypedField(p.currentField).types());
+    const currentTypes = sorted.flatMap((p) => new RichTypedField(p.currentField).types());
     setTypeHistory(
       field,
       rich.types().map((t) => currentTypes.find((c) => new RichPropertyType(c).equals(t)) ?? t),

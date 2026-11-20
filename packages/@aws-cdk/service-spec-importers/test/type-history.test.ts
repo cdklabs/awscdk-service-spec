@@ -1315,23 +1315,28 @@ describe('the result does not depend on the input order or the locale', () => {
         importRegistry(
           released,
           inOrder(order, {
-            properties: { A: ref('P'), B: ref('P') },
+            properties: { A: ref('P'), B: ref('P'), C: ref('P') },
             definitions: { P: object({ Name: str(), F: str() }) },
           }),
         );
         importRegistry(
           db,
           inOrder(order, {
-            properties: { A: ref('PA'), B: ref('PB') },
-            definitions: { PA: object({ Name: str(), F: int() }), PB: object({ Name: str(), F: bool() }) },
+            properties: { A: ref('PA'), B: ref('PB'), C: ref('PC') },
+            definitions: {
+              PA: object({ Name: str(), F: int() }),
+              PB: object({ Name: str(), F: bool() }),
+              PC: object({ Name: str(), F: { type: 'number' } }),
+            },
           }),
         );
       });
       return history(typeDefinition('P').properties.F);
     });
+    // The L1 renders integer and number alike, but the history keeps both
     expect(outputs).toEqual([
-      ['string', 'boolean', 'integer'],
-      ['string', 'boolean', 'integer'],
+      ['string', 'boolean', 'integer', 'number'],
+      ['string', 'boolean', 'integer', 'number'],
     ]);
   });
 
