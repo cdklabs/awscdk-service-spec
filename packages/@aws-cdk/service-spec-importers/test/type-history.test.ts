@@ -1235,6 +1235,93 @@ describe('a kept type whose field needs different types at its positions follows
     expect(fields('PB')).toEqual({ Name: 'string', F: 'NB' });
   });
 
+  test('but not once the type above its other positions follows CloudFormation and leaves it one position', () => {
+    // P.F needs NA at A and C.G, NB at B.G; T.H needs MB and MC. Once T switches, P counts only at A
+    const outputs = ORDERS.map((order) => {
+      const result = runFresh(() => {
+        importRegistry(
+          released,
+          inOrder(order, {
+            properties: { A: ref('P'), B: ref('T'), C: ref('T') },
+            definitions: {
+              P: object({ Name: str(), F: ref('N') }),
+              T: object({ Name: str(), G: ref('P'), H: ref('M') }),
+              N: object({ X: str() }),
+              M: object({ Y: str() }),
+            },
+          }),
+        );
+        importRegistry(
+          db,
+          inOrder(order, {
+            properties: { A: ref('PA'), B: ref('TB'), C: ref('TC') },
+            definitions: {
+              PA: object({ Name: str(), F: ref('NA') }),
+              PB: object({ Name: str(), F: ref('NB') }),
+              TB: object({ Name: str(), G: ref('PB'), H: ref('MB') }),
+              TC: object({ Name: str(), G: ref('PA'), H: ref('MC') }),
+              NA: object({ X: str(), New: str() }),
+              NB: object({ X: str(), Other: str() }),
+              MB: object({ Y: str(), New2: str() }),
+              MC: object({ Y: str(), Other2: str() }),
+            },
+          }),
+        );
+      });
+
+      expect(cases(result)).toEqual([]);
+      expect(switched(result)).toEqual(['T -> TB at property B', 'T -> TC at property C']);
+      expect(settled(result)).toEqual(['rename N -> NA at property A.F', 'rename P -> PA at property A']);
+      expect(history(resource(db).properties.A)).toEqual(['P', 'PA']);
+      expect(canonicalL1()).toContain('P { F: N <- NA; Name: string }');
+      return runOutput(result);
+    });
+    expect(outputs[1]).toEqual(outputs[0]);
+  });
+
+  test('two that are each below the other both follow CloudFormation', () => {
+    // P.F needs NA at A.F and NB at B.K.F, below T; T.H needs MA at A.G.H, below P, and MB at B.H
+    const outputs = ORDERS.map((order) => {
+      const result = runFresh(() => {
+        importRegistry(
+          released,
+          inOrder(order, {
+            properties: { A: ref('P'), B: ref('T') },
+            definitions: {
+              P: object({ Name: str(), F: ref('N'), G: ref('T') }),
+              T: object({ Name: str(), H: ref('M'), K: ref('P') }),
+              N: object({ X: str() }),
+              M: object({ Y: str() }),
+            },
+          }),
+        );
+        importRegistry(
+          db,
+          inOrder(order, {
+            properties: { A: ref('PA'), B: ref('TB') },
+            definitions: {
+              PA: object({ Name: str(), F: ref('NA'), G: ref('TA') }),
+              PB: object({ Name: str(), F: ref('NB'), G: ref('TB') }),
+              TA: object({ Name: str(), H: ref('MA'), K: ref('PA') }),
+              TB: object({ Name: str(), H: ref('MB'), K: ref('PB') }),
+              NA: object({ X: str(), New: str() }),
+              NB: object({ X: str(), Other: str() }),
+              MA: object({ Y: str(), New2: str() }),
+              MB: object({ Y: str(), Other2: str() }),
+            },
+          }),
+        );
+      });
+
+      expect(cases(result)).toEqual([]);
+      // Their positions below each other no longer count
+      expect(switched(result)).toEqual(['P -> PA at property A', 'T -> TB at property B']);
+      expect(settled(result)).toEqual([]);
+      return runOutput(result);
+    });
+    expect(outputs[1]).toEqual(outputs[0]);
+  });
+
   test('an entry that keeps it fails the build, naming the field, unless an entry also keeps the nested type', () => {
     const keepOld = (oldType: string, newTypes: string[]) =>
       mapping({ resource: RESOURCE, oldType, newTypes, kind: 'keep-old' });
