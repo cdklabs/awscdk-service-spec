@@ -15,7 +15,6 @@ const SERVICE = 'aws-some';
 const CHANGELOG_PARAGRAPH =
   '**CHANGES TO L1 RESOURCES:** L1 resources are automatically generated from public CloudFormation Resource Schemas. They are built to closely reflect the real state of CloudFormation. Sometimes these updates can contain changes that are incompatible with previous types, but more accurately reflect reality. In this release we have changed:';
 
-/** The line that follows the paragraph when there is no breaking change */
 const NO_CHANGES = 'No breaking changes detected in this release.';
 
 /**
@@ -32,20 +31,18 @@ beforeEach(() => {
   head = emptyDatabase();
 });
 
-/** The changelog lines, after the paragraph and the empty line that start the text */
 function changelogLines(): string[] {
   const [paragraph, empty, ...lines] = formatBreakingChanges(findBreakingChanges(base, head)).split('\n');
   expect([paragraph, empty]).toEqual([CHANGELOG_PARAGRAPH, '']);
   return lines;
 }
 
-/** Import `RESOURCE` into both databases, from a schema before and after */
+/** Import `RESOURCE` into `base` and `head` */
 function both(before: Partial<CloudFormationRegistryResource>, after: Partial<CloudFormationRegistryResource>) {
   importRegistry(base, before);
   importRegistry(head, after);
 }
 
-/** Import `RESOURCE` from the legacy resource specification, with one string property `Name` */
 function legacyName(target: SpecDatabase, updateType: resourcespec.Property['UpdateType']) {
   importLegacySpec(target, { properties: { Name: { PrimitiveType: 'String', UpdateType: updateType } }, types: {} });
 }
@@ -728,7 +725,6 @@ describe('diff-db', () => {
     fs.rmSync(dir, { recursive: true, force: true });
   });
 
-  /** Run the diff-db command line from its source with `args` and the databases `dbs` */
   function diffDb(args: string[], dbs = [base, head]) {
     const files = dbs.map((db, i) => {
       const file = path.join(dir, `db${i}.json`);

@@ -10,20 +10,7 @@ import {
 import { DbDiff } from './db-diff';
 import { compareL1, L1Changes, L1StructRename } from './l1-changes';
 
-/**
- * The kinds of breaking change, in the order they are listed within a resource
- *
- * - `removed`: a resource, property, attribute, type definition, field of a type definition or metric that the base
- *   database has and the new one lacks
- * - `now-required`: a property or field that was optional
- * - `now-immutable`: a property or field whose update now always replaces the resource, which it did not always do,
- *   or may now replace it, which it never did
- * - `default-changed`: a property or field with a default value in both databases, which differ
- * - `allowed-values-narrowed`: a property or field that no longer allows a value, or allows only some values where it
- *   allowed any
- * - `cdk-type-renamed`: a struct that the L1 renders under another name, alone (a rename) or with others (a merge)
- * - `cdk-type-changed`: a type that the L1 renders differently, other than by widening it
- */
+/** The kinds of breaking change, in the order they are listed within a resource */
 export type BreakingChangeKind =
   | 'removed'
   | 'now-required'
@@ -52,25 +39,18 @@ export interface BreakingChange {
   /** The resource type, or the service's CloudFormation namespace for a metric of the service */
   readonly resource: string;
   readonly kind: BreakingChangeKind;
-  /**
-   * What changed: a property `Name`, a field `Struct.Field` (or `Property.Field` where a property switched from a struct
-   * that is still used), an attribute, type, metric or struct; empty for a resource
-   */
+  /** The property, field (`Struct.Field`), attribute, type, metric or struct that changed; empty for a resource */
   readonly element: string;
   /** The changelog description, without the final full stop, for example `Name property is now required` */
   readonly description: string;
 }
 
 /**
- * The changes between a base database and a new one that can make an existing CloudFormation template or existing CDK
- * code fail, ordered by service, resource, kind, element and description
+ * The changes from `base` to `head` that can make an existing CloudFormation template or existing CDK code fail, each
+ * once, ordered by service, resource, kind, element and description
  *
- * Template breaks come from the model diff (`DbDiff`): removals, and the properties and fields that became required,
- * immutable, got another default value or fewer allowed values, also between the old and the new struct of each struct
- * the L1 renders under another name. CDK code breaks come from the L1 change report
- * (`compareL1`, pass it when it is already computed): struct renames and merges, and rendered types that changed other
- * than by widening. Additions, relaxations, deprecations, documentation and anything in a new resource are never
- * listed.
+ * Template breaks come from the model diff (`DbDiff`), CDK code breaks (the `cdk-` kinds) from the L1 change report;
+ * pass `l1Changes` when it is already computed.
  */
 export function findBreakingChanges(
   base: SpecDatabase,
@@ -121,9 +101,7 @@ export function findBreakingChanges(
     }
   }
 
-  // The model diff pairs type definitions by name, so the fields of a struct the L1 renders under another name are
-  // compared here: the fields of `from` that `to` lacks or restricts break the templates and code that set them where
-  // `from` was
+  // The model diff pairs type definitions by name, so each renamed struct is compared with its new struct here
   for (const rename of l1Changes.renames) {
     const at = { service: serviceOf(head, rename.resource), resource: rename.resource };
     const fields = differ.diffTypeDefinition(
@@ -145,8 +123,7 @@ export function findBreakingChanges(
       compare(a.element, b.element) ||
       compare(a.description, b.description),
   );
-  // The same change can be found twice, for example in a struct changed under its own name and at a property of that
-  // name that switched from the struct; such changes have the same sort key, so they are next to each other
+  // A struct's change can also be found at a property that switched from it; equal changes sort next to each other
   return changes.filter((c, i) => i === 0 || sortKey(c) !== sortKey(changes[i - 1]));
 }
 
@@ -154,10 +131,7 @@ export function findBreakingChanges(
 const CHANGELOG_PARAGRAPH =
   '**CHANGES TO L1 RESOURCES:** L1 resources are automatically generated from public CloudFormation Resource Schemas. They are built to closely reflect the real state of CloudFormation. Sometimes these updates can contain changes that are incompatible with previous types, but more accurately reflect reality. In this release we have changed:';
 
-/**
- * The changelog text for the L1 pull request: the `**CHANGES TO L1 RESOURCES:**` paragraph, an empty line, and one line
- * per change, or a line that says there is none
- */
+/** The changelog text for the L1 pull request: the paragraph, an empty line, one line per change or one saying none */
 export function formatBreakingChanges(changes: BreakingChange[]): string {
   // Each line but the last ends in two spaces, a markdown line break
   const entries =
@@ -175,9 +149,7 @@ interface Place {
   readonly resource: string;
 }
 
-/**
- * The breaking changes of the properties of a resource, or the fields of a type definition (`prefix` is `Type.`)
- */
+/** The breaking changes of the properties of a resource, or of the fields of a type (`prefix` is `Type.`) */
 function propertyChanges(
   at: Place,
   diff: MapDiff<Property, UpdatedProperty> | undefined,
@@ -196,8 +168,6 @@ function propertyChanges(
     if (!old.required && now.required) {
       change('now-required', name, `${name} property is now required`);
     }
-    // `causesReplacement` is `no` for a mutable property, `maybe` for one that may require replacement and `yes` for
-    // an immutable one
     const replaces = [old.causesReplacement ?? 'no', now.causesReplacement ?? 'no'];
     if (replaces[0] !== 'yes' && replaces[1] === 'yes') {
       change('now-immutable', name, `${name} property is now immutable`);
@@ -227,13 +197,7 @@ function propertyChanges(
 type AllowedValue = string | number;
 type Narrowing = { readonly removed: AllowedValue } | { readonly restrictedTo: AllowedValue[] };
 
-/**
- * How the allowed values of a type are narrower than before: each value no longer allowed, or the values now allowed
- * where any were
- *
- * Strings and integers are compared with the same type, lists and maps by their elements, and type unions by their
- * members of each type, where each union has one member of that type.
- */
+/** Each allowed value that `now` drops, or the values `now` allows where `old` allowed any */
 function allowedValueNarrowings(old: PropertyType, now: PropertyType): Narrowing[] {
   if ((old.type === 'string' && now.type === 'string') || (old.type === 'integer' && now.type === 'integer')) {
     const before: AllowedValue[] | undefined = old.allowedValues;
@@ -258,13 +222,10 @@ function allowedValueNarrowings(old: PropertyType, now: PropertyType): Narrowing
   return [];
 }
 
-/**
- * The struct renames and merges, and the rendered types that changed other than by widening, in the L1 change report,
- * including the fields of renamed and merged structs
- */
+/** The struct renames and merges in the L1 change report, and the rendered types that changed other than by widening */
 function cdkCodeChanges(head: SpecDatabase, l1Changes: L1Changes): BreakingChange[] {
   const ret = new Array<BreakingChange>();
-  // Rendered types are made of type names, `Array<...>`, `Map<string, ...>` and ` | `, so ` to ` separates them
+  // A rendered type (`renderType()`) never contains ` to `
   const typeChange = (resource: string, noun: string, name: string, description: string) => {
     const types = /^type changed from (.+) to (.+)$/.exec(description);
     if (!types) {
@@ -291,7 +252,7 @@ function cdkCodeChanges(head: SpecDatabase, l1Changes: L1Changes): BreakingChang
       element: rename.from,
       description: `${rename.from} type ${merged ? 'merged into' : 'renamed to'} ${rename.to}`,
     });
-    // Field changes read `<field> type changed from A to B`, `<field> now required`, `<field> removed` and so on
+    // Only the type changes: the struct comparison in `findBreakingChanges()` finds the other breaking field changes
     for (const fieldChange of rename.fieldChanges) {
       const field = /^(\S+) (type changed from .+)$/.exec(fieldChange);
       if (field) {
@@ -312,9 +273,8 @@ function cdkCodeChanges(head: SpecDatabase, l1Changes: L1Changes): BreakingChang
 }
 
 /**
- * How the field changes of a struct the L1 renders under another name are named: `<from>.` when the new database no
- * longer has `from` (a rename or a merge), and otherwise each position of the rename (`Source.`, `Settings.Primary.`),
- * because the places that still use `from` keep it, and the break is where it was replaced
+ * The prefixes of a renamed struct's field changes: `<from>.`, or, while `head` still uses `from`, each position of the
+ * rename (`Source.`), because only those positions break
  */
 function renamedFieldPrefixes(head: SpecDatabase, rename: L1StructRename): string[] {
   const resource = head.lookup('resource', 'cloudFormationType', 'equals', rename.resource).only();
@@ -325,13 +285,11 @@ function renamedFieldPrefixes(head: SpecDatabase, rename: L1StructRename): strin
   return rename.positions.map((position) => `${position.replace(/^(property|attribute|field) /, '')}.`);
 }
 
-/** The service of a resource type in a database */
 function serviceOf(db: SpecDatabase, resourceType: string): string {
   return db.incoming('hasResource', db.lookup('resource', 'cloudFormationType', 'equals', resourceType).only()).only()
     .entity.name;
 }
 
-/** The type definition of a resource by its name, as the L1 change report names structs */
 function typeDefinition(db: SpecDatabase, resourceType: string, name: string): TypeDefinition {
   const resource = db.lookup('resource', 'cloudFormationType', 'equals', resourceType).only();
   const found = db.follow('usesType', resource).filter(({ entity }) => entity.name === name);
@@ -341,10 +299,7 @@ function typeDefinition(db: SpecDatabase, resourceType: string, name: string): T
   return found[0].entity;
 }
 
-/**
- * Whether a rendered type accepts everything the old one did: it is `json`, or a union of the old type's members and
- * others, also inside lists and maps of the same kind
- */
+/** Whether rendered type `to` accepts every value that `from` accepts */
 function widens(from: string, to: string): boolean {
   if (to === 'json') {
     return true;
@@ -360,7 +315,6 @@ function widens(from: string, to: string): boolean {
   return fromMembers.every((m) => toMembers.includes(m));
 }
 
-/** The members of a rendered type union, split where no `<...>` is open */
 function unionMembers(type: string): string[] {
   const members = new Array<string>();
   let depth = 0;
@@ -378,7 +332,6 @@ function unionMembers(type: string): string[] {
   return [...members, type.slice(start)];
 }
 
-/** A removal: `noun` follows `name` in the changelog description */
 function removal(service: string, resource: string, element: string, noun: string, name = element): BreakingChange {
   return { service, resource, kind: 'removed', element, description: `${name ? `${name} ` : ''}${noun} removed` };
 }
@@ -393,7 +346,6 @@ function compare(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0;
 }
 
-/** Text with each line break replaced by a space, so that one change stays on one line */
 function oneLine(text: string): string {
   return text.replace(/\r\n|\r|\n/g, ' ');
 }
