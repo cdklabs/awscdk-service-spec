@@ -214,10 +214,12 @@ export function reportInactive(result: TypeHistoryResult, entry: TypeMapping, re
   result.inactive.push({ entry, reason });
 }
 
+/** Writes copies of `types`, so the field shares no type object with another field */
 export function setTypeHistory(field: Field, types: PropertyType[]) {
-  field.type = types[types.length - 1];
-  if (types.length > 1) {
-    field.previousTypes = types.slice(0, -1);
+  const copies = structuredClone(types);
+  field.type = copies[copies.length - 1];
+  if (copies.length > 1) {
+    field.previousTypes = copies.slice(0, -1);
   } else {
     delete field.previousTypes;
   }

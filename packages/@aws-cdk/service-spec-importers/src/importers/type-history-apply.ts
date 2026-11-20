@@ -229,7 +229,8 @@ class TypeHistoryApplier {
         .join(' <- ');
     const sorted = positions.map((p) => ({ ...p, key: key(p) })).sort((a, b) => compareByCodeUnit(a.key, b.key));
     for (const p of sorted.filter((q) => !q.typeUnchanged)) {
-      rich.updateType(p.cfnType);
+      // A copy: updateType keeps the object it is given and writes a later equal type's allowed values into it
+      rich.updateType(structuredClone(p.cfnType));
     }
     // A type that both have keeps the details of the current one, like its allowed values
     const currentTypes = sorted.flatMap((p) => new RichTypedField(p.currentField).types());
