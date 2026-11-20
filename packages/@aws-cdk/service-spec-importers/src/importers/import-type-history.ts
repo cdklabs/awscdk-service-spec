@@ -16,9 +16,11 @@ import {
   isUnpaired,
   keepsMixinsFields,
   need,
+  neededTypes,
   ownerKey,
   Owner,
   Position,
+  positionsByField,
   pushTo,
   releasedAnd,
   reportInactive,
@@ -35,6 +37,7 @@ import {
 import { reportTagBreaks, reportTypeHistory } from './type-history-report';
 import { TypeHistoryResult } from './type-history-result';
 import { fieldLabel, referencedStructs, renderedFieldType, renderedPropertyTypes } from '../l1-view';
+import { compareByCodeUnit } from '../report/sorting';
 import { TypeMapping } from '../type-mappings';
 import { matchShape, sameNameOrSharedField } from '../type-pairing';
 
@@ -79,12 +82,14 @@ export function importTypeHistory(
   }
 
   const byType = (a: { resource: string; releasedType: string }, b: { resource: string; releasedType: string }) =>
-    a.resource.localeCompare(b.resource) || a.releasedType.localeCompare(b.releasedType);
+    compareByCodeUnit(a.resource, b.resource) || compareByCodeUnit(a.releasedType, b.releasedType);
   result.undecided.sort(byType);
   result.settled.sort(byType);
-  result.weak.sort((a, b) => byType(a, b) || a.newType.localeCompare(b.newType));
-  result.switched.sort((a, b) => byType(a, b) || a.newType.localeCompare(b.newType));
-  result.tagBreaks.sort((a, b) => a.resource.localeCompare(b.resource) || a.position.localeCompare(b.position));
+  result.weak.sort((a, b) => byType(a, b) || compareByCodeUnit(a.newType, b.newType));
+  result.switched.sort((a, b) => byType(a, b) || compareByCodeUnit(a.newType, b.newType));
+  result.tagBreaks.sort(
+    (a, b) => compareByCodeUnit(a.resource, b.resource) || compareByCodeUnit(a.position, b.position),
+  );
   result.applied.sort((a, b) => mappings.indexOf(a.entry) - mappings.indexOf(b.entry));
   result.inactive.sort((a, b) => mappings.indexOf(a.entry) - mappings.indexOf(b.entry));
   return result;
@@ -225,7 +230,7 @@ class ResourceTypeHistory {
 
   /**
    * The released type aws-cdk-lib renders here once the released history comes first, undefined where it renders
-   * CloudFormation's (a changed modern tag property), and the types whose structs only cfn-property-mixins renders
+   * CloudFormation's (`rendersCloudFormation`), and the types whose structs only cfn-property-mixins renders
    */
   private renderedReleasedTypes(
     owner: Owner,
@@ -454,37 +459,64 @@ class ResourceTypeHistory {
   }
 
   /**
-   * Decide every released type in rounds, until the positions that count are those the decisions render
+   * Decide every released type in rounds. A kept type with a field whose positions need several types (`neededTypes()`)
+   * then follows CloudFormation, and the rounds start again.
+   */
+  private decideAll(): Round {
+    // The types that follow CloudFormation for that reason; the set only grows, so the loop ends
+    const forced = new Set<TypeDefinition>();
+    for (;;) {
+      const round = this.decideRounds(forced);
+      const found = this.keptWithSeveralTypes(round).filter((t) => !forced.has(t));
+      if (found.length === 0) {
+        return round;
+      }
+      found.forEach((t) => forced.add(t));
+    }
+  }
+
+  private keptWithSeveralTypes(round: Round): TypeDefinition[] {
+    return [...positionsByField(this.positions, round).values()]
+      .filter((positions) => neededTypes(this.db, round, positions).length > 1)
+      .map((positions) => positions[0].owner.parent)
+      .filter((parent): parent is TypeDefinition => !!parent && round.decisions.get(parent)?.kind === 'kept');
+  }
+
+  /**
+   * Decide in rounds until the positions that count are those the decisions render
    *
    * Each round counts again from all positions, so a position left out under one round can count in the next. Rounds
    * that come back to an earlier set without settling leave the types whose positions changed undecided.
    */
-  private decideAll(): Round {
+  private decideRounds(forced: ReadonlySet<TypeDefinition>): Round {
     let active: ReadonlySet<Position> = new Set(this.positions);
-    const seen = new Set<string>([this.activeKey(active)]);
+    const sets = [active];
+    const seen = new Map<string, number>([[this.activeKey(active), 0]]);
     // `seen` ends every cycle; the bound only stops rounds that change without repeating, which no known input does
     const maxRounds = this.positions.length + 1;
     for (let i = 0; i < maxRounds; i++) {
-      const round = this.decideRound(active);
+      const round = this.decideRound(active, forced);
       const next = this.activeFromDecisions(round);
       const key = this.activeKey(next);
       if (key === this.activeKey(active)) {
         return round;
       }
-      if (seen.has(key)) {
-        return this.decideInterdependent(round, next);
+      const cycleStart = seen.get(key);
+      if (cycleStart !== undefined) {
+        return this.decideInterdependent(sets.slice(cycleStart), forced);
       }
-      seen.add(key);
+      seen.set(key, sets.length);
+      sets.push(next);
       active = next;
     }
     // The rounds neither settled nor repeated within the bound: fail closed, as for a cycle
-    const round = this.decideRound(active);
+    const round = this.decideRound(active, forced);
     const next = this.activeFromDecisions(round);
-    return this.activeKey(next) !== this.activeKey(active) ? this.decideInterdependent(round, next) : round;
+    return this.activeKey(next) !== this.activeKey(active) ? this.decideInterdependent([active, next], forced) : round;
   }
 
-  private decideRound(active: ReadonlySet<Position>): Round {
-    const { mergeTargets, switched } = this.findMergesAndSplits(active);
+  private decideRound(active: ReadonlySet<Position>, forced: ReadonlySet<TypeDefinition>): Round {
+    const { mergeTargets, switched } = this.findMergesAndSplits(active, forced);
     const decisions = new Map<TypeDefinition, Decision>();
     for (const [releasedType, uses] of this.uses) {
       const activeUses = uses.filter((u) => active.has(u.position));
@@ -517,15 +549,17 @@ class ResourceTypeHistory {
   }
 
   /**
-   * Decide on the positions of both rounds, leaving each released type whose positions differ between them undecided
+   * Decide on the positions of every set of a cycle, leaving each released type whose positions differ among them
+   * undecided
    */
-  private decideInterdependent(round: Round, next: ReadonlySet<Position>): Round {
-    const changed = new Set([...next, ...round.active].filter((p) => next.has(p) !== round.active.has(p)));
-    const both = this.decideRound(new Set([...next, ...round.active]));
-    const decisions = new Map(both.decisions);
+  private decideInterdependent(cycle: Array<ReadonlySet<Position>>, forced: ReadonlySet<TypeDefinition>): Round {
+    const union = new Set(cycle.flatMap((active) => [...active]));
+    const changed = new Set([...union].filter((p) => !cycle.every((active) => active.has(p))));
+    const all = this.decideRound(union, forced);
+    const decisions = new Map(all.decisions);
     for (const [releasedType, uses] of this.uses) {
       if (uses.some((u) => changed.has(u.position))) {
-        const activeUses = uses.filter((u) => both.active.has(u.position));
+        const activeUses = uses.filter((u) => all.active.has(u.position));
         const fields = releasedAnd(
           releasedType,
           activeUses.flatMap((u) => need(u)),
@@ -539,7 +573,7 @@ class ResourceTypeHistory {
         });
       }
     }
-    return this.withRenderedFields({ ...both, decisions });
+    return this.withRenderedFields({ ...all, decisions });
   }
 
   private activeKey(positions: ReadonlySet<Position>) {
@@ -591,7 +625,7 @@ class ResourceTypeHistory {
    * The rule skips a type that an entry decides or that has an unpaired use. Such a type still switches the others of
    * its merge when the merged type has a field it lacks, but not when its own positions need different fields.
    */
-  private findMergesAndSplits(active: ReadonlySet<Position>) {
+  private findMergesAndSplits(active: ReadonlySet<Position>, forced: ReadonlySet<TypeDefinition>) {
     const usesOf = new Map<TypeDefinition, Use[]>();
     const typesAt = new Map<TypeDefinition, TypeDefinition[]>();
     const mergedInto = new Map<TypeDefinition, TypeDefinition[]>();
@@ -620,7 +654,8 @@ class ResourceTypeHistory {
     const switched = new Set<TypeDefinition>();
     for (const [releasedType, types] of typesAt) {
       const gains = types.some((t) => hasNewField(releasedType, t));
-      if (types.length > 1 && byRule(releasedType) && (gains || needsDiffer(releasedType))) {
+      const splits = types.length > 1 && (gains || needsDiffer(releasedType));
+      if (byRule(releasedType) && (splits || forced.has(releasedType))) {
         switched.add(releasedType);
       }
     }

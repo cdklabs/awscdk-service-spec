@@ -67,7 +67,10 @@ export interface VisitedPosition extends PositionBase {
   readonly cfnType: PropertyType;
   /** Whether CloudFormation's type renders as the released newest type here, so CloudFormation did not change it */
   readonly typeUnchanged: boolean;
-  /** Whether the L1 renders CloudFormation's type here whatever the history keeps (a changed modern tag property) */
+  /**
+   * Whether the L1 renders the newest type of the history here (a changed modern tag property): CloudFormation's, or,
+   * where the history already has it as an older type, the released newest one, uncompared
+   */
   readonly rendersCloudFormation: boolean;
   readonly within?: undefined;
 }
@@ -247,7 +250,35 @@ export function releasedAnd(releasedType: TypeDefinition, names: string[]): stri
 }
 
 export function pushTo<K, V>(map: Map<K, V[]>, key: K, ...values: V[]) {
-  map.set(key, [...(map.get(key) ?? []), ...values]);
+  const list = map.get(key);
+  if (list) {
+    list.push(...values);
+  } else {
+    map.set(key, values);
+  }
+}
+
+/**
+ * The visited positions that count under a round, by the field whose history they share (`Owner.key`)
+ */
+export function positionsByField(positions: readonly Position[], round: DecidedRound): Map<string, VisitedPosition[]> {
+  const byField = new Map<string, VisitedPosition[]>();
+  for (const position of positions) {
+    if (position.kind === 'visited' && round.active.has(position)) {
+      pushTo(byField, position.owner.key, position);
+    }
+  }
+  return byField;
+}
+
+/**
+ * The types that the positions of one field need: CloudFormation's where a use follows it, `undefined` (the released
+ * history) elsewhere. A field holds one type.
+ */
+export function neededTypes(db: SpecDatabase, round: DecidedRound, positions: VisitedPosition[]) {
+  return unique(
+    positions.map((p) => (p.uses.some((u) => followsIn(round, u)) ? renderType(db, p.cfnType) : undefined)),
+  );
 }
 
 export function fieldKey({ typeDef, name }: CurrentField) {

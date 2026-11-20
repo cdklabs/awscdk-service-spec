@@ -15,16 +15,18 @@ import {
   followsIn,
   isDefined,
   last,
+  neededTypes,
   ownerKey,
   Position,
-  pushTo,
+  positionsByField,
   Round,
   sameRenderedType,
   setRequired,
   setTypeHistory,
   Use,
-  VisitedPosition,
 } from './type-history-model';
+import { renderType } from '../l1-view';
+import { compareByCodeUnit } from '../report/sorting';
 
 export interface TypeHistoryApplyContext {
   /** The current sources, which the decisions are written into */
@@ -144,19 +146,25 @@ class TypeHistoryApplier {
    * Put the released histories first, at the positions that count and at kept released fields no position reached
    */
   private updateHistories(plans: Map<TypeDefinition, FieldPlan>, ownFields: Set<TypeDefinition>) {
-    const byOwner = new Map<string, VisitedPosition[]>();
-    for (const position of this.positions) {
-      if (position.kind === 'visited' && this.round.active.has(position)) {
-        pushTo(byOwner, position.owner.key, position);
-      }
-    }
+    const byOwner = positionsByField(this.positions, this.round);
     for (const positions of byOwner.values()) {
       const { owner } = positions[0];
       const field = owner.bag
         ? this.resource[owner.bag][owner.name]
         : this.targets.get(owner.parent!.$id)?.properties[owner.name];
+      const types = neededTypes(this.db, this.round, positions);
+      // An undecided type fails the gate and keeps its released history
+      if (types.length > 1 && this.round.decisions.get(owner.parent!)?.kind !== 'undecided') {
+        const needed = types.map((t) => t ?? 'its released type').sort(compareByCodeUnit);
+        throw new Error(
+          `${this.resource.cloudFormationType}: ${owner.parent!.name}.${owner.name} needs ${needed.join(', ')} at ` +
+            'its positions, which one kept field cannot hold',
+        );
+      }
+      const following =
+        types.length === 1 ? positions.find((p) => p.uses.some((u) => followsIn(this.round, u))) : undefined;
       if (field) {
-        this.updateHistory(field, positions[0].releasedField, positions);
+        this.updateHistory(field, positions[0].releasedField, positions, following);
       }
     }
     // A kept released field no position reached keeps its released history, followed by the current field's type
@@ -194,15 +202,15 @@ class TypeHistoryApplier {
   }
 
   /**
-   * Put the released history first at the positions of one field (rules 1 and 2). Updates the field in place, because
-   * a nested read-only field is the same object as its attribute.
+   * Put the released history first at the positions of one field (rules 1 and 2), or CloudFormation's type where the
+   * field follows it. Updates the field in place, because a nested read-only field is the same object as its attribute.
    */
   private updateHistory(
     field: Field,
     releasedField: Field,
     positions: Array<{ currentField: Field; cfnType: PropertyType; typeUnchanged: boolean; uses: Use[] }>,
+    following?: { cfnType: PropertyType },
   ) {
-    const following = positions.find((p) => p.uses.some((u) => followsIn(this.round, u)));
     if (following) {
       setTypeHistory(field, [following.cfnType]);
       return;
@@ -213,8 +221,11 @@ class TypeHistoryApplier {
       return;
     }
     const rich = new RichTypedField({ type: last(history), previousTypes: history.slice(0, -1) });
-    for (const position of positions.filter((p) => !p.typeUnchanged)) {
-      rich.updateType(position.cfnType);
+    const changed = positions
+      .filter((p) => !p.typeUnchanged)
+      .map((p) => ({ type: p.cfnType, rendered: renderType(this.db, p.cfnType) }));
+    for (const { type } of changed.sort((a, b) => compareByCodeUnit(a.rendered, b.rendered))) {
+      rich.updateType(type);
     }
     // A type that both have keeps the details of the current one, like its allowed values
     const currentTypes = positions.flatMap((p) => new RichTypedField(p.currentField).types());

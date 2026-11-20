@@ -97,9 +97,7 @@ export function divergingChecks(cType: string): Partial<CloudFormationRegistryRe
   };
 }
 
-/**
- * The one type definition of the given name that a resource uses
- */
+/** The one type definition of the given name that a resource uses */
 export function resourceTypeDefinition(target: SpecDatabase, name: string, typeName = RESOURCE) {
   const resource = target.lookup('resource', 'cloudFormationType', 'equals', typeName).only();
   const found = target

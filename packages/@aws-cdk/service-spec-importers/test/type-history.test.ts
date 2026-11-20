@@ -1,5 +1,6 @@
 import { emptyDatabase, Property, RichProperty, RichPropertyType, SpecDatabase } from '@aws-cdk/service-spec-types';
 import {
+  bool,
   divergingChecks,
   importLegacySpec,
   importRegistry,
@@ -12,8 +13,8 @@ import {
   strings,
 } from './utils';
 import { importTypeHistory, TypeHistoryResult, UndecidedCase } from '../src/importers/import-type-history';
-import { compareL1 } from '../src/l1-changes';
-import { L1View } from '../src/l1-view';
+import { compareL1, formatL1Changes } from '../src/l1-changes';
+import { GeneratedPackage, L1View } from '../src/l1-view';
 import { typeGate } from '../src/type-gate';
 import { TypeMapping, TypeMappingKind } from '../src/type-mappings';
 import { CloudFormationRegistryResource, jsonschema } from '../src/types';
@@ -898,6 +899,38 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
     expect(history(resource(db).properties.Top)).toEqual(['NodeA']);
   });
 
+  test('a type whose positions change only between earlier rounds of a longer cycle is interdependent too', () => {
+    // S switches while PM.F counts, which drops PS.G; the split entry keeps V at PM only while PS.G counts, which
+    // keeps PM.F and PM.K. The rounds go around four sets, and W at PM.K is in both of the last two.
+    importRegistry(released, {
+      properties: { PM: ref('V'), PS: ref('S'), PC: ref('V') },
+      definitions: {
+        V: object({ Name: str(), F: ref('S'), K: ref('W') }),
+        S: object({ Name: str(), G: ref('V') }),
+        W: object({ Z: str() }),
+      },
+    });
+    importRegistry(db, {
+      properties: { PM: ref('VM'), PS: ref('SC'), PC: ref('VC') },
+      definitions: {
+        VM: object({ Name: str(), F: ref('SX'), K: ref('W') }),
+        SX: object({ Name: str(), NewS: str() }),
+        SC: object({ Name: str(), G: ref('VB') }),
+        VB: object({ Name: str(), F: str() }),
+        VC: object({ K: ref('W') }),
+        W: object({ Z: str() }),
+      },
+    });
+
+    const result = run([mapping({ resource: RESOURCE, oldType: 'V', newTypes: ['VM'], kind: 'split' })]);
+
+    expect(cases(result)).toEqual([
+      'interdependent S at property PM.F, property PS, property PS.G.F',
+      'interdependent V at property PC, property PM, property PS.G',
+      'interdependent W at property PC.K, property PM.K',
+    ]);
+  });
+
   describe('a merge or split whose positions need different fields, with nothing new, also follows CloudFormation', () => {
     // Released Shared {Url, Port}; CloudFormation keeps Shared {Url, Port} at First and renames Second to a type
     // without Port
@@ -1095,6 +1128,249 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
       expect(fields('Check')).toEqual({ Enabled: 'boolean', Configuration: 'string' });
       expect(l1Renames()).toEqual([]);
     });
+  });
+});
+
+describe('a kept type whose field needs different types at its positions follows CloudFormation, a type break', () => {
+  // Released P {Name, F: N} at A and B; CloudFormation splits P into PA and PB, and N below into NA and NB, which
+  // gain a field each, so N follows CloudFormation at A.F and B.F and one field P.F cannot hold both
+  const nestedSplit = (
+    order: Order,
+    extraReleased: Partial<CloudFormationRegistryResource> = {},
+    extraCurrent: Partial<CloudFormationRegistryResource> = {},
+  ) => {
+    importRegistry(
+      released,
+      inOrder(order, {
+        properties: { A: ref('P'), B: ref('P'), ...extraReleased.properties },
+        definitions: {
+          P: object({ Name: str(), F: ref('N') }),
+          N: object({ X: str() }),
+          ...extraReleased.definitions,
+        },
+      }),
+    );
+    importRegistry(
+      db,
+      inOrder(order, {
+        properties: { A: ref('PA'), B: ref('PB'), ...extraCurrent.properties },
+        definitions: {
+          PA: object({ Name: str(), F: ref('NA') }),
+          PB: object({ Name: str(), F: ref('NB') }),
+          NA: object({ X: str(), New: str() }),
+          NB: object({ X: str(), Other: str() }),
+          ...extraCurrent.definitions,
+        },
+      }),
+    );
+  };
+
+  test('in either input order', () => {
+    const outputs = ORDERS.map((order) => {
+      const result = runFresh(() => nestedSplit(order));
+
+      expect(cases(result)).toEqual([]);
+      expect(gateFails(result)).toBe(false);
+      expect(settled(result)).toEqual([]);
+      expect(switched(result)).toEqual(['P -> PA at property A', 'P -> PB at property B']);
+      expect(history(resource(db).properties.A)).toEqual(['PA']);
+      expect(history(resource(db).properties.B)).toEqual(['PB']);
+      expect(fields('PA')).toEqual({ Name: 'string', F: 'NA' });
+      expect(fields('PB')).toEqual({ Name: 'string', F: 'NB' });
+      expect(l1Structs()).toEqual(['NA', 'NB', 'PA', 'PB']);
+      expect(l1Renames()).toEqual([
+        'N -> NA at property A.F',
+        'N -> NB at property B.F',
+        'P -> PA at property A',
+        'P -> PB at property B',
+      ]);
+      return runOutput(result);
+    });
+    expect(outputs[1]).toEqual(outputs[0]);
+  });
+
+  test('where CloudFormation keeps the nested type at one position', () => {
+    importRegistry(released, {
+      properties: { A: ref('P'), B: ref('P') },
+      definitions: { P: object({ Name: str(), F: ref('N') }), N: object({ X: str() }) },
+    });
+    importRegistry(db, {
+      properties: { A: ref('PA'), B: ref('PB') },
+      definitions: {
+        PA: object({ Name: str(), F: ref('NA') }),
+        PB: object({ Name: str(), F: ref('N') }),
+        NA: object({ X: str(), New: str() }),
+        N: object({ X: str() }),
+      },
+    });
+
+    const result = run();
+
+    expect(cases(result)).toEqual([]);
+    expect(switched(result)).toEqual(['P -> PA at property A', 'P -> PB at property B']);
+    expect(fields('PA')).toEqual({ Name: 'string', F: 'NA' });
+    expect(fields('PB')).toEqual({ Name: 'string', F: 'N' });
+  });
+
+  test('where the nested type follows CloudFormation only once a later round leaves out one of its positions', () => {
+    // T switches to T2 at Q, so Q.Inner, where N has no pair, counts only in the first round
+    nestedSplit(
+      'given',
+      { properties: { Q: ref('T'), Q2: ref('T') }, definitions: { T: object({ Name: str(), Inner: ref('N') }) } },
+      {
+        properties: { Q: ref('T2'), Q2: ref('T') },
+        definitions: {
+          T2: object({ Name: str(), Inner: ref('Z'), Extra: str() }),
+          T: object({ Name: str() }),
+          Z: object({ Zz: str() }),
+        },
+      },
+    );
+
+    const result = run();
+
+    expect(cases(result)).toEqual([]);
+    expect(switched(result)).toEqual(['P -> PA at property A', 'P -> PB at property B', 'T -> T2 at property Q']);
+    expect(fields('PA')).toEqual({ Name: 'string', F: 'NA' });
+    expect(fields('PB')).toEqual({ Name: 'string', F: 'NB' });
+  });
+
+  test('an entry that keeps it fails the build, naming the field, unless an entry also keeps the nested type', () => {
+    const keepOld = (oldType: string, newTypes: string[]) =>
+      mapping({ resource: RESOURCE, oldType, newTypes, kind: 'keep-old' });
+
+    expect(() => runFresh(() => nestedSplit('given'), [keepOld('P', ['PA', 'PB'])])).toThrow(
+      `${RESOURCE}: P.F needs NA, NB at its positions`,
+    );
+
+    const result = runFresh(() => nestedSplit('given'), [keepOld('P', ['PA', 'PB']), keepOld('N', ['NA', 'NB'])]);
+    expect(cases(result)).toEqual([]);
+    expect(history(typeDefinition('P').properties.F)).toEqual(['N', 'NA', 'NB']);
+  });
+
+  test('an undecided one keeps its released field type, and the gate fails', () => {
+    // At C, CloudFormation's Z shares no field with P
+    const result = runFresh(() =>
+      nestedSplit(
+        'given',
+        { properties: { C: ref('P') } },
+        { properties: { C: ref('Z') }, definitions: { Z: object({ Zz: str() }) } },
+      ),
+    );
+
+    expect(cases(result)).toEqual(['no-pair P at property A, property B, property C']);
+    expect(gateFails(result)).toBe(true);
+    expect(history(typeDefinition('P').properties.F)).toEqual(['N', 'NA', 'NB']);
+  });
+
+  test('only the mixins render it at the tag property: they keep it, with its released fields', () => {
+    const tagStruct = (a: string, b: string) =>
+      object({ Key: str(), Value: str(), A: ref(a), B: ref(b) }, ['Key', 'Value']);
+    const outputs = ORDERS.map((order) => {
+      const result = runFresh(() => {
+        importRegistry(
+          released,
+          inOrder(order, {
+            properties: { Tags: { type: 'array', items: ref('TagX') } as jsonschema.Schema },
+            definitions: {
+              TagX: tagStruct('P', 'P'),
+              P: object({ Name: str(), F: ref('N') }),
+              N: object({ X: str() }),
+            },
+          }),
+        );
+        importRegistry(
+          db,
+          inOrder(order, {
+            properties: { Tags: { type: 'array', items: ref('TagY') } as jsonschema.Schema },
+            definitions: {
+              TagY: tagStruct('PA', 'PB'),
+              PA: object({ Name: str(), F: ref('NA') }),
+              PB: object({ Name: str(), F: ref('NB') }),
+              NA: object({ X: str(), New: str() }),
+              NB: object({ X: str(), Other: str() }),
+            },
+          }),
+        );
+      });
+
+      expect([...cases(result), ...settled(result), ...switched(result)]).toEqual([]);
+      expect(tagBreaks(result)).toEqual(['property Tags: Array<TagX> -> Array<TagY>']);
+      expect(l1Structs()).toEqual(['NA', 'NB', 'PA', 'PB', 'TagY']);
+      expect(canonicalL1('cfn-property-mixins').filter((line) => /^(TagX|P|N) /.test(line))).toEqual([
+        'N { X: string }',
+        'P { F: N; Name: string }',
+        'TagX { A: P; B: P; Key: string; Value: string }',
+      ]);
+      return runOutput(result);
+    });
+    expect(outputs[1]).toEqual(outputs[0]);
+  });
+});
+
+describe('the result does not depend on the input order or the locale', () => {
+  test('a field of a kept split takes the types CloudFormation gives it at its positions in code-unit order', () => {
+    const outputs = ORDERS.map((order) => {
+      runFresh(() => {
+        importRegistry(
+          released,
+          inOrder(order, {
+            properties: { A: ref('P'), B: ref('P') },
+            definitions: { P: object({ Name: str(), F: str() }) },
+          }),
+        );
+        importRegistry(
+          db,
+          inOrder(order, {
+            properties: { A: ref('PA'), B: ref('PB') },
+            definitions: { PA: object({ Name: str(), F: int() }), PB: object({ Name: str(), F: bool() }) },
+          }),
+        );
+      });
+      return history(typeDefinition('P').properties.F);
+    });
+    expect(outputs).toEqual([
+      ['string', 'boolean', 'integer'],
+      ['string', 'boolean', 'integer'],
+    ]);
+  });
+
+  test('cases, their positions and type breaks are ordered by code unit, so upper case sorts before lower case', () => {
+    // localeCompare sorts DevOps before DMS, and DevSettings before DMSSettings, in every locale
+    for (const typeName of ['AWS::DevOps::R', 'AWS::DMS::R']) {
+      importRegistry(
+        released,
+        {
+          properties: {
+            DevSettings: ref('Settings'),
+            DMSSettings: ref('Settings'),
+            Tags: { type: 'array', items: ref('Kv') },
+          },
+          definitions: { Settings: object({ Url: str() }), Kv: object(strings(['Key', 'Value']), ['Key', 'Value']) },
+        },
+        typeName,
+      );
+      importRegistry(
+        db,
+        {
+          properties: {
+            DevSettings: ref('Options'),
+            DMSSettings: ref('Options'),
+            Tags: { type: 'array', items: ref('KvV2') },
+          },
+          definitions: { Options: object({ Mode: str() }), KvV2: object(strings(['Key', 'Value']), ['Key', 'Value']) },
+        },
+        typeName,
+      );
+    }
+
+    const result = run();
+
+    expect(result.undecided.map((c) => `${c.resource} ${c.positions.map((p) => p.position).join(', ')}`)).toEqual([
+      'AWS::DMS::R property DMSSettings, property DevSettings',
+      'AWS::DevOps::R property DMSSettings, property DevSettings',
+    ]);
+    expect(result.tagBreaks.map((b) => b.resource)).toEqual(['AWS::DMS::R', 'AWS::DevOps::R']);
   });
 });
 
@@ -1468,7 +1744,7 @@ describe('a kept struct below a union change', () => {
     );
 
     test('the released name is compared below the member where the tag property turns into a union', () => {
-      // The modern tag property renders its newest type, SettingsV2 with Extra; the mixins also render Settings
+      // The modern tag property renders its newest type, the union, so SettingsV2 with Extra; the mixins add Settings
       setup(settingsV2OrString, false, 'Tags');
 
       const result = run();
@@ -2411,4 +2687,54 @@ function fields(typeName: string) {
       `${history(prop)[0]}${prop.required ? ' (required)' : ''}`,
     ]),
   );
+}
+
+type Order = 'given' | 'reversed';
+const ORDERS: Order[] = ['given', 'reversed'];
+
+/** The schema as given, or with the order of its properties, definitions and their fields reversed */
+function inOrder(
+  order: Order,
+  schema: Partial<CloudFormationRegistryResource>,
+): Partial<CloudFormationRegistryResource> {
+  if (order === 'given') {
+    return schema;
+  }
+  const reversed = <A>(record: Record<string, A>) => Object.fromEntries(Object.entries(record).reverse());
+  return {
+    ...schema,
+    properties: reversed(schema.properties ?? {}),
+    definitions: reversed(
+      Object.fromEntries(
+        Object.entries(schema.definitions ?? {}).map(([name, def]) => [
+          name,
+          (def as any).properties ? { ...(def as any), properties: reversed((def as any).properties) } : def,
+        ]),
+      ),
+    ),
+  };
+}
+
+/** The gate text, the rendered L1 and the L1 change report of a run */
+function runOutput(result: TypeHistoryResult) {
+  return { gate: gate(result).report, l1: canonicalL1(), changes: formatL1Changes(compareL1(released, db)) };
+}
+
+/** Each rendered property and struct field with its whole type history, sorted */
+function canonicalL1(pkg: GeneratedPackage = 'aws-cdk-lib') {
+  const view = new L1View(db, resource(db), pkg);
+  const line = (name: string, field: Property, required: boolean) =>
+    `${name}: ${history(field).join(' <- ')}${required ? ' (required)' : ''}`;
+  const properties = Object.keys(view.properties)
+    .sort()
+    .map((name) => `property ${line(name, resource(db).properties[name], view.properties[name].required)}`);
+  const structs = [...view.structs.keys()].sort().map((name) => {
+    const struct = view.structs.get(name)!;
+    const rendered = view.fields(struct);
+    const fieldLines = Object.keys(rendered)
+      .sort()
+      .map((f) => line(f, struct.properties[f], rendered[f].required));
+    return `${name} { ${fieldLines.join('; ')} }`;
+  });
+  return [...properties, ...structs];
 }
