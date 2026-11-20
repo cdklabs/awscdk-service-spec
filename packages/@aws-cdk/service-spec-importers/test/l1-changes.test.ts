@@ -174,6 +174,47 @@ test('removed resources and attributes are listed by name', () => {
   );
 });
 
+test('changes are ordered by code unit, so upper case sorts before lower case in every locale', () => {
+  for (const resource of ['AWS::IoT::Thing', 'AWS::IVS::Channel']) {
+    importRegistry(
+      base,
+      {
+        properties: {
+          Replicas: str(),
+          ReplicaSpecification: str(),
+          Address: ref('AddressRequest'),
+          Set: ref('SetRequest'),
+        },
+        definitions: { AddressRequest: object({ Name: str() }), SetRequest: object({ Name: str() }) },
+      },
+      resource,
+    );
+    importRegistry(
+      head,
+      {
+        properties: { Address: ref('IpAddress'), Set: ref('IPSet') },
+        definitions: { IpAddress: object({ Name: str() }), IPSet: object({ Name: str() }) },
+      },
+      resource,
+    );
+  }
+
+  const changes = compareL1(base, head);
+
+  expect(changes.removed.map((c) => `${c.resource} ${c.element}`)).toEqual([
+    'AWS::IVS::Channel property ReplicaSpecification',
+    'AWS::IVS::Channel property Replicas',
+    'AWS::IoT::Thing property ReplicaSpecification',
+    'AWS::IoT::Thing property Replicas',
+  ]);
+  expect(changes.renames.map((r) => `${r.resource} ${r.to}`)).toEqual([
+    'AWS::IVS::Channel IPSet',
+    'AWS::IVS::Channel IpAddress',
+    'AWS::IoT::Thing IPSet',
+    'AWS::IoT::Thing IpAddress',
+  ]);
+});
+
 test('a struct that is no longer rendered and not renamed is reported as removed', () => {
   importRegistry(base, {
     properties: { Settings: { $ref: '#/definitions/Settings' } },
