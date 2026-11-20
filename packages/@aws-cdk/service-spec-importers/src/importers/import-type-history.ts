@@ -467,19 +467,37 @@ class ResourceTypeHistory {
     const forced = new Set<TypeDefinition>();
     for (;;) {
       const round = this.decideRounds(forced);
-      const found = this.keptWithSeveralTypes(round).filter((t) => !forced.has(t));
-      if (found.length === 0) {
+      const found = new Map([...this.keptWithSeveralTypes(round)].filter(([t]) => !forced.has(t)));
+      if (found.size === 0) {
         return round;
       }
-      found.forEach((t) => forced.add(t));
+      // Outermost first: a type that switches leaves out the positions below it, which can end another's conflict.
+      // Where each one is below another, all follow CloudFormation.
+      const below = (p: Position, t: TypeDefinition) => {
+        for (let u = p.parentUse; u; u = u.position.parentUse) {
+          if (u.released !== t && found.has(u.released)) {
+            return true;
+          }
+        }
+        return false;
+      };
+      const outermost = [...found].filter(([t, positions]) => !positions.some((p) => below(p, t))).map(([t]) => t);
+      (outermost.length > 0 ? outermost : [...found.keys()]).forEach((t) => forced.add(t));
     }
   }
 
-  private keptWithSeveralTypes(round: Round): TypeDefinition[] {
-    return [...positionsByField(this.positions, round).values()]
-      .filter((positions) => neededTypes(this.db, round, positions).length > 1)
-      .map((positions) => positions[0].owner.parent)
-      .filter((parent): parent is TypeDefinition => !!parent && round.decisions.get(parent)?.kind === 'kept');
+  /**
+   * The kept types with a field whose positions need several types, with the positions of those fields
+   */
+  private keptWithSeveralTypes(round: Round): Map<TypeDefinition, VisitedPosition[]> {
+    const found = new Map<TypeDefinition, VisitedPosition[]>();
+    for (const positions of positionsByField(this.positions, round).values()) {
+      const parent = positions[0].owner.parent;
+      if (parent && round.decisions.get(parent)?.kind === 'kept' && neededTypes(this.db, round, positions).length > 1) {
+        pushTo(found, parent, ...positions);
+      }
+    }
+    return found;
   }
 
   /**
