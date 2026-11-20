@@ -25,6 +25,8 @@ import {
   Use,
   VisitedPosition,
 } from './type-history-model';
+import { renderType } from '../l1-view';
+import { compareByCodeUnit } from '../report/sorting';
 
 export interface TypeHistoryApplyContext {
   /** The current sources, which the decisions are written into */
@@ -213,8 +215,11 @@ class TypeHistoryApplier {
       return;
     }
     const rich = new RichTypedField({ type: last(history), previousTypes: history.slice(0, -1) });
-    for (const position of positions.filter((p) => !p.typeUnchanged)) {
-      rich.updateType(position.cfnType);
+    const changed = positions
+      .filter((p) => !p.typeUnchanged)
+      .map((p) => ({ type: p.cfnType, rendered: renderType(this.db, p.cfnType) }));
+    for (const { type } of changed.sort((a, b) => compareByCodeUnit(a.rendered, b.rendered))) {
+      rich.updateType(type);
     }
     // A type that both have keeps the details of the current one, like its allowed values
     const currentTypes = positions.flatMap((p) => new RichTypedField(p.currentField).types());

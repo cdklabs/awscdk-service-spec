@@ -1,5 +1,6 @@
 import { emptyDatabase, Property, RichProperty, RichPropertyType, SpecDatabase } from '@aws-cdk/service-spec-types';
 import {
+  bool,
   divergingChecks,
   importLegacySpec,
   importRegistry,
@@ -1099,6 +1100,32 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
 });
 
 describe('the result does not depend on the input order or the locale', () => {
+  test('a field of a kept split takes the types CloudFormation gives it at its positions in code-unit order', () => {
+    const outputs = ORDERS.map((order) => {
+      runFresh(() => {
+        importRegistry(
+          released,
+          inOrder(order, {
+            properties: { A: ref('P'), B: ref('P') },
+            definitions: { P: object({ Name: str(), F: str() }) },
+          }),
+        );
+        importRegistry(
+          db,
+          inOrder(order, {
+            properties: { A: ref('PA'), B: ref('PB') },
+            definitions: { PA: object({ Name: str(), F: int() }), PB: object({ Name: str(), F: bool() }) },
+          }),
+        );
+      });
+      return history(typeDefinition('P').properties.F);
+    });
+    expect(outputs).toEqual([
+      ['string', 'boolean', 'integer'],
+      ['string', 'boolean', 'integer'],
+    ]);
+  });
+
   test('cases, their positions and type breaks are ordered by code unit, so upper case sorts before lower case', () => {
     // localeCompare sorts DevOps before DMS, and DevSettings before DMSSettings, in every locale
     for (const typeName of ['AWS::DevOps::R', 'AWS::DMS::R']) {
@@ -2451,4 +2478,30 @@ function fields(typeName: string) {
       `${history(prop)[0]}${prop.required ? ' (required)' : ''}`,
     ]),
   );
+}
+
+type Order = 'given' | 'reversed';
+const ORDERS: Order[] = ['given', 'reversed'];
+
+/** The schema as given, or with the order of its properties, definitions and their fields reversed */
+function inOrder(
+  order: Order,
+  schema: Partial<CloudFormationRegistryResource>,
+): Partial<CloudFormationRegistryResource> {
+  if (order === 'given') {
+    return schema;
+  }
+  const reversed = <A>(record: Record<string, A>) => Object.fromEntries(Object.entries(record).reverse());
+  return {
+    ...schema,
+    properties: reversed(schema.properties ?? {}),
+    definitions: reversed(
+      Object.fromEntries(
+        Object.entries(schema.definitions ?? {}).map(([name, def]) => [
+          name,
+          (def as any).properties ? { ...(def as any), properties: reversed((def as any).properties) } : def,
+        ]),
+      ),
+    ),
+  };
 }
