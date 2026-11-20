@@ -1,5 +1,6 @@
 import { PropertyType, SpecDatabase, TypeDefinition } from '@aws-cdk/service-spec-types';
 import { fieldLabel, GENERATED_PACKAGES, L1View, RenderedField, renderType } from './l1-view';
+import { compareByCodeUnit } from './report/sorting';
 
 /**
  * A struct that the L1 renders under another name at the same positions, because its source renamed it or merged it
@@ -77,12 +78,13 @@ export function compareL1(base: SpecDatabase, head: SpecDatabase): L1Changes {
   }
 
   const byElement = (a: L1Change, b: L1Change) =>
-    a.resource.localeCompare(b.resource) || a.element.localeCompare(b.element);
+    compareByCodeUnit(a.resource, b.resource) || compareByCodeUnit(a.element, b.element);
   for (const rename of changes.renames) {
     rename.positions.sort();
   }
   changes.renames.sort(
-    (a, b) => a.resource.localeCompare(b.resource) || a.to.localeCompare(b.to) || a.from.localeCompare(b.from),
+    (a, b) =>
+      compareByCodeUnit(a.resource, b.resource) || compareByCodeUnit(a.to, b.to) || compareByCodeUnit(a.from, b.from),
   );
   changes.removed.sort(byElement);
   changes.requiredness.sort(byElement);
@@ -170,7 +172,8 @@ function addResourceChanges(changes: MutableL1Changes, perPackage: ResourceChang
     for (const rename of resourceChanges.renames) {
       const same = earlierRenames.find((r) => r.from === rename.from && r.to === rename.to);
       if (same) {
-        same.positions.push(...rename.positions.filter((p) => !same.positions.includes(p)));
+        const positions = new Set(same.positions);
+        same.positions.push(...rename.positions.filter((p) => !positions.has(p)));
         same.fieldChanges.push(...rename.fieldChanges.filter((c) => !same.fieldChanges.includes(c)));
         same.fieldChanges.sort();
       } else {
@@ -300,7 +303,7 @@ class ResourceComparison {
         return;
       }
       if (renamed.has(key)) {
-        paths.set(key, [...(paths.get(key) ?? []), label]);
+        pushTo(paths, key, label);
       }
       // Recursive structs stop where they repeat
       if (ancestry.includes(key)) {
@@ -355,7 +358,7 @@ class ResourceComparison {
     return { requiredness, type: baseType === headType ? undefined : `type changed from ${baseType} to ${headType}` };
   }
 
-  /** Pair the structs at the same place in two types, in the same lists and maps; false if the shapes differ */
+  /** Pair the structs at the same place in two types, in the same lists and maps; false if they have no struct there */
   private pairStructs(
     position: string,
     baseType: PropertyType,
@@ -455,7 +458,12 @@ function unique<A>(xs: A[]): A[] {
 }
 
 function pushTo<K, V>(map: Map<K, V[]>, key: K, ...values: V[]) {
-  map.set(key, [...(map.get(key) ?? []), ...values]);
+  const list = map.get(key);
+  if (list) {
+    list.push(...values);
+  } else {
+    map.set(key, values);
+  }
 }
 
 function isDefined<A>(x: A | undefined): x is A {
