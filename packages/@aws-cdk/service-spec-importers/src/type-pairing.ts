@@ -3,10 +3,8 @@ import { PropertyType, RichPropertyType, SpecDatabase, TypeDefinition } from '@a
 /**
  * The type definitions at the same places of two types with the same shape, or undefined if their shapes differ
  *
- * Two types have the same shape if they have the same primitive types (integers and numbers are the same, as in L1
- * code) and matching type definitions in the same arrays, maps and unions. Two unions have the same shape if they
- * have as many members and every member of each has the same shape as a member of the other. Any two type definitions
- * match.
+ * Same shape: the same lists, maps and primitives (integer and number are one, as in L1 code), unions of as many
+ * members where each member matches one of the other, and any two type definitions.
  */
 export function matchShape(
   fromDb: SpecDatabase,
@@ -47,9 +45,7 @@ export function matchShape(
 }
 
 /**
- * Whether two type definitions at the same position can be the same L1 type: same name, or a shared field
- *
- * A type definition without fields can be the same as any other.
+ * Whether two type definitions at the same position can be the same L1 type
  */
 export function sameNameOrSharedField(from: TypeDefinition, to: TypeDefinition) {
   const fields = Object.keys(from.properties);

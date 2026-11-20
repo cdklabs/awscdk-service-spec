@@ -6,43 +6,34 @@ import { PR_PLACEHOLDER, REASON_PLACEHOLDER, TypeMapping, TypeMappingKind } from
 
 const MIXINS = '@aws-cdk/cfn-property-mixins';
 
-/**
- * What the report of one resource's type history reads: the last round of decisions and the resource's entries
- */
 export interface TypeHistoryReportContext {
   readonly db: SpecDatabase;
   readonly resource: Resource;
   readonly round: Round;
-  /** The entries of the mapping file that name a released and current type of the resource */
+  /** The resource's mapping entries whose types both databases have, by `oldType` */
   readonly entries: ReadonlyMap<string, TypeMapping>;
   readonly releasedByName: ReadonlyMap<string, TypeDefinition>;
   readonly result: TypeHistoryResult;
 }
 
 /**
- * Add the undecided, settled, switched and weak cases and the applied and inactive entries of one resource's last
- * round of decisions to the result
+ * Add one resource's cases and its applied and inactive entries to the result
  */
 export function reportTypeHistory(context: TypeHistoryReportContext) {
   new TypeHistoryReporter(context).report();
 }
 
-/**
- * What the report of one resource's tag type breaks reads, once its decisions are applied to `db`
- */
 export interface TagBreakReportContext {
   readonly db: SpecDatabase;
   readonly released: SpecDatabase;
   readonly releasedResource: Resource;
-  /** The resource in `db` */
   readonly resource: Resource;
   readonly positions: readonly Position[];
   readonly result: TypeHistoryResult;
 }
 
 /**
- * Add each position where the L1 renders CloudFormation's type whatever the released history keeps, a modern tag
- * property, to the result if the type it renders there differs from the one the released L1 renders
+ * Add each modern tag property whose rendered type changed to the result. Call it after `applyTypeHistory()`.
  */
 export function reportTagBreaks(context: TagBreakReportContext) {
   const { db, released, releasedResource, resource, result } = context;
@@ -139,8 +130,7 @@ class TypeHistoryReporter {
   }
 
   /**
-   * Report each current type of a settled change that shares fewer than half of the released type's fields, by name,
-   * and each one paired with a released type without fields, since only its position paired them
+   * Report the weak matches of a settled change ("Type history gate" in README.md)
    */
   private reportWeakMatches(releasedType: TypeDefinition, renamed: Use[]) {
     const releasedFields = Object.keys(releasedType.properties);
@@ -212,16 +202,13 @@ class TypeHistoryReporter {
   }
 
   /**
-   * Where the L1 renders a position: for a field of a current type definition, the first place the L1 renders that
-   * field, which need not be the first place CloudFormation's types reach it
+   * Where the L1 renders a position: for a current field, the first place the L1 renders it, which need not be the
+   * first place CloudFormation's types reach it
    */
   private label(position: Position) {
     return (position.within && this.round.renderedFields.get(fieldKey(position.within))) ?? position.label;
   }
 
-  /**
-   * Where the L1 renders the released type of a use, naming the package where only cfn-property-mixins renders it
-   */
   private useLabel(use: Use) {
     const label = this.label(use.position);
     return use.mixinsOnly ? `${label} in ${MIXINS} only` : label;

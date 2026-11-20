@@ -1,6 +1,5 @@
 /**
- * The positions, uses, decisions and rounds of the type history, shared by its collection and decision
- * (`import-type-history.ts`), its report (`type-history-report.ts`) and its application (`type-history-apply.ts`)
+ * The positions, uses, decisions and rounds of the type history, shared by its import, report and apply modules
  */
 import { Attribute, Property, PropertyType, SpecDatabase, TypeDefinition } from '@aws-cdk/service-spec-types';
 import { TypeHistoryResult, UndecidedKind } from './type-history-result';
@@ -10,20 +9,17 @@ import { TypeMapping } from '../type-mappings';
 export type Field = Property | Attribute;
 
 /**
- * The fields a kept type definition gets: each with its requiredness and the field that types it, if any
+ * The fields a kept type definition gets; `source` is the field that types each
  */
 export type FieldPlan = Array<{ name: string; required: boolean; source?: Field }>;
 
-/**
- * A field of a current type definition
- */
 interface CurrentField {
   readonly typeDef: TypeDefinition;
   readonly name: string;
 }
 
 /**
- * A place CloudFormation's newest types reach: a property, an attribute, or a field of a type definition they reach
+ * A property, attribute or nested field that CloudFormation's newest types reach
  */
 export interface CloudFormationPosition {
   readonly label: string;
@@ -33,12 +29,9 @@ export interface CloudFormationPosition {
 
 /**
  * - `same`: CloudFormation's type there has the released name.
- * - `paired`: CloudFormation's type there has another name and is paired with the released type.
- * - `not-a-type`: CloudFormation's type there has another shape, even inside its lists and maps, so it has no type
- *   definition at that place; also every use at an unreached position, and every use that only cfn-property-mixins
- *   renders.
- * - `no-pair`: CloudFormation's type there has the same shape, but no type definition at that place shares a field
- *   with the released one.
+ * - `paired`: it has another name and pairs with the released type.
+ * - `not-a-type`: it has another shape, even inside lists and maps; also every unreached and mixins-only use.
+ * - `no-pair`: it has the same shape, but no type definition at that place shares a field with the released one.
  * - `ambiguous`: more than one does.
  */
 export type UseStatus = 'same' | 'paired' | 'not-a-type' | 'no-pair' | 'ambiguous';
@@ -74,11 +67,7 @@ export interface VisitedPosition extends PositionBase {
   readonly cfnType: PropertyType;
   /** Whether CloudFormation's type renders as the released newest type here, so CloudFormation did not change it */
   readonly typeUnchanged: boolean;
-  /**
-   * Whether the L1 renders CloudFormation's type here whatever the released history keeps, as at a modern tag property
-   * whose type CloudFormation changed, so no released type is kept here (except where CloudFormation's type is an older
-   * type of the released history, which the build does not add again, see `importTypeHistory()`)
-   */
+  /** Whether the L1 renders CloudFormation's type here whatever the history keeps (a changed modern tag property) */
   readonly rendersCloudFormation: boolean;
   readonly within?: undefined;
 }
@@ -121,10 +110,7 @@ export interface Use {
   readonly status: UseStatus;
   /** CloudFormation's type definition there */
   readonly cfn?: TypeDefinition;
-  /**
-   * Whether only cfn-property-mixins renders the released type here, as a struct of its own: the structs of the
-   * oldest type of a modern tag property, whose type aws-cdk-lib renders as the newest, and the structs below them
-   */
+  /** Whether only the mixins render the released type here (at or below a modern tag property's oldest type) */
   readonly mixinsOnly?: boolean;
 }
 
@@ -138,10 +124,8 @@ interface DecisionBase {
 }
 
 /**
- * - `kept`: the released type stays, with the fields its positions need.
- * - `switched`: the merge and split rule makes the released type follow CloudFormation.
- * - `entry`: a mapping entry decides it.
- * - `undecided`: the gate fails for it.
+ * `switched`: the rule for merged and split types makes the released type follow CloudFormation. `undecided`: the
+ * gate fails for it.
  */
 export type Decision =
   | (DecisionBase & { readonly kind: 'kept' | 'switched' })
@@ -154,8 +138,7 @@ export type Decision =
     });
 
 /**
- * One round of decisions, all from the same positions that count: the merges and switches come from their uses, the
- * decisions from those, and the rendered fields from the decisions
+ * One round of decisions, all from the same positions that count
  */
 export interface Round {
   /** The positions that count */
@@ -165,10 +148,7 @@ export interface Round {
   /** The released type definitions that follow CloudFormation by the merge and split rule */
   readonly switched: ReadonlySet<TypeDefinition>;
   readonly decisions: ReadonlyMap<TypeDefinition, Decision>;
-  /**
-   * The fields of current type definitions that the L1 renders, see `renderedCurrentFields()` in
-   * `import-type-history.ts`
-   */
+  /** Each current field the L1 renders, by `fieldKey()`, with the first place it renders it */
   readonly renderedFields: ReadonlyMap<string, string>;
 }
 
@@ -182,7 +162,7 @@ export type DecidedRound = Omit<Round, 'renderedFields'>;
  */
 export function need(use: Use): string[] {
   const releasedFields = Object.keys(use.released.properties);
-  // CloudFormation's type there, inside any lists and maps, is not a type definition
+  // Without a paired CloudFormation type, exactly the released fields
   if (!use.cfn) {
     return releasedFields;
   }
@@ -191,11 +171,9 @@ export function need(use: Use): string[] {
 }
 
 /**
- * The uses whose needs decide the fields of a released type definition and their requiredness: those that aws-cdk-lib
- * renders, or all of them where it renders none
- *
- * cfn-property-mixins renders every field optional, so a use that only it renders takes the fields the others need,
- * as long as they include its released ones (see `keepsMixinsFields()`).
+ * The uses that decide a released type's fields and requiredness: those aws-cdk-lib renders, or all where it renders
+ * none. cfn-property-mixins renders every field optional, so a use only it renders just needs its released fields
+ * kept (`keepsMixinsFields()`).
  */
 export function constrainingUses(uses: Use[]): Use[] {
   const lib = uses.filter((u) => !u.mixinsOnly);
@@ -203,29 +181,20 @@ export function constrainingUses(uses: Use[]): Use[] {
 }
 
 /**
- * Whether fields keep the released fields that each use only cfn-property-mixins renders needs
+ * Whether `fields` include what each mixins-only use needs
  */
 export function keepsMixinsFields(uses: Use[], fields: string[]) {
   return uses.filter((u) => u.mixinsOnly).every((u) => need(u).every((name) => fields.includes(name)));
 }
 
-/**
- * Whether the L1 renders the released type at a use, in a round
- */
 export function staysIn(round: DecidedRound, use: Use) {
   return !!round.decisions.get(use.released)?.stays.includes(use);
 }
 
-/**
- * Whether the position of a use renders CloudFormation's type instead, in a round
- */
 export function followsIn(round: DecidedRound, use: Use) {
   return !!round.decisions.get(use.released)?.follows.includes(use);
 }
 
-/**
- * Whether a released type renders as CloudFormation's type does, so CloudFormation did not change the type there
- */
 export function sameRenderedType(
   released: SpecDatabase,
   db: SpecDatabase,
@@ -266,9 +235,6 @@ export function ownerKey(parent: TypeDefinition, name: string) {
   return `${parent.$id} ${name}`;
 }
 
-/**
- * Whether no current type pairs with the released type at a use, or more than one does
- */
 export function isUnpaired(use: Use): use is Use & { readonly status: 'no-pair' | 'ambiguous' } {
   return use.status === 'no-pair' || use.status === 'ambiguous';
 }
@@ -288,16 +254,10 @@ export function fieldKey({ typeDef, name }: CurrentField) {
   return `${typeDef.$id} ${name}`;
 }
 
-/**
- * The type definitions CloudFormation's types give a released type definition at its uses
- */
 export function cloudFormationTypes(uses: Use[]): TypeDefinition[] {
   return unique(uses.map((u) => u.cfn).filter(isDefined));
 }
 
-/**
- * Whether a current type definition has a field that a released one lacks, by name
- */
 export function hasNewField(releasedType: TypeDefinition, current: TypeDefinition) {
   return Object.keys(current.properties).some((name) => !releasedType.properties[name]);
 }
@@ -310,9 +270,6 @@ export function unique<A>(xs: A[]): A[] {
   return [...new Set(xs)];
 }
 
-/**
- * The type inside any lists and maps
- */
 export function insideContainers(type: PropertyType): PropertyType {
   return type.type === 'array' || type.type === 'map' ? insideContainers(type.element) : type;
 }
