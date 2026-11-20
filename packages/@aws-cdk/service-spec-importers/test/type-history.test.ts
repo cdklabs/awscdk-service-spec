@@ -1335,6 +1335,39 @@ describe('a kept type whose field needs different types at its positions follows
     expect(history(typeDefinition('P').properties.F)).toEqual(['N', 'NA', 'NB']);
   });
 
+  test('an entry that keeps it fails the build, naming a carried field that its positions give different types', () => {
+    // Released P {Name} at A and B; CloudFormation's types there add G, a string at A and an integer at B
+    const carried = (order: Order, typeAtA: string) => () => {
+      importRegistry(
+        released,
+        inOrder(order, { properties: { A: ref('P'), B: ref('P') }, definitions: { P: object({ Name: str() }) } }),
+      );
+      importRegistry(
+        db,
+        inOrder(order, {
+          properties: { A: ref(typeAtA), B: ref('PB') },
+          definitions: {
+            [typeAtA]: object({ Name: str(), G: str() }),
+            PB: object({ Name: str(), G: int() }),
+          },
+        }),
+      );
+    };
+    const keepOld = (newTypes: string[]) => [mapping({ resource: RESOURCE, oldType: 'P', newTypes, kind: 'keep-old' })];
+
+    for (const order of ORDERS) {
+      // Without an entry, P gains a field and follows CloudFormation at both positions
+      const result = runFresh(carried(order, 'PA'));
+      expect(gateFails(result)).toBe(false);
+      expect(switched(result)).toEqual(['P -> PA at property A', 'P -> PB at property B']);
+
+      const message = `${RESOURCE}: P.G needs number, string at its positions`;
+      expect(() => runFresh(carried(order, 'PA'), keepOld(['PA', 'PB']))).toThrow(message);
+      // Also where the kept type is CloudFormation's type at A, whose own field it would keep
+      expect(() => runFresh(carried(order, 'P'), keepOld(['PB']))).toThrow(message);
+    }
+  });
+
   test('an undecided one keeps its released field type, and the gate fails', () => {
     // At C, CloudFormation's Z shares no field with P
     const result = runFresh(() =>
@@ -1348,6 +1381,36 @@ describe('a kept type whose field needs different types at its positions follows
     expect(cases(result)).toEqual(['no-pair P at property A, property B, property C']);
     expect(gateFails(result)).toBe(true);
     expect(history(typeDefinition('P').properties.F)).toEqual(['N', 'NA', 'NB']);
+  });
+
+  test('an undecided one carries a field that its positions give different types, and the gate fails', () => {
+    // At C, CloudFormation's Z shares no field with P
+    const outputs = ORDERS.map((order) => {
+      const result = runFresh(() => {
+        importRegistry(
+          released,
+          inOrder(order, {
+            properties: { A: ref('P'), B: ref('P'), C: ref('P') },
+            definitions: { P: object({ Name: str() }) },
+          }),
+        );
+        importRegistry(
+          db,
+          inOrder(order, {
+            properties: { A: ref('PA'), B: ref('PB'), C: ref('Z') },
+            definitions: {
+              PA: object({ Name: str(), G: str() }),
+              PB: object({ Name: str(), G: int() }),
+              Z: object({ Zz: str() }),
+            },
+          }),
+        );
+      });
+      expect(cases(result)).toEqual(['no-pair P at property A, property B, property C']);
+      expect(gateFails(result)).toBe(true);
+      return history(typeDefinition('P').properties.G);
+    });
+    expect(outputs).toEqual([['integer'], ['integer']]);
   });
 
   test('only the mixins render it at the tag property: they keep it, with its released fields', () => {
@@ -1427,7 +1490,7 @@ describe('the result does not depend on the input order or the locale', () => {
     ]);
   });
 
-  test('each current type keeps its own allowed values when a kept field takes the types of its positions', () => {
+  test('each current type keeps its own allowed values, and a new kept type takes those first in code-unit order', () => {
     const outputs = ORDERS.map((order) => {
       runFresh(() => {
         importRegistry(
@@ -1458,6 +1521,54 @@ describe('the result does not depend on the input order or the locale', () => {
     });
     expect(outputs[0]).toEqual({ PA: ['string<a|b>'], PB: ['string<c>'], P: ['integer', 'string<a|b>'] });
     expect(outputs[1]).toEqual(outputs[0]);
+  });
+
+  test("a kept type that is CloudFormation's type at one of its positions keeps that type's allowed values", () => {
+    const properties = { A: ref('PA'), B: ref('PB'), C: ref('P') };
+    const definitions = {
+      PA: object({ Name: str(), F: { type: 'string', enum: ['a', 'b'] } }),
+      PB: object({ Name: str(), F: { type: 'string', enum: ['c'] } }),
+      P: object({ Name: str(), F: { type: 'string', enum: ['z'] } }),
+    };
+    const outputs = permutations(Object.keys(properties)).flatMap((propertyOrder) =>
+      permutations(Object.keys(definitions)).map((definitionOrder) => {
+        runFresh(() => {
+          importRegistry(released, {
+            properties: { A: ref('P'), B: ref('P'), C: ref('P') },
+            definitions: { P: object({ Name: str(), F: int() }) },
+          });
+          importRegistry(db, {
+            properties: inKeyOrder(properties, propertyOrder),
+            definitions: inKeyOrder(definitions, definitionOrder),
+          });
+        });
+        return ['PA', 'PB', 'P'].map((name) => `${name}.F: ${history(typeDefinition(name).properties.F).join(' <- ')}`);
+      }),
+    );
+    expect(outputs).toEqual(Array(36).fill(['PA.F: string<a|b>', 'PB.F: string<c>', 'P.F: integer <- string<z>']));
+  });
+
+  test('a field that a kept type carries takes the allowed values of its positions in a fixed order', () => {
+    const outputs = ORDERS.map((order) => {
+      runFresh(() => {
+        importRegistry(
+          released,
+          inOrder(order, { properties: { A: ref('P'), B: ref('P') }, definitions: { P: object({ Name: str() }) } }),
+        );
+        importRegistry(
+          db,
+          inOrder(order, {
+            properties: { A: ref('PA'), B: ref('PB') },
+            definitions: {
+              PA: object({ Name: str(), G: { type: 'string', enum: ['g1'] } }),
+              PB: object({ Name: str(), G: { type: 'string', enum: ['g2'] } }),
+            },
+          }),
+        );
+      }, [mapping({ resource: RESOURCE, oldType: 'P', newTypes: ['PA', 'PB'], kind: 'keep-old' })]);
+      return history(typeDefinition('P').properties.G);
+    });
+    expect(outputs).toEqual([['string<g1>'], ['string<g1>']]);
   });
 
   test('cases, their positions and type breaks are ordered by code unit, so upper case sorts before lower case', () => {
@@ -2838,6 +2949,14 @@ function inOrder(
       ),
     ),
   };
+}
+
+function permutations<A>(xs: A[]): A[][] {
+  return xs.length <= 1 ? [xs] : xs.flatMap((x, i) => permutations(xs.filter((_, j) => j !== i)).map((p) => [x, ...p]));
+}
+
+function inKeyOrder<A>(record: Record<string, A>, keys: string[]): Record<string, A> {
+  return Object.fromEntries(keys.map((key) => [key, record[key]]));
 }
 
 /** The gate text, the rendered L1 and the L1 change report of a run */
