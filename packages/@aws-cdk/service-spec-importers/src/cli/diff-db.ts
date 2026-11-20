@@ -22,7 +22,7 @@ async function main() {
     )
     .option(
       '--breaking-changes',
-      'Print the changes from <db1> to <db2> that can break existing CloudFormation templates or CDK code, the services without the aws- prefix and the changelog text for the L1 pull request, as markdown; with --l1-changes, after the L1 change report',
+      'Print the changelog text for the L1 pull request: the "CHANGES TO L1 RESOURCES" paragraph and one line for each change from <db1> to <db2> that can break existing CloudFormation templates or CDK code; with --l1-changes, after the L1 change report; with --json, the list of those changes',
       false,
     )
     .parse();
@@ -45,8 +45,8 @@ async function main() {
       const output = options.l1Changes ? { ...changes, breakingChanges: breaking } : breaking;
       console.log(JSON.stringify(output, undefined, 2));
     } else {
-      const report = formatBreakingChanges(breaking);
-      console.log(options.l1Changes ? `${formatL1Changes(changes)}\n\n${report}` : report);
+      const changelog = formatBreakingChanges(breaking);
+      console.log(options.l1Changes ? `${formatL1Changes(changes)}\n\n${changelog}` : changelog);
     }
     return;
   }

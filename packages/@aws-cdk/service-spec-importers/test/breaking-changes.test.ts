@@ -11,9 +11,12 @@ import { CloudFormationRegistryResource, resourcespec } from '../src/types';
 /** The service of `RESOURCE` */
 const SERVICE = 'aws-some';
 
-/** The paragraph that starts the changelog block, as the prompt for L1 pull requests gives it */
+/** The paragraph that starts the changelog text, as the prompt for L1 pull requests gives it */
 const CHANGELOG_PARAGRAPH =
   '**CHANGES TO L1 RESOURCES:** L1 resources are automatically generated from public CloudFormation Resource Schemas. They are built to closely reflect the real state of CloudFormation. Sometimes these updates can contain changes that are incompatible with previous types, but more accurately reflect reality. In this release we have changed:';
+
+/** The line that follows the paragraph when there is no breaking change */
+const NO_CHANGES = 'No breaking changes detected in this release.';
 
 /**
  * How aws-cdk's release tooling finds the note in a commit message: `cdk-release` passes `CHANGES TO L1 RESOURCES` as
@@ -29,18 +32,11 @@ beforeEach(() => {
   head = emptyDatabase();
 });
 
-/** The rows of the breaking changes table, as `service | resource | change | explanation` */
-function rows(): string[] {
-  return findBreakingChanges(base, head).changes.map(
-    (c) => `${c.service} | ${c.resource} | ${c.change} | ${c.explanation}`,
-  );
-}
-
-/** The changelog lines, without the paragraph that starts the block */
+/** The changelog lines, after the paragraph and the empty line that start the text */
 function changelogLines(): string[] {
-  const text = formatBreakingChanges(findBreakingChanges(base, head));
-  const block = text.slice(text.indexOf(CHANGELOG_PARAGRAPH) + CHANGELOG_PARAGRAPH.length, text.lastIndexOf('```'));
-  return block.split('\n').filter((l) => l !== '');
+  const [paragraph, empty, ...lines] = formatBreakingChanges(findBreakingChanges(base, head)).split('\n');
+  expect([paragraph, empty]).toEqual([CHANGELOG_PARAGRAPH, '']);
+  return lines;
 }
 
 /** Import `RESOURCE` into both databases, from a schema before and after */
@@ -71,10 +67,9 @@ function addMetric(db: SpecDatabase, name: string, on: { resource?: string; serv
 }
 
 describe('removals', () => {
-  test('a removed property is listed with its type', () => {
+  test('a removed property is listed', () => {
     both({ properties: { Name: str(), StatusInfos: str() } }, { properties: { Name: str() } });
 
-    expect(rows()).toEqual([`${SERVICE} | ${RESOURCE} | [-] StatusInfos: string | Property removed`]);
     expect(changelogLines()).toEqual([`${SERVICE}: ${RESOURCE}: StatusInfos property removed.`]);
   });
 
@@ -84,8 +79,21 @@ describe('removals', () => {
       { properties: { Name: str() } },
     );
 
-    expect(rows()).toEqual([`${SERVICE} | ${RESOURCE} | [-] Arn: string | Attribute removed`]);
     expect(changelogLines()).toEqual([`${SERVICE}: ${RESOURCE}: Arn attribute removed.`]);
+  });
+
+  test('a removed property and a removed attribute of the same name and type are two lines', () => {
+    importLegacySpec(base, {
+      properties: { Name: { PrimitiveType: 'String', UpdateType: 'Mutable' } },
+      attributes: { Name: { PrimitiveType: 'String' } },
+      types: {},
+    });
+    importLegacySpec(head, { properties: {}, types: {} });
+
+    expect(changelogLines()).toEqual([
+      `${SERVICE}: ${RESOURCE}: Name attribute removed.  `,
+      `${SERVICE}: ${RESOURCE}: Name property removed.`,
+    ]);
   });
 
   test('a removed type definition is listed, next to the removal of the property that used it', () => {
@@ -94,10 +102,6 @@ describe('removals', () => {
       { properties: { Name: str() } },
     );
 
-    expect(rows()).toEqual([
-      `${SERVICE} | ${RESOURCE} | [-] Settings: Settings | Property removed`,
-      `${SERVICE} | ${RESOURCE} | [-] type Settings | Type removed`,
-    ]);
     expect(changelogLines()).toEqual([
       `${SERVICE}: ${RESOURCE}: Settings property removed.  `,
       `${SERVICE}: ${RESOURCE}: Settings type removed.`,
@@ -110,7 +114,6 @@ describe('removals', () => {
       { properties: { Settings: ref('Settings') }, definitions: { Settings: object({ Url: str() }) } },
     );
 
-    expect(rows()).toEqual([`${SERVICE} | ${RESOURCE} | [-] Settings.Port: string | Property removed`]);
     expect(changelogLines()).toEqual([`${SERVICE}: ${RESOURCE}: Settings.Port property removed.`]);
   });
 
@@ -122,11 +125,6 @@ describe('removals', () => {
     addMetric(head, 'Invocations', { resource: RESOURCE });
     addMetric(base, 'Requests', { service: SERVICE });
 
-    expect(rows()).toEqual([
-      `${SERVICE} | AWS::Some | [-] metric AWS/Some Requests | Metric removed`,
-      `${SERVICE} | ${RESOURCE} | [-] metric AWS/Some Errors | Metric removed`,
-      `${SERVICE} | ${RESOURCE} | [-] metric AWS/Some Throttles | Metric removed`,
-    ]);
     expect(changelogLines()).toEqual([
       `${SERVICE}: AWS::Some: AWS/Some Requests metric removed.  `,
       `${SERVICE}: ${RESOURCE}: AWS/Some Errors metric removed.  `,
@@ -134,21 +132,17 @@ describe('removals', () => {
     ]);
   });
 
-  test('a removed service lists each of its resources and its metrics, and its prefix from the base database', () => {
+  test('a removed service lists each of its resources and its metrics', () => {
     importRegistry(base, { properties: { Name: str(), Other: str() } }, 'Dev::Thing::Widget');
     importRegistry(base, { properties: { Name: str() } }, 'Dev::Thing::Gadget');
     addMetric(base, 'Requests', { service: 'dev-thing' });
     importRegistry(base, { properties: { Name: str() } });
     importRegistry(head, { properties: { Name: str() } });
 
-    const report = findBreakingChanges(base, head);
-    expect(rows()).toEqual([
-      'dev-thing | Dev::Thing | [-] metric AWS/Some Requests | Metric removed',
-      'dev-thing | Dev::Thing::Gadget | [-] Dev::Thing::Gadget | Resource removed',
-      'dev-thing | Dev::Thing::Widget | [-] Dev::Thing::Widget | Resource removed',
-    ]);
-    expect(report.nonStandardServices).toEqual([
-      { service: 'dev-thing', expected: 'aws-thing', namespace: 'Dev::Thing' },
+    expect(changelogLines()).toEqual([
+      'dev-thing: Dev::Thing: AWS/Some Requests metric removed.  ',
+      'dev-thing: Dev::Thing::Gadget: resource removed.  ',
+      'dev-thing: Dev::Thing::Widget: resource removed.',
     ]);
   });
 
@@ -157,7 +151,6 @@ describe('removals', () => {
     importRegistry(base, { properties: { Name: str() } });
     importRegistry(head, { properties: { Name: str() } });
 
-    expect(rows()).toEqual([`${SERVICE} | AWS::Some::Gone | [-] AWS::Some::Gone | Resource removed`]);
     expect(changelogLines()).toEqual([`${SERVICE}: AWS::Some::Gone: resource removed.`]);
   });
 });
@@ -176,10 +169,6 @@ describe('restrictions', () => {
       },
     );
 
-    expect(rows()).toEqual([
-      `${SERVICE} | ${RESOURCE} | InstanceType: optional → required | Property changed to required`,
-      `${SERVICE} | ${RESOURCE} | Settings.Url: optional → required | Property changed to required`,
-    ]);
     expect(changelogLines()).toEqual([
       `${SERVICE}: ${RESOURCE}: InstanceType property is now required.  `,
       `${SERVICE}: ${RESOURCE}: Settings.Url property is now required.`,
@@ -199,10 +188,6 @@ describe('restrictions', () => {
       },
     );
 
-    expect(rows()).toEqual([
-      `${SERVICE} | ${RESOURCE} | BucketName: mutable → immutable | Property changed to immutable`,
-      `${SERVICE} | ${RESOURCE} | Settings.Url: mutable → immutable | Property changed to immutable`,
-    ]);
     expect(changelogLines()).toEqual([
       `${SERVICE}: ${RESOURCE}: BucketName property is now immutable.  `,
       `${SERVICE}: ${RESOURCE}: Settings.Url property is now immutable.`,
@@ -213,16 +198,13 @@ describe('restrictions', () => {
     legacyName(base, 'Conditional');
     legacyName(head, 'Immutable');
 
-    expect(rows()).toEqual([`${SERVICE} | ${RESOURCE} | Name: immutable? → immutable | Property changed to immutable`]);
+    expect(changelogLines()).toEqual([`${SERVICE}: ${RESOURCE}: Name property is now immutable.`]);
   });
 
   test('a mutable property that may now cause replacement is listed', () => {
     legacyName(base, 'Mutable');
     legacyName(head, 'Conditional');
 
-    expect(rows()).toEqual([
-      `${SERVICE} | ${RESOURCE} | Name: mutable → immutable? | Property may require replacement`,
-    ]);
     expect(changelogLines()).toEqual([`${SERVICE}: ${RESOURCE}: Name property may now require replacement.`]);
   });
 
@@ -230,7 +212,7 @@ describe('restrictions', () => {
     legacyName(base, 'Immutable');
     legacyName(head, 'Conditional');
 
-    expect(rows()).toEqual([]);
+    expect(changelogLines()).toEqual([NO_CHANGES]);
   });
 
   test('a changed default value is listed when both databases have one', () => {
@@ -253,9 +235,6 @@ describe('restrictions', () => {
       },
     );
 
-    expect(rows()).toEqual([
-      `${SERVICE} | ${RESOURCE} | Mode: default="fast" → default="safe" | Default value changed`,
-    ]);
     expect(changelogLines()).toEqual([
       `${SERVICE}: ${RESOURCE}: Mode property default value changed from "fast" to "safe".`,
     ]);
@@ -273,8 +252,8 @@ describe('restrictions', () => {
       },
     );
 
-    expect(rows()).toEqual([
-      `${SERVICE} | ${RESOURCE} | Settings.Port: default=80 → default=443 | Default value changed`,
+    expect(changelogLines()).toEqual([
+      `${SERVICE}: ${RESOURCE}: Settings.Port property default value changed from 80 to 443.`,
     ]);
   });
 
@@ -284,10 +263,6 @@ describe('restrictions', () => {
       { properties: { Mode: { type: 'string', enum: ['B', 'A', 'E'] } } },
     );
 
-    expect(rows()).toEqual([
-      `${SERVICE} | ${RESOURCE} | Mode: [-] allowed value "C" | Allowed value removed`,
-      `${SERVICE} | ${RESOURCE} | Mode: [-] allowed value "D" | Allowed value removed`,
-    ]);
     expect(changelogLines()).toEqual([
       `${SERVICE}: ${RESOURCE}: Mode property no longer allows "C".  `,
       `${SERVICE}: ${RESOURCE}: Mode property no longer allows "D".`,
@@ -310,11 +285,6 @@ describe('restrictions', () => {
       },
     );
 
-    expect(rows()).toEqual([
-      `${SERVICE} | ${RESOURCE} | Mode: allowed values restricted to "A", "B" | Allowed values restricted`,
-      `${SERVICE} | ${RESOURCE} | Settings.Kind: allowed values restricted to "X" | Allowed values restricted`,
-      `${SERVICE} | ${RESOURCE} | Sizes: allowed values restricted to 1, 2 | Allowed values restricted`,
-    ]);
     expect(changelogLines()).toEqual([
       `${SERVICE}: ${RESOURCE}: Mode property now only allows "A", "B".  `,
       `${SERVICE}: ${RESOURCE}: Settings.Kind property now only allows "X".  `,
@@ -334,7 +304,7 @@ describe('restrictions', () => {
       },
     );
 
-    expect(rows()).toEqual([`${SERVICE} | ${RESOURCE} | Mode: [-] allowed value "B" | Allowed value removed`]);
+    expect(changelogLines()).toEqual([`${SERVICE}: ${RESOURCE}: Mode property no longer allows "B".`]);
   });
 });
 
@@ -360,11 +330,6 @@ describe('CDK code breaks', () => {
       },
     );
 
-    expect(rows()).toEqual([
-      `${SERVICE} | ${RESOURCE} | BurnSettings → BurnDvbSettings | CDK type merged`,
-      `${SERVICE} | ${RESOURCE} | DestinationRequest → Destination | CDK type renamed`,
-      `${SERVICE} | ${RESOURCE} | DvbSettings → BurnDvbSettings | CDK type merged`,
-    ]);
     expect(changelogLines()).toEqual([
       `${SERVICE}: ${RESOURCE}: BurnSettings type merged into BurnDvbSettings.  `,
       `${SERVICE}: ${RESOURCE}: DestinationRequest type renamed to Destination.  `,
@@ -405,15 +370,6 @@ describe('CDK code breaks', () => {
       },
     );
 
-    expect(rows()).toEqual([
-      `${SERVICE} | ${RESOURCE} | [-] OldSettings.Port: string | Property removed`,
-      `${SERVICE} | ${RESOURCE} | OldSettings.Url: optional → required | Property changed to required`,
-      `${SERVICE} | ${RESOURCE} | OldSettings.Url: mutable → immutable | Property changed to immutable`,
-      `${SERVICE} | ${RESOURCE} | OldSettings.Timeout: default=5 → default=10 | Default value changed`,
-      `${SERVICE} | ${RESOURCE} | OldSettings.Mode: [-] allowed value "B" | Allowed value removed`,
-      `${SERVICE} | ${RESOURCE} | OldSettings → NewSettings | CDK type renamed`,
-      `${SERVICE} | ${RESOURCE} | OldSettings.Kind: json → string | CDK type changed`,
-    ]);
     expect(changelogLines()).toEqual([
       `${SERVICE}: ${RESOURCE}: OldSettings.Port property removed.  `,
       `${SERVICE}: ${RESOURCE}: OldSettings.Url property is now required.  `,
@@ -444,12 +400,12 @@ describe('CDK code breaks', () => {
       },
     );
 
-    expect(rows()).toEqual([
-      `${SERVICE} | ${RESOURCE} | [-] BurnSettings.Size: string | Property removed`,
-      `${SERVICE} | ${RESOURCE} | BurnSettings.Font: optional → required | Property changed to required`,
-      `${SERVICE} | ${RESOURCE} | DvbSettings.Font: optional → required | Property changed to required`,
-      `${SERVICE} | ${RESOURCE} | BurnSettings → BurnDvbSettings | CDK type merged`,
-      `${SERVICE} | ${RESOURCE} | DvbSettings → BurnDvbSettings | CDK type merged`,
+    expect(changelogLines()).toEqual([
+      `${SERVICE}: ${RESOURCE}: BurnSettings.Size property removed.  `,
+      `${SERVICE}: ${RESOURCE}: BurnSettings.Font property is now required.  `,
+      `${SERVICE}: ${RESOURCE}: DvbSettings.Font property is now required.  `,
+      `${SERVICE}: ${RESOURCE}: BurnSettings type merged into BurnDvbSettings.  `,
+      `${SERVICE}: ${RESOURCE}: DvbSettings type merged into BurnDvbSettings.`,
     ]);
   });
 
@@ -468,12 +424,6 @@ describe('CDK code breaks', () => {
       },
     );
 
-    expect(rows()).toEqual([
-      `${SERVICE} | ${RESOURCE} | [-] Source.Size: string | Property removed`,
-      `${SERVICE} | ${RESOURCE} | Source.Url: optional → required | Property changed to required`,
-      `${SERVICE} | ${RESOURCE} | Endpoint → Address | CDK type renamed`,
-      `${SERVICE} | ${RESOURCE} | Source.Kind: json → string | CDK type changed`,
-    ]);
     expect(changelogLines()).toEqual([
       `${SERVICE}: ${RESOURCE}: Source.Size property removed.  `,
       `${SERVICE}: ${RESOURCE}: Source.Url property is now required.  `,
@@ -504,10 +454,10 @@ describe('CDK code breaks', () => {
     expect(compareL1(base, head).renames.map((r) => r.positions)).toEqual([
       ['property Settings.Primary', 'property Source'],
     ]);
-    expect(rows()).toEqual([
-      `${SERVICE} | ${RESOURCE} | [-] Settings.Primary.Size: string | Property removed`,
-      `${SERVICE} | ${RESOURCE} | [-] Source.Size: string | Property removed`,
-      `${SERVICE} | ${RESOURCE} | Endpoint → Address | CDK type renamed`,
+    expect(changelogLines()).toEqual([
+      `${SERVICE}: ${RESOURCE}: Settings.Primary.Size property removed.  `,
+      `${SERVICE}: ${RESOURCE}: Source.Size property removed.  `,
+      `${SERVICE}: ${RESOURCE}: Endpoint type renamed to Address.`,
     ]);
   });
 
@@ -523,10 +473,10 @@ describe('CDK code breaks', () => {
       },
     );
 
-    expect(rows()).toEqual([
-      `${SERVICE} | ${RESOURCE} | [-] Endpoint.Port: string | Property removed`,
-      `${SERVICE} | ${RESOURCE} | [-] Endpoint.Size: string | Property removed`,
-      `${SERVICE} | ${RESOURCE} | Endpoint → Address | CDK type renamed`,
+    expect(changelogLines()).toEqual([
+      `${SERVICE}: ${RESOURCE}: Endpoint.Port property removed.  `,
+      `${SERVICE}: ${RESOURCE}: Endpoint.Size property removed.  `,
+      `${SERVICE}: ${RESOURCE}: Endpoint type renamed to Address.`,
     ]);
   });
 
@@ -544,11 +494,6 @@ describe('CDK code breaks', () => {
       },
     );
 
-    expect(rows()).toEqual([
-      `${SERVICE} | ${RESOURCE} | CreateTime: number → string | CDK type changed`,
-      `${SERVICE} | ${RESOURCE} | Policy: json → string | CDK type changed`,
-      `${SERVICE} | ${RESOURCE} | Settings.Type: json → string | CDK type changed`,
-    ]);
     expect(changelogLines()).toEqual([
       `${SERVICE}: ${RESOURCE}: CreateTime attribute type changed from number to string.  `,
       `${SERVICE}: ${RESOURCE}: Policy property type changed from json to string.  `,
@@ -581,7 +526,7 @@ describe('CDK code breaks', () => {
       'property ToUnion: type changed from Array<string> to Array<boolean | string>',
       'property ToWiderUnion: type changed from Array<string> | boolean to Array<string> | boolean | number',
     ]);
-    expect(rows()).toEqual([]);
+    expect(changelogLines()).toEqual([NO_CHANGES]);
   });
 
   test('a rendered type union that loses a member is listed', () => {
@@ -590,8 +535,8 @@ describe('CDK code breaks', () => {
       { properties: { Value: { type: 'array', items: { type: 'string' } } } },
     );
 
-    expect(rows()).toEqual([
-      `${SERVICE} | ${RESOURCE} | Value: Array<string> | boolean → Array<string> | CDK type changed`,
+    expect(changelogLines()).toEqual([
+      `${SERVICE}: ${RESOURCE}: Value property type changed from Array<string> | boolean to Array<string>.`,
     ]);
   });
 });
@@ -623,7 +568,7 @@ describe('never listed', () => {
     importRegistry(head, { properties: { Name: str() } }, 'AWS::Other::New');
     addMetric(head, 'Errors', { resource: RESOURCE });
 
-    expect(rows()).toEqual([]);
+    expect(changelogLines()).toEqual([NO_CHANGES]);
   });
 
   test('relaxations, deprecations and documentation changes', () => {
@@ -652,111 +597,12 @@ describe('never listed', () => {
     head.lookup('resource', 'cloudFormationType', 'equals', RESOURCE).only().properties.Old.deprecated =
       Deprecation.WARN;
 
-    expect(rows()).toEqual([]);
-  });
-});
-
-describe('non-standard service prefixes', () => {
-  const SECTION = [
-    '### Non-Standard Service Prefixes Detected',
-    '',
-    '| Detected Service | Expected Service | CloudFormation Namespace |',
-    '|------------------|------------------|--------------------------|',
-  ].join('\n');
-
-  test('a new service is listed with the expected name and its namespace', () => {
-    importRegistry(head, { properties: { Name: str() } }, 'Dev::ServiceCatalog::Portfolio');
-
-    expect(findBreakingChanges(base, head).nonStandardServices).toEqual([
-      { service: 'dev-servicecatalog', expected: 'aws-servicecatalog', namespace: 'Dev::ServiceCatalog' },
-    ]);
-  });
-
-  test('an existing service is listed only when it has a breaking change', () => {
-    importRegistry(base, { properties: { Name: str(), Old: str() } }, 'Alexa::ASK::Skill');
-    importRegistry(head, { properties: { Name: str() } }, 'Alexa::ASK::Skill');
-    importRegistry(base, { properties: { Name: str() } }, 'Beta::Lambda::Function');
-    importRegistry(head, { properties: { Name: str(), New: str() } }, 'Beta::Lambda::Function');
-
-    const report = findBreakingChanges(base, head);
-    expect(report.nonStandardServices).toEqual([
-      { service: 'alexa-ask', expected: 'aws-ask', namespace: 'Alexa::ASK' },
-    ]);
-    expect(formatBreakingChanges(report)).toContain(
-      [
-        SECTION,
-        '| alexa-ask | aws-ask | Alexa::ASK |',
-        '',
-        '**Action Required:** These services have non-standard prefixes that may indicate an error in the CloudFormation resource specification. Please verify these are intentional before merging.',
-      ].join('\n'),
-    );
-  });
-
-  test('services that start with aws- are not listed, and the section is left out', () => {
-    importRegistry(head, { properties: { Name: str() } }, 'AWS::New::Thing');
-
-    const report = findBreakingChanges(base, head);
-    expect(report.nonStandardServices).toEqual([]);
-    expect(formatBreakingChanges(report)).not.toContain('Non-Standard');
+    expect(changelogLines()).toEqual([NO_CHANGES]);
   });
 });
 
 describe('output', () => {
-  test('with no breaking change, the output is the empty table and the changelog block', () => {
-    both({ properties: { Name: str() } }, { properties: { Name: str(), Extra: str() } });
-
-    expect(formatBreakingChanges(findBreakingChanges(base, head))).toEqual(
-      [
-        '### Breaking Changes Analysis',
-        '| Service | Resource | Change | Explanation |',
-        '|---------|----------|--------|-------------|',
-        '',
-        'No breaking changes found.',
-        '',
-        '### Changelog Entry',
-        '**Copy the text below for your L1 PR:**',
-        '',
-        '```',
-        CHANGELOG_PARAGRAPH,
-        '',
-        'No breaking changes detected in this release.',
-        '```',
-      ].join('\n'),
-    );
-  });
-
-  test('a new service with a non-standard prefix and no breaking change prints the three sections', () => {
-    importRegistry(head, { properties: { Name: str() } }, 'Dev::ServiceCatalog::Portfolio');
-
-    expect(formatBreakingChanges(findBreakingChanges(base, head))).toEqual(
-      [
-        '### Breaking Changes Analysis',
-        '| Service | Resource | Change | Explanation |',
-        '|---------|----------|--------|-------------|',
-        '',
-        'No breaking changes found.',
-        '',
-        '### Non-Standard Service Prefixes Detected',
-        '',
-        '| Detected Service | Expected Service | CloudFormation Namespace |',
-        '|------------------|------------------|--------------------------|',
-        '| dev-servicecatalog | aws-servicecatalog | Dev::ServiceCatalog |',
-        '',
-        '**Action Required:** These services have non-standard prefixes that may indicate an error in the CloudFormation resource specification. Please verify these are intentional before merging.',
-        '',
-        '### Changelog Entry',
-        '**Copy the text below for your L1 PR:**',
-        '',
-        '```',
-        CHANGELOG_PARAGRAPH,
-        '',
-        'No breaking changes detected in this release.',
-        '```',
-      ].join('\n'),
-    );
-  });
-
-  test("the prompt's example changes print as its example, ordered by service", () => {
+  test('the output is the paragraph, an empty line and one line per change, ordered by service', () => {
     importRegistry(base, { properties: { StatusInfos: str(), Name: str() } }, 'AWS::RDS::DBInstance');
     importRegistry(head, { properties: { Name: str() } }, 'AWS::RDS::DBInstance');
     importRegistry(base, { properties: { InstanceType: str() } }, 'AWS::EC2::Instance');
@@ -770,78 +616,65 @@ describe('output', () => {
 
     expect(formatBreakingChanges(findBreakingChanges(base, head))).toEqual(
       [
-        '### Breaking Changes Analysis',
-        '| Service | Resource | Change | Explanation |',
-        '|---------|----------|--------|-------------|',
-        '| aws-ec2 | AWS::EC2::Instance | `InstanceType: optional → required` | Property changed to required |',
-        '| aws-rds | AWS::RDS::DBInstance | `[-] StatusInfos: string` | Property removed |',
-        '| aws-s3 | AWS::S3::Bucket | `BucketName: mutable → immutable` | Property changed to immutable |',
-        '',
-        '### Changelog Entry',
-        '**Copy the text below for your L1 PR:**',
-        '',
-        '```',
         CHANGELOG_PARAGRAPH,
         '',
         'aws-ec2: AWS::EC2::Instance: InstanceType property is now required.  ',
         'aws-rds: AWS::RDS::DBInstance: StatusInfos property removed.  ',
         'aws-s3: AWS::S3::Bucket: BucketName property is now immutable.',
-        '```',
       ].join('\n'),
     );
   });
 
-  test('the changelog block starts with the line that aws-cdk release tooling reads as the L1 changes note', () => {
-    both({ properties: { Name: str(), Old: str() } }, { properties: { Name: str() } });
-    const lines = formatBreakingChanges(findBreakingChanges(base, head)).split('\n');
-    const fence = lines.indexOf('```');
+  test('with no breaking change, the output is the paragraph, an empty line and the line that says so', () => {
+    both({ properties: { Name: str() } }, { properties: { Name: str(), Extra: str() } });
 
-    expect(lines.slice(fence + 1)).toEqual([
-      CHANGELOG_PARAGRAPH,
-      '',
-      `${SERVICE}: ${RESOURCE}: Old property removed.`,
-      '```',
-    ]);
-    expect(RELEASE_NOTE_LINE.exec(lines[fence + 1])?.[1]).toEqual('CHANGES TO L1 RESOURCES');
+    expect(formatBreakingChanges(findBreakingChanges(base, head))).toEqual(
+      [CHANGELOG_PARAGRAPH, '', NO_CHANGES].join('\n'),
+    );
   });
 
-  test('a vertical bar in a table cell is escaped, and not in the changelog', () => {
-    both(
-      { properties: { Mode: { type: 'string', enum: ['a|b', 'c'] } } },
-      { properties: { Mode: { type: 'string', enum: ['c'] } } },
-    );
+  test('no table, heading, copy instruction, code fence or service prefix section is printed', () => {
+    importRegistry(base, { properties: { Name: str(), 'Back`tick': str(), Old: str() } }, 'Alexa::ASK::Skill');
+    importRegistry(head, { properties: { Name: str() } }, 'Alexa::ASK::Skill');
+    importRegistry(head, { properties: { Name: str() } }, 'Dev::ServiceCatalog::Portfolio');
     const text = formatBreakingChanges(findBreakingChanges(base, head));
 
-    expect(text).toContain('| `Mode: [-] allowed value "a\\|b"` | Allowed value removed |');
-    expect(text).toContain(`${SERVICE}: ${RESOURCE}: Mode property no longer allows "a|b".`);
+    expect(text).toEqual(
+      [
+        CHANGELOG_PARAGRAPH,
+        '',
+        'alexa-ask: Alexa::ASK::Skill: Back`tick property removed.  ',
+        'alexa-ask: Alexa::ASK::Skill: Old property removed.',
+      ].join('\n'),
+    );
+    expect(text).not.toMatch(/^#|^\||^`{3}|Copy the text below|Non-Standard|aws-ask|Action Required/m);
   });
 
-  test('backticks in a change lengthen its code span and the changelog fence', () => {
-    both({ properties: { Name: str(), 'Back`tick': str(), 'Tri```ple': str() } }, { properties: { Name: str() } });
-    const lines = formatBreakingChanges(findBreakingChanges(base, head)).split('\n');
+  test('the output starts with the line that aws-cdk release tooling reads as the L1 changes note', () => {
+    both({ properties: { Name: str(), Old: str() } }, { properties: { Name: str() } });
+    const [first] = formatBreakingChanges(findBreakingChanges(base, head)).split('\n');
 
-    expect(lines).toContain('| aws-some | AWS::Some::Type | ``[-] Back`tick: string`` | Property removed |');
-    expect(lines).toContain('| aws-some | AWS::Some::Type | ````[-] Tri```ple: string```` | Property removed |');
-    expect(lines.slice(lines.indexOf('**Copy the text below for your L1 PR:**') + 2)).toEqual([
-      '````',
-      CHANGELOG_PARAGRAPH,
-      '',
-      `${SERVICE}: ${RESOURCE}: Back\`tick property removed.  `,
-      `${SERVICE}: ${RESOURCE}: Tri\`\`\`ple property removed.`,
-      '````',
+    expect(RELEASE_NOTE_LINE.exec(first)?.[1]).toEqual('CHANGES TO L1 RESOURCES');
+  });
+
+  test('a vertical bar or a backtick in a name is printed as it is', () => {
+    both(
+      { properties: { Mode: { type: 'string', enum: ['a|b', 'c'] }, 'Tri```ple': str() } },
+      { properties: { Mode: { type: 'string', enum: ['c'] } } },
+    );
+
+    expect(changelogLines()).toEqual([
+      `${SERVICE}: ${RESOURCE}: Tri\`\`\`ple property removed.  `,
+      `${SERVICE}: ${RESOURCE}: Mode property no longer allows "a|b".`,
     ]);
   });
 
-  test('a line break in a name stays on one table row and one changelog line', () => {
+  test('a line break in a name stays on one changelog line', () => {
     both(
       { properties: { Name: str(), 'New\nLine': str(), 'Odd\rLine': str(), 'Old\r\nLine': str() } },
       { properties: { Name: str() } },
     );
-    const text = formatBreakingChanges(findBreakingChanges(base, head));
 
-    expect(text).toContain('| `[-] New Line: string` | Property removed |');
-    expect(text).toContain('| `[-] Odd Line: string` | Property removed |');
-    expect(text).toContain('| `[-] Old Line: string` | Property removed |');
     expect(changelogLines()).toEqual([
       `${SERVICE}: ${RESOURCE}: New Line property removed.  `,
       `${SERVICE}: ${RESOURCE}: Odd Line property removed.  `,
@@ -873,15 +706,15 @@ describe('output', () => {
     const text = build([0, 1, 2]);
     expect(build([2, 1, 0])).toEqual(text);
     expect(build([1, 0, 2])).toEqual(text);
-    expect(text.split('\n').filter((l) => l.startsWith('| aws-'))).toEqual([
-      '| aws-alpha | AWS::Alpha::Bee | `[-] P: string` | Property removed |',
-      '| aws-alpha | AWS::Alpha::Bee | `[-] Q: string` | Property removed |',
-      '| aws-alpha | AWS::Alpha::Thing | `[-] X: string` | Property removed |',
-      '| aws-alpha | AWS::Alpha::Thing | `Y: optional → required` | Property changed to required |',
-      '| aws-alpha | AWS::Alpha::Thing | `Z: optional → required` | Property changed to required |',
-      '| aws-alpha | AWS::Alpha::Thing | `Y: mutable → immutable` | Property changed to immutable |',
-      '| aws-zeta | AWS::Zeta::Thing | `[-] A: string` | Property removed |',
-      '| aws-zeta | AWS::Zeta::Thing | `[-] B: string` | Property removed |',
+    expect(text.split('\n').slice(2)).toEqual([
+      'aws-alpha: AWS::Alpha::Bee: P property removed.  ',
+      'aws-alpha: AWS::Alpha::Bee: Q property removed.  ',
+      'aws-alpha: AWS::Alpha::Thing: X property removed.  ',
+      'aws-alpha: AWS::Alpha::Thing: Y property is now required.  ',
+      'aws-alpha: AWS::Alpha::Thing: Z property is now required.  ',
+      'aws-alpha: AWS::Alpha::Thing: Y property is now immutable.  ',
+      'aws-zeta: AWS::Zeta::Thing: A property removed.  ',
+      'aws-zeta: AWS::Zeta::Thing: B property removed.',
     ]);
   });
 });
@@ -913,6 +746,26 @@ describe('diff-db', () => {
     );
   }
 
+  /** The changelog text for the databases below, as `--breaking-changes` prints it */
+  const CHANGELOG = [
+    CHANGELOG_PARAGRAPH,
+    '',
+    `${SERVICE}: ${RESOURCE}: Old property removed.  `,
+    `${SERVICE}: ${RESOURCE}: DestinationRequest type renamed to Destination.`,
+  ].join('\n');
+
+  /** The breaking changes for the databases below, as `--json` prints them */
+  const CHANGES = [
+    { service: SERVICE, resource: RESOURCE, kind: 'removed', element: 'Old', description: 'Old property removed' },
+    {
+      service: SERVICE,
+      resource: RESOURCE,
+      kind: 'cdk-type-renamed',
+      element: 'DestinationRequest',
+      description: 'DestinationRequest type renamed to Destination',
+    },
+  ];
+
   beforeEach(() => {
     both(
       {
@@ -930,37 +783,35 @@ describe('diff-db', () => {
     const result = diffDb(['--l1-changes']);
 
     expect(result.stdout).toEqual(`${formatL1Changes(compareL1(base, head))}\n`);
+    expect(result.stdout).not.toContain('CHANGES TO L1 RESOURCES');
     expect(result.status).toBe(0);
   });
 
-  test('--breaking-changes alone prints the analysis', () => {
+  test('--breaking-changes alone prints the changelog text and nothing else', () => {
     const result = diffDb(['--breaking-changes']);
 
-    expect(result.stdout).toEqual(`${formatBreakingChanges(findBreakingChanges(base, head))}\n`);
-    expect(result.stdout).toContain('`[-] Old: string`');
+    expect(result.stdout).toEqual(`${CHANGELOG}\n`);
     expect(result.status).toBe(0);
   });
 
-  test('both options print the L1 change report with the analysis at the end', () => {
+  test('both options print the L1 change report, an empty line and the changelog text', () => {
     const result = diffDb(['--l1-changes', '--breaking-changes']);
 
-    expect(result.stdout).toEqual(
-      `${formatL1Changes(compareL1(base, head))}\n\n${formatBreakingChanges(findBreakingChanges(base, head))}\n`,
-    );
+    expect(result.stdout).toEqual(`${formatL1Changes(compareL1(base, head))}\n\n${CHANGELOG}\n`);
     expect(result.status).toBe(0);
   });
 
-  test('with --json, --l1-changes alone prints the L1 changes and --breaking-changes the analysis', () => {
+  test('with --json, --l1-changes alone prints the L1 changes and --breaking-changes the list of changes', () => {
     expect(JSON.parse(diffDb(['--l1-changes', '--json']).stdout)).toEqual(
       JSON.parse(JSON.stringify(compareL1(base, head))),
     );
-    expect(JSON.parse(diffDb(['--breaking-changes', '--json']).stdout)).toEqual(findBreakingChanges(base, head));
+    expect(JSON.parse(diffDb(['--breaking-changes', '--json']).stdout)).toEqual(CHANGES);
   });
 
-  test('with --json, both options print the L1 changes with the analysis as breakingChanges', () => {
+  test('with --json, both options print the L1 changes with the list of changes as breakingChanges', () => {
     expect(JSON.parse(diffDb(['--l1-changes', '--breaking-changes', '--json']).stdout)).toEqual({
       ...JSON.parse(JSON.stringify(compareL1(base, head))),
-      breakingChanges: findBreakingChanges(base, head),
+      breakingChanges: CHANGES,
     });
   });
 

@@ -1,17 +1,14 @@
 import {
-  Attribute,
   MapDiff,
   Metric,
   Property,
   PropertyType,
-  Service,
   SpecDatabase,
   TypeDefinition,
   UpdatedProperty,
 } from '@aws-cdk/service-spec-types';
 import { DbDiff } from './db-diff';
 import { compareL1, L1Changes, L1StructRename } from './l1-changes';
-import { renderType } from './l1-view';
 
 /**
  * The kinds of breaking change, in the order they are listed within a resource
@@ -60,34 +57,13 @@ export interface BreakingChange {
    * that is still used), an attribute, type, metric or struct; empty for a resource
    */
   readonly element: string;
-  /** The change, as the table shows it, for example `Name: optional → required` */
-  readonly change: string;
-  /** The change in three or four words, for example `Property changed to required` */
-  readonly explanation: string;
   /** The changelog description, without the final full stop, for example `Name property is now required` */
   readonly description: string;
 }
 
 /**
- * A service whose name does not start with `aws-`
- */
-export interface NonStandardService {
-  readonly service: string;
-  /** `aws-` and the rest of the name */
-  readonly expected: string;
-  readonly namespace: string;
-}
-
-export interface BreakingChanges {
-  /** Ordered by service, resource, kind and element */
-  readonly changes: BreakingChange[];
-  /** The services with a breaking change or new in the new database whose names do not start with `aws-` */
-  readonly nonStandardServices: NonStandardService[];
-}
-
-/**
  * The changes between a base database and a new one that can make an existing CloudFormation template or existing CDK
- * code fail
+ * code fail, ordered by service, resource, kind, element and description
  *
  * Template breaks come from the model diff (`DbDiff`): removals, and the properties and fields that became required,
  * immutable, got another default value or fewer allowed values, also between the old and the new struct of each struct
@@ -100,7 +76,7 @@ export function findBreakingChanges(
   base: SpecDatabase,
   head: SpecDatabase,
   l1Changes: L1Changes = compareL1(base, head),
-): BreakingChanges {
+): BreakingChange[] {
   const changes = new Array<BreakingChange>();
   const differ = new DbDiff(base, head);
   const diff = differ.diff();
@@ -108,9 +84,7 @@ export function findBreakingChanges(
 
   for (const service of Object.values(diff.services.removed ?? {})) {
     for (const { entity } of base.follow('hasResource', service)) {
-      changes.push(
-        removal(service.name, entity.cloudFormationType, '', entity.cloudFormationType, 'Resource', 'resource'),
-      );
+      changes.push(removal(service.name, entity.cloudFormationType, '', 'resource'));
     }
     for (const { entity } of base.follow('serviceHasMetric', service)) {
       changes.push(metricRemoval(service.name, service.cloudFormationNamespace, entity));
@@ -123,19 +97,19 @@ export function findBreakingChanges(
       changes.push(metricRemoval(serviceName, namespace, metric));
     }
     for (const resourceType of Object.keys(service.resourceDiff?.removed ?? {})) {
-      changes.push(removal(serviceName, resourceType, '', resourceType, 'Resource', 'resource'));
+      changes.push(removal(serviceName, resourceType, '', 'resource'));
     }
 
     for (const [resourceType, resource] of Object.entries(service.resourceDiff?.updated ?? {})) {
-      const at = { service: serviceName, resource: resourceType, base };
+      const at = { service: serviceName, resource: resourceType };
       changes.push(...propertyChanges(at, resource.properties, ''));
-      for (const [name, attribute] of Object.entries(resource.attributes?.removed ?? {})) {
-        changes.push(removal(serviceName, resourceType, name, typed(base, name, attribute), 'Attribute', 'attribute'));
+      for (const name of Object.keys(resource.attributes?.removed ?? {})) {
+        changes.push(removal(serviceName, resourceType, name, 'attribute'));
       }
       for (const name of Object.keys(resource.typeDefinitionDiff?.removed ?? {})) {
         // A struct the L1 renders under another name is listed as the rename
         if (!renamed.has(`${resourceType} ${name}`)) {
-          changes.push(removal(serviceName, resourceType, `type ${name}`, `type ${name}`, 'Type', 'type', name));
+          changes.push(removal(serviceName, resourceType, `type ${name}`, 'type', name));
         }
       }
       for (const [name, type] of Object.entries(resource.typeDefinitionDiff?.updated ?? {})) {
@@ -151,7 +125,7 @@ export function findBreakingChanges(
   // compared here: the fields of `from` that `to` lacks or restricts break the templates and code that set them where
   // `from` was
   for (const rename of l1Changes.renames) {
-    const at = { service: serviceOf(head, rename.resource), resource: rename.resource, base };
+    const at = { service: serviceOf(head, rename.resource), resource: rename.resource };
     const fields = differ.diffTypeDefinition(
       typeDefinition(base, rename.resource, rename.from),
       typeDefinition(head, rename.resource, rename.to),
@@ -162,86 +136,43 @@ export function findBreakingChanges(
   }
 
   changes.push(...cdkCodeChanges(head, l1Changes));
-  const sortKey = (c: BreakingChange) => JSON.stringify([c.service, c.resource, c.kind, c.element, c.change]);
+  const sortKey = (c: BreakingChange) => JSON.stringify([c.service, c.resource, c.kind, c.element, c.description]);
   changes.sort(
     (a, b) =>
       compare(a.service, b.service) ||
       compare(a.resource, b.resource) ||
       KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind) ||
       compare(a.element, b.element) ||
-      compare(a.change, b.change),
+      compare(a.description, b.description),
   );
   // The same change can be found twice, for example in a struct changed under its own name and at a property of that
-  // name that switched from the struct; such rows have the same sort key, so they are next to each other
-  const unique = changes.filter((c, i) => i === 0 || sortKey(c) !== sortKey(changes[i - 1]));
-
-  return {
-    changes: unique,
-    nonStandardServices: nonStandardServices(base, head, unique, Object.keys(diff.services.added ?? {})),
-  };
+  // name that switched from the struct; such changes have the same sort key, so they are next to each other
+  return changes.filter((c, i) => i === 0 || sortKey(c) !== sortKey(changes[i - 1]));
 }
 
-/** The paragraph that starts the changelog block; aws-cdk's release tooling finds the L1 changes by its first words */
+/** The paragraph that starts the changelog text; aws-cdk's release tooling finds the L1 changes by its first words */
 const CHANGELOG_PARAGRAPH =
   '**CHANGES TO L1 RESOURCES:** L1 resources are automatically generated from public CloudFormation Resource Schemas. They are built to closely reflect the real state of CloudFormation. Sometimes these updates can contain changes that are incompatible with previous types, but more accurately reflect reality. In this release we have changed:';
 
 /**
- * The breaking changes as markdown: a table, the non-standard service prefixes if there are any, and the changelog
- * text for the L1 pull request, one line per change
+ * The changelog text for the L1 pull request: the `**CHANGES TO L1 RESOURCES:**` paragraph, an empty line, and one line
+ * per change, or a line that says there is none
  */
-export function formatBreakingChanges(report: BreakingChanges): string {
-  const lines = [
-    '### Breaking Changes Analysis',
-    '| Service | Resource | Change | Explanation |',
-    '|---------|----------|--------|-------------|',
-    ...report.changes.map(
-      (c) => `| ${cell(c.service)} | ${cell(c.resource)} | ${code(c.change)} | ${cell(c.explanation)} |`,
-    ),
-  ];
-  if (report.changes.length === 0) {
-    lines.push('', 'No breaking changes found.');
-  }
-
-  if (report.nonStandardServices.length > 0) {
-    lines.push(
-      '',
-      '### Non-Standard Service Prefixes Detected',
-      '',
-      '| Detected Service | Expected Service | CloudFormation Namespace |',
-      '|------------------|------------------|--------------------------|',
-      ...report.nonStandardServices.map((s) => `| ${cell(s.service)} | ${cell(s.expected)} | ${cell(s.namespace)} |`),
-      '',
-      '**Action Required:** These services have non-standard prefixes that may indicate an error in the CloudFormation resource specification. Please verify these are intentional before merging.',
-    );
-  }
-
+export function formatBreakingChanges(changes: BreakingChange[]): string {
   // Each line but the last ends in two spaces, a markdown line break
   const entries =
-    report.changes.length > 0
-      ? report.changes.map(
+    changes.length > 0
+      ? changes.map(
           (c, i, all) =>
             `${oneLine(`${c.service}: ${c.resource}: ${c.description}`)}.${i < all.length - 1 ? '  ' : ''}`,
         )
       : ['No breaking changes detected in this release.'];
-  const fence = '`'.repeat(Math.max(3, longestBacktickRun(entries.join('\n')) + 1));
-  lines.push(
-    '',
-    '### Changelog Entry',
-    '**Copy the text below for your L1 PR:**',
-    '',
-    fence,
-    CHANGELOG_PARAGRAPH,
-    '',
-    ...entries,
-    fence,
-  );
-  return lines.join('\n');
+  return [CHANGELOG_PARAGRAPH, '', ...entries].join('\n');
 }
 
 interface Place {
   readonly service: string;
   readonly resource: string;
-  readonly base: SpecDatabase;
 }
 
 /**
@@ -253,79 +184,45 @@ function propertyChanges(
   prefix: string,
 ): BreakingChange[] {
   const ret = new Array<BreakingChange>();
-  const change = (kind: BreakingChangeKind, element: string, text: string, explanation: string, description: string) =>
-    ret.push({ service: at.service, resource: at.resource, kind, element, change: text, explanation, description });
+  const change = (kind: BreakingChangeKind, element: string, description: string) =>
+    ret.push({ service: at.service, resource: at.resource, kind, element, description });
 
-  for (const [field, property] of Object.entries(diff?.removed ?? {})) {
-    const name = `${prefix}${field}`;
-    ret.push(removal(at.service, at.resource, name, typed(at.base, name, property), 'Property', 'property'));
+  for (const field of Object.keys(diff?.removed ?? {})) {
+    ret.push(removal(at.service, at.resource, `${prefix}${field}`, 'property'));
   }
 
   for (const [field, { old, new: now }] of Object.entries(diff?.updated ?? {})) {
     const name = `${prefix}${field}`;
     if (!old.required && now.required) {
-      change(
-        'now-required',
-        name,
-        `${name}: optional → required`,
-        'Property changed to required',
-        `${name} property is now required`,
-      );
+      change('now-required', name, `${name} property is now required`);
     }
+    // `causesReplacement` is `no` for a mutable property, `maybe` for one that may require replacement and `yes` for
+    // an immutable one
     const replaces = [old.causesReplacement ?? 'no', now.causesReplacement ?? 'no'];
     if (replaces[0] !== 'yes' && replaces[1] === 'yes') {
-      change(
-        'now-immutable',
-        name,
-        `${name}: ${MUTABILITY[replaces[0]]} → ${MUTABILITY[replaces[1]]}`,
-        'Property changed to immutable',
-        `${name} property is now immutable`,
-      );
+      change('now-immutable', name, `${name} property is now immutable`);
     } else if (replaces[0] === 'no' && replaces[1] === 'maybe') {
-      change(
-        'now-immutable',
-        name,
-        `${name}: ${MUTABILITY.no} → ${MUTABILITY.maybe}`,
-        'Property may require replacement',
-        `${name} property may now require replacement`,
-      );
+      change('now-immutable', name, `${name} property may now require replacement`);
     }
     if (old.defaultValue !== undefined && now.defaultValue !== undefined && old.defaultValue !== now.defaultValue) {
       change(
         'default-changed',
         name,
-        `${name}: default=${old.defaultValue} → default=${now.defaultValue}`,
-        'Default value changed',
         `${name} property default value changed from ${old.defaultValue} to ${now.defaultValue}`,
       );
     }
     for (const narrowing of allowedValueNarrowings(old.type, now.type)) {
       if ('removed' in narrowing) {
         const value = JSON.stringify(narrowing.removed);
-        change(
-          'allowed-values-narrowed',
-          name,
-          `${name}: [-] allowed value ${value}`,
-          'Allowed value removed',
-          `${name} property no longer allows ${value}`,
-        );
+        change('allowed-values-narrowed', name, `${name} property no longer allows ${value}`);
       } else {
         const values = narrowing.restrictedTo.map((v) => JSON.stringify(v)).join(', ');
-        change(
-          'allowed-values-narrowed',
-          name,
-          `${name}: allowed values restricted to ${values}`,
-          'Allowed values restricted',
-          `${name} property now only allows ${values}`,
-        );
+        change('allowed-values-narrowed', name, `${name} property now only allows ${values}`);
       }
     }
   }
   return ret;
 }
-
-/** How the model diff shows `causesReplacement` */
-const MUTABILITY: Record<string, string> = { no: 'mutable', maybe: 'immutable?', yes: 'immutable' };
 
 type AllowedValue = string | number;
 type Narrowing = { readonly removed: AllowedValue } | { readonly restrictedTo: AllowedValue[] };
@@ -380,8 +277,6 @@ function cdkCodeChanges(head: SpecDatabase, l1Changes: L1Changes): BreakingChang
         resource,
         kind: 'cdk-type-changed',
         element: name,
-        change: `${name}: ${from} → ${to}`,
-        explanation: 'CDK type changed',
         description: `${name} ${noun} type changed from ${from} to ${to}`,
       });
     }
@@ -394,8 +289,6 @@ function cdkCodeChanges(head: SpecDatabase, l1Changes: L1Changes): BreakingChang
       resource: rename.resource,
       kind: 'cdk-type-renamed',
       element: rename.from,
-      change: `${rename.from} → ${rename.to}`,
-      explanation: merged ? 'CDK type merged' : 'CDK type renamed',
       description: `${rename.from} type ${merged ? 'merged into' : 'renamed to'} ${rename.to}`,
     });
     // Field changes read `<field> type changed from A to B`, `<field> now required`, `<field> removed` and so on
@@ -485,55 +378,14 @@ function unionMembers(type: string): string[] {
   return [...members, type.slice(start)];
 }
 
-/**
- * A removal: `what` is the change after `[-] `, `explanationNoun` starts the explanation and `noun` follows `name` in the
- * changelog description
- */
-function removal(
-  service: string,
-  resource: string,
-  element: string,
-  what: string,
-  explanationNoun: string,
-  noun: string,
-  name = element,
-): BreakingChange {
-  return {
-    service,
-    resource,
-    kind: 'removed',
-    element,
-    change: `[-] ${what}`,
-    explanation: `${explanationNoun} removed`,
-    description: `${name ? `${name} ` : ''}${noun} removed`,
-  };
+/** A removal: `noun` follows `name` in the changelog description */
+function removal(service: string, resource: string, element: string, noun: string, name = element): BreakingChange {
+  return { service, resource, kind: 'removed', element, description: `${name ? `${name} ` : ''}${noun} removed` };
 }
 
 function metricRemoval(service: string, resource: string, metric: Metric): BreakingChange {
   const name = `${metric.namespace} ${metric.name}`;
-  return removal(service, resource, `metric ${name}`, `metric ${name}`, 'Metric', 'metric', name);
-}
-
-/** A property or attribute with the type that the base database gives it, as the L1 renders it */
-function typed(db: SpecDatabase, name: string, field: Property | Attribute): string {
-  return `${name}: ${renderType(db, field.type)}`;
-}
-
-/**
- * The services whose names do not start with `aws-` among the services of `changes` and `added`
- */
-function nonStandardServices(
-  base: SpecDatabase,
-  head: SpecDatabase,
-  changes: BreakingChange[],
-  added: string[],
-): NonStandardService[] {
-  const names = [...new Set([...changes.map((c) => c.service), ...added])].filter((n) => !n.startsWith('aws-'));
-  return names.sort(compare).map((name) => {
-    const service: Service = [head, base].flatMap((db) => db.lookup('service', 'name', 'equals', name))[0];
-    const rest = name.includes('-') ? name.slice(name.indexOf('-') + 1) : name;
-    return { service: name, expected: `aws-${rest}`, namespace: service.cloudFormationNamespace };
-  });
+  return removal(service, resource, `metric ${name}`, 'metric', name);
 }
 
 /** Compare by code point, so the order does not depend on the locale */
@@ -541,23 +393,7 @@ function compare(a: string, b: string): number {
   return a < b ? -1 : a > b ? 1 : 0;
 }
 
-/** Text with each line break replaced by a space, so that one change stays on one row or line */
+/** Text with each line break replaced by a space, so that one change stays on one line */
 function oneLine(text: string): string {
   return text.replace(/\r\n|\r|\n/g, ' ');
-}
-
-/** Text for a markdown table cell */
-function cell(text: string): string {
-  return oneLine(text).replace(/\|/g, '\\|');
-}
-
-/** Text as inline code in a markdown table cell */
-function code(text: string): string {
-  const ticks = '`'.repeat(longestBacktickRun(text) + 1);
-  const pad = text.startsWith('`') || text.endsWith('`') ? ' ' : '';
-  return `${ticks}${pad}${cell(text)}${pad}${ticks}`;
-}
-
-function longestBacktickRun(text: string): number {
-  return Math.max(0, ...(text.match(/`+/g) ?? []).map((run) => run.length));
 }
