@@ -23,8 +23,10 @@ import {
   sameRenderedType,
   setRequired,
   setTypeHistory,
+  unique,
   Use,
 } from './type-history-model';
+import { renderedFieldType, renderType } from '../l1-view';
 import { compareByCodeUnit } from '../report/sorting';
 
 export interface TypeHistoryApplyContext {
@@ -101,12 +103,25 @@ class TypeHistoryApplier {
           const atPositions = deciding.map((u) => this.fieldAt(u, name));
           // CloudFormation says nothing about a field its types do not reach, so the release decides there
           const releasedRequired = !!releasedType.properties[name]?.required;
+          const given = atPositions
+            .filter(isDefined)
+            .sort((a, b) => compareByCodeUnit(historyKey(this.db, a), historyKey(this.db, b)));
+          // A field the release lacks renders the type of its positions, so they must agree, unless the gate fails anyway
+          if (!releasedType.properties[name] && decision.kind !== 'undecided') {
+            const needed = unique(given.map((f) => renderType(this.db, renderedFieldType(f)))).sort(compareByCodeUnit);
+            if (needed.length > 1) {
+              throw new Error(
+                `${this.resource.cloudFormationType}: ${releasedType.name}.${name} needs ${needed.join(', ')} at ` +
+                  'its positions, which one kept field cannot hold',
+              );
+            }
+          }
           return {
             name,
             required: deciding.every((u, i) =>
               u.position.kind === 'unreached' ? releasedRequired : atPositions[i]?.required,
             ),
-            source: (own ? target.properties[name] : undefined) ?? atPositions.find(isDefined),
+            source: (own ? target.properties[name] : undefined) ?? given[0],
           };
         }),
       );
@@ -220,20 +235,19 @@ class TypeHistoryApplier {
       return;
     }
     const rich = new RichTypedField({ type: last(history), previousTypes: history.slice(0, -1) });
-    // In a fixed order, not the schema's; the key keeps integer and number apart, which the L1 renders alike
-    const key = (p: { currentField: Field }) =>
-      new RichTypedField(p.currentField)
-        .types()
-        .reverse()
-        .map((t) => new RichPropertyType(t).stringify(this.db, false))
-        .join(' <- ');
-    const sorted = positions.map((p) => ({ ...p, key: key(p) })).sort((a, b) => compareByCodeUnit(a.key, b.key));
+    // In a fixed order, not the schema's
+    const sorted = positions
+      .map((p) => ({ ...p, key: historyKey(this.db, p.currentField) }))
+      .sort((a, b) => compareByCodeUnit(a.key, b.key));
     for (const p of sorted.filter((q) => !q.typeUnchanged)) {
       // A copy: updateType keeps the object it is given and writes a later equal type's allowed values into it
       rich.updateType(structuredClone(p.cfnType));
     }
-    // A type that both have keeps the details of the current one, like its allowed values
-    const currentTypes = sorted.flatMap((p) => new RichTypedField(p.currentField).types());
+    // A type that both have keeps the details of the current one, like its allowed values: the field's own type first
+    const currentTypes = [
+      ...sorted.filter((p) => p.currentField === field),
+      ...sorted.filter((p) => p.currentField !== field),
+    ].flatMap((p) => new RichTypedField(p.currentField).types());
     setTypeHistory(
       field,
       rich.types().map((t) => currentTypes.find((c) => new RichPropertyType(c).equals(t)) ?? t),
@@ -339,4 +353,13 @@ class TypeHistoryApplier {
     }
     return target;
   }
+}
+
+/** A sort key of a field's type history, newest first; unlike the L1, it keeps integer and number apart */
+function historyKey(db: SpecDatabase, field: Field) {
+  return new RichTypedField(field)
+    .types()
+    .reverse()
+    .map((t) => new RichPropertyType(t).stringify(db, false))
+    .join(' <- ');
 }
