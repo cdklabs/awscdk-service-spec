@@ -129,7 +129,7 @@ export class DiffDb extends pj.Component {
           run: `${this.diffDb} base/db.json.gz head/db.json.gz > DIFF || echo "diff-result=true" >> $GITHUB_OUTPUT`,
         },
         {
-          // Only reports: the build job's type history gate decides what fails
+          // Informational: a failed report does not fail the job
           name: 'Report L1 changes',
           run: [
             `if ! ${this.diffDb} --l1-changes base/db.json.gz head/db.json.gz > L1-CHANGES; then`,
