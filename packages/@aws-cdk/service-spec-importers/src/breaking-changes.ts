@@ -153,7 +153,10 @@ interface Place {
   readonly resource: string;
 }
 
-/** The breaking changes of the properties of a resource, or of the fields of a type (`prefix` is `Type.`) */
+/**
+ * The breaking changes of the properties of a resource, or of the fields of a type (`prefix` is `Type.`, or a position
+ * path from `renamedFieldPrefixes()`)
+ */
 function propertyChanges(
   at: Place,
   diff: MapDiff<Property, UpdatedProperty> | undefined,
