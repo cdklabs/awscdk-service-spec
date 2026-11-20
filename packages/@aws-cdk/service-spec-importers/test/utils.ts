@@ -115,9 +115,7 @@ export function resourceTypeDefinition(target: SpecDatabase, name: string, typeN
   return found[0];
 }
 
-/**
- * Write a pin file for a released database fixture, version 1.2.3
- */
+/** Write a pin file for a released database fixture, version 1.2.3 */
 export function writePins(file: string, sha256: string) {
   fs.writeFileSync(file, JSON.stringify({ version: '1.2.3', integrity: 'sha512-c29tZSBieXRlcw==', sha256 }));
 }

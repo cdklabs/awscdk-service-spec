@@ -12,13 +12,8 @@ const ENTRIES_FILE = '$RUNNER_TEMP/type-mapping-entries.txt';
 const ON_PULL_REQUEST = "github.event_name == 'pull_request' || github.event_name == 'merge_group'";
 
 /**
- * Add the type history gate and the released database checks to the build job
- *
- * The build job runs for pull requests and in the merge queue. Its gate step alone writes the printed mapping
- * entries to a file, uploaded only when the gate fails, and sets the `type_gate_failed` job output.
- *
- * A change of the released database passes only if it matches the npm release of the pinned version, does not move
- * back, and the gate also passes against the base branch's released database.
+ * Add the type history gate and the released database checks to the build job, see "Type history gate" and "Moving
+ * the baseline" in README.md
  */
 export class TypeHistoryGate extends pj.Component {
   public constructor(root: yarn.Monorepo, options: TypeHistoryGateOptions) {

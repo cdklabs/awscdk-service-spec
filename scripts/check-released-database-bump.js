@@ -1,17 +1,10 @@
-// Check a change of the released database against npm and the base branch.
+// Check a change of the released database against npm and the base branch, see "Moving the baseline" in README.md.
+// Run from the root of the change's checkout.
 //
-// Usage: node scripts/check-released-database-bump.js <base-branch-checkout>
-//
-// Run from the root of the change's checkout. For a pull request, set PULL_REQUEST to its number: the change is then
-// what the pull request's merge commit (refs/pull/<number>/merge, fetched into the base checkout) changes, so a pull
-// request that is behind the base branch but leaves the released database alone has nothing to check. Without it,
-// or when that ref is missing, the change is the difference from the base branch.
-//
-// If the change keeps the pins, VERSION and db.json.gz, there is nothing to check. Otherwise it fails unless the npm
-// tarball of the pinned version has the pinned integrity, its package/db.json.gz equals the snapshot, its
-// package/package.json version equals VERSION, and the version is not lower than the base branch's. It writes
-// `changed=true|false` and, when the base branch has a released database to run the type history gate against,
-// `base-baseline=true` to $GITHUB_OUTPUT.
+// With PULL_REQUEST set, the change is what the pull request's merge commit changes, so a pull request that is behind
+// the base branch but leaves the released database alone has nothing to check. Without it, or without that merge
+// commit, the change is the difference from the base branch. Writes `changed` and `base-baseline` (the base branch
+// has a released database to run the type history gate against) to $GITHUB_OUTPUT.
 const child_process = require('child_process');
 const crypto = require('crypto');
 const fs = require('fs');
@@ -138,17 +131,15 @@ function pullRequestChangesBaseline(baseDir) {
   return files('FETCH_HEAD^1') !== files('FETCH_HEAD');
 }
 
-/**
- * The pins, VERSION and snapshot sha256 of a checkout, which may have the snapshot as a Git LFS pointer
- */
+/** The pins, VERSION and snapshot sha256 of a checkout, which may have the snapshot as a Git LFS pointer */
 function readBaseline(dir) {
   const pinsFile = path.join(dir, PINS);
   if (!fs.existsSync(pinsFile)) {
     return {};
   }
   const pins = JSON.parse(fs.readFileSync(pinsFile, 'utf-8'));
-  // The same rules as projenrc/released-database.ts and packages/@aws-cdk/service-spec-importers/src/released-database.ts:
-  // change them together (this script runs in a plain node step)
+  // Also in projenrc/released-database.ts and service-spec-importers' src/released-database.ts, which this plain node
+  // step cannot import: change all three together
   const valid =
     typeof pins.version === 'string' &&
     /^\d+\.\d+\.\d+$/.test(pins.version) &&
@@ -198,14 +189,9 @@ function setOutput(name, value) {
   }
 }
 
-/**
- * A check that failed, printed as a GitHub error annotation
- */
 class CheckFailure extends Error {}
 
-/**
- * Stop the check with an error annotation; thrown rather than exiting, so `finally` blocks still clean up
- */
+/** Thrown rather than exiting, so `finally` blocks still clean up */
 function fail(message) {
   throw new CheckFailure(message);
 }

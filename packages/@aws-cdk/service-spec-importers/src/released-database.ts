@@ -3,9 +3,6 @@ import { promises as fs } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import { emptyDatabase, SpecDatabase } from '@aws-cdk/service-spec-types';
 
-/**
- * The pins of the released database that a build uses as its baseline
- */
 export interface ReleasedDatabasePins {
   /** The @aws-cdk/aws-service-spec version */
   readonly version: string;
@@ -22,9 +19,7 @@ export interface ReleasedDatabase {
 
 const LFS_POINTER = 'version https://git-lfs.github.com/spec/v1';
 
-/**
- * Load a released database snapshot, refusing it unless it has the sha256 of the pin file
- */
+/** Load a released database snapshot; throws unless it has the sha256 of the pin file */
 export async function loadReleasedDatabase(snapshotPath: string, pinsPath: string): Promise<ReleasedDatabase> {
   const pins = await readReleasedDatabasePins(pinsPath);
   const bytes = await fs.readFile(snapshotPath);
@@ -47,9 +42,7 @@ export async function loadReleasedDatabase(snapshotPath: string, pinsPath: strin
   return { db, pins };
 }
 
-/**
- * Read and check a pin file
- */
+/** Read a pin file; throws unless it holds a version, an npm sha512 integrity and a sha256 */
 export async function readReleasedDatabasePins(pinsPath: string): Promise<ReleasedDatabasePins> {
   const invalid = (why: string) => new Error(`Invalid pin file ${pinsPath}: ${why}`);
 
@@ -62,8 +55,8 @@ export async function readReleasedDatabasePins(pinsPath: string): Promise<Releas
   if (typeof pins !== 'object' || pins === null) {
     throw invalid('expected an object with version, integrity and sha256');
   }
-  // The same rules as projenrc/released-database.ts and scripts/check-released-database-bump.js: change them together
-  // (they run before this package is built, and in a plain node step)
+  // Also in projenrc/released-database.ts and scripts/check-released-database-bump.js, which cannot import this
+  // package: change all three together
   if (typeof pins.version !== 'string' || !/^\d+\.\d+\.\d+$/.test(pins.version)) {
     throw invalid(`version must be a version like 1.2.3, got ${JSON.stringify(pins.version)}`);
   }

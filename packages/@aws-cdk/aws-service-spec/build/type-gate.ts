@@ -8,12 +8,9 @@ import { FullDatabase, RELEASED_DATABASE, TYPE_MAPPINGS } from './full-database'
 const ROOT = path.join(__dirname, '../../../..');
 
 /**
- * The type history gate: build the database and fail if the matcher left a released type undecided
+ * The type history gate, see "Type history gate" in README.md
  *
- * Usage: type-gate [--snapshot DB --pins PIN_FILE] [--entries-file FILE]
- *
- * --snapshot and --pins build against another released database, for example the base branch's. --entries-file
- * receives the undecided cases with their mapping entries when the gate fails.
+ * --snapshot and --pins build against another released database, such as the base branch's.
  */
 async function main() {
   const { values } = parseArgs({

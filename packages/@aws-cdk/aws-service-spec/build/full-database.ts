@@ -14,25 +14,17 @@ import { Scrutinies } from './scrutinies';
 
 const SOURCES = path.join(__dirname, '../../../../sources');
 
-/**
- * The released database whose L1 types every build keeps, and its pin file
- */
+/** The released database whose L1 types every build keeps, and its pin file */
 export const RELEASED_DATABASE = {
   snapshot: path.join(SOURCES, 'ReleasedDatabase/db.json.gz'),
   pins: path.join(__dirname, 'released-database.json'),
 };
 
-/**
- * A person's decisions for released types, where the matcher cannot decide or they decide otherwise
- */
+/** See "Type mappings" in README.md */
 export const TYPE_MAPPINGS = path.join(__dirname, 'type-mappings.json');
 
 export interface FullDatabaseOptions extends DatabaseBuilderOptions {
-  /**
-   * The released database whose L1 types the build keeps
-   *
-   * @default RELEASED_DATABASE
-   */
+  /** @default RELEASED_DATABASE */
   readonly releasedDatabase?: Omit<TypeHistoryOptions, 'mappings'>;
 }
 
@@ -60,9 +52,7 @@ export class FullDatabase extends DatabaseBuilder {
       .importCfnPrimaryIdentifierOverrides(path.join(SOURCES, 'CloudFormationRefOverrides/ref-overrides.json'));
   }
 
-  /**
-   * Build the database with the result of the type history, which the constructor always imports
-   */
+  /** As `build()`, with the type history result, which the constructor always imports */
   public async buildWithTypeHistory() {
     const built = await this.build();
     if (!built.typeHistory) {

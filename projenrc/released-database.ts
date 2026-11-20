@@ -3,12 +3,7 @@ import * as path from 'node:path';
 import * as pj from 'projen';
 import { DownloadScript } from './download-script';
 
-/**
- * The pin file of the released database that every build uses as its baseline
- *
- * It holds the @aws-cdk/aws-service-spec version, the npm `dist.integrity` of its tarball and the sha256 of its
- * `db.json.gz`. The build refuses a snapshot without that sha256.
- */
+/** See "Released database baseline" in README.md */
 export const RELEASED_DATABASE_PINS = 'packages/@aws-cdk/aws-service-spec/build/released-database.json';
 export const RELEASED_DATABASE_DIR = 'sources/ReleasedDatabase';
 
@@ -19,11 +14,9 @@ export interface ReleasedDatabasePins {
 }
 
 /**
- * Read the pin file for the projen tasks, refusing values that are not a version, an npm sha512 integrity and a sha256
- *
- * The values end up in a task's command line, so anything else is rejected. The rules are the same as in
- * `packages/@aws-cdk/service-spec-importers/src/released-database.ts` and `scripts/check-released-database-bump.js`:
- * change them together (projen runs before that package is built).
+ * Read the pin file for the projen tasks. Its values go into command lines, so it throws unless they are a version,
+ * an npm sha512 integrity and a sha256. Also in service-spec-importers' `src/released-database.ts` (projen runs
+ * before that package is built) and `scripts/check-released-database-bump.js`: change all three together.
  */
 export function readPinsForTasks(root: string): ReleasedDatabasePins {
   const file = path.join(root, RELEASED_DATABASE_PINS);
@@ -41,9 +34,6 @@ export function readPinsForTasks(root: string): ReleasedDatabasePins {
   };
 }
 
-/**
- * Add the task that downloads the pinned released database and writes its version
- */
 export function addReleasedDatabaseTask(project: pj.Project, pins: ReleasedDatabasePins) {
   const tarball = `https://registry.npmjs.org/@aws-cdk/aws-service-spec/-/aws-service-spec-${pins.version}.tgz`;
   project.addTask('update-source:released-database', {

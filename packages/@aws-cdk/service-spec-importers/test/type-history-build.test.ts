@@ -97,9 +97,7 @@ function build(current = divergingChecks('CustomCheck')) {
     .build();
 }
 
-/**
- * Write the released database snapshot and its pins, from one or more imports of the released resource
- */
+/** Write the snapshot and its pins; each schema is one import of the released resource */
 function writeReleased(...schemas: Array<Partial<CloudFormationRegistryResource>>) {
   const released = emptyDatabase();
   for (const schema of schemas) {

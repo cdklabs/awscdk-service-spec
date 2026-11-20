@@ -10,7 +10,7 @@ const option = (name) => (rest.includes(name) ? rest[rest.indexOf(name) + 1] : u
 const shouldExtract = rest.includes("--extract")
 // Only keep this file of a gzipped tarball
 const tarballEntry = option('--tarball-entry');
-// The expected digest of the download, in the format of npm's dist.integrity (for example sha512-<base64>)
+// The expected digest, in npm's dist.integrity format (for example sha512-<base64>)
 const integrity = option('--integrity');
 
 const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sources-'));

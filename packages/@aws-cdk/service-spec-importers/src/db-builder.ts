@@ -51,11 +51,10 @@ export interface DatabaseBuilderOptions {
 export type SourceImporter = (db: SpecDatabase, report: ProblemReport) => Promise<void>;
 
 export interface TypeHistoryOptions {
-  /** The released database snapshot (`db.json.gz`) whose L1 types the build keeps */
+  /** The released database, a `db.json.gz` */
   readonly snapshot: string;
   /** The pin file with the sha256 the snapshot must have */
   readonly pins: string;
-  /** The type mapping file */
   readonly mappings: string;
 }
 
@@ -96,7 +95,7 @@ export class DatabaseBuilder {
   public async build(): Promise<{
     db: SpecDatabase;
     report: ProblemReport;
-    /** The result of `importTypeHistory`, if it is one of the importers */
+    /** Set when `importTypeHistory` is one of the importers */
     typeHistory?: TypeHistory;
   }> {
     const report = new ProblemReport();
@@ -114,11 +113,8 @@ export class DatabaseBuilder {
   }
 
   /**
-   * Keep the L1 types of a released database, as decided by the type mapping file
-   *
-   * Call this after the sources that define resources and types. The build fails if the snapshot does not have the
-   * sha256 of its pin file, or if the mapping file has a malformed entry. Cases the matcher cannot decide are
-   * returned by `build()`, for the type history gate.
+   * Keep the L1 types of a released database; call it after the sources that define resources and types.
+   * The build fails on a snapshot without the pinned sha256 or on a malformed mapping entry.
    */
   public importTypeHistory(options: TypeHistoryOptions) {
     return this.addSourceImporter(async (db) => {

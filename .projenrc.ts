@@ -4,7 +4,7 @@ import { addReleasedDatabaseTask, readPinsForTasks } from './projenrc/released-d
 import { TypeHistoryGate } from './projenrc/type-history-gate';
 import { RegionalSource, Role, ScriptSource, SingleSource, SourceProcessing } from './projenrc/update-sources';
 
-// The released database that every build keeps the L1 types of, see "Released database baseline" in README.md
+// See "Released database baseline" in README.md
 const releasedDatabasePins = readPinsForTasks(__dirname);
 
 const workflowRunsOn = [
@@ -224,12 +224,11 @@ new DiffDb(repo, {
   serviceSpecImporters,
 });
 
-// Fail where the build cannot decide how a released L1 type continues, and check changes of the released database
 new TypeHistoryGate(repo, { serviceSpec: awsServiceSpec });
 
 // Update sources
 
-// Not scheduled: the pins move to the version each aws-cdk-lib release was built from, see README.md
+// Not scheduled: the pins move once per aws-cdk-lib release, see README.md
 addReleasedDatabaseTask(repo, releasedDatabasePins);
 
 new SingleSource(repo, {
