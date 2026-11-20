@@ -12,9 +12,8 @@ export interface L1StructRename {
   /** The struct the new database renders instead */
   readonly to: string;
   /**
-   * Where the L1 uses the struct, as the path from a resource property or attribute, for example
-   * `property Destinations` or `property Settings.Filter`, or as `field Struct.Field` below a struct the L1 renders only
-   * as a struct of its own
+   * Where the L1 uses the struct: every path from a resource property or attribute, such as `property Settings.Filter`,
+   * and `field Struct.Field` below a struct that no such path reaches, for example a later type of a property's history
    */
   readonly positions: string[];
   /** How the fields of `to` differ from the fields of `from`, for example `Url added` or `Port now required` */
@@ -28,21 +27,16 @@ export interface L1Change {
   readonly description: string;
 }
 
-/**
- * The changes to what CDK renders as L1 code between two databases
- */
+/** The changes to what CDK renders as L1 code between two databases */
 export interface L1Changes {
   readonly renames: L1StructRename[];
-  /**
-   * Resources, properties, attributes and structs the L1 no longer renders, and fields that a struct no longer has
-   * where the struct keeps its name
-   */
+  /** What the L1 no longer renders; a removed field only where its struct keeps its name */
   readonly removed: L1Change[];
   /** Properties and fields that became required or optional */
   readonly requiredness: L1Change[];
   /** Changed types */
   readonly other: L1Change[];
-  /** Fields that a struct has where it keeps its name */
+  /** Fields added to a struct that keeps its name */
   readonly addedFields: L1Change[];
   /** The number of added resources, properties, attributes, structs and fields */
   readonly additions: number;
@@ -52,12 +46,8 @@ export interface L1Changes {
  * Compare what CDK renders as L1 code from a base database with what it renders from a new database
  *
  * Structs are compared by position: two different structs at the same property or field, in the same lists and
- * maps, are a struct rename (or a merge, when several structs become the same one).
- *
- * Each generated package (`GENERATED_PACKAGES`) is compared on its own, and a change is listed if it is a change in
- * either package, once: a struct that only cfn-property-mixins renders counts, and one that no package renders does
- * not. The mixins leave out the structs flagged for backwards compatibility and every requiredness, and add the
- * structs of the oldest type of a modern tag property (see `renderedPropertyTypes()`).
+ * maps, are a rename, or a merge when several structs become one. Each generated package is compared on its own
+ * (what each renders: `L1View`), and a change in either package is listed once.
  */
 export function compareL1(base: SpecDatabase, head: SpecDatabase): L1Changes {
   const changes: MutableL1Changes = {
@@ -101,9 +91,7 @@ export function compareL1(base: SpecDatabase, head: SpecDatabase): L1Changes {
   return changes;
 }
 
-/**
- * A human-readable report of the changes, grouped by resource
- */
+/** A human-readable report of the changes, grouped by resource */
 export function formatL1Changes(changes: L1Changes): string {
   const lines = [
     [
@@ -160,19 +148,14 @@ export function formatL1Changes(changes: L1Changes): string {
 type Mutable<T> = { -readonly [K in keyof T]: T[K] };
 type MutableL1Changes = Mutable<L1Changes>;
 
-/**
- * The changes of one resource in one generated package, with each added element by a key instead of a count
- */
+/** One resource's changes in one package, with additions as keys so that an addition in both packages counts once */
 interface ResourceChanges extends Omit<L1Changes, 'additions'> {
   readonly added: Set<string>;
 }
 
 const LISTED_CHANGES = ['removed', 'requiredness', 'other', 'addedFields'] as const;
 
-/**
- * Add one resource's changes in each generated package to `changes`, listing a change that an earlier package has
- * only once
- */
+/** Add one resource's changes in each generated package to `changes`, each change once */
 function addResourceChanges(changes: MutableL1Changes, perPackage: ResourceChanges[]) {
   const renames = new Array<L1StructRename>();
   const listed: Record<(typeof LISTED_CHANGES)[number], L1Change[]> = {
@@ -219,17 +202,12 @@ interface StructPair {
   readonly positions: string[];
 }
 
-/**
- * The differences between a rendered property, attribute or field in the base and in the new database
- */
 interface FieldDifferences {
   readonly requiredness?: string;
   readonly type?: string;
 }
 
-/**
- * A field of a pair of structs where another pair of structs is: `key` is that other pair
- */
+/** A field of a struct pair whose type holds the struct pair `key` */
 interface PairLink {
   readonly name: string;
   readonly key: string;
@@ -300,13 +278,7 @@ class ResourceComparison {
     return this.changes;
   }
 
-  /**
-   * Name each renamed struct's positions as the type history gate does: the path from a resource property or
-   * attribute, for example `property Checks.C`, at every path the L1 renders it
-   *
-   * A struct the L1 renders only as a struct of its own, not at any such path (for example a later type of a
-   * property's history), keeps its positions as `field Struct.Field`.
-   */
+  /** Set the positions of each renamed struct, as `L1StructRename.positions` describes them */
   private placeRenames() {
     const renamed = new Set([...this.pairs].filter(([, p]) => p.base.name !== p.head.name).map(([key]) => key));
     // Walk only into pairs from which a rename can be reached, so paths are only spelled out where they are printed
@@ -362,10 +334,7 @@ class ResourceComparison {
     }
   }
 
-  /**
-   * Compare a rendered property, attribute or field, and pair the structs at the same places in its type, passing
-   * each pair's key to `link`
-   */
+  /** Compare two rendered fields, and pair the structs at the same places in their types, passing each key to `link` */
   private compareField(
     position: string,
     baseField: RenderedField,
@@ -386,11 +355,7 @@ class ResourceComparison {
     return { requiredness, type: baseType === headType ? undefined : `type changed from ${baseType} to ${headType}` };
   }
 
-  /**
-   * Pair the structs of two types that have them at the same place, in the same lists and maps
-   *
-   * Returns false if the types do not have that shape.
-   */
+  /** Pair the structs at the same place in two types, in the same lists and maps; false if the shapes differ */
   private pairStructs(
     position: string,
     baseType: PropertyType,
