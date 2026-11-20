@@ -9,49 +9,38 @@ import {
 } from '@aws-cdk/service-spec-types';
 
 /**
- * The packages that the CDK code generator, spec2cdk in aws-cdk, generates from this database
- *
- * - `aws-cdk-lib`: the L1 resource classes with their props and structs.
- * - `cfn-property-mixins`: `@aws-cdk/cfn-property-mixins`, a property mixin per resource with its own props and
- *   structs, all of whose properties and struct fields are optional.
+ * The packages that the CDK code generator, spec2cdk in aws-cdk, generates from this database: `aws-cdk-lib` (the L1
+ * resource classes) and `@aws-cdk/cfn-property-mixins` (a property mixin per resource)
  */
 export type GeneratedPackage = 'aws-cdk-lib' | 'cfn-property-mixins';
 
 export const GENERATED_PACKAGES: readonly GeneratedPackage[] = ['aws-cdk-lib', 'cfn-property-mixins'];
 
-/**
- * A property, attribute or struct field as CDK renders it
- */
+/** A property, attribute or struct field as CDK renders it */
 export interface RenderedField {
   readonly type: PropertyType;
   readonly required: boolean;
 }
 
 /**
- * The property that holds a resource's tags, as the CDK code generator finds it
- *
- * - `legacy`: an `ITaggable` resource. It is in the generator's table of legacy resources, which names the property.
- * - `modern`: an `ITaggableV2` resource. Its tag information names the property, and the resource has it.
+ * A resource's tag property: `legacy` for an `ITaggable` resource, named in `LEGACY_TAGGABLES`; `modern` for an
+ * `ITaggableV2` resource, named by its tag information
  */
 export interface TagProperty {
   readonly name: string;
   readonly style: 'legacy' | 'modern';
 }
 
-/**
- * The types of a resource property's type history that a generated package renders
- */
+/** The types of a resource property's type history that a package renders */
 export interface RenderedTypes {
-  /** The type the property has */
   readonly type: PropertyType;
-  /** The types whose structs the package renders: the property's type, and others as structs of their own */
+  /** The types whose structs the package renders, `type` among them */
   readonly structTypes: PropertyType[];
 }
 
 /**
- * The tag property of a resource, or undefined if the CDK code generator renders it without tags
- *
- * The generator's table of legacy resources comes first (`resourceTaggabilityStyle` in spec2cdk's `tagging.ts`).
+ * The tag property of a resource, or undefined if the CDK code generator renders it without tags. The legacy table
+ * comes first, as in spec2cdk's `resourceTaggabilityStyle` (`tagging.ts`).
  */
 export function tagProperty(resource: Resource): TagProperty | undefined {
   const legacy = LEGACY_TAGGABLES[resource.cloudFormationType];
@@ -65,11 +54,11 @@ export function tagProperty(resource: Resource): TagProperty | undefined {
 /**
  * Which types of the type history `types` (oldest first) a package renders for the resource property `name`
  *
- * - A property other than the tag property has the oldest type, and renders the later types of its history as
- *   structs of their own (spec2cdk's `ResourceDecider.handleTypeHistoryTypes`).
- * - A legacy tag property has the oldest type, a modern one the newest (`TypeConverter.typeFromPropertyForModernTags`).
- *   aws-cdk-lib renders the structs of no other type of its history. cfn-property-mixins also resolves every property
- *   with its oldest type (`cfn-prop-mixins/builder.ts`), so it renders the structs of the oldest type too.
+ * - Any property but the tag property: the oldest type, and the later types as structs of their own (spec2cdk's
+ *   `ResourceDecider.handleTypeHistoryTypes`).
+ * - The tag property: the oldest type if legacy, the newest if modern (`TypeConverter.typeFromPropertyForModernTags`),
+ *   and no other type's structs. cfn-property-mixins resolves every property with its oldest type
+ *   (`cfn-prop-mixins/builder.ts`), so it adds the structs of that one.
  */
 export function renderedPropertyTypes(
   resource: Resource,
@@ -85,10 +74,6 @@ export function renderedPropertyTypes(
   return { type, structTypes: pkg === 'cfn-property-mixins' ? [...new Set([type, types[0]])] : [type] };
 }
 
-/**
- * Whether a package renders a resource property as required: aws-cdk-lib a required property other than the tag
- * property; cfn-property-mixins none
- */
 export function renderedPropertyRequired(
   resource: Resource,
   name: string,
@@ -98,9 +83,7 @@ export function renderedPropertyRequired(
   return pkg === 'aws-cdk-lib' && tagProperty(resource)?.name !== name && !!property.required;
 }
 
-/**
- * The type that a struct field or an attribute renders, in both packages: the oldest of its type history
- */
+/** The type that a struct field or an attribute renders in both packages: the oldest of its type history */
 export function renderedFieldType(field: Pick<Property, 'type' | 'previousTypes'>): PropertyType {
   return new RichTypedField(field).types()[0];
 }
@@ -108,17 +91,13 @@ export function renderedFieldType(field: Pick<Property, 'type' | 'previousTypes'
 /**
  * What CDK renders as L1 code for one resource, in one generated package
  *
- * This follows the CDK code generator: the types of resource properties are `renderedPropertyTypes()`, and struct
- * fields and attributes render `renderedFieldType()`. aws-cdk-lib also renders the type definitions flagged
- * `mustRenderForBwCompat`; cfn-property-mixins does not, and renders every property and struct field optional. The
- * mixins render no attributes, only the structs of their types, so `attributes` is the same in both packages.
+ * cfn-property-mixins leaves out the structs flagged `mustRenderForBwCompat` and renders every property and field
+ * optional. It renders no attributes, only the structs of their types, so `attributes` is the same in both packages.
  */
 export class L1View {
   public readonly properties: Record<string, RenderedField>;
   public readonly attributes: Record<string, RenderedField>;
-  /**
-   * The rendered structs, by name
-   */
+  /** The rendered structs, by name */
   public readonly structs = new Map<string, TypeDefinition>();
 
   constructor(
@@ -147,9 +126,6 @@ export class L1View {
     }
   }
 
-  /**
-   * The rendered fields of a struct
-   */
   public fields(struct: TypeDefinition): Record<string, RenderedField> {
     return mapValues(struct.properties, (prop) => ({
       type: renderedFieldType(prop),
@@ -174,19 +150,12 @@ export class L1View {
   }
 }
 
-/**
- * How the L1 change report and the type history gate name a resource property or attribute, for example
- * `property Settings`
- */
+/** How reports name a resource property or attribute, for example `property Settings` */
 export function fieldLabel(bag: 'properties' | 'attributes', name: string): string {
   return `${bag === 'properties' ? 'property' : 'attribute'} ${name}`;
 }
 
-/**
- * The type as L1 code renders it, with structs by name
- *
- * Integers and numbers are the same in L1 code, and allowed values are not rendered.
- */
+/** The type as L1 code renders it: structs by name, integers as numbers and no allowed values */
 export function renderType(db: SpecDatabase, type: PropertyType): string {
   switch (type.type) {
     case 'integer':
@@ -208,9 +177,7 @@ export function renderType(db: SpecDatabase, type: PropertyType): string {
   }
 }
 
-/**
- * The structs a type refers to, looking into lists, maps and unions
- */
+/** The structs a type names, inside lists, maps and unions too, but not the structs of their fields */
 export function referencedStructs(db: SpecDatabase, type: PropertyType): TypeDefinition[] {
   switch (type.type) {
     case 'array':

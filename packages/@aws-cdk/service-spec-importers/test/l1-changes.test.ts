@@ -334,7 +334,6 @@ describe('tag properties render as the CDK code generator renders them', () => {
   // Also in that table; imported here without tag information
   const LEGACY_UNTAGGED = 'AWS::OpsWorks::Layer';
 
-  /** `Tags` as a required list of the named struct, whose fields are strings */
   const tagList = (struct: string, fields = ['Key', 'Value'], required: string[] = []) => ({
     properties: { Tags: { type: 'array', items: ref(struct) } as jsonschema.Schema },
     definitions: { [struct]: object(Object.fromEntries(fields.map((f) => [f, str()])), required) },
@@ -349,7 +348,7 @@ describe('tag properties render as the CDK code generator renders them', () => {
       : { properties: { Tags: ref('Settings') }, definitions: { Settings: object({ Url: str() }) } };
   const untagged = (schema: Partial<CloudFormationRegistryResource>) => ({ ...schema, tagging: { taggable: false } });
 
-  /** Import the schemas one after the other, so that each property's type history has their types, oldest first */
+  /** Each import adds its types to the type history, so the schemas go oldest first */
   const importVersions = (
     target: SpecDatabase,
     typeName: string,
