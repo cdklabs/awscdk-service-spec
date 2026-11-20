@@ -40,7 +40,10 @@ export interface BreakingChange {
   /** The resource type, or the service's CloudFormation namespace for a metric of the service */
   readonly resource: string;
   readonly kind: BreakingChangeKind;
-  /** The property, field (`Struct.Field`), attribute, type, metric or struct that changed; empty for a resource */
+  /**
+   * The property, field (`Struct.Field`, or a position path, see `renamedFieldPrefixes()`), attribute, type, metric or
+   * struct that changed; empty for a resource
+   */
   readonly element: string;
   /** The changelog description, without the final full stop, for example `Name property is now required` */
   readonly description: string;
@@ -124,7 +127,7 @@ export function findBreakingChanges(
       compareByCodeUnit(a.element, b.element) ||
       compareByCodeUnit(a.description, b.description),
   );
-  // A struct's change can also be found at a property that switched from it; equal changes sort next to each other
+  // A struct's change is also found at a property of the same name that switched from it; equal ones sort together
   return changes.filter((c, i) => i === 0 || sortKey(c) !== sortKey(changes[i - 1]));
 }
 
