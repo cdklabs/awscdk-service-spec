@@ -227,9 +227,7 @@ class TypeHistoryApplier {
         .reverse()
         .map((t) => new RichPropertyType(t).stringify(this.db, false))
         .join(' <- ');
-    const sorted = positions
-      .map((p) => ({ ...p, key: key(p) }))
-      .sort((a, b) => compareByCodeUnit(a.key, b.key));
+    const sorted = positions.map((p) => ({ ...p, key: key(p) })).sort((a, b) => compareByCodeUnit(a.key, b.key));
     for (const p of sorted.filter((q) => !q.typeUnchanged)) {
       rich.updateType(p.cfnType);
     }
