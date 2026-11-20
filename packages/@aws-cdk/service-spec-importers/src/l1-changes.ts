@@ -358,7 +358,7 @@ class ResourceComparison {
     return { requiredness, type: baseType === headType ? undefined : `type changed from ${baseType} to ${headType}` };
   }
 
-  /** Pair the structs at the same place in two types, in the same lists and maps; false if the shapes differ */
+  /** Pair the structs at the same place in two types, in the same lists and maps; false if they have no struct there */
   private pairStructs(
     position: string,
     baseType: PropertyType,
