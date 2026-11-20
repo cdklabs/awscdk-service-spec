@@ -26,15 +26,11 @@ import {
   VisitedPosition,
 } from './type-history-model';
 
-/**
- * What applying one resource's type history reads and writes
- */
 export interface TypeHistoryApplyContext {
-  /** The database with the current sources, which the decisions are written into */
+  /** The current sources, which the decisions are written into */
   readonly db: SpecDatabase;
   readonly released: SpecDatabase;
   readonly releasedResource: Resource;
-  /** The resource in `db` */
   readonly resource: Resource;
   readonly positions: readonly Position[];
   readonly round: Round;
@@ -56,7 +52,7 @@ class TypeHistoryApplier {
   private readonly positions: readonly Position[];
   private readonly round: Round;
   private readonly currentByName: ReadonlyMap<string, TypeDefinition>;
-  /** The type definition in `db` for each kept released type definition (by released id) */
+  /** The type definition in `db` that keeps each released one, by released `$id` */
   private readonly targets = new Map<string, TypeDefinition>();
 
   constructor(context: TypeHistoryApplyContext) {
@@ -70,9 +66,7 @@ class TypeHistoryApplier {
   }
 
   /**
-   * Write the decisions into `db`, in this order: plan the kept types' fields from the current sources, before any of
-   * their type definitions change, write them, put the released histories first, and carry the flags for backwards
-   * compatibility
+   * Plan every kept type's fields before writing any: the plans read current type definitions that the writes change
    */
   public apply() {
     const { plans, ownFields } = this.planFields();
@@ -82,12 +76,10 @@ class TypeHistoryApplier {
   }
 
   /**
-   * The fields each kept type definition gets, with their requiredness and the field that types them
+   * The fields each kept type gets, with their requiredness and the field that types each
    *
-   * `ownFields` holds the kept types whose target, the current type definition of their name, is a type the current
-   * sources give one of their positions, so that its own fields are CloudFormation's there. Otherwise it describes
-   * nothing the L1 renders as the kept type, and CloudFormation's types at the positions, or the release, type its
-   * fields.
+   * `ownFields` holds the kept types whose target (the current type of their name) stands at one of their positions,
+   * so its own fields are CloudFormation's there. Any other target's fields describe nothing the L1 renders.
    */
   private planFields() {
     const plans = new Map<TypeDefinition, FieldPlan>();
@@ -101,7 +93,6 @@ class TypeHistoryApplier {
       if (own) {
         ownFields.add(releasedType);
       }
-      // cfn-property-mixins renders every field optional, so a use only it renders does not decide requiredness
       const deciding = constrainingUses(decision.stays);
       plans.set(
         releasedType,
@@ -122,9 +113,6 @@ class TypeHistoryApplier {
     return { plans, ownFields };
   }
 
-  /**
-   * Give each kept type definition its planned fields, and its released flag for backwards compatibility
-   */
   private writeFields(plans: Map<TypeDefinition, FieldPlan>) {
     for (const [releasedType, plan] of plans) {
       const target = this.target(releasedType);
@@ -153,8 +141,7 @@ class TypeHistoryApplier {
   }
 
   /**
-   * Put the released histories first: at the positions that count, grouped by the field they are, and at the kept
-   * released fields that no position reached
+   * Put the released histories first, at the positions that count and at kept released fields no position reached
    */
   private updateHistories(plans: Map<TypeDefinition, FieldPlan>, ownFields: Set<TypeDefinition>) {
     const byOwner = new Map<string, VisitedPosition[]>();
@@ -172,9 +159,8 @@ class TypeHistoryApplier {
         this.updateHistory(field, positions[0].releasedField, positions);
       }
     }
-    // A kept released field that no position reached, for example below a position whose CloudFormation type has
-    // another shape, keeps its released history too, followed by the type of the current type definition of its name
-    // where that is a type the current sources give one of its positions
+    // A kept released field no position reached keeps its released history, followed by the current field's type
+    // where the target's own fields are CloudFormation's (`ownFields`)
     for (const [releasedType, plan] of plans) {
       const target = this.target(releasedType);
       for (const { name } of plan) {
@@ -194,8 +180,7 @@ class TypeHistoryApplier {
   }
 
   /**
-   * Keep the backwards compatibility flag of each released type definition that has it and that no decision covers,
-   * on its type definition in `db` (decided ones get it in `writeFields`)
+   * Carry the backwards compatibility flag of released types no decision covers; `writeFields` carries the kept ones
    */
   private carryBwCompatFlags() {
     for (const { entity } of this.released.follow('usesType', this.releasedResource)) {
@@ -209,10 +194,8 @@ class TypeHistoryApplier {
   }
 
   /**
-   * Put the released history first at the positions of one property, attribute or field (rules 1 and 2)
-   *
-   * The field is updated in place, because a nested read-only field is the same object as its attribute, and keeps
-   * all its other details.
+   * Put the released history first at the positions of one field (rules 1 and 2). Updates the field in place, because
+   * a nested read-only field is the same object as its attribute.
    */
   private updateHistory(
     field: Field,
@@ -241,16 +224,12 @@ class TypeHistoryApplier {
     );
   }
 
-  /**
-   * The field of CloudFormation's type at a use, or else of another current type at its position
-   */
   private fieldAt(use: Use, name: string): Property | undefined {
     return use.cfn?.properties[name] ?? use.position.currentTypes.find((t) => t.properties[name])?.properties[name];
   }
 
   /**
-   * A released field for a kept type definition, or undefined if neither its released types nor a current field can
-   * give it a type
+   * A released field for a kept type, or undefined if neither its released types nor `current` can give it a type
    */
   private keptReleasedField(releasedField: Field, current?: Field): Property | undefined {
     const field = structuredClone(releasedField);
@@ -270,8 +249,7 @@ class TypeHistoryApplier {
   }
 
   /**
-   * Translate a released type into the same type in `db`, or undefined if it refers to a type definition that is
-   * not kept
+   * The same type in `db`, or undefined if it refers to a type definition that is not kept
    */
   private translate(type: PropertyType): PropertyType | undefined {
     switch (type.type) {
@@ -296,9 +274,8 @@ class TypeHistoryApplier {
   /**
    * The type definition in `db` for a released one, or undefined if the L1 no longer renders it
    *
-   * A released type definition that follows CloudFormation at all its positions is CloudFormation's type of its name,
-   * if there is one. A released type definition that is not rendered at a position the current sources have, like a
-   * later type of a property's history, is kept as the current type of its name, or else as released.
+   * One that follows CloudFormation everywhere is the current type of its name, if any. One without a decision, like a
+   * later type of a property's history, is the current type of its name or else kept as released.
    */
   private typeFor(releasedType: TypeDefinition): TypeDefinition | undefined {
     const existing = this.targets.get(releasedType.$id);

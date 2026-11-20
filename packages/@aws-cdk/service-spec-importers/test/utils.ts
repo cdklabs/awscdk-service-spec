@@ -11,12 +11,9 @@ export function patchObject(obj: any, fn: Patcher<JsonObjectLens>): any {
   return patchedObj;
 }
 
-/** The resource type of the type history and L1 change fixtures */
 export const RESOURCE = 'AWS::Some::Type';
 
-/**
- * Import a CloudFormation registry schema of a resource, by default `RESOURCE`
- */
+/** Import a CloudFormation registry schema, by default for `RESOURCE` */
 export function importRegistry(
   target: SpecDatabase,
   schema: Partial<CloudFormationRegistryResource>,
@@ -36,9 +33,7 @@ export function importRegistry(
   });
 }
 
-/**
- * Import `RESOURCE` and its property types from the (legacy) resource specification
- */
+/** Import `RESOURCE` and its property types from the legacy resource specification */
 export function importLegacySpec(
   target: SpecDatabase,
   options: {
@@ -68,8 +63,8 @@ export function ref(name: string): jsonschema.Reference {
   return { $ref: `#/definitions/${name}` };
 }
 
-// Each call gives a new schema object: the registry import writes a marker into each schema it resolves
-// (`setResolvedReference`), so fixtures must not share one
+// A new object per call: the registry import marks each schema it resolves (`setResolvedReference`), so fixtures
+// must not share one
 export function str(): jsonschema.Schema {
   return { type: 'string' };
 }

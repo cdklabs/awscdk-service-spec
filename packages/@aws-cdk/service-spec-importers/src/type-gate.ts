@@ -25,11 +25,7 @@ const WHY: Record<UndecidedKind, string> = {
 };
 
 /**
- * The type history gate: it fails when the matcher left a released type definition undecided
- *
- * Settled renames, merges and splits, weak matches among them, merged and split types that follow CloudFormation,
- * modern tag properties whose type follows CloudFormation, applied mapping entries and entries that apply nowhere are
- * reported only.
+ * The type history gate: it fails exactly when the matcher left a released type undecided, and reports the rest
  */
 export function typeGate(result: TypeHistoryResult, options: TypeGateOptions): TypeGate {
   const failed = result.undecided.length > 0;

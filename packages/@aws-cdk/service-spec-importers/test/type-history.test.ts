@@ -1468,8 +1468,7 @@ describe('a kept struct below a union change', () => {
     );
 
     test('the released name is compared below the member where the tag property turns into a union', () => {
-      // A modern tag property renders the newest type of its history, so the L1 renders SettingsV2 with Extra, as
-      // where a property turns into a union; the mixins still render the released Settings too
+      // The modern tag property renders its newest type, SettingsV2 with Extra; the mixins also render Settings
       setup(settingsV2OrString, false, 'Tags');
 
       const result = run();

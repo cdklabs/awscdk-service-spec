@@ -1,14 +1,7 @@
 import { TypeMapping } from '../type-mappings';
 
 /**
- * Why the matcher cannot decide how a released type definition continues
- *
- * - `no-pair`: at a position where CloudFormation changed its type, no current type shares a field with it.
- * - `ambiguous`: at such a position, more than one current type does.
- * - `diverging`: its positions need different fields, and it is neither a merge nor a split, or it is one that follows
- *   CloudFormation and the positions where it keeps its name need different fields.
- * - `interdependent`: whether it follows CloudFormation depends on whether other types do, and the rounds that decide
- *   them do not settle, so the build does not choose, even where only one result would fit.
+ * Why the matcher cannot decide how a released type definition continues: the cases of "Type history gate" in README.md
  */
 export type UndecidedKind = 'no-pair' | 'ambiguous' | 'diverging' | 'interdependent';
 
@@ -42,8 +35,7 @@ export interface SettledChange {
 }
 
 /**
- * A current type that a settled rename, merge or split pairs with a released type, sharing fewer than half of the
- * released type's fields (or none, if the released type has none)
+ * A weak match among the settled renames, merges and splits ("Type history gate" in README.md)
  */
 export interface WeakMatch {
   readonly resource: string;
@@ -58,8 +50,7 @@ export interface WeakMatch {
 }
 
 /**
- * A merged or split released type definition whose positions now render a CloudFormation type of another name, a
- * reported type break
+ * A merged or split released type that now follows CloudFormation's type of another name, a reported type break
  */
 export interface SwitchedType {
   readonly resource: string;
@@ -72,10 +63,6 @@ export interface SwitchedType {
 
 /**
  * A modern tag property whose type CloudFormation changed, a reported type break
- *
- * The generated packages render the newest type of a modern tag property's history, so there they render
- * CloudFormation's type, whatever the released history keeps. The released types stay first in the history, so
- * cfn-property-mixins still renders the structs of the oldest one.
  */
 export interface TagTypeBreak {
   readonly resource: string;
@@ -102,11 +89,9 @@ export interface InactiveMapping {
 export interface TypeHistoryResult {
   readonly undecided: UndecidedCase[];
   readonly settled: SettledChange[];
-  /** The settled changes whose current type shares few released fields; they do not fail the gate */
   readonly weak: WeakMatch[];
-  /** The merged and split types that follow CloudFormation's types; they do not fail the gate */
+  /** The merged and split types that follow CloudFormation's types */
   readonly switched: SwitchedType[];
-  /** The modern tag properties that follow CloudFormation's type; they do not fail the gate */
   readonly tagBreaks: TagTypeBreak[];
   readonly applied: AppliedMapping[];
   readonly inactive: InactiveMapping[];

@@ -41,30 +41,11 @@ import { matchShape, sameNameOrSharedField } from '../type-pairing';
 export * from './type-history-result';
 
 /**
- * Keep the L1 types of a released database in `db`, which must already hold the current sources
+ * Keep the L1 types of the released database in `db`, which must already hold the current sources
  *
- * The rules, the merge and split rule and the mapping kinds are stated in "Released database baseline" in README.md.
- * Per resource that both databases have, the steps are:
- *
- * 1. Collect the positions where the released L1 renders a type definition, as `renderedPropertyTypes()` and
- *    `renderedFieldType()` in l1-view.ts say, pair each with CloudFormation's type there, and add the positions where
- *    CloudFormation uses a current type definition of a released name. A modern tag property renders the newest type
- *    of its history, so where CloudFormation changed its type the build adds CloudFormation's type last and the L1
- *    renders it there: no released type is kept there. (Where CloudFormation's type is already an older type of the
- *    released history, the build does not add it again, and the L1 keeps rendering the released newest type there,
- *    by name and without comparing it with CloudFormation's.) The released types whose structs only
- *    cfn-property-mixins renders there keep their released fields, plus those their other positions need; they do not
- *    decide the fields or requiredness aws-cdk-lib renders, and a position that lacks one of their released fields
- *    leaves them undecided.
- * 2. Decide every released type definition in rounds: by its mapping entry, else by the merge and split rule, else
- *    from the fields its positions need. Each round counts again the positions the decisions render, until they
- *    settle.
- * 3. Report the undecided, settled, switched and weak cases and the applied and inactive entries.
- * 4. Apply the decisions to `db`: the kept type definitions' fields, the released histories first, and the flags for
- *    backwards compatibility. Then report the modern tag properties whose rendered type changed, as type breaks.
- *
- * Undecided type definitions keep their released fields plus all carried ones, and are returned with the entries that
- * would decide them.
+ * Applies the rules of "Released database baseline" in README.md to each resource both databases have, changing `db`
+ * in place, and returns what the type history gate reports. A type the rules cannot decide keeps its released fields
+ * plus all carried ones, and its case lists the mapping entries that would decide it.
  */
 export function importTypeHistory(
   db: SpecDatabase,
@@ -167,7 +148,7 @@ class ResourceTypeHistory {
   }
 
   /**
-   * Record a position and the released type definitions the L1 renders there, then the fields they keep
+   * Record a position and the released types the L1 renders there, then visit the fields they keep
    */
   private visit(
     label: string,
@@ -198,15 +179,13 @@ class ResourceTypeHistory {
     };
     this.positions.push(position);
 
-    // Where CloudFormation put the type into a list or map, or took it out, the structs inside pair and are compared
-    // as at any other position, while the L1 keeps rendering the released type
+    // A type put into or taken out of a list or map still pairs the structs inside (rule 2)
     const pairs =
       rendered &&
       (matchShape(this.released, rendered, this.db, cfnType) ??
         matchShape(this.released, insideContainers(rendered), this.db, insideContainers(cfnType)));
     const renderedStructs = rendered ? unique(referencedStructs(this.released, rendered)) : [];
-    // The mixins render these as structs of their own, not as the position's type, so CloudFormation's type there does
-    // not describe them: they keep their released fields, and take those their other uses need
+    // Only the mixins render these, as structs of their own, so CloudFormation's type here does not describe them
     const mixinsStructs = unique(mixinsOnly.flatMap((t) => referencedStructs(this.released, t))).filter(
       (s) => !renderedStructs.includes(s),
     );
@@ -245,11 +224,8 @@ class ResourceTypeHistory {
   }
 
   /**
-   * The released type the L1 renders at a position once the build has put the released history first, and the
-   * released types only cfn-property-mixins renders the structs of there
-   *
-   * `rendered` is undefined where the L1 renders CloudFormation's type instead, whatever the history keeps: at a modern
-   * tag property whose type CloudFormation changed, which renders the newest type of its history.
+   * The released type aws-cdk-lib renders here once the released history comes first, undefined where it renders
+   * CloudFormation's (a changed modern tag property), and the types whose structs only cfn-property-mixins renders
    */
   private renderedReleasedTypes(
     owner: Owner,
@@ -260,7 +236,7 @@ class ResourceTypeHistory {
     if (owner.bag !== 'properties') {
       return { rendered: renderedFieldType(releasedField), mixinsOnly: [] };
     }
-    // Where CloudFormation changed the type, the build adds it to the released history
+    // The build adds a changed type to the released history (rule 2)
     const releasedTypes = new RichTypedField(releasedField).types();
     const history = typeUnchanged ? releasedTypes : [...releasedTypes, cfnType];
     const lib = renderedPropertyTypes(this.resource, owner.name, history, 'aws-cdk-lib');
@@ -272,12 +248,8 @@ class ResourceTypeHistory {
   }
 
   /**
-   * Record the released type definitions at the fields of a kept released type that CloudFormation's types do not
-   * reach, because CloudFormation's type at its position has another shape or no pair
-   *
-   * They keep exactly their released fields there, and are compared like any other use, so a current type of their
-   * name that CloudFormation uses elsewhere with other fields leaves them undecided. Below a struct that only
-   * cfn-property-mixins renders, only it renders them too.
+   * Record the released types below a kept type that CloudFormation's types do not reach (another shape or no pair).
+   * They need exactly their released fields there and are compared like any other use.
    */
   private visitUnreached(label: string, releasedType: TypeDefinition, ancestry: string[], parentUse: Use) {
     for (const [name, field] of Object.entries(releasedType.properties)) {
@@ -309,8 +281,7 @@ class ResourceTypeHistory {
   }
 
   /**
-   * Add the positions where CloudFormation uses a current type definition of a released name and the released L1
-   * does not, so that rule 3 compares them too: the kept type definition is that current one
+   * Add the positions where CloudFormation uses the current type of a released name and the released L1 does not
    */
   private addCurrentOnlyPositions() {
     const visited = new Set(this.positions.map((p) => p.currentField).filter(isDefined));
@@ -339,8 +310,7 @@ class ResourceTypeHistory {
   }
 
   /**
-   * Where CloudFormation's types refer to each current type definition: the newest types of the properties and
-   * attributes, and of the fields of the type definitions those reach
+   * Where CloudFormation's newest types use each current type definition, at any depth
    */
   private cloudFormationPositions(): Map<TypeDefinition, CloudFormationPosition[]> {
     const positions = new Map<TypeDefinition, CloudFormationPosition[]>();
@@ -366,23 +336,18 @@ class ResourceTypeHistory {
   }
 
   /**
-   * Whether the L1 renders a position: one that only the current sources have counts only where the L1 renders the
-   * current field it is
+   * Whether the L1 renders a position; a current-only one only where it renders the current field it is
    */
   private rendered(position: Position, round: Round) {
     return !position.within || round.renderedFields.has(fieldKey(position.within));
   }
 
   /**
-   * The fields of current type definitions that CloudFormation's types reach through the properties, attributes and
-   * fields the L1 renders, each with the first place the L1 renders it, so a field below one the L1 leaves out, at any
-   * depth, is not among them
+   * The fields of current type definitions that the L1 renders, each with the first place it renders them
    *
-   * Where the L1 renders kept type definitions at a position, it renders the fields of the CloudFormation types they
-   * are paired with that the kept ones keep. A resource property that renders the structs of the newest type of its
-   * history, CloudFormation's (see `rendersNewestType()`), also renders the fields of each CloudFormation type, except
-   * those that a kept type definition of its name leaves out. Elsewhere the L1 renders those fields only where no kept
-   * type definition is rendered.
+   * Where kept released types stay at a position, the L1 renders the fields they keep. Where none stays, and also at a
+   * property that renders the structs of its newest type (`rendersNewestType()`), it renders CloudFormation's fields
+   * less those a kept type of the same name leaves out.
    */
   private renderedCurrentFields(round: DecidedRound): Map<string, string> {
     const keptAt = new Map<Field, Use[]>();
@@ -439,10 +404,8 @@ class ResourceTypeHistory {
   }
 
   /**
-   * Whether a resource property renders the structs of CloudFormation's type even where a kept released type stays
-   * there: the build puts that type after the released history, and a property other than the tag property renders
-   * the later types of its history as structs of their own, a modern tag property the newest as its type, and a
-   * legacy one neither
+   * Whether a resource property renders the structs of CloudFormation's type, put last in its history, even where a
+   * kept released type stays (see `renderedPropertyTypes()`)
    */
   private rendersNewestType(name: string, field: Field) {
     const released = this.releasedResource.properties[name];
@@ -451,8 +414,7 @@ class ResourceTypeHistory {
   }
 
   /**
-   * Whether the L1 renders a field of a current type definition of the resource: not if it keeps a released type
-   * definition of its name that leaves the field out
+   * Whether the L1 renders a field of a current type: not where a kept released type of its name leaves it out
    */
   private keepsField(typeDef: TypeDefinition, name: string, round: DecidedRound) {
     const released = this.releasedByName.get(typeDef.name);
@@ -492,19 +454,15 @@ class ResourceTypeHistory {
   }
 
   /**
-   * Decide every released type definition, until the positions that count are those the decisions render
+   * Decide every released type in rounds, until the positions that count are those the decisions render
    *
-   * A position whose parent type definition the L1 no longer renders there does not count, and neither does a
-   * position that only the current sources have at or below a field a kept type definition leaves out. Each round
-   * counts the positions again from all of them, so a position left out because its parent followed CloudFormation in
-   * an earlier round counts again once that parent stays. Where the rounds come back to positions they counted before
-   * without settling, the released types whose positions changed are undecided.
+   * Each round counts again from all positions, so a position left out under one round can count in the next. Rounds
+   * that come back to an earlier set without settling leave the types whose positions changed undecided.
    */
   private decideAll(): Round {
     let active: ReadonlySet<Position> = new Set(this.positions);
     const seen = new Set<string>([this.activeKey(active)]);
-    // `seen` ends every cycle. The bound only stops a sequence of rounds that keeps changing without repeating; no
-    // known input reaches it, see the fallback below.
+    // `seen` ends every cycle; the bound only stops rounds that change without repeating, which no known input does
     const maxRounds = this.positions.length + 1;
     for (let i = 0; i < maxRounds; i++) {
       const round = this.decideRound(active);
@@ -525,9 +483,6 @@ class ResourceTypeHistory {
     return this.activeKey(next) !== this.activeKey(active) ? this.decideInterdependent(round, next) : round;
   }
 
-  /**
-   * Decide every released type definition on the positions that count
-   */
   private decideRound(active: ReadonlySet<Position>): Round {
     const { mergeTargets, switched } = this.findMergesAndSplits(active);
     const decisions = new Map<TypeDefinition, Decision>();
@@ -562,8 +517,7 @@ class ResourceTypeHistory {
   }
 
   /**
-   * Decide the positions of both rounds, and leave undecided each released type whose positions differ between them,
-   * because the rounds that decide whether it follows CloudFormation do not settle
+   * Decide on the positions of both rounds, leaving each released type whose positions differ between them undecided
    */
   private decideInterdependent(round: Round, next: ReadonlySet<Position>): Round {
     const changed = new Set([...next, ...round.active].filter((p) => next.has(p) !== round.active.has(p)));
@@ -604,7 +558,6 @@ class ResourceTypeHistory {
       }
     }
 
-    // A use that only cfn-property-mixins renders takes the fields the others need, if they keep its released ones
     const needs = constrainingUses(uses).map((u) => need(u));
     const keepAll = releasedAnd(
       releasedType,
@@ -633,14 +586,10 @@ class ResourceTypeHistory {
   }
 
   /**
-   * Find the merges, and the merged and split released type definitions that follow CloudFormation, at the positions
-   * that count
+   * The merge targets, and the released types that switch by the rule for merged and split types in README.md
    *
-   * A merge or split follows CloudFormation where one of CloudFormation's types has a field the released type lacks,
-   * or where the positions of the released type need different fields. A released type definition that a mapping
-   * entry decides, or that has a position without a pair, does not follow CloudFormation by this rule. Whether a merged
-   * type has a field one of its released types lacks counts every one of them, so such a type still makes the others
-   * follow that way; whether positions need different fields counts only the released types the rule decides.
+   * The rule skips a type that an entry decides or that has an unpaired use. Such a type still switches the others of
+   * its merge when the merged type has a field it lacks, but not when its own positions need different fields.
    */
   private findMergesAndSplits(active: ReadonlySet<Position>) {
     const usesOf = new Map<TypeDefinition, Use[]>();
