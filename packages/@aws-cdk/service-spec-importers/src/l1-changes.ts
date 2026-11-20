@@ -1,5 +1,6 @@
 import { PropertyType, SpecDatabase, TypeDefinition } from '@aws-cdk/service-spec-types';
 import { fieldLabel, GENERATED_PACKAGES, L1View, RenderedField, renderType } from './l1-view';
+import { compareByCodeUnit } from './report/sorting';
 
 /**
  * A struct that the L1 renders under another name at the same positions, because its source renamed it or merged it
@@ -77,12 +78,13 @@ export function compareL1(base: SpecDatabase, head: SpecDatabase): L1Changes {
   }
 
   const byElement = (a: L1Change, b: L1Change) =>
-    a.resource.localeCompare(b.resource) || a.element.localeCompare(b.element);
+    compareByCodeUnit(a.resource, b.resource) || compareByCodeUnit(a.element, b.element);
   for (const rename of changes.renames) {
     rename.positions.sort();
   }
   changes.renames.sort(
-    (a, b) => a.resource.localeCompare(b.resource) || a.to.localeCompare(b.to) || a.from.localeCompare(b.from),
+    (a, b) =>
+      compareByCodeUnit(a.resource, b.resource) || compareByCodeUnit(a.to, b.to) || compareByCodeUnit(a.from, b.from),
   );
   changes.removed.sort(byElement);
   changes.requiredness.sort(byElement);
