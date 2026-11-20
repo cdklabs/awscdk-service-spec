@@ -172,7 +172,8 @@ function addResourceChanges(changes: MutableL1Changes, perPackage: ResourceChang
     for (const rename of resourceChanges.renames) {
       const same = earlierRenames.find((r) => r.from === rename.from && r.to === rename.to);
       if (same) {
-        same.positions.push(...rename.positions.filter((p) => !same.positions.includes(p)));
+        const positions = new Set(same.positions);
+        same.positions.push(...rename.positions.filter((p) => !positions.has(p)));
         same.fieldChanges.push(...rename.fieldChanges.filter((c) => !same.fieldChanges.includes(c)));
         same.fieldChanges.sort();
       } else {
@@ -302,7 +303,7 @@ class ResourceComparison {
         return;
       }
       if (renamed.has(key)) {
-        paths.set(key, [...(paths.get(key) ?? []), label]);
+        pushTo(paths, key, label);
       }
       // Recursive structs stop where they repeat
       if (ancestry.includes(key)) {
@@ -457,7 +458,12 @@ function unique<A>(xs: A[]): A[] {
 }
 
 function pushTo<K, V>(map: Map<K, V[]>, key: K, ...values: V[]) {
-  map.set(key, [...(map.get(key) ?? []), ...values]);
+  const list = map.get(key);
+  if (list) {
+    list.push(...values);
+  } else {
+    map.set(key, values);
+  }
 }
 
 function isDefined<A>(x: A | undefined): x is A {
