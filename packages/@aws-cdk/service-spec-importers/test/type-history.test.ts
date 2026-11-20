@@ -1098,6 +1098,46 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
   });
 });
 
+describe('the result does not depend on the input order or the locale', () => {
+  test('cases, their positions and type breaks are ordered by code unit, so upper case sorts before lower case', () => {
+    // localeCompare sorts DevOps before DMS, and DevSettings before DMSSettings, in every locale
+    for (const typeName of ['AWS::DevOps::R', 'AWS::DMS::R']) {
+      importRegistry(
+        released,
+        {
+          properties: {
+            DevSettings: ref('Settings'),
+            DMSSettings: ref('Settings'),
+            Tags: { type: 'array', items: ref('Kv') },
+          },
+          definitions: { Settings: object({ Url: str() }), Kv: object(strings(['Key', 'Value']), ['Key', 'Value']) },
+        },
+        typeName,
+      );
+      importRegistry(
+        db,
+        {
+          properties: {
+            DevSettings: ref('Options'),
+            DMSSettings: ref('Options'),
+            Tags: { type: 'array', items: ref('KvV2') },
+          },
+          definitions: { Options: object({ Mode: str() }), KvV2: object(strings(['Key', 'Value']), ['Key', 'Value']) },
+        },
+        typeName,
+      );
+    }
+
+    const result = run();
+
+    expect(result.undecided.map((c) => `${c.resource} ${c.positions.map((p) => p.position).join(', ')}`)).toEqual([
+      'AWS::DMS::R property DMSSettings, property DevSettings',
+      'AWS::DevOps::R property DMSSettings, property DevSettings',
+    ]);
+    expect(result.tagBreaks.map((b) => b.resource)).toEqual(['AWS::DMS::R', 'AWS::DevOps::R']);
+  });
+});
+
 describe('settled renames whose current type shares fewer than half of the released fields', () => {
   const setup = (releasedFields: string[], currentFields: string[]) => {
     importRegistry(released, {

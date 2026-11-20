@@ -35,6 +35,7 @@ import {
 import { reportTagBreaks, reportTypeHistory } from './type-history-report';
 import { TypeHistoryResult } from './type-history-result';
 import { fieldLabel, referencedStructs, renderedFieldType, renderedPropertyTypes } from '../l1-view';
+import { compareByCodeUnit } from '../report/sorting';
 import { TypeMapping } from '../type-mappings';
 import { matchShape, sameNameOrSharedField } from '../type-pairing';
 
@@ -79,12 +80,14 @@ export function importTypeHistory(
   }
 
   const byType = (a: { resource: string; releasedType: string }, b: { resource: string; releasedType: string }) =>
-    a.resource.localeCompare(b.resource) || a.releasedType.localeCompare(b.releasedType);
+    compareByCodeUnit(a.resource, b.resource) || compareByCodeUnit(a.releasedType, b.releasedType);
   result.undecided.sort(byType);
   result.settled.sort(byType);
-  result.weak.sort((a, b) => byType(a, b) || a.newType.localeCompare(b.newType));
-  result.switched.sort((a, b) => byType(a, b) || a.newType.localeCompare(b.newType));
-  result.tagBreaks.sort((a, b) => a.resource.localeCompare(b.resource) || a.position.localeCompare(b.position));
+  result.weak.sort((a, b) => byType(a, b) || compareByCodeUnit(a.newType, b.newType));
+  result.switched.sort((a, b) => byType(a, b) || compareByCodeUnit(a.newType, b.newType));
+  result.tagBreaks.sort(
+    (a, b) => compareByCodeUnit(a.resource, b.resource) || compareByCodeUnit(a.position, b.position),
+  );
   result.applied.sort((a, b) => mappings.indexOf(a.entry) - mappings.indexOf(b.entry));
   result.inactive.sort((a, b) => mappings.indexOf(a.entry) - mappings.indexOf(b.entry));
   return result;
