@@ -247,7 +247,12 @@ export function releasedAnd(releasedType: TypeDefinition, names: string[]): stri
 }
 
 export function pushTo<K, V>(map: Map<K, V[]>, key: K, ...values: V[]) {
-  map.set(key, [...(map.get(key) ?? []), ...values]);
+  const list = map.get(key);
+  if (list) {
+    list.push(...values);
+  } else {
+    map.set(key, values);
+  }
 }
 
 export function fieldKey({ typeDef, name }: CurrentField) {
