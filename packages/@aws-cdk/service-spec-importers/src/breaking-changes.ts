@@ -299,20 +299,21 @@ function typeDefinition(db: SpecDatabase, resourceType: string, name: string): T
   return found[0].entity;
 }
 
-/** Whether rendered type `to` accepts every value that `from` accepts */
+/**
+ * Whether rendered type `to` widens `from`: each member of `from` has a member of `to` that is `json`, the same type,
+ * or a list or map of the same kind whose element type widens
+ */
 function widens(from: string, to: string): boolean {
-  if (to === 'json') {
+  const toMembers = unionMembers(to);
+  return unionMembers(from).every((m) => toMembers.some((t) => memberWidens(m, t)));
+}
+
+function memberWidens(from: string, to: string): boolean {
+  if (to === 'json' || from === to) {
     return true;
   }
-  const [fromMembers, toMembers] = [unionMembers(from), unionMembers(to)];
-  if (fromMembers.length === 1 && toMembers.length === 1) {
-    for (const wrapper of ['Array<', 'Map<string, ']) {
-      if (from.startsWith(wrapper) && to.startsWith(wrapper)) {
-        return widens(from.slice(wrapper.length, -1), to.slice(wrapper.length, -1));
-      }
-    }
-  }
-  return fromMembers.every((m) => toMembers.includes(m));
+  const wrapper = ['Array<', 'Map<string, '].find((w) => from.startsWith(w) && to.startsWith(w));
+  return wrapper !== undefined && widens(from.slice(wrapper.length, -1), to.slice(wrapper.length, -1));
 }
 
 function unionMembers(type: string): string[] {

@@ -6,7 +6,7 @@ import { Deprecation, emptyDatabase, SpecDatabase } from '@aws-cdk/service-spec-
 import { importLegacySpec, importRegistry, object, ref, RESOURCE, str } from './utils';
 import { findBreakingChanges, formatBreakingChanges } from '../src/breaking-changes';
 import { compareL1, formatL1Changes } from '../src/l1-changes';
-import { CloudFormationRegistryResource, resourcespec } from '../src/types';
+import { CloudFormationRegistryResource, jsonschema, resourcespec } from '../src/types';
 
 /** The service of `RESOURCE` */
 const SERVICE = 'aws-some';
@@ -535,6 +535,127 @@ describe('CDK code breaks', () => {
     expect(changelogLines()).toEqual([
       `${SERVICE}: ${RESOURCE}: Value property type changed from Array<string> | boolean to Array<string>.`,
     ]);
+  });
+
+  test('a list in a union whose element type gains a member is not listed', () => {
+    both(
+      { properties: { Value: { anyOf: [{ type: 'array', items: { type: 'boolean' } }, str()] } } },
+      {
+        properties: {
+          Value: { anyOf: [{ type: 'array', items: { anyOf: [{ type: 'boolean' }, { type: 'number' }] } }, str()] },
+        },
+      },
+    );
+
+    expect(compareL1(base, head).other.map((c) => c.description)).toEqual([
+      'type changed from Array<boolean> | string to Array<boolean | number> | string',
+    ]);
+    expect(changelogLines()).toEqual([NO_CHANGES]);
+  });
+
+  test('a list that becomes a union with a wider list is not listed', () => {
+    both(
+      { properties: { Value: { type: 'array', items: { type: 'boolean' } } } },
+      {
+        properties: {
+          Value: { anyOf: [{ type: 'array', items: { anyOf: [{ type: 'boolean' }, { type: 'number' }] } }, str()] },
+        },
+      },
+    );
+
+    expect(compareL1(base, head).other.map((c) => c.description)).toEqual([
+      'type changed from Array<boolean> to Array<boolean | number> | string',
+    ]);
+    expect(changelogLines()).toEqual([NO_CHANGES]);
+  });
+
+  test('a map in a union whose value type gains a member is not listed', () => {
+    both(
+      { properties: { Value: { anyOf: [{ type: 'object', additionalProperties: { type: 'boolean' } }, str()] } } },
+      {
+        properties: {
+          Value: {
+            anyOf: [
+              { type: 'object', additionalProperties: { anyOf: [{ type: 'boolean' }, { type: 'number' }] } },
+              str(),
+            ],
+          },
+        },
+      },
+    );
+
+    expect(compareL1(base, head).other.map((c) => c.description)).toEqual([
+      'type changed from Map<string, boolean> | string to Map<string, boolean | number> | string',
+    ]);
+    expect(changelogLines()).toEqual([NO_CHANGES]);
+  });
+
+  test('a struct that becomes a union with json is not listed', () => {
+    both(
+      { properties: { Value: ref('Foo'), Other: ref('Foo') }, definitions: { Foo: object({ Name: str() }) } },
+      {
+        properties: { Value: { anyOf: [{}, str()] }, Other: ref('Foo') },
+        definitions: { Foo: object({ Name: str() }) },
+      },
+    );
+
+    expect(compareL1(base, head).other.map((c) => c.description)).toEqual(['type changed from Foo to json | string']);
+    expect(changelogLines()).toEqual([NO_CHANGES]);
+  });
+
+  test('a list in a union whose element type loses a member is listed', () => {
+    both(
+      {
+        properties: {
+          Value: { anyOf: [{ type: 'array', items: { anyOf: [{ type: 'boolean' }, { type: 'number' }] } }, str()] },
+        },
+      },
+      { properties: { Value: { anyOf: [{ type: 'array', items: { type: 'boolean' } }, str()] } } },
+    );
+
+    expect(changelogLines()).toEqual([
+      `${SERVICE}: ${RESOURCE}: Value property type changed from Array<boolean | number> | string to Array<boolean> | string.`,
+    ]);
+  });
+
+  test('a rendered type change is listed unless the new type accepts every value of the old one', () => {
+    const list = (items: jsonschema.Schema): jsonschema.Schema => ({ type: 'array', items });
+    const map = (values: jsonschema.Schema): jsonschema.Schema => ({ type: 'object', additionalProperties: values });
+    const bool = (): jsonschema.Schema => ({ type: 'boolean' });
+    const num = (): jsonschema.Schema => ({ type: 'number' });
+    const json = (): jsonschema.Schema => ({});
+    const anyOf = (...types: jsonschema.Schema[]): jsonschema.Schema => ({ anyOf: types });
+    // Property, schema before, schema after, whether the change is listed
+    const cases: Array<[string, () => jsonschema.Schema, () => jsonschema.Schema, boolean]> = [
+      ['StringToJson', str, json, false],
+      ['StringToUnion', str, () => anyOf(bool(), str()), false],
+      ['ListToWiderList', () => list(str()), () => list(anyOf(bool(), str())), false],
+      ['UnionToWiderUnion', () => anyOf(list(str()), bool()), () => anyOf(list(str()), bool(), num()), false],
+      ['MapToWiderMap', () => map(str()), () => map(anyOf(num(), str())), false],
+      ['NestedListToWiderList', () => list(list(str())), () => list(list(anyOf(bool(), str()))), false],
+      ['MapToJson', () => map(str()), json, false],
+      ['ListToListOfJson', () => list(str()), () => list(json()), false],
+      ['JsonToString', json, str, true],
+      ['NumberToString', num, str, true],
+      ['UnionToMember', () => anyOf(bool(), str()), str, true],
+      ['ListToNarrowerList', () => list(anyOf(bool(), str())), () => list(str()), true],
+      ['ListToMap', () => list(str()), () => map(str()), true],
+      ['MapToNarrowerMap', () => map(anyOf(num(), str())), () => map(str()), true],
+    ];
+    both(
+      { properties: Object.fromEntries(cases.map(([name, before]) => [name, before()])) },
+      { properties: Object.fromEntries(cases.map(([name, , after]) => [name, after()])) },
+    );
+
+    const changed = compareL1(base, head).other.map((c) => c.element);
+    expect(changed).toEqual(cases.map(([name]) => `property ${name}`).sort());
+    const listed = changelogLines().map((line) => /: (\w+) property type changed/.exec(line)?.[1]);
+    expect(listed).toEqual(
+      cases
+        .filter(([, , , breaks]) => breaks)
+        .map(([name]) => name)
+        .sort(),
+    );
   });
 });
 
