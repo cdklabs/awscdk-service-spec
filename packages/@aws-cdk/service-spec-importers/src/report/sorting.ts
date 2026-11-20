@@ -25,3 +25,8 @@ export function sortKeyComparator<A>(keyFn: (x: A) => Array<string | number>) {
     return bk.length - ak.length;
   };
 }
+
+/** Order strings by UTF-16 code unit, the same on every machine, unlike `localeCompare` */
+export function compareByCodeUnit(a: string, b: string): number {
+  return a < b ? -1 : a > b ? 1 : 0;
+}
