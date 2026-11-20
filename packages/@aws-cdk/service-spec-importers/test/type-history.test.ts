@@ -898,6 +898,37 @@ describe('merged and split types that gain a field or no longer fit follow Cloud
     expect(settled(second)).toEqual(['rename P -> PY at property Pt2']);
     expect(history(resource(db).properties.Top)).toEqual(['NodeA']);
   });
+  test('a type whose positions change only between earlier rounds of a longer cycle is interdependent too', () => {
+    // S switches while PM.F counts, which drops PS.G; the split entry keeps V at PM only while PS.G counts, which
+    // keeps PM.F and PM.K. The rounds go around four sets, and W at PM.K is in both of the last two.
+    importRegistry(released, {
+      properties: { PM: ref('V'), PS: ref('S'), PC: ref('V') },
+      definitions: {
+        V: object({ Name: str(), F: ref('S'), K: ref('W') }),
+        S: object({ Name: str(), G: ref('V') }),
+        W: object({ Z: str() }),
+      },
+    });
+    importRegistry(db, {
+      properties: { PM: ref('VM'), PS: ref('SC'), PC: ref('VC') },
+      definitions: {
+        VM: object({ Name: str(), F: ref('SX'), K: ref('W') }),
+        SX: object({ Name: str(), NewS: str() }),
+        SC: object({ Name: str(), G: ref('VB') }),
+        VB: object({ Name: str(), F: str() }),
+        VC: object({ K: ref('W') }),
+        W: object({ Z: str() }),
+      },
+    });
+
+    const result = run([mapping({ resource: RESOURCE, oldType: 'V', newTypes: ['VM'], kind: 'split' })]);
+
+    expect(cases(result)).toEqual([
+      'interdependent S at property PM.F, property PS, property PS.G.F',
+      'interdependent V at property PC, property PM, property PS.G',
+      'interdependent W at property PC.K, property PM.K',
+    ]);
+  });
 
   describe('a merge or split whose positions need different fields, with nothing new, also follows CloudFormation', () => {
     // Released Shared {Url, Port}; CloudFormation keeps Shared {Url, Port} at First and renames Second to a type

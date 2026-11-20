@@ -464,7 +464,8 @@ class ResourceTypeHistory {
    */
   private decideAll(): Round {
     let active: ReadonlySet<Position> = new Set(this.positions);
-    const seen = new Set<string>([this.activeKey(active)]);
+    const sets = [active];
+    const seen = new Map<string, number>([[this.activeKey(active), 0]]);
     // `seen` ends every cycle; the bound only stops rounds that change without repeating, which no known input does
     const maxRounds = this.positions.length + 1;
     for (let i = 0; i < maxRounds; i++) {
@@ -474,16 +475,18 @@ class ResourceTypeHistory {
       if (key === this.activeKey(active)) {
         return round;
       }
-      if (seen.has(key)) {
-        return this.decideInterdependent(round, next);
+      const cycleStart = seen.get(key);
+      if (cycleStart !== undefined) {
+        return this.decideInterdependent(sets.slice(cycleStart));
       }
-      seen.add(key);
+      seen.set(key, sets.length);
+      sets.push(next);
       active = next;
     }
     // The rounds neither settled nor repeated within the bound: fail closed, as for a cycle
     const round = this.decideRound(active);
     const next = this.activeFromDecisions(round);
-    return this.activeKey(next) !== this.activeKey(active) ? this.decideInterdependent(round, next) : round;
+    return this.activeKey(next) !== this.activeKey(active) ? this.decideInterdependent([active, next]) : round;
   }
 
   private decideRound(active: ReadonlySet<Position>): Round {
@@ -520,15 +523,17 @@ class ResourceTypeHistory {
   }
 
   /**
-   * Decide on the positions of both rounds, leaving each released type whose positions differ between them undecided
+   * Decide on the positions of every set of a cycle, leaving each released type whose positions differ among them
+   * undecided
    */
-  private decideInterdependent(round: Round, next: ReadonlySet<Position>): Round {
-    const changed = new Set([...next, ...round.active].filter((p) => next.has(p) !== round.active.has(p)));
-    const both = this.decideRound(new Set([...next, ...round.active]));
-    const decisions = new Map(both.decisions);
+  private decideInterdependent(cycle: Array<ReadonlySet<Position>>): Round {
+    const union = new Set(cycle.flatMap((active) => [...active]));
+    const changed = new Set([...union].filter((p) => !cycle.every((active) => active.has(p))));
+    const all = this.decideRound(union);
+    const decisions = new Map(all.decisions);
     for (const [releasedType, uses] of this.uses) {
       if (uses.some((u) => changed.has(u.position))) {
-        const activeUses = uses.filter((u) => both.active.has(u.position));
+        const activeUses = uses.filter((u) => all.active.has(u.position));
         const fields = releasedAnd(
           releasedType,
           activeUses.flatMap((u) => need(u)),
@@ -542,7 +547,7 @@ class ResourceTypeHistory {
         });
       }
     }
-    return this.withRenderedFields({ ...both, decisions });
+    return this.withRenderedFields({ ...all, decisions });
   }
 
   private activeKey(positions: ReadonlySet<Position>) {
