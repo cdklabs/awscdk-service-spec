@@ -39,6 +39,10 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
   });
   const resourceFailure = failure.in(resource.typeName);
 
+  // Type definitions whose properties are currently being converted. A recursive schema
+  // (A -> B -> A) must not re-enter a type that is still being filled in.
+  const typeDefinitionsInProgress = new Set<string>();
+
   recurseProperties(resource, resourceBuilder, resourceFailure);
 
   // AWS::CloudFront::ContinuousDeploymentPolicy recently introduced a change where they're marking deprecatedProperties
@@ -323,12 +327,17 @@ export function importCloudFormationRegistryResource(options: LoadCloudFormation
 
     // If the type has no props, it's not a RecordLikeObject and we don't need to recurse
     // @todo The type should probably also just be json since they are useless otherwise. Fix after this package is in use.
-    if (freshInSession) {
+    if (freshInSession && !typeDefinitionsInProgress.has(nameHint)) {
       if (schema.description) {
         typeDefinitionBuilder.setFields({ documentation: schema.description });
       }
       if (jsonschema.isRecordLikeObject(schema)) {
-        recurseProperties(schema, typeDefinitionBuilder, fail.in(`typedef ${nameHint}`));
+        typeDefinitionsInProgress.add(nameHint);
+        try {
+          recurseProperties(schema, typeDefinitionBuilder, fail.in(`typedef ${nameHint}`));
+        } finally {
+          typeDefinitionsInProgress.delete(nameHint);
+        }
       }
     }
 
