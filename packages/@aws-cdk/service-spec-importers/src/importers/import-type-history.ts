@@ -16,9 +16,11 @@ import {
   isUnpaired,
   keepsMixinsFields,
   need,
+  neededTypes,
   ownerKey,
   Owner,
   Position,
+  positionsByField,
   pushTo,
   releasedAnd,
   reportInactive,
@@ -457,19 +459,43 @@ class ResourceTypeHistory {
   }
 
   /**
-   * Decide every released type in rounds, until the positions that count are those the decisions render
+   * Decide every released type in rounds. A kept type with a field whose positions need several types (`neededTypes()`)
+   * then follows CloudFormation, and the rounds start again.
+   */
+  private decideAll(): Round {
+    // The types that follow CloudFormation for that reason; the set only grows, so the loop ends
+    const forced = new Set<TypeDefinition>();
+    for (;;) {
+      const round = this.decideRounds(forced);
+      const found = this.keptWithSeveralTypes(round).filter((t) => !forced.has(t));
+      if (found.length === 0) {
+        return round;
+      }
+      found.forEach((t) => forced.add(t));
+    }
+  }
+
+  private keptWithSeveralTypes(round: Round): TypeDefinition[] {
+    return [...positionsByField(this.positions, round).values()]
+      .filter((positions) => neededTypes(this.db, round, positions).length > 1)
+      .map((positions) => positions[0].owner.parent)
+      .filter((parent): parent is TypeDefinition => !!parent && round.decisions.get(parent)?.kind === 'kept');
+  }
+
+  /**
+   * Decide in rounds until the positions that count are those the decisions render
    *
    * Each round counts again from all positions, so a position left out under one round can count in the next. Rounds
    * that come back to an earlier set without settling leave the types whose positions changed undecided.
    */
-  private decideAll(): Round {
+  private decideRounds(forced: ReadonlySet<TypeDefinition>): Round {
     let active: ReadonlySet<Position> = new Set(this.positions);
     const sets = [active];
     const seen = new Map<string, number>([[this.activeKey(active), 0]]);
     // `seen` ends every cycle; the bound only stops rounds that change without repeating, which no known input does
     const maxRounds = this.positions.length + 1;
     for (let i = 0; i < maxRounds; i++) {
-      const round = this.decideRound(active);
+      const round = this.decideRound(active, forced);
       const next = this.activeFromDecisions(round);
       const key = this.activeKey(next);
       if (key === this.activeKey(active)) {
@@ -477,20 +503,20 @@ class ResourceTypeHistory {
       }
       const cycleStart = seen.get(key);
       if (cycleStart !== undefined) {
-        return this.decideInterdependent(sets.slice(cycleStart));
+        return this.decideInterdependent(sets.slice(cycleStart), forced);
       }
       seen.set(key, sets.length);
       sets.push(next);
       active = next;
     }
     // The rounds neither settled nor repeated within the bound: fail closed, as for a cycle
-    const round = this.decideRound(active);
+    const round = this.decideRound(active, forced);
     const next = this.activeFromDecisions(round);
-    return this.activeKey(next) !== this.activeKey(active) ? this.decideInterdependent([active, next]) : round;
+    return this.activeKey(next) !== this.activeKey(active) ? this.decideInterdependent([active, next], forced) : round;
   }
 
-  private decideRound(active: ReadonlySet<Position>): Round {
-    const { mergeTargets, switched } = this.findMergesAndSplits(active);
+  private decideRound(active: ReadonlySet<Position>, forced: ReadonlySet<TypeDefinition>): Round {
+    const { mergeTargets, switched } = this.findMergesAndSplits(active, forced);
     const decisions = new Map<TypeDefinition, Decision>();
     for (const [releasedType, uses] of this.uses) {
       const activeUses = uses.filter((u) => active.has(u.position));
@@ -526,10 +552,10 @@ class ResourceTypeHistory {
    * Decide on the positions of every set of a cycle, leaving each released type whose positions differ among them
    * undecided
    */
-  private decideInterdependent(cycle: Array<ReadonlySet<Position>>): Round {
+  private decideInterdependent(cycle: Array<ReadonlySet<Position>>, forced: ReadonlySet<TypeDefinition>): Round {
     const union = new Set(cycle.flatMap((active) => [...active]));
     const changed = new Set([...union].filter((p) => !cycle.every((active) => active.has(p))));
-    const all = this.decideRound(union);
+    const all = this.decideRound(union, forced);
     const decisions = new Map(all.decisions);
     for (const [releasedType, uses] of this.uses) {
       if (uses.some((u) => changed.has(u.position))) {
@@ -599,7 +625,7 @@ class ResourceTypeHistory {
    * The rule skips a type that an entry decides or that has an unpaired use. Such a type still switches the others of
    * its merge when the merged type has a field it lacks, but not when its own positions need different fields.
    */
-  private findMergesAndSplits(active: ReadonlySet<Position>) {
+  private findMergesAndSplits(active: ReadonlySet<Position>, forced: ReadonlySet<TypeDefinition>) {
     const usesOf = new Map<TypeDefinition, Use[]>();
     const typesAt = new Map<TypeDefinition, TypeDefinition[]>();
     const mergedInto = new Map<TypeDefinition, TypeDefinition[]>();
@@ -628,7 +654,8 @@ class ResourceTypeHistory {
     const switched = new Set<TypeDefinition>();
     for (const [releasedType, types] of typesAt) {
       const gains = types.some((t) => hasNewField(releasedType, t));
-      if (types.length > 1 && byRule(releasedType) && (gains || needsDiffer(releasedType))) {
+      const splits = types.length > 1 && (gains || needsDiffer(releasedType));
+      if (byRule(releasedType) && (splits || forced.has(releasedType))) {
         switched.add(releasedType);
       }
     }
