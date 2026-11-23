@@ -103,9 +103,14 @@ class TypeHistoryApplier {
           const atPositions = deciding.map((u) => this.fieldAt(u, name));
           // CloudFormation says nothing about a field its types do not reach, so the release decides there
           const releasedRequired = !!releasedType.properties[name]?.required;
-          const given = atPositions
-            .filter(isDefined)
-            .sort((a, b) => compareByCodeUnit(historyKey(this.db, a), historyKey(this.db, b)));
+          // Equal types take the details of the first position by path
+          const given = deciding
+            .flatMap((u, i) => {
+              const field = atPositions[i];
+              return field ? [{ field, key: [historyKey(this.db, field), u.position.label, detailsKey(field)] }] : [];
+            })
+            .sort((a, b) => compareKeys(a.key, b.key))
+            .map((p) => p.field);
           // A field the release lacks renders the type of its positions, so they must agree, unless the gate fails anyway
           if (!releasedType.properties[name] && decision.kind !== 'undecided') {
             const needed = unique(given.map((f) => renderType(this.db, renderedFieldType(f)))).sort(compareByCodeUnit);
@@ -175,8 +180,14 @@ class TypeHistoryApplier {
             'its positions, which one kept field cannot hold',
         );
       }
+      // Types that render alike can still differ, like the order of a union's members, so the first by code unit
       const following =
-        types.length === 1 ? positions.find((p) => p.uses.some((u) => followsIn(this.round, u))) : undefined;
+        types.length === 1
+          ? positions
+              .filter((p) => p.uses.some((u) => followsIn(this.round, u)))
+              .map((p) => ({ p, key: new RichPropertyType(p.cfnType).stringify(this.db, false) }))
+              .sort((a, b) => compareByCodeUnit(a.key, b.key))[0]?.p
+          : undefined;
       if (field) {
         this.updateHistory(field, positions[0].releasedField, positions, following);
       }
@@ -362,4 +373,25 @@ function historyKey(db: SpecDatabase, field: Field) {
     .reverse()
     .map((t) => new RichPropertyType(t).stringify(db, false))
     .join(' <- ');
+}
+
+/** A sort key of everything but a field's types, which `historyKey` covers */
+function detailsKey(field: Field) {
+  const { type: _type, previousTypes: _previousTypes, ...details } = field;
+  return JSON.stringify(details, (_key, value) =>
+    value && typeof value === 'object' && !Array.isArray(value)
+      ? Object.fromEntries(Object.entries(value).sort(([a], [b]) => compareByCodeUnit(a, b)))
+      : value,
+  );
+}
+
+/** Order by the first key that differs */
+function compareKeys(a: string[], b: string[]) {
+  for (let i = 0; i < a.length; i++) {
+    const diff = compareByCodeUnit(a[i], b[i]);
+    if (diff !== 0) {
+      return diff;
+    }
+  }
+  return 0;
 }

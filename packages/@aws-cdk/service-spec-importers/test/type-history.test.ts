@@ -1571,6 +1571,108 @@ describe('the result does not depend on the input order or the locale', () => {
     expect(outputs).toEqual([['string<g1>'], ['string<g1>']]);
   });
 
+  test('a field that a kept type carries from positions of the same type takes the details of the first by path', () => {
+    const properties = { A: ref('PA'), B: ref('PB') };
+    const definitions = {
+      PA: object({ Name: str(), G: { type: 'string', description: 'doc at A' } }),
+      PB: object({ Name: str(), G: { type: 'string', description: 'another doc at B' } }),
+    };
+    const outputs = ORDERS.flatMap((releasedOrder) =>
+      permutations(Object.keys(properties)).flatMap((propertyOrder) =>
+        permutations(Object.keys(definitions)).map((definitionOrder) => {
+          runFresh(() => {
+            importRegistry(
+              released,
+              inOrder(releasedOrder, {
+                properties: { A: ref('P'), B: ref('P') },
+                definitions: { P: object({ Name: str() }) },
+              }),
+            );
+            importRegistry(db, {
+              properties: inKeyOrder(properties, propertyOrder),
+              definitions: inKeyOrder(definitions, definitionOrder),
+            });
+          }, [mapping({ resource: RESOURCE, oldType: 'P', newTypes: ['PA', 'PB'], kind: 'keep-old' })]);
+          const { G } = typeDefinition('P').properties;
+          return `${history(G).join(' <- ')}: ${G.documentation}`;
+        }),
+      ),
+    );
+    expect(outputs).toEqual(Array(8).fill('string: doc at A'));
+  });
+
+  test('a field that a kept type carries from two positions at one path takes the details first in code-unit order', () => {
+    // Both members of the union reach P at property Target.X
+    const target = (order: Order) => ({ anyOf: order === 'given' ? [ref('A'), ref('B')] : [ref('B'), ref('A')] });
+    const outputs = ORDERS.flatMap((releasedOrder) =>
+      ORDERS.map((order) => {
+        runFresh(() => {
+          importRegistry(
+            released,
+            inOrder(releasedOrder, {
+              properties: { Target: target(releasedOrder) },
+              definitions: {
+                A: object({ Arn: str(), X: ref('P') }),
+                B: object({ Url: str(), X: ref('P') }),
+                P: object({ Name: str() }),
+              },
+            }),
+          );
+          importRegistry(
+            db,
+            inOrder(order, {
+              properties: { Target: target(order) },
+              definitions: {
+                A: object({ Arn: str(), X: ref('PA') }),
+                B: object({ Url: str(), X: ref('PB') }),
+                PA: object({ Name: str(), G: { type: 'string', description: 'doc one' } }),
+                PB: object({ Name: str(), G: { type: 'string', description: 'doc two' } }),
+              },
+            }),
+          );
+        }, [mapping({ resource: RESOURCE, oldType: 'P', newTypes: ['PA', 'PB'], kind: 'keep-old' })]);
+        const { G } = typeDefinition('P').properties;
+        return `${history(G).join(' <- ')}: ${G.documentation}`;
+      }),
+    );
+    expect(outputs).toEqual(Array(4).fill('string: doc one'));
+  });
+
+  test('a kept field whose struct follows CloudFormation takes its type in code-unit order where the types render alike', () => {
+    // Q merges with R into QX, which gains a field, so Q follows CloudFormation at the kept P.F
+    const outputs = ORDERS.flatMap((releasedOrder) =>
+      ORDERS.map((order) => {
+        const result = runFresh(() => {
+          importRegistry(
+            released,
+            inOrder(releasedOrder, {
+              properties: { A: ref('P'), B: ref('P'), C: ref('R') },
+              definitions: {
+                P: object({ Name: str(), F: { anyOf: [ref('Q'), str()] } }),
+                Q: object({ X: str() }),
+                R: object({ X: str() }),
+              },
+            }),
+          );
+          importRegistry(
+            db,
+            inOrder(order, {
+              properties: { A: ref('PA'), B: ref('PB'), C: ref('QX') },
+              definitions: {
+                PA: object({ Name: str(), F: { anyOf: [str(), ref('QX')] } }),
+                PB: object({ Name: str(), F: { anyOf: [ref('QX'), str()] } }),
+                QX: object({ X: str(), New: str() }),
+              },
+            }),
+          );
+        });
+        expect(switched(result)).toEqual(['Q -> QX at property A.F, property B.F', 'R -> QX at property C']);
+        return history(typeDefinition('P').properties.F);
+      }),
+    );
+    expect(outputs).toEqual(Array(4).fill(['QX | string']));
+  });
+
   test('cases, their positions and type breaks are ordered by code unit, so upper case sorts before lower case', () => {
     // localeCompare sorts DevOps before DMS, and DevSettings before DMSSettings, in every locale
     for (const typeName of ['AWS::DevOps::R', 'AWS::DMS::R']) {
