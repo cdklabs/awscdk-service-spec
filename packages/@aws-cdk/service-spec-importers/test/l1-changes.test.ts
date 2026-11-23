@@ -1,7 +1,7 @@
 import { emptyDatabase, SpecDatabase } from '@aws-cdk/service-spec-types';
 import { importLegacySpec, importRegistry, object, ref, RESOURCE, str } from './utils';
 import { compareL1, formatL1Changes } from '../src/l1-changes';
-import { GeneratedPackage, L1View, renderType } from '../src/l1-view';
+import { GENERATED_PACKAGES, GeneratedPackage, L1View, renderType } from '../src/l1-view';
 import { CloudFormationRegistryResource, jsonschema } from '../src/types';
 
 let base: SpecDatabase;
@@ -136,7 +136,7 @@ test('removals, requiredness changes and other changes are reported by resource'
   ]);
   expect(formatL1Changes(changes)).toEqual(
     [
-      'L1 changes from the base database (what CDK renders): 0 renamed or merged structs, 2 removed, 2 requiredness changes, 1 other changes, 0 additions',
+      'L1 changes from the base database (what CDK renders): 0 renamed or merged structs, 2 removed, 2 requiredness changes, 1 other changes',
       '',
       'Removed:',
       `  ${RESOURCE}`,
@@ -243,6 +243,9 @@ test('a property renders its oldest type, and the later types of its history as 
   importRegistry(head, registry);
 
   // The base L1 has `settings: SettingsRequestProperty`, and also renders `SettingsProperty`
+  for (const pkg of GENERATED_PACKAGES) {
+    expect(renderedStructs(base, pkg)).toEqual(['Settings', 'SettingsRequest']);
+  }
   expect(compareL1(base, head)).toEqual({
     renames: [],
     removed: [{ resource: RESOURCE, element: 'struct SettingsRequest', description: 'no longer rendered' }],
@@ -254,8 +257,6 @@ test('a property renders its oldest type, and the later types of its history as 
         description: 'type changed from SettingsRequest to Array<Settings>',
       },
     ],
-    addedFields: [],
-    additions: 0,
   });
 });
 
@@ -278,6 +279,9 @@ test('a struct field renders its oldest type, and the structs of its later types
   importRegistry(head, registry);
 
   // The base L1 has `filter: FilterRequestProperty` and does not render `FilterProperty`
+  for (const pkg of GENERATED_PACKAGES) {
+    expect(renderedStructs(base, pkg)).toEqual(['FilterRequest', 'Pod']);
+  }
   expect(compareL1(base, head)).toEqual({
     renames: [],
     removed: [{ resource: RESOURCE, element: 'struct FilterRequest', description: 'no longer rendered' }],
@@ -289,8 +293,6 @@ test('a struct field renders its oldest type, and the structs of its later types
         description: 'type changed from FilterRequest to Array<Filter>',
       },
     ],
-    addedFields: [],
-    additions: 1,
   });
 });
 
@@ -309,8 +311,6 @@ test('an attribute renders its oldest type', () => {
     removed: [],
     requiredness: [],
     other: [{ resource: RESOURCE, element: 'attribute Revision', description: 'type changed from number to string' }],
-    addedFields: [],
-    additions: 0,
   });
 });
 
@@ -326,47 +326,26 @@ test('a struct that the legacy spec flags to render for backwards compatibility 
     removed: [{ resource: RESOURCE, element: 'struct Unused', description: 'no longer rendered' }],
     requiredness: [],
     other: [],
-    addedFields: [],
-    additions: 0,
   });
 });
 
-test('additions are counted and a database compared with itself has no changes', () => {
-  importRegistry(base, { properties: { Name: { type: 'string' } } });
-  importRegistry(head, {
-    properties: { Name: { type: 'string' }, Settings: { $ref: '#/definitions/Settings' } },
-    definitions: { Settings: object({ Url: { type: 'string' } }) },
-  });
-
-  expect(compareL1(base, head).additions).toBe(2);
-  expect(formatL1Changes(compareL1(base, base))).toEqual(
-    'L1 changes from the base database (what CDK renders): 0 renamed or merged structs, 0 removed, 0 requiredness changes, 0 other changes, 0 additions',
-  );
-});
-
-test('fields added to a struct that keeps its name are listed by name', () => {
+test('a database that only adds resources, properties, attributes, structs and fields has no L1 changes', () => {
   importRegistry(base, {
-    properties: { Settings: { $ref: '#/definitions/Settings' } },
-    definitions: { Settings: object({ Url: { type: 'string' } }) },
+    properties: { Settings: ref('Settings') },
+    definitions: { Settings: object({ Url: str() }) },
   });
   importRegistry(head, {
-    properties: { Settings: { $ref: '#/definitions/Settings' }, Name: { type: 'string' } },
-    definitions: { Settings: object({ Url: { type: 'string' }, Port: { type: 'integer' } }) },
+    properties: { Settings: ref('Settings'), Name: str(), Extra: ref('Extra'), Arn: str() },
+    definitions: { Settings: object({ Url: str(), Port: str() }), Extra: object({ Id: str() }) },
+    readOnlyProperties: ['/properties/Arn'],
   });
+  importRegistry(head, { properties: { Name: str() } }, 'AWS::Some::New');
+  const noChanges =
+    'L1 changes from the base database (what CDK renders): 0 renamed or merged structs, 0 removed, 0 requiredness changes, 0 other changes';
 
-  const changes = compareL1(base, head);
-
-  expect(changes.addedFields).toEqual([{ resource: RESOURCE, element: 'field Settings.Port', description: 'added' }]);
-  expect(changes.additions).toBe(2);
-  expect(formatL1Changes(changes)).toEqual(
-    [
-      'L1 changes from the base database (what CDK renders): 0 renamed or merged structs, 0 removed, 0 requiredness changes, 0 other changes, 2 additions',
-      '',
-      'Added fields:',
-      `  ${RESOURCE}`,
-      '    field Settings.Port',
-    ].join('\n'),
-  );
+  expect(compareL1(base, head)).toEqual({ renames: [], removed: [], requiredness: [], other: [] });
+  expect(formatL1Changes(compareL1(base, head))).toEqual(noChanges);
+  expect(formatL1Changes(compareL1(base, base))).toEqual(noChanges);
 });
 
 describe('tag properties render as the CDK code generator renders them', () => {
@@ -500,14 +479,14 @@ describe('tag properties render as the CDK code generator renders them', () => {
     expect(changes.renames).toEqual([]);
   });
 
-  test('the report shows a field added to a struct only the mixins render, which render every field optional', () => {
+  test('the report shows a field removed from a struct only the mixins render, which render every field optional', () => {
     importVersions(base, RESOURCE, tagList('TagEntry'), tagList('Tag'));
-    importVersions(head, RESOURCE, tagList('TagEntry', ['Key', 'Value', 'Owner'], ['Key']), tagList('Tag'));
+    importVersions(head, RESOURCE, tagList('TagEntry', ['Key'], ['Key']), tagList('Tag'));
 
     const changes = compareL1(base, head);
 
-    expect(changes.addedFields.map((c) => c.element)).toEqual(['field TagEntry.Owner']);
-    expect([...changes.renames, ...changes.removed, ...changes.requiredness, ...changes.other]).toEqual([]);
+    expect(changes.removed.map((c) => c.element)).toEqual(['field TagEntry.Value']);
+    expect([...changes.renames, ...changes.requiredness, ...changes.other]).toEqual([]);
   });
 
   test('the report leaves out the structs that no package renders', () => {
@@ -521,7 +500,7 @@ describe('tag properties render as the CDK code generator renders them', () => {
       head,
       LEGACY_UNTAGGED,
       untagged(tagList('TagEntry')),
-      untagged(tagList('TagEntryV2', ['Key', 'Value', 'Owner'], ['Key'])),
+      untagged(tagList('TagEntryV2', ['Key'], ['Key'])),
     );
 
     expect(compareL1(base, head)).toEqual({
@@ -529,8 +508,11 @@ describe('tag properties render as the CDK code generator renders them', () => {
       removed: [],
       requiredness: [],
       other: [],
-      addedFields: [],
-      additions: 0,
     });
   });
 });
+
+function renderedStructs(target: SpecDatabase, pkg: GeneratedPackage) {
+  const resource = target.lookup('resource', 'cloudFormationType', 'equals', RESOURCE).only();
+  return [...new L1View(target, resource, pkg).structs.keys()].sort();
+}

@@ -36,10 +36,6 @@ export interface L1Changes {
   readonly requiredness: L1Change[];
   /** Changed types */
   readonly other: L1Change[];
-  /** Fields added to a struct that keeps its name */
-  readonly addedFields: L1Change[];
-  /** The number of added resources, properties, attributes, structs and fields */
-  readonly additions: number;
 }
 
 /**
@@ -50,14 +46,7 @@ export interface L1Changes {
  * (what each renders: `L1View`), and a change in either package is listed once.
  */
 export function compareL1(base: SpecDatabase, head: SpecDatabase): L1Changes {
-  const changes: MutableL1Changes = {
-    renames: [],
-    removed: [],
-    requiredness: [],
-    other: [],
-    addedFields: [],
-    additions: 0,
-  };
+  const changes: L1Changes = { renames: [], removed: [], requiredness: [], other: [] };
 
   for (const baseResource of base.all('resource')) {
     const found = head.lookup('resource', 'cloudFormationType', 'equals', baseResource.cloudFormationType);
@@ -69,11 +58,6 @@ export function compareL1(base: SpecDatabase, head: SpecDatabase): L1Changes {
       new ResourceComparison(new L1View(base, baseResource, pkg), new L1View(head, found.only(), pkg)).compare(),
     );
     addResourceChanges(changes, perPackage);
-  }
-  for (const resource of head.all('resource')) {
-    if (base.lookup('resource', 'cloudFormationType', 'equals', resource.cloudFormationType).length === 0) {
-      changes.additions += 1;
-    }
   }
 
   const byElement = (a: L1Change, b: L1Change) =>
@@ -87,7 +71,6 @@ export function compareL1(base: SpecDatabase, head: SpecDatabase): L1Changes {
   changes.removed.sort(byElement);
   changes.requiredness.sort(byElement);
   changes.other.sort(byElement);
-  changes.addedFields.sort(byElement);
   return changes;
 }
 
@@ -99,8 +82,7 @@ export function formatL1Changes(changes: L1Changes): string {
       `${changes.renames.length} renamed or merged structs,`,
       `${changes.removed.length} removed,`,
       `${changes.requiredness.length} requiredness changes,`,
-      `${changes.other.length} other changes,`,
-      `${changes.additions} additions`,
+      `${changes.other.length} other changes`,
     ].join(' '),
   ];
 
@@ -140,31 +122,16 @@ export function formatL1Changes(changes: L1Changes): string {
   section('Removed:', changes.removed, false);
   section('Requiredness changes:', changes.requiredness, true);
   section('Other changes:', changes.other, true);
-  section('Added fields:', changes.addedFields, false);
 
   return lines.join('\n');
 }
 
-type Mutable<T> = { -readonly [K in keyof T]: T[K] };
-type MutableL1Changes = Mutable<L1Changes>;
-
-/** One resource's changes in one package, with additions as keys so that an addition in both packages counts once */
-interface ResourceChanges extends Omit<L1Changes, 'additions'> {
-  readonly added: Set<string>;
-}
-
-const LISTED_CHANGES = ['removed', 'requiredness', 'other', 'addedFields'] as const;
+const LISTED_CHANGES = ['removed', 'requiredness', 'other'] as const;
 
 /** Add one resource's changes in each generated package to `changes`, each change once */
-function addResourceChanges(changes: MutableL1Changes, perPackage: ResourceChanges[]) {
+function addResourceChanges(changes: L1Changes, perPackage: L1Changes[]) {
   const renames = new Array<L1StructRename>();
-  const listed: Record<(typeof LISTED_CHANGES)[number], L1Change[]> = {
-    removed: [],
-    requiredness: [],
-    other: [],
-    addedFields: [],
-  };
-  const added = new Set<string>();
+  const listed: Record<(typeof LISTED_CHANGES)[number], L1Change[]> = { removed: [], requiredness: [], other: [] };
   for (const resourceChanges of perPackage) {
     const earlierRenames = [...renames];
     for (const rename of resourceChanges.renames) {
@@ -186,13 +153,11 @@ function addResourceChanges(changes: MutableL1Changes, perPackage: ResourceChang
         ),
       );
     }
-    resourceChanges.added.forEach((key) => added.add(key));
   }
   changes.renames.push(...renames);
   for (const kind of LISTED_CHANGES) {
     changes[kind].push(...listed[kind]);
   }
-  changes.additions += added.size;
 }
 
 interface StructPair {
@@ -222,20 +187,13 @@ class ResourceComparison {
   private readonly roots = new Array<{ readonly label: string; readonly key: string }>();
   /** The pairs at the fields of each pair */
   private readonly links = new Map<string, PairLink[]>();
-  private readonly changes: ResourceChanges = {
-    renames: [],
-    removed: [],
-    requiredness: [],
-    other: [],
-    addedFields: [],
-    added: new Set(),
-  };
+  private readonly changes: L1Changes = { renames: [], removed: [], requiredness: [], other: [] };
 
   constructor(private readonly base: L1View, private readonly head: L1View) {
     this.resourceType = base.resource.cloudFormationType;
   }
 
-  public compare(): ResourceChanges {
+  public compare(): L1Changes {
     for (const bag of ['properties', 'attributes'] as const) {
       for (const [name, baseField] of Object.entries(this.base[bag])) {
         const element = fieldLabel(bag, name);
@@ -248,9 +206,6 @@ class ResourceComparison {
           this.roots.push({ label: element, key }),
         );
         this.reportDifferences(element, differences);
-      }
-      for (const name of Object.keys(this.head[bag]).filter((n) => !this.base[bag][n])) {
-        this.changes.added.add(fieldLabel(bag, name));
       }
     }
 
@@ -272,9 +227,6 @@ class ResourceComparison {
       if (!this.head.structs.has(name) && !renamedFrom.has(name)) {
         this.report(this.changes.removed, `struct ${name}`, 'no longer rendered');
       }
-    }
-    for (const name of [...this.head.structs.keys()].filter((n) => !this.base.structs.has(n))) {
-      this.changes.added.add(`struct ${name}`);
     }
     return this.changes;
   }
@@ -419,8 +371,8 @@ class ResourceComparison {
         this.reportDifferences(element, differences);
       }
     }
-    const added = Object.keys(headFields).filter((name) => !baseFields[name]);
     if (renamed) {
+      const added = Object.keys(headFields).filter((name) => !baseFields[name]);
       fieldChanges.push(...added.map((name) => `${name} added`));
       this.changes.renames.push({
         resource: this.resourceType,
@@ -429,11 +381,6 @@ class ResourceComparison {
         positions: pair.positions,
         fieldChanges: fieldChanges.sort(),
       });
-    } else {
-      for (const name of added) {
-        this.changes.added.add(`field ${pair.key} ${name}`);
-        this.report(this.changes.addedFields, `field ${pair.head.name}.${name}`, 'added');
-      }
     }
   }
 
