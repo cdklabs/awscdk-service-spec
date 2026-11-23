@@ -145,7 +145,6 @@ export class DiffDb extends pj.Component {
             `if ! ${this.diffDb} --breaking-changes base/db.json.gz head/db.json.gz > BREAKING-CHANGES; then`,
             '  echo "The breaking change list failed, see the job log." > BREAKING-CHANGES',
             'fi',
-            'cat BREAKING-CHANGES',
           ].join('\n'),
         },
         pj.github.WorkflowSteps.uploadArtifact({
@@ -160,7 +159,8 @@ export class DiffDb extends pj.Component {
           name: 'Create PR.md',
           if: 'steps.diff-db.outputs.diff-result',
           env: {
-            // Bytes for all of PR.md; GitHub takes up to 262,144 bytes in a comment
+            // Bytes for PR.md: the model diff gets what the two reports leave of it, and the reports are never cut
+            // GitHub takes up to 262,144 bytes in a comment
             // @see https://github.com/dead-claudia/github-limits?tab=readme-ov-file#issue-comments
             DIFF_LIMIT: String(200_000),
             // Pass GitHub context through env vars instead of interpolating

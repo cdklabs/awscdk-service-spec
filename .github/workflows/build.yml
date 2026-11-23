@@ -157,7 +157,6 @@ jobs:
           if ! packages/@aws-cdk/service-spec-importers/bin/diff-db --breaking-changes base/db.json.gz head/db.json.gz > BREAKING-CHANGES; then
             echo "The breaking change list failed, see the job log." > BREAKING-CHANGES
           fi
-          cat BREAKING-CHANGES
       - name: Upload diff
         id: upload_diff
         if: steps.diff-db.outputs.diff-result
