@@ -173,7 +173,7 @@ packages/@aws-cdk/service-spec-importers/bin/diff-db --l1-changes sources/Releas
 ```
 
 It lists renamed and merged structs, removed resources, properties, attributes, fields and structs, requiredness
-changes, type changes, and the fields added to structs that keep their names. It compares what aws-cdk-lib and
+changes and type changes. It compares what aws-cdk-lib and
 `@aws-cdk/cfn-property-mixins` render, and lists a change in either once: the mixins render every field optional and
 no struct that is kept only for backwards compatibility, and they also render the structs of the oldest type of a
 modern tag property. The database diff comment on pull requests includes it. A renamed struct's positions are named
