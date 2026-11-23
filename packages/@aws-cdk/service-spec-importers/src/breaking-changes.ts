@@ -9,7 +9,6 @@ import {
 } from '@aws-cdk/service-spec-types';
 import { DbDiff } from './db-diff';
 import { compareL1, L1Changes, L1StructRename } from './l1-changes';
-import { compareByCodeUnit } from './report/sorting';
 
 /** The kinds of breaking change, in the order they are listed within a resource */
 export type BreakingChangeKind =
@@ -118,17 +117,24 @@ export function findBreakingChanges(
   }
 
   changes.push(...cdkCodeChanges(head, l1Changes));
-  const sortKey = (c: BreakingChange) => JSON.stringify([c.service, c.resource, c.kind, c.element, c.description]);
   changes.sort(
     (a, b) =>
-      compareByCodeUnit(a.service, b.service) ||
-      compareByCodeUnit(a.resource, b.resource) ||
+      a.service.localeCompare(b.service) ||
+      a.resource.localeCompare(b.resource) ||
       KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind) ||
-      compareByCodeUnit(a.element, b.element) ||
-      compareByCodeUnit(a.description, b.description),
+      a.element.localeCompare(b.element) ||
+      a.description.localeCompare(b.description),
   );
-  // A struct's change can also be found at a property of the same name that switched from it; equal ones sort together
-  return changes.filter((c, i) => i === 0 || sortKey(c) !== sortKey(changes[i - 1]));
+  // A struct's change can also be found at a property of the same name that switched from it
+  const seen = new Set<string>();
+  return changes.filter((c) => {
+    const key = JSON.stringify([c.service, c.resource, c.kind, c.element, c.description]);
+    if (seen.has(key)) {
+      return false;
+    }
+    seen.add(key);
+    return true;
+  });
 }
 
 /** The paragraph that starts the changelog text; aws-cdk's release tooling finds the L1 changes by its first words */

@@ -477,6 +477,32 @@ describe('CDK code breaks', () => {
     ]);
   });
 
+  test('a change found twice is listed once, also beside a change whose name sorts equal to it', () => {
+    // The same name, composed and decomposed: localeCompare finds them equal
+    const composed = 'Café'.normalize('NFC');
+    const decomposed = composed.normalize('NFD');
+    both(
+      {
+        properties: { Endpoint: ref('Endpoint'), Backup: ref('Endpoint') },
+        definitions: { Endpoint: object({ Url: str(), [composed]: str(), [decomposed]: str() }) },
+      },
+      {
+        properties: { Endpoint: ref('Address'), Backup: ref('Endpoint') },
+        definitions: { Endpoint: object({ Url: str() }), Address: object({ Url: str() }) },
+      },
+    );
+
+    expect(
+      changelogLines()
+        .map((line) => line.trimEnd())
+        .sort(),
+    ).toEqual([
+      `${SERVICE}: ${RESOURCE}: Endpoint type renamed to Address.`,
+      `${SERVICE}: ${RESOURCE}: Endpoint.${decomposed} property removed.`,
+      `${SERVICE}: ${RESOURCE}: Endpoint.${composed} property removed.`,
+    ]);
+  });
+
   test('a rendered type that changed is listed, for properties, fields and attributes', () => {
     both(
       {
@@ -836,17 +862,17 @@ describe('output', () => {
     ]);
   });
 
-  test('changes are ordered by code unit, so upper case sorts before lower case in every locale', () => {
-    for (const type of ['AWS::Some::Typea', 'AWS::Some::TypeB']) {
-      importRegistry(base, { properties: { Replicas: str(), ReplicaSpecification: str() } }, type);
+  test('changes are ordered alphabetically, with case compared last', () => {
+    for (const type of ['AWS::Some::TypeB', 'AWS::Some::Typea']) {
+      importRegistry(base, { properties: { ReplicaSpecification: str(), Replicas: str() } }, type);
       importRegistry(head, { properties: {} }, type);
     }
 
     expect(changelogLines()).toEqual([
-      `${SERVICE}: AWS::Some::TypeB: ReplicaSpecification property removed.  `,
-      `${SERVICE}: AWS::Some::TypeB: Replicas property removed.  `,
+      `${SERVICE}: AWS::Some::Typea: Replicas property removed.  `,
       `${SERVICE}: AWS::Some::Typea: ReplicaSpecification property removed.  `,
-      `${SERVICE}: AWS::Some::Typea: Replicas property removed.`,
+      `${SERVICE}: AWS::Some::TypeB: Replicas property removed.  `,
+      `${SERVICE}: AWS::Some::TypeB: ReplicaSpecification property removed.`,
     ]);
   });
 });
