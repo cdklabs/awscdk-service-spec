@@ -1823,9 +1823,8 @@ describe('a kept struct below a list or map change', () => {
     expect(cases(result)).toEqual([]);
     expect(history(resource(db).properties.Settings)).toEqual(['Settings', 'Array<Settings>']);
     expect(fields('Settings')).toEqual({ Url: 'string', Mode: 'string (required)' });
-    const changes = compareL1(released, db);
-    expect(changes.addedFields.map((c) => c.element)).toEqual(['field Settings.Mode']);
-    expect(changes.removed.map((c) => c.element)).toEqual(['field Settings.Port']);
+    expect(canonicalL1()).toContain('Settings { Mode: string (required); Url: string }');
+    expect(compareL1(released, db).removed.map((c) => c.element)).toEqual(['field Settings.Port']);
   });
 
   test('takes the fields of the struct CloudFormation took out of a list', () => {
@@ -1891,9 +1890,8 @@ describe('a kept struct below a list or map change', () => {
     expect(cases(result)).toEqual([]);
     expect(history(resource(db).properties.Settings)[0]).toEqual('Settings');
     expect(fields('Settings')).toEqual({ Url: 'string', Port: 'integer', Mode: 'string (required)' });
-    const changes = compareL1(released, db);
-    expect(changes.addedFields.map((c) => c.element)).toEqual(['field Settings.Mode']);
-    expect(changes.removed).toEqual([]);
+    expect(canonicalL1()).toContain('Settings { Mode: string (required); Port: integer; Url: string }');
+    expect(l1Changes()).toEqual([]);
   });
 
   test('keeps its released name when CloudFormation also renamed it', () => {
