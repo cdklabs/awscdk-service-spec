@@ -174,26 +174,26 @@ test('removed resources and attributes are listed by name', () => {
   );
 });
 
-test('changes are ordered by code unit, so upper case sorts before lower case in every locale', () => {
-  for (const resource of ['AWS::IoT::Thing', 'AWS::IVS::Channel']) {
+test('changes are ordered by resource, then by name, with case compared last', () => {
+  for (const resource of ['AWS::IVS::Channel', 'AWS::IoT::Thing']) {
     importRegistry(
       base,
       {
         properties: {
-          Replicas: str(),
           ReplicaSpecification: str(),
-          Address: ref('AddressRequest'),
+          Replicas: str(),
           Set: ref('SetRequest'),
+          Address: ref('AddressRequest'),
         },
-        definitions: { AddressRequest: object({ Name: str() }), SetRequest: object({ Name: str() }) },
+        definitions: { SetRequest: object({ Name: str() }), AddressRequest: object({ Name: str() }) },
       },
       resource,
     );
     importRegistry(
       head,
       {
-        properties: { Address: ref('IpAddress'), Set: ref('IPSet') },
-        definitions: { IpAddress: object({ Name: str() }), IPSet: object({ Name: str() }) },
+        properties: { Set: ref('IPSet'), Address: ref('IpAddress') },
+        definitions: { IPSet: object({ Name: str() }), IpAddress: object({ Name: str() }) },
       },
       resource,
     );
@@ -202,16 +202,16 @@ test('changes are ordered by code unit, so upper case sorts before lower case in
   const changes = compareL1(base, head);
 
   expect(changes.removed.map((c) => `${c.resource} ${c.element}`)).toEqual([
-    'AWS::IVS::Channel property ReplicaSpecification',
-    'AWS::IVS::Channel property Replicas',
-    'AWS::IoT::Thing property ReplicaSpecification',
     'AWS::IoT::Thing property Replicas',
+    'AWS::IoT::Thing property ReplicaSpecification',
+    'AWS::IVS::Channel property Replicas',
+    'AWS::IVS::Channel property ReplicaSpecification',
   ]);
   expect(changes.renames.map((r) => `${r.resource} ${r.to}`)).toEqual([
-    'AWS::IVS::Channel IPSet',
-    'AWS::IVS::Channel IpAddress',
-    'AWS::IoT::Thing IPSet',
     'AWS::IoT::Thing IpAddress',
+    'AWS::IoT::Thing IPSet',
+    'AWS::IVS::Channel IpAddress',
+    'AWS::IVS::Channel IPSet',
   ]);
 });
 
