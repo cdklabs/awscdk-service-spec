@@ -138,6 +138,16 @@ export class DiffDb extends pj.Component {
             'cat L1-CHANGES',
           ].join('\n'),
         },
+        {
+          // Informational, as above
+          name: 'List breaking changes',
+          run: [
+            `if ! ${this.diffDb} --breaking-changes base/db.json.gz head/db.json.gz > BREAKING-CHANGES; then`,
+            '  echo "The breaking change list failed, see the job log." > BREAKING-CHANGES',
+            'fi',
+            'cat BREAKING-CHANGES',
+          ].join('\n'),
+        },
         pj.github.WorkflowSteps.uploadArtifact({
           name: 'Upload diff',
           if: 'steps.diff-db.outputs.diff-result',
@@ -150,7 +160,9 @@ export class DiffDb extends pj.Component {
           name: 'Create PR.md',
           if: 'steps.diff-db.outputs.diff-result',
           env: {
-            DIFF_LIMIT: String(200_000), // @see https://github.com/dead-claudia/github-limits?tab=readme-ov-file#pr-body
+            // Bytes for all of PR.md; GitHub takes up to 262,144 bytes in a comment
+            // @see https://github.com/dead-claudia/github-limits?tab=readme-ov-file#issue-comments
+            DIFF_LIMIT: String(200_000),
             // Pass GitHub context through env vars instead of interpolating
             // `${{ ... }}` expressions directly into the shell script (flagged by
             // cdklabs-projen-project-types' CheckGhaExpressions).
@@ -158,23 +170,29 @@ export class DiffDb extends pj.Component {
             RUN_ID: '${{ github.run_id }}',
           },
           run: [
-            'if [ $(wc -c < DIFF) -gt $DIFF_LIMIT ]; then',
-            '  echo "> [!WARNING]" >> PR.md',
-            '  echo "> Diff too large for inline display. Download the full diff using the link below." >> PR.md',
-            '  echo "" >> PR.md',
+            '{',
+            `  echo '**${this.serviceSpec.name}**: Model database diff detected'`,
+            "  echo '```'",
+            '  cat L1-CHANGES',
+            "  echo '```'",
+            "  echo '**Breaking changes** (changelog text):'",
+            "  echo '```'",
+            '  cat BREAKING-CHANGES',
+            "  echo '```'",
+            '  echo "[📁 Download full diff](https://github.com/${REPOSITORY}/actions/runs/${RUN_ID})"',
+            "  echo '```'",
+            '} > PR-PARTS',
+            "WARNING=$'> [!WARNING]\\n> Diff too large for inline display. Download the full diff using the link below.\\n\\n'",
+            "MARKER=$'\\n... (truncated)\\n'",
+            "FENCE=$'```\\n'",
+            '# Only the model diff is shortened, to what the limit leaves after the other parts',
+            'BUDGET=$(( DIFF_LIMIT - $(wc -c < PR-PARTS) - ${#FENCE} ))',
+            'if [ $(wc -c < DIFF) -le $BUDGET ]; then',
+            '  { cat PR-PARTS DIFF; printf %s "$FENCE"; } > PR.md',
+            'else',
+            '  BUDGET=$(( BUDGET - ${#WARNING} - ${#MARKER} ))',
+            '  { printf %s "$WARNING"; cat PR-PARTS; head -c $(( BUDGET > 0 ? BUDGET : 0 )) DIFF; printf %s "$MARKER$FENCE"; } > PR.md',
             'fi',
-            `echo '**${this.serviceSpec.name}**: Model database diff detected' >> PR.md`,
-            "echo '```' >> PR.md",
-            'cat L1-CHANGES >> PR.md',
-            "echo '```' >> PR.md",
-            'echo "[📁 Download full diff](https://github.com/${REPOSITORY}/actions/runs/${RUN_ID})" >> PR.md',
-            "echo '```' >> PR.md",
-            'head -c $DIFF_LIMIT DIFF >> PR.md',
-            'if [ $(wc -c < DIFF) -gt $DIFF_LIMIT ]; then',
-            '  echo "" >> PR.md',
-            '  echo "... (truncated)" >> PR.md',
-            'fi',
-            "echo '```' >> PR.md",
           ].join('\n'),
         },
         {
