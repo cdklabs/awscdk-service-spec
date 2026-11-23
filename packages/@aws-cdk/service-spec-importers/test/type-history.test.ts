@@ -2681,6 +2681,21 @@ describe('a modern tag property renders the newest type of its history, so its t
     expect(Object.keys(fields('PolicyTag'))).toEqual(['Key', 'Value']);
   });
 
+  test('the type breaks of several resources are listed by resource name, not in the order they were imported', () => {
+    // DMS is imported first, and DevOps sorts first alphabetically
+    for (const typeName of ['AWS::DMS::R', 'AWS::DevOps::R']) {
+      importRegistry(released, tagList('PolicyTag'), typeName);
+      importRegistry(db, tagList('PolicyTagV2'), typeName);
+    }
+
+    const result = run();
+
+    expect(result.tagBreaks.map((b) => `${b.resource} ${b.position}`)).toEqual([
+      'AWS::DevOps::R property Tags',
+      'AWS::DMS::R property Tags',
+    ]);
+  });
+
   test('a struct only the mixins render keeps its released fields where CloudFormation changed the tag type', () => {
     // The released L1 renders the newest type, CloudFormation's tags; the mixins also render TagEntry
     importRegistry(released, tagList('TagEntry'));
