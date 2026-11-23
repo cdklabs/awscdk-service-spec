@@ -1,6 +1,7 @@
 import { emptyDatabase, loadDatabase } from '@aws-cdk/service-spec-types';
 import { Command } from 'commander';
 import { CliError, handleFailure } from './util';
+import { findBreakingChanges, formatBreakingChanges } from '../breaking-changes';
 import { DbDiff } from '../db-diff';
 import { DiffFormatter } from '../diff-fmt';
 import { compareL1, formatL1Changes } from '../l1-changes';
@@ -19,16 +20,34 @@ async function main() {
       'Report the struct renames and merges, removals, requiredness changes and other changes in the L1 code CDK renders from <db1> and from <db2>, instead of the database differences',
       false,
     )
+    .option(
+      '--breaking-changes',
+      'Print the changelog text for the L1 pull request: the "CHANGES TO L1 RESOURCES" paragraph and one line for each change from <db1> to <db2> that can break existing CloudFormation templates or CDK code; with --l1-changes, after the L1 change report; with --json, the list of those changes',
+      false,
+    )
     .parse();
   const options = program.opts();
   const args = program.args;
 
-  if (options.l1Changes) {
+  if (options.l1Changes || options.breakingChanges) {
     if (!args[1]) {
-      throw new CliError('--l1-changes needs two databases: the base database and the new database');
+      const option = options.l1Changes ? '--l1-changes' : '--breaking-changes';
+      throw new CliError(`${option} needs two databases: the base database and the new database`);
     }
-    const changes = compareL1(await loadDatabase(args[0]), await loadDatabase(args[1]));
-    console.log(options.json ? JSON.stringify(changes, undefined, 2) : formatL1Changes(changes));
+    const [base, head] = [await loadDatabase(args[0]), await loadDatabase(args[1])];
+    const changes = compareL1(base, head);
+    if (!options.breakingChanges) {
+      console.log(options.json ? JSON.stringify(changes, undefined, 2) : formatL1Changes(changes));
+      return;
+    }
+    const breaking = findBreakingChanges(base, head, changes);
+    if (options.json) {
+      const output = options.l1Changes ? { ...changes, breakingChanges: breaking } : breaking;
+      console.log(JSON.stringify(output, undefined, 2));
+    } else {
+      const changelog = formatBreakingChanges(breaking);
+      console.log(options.l1Changes ? `${formatL1Changes(changes)}\n\n${changelog}` : changelog);
+    }
     return;
   }
 
