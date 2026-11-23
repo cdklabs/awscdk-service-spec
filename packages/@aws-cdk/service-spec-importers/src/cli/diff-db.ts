@@ -16,7 +16,7 @@ async function main() {
     .option('-j, --json', 'Output json', false)
     .option(
       '--l1-changes',
-      'Report the struct renames and merges, removals, requiredness changes, other changes and added fields in the L1 code CDK renders from <db1> and from <db2>, instead of the database differences',
+      'Report the struct renames and merges, removals, requiredness changes and other changes in the L1 code CDK renders from <db1> and from <db2>, instead of the database differences',
       false,
     )
     .parse();
