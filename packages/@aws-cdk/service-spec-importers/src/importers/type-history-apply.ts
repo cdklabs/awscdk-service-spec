@@ -27,7 +27,7 @@ import {
   Use,
 } from './type-history-model';
 import { renderedFieldType, renderType } from '../l1-view';
-import { compareByCodeUnit } from '../report/sorting';
+import { sortKeyComparator } from '../report/sorting';
 
 export interface TypeHistoryApplyContext {
   /** The current sources, which the decisions are written into */
@@ -109,11 +109,13 @@ class TypeHistoryApplier {
               const field = atPositions[i];
               return field ? [{ field, key: [historyKey(this.db, field), u.position.label, detailsKey(field)] }] : [];
             })
-            .sort((a, b) => compareKeys(a.key, b.key))
+            .sort(sortKeyComparator((p) => p.key))
             .map((p) => p.field);
           // A field the release lacks renders the type of its positions, so they must agree, unless the gate fails anyway
           if (!releasedType.properties[name] && decision.kind !== 'undecided') {
-            const needed = unique(given.map((f) => renderType(this.db, renderedFieldType(f)))).sort(compareByCodeUnit);
+            const needed = unique(given.map((f) => renderType(this.db, renderedFieldType(f)))).sort((a, b) =>
+              a.localeCompare(b),
+            );
             if (needed.length > 1) {
               throw new Error(
                 `${this.resource.cloudFormationType}: ${releasedType.name}.${name} needs ${needed.join(', ')} at ` +
@@ -174,19 +176,19 @@ class TypeHistoryApplier {
       const types = neededTypes(this.db, this.round, positions);
       // An undecided type fails the gate and keeps its released history
       if (types.length > 1 && this.round.decisions.get(owner.parent!)?.kind !== 'undecided') {
-        const needed = types.map((t) => t ?? 'its released type').sort(compareByCodeUnit);
+        const needed = types.map((t) => t ?? 'its released type').sort((a, b) => a.localeCompare(b));
         throw new Error(
           `${this.resource.cloudFormationType}: ${owner.parent!.name}.${owner.name} needs ${needed.join(', ')} at ` +
             'its positions, which one kept field cannot hold',
         );
       }
-      // Types that render alike can still differ, like the order of a union's members, so the first by code unit
+      // Types that render alike can still differ, like the order of a union's members, so the first by `stringify`
       const following =
         types.length === 1
           ? positions
               .filter((p) => p.uses.some((u) => followsIn(this.round, u)))
               .map((p) => ({ p, key: new RichPropertyType(p.cfnType).stringify(this.db, false) }))
-              .sort((a, b) => compareByCodeUnit(a.key, b.key))[0]?.p
+              .sort((a, b) => a.key.localeCompare(b.key))[0]?.p
           : undefined;
       if (field) {
         this.updateHistory(field, positions[0].releasedField, positions, following);
@@ -249,7 +251,7 @@ class TypeHistoryApplier {
     // In a fixed order, not the schema's
     const sorted = positions
       .map((p) => ({ ...p, key: historyKey(this.db, p.currentField) }))
-      .sort((a, b) => compareByCodeUnit(a.key, b.key));
+      .sort((a, b) => a.key.localeCompare(b.key));
     for (const p of sorted.filter((q) => !q.typeUnchanged)) {
       // A copy: updateType keeps the object it is given and writes a later equal type's allowed values into it
       rich.updateType(structuredClone(p.cfnType));
@@ -380,18 +382,7 @@ function detailsKey(field: Field) {
   const { type: _type, previousTypes: _previousTypes, ...details } = field;
   return JSON.stringify(details, (_key, value) =>
     value && typeof value === 'object' && !Array.isArray(value)
-      ? Object.fromEntries(Object.entries(value).sort(([a], [b]) => compareByCodeUnit(a, b)))
+      ? Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b)))
       : value,
   );
-}
-
-/** Order by the first key that differs */
-function compareKeys(a: string[], b: string[]) {
-  for (let i = 0; i < a.length; i++) {
-    const diff = compareByCodeUnit(a[i], b[i]);
-    if (diff !== 0) {
-      return diff;
-    }
-  }
-  return 0;
 }

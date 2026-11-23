@@ -2,7 +2,6 @@ import { Resource, RichTypedField, SpecDatabase, TypeDefinition } from '@aws-cdk
 import { Field, fieldKey, need, Position, reportInactive, Round, Use, unique } from './type-history-model';
 import { TypeHistoryResult, TypePosition, UndecidedKind } from './type-history-result';
 import { renderedPropertyTypes, renderType } from '../l1-view';
-import { compareByCodeUnit } from '../report/sorting';
 import { PR_PLACEHOLDER, REASON_PLACEHOLDER, TypeMapping, TypeMappingKind } from '../type-mappings';
 
 const MIXINS = '@aws-cdk/cfn-property-mixins';
@@ -170,7 +169,7 @@ class TypeHistoryReporter {
         fields: [...need(use)].sort(),
       });
     }
-    return [...positions.values()].sort((a, b) => compareByCodeUnit(a.position, b.position));
+    return [...positions.values()].sort((a, b) => a.position.localeCompare(b.position));
   }
 
   private proposals(releasedType: TypeDefinition, uses: Use[], kind: UndecidedKind): TypeMapping[] {

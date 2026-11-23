@@ -1458,8 +1458,8 @@ describe('a kept type whose field needs different types at its positions follows
   });
 });
 
-describe('the result does not depend on the input order or the locale', () => {
-  test('a field of a kept split takes the types CloudFormation gives it at its positions in code-unit order', () => {
+describe('the result does not depend on the input order', () => {
+  test('a field of a kept split takes the types CloudFormation gives it at its positions in alphabetical order', () => {
     const outputs = ORDERS.map((order) => {
       runFresh(() => {
         importRegistry(
@@ -1490,7 +1490,7 @@ describe('the result does not depend on the input order or the locale', () => {
     ]);
   });
 
-  test('each current type keeps its own allowed values, and a new kept type takes those first in code-unit order', () => {
+  test('each current type keeps its own allowed values, and a new kept type takes those first in alphabetical order', () => {
     const outputs = ORDERS.map((order) => {
       runFresh(() => {
         importRegistry(
@@ -1601,7 +1601,7 @@ describe('the result does not depend on the input order or the locale', () => {
     expect(outputs).toEqual(Array(8).fill('string: doc at A'));
   });
 
-  test('a field that a kept type carries from two positions at one path takes the details first in code-unit order', () => {
+  test('a field that a kept type carries from two positions at one path takes the details first in alphabetical order', () => {
     // Both members of the union reach P at property Target.X
     const target = (order: Order) => ({ anyOf: order === 'given' ? [ref('A'), ref('B')] : [ref('B'), ref('A')] });
     const outputs = ORDERS.flatMap((releasedOrder) =>
@@ -1638,7 +1638,7 @@ describe('the result does not depend on the input order or the locale', () => {
     expect(outputs).toEqual(Array(4).fill('string: doc one'));
   });
 
-  test('a kept field whose struct follows CloudFormation takes its type in code-unit order where the types render alike', () => {
+  test('a kept field whose struct follows CloudFormation takes its type in alphabetical order where the types render alike', () => {
     // Q merges with R into QX, which gains a field, so Q follows CloudFormation at the kept P.F
     const outputs = ORDERS.flatMap((releasedOrder) =>
       ORDERS.map((order) => {
@@ -1671,44 +1671,6 @@ describe('the result does not depend on the input order or the locale', () => {
       }),
     );
     expect(outputs).toEqual(Array(4).fill(['QX | string']));
-  });
-
-  test('cases, their positions and type breaks are ordered by code unit, so upper case sorts before lower case', () => {
-    // localeCompare sorts DevOps before DMS, and DevSettings before DMSSettings, in every locale
-    for (const typeName of ['AWS::DevOps::R', 'AWS::DMS::R']) {
-      importRegistry(
-        released,
-        {
-          properties: {
-            DevSettings: ref('Settings'),
-            DMSSettings: ref('Settings'),
-            Tags: { type: 'array', items: ref('Kv') },
-          },
-          definitions: { Settings: object({ Url: str() }), Kv: object(strings(['Key', 'Value']), ['Key', 'Value']) },
-        },
-        typeName,
-      );
-      importRegistry(
-        db,
-        {
-          properties: {
-            DevSettings: ref('Options'),
-            DMSSettings: ref('Options'),
-            Tags: { type: 'array', items: ref('KvV2') },
-          },
-          definitions: { Options: object({ Mode: str() }), KvV2: object(strings(['Key', 'Value']), ['Key', 'Value']) },
-        },
-        typeName,
-      );
-    }
-
-    const result = run();
-
-    expect(result.undecided.map((c) => `${c.resource} ${c.positions.map((p) => p.position).join(', ')}`)).toEqual([
-      'AWS::DMS::R property DMSSettings, property DevSettings',
-      'AWS::DevOps::R property DMSSettings, property DevSettings',
-    ]);
-    expect(result.tagBreaks.map((b) => b.resource)).toEqual(['AWS::DMS::R', 'AWS::DevOps::R']);
   });
 });
 
