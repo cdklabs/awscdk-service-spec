@@ -33,6 +33,10 @@ export class DiffDb extends pj.Component {
     return relative(this.project.outdir, path);
   }
 
+  private get diffDb() {
+    return this.path(this.importers.outdir + '/bin/diff-db');
+  }
+
   private uploadHeadDatabase() {
     this.workflow.file?.patch(
       pj.JsonPatch.add(
@@ -122,9 +126,17 @@ export class DiffDb extends pj.Component {
           name: 'Diff databases',
           id: 'diff-db',
           continueOnError: true,
-          run: `${this.path(
-            this.importers.outdir + '/bin/diff-db',
-          )} base/db.json.gz head/db.json.gz > DIFF || echo "diff-result=true" >> $GITHUB_OUTPUT`,
+          run: `${this.diffDb} base/db.json.gz head/db.json.gz > DIFF || echo "diff-result=true" >> $GITHUB_OUTPUT`,
+        },
+        {
+          // Informational: a failed report does not fail the job
+          name: 'Report L1 changes',
+          run: [
+            `if ! ${this.diffDb} --l1-changes base/db.json.gz head/db.json.gz > L1-CHANGES; then`,
+            '  echo "The L1 change report failed, see the job log." > L1-CHANGES',
+            'fi',
+            'cat L1-CHANGES',
+          ].join('\n'),
         },
         pj.github.WorkflowSteps.uploadArtifact({
           name: 'Upload diff',
@@ -152,6 +164,9 @@ export class DiffDb extends pj.Component {
             '  echo "" >> PR.md',
             'fi',
             `echo '**${this.serviceSpec.name}**: Model database diff detected' >> PR.md`,
+            "echo '```' >> PR.md",
+            'cat L1-CHANGES >> PR.md',
+            "echo '```' >> PR.md",
             'echo "[📁 Download full diff](https://github.com/${REPOSITORY}/actions/runs/${RUN_ID})" >> PR.md',
             "echo '```' >> PR.md",
             'head -c $DIFF_LIMIT DIFF >> PR.md',
