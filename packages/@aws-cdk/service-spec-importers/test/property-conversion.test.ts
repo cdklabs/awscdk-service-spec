@@ -1003,6 +1003,75 @@ test('oneOf containing a list of "required" properties and a required property',
   expect(Object.keys(resource.properties)).toContain('DataSourceConfiguration');
 });
 
+test('allOf containing only oneOf lists of "required" properties on a typed object', () => {
+  // Shape of AWS::SecurityAgent::AgentSpace ProviderResource
+  importCloudFormationRegistryResource({
+    db,
+    report,
+    resource: {
+      typeName: 'AWS::AllOf::Required',
+      description: 'Resource Type Description',
+      definitions: {
+        Repository: {
+          type: 'object',
+          properties: {
+            Name: { type: 'string' },
+          },
+        },
+        ProviderResource: {
+          type: 'object',
+          properties: {
+            GitHubRepository: { $ref: '#/definitions/Repository' },
+            GitLabRepository: { $ref: '#/definitions/Repository' },
+            GitHubCapabilities: { type: 'string' },
+            GitLabCapabilities: { type: 'string' },
+          },
+          allOf: [
+            { oneOf: [{ required: ['GitHubRepository'] }, { required: ['GitLabRepository'] }] },
+            { oneOf: [{ required: ['GitHubCapabilities'] }, { required: ['GitLabCapabilities'] }] },
+          ],
+          additionalProperties: false,
+        },
+        IntegratedResource: {
+          type: 'object',
+          properties: {
+            Integration: { type: 'string' },
+            ProviderResources: {
+              type: 'array',
+              items: { $ref: '#/definitions/ProviderResource' },
+            },
+          },
+          required: ['Integration', 'ProviderResources'],
+          additionalProperties: false,
+        },
+      },
+      properties: {
+        IntegratedResource: {
+          $ref: '#/definitions/IntegratedResource',
+        },
+      },
+    },
+  });
+
+  const resource = db.lookup('resource', 'cloudFormationType', 'equals', 'AWS::AllOf::Required').only();
+  const integrated = db.get(
+    'typeDefinition',
+    (resource.properties.IntegratedResource.type as DefinitionReference).reference.$ref,
+  );
+  expect(Object.keys(integrated.properties)).toEqual(['Integration', 'ProviderResources']);
+  expect(integrated.properties.ProviderResources.required).toBe(true);
+
+  const providerResources = integrated.properties.ProviderResources.type as ArrayType<DefinitionReference>;
+  expect(providerResources.type).toBe('array');
+  const providerResource = db.get('typeDefinition', providerResources.element.reference.$ref);
+  expect(Object.keys(providerResource.properties)).toEqual([
+    'GitHubRepository',
+    'GitLabRepository',
+    'GitHubCapabilities',
+    'GitLabCapabilities',
+  ]);
+});
+
 test('mix of oneOf and anyOf in one property', async () => {
   importCloudFormationRegistryResource({
     db,
