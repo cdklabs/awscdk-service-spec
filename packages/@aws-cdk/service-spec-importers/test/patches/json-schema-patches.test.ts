@@ -190,6 +190,47 @@ describe(canonicalizeTypeOperators, () => {
 
     expect(patchedObj).toEqual(obj);
   });
+
+  test('branch that partially overrides properties keeps the parent properties', () => {
+    // Shape of AWS::EventsV2::Subscriber InvokeConfiguration: the first anyOf branch only narrows
+    // one property, the second only adds a required field.
+    const obj = {
+      properties: {
+        InvokeConfiguration: {
+          type: 'object',
+          properties: {
+            TargetArn: { type: 'string', pattern: '^arn:' },
+            RoleArn: { type: 'string' },
+            LambdaParameters: { type: 'object', properties: { Qualifier: { type: 'string' } } },
+          },
+          required: ['TargetArn', 'RoleArn'],
+          anyOf: [
+            {
+              type: 'object',
+              properties: {
+                TargetArn: { minLength: 1 },
+              },
+            },
+            {
+              required: ['UniversalTargetParameters'],
+            },
+          ],
+        },
+      },
+    };
+
+    const patchedObj = patchObject(obj, canonicalizeTypeOperators('anyOf'));
+
+    const [narrowed, extraRequired] = patchedObj.properties.InvokeConfiguration.anyOf;
+    expect(narrowed.properties).toEqual({
+      TargetArn: { type: 'string', pattern: '^arn:', minLength: 1 },
+      RoleArn: { type: 'string' },
+      LambdaParameters: { type: 'object', properties: { Qualifier: { type: 'string' } } },
+    });
+    expect(narrowed.required).toEqual(['TargetArn', 'RoleArn']);
+    expect(extraRequired.properties).toEqual(obj.properties.InvokeConfiguration.properties);
+    expect(extraRequired.required).toEqual(['UniversalTargetParameters', 'TargetArn', 'RoleArn']);
+  });
 });
 
 describe(removeEmptyRequiredArray, () => {
